@@ -1,6 +1,9 @@
+import "./globals.css";
+
 export const metadata = {
-  title: "SCRIMED OS Hub",
-  description: "SCRIMED operating hub"
+  title: "SCRIMED | Healthcare Intelligence Platform",
+  description:
+    "SCRIMED is an AI-native healthcare intelligence platform for clinical workflows, automation, interoperability, and trust monitoring."
 };
 
 export default function RootLayout({
