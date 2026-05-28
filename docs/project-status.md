@@ -4,15 +4,19 @@ Updated: 2026-05-28
 
 ## Current Baseline
 
-The active `scrimed-site` baseline is now a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and the next execution step converted the placeholder root page into a serious SCRIMED platform homepage.
+The active `scrimed-site` baseline is now a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface.
 
 Current baseline includes:
 
 - Next.js App Router project structure
 - Root page at `/`
+- Platform page at `/platform`
+- Trust and Watchtower page at `/trust`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
 - Platform status endpoint at `/api/status`
+- Readiness endpoint at `/api/readiness`
+- Platform events endpoint at `/api/events`
 - Vercel deployment configuration
 - TypeScript configuration and Next.js environment references
 - GitHub Actions build workflow in `.github/workflows/ci.yml`
@@ -20,7 +24,9 @@ Current baseline includes:
 
 ## Deployment Status
 
-The latest `main` commit was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
+The latest prior `main` commit was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
+
+The newest changes add `/platform`, `/trust`, `/api/readiness`, and `/api/events`; these should be verified on Vercel after the current deployment completes.
 
 Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
 
@@ -44,15 +50,17 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added `/api/status` for module readiness metadata.
 - Added `tsconfig.json`, `next-env.d.ts`, and global styling to strengthen the Next.js foundation.
 - Added GitHub Actions CI for dependency installation and Next.js build verification.
-- Confirmed Vercel deployment success for the latest `main` state.
+- Confirmed Vercel deployment success for the initial strengthened `main` state.
+- Added `/platform` and `/trust` as first product detail surfaces.
+- Added `/api/readiness` and `/api/events` as stable foundation-level operational endpoints.
 
 ## Recommended Next Steps
 
-1. Confirm GitHub Actions is enabled for the repository and that the CI workflow runs on the next push or pull request.
-2. Define the stable route contract for readiness and events before adding `/api/readiness` and `/api/events`.
-3. Decide whether `scrimed-site` is the public marketing site, the product console, or both; split responsibilities if needed.
+1. Confirm Vercel success for the newest route expansion.
+2. Confirm GitHub Actions is enabled for the repository and that the CI workflow runs on the next push or pull request.
+3. Add dedicated module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower.
 4. Start the SCRIMED OS Hub implementation inside the Next.js app using intentional product modules rather than reviving stale branch code wholesale.
-5. Add deeper product pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower.
+5. Add data contracts for future clinical integrations before implementing FHIR, HL7, claims, or pricing connectors.
 
 ## Notes
 
