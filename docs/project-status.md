@@ -11,11 +11,14 @@ Current baseline includes:
 - Next.js App Router project structure
 - Root page at `/`
 - SCRIMED OS Hub console at `/hub`
+- Hub readiness console at `/hub/readiness`
+- Hub events console at `/hub/events`
 - Platform page at `/platform`
 - Integration contracts page at `/integrations`
 - Trust and Watchtower page at `/trust`
 - Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
 - Shared Hub model in `app/lib/scrimedHub.ts`
+- Shared Hub operations model in `app/lib/hubOperations.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
@@ -31,11 +34,11 @@ Current baseline includes:
 
 ## Deployment Status
 
-The latest `main` commit was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
+Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment on 2026-05-28.
+
+GitHub Actions build verification is configured, but workflow runs are not visible through the current connector. The local environment also does not have `gh`, so Actions logs could not be inspected from this session. Because Vercel is green, GitHub Actions is not treated as a product/deploy blocker right now; it remains a hardening item.
 
 Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
-
-GitHub Actions build verification is configured, but workflow runs are not visible through the current connector. The local environment also does not have `gh`, so Actions logs could not be inspected from this session.
 
 ## CI Failure Root Cause
 
@@ -78,14 +81,16 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added integration contracts for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing.
 - Added `/integrations` and `/api/contracts`, then wired contracts into Hub, readiness, and homepage surfaces.
 - Fixed the likely CI workflow failure caused by npm caching without a lockfile.
+- Added shared Hub operations data and backed `/api/readiness` and `/api/events` with it.
+- Added `/hub/readiness` and `/hub/events` console views.
 
 ## Recommended Next Steps
 
-1. Confirm GitHub Actions is enabled in repository settings and inspect the next CI run from the GitHub UI.
-2. Add a committed `package-lock.json` once npm is available locally or via a controlled CI-generated update.
-3. Re-enable npm caching after the lockfile exists.
-4. Add detailed contract pages for each future integration type.
-5. Add `/hub/readiness` and `/hub/events` console views using the existing readiness and event APIs.
+1. Use Vercel as the active deploy gate until GitHub Actions visibility is resolved.
+2. Confirm GitHub Actions is enabled in repository settings and inspect the next CI run from the GitHub UI.
+3. Add a committed `package-lock.json` once npm is available locally or via a controlled CI-generated update.
+4. Re-enable npm caching after the lockfile exists.
+5. Add detailed contract pages for each future integration type.
 
 ## Notes
 
