@@ -31,6 +31,7 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "OS Hub", value: "/hub" },
+  { label: "Quality", value: "/api/quality/gates" },
   { label: "Synthetic", value: "/api/synthetic/scenarios" },
   { label: "Contracts", value: "/api/contracts" }
 ];
@@ -47,6 +48,7 @@ export default function Home() {
           <div className="nav-links">
             <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
+            <a href="/quality">Quality</a>
             <a href="/synthetic">Synthetic</a>
             <a href="/integrations">Integrations</a>
             <a href="/trust">Trust</a>
