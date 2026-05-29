@@ -61,9 +61,10 @@ export const hubModules: HubModule[] = [
 
 export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
+  { name: "Quality gates", value: "managed bypass active", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
   { name: "Synthetic validation", value: "fixtures ready", tone: "good" },
-  { name: "Build verification", value: "CI workflow added", tone: "watch" },
+  { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
 ];
@@ -87,6 +88,7 @@ export const hubRoutes = [
   "/trust",
   "/integrations",
   "/synthetic",
+  "/quality",
   ...syntheticScenarios.map((scenario) => scenario.route),
   ...integrationContracts.map((contract) => contract.route),
   "/modules/clinical-copilot",
@@ -102,6 +104,7 @@ export const hubRoutes = [
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/synthetic/scenarios",
   ...syntheticRoutes.filter((route) => route.startsWith("/api/synthetic/")),
+  "/api/quality/gates",
   "/api/hub/summary"
 ];
 
