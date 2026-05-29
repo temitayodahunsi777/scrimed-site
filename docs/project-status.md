@@ -12,6 +12,7 @@ Current baseline includes:
 - Root page at `/`
 - Platform page at `/platform`
 - Trust and Watchtower page at `/trust`
+- Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
 - Platform status endpoint at `/api/status`
@@ -24,9 +25,9 @@ Current baseline includes:
 
 ## Deployment Status
 
-The latest prior `main` commit was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
+The latest prior `main` route expansion was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
 
-The newest changes add `/platform`, `/trust`, `/api/readiness`, and `/api/events`; these should be verified on Vercel after the current deployment completes.
+The newest changes add dedicated module pages and link them from `/platform`; these should be verified on Vercel after the current deployment completes.
 
 Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
 
@@ -53,14 +54,16 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Confirmed Vercel deployment success for the initial strengthened `main` state.
 - Added `/platform` and `/trust` as first product detail surfaces.
 - Added `/api/readiness` and `/api/events` as stable foundation-level operational endpoints.
+- Added dedicated pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower.
+- Linked module pages from `/platform` and exposed module routes from `/api/status`.
 
 ## Recommended Next Steps
 
-1. Confirm Vercel success for the newest route expansion.
+1. Confirm Vercel success for the newest module page expansion.
 2. Confirm GitHub Actions is enabled for the repository and that the CI workflow runs on the next push or pull request.
-3. Add dedicated module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower.
-4. Start the SCRIMED OS Hub implementation inside the Next.js app using intentional product modules rather than reviving stale branch code wholesale.
-5. Add data contracts for future clinical integrations before implementing FHIR, HL7, claims, or pricing connectors.
+3. Start the SCRIMED OS Hub implementation inside the Next.js app using intentional product modules rather than reviving stale branch code wholesale.
+4. Add data contracts for future clinical integrations before implementing FHIR, HL7, claims, or pricing connectors.
+5. Add a lightweight product console route once the OS Hub object model is defined.
 
 ## Notes
 
