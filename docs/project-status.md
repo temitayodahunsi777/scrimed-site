@@ -4,7 +4,7 @@ Updated: 2026-05-28
 
 ## Current Baseline
 
-The active `scrimed-site` baseline is now a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface with an initial OS Hub command layer.
+The active `scrimed-site` baseline is now a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface with an initial OS Hub command layer and integration contract boundary.
 
 Current baseline includes:
 
@@ -12,14 +12,17 @@ Current baseline includes:
 - Root page at `/`
 - SCRIMED OS Hub console at `/hub`
 - Platform page at `/platform`
+- Integration contracts page at `/integrations`
 - Trust and Watchtower page at `/trust`
 - Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
 - Shared Hub model in `app/lib/scrimedHub.ts`
+- Shared integration contract model in `app/lib/integrationContracts.ts`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
 - Platform status endpoint at `/api/status`
 - Readiness endpoint at `/api/readiness`
 - Platform events endpoint at `/api/events`
+- Integration contracts endpoint at `/api/contracts`
 - Hub summary endpoint at `/api/hub/summary`
 - Vercel deployment configuration
 - TypeScript configuration and Next.js environment references
@@ -28,9 +31,9 @@ Current baseline includes:
 
 ## Deployment Status
 
-The latest prior module-page expansion was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
+The latest prior OS Hub expansion was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
 
-The newest changes add the SCRIMED OS Hub console, shared Hub data model, and `/api/hub/summary`; these should be verified on Vercel after the current deployment completes.
+The newest changes add the integration contract model, `/integrations`, `/api/contracts`, and related Hub/readiness/homepage wiring. These should be verified on Vercel after the current deployment completes.
 
 Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
 
@@ -45,6 +48,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - CarePath AI for patient intake, triage, and navigation
 - TrialCore for clinical trial discovery and matching
 - Watchtower / TrustWatch for AI reliability, drift detection, and safety monitoring
+- Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 
 ## Completed Execution
 
@@ -61,13 +65,15 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Linked module pages from `/platform` and exposed module routes from `/api/status`.
 - Added the SCRIMED OS Hub data model, `/hub` console, and `/api/hub/summary` endpoint.
 - Wired homepage, status, and readiness surfaces to the Hub layer.
+- Added integration contracts for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing.
+- Added `/integrations` and `/api/contracts`, then wired contracts into Hub, readiness, and homepage surfaces.
 
 ## Recommended Next Steps
 
-1. Confirm Vercel success for the newest OS Hub expansion.
+1. Confirm Vercel success for the newest integration-contract expansion.
 2. Confirm GitHub Actions is enabled for the repository and that the CI workflow runs on the next push or pull request.
-3. Add data contracts for future clinical integrations before implementing FHIR, HL7, claims, or pricing connectors.
-4. Add a `/hub/readiness` or `/hub/events` console view after the Hub object model stabilizes.
+3. Add detailed contract pages for each future integration type.
+4. Add `/hub/readiness` and `/hub/events` console views using the existing readiness and event APIs.
 5. Add visual QA with browser screenshots once local package management is available.
 
 ## Notes
