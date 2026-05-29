@@ -31,8 +31,8 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "OS Hub", value: "/hub" },
-  { label: "Readiness", value: "/api/readiness" },
-  { label: "Events", value: "/api/events" }
+  { label: "Contracts", value: "/api/contracts" },
+  { label: "Readiness", value: "/api/readiness" }
 ];
 
 export default function Home() {
@@ -47,6 +47,7 @@ export default function Home() {
           <div className="nav-links">
             <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
+            <a href="/integrations">Integrations</a>
             <a href="/trust">Trust</a>
           </div>
         </nav>
@@ -60,7 +61,7 @@ export default function Home() {
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
               <a className="primary-action" href="/hub">Open OS Hub</a>
-              <a className="secondary-action" href="/platform">View platform</a>
+              <a className="secondary-action" href="/integrations">View contracts</a>
             </div>
           </div>
 
@@ -82,10 +83,10 @@ export default function Home() {
                 <span className="trace-dot" /> Watchtower monitoring active
               </div>
               <div>
-                <span className="trace-dot trace-dot-alt" /> Clinical workflow modules staged
+                <span className="trace-dot trace-dot-alt" /> Integration contracts defined
               </div>
               <div>
-                <span className="trace-dot trace-dot-muted" /> Interoperability layer in foundation phase
+                <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated
               </div>
             </div>
           </aside>
