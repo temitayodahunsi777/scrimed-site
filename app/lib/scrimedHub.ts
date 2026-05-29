@@ -60,6 +60,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
   { name: "Build verification", value: "CI workflow added", tone: "watch" },
+  { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
 ];
 
@@ -68,6 +69,7 @@ export const hubRoutes = [
   "/hub",
   "/platform",
   "/trust",
+  "/integrations",
   "/modules/clinical-copilot",
   "/modules/docutwin",
   "/modules/carepath-ai",
@@ -77,6 +79,7 @@ export const hubRoutes = [
   "/api/status",
   "/api/readiness",
   "/api/events",
+  "/api/contracts",
   "/api/hub/summary"
 ];
 
