@@ -30,7 +30,7 @@ const systemLayers = [
 
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
-  { label: "Baseline", value: "Next.js" },
+  { label: "OS Hub", value: "/hub" },
   { label: "Readiness", value: "/api/readiness" },
   { label: "Events", value: "/api/events" }
 ];
@@ -45,9 +45,9 @@ export default function Home() {
             <span>SCRIMED</span>
           </a>
           <div className="nav-links">
+            <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
             <a href="/trust">Trust</a>
-            <a href="#roadmap">Roadmap</a>
           </div>
         </nav>
 
@@ -59,8 +59,8 @@ export default function Home() {
               A modular platform for clinical decision support, workflow automation, healthcare data interoperability, and continuous trust monitoring across AI-enabled care systems.
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
-              <a className="primary-action" href="/platform">View platform</a>
-              <a className="secondary-action" href="/api/readiness">Readiness</a>
+              <a className="primary-action" href="/hub">Open OS Hub</a>
+              <a className="secondary-action" href="/platform">View platform</a>
             </div>
           </div>
 
