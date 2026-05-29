@@ -67,6 +67,8 @@ export const hubSignals: HubSignal[] = [
 export const hubRoutes = [
   "/",
   "/hub",
+  "/hub/readiness",
+  "/hub/events",
   "/platform",
   "/trust",
   "/integrations",
