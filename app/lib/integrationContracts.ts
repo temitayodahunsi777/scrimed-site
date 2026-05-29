@@ -56,6 +56,14 @@ export const integrationContracts: IntegrationContract[] = [
   }
 ];
 
+export function getContractSlug(contract: IntegrationContract) {
+  return contract.route.split("/").filter(Boolean).at(-1) ?? "";
+}
+
+export function getIntegrationContractBySlug(slug: string) {
+  return integrationContracts.find((contract) => getContractSlug(contract) === slug);
+}
+
 export function getIntegrationContractSummary() {
   const defined = integrationContracts.filter((contract) => contract.status === "contract-defined").length;
 
@@ -66,6 +74,6 @@ export function getIntegrationContractSummary() {
     defined,
     planned: integrationContracts.length - defined,
     contracts: integrationContracts,
-    updated: "2026-05-28"
+    updated: "2026-05-29"
   };
 }
