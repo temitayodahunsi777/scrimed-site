@@ -4,20 +4,23 @@ Updated: 2026-05-28
 
 ## Current Baseline
 
-The active `scrimed-site` baseline is now a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface.
+The active `scrimed-site` baseline is now a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface with an initial OS Hub command layer.
 
 Current baseline includes:
 
 - Next.js App Router project structure
 - Root page at `/`
+- SCRIMED OS Hub console at `/hub`
 - Platform page at `/platform`
 - Trust and Watchtower page at `/trust`
 - Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
+- Shared Hub model in `app/lib/scrimedHub.ts`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
 - Platform status endpoint at `/api/status`
 - Readiness endpoint at `/api/readiness`
 - Platform events endpoint at `/api/events`
+- Hub summary endpoint at `/api/hub/summary`
 - Vercel deployment configuration
 - TypeScript configuration and Next.js environment references
 - GitHub Actions build workflow in `.github/workflows/ci.yml`
@@ -25,9 +28,9 @@ Current baseline includes:
 
 ## Deployment Status
 
-The latest prior `main` route expansion was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
+The latest prior module-page expansion was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
 
-The newest changes add dedicated module pages and link them from `/platform`; these should be verified on Vercel after the current deployment completes.
+The newest changes add the SCRIMED OS Hub console, shared Hub data model, and `/api/hub/summary`; these should be verified on Vercel after the current deployment completes.
 
 Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
 
@@ -56,14 +59,16 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added `/api/readiness` and `/api/events` as stable foundation-level operational endpoints.
 - Added dedicated pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower.
 - Linked module pages from `/platform` and exposed module routes from `/api/status`.
+- Added the SCRIMED OS Hub data model, `/hub` console, and `/api/hub/summary` endpoint.
+- Wired homepage, status, and readiness surfaces to the Hub layer.
 
 ## Recommended Next Steps
 
-1. Confirm Vercel success for the newest module page expansion.
+1. Confirm Vercel success for the newest OS Hub expansion.
 2. Confirm GitHub Actions is enabled for the repository and that the CI workflow runs on the next push or pull request.
-3. Start the SCRIMED OS Hub implementation inside the Next.js app using intentional product modules rather than reviving stale branch code wholesale.
-4. Add data contracts for future clinical integrations before implementing FHIR, HL7, claims, or pricing connectors.
-5. Add a lightweight product console route once the OS Hub object model is defined.
+3. Add data contracts for future clinical integrations before implementing FHIR, HL7, claims, or pricing connectors.
+4. Add a `/hub/readiness` or `/hub/events` console view after the Hub object model stabilizes.
+5. Add visual QA with browser screenshots once local package management is available.
 
 ## Notes
 
