@@ -1,30 +1,35 @@
 const modules = [
   {
     name: "Clinical Copilot",
+    href: "/modules/clinical-copilot",
     maturity: "Design",
     users: "Clinicians and care teams",
     outcome: "Summarize patient context, surface decision support, and reduce documentation load."
   },
   {
     name: "DocuTwin",
+    href: "/modules/docutwin",
     maturity: "Design",
     users: "Clinical operations",
     outcome: "Turn structured and conversational inputs into governed documentation workflows."
   },
   {
     name: "CarePath AI",
+    href: "/modules/carepath-ai",
     maturity: "Design",
     users: "Patients, navigators, and intake teams",
     outcome: "Support intake, triage, routing, and care pathway coordination."
   },
   {
     name: "TrialCore",
+    href: "/modules/trialcore",
     maturity: "Design",
     users: "Research and trial operations",
     outcome: "Match patients to trial opportunities using structured eligibility signals."
   },
   {
     name: "Watchtower",
+    href: "/modules/watchtower",
     maturity: "Foundation",
     users: "Platform, safety, and compliance teams",
     outcome: "Monitor drift, regressions, latency, cost, traces, and trust signals."
@@ -51,7 +56,7 @@ export default function PlatformPage() {
               <h2>{module.name}</h2>
             </div>
             <p>{module.users}</p>
-            <strong>{module.outcome}</strong>
+            <a className="module-link" href={module.href}>{module.outcome}</a>
           </article>
         ))}
       </section>
