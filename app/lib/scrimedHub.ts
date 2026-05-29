@@ -1,4 +1,5 @@
 import { integrationContracts } from "./integrationContracts";
+import { syntheticScenarios } from "./syntheticClinical";
 
 export type HubModule = {
   name: string;
@@ -61,6 +62,7 @@ export const hubModules: HubModule[] = [
 export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
+  { name: "Synthetic validation", value: "fixtures ready", tone: "good" },
   { name: "Build verification", value: "CI workflow added", tone: "watch" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
@@ -71,6 +73,11 @@ const contractRoutes = integrationContracts.flatMap((contract) => [
   `/api${contract.route}`
 ]);
 
+const syntheticRoutes = syntheticScenarios.flatMap((scenario) => [
+  scenario.route,
+  `/api/synthetic/scenarios/${scenario.id}`
+]);
+
 export const hubRoutes = [
   "/",
   "/hub",
@@ -79,6 +86,8 @@ export const hubRoutes = [
   "/platform",
   "/trust",
   "/integrations",
+  "/synthetic",
+  ...syntheticScenarios.map((scenario) => scenario.route),
   ...integrationContracts.map((contract) => contract.route),
   "/modules/clinical-copilot",
   "/modules/docutwin",
@@ -91,6 +100,8 @@ export const hubRoutes = [
   "/api/events",
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
+  "/api/synthetic/scenarios",
+  ...syntheticRoutes.filter((route) => route.startsWith("/api/synthetic/")),
   "/api/hub/summary"
 ];
 
