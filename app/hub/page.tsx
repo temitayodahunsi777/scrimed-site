@@ -1,5 +1,23 @@
 import { getHubSummary, hubModules, hubSignals } from "../lib/scrimedHub";
 
+const consoleViews = [
+  {
+    name: "Readiness",
+    href: "/hub/readiness",
+    summary: "Review foundation checks, non-blocking watches, and gated clinical integrations."
+  },
+  {
+    name: "Events",
+    href: "/hub/events",
+    summary: "Track repository, product, operations, integration, and deployment milestones."
+  },
+  {
+    name: "Contracts",
+    href: "/integrations",
+    summary: "Inspect integration contracts before any live clinical data connector is implemented."
+  }
+];
+
 export default function HubPage() {
   const summary = getHubSummary();
 
@@ -31,6 +49,16 @@ export default function HubPage() {
           <span>Foundation</span>
           <strong>{summary.activeModules}</strong>
         </article>
+      </section>
+
+      <section className="section-band principle-grid" aria-label="Hub console views">
+        {consoleViews.map((view) => (
+          <article key={view.name}>
+            <h3>{view.name}</h3>
+            <p>{view.summary}</p>
+            <a className="module-link" href={view.href}>Open {view.name}</a>
+          </article>
+        ))}
       </section>
 
       <section className="section-band split-band">
