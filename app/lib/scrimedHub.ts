@@ -1,3 +1,5 @@
+import { integrationContracts } from "./integrationContracts";
+
 export type HubModule = {
   name: string;
   route: string;
@@ -64,6 +66,11 @@ export const hubSignals: HubSignal[] = [
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
 ];
 
+const contractRoutes = integrationContracts.flatMap((contract) => [
+  contract.route,
+  `/api${contract.route}`
+]);
+
 export const hubRoutes = [
   "/",
   "/hub",
@@ -72,6 +79,7 @@ export const hubRoutes = [
   "/platform",
   "/trust",
   "/integrations",
+  ...integrationContracts.map((contract) => contract.route),
   "/modules/clinical-copilot",
   "/modules/docutwin",
   "/modules/carepath-ai",
@@ -82,6 +90,7 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/contracts",
+  ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/hub/summary"
 ];
 
@@ -99,6 +108,6 @@ export function getHubSummary() {
     routes: hubRoutes,
     signals: hubSignals,
     modules: hubModules,
-    updated: "2026-05-28"
+    updated: "2026-05-29"
   };
 }
