@@ -7,6 +7,11 @@ const consoleViews = [
     summary: "Review foundation checks, non-blocking watches, and gated clinical integrations."
   },
   {
+    name: "Quality",
+    href: "/quality",
+    summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."
+  },
+  {
     name: "Events",
     href: "/hub/events",
     summary: "Track repository, product, operations, integration, and deployment milestones."
