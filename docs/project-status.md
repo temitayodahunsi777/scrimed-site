@@ -27,17 +27,27 @@ Current baseline includes:
 - Vercel deployment configuration
 - TypeScript configuration and Next.js environment references
 - GitHub Actions build workflow in `.github/workflows/ci.yml`
-- Runtime scripts for development, build, and start
+- Runtime scripts for development, type checking, build, and start
 
 ## Deployment Status
 
-The latest prior OS Hub expansion was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
-
-The newest changes add the integration contract model, `/integrations`, `/api/contracts`, and related Hub/readiness/homepage wiring. These should be verified on Vercel after the current deployment completes.
+The latest `main` commit was picked up by Vercel and reported success for the `scrimed-site` deployment on 2026-05-28.
 
 Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
 
-GitHub Actions build verification has been added, but no workflow run was visible immediately after the workflow file was introduced. If Actions is enabled, the next push or pull request to `main` should run the CI build.
+GitHub Actions build verification is configured, but workflow runs are not visible through the current connector. The local environment also does not have `gh`, so Actions logs could not be inspected from this session.
+
+## CI Failure Root Cause
+
+The CI workflow previously configured `actions/setup-node` with `cache: npm`, but the repository does not have a `package-lock.json`. That combination can fail before the install/build step because npm caching expects lockfile metadata.
+
+Fix applied:
+
+- Removed `cache: npm` from `.github/workflows/ci.yml`.
+- Kept `npm install` as the install command so the build does not require a committed lockfile yet.
+- Added `npm run typecheck` to CI.
+- Added a `typecheck` script to `package.json`.
+- Verified the resulting `main` state with a successful Vercel deployment.
 
 ## Product Direction
 
@@ -57,8 +67,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Rebuilt the homepage from a placeholder into a platform-oriented SCRIMED web presence.
 - Added `/api/status` for module readiness metadata.
 - Added `tsconfig.json`, `next-env.d.ts`, and global styling to strengthen the Next.js foundation.
-- Added GitHub Actions CI for dependency installation and Next.js build verification.
-- Confirmed Vercel deployment success for the initial strengthened `main` state.
+- Added GitHub Actions CI for dependency installation, type checking, and Next.js build verification.
+- Confirmed Vercel deployment success for the strengthened `main` state.
 - Added `/platform` and `/trust` as first product detail surfaces.
 - Added `/api/readiness` and `/api/events` as stable foundation-level operational endpoints.
 - Added dedicated pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower.
@@ -67,14 +77,15 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Wired homepage, status, and readiness surfaces to the Hub layer.
 - Added integration contracts for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing.
 - Added `/integrations` and `/api/contracts`, then wired contracts into Hub, readiness, and homepage surfaces.
+- Fixed the likely CI workflow failure caused by npm caching without a lockfile.
 
 ## Recommended Next Steps
 
-1. Confirm Vercel success for the newest integration-contract expansion.
-2. Confirm GitHub Actions is enabled for the repository and that the CI workflow runs on the next push or pull request.
-3. Add detailed contract pages for each future integration type.
-4. Add `/hub/readiness` and `/hub/events` console views using the existing readiness and event APIs.
-5. Add visual QA with browser screenshots once local package management is available.
+1. Confirm GitHub Actions is enabled in repository settings and inspect the next CI run from the GitHub UI.
+2. Add a committed `package-lock.json` once npm is available locally or via a controlled CI-generated update.
+3. Re-enable npm caching after the lockfile exists.
+4. Add detailed contract pages for each future integration type.
+5. Add `/hub/readiness` and `/hub/events` console views using the existing readiness and event APIs.
 
 ## Notes
 
