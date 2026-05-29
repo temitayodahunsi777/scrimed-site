@@ -1,6 +1,6 @@
 # SCRIMED Project Status
 
-Updated: 2026-05-28
+Updated: 2026-05-29
 
 ## Current Baseline
 
@@ -15,6 +15,8 @@ Current baseline includes:
 - Hub events console at `/hub/events`
 - Platform page at `/platform`
 - Integration contracts page at `/integrations`
+- Detailed contract routes under `/contracts/[slug]`
+- Per-contract API routes under `/api/contracts/[slug]`
 - Trust and Watchtower page at `/trust`
 - Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
 - Shared Hub model in `app/lib/scrimedHub.ts`
@@ -34,11 +36,7 @@ Current baseline includes:
 
 ## Deployment Status
 
-Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment on 2026-05-28.
-
-GitHub Actions build verification is configured, but workflow runs are not visible through the current connector. The local environment also does not have `gh`, so Actions logs could not be inspected from this session. Because Vercel is green, GitHub Actions is not treated as a product/deploy blocker right now; it remains a hardening item.
-
-Earlier PRs #1 through #9 represented exploratory or superseded approaches and have been closed so the repository history has a single active deployment baseline.
+Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. GitHub Actions build verification is configured, but workflow runs are not visible through the current connector. Because Vercel is green, GitHub Actions is not treated as a product/deploy blocker right now; it remains a hardening item.
 
 ## CI Failure Root Cause
 
@@ -50,7 +48,7 @@ Fix applied:
 - Kept `npm install` as the install command so the build does not require a committed lockfile yet.
 - Added `npm run typecheck` to CI.
 - Added a `typecheck` script to `package.json`.
-- Verified the resulting `main` state with a successful Vercel deployment.
+- Verified the resulting `main` state with successful Vercel deployments.
 
 ## Product Direction
 
@@ -83,14 +81,15 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Fixed the likely CI workflow failure caused by npm caching without a lockfile.
 - Added shared Hub operations data and backed `/api/readiness` and `/api/events` with it.
 - Added `/hub/readiness` and `/hub/events` console views.
+- Added detailed pages and per-contract API routes for every integration contract.
 
 ## Recommended Next Steps
 
 1. Use Vercel as the active deploy gate until GitHub Actions visibility is resolved.
-2. Confirm GitHub Actions is enabled in repository settings and inspect the next CI run from the GitHub UI.
+2. Add generated examples or fixtures for each contract so future connector work has test payloads.
 3. Add a committed `package-lock.json` once npm is available locally or via a controlled CI-generated update.
 4. Re-enable npm caching after the lockfile exists.
-5. Add detailed contract pages for each future integration type.
+5. Begin the synthetic clinical test environment first; it gives SCRIMED useful workflow validation without touching live clinical data.
 
 ## Notes
 
