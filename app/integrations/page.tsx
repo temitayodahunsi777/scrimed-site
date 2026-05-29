@@ -20,7 +20,7 @@ export default function IntegrationsPage() {
               <h2>{contract.name}</h2>
             </div>
             <p>{contract.sourceType}</p>
-            <strong>{contract.purpose}</strong>
+            <a className="module-link" href={contract.route}>{contract.purpose}</a>
           </article>
         ))}
       </section>
