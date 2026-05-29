@@ -6,6 +6,7 @@ const checks = [
   { name: "status_endpoint", status: "pass", detail: "/api/status is available." },
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
+  { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
 ];
 
