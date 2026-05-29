@@ -12,6 +12,11 @@ const consoleViews = [
     summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."
   },
   {
+    name: "Synthetic",
+    href: "/synthetic/validation",
+    summary: "Review deterministic synthetic checks before any live clinical connector is introduced."
+  },
+  {
     name: "Events",
     href: "/hub/events",
     summary: "Track repository, product, operations, integration, and deployment milestones."

@@ -9,10 +9,16 @@ SCRIMED is being developed as a modular AI healthcare intelligence platform desi
 Execution should move through explicit gates instead of ambiguous blockers:
 
 - Vercel is the active deploy gate.
-- Synthetic clinical scenarios validate workflows before live clinical data is connected.
+- Executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
 - Quality gates document active, planned, and bypassed checks.
 - GitHub Actions and local package-manager builds remain hardening items until tooling and run visibility are available.
+
+Reasoning level:
+
+- Use high reasoning for SCRIMED architecture, healthcare workflow design, quality gates, safety, integration boundaries, and company-level sequencing.
+- Use medium reasoning for routine implementation after the architecture and acceptance criteria are clear.
+- Use low reasoning only for mechanical edits, formatting, and one-line maintenance tasks.
 
 ## Phase 1 - Core Platform Foundations
 
@@ -42,13 +48,15 @@ Completed foundations:
 - Synthetic clinical scenario model
 - Synthetic scenario page and API
 - Scenario detail pages and per-scenario API routes
+- Synthetic validation page and API
+- Deterministic checks for labels, identifier safety, contract boundaries, trace completeness, assertions, and human review guardrails
 - Quality gates page and API
 
 Next build targets:
 
 - Generated request and response fixtures for every integration contract
-- Deterministic assertions for every synthetic scenario
-- A fixture runner that can promote scenario assertions into executable checks
+- Fixture payload schemas for each synthetic scenario
+- Quality gate promotion for executable synthetic validation results
 
 ## Phase 3 - Intelligence Layer
 

@@ -12,7 +12,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
-- Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/api/synthetic/scenarios`, and `/api/synthetic/scenarios/[slug]`
+- Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
 - Quality gates: `/quality` and `/api/quality/gates`
 - Core operational APIs: `/api/health`, `/api/status`, `/api/readiness`, `/api/events`, and `/api/hub/summary`
 
@@ -55,7 +55,7 @@ SCRIMED currently uses a managed quality path instead of letting one blocked too
 Active gates:
 
 - Vercel deployment status as the primary deploy gate
-- Synthetic clinical scenarios for workflow validation without live patient data
+- Executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
 - Hub readiness checks for operational visibility
 
@@ -67,9 +67,21 @@ Managed bypasses:
 
 Replacement process:
 
-- Vercel deployment plus synthetic validation replaces unavailable local build verification.
+- Vercel deployment plus executable synthetic validation replaces unavailable local build verification.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
+
+## Synthetic Validation Checks
+
+Each synthetic scenario now receives deterministic checks for:
+
+- synthetic-only labeling
+- absence of obvious production identifiers
+- synthetic clinical test contract binding
+- risk marker retention
+- workflow trace completeness
+- assertion completeness
+- human review, draft, no-final-claim, or Watchtower guardrails
 
 ## Watchtower Monitoring System
 

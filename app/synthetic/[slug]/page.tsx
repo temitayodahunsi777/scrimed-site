@@ -3,6 +3,7 @@ import {
   getSyntheticScenarioBySlug,
   syntheticScenarios
 } from "../../lib/syntheticClinical";
+import { getSyntheticValidationResultBySlug } from "../../lib/syntheticValidation";
 
 export function generateStaticParams() {
   return syntheticScenarios.map((scenario) => ({
@@ -17,8 +18,9 @@ export default async function SyntheticScenarioPage({
 }) {
   const { slug } = await params;
   const scenario = getSyntheticScenarioBySlug(slug);
+  const validation = getSyntheticValidationResultBySlug(slug);
 
-  if (!scenario) {
+  if (!scenario || !validation) {
     notFound();
   }
 
@@ -50,6 +52,25 @@ export default async function SyntheticScenarioPage({
         </article>
       </section>
 
+      <section className="section-band hub-summary" aria-label="Synthetic validation result">
+        <article>
+          <span>Validation</span>
+          <strong>{validation.status}</strong>
+        </article>
+        <article>
+          <span>Passed</span>
+          <strong>{validation.passed}</strong>
+        </article>
+        <article>
+          <span>Failed</span>
+          <strong>{validation.failed}</strong>
+        </article>
+        <article>
+          <span>API</span>
+          <strong>/api/synthetic/validation/{scenario.id}</strong>
+        </article>
+      </section>
+
       <section className="section-band split-band">
         <div>
           <p className="eyebrow">Expected outcome</p>
@@ -71,6 +92,16 @@ export default async function SyntheticScenarioPage({
           <article key={assertion}>
             <h3>{assertion}</h3>
             <p>Required for this synthetic workflow to be considered valid.</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-band principle-grid" aria-label="Synthetic validation checks">
+        {validation.checks.map((check) => (
+          <article key={check.id}>
+            <span>{check.status}</span>
+            <h3>{check.label}</h3>
+            <p>{check.detail}</p>
           </article>
         ))}
       </section>

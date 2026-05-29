@@ -1,5 +1,6 @@
 import { integrationContracts } from "./integrationContracts";
 import { syntheticScenarios } from "./syntheticClinical";
+import { getSyntheticValidationResults } from "./syntheticValidation";
 
 export type HubModule = {
   name: string;
@@ -63,7 +64,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Quality gates", value: "managed bypass active", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
-  { name: "Synthetic validation", value: "fixtures ready", tone: "good" },
+  { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
@@ -76,7 +77,8 @@ const contractRoutes = integrationContracts.flatMap((contract) => [
 
 const syntheticRoutes = syntheticScenarios.flatMap((scenario) => [
   scenario.route,
-  `/api/synthetic/scenarios/${scenario.id}`
+  `/api/synthetic/scenarios/${scenario.id}`,
+  `/api/synthetic/validation/${scenario.id}`
 ]);
 
 export const hubRoutes = [
@@ -88,6 +90,7 @@ export const hubRoutes = [
   "/trust",
   "/integrations",
   "/synthetic",
+  "/synthetic/validation",
   "/quality",
   ...syntheticScenarios.map((scenario) => scenario.route),
   ...integrationContracts.map((contract) => contract.route),
@@ -103,6 +106,7 @@ export const hubRoutes = [
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/synthetic/scenarios",
+  "/api/synthetic/validation",
   ...syntheticRoutes.filter((route) => route.startsWith("/api/synthetic/")),
   "/api/quality/gates",
   "/api/hub/summary"
@@ -111,6 +115,7 @@ export const hubRoutes = [
 export function getHubSummary() {
   const activeModules = hubModules.filter((module) => module.phase === "foundation").length;
   const stagedModules = hubModules.filter((module) => module.phase === "staged").length;
+  const syntheticValidation = getSyntheticValidationResults();
 
   return {
     service: "scrimed-os-hub",
@@ -121,6 +126,7 @@ export function getHubSummary() {
     moduleCount: hubModules.length,
     routes: hubRoutes,
     signals: hubSignals,
+    syntheticValidation,
     modules: hubModules,
     updated: "2026-05-29"
   };

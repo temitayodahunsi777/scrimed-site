@@ -19,6 +19,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
+  { name: "synthetic_assertions", status: "pass", detail: "/synthetic/validation and /api/synthetic/validation are available." },
   { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates are available with a managed bypass path for CI visibility gaps." },
   { name: "github_actions", status: "watch", detail: "CI is configured, but run visibility is not confirmed in this session." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
@@ -62,6 +63,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-29"
   },
   {
+    id: "scrimed-synthetic-assertion-runner",
+    type: "operations",
+    summary: "Added deterministic synthetic scenario checks for labels, identifier safety, contract boundaries, trace completeness, assertions, and human review guardrails.",
+    date: "2026-05-29"
+  },
+  {
     id: "scrimed-ci-bypass-vercel-gate",
     type: "deployment",
     summary: "Kept Vercel as the working deploy gate while GitHub Actions visibility remains unresolved.",
@@ -77,7 +84,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, synthetic scenarios, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, executable synthetic assertions, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-05-29"
   };
 }

@@ -18,6 +18,7 @@ Current baseline includes:
 - Detailed contract routes under `/contracts/[slug]`
 - Synthetic clinical environment at `/synthetic`
 - Synthetic scenario routes under `/synthetic/[slug]`
+- Synthetic validation page at `/synthetic/validation`
 - Quality gates page at `/quality`
 - Trust and Watchtower page at `/trust`
 - Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
@@ -25,6 +26,7 @@ Current baseline includes:
 - Shared Hub operations model in `app/lib/hubOperations.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared synthetic scenario model in `app/lib/syntheticClinical.ts`
+- Shared synthetic validation model in `app/lib/syntheticValidation.ts`
 - Shared quality gate model in `app/lib/qualityGates.ts`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
@@ -35,6 +37,8 @@ Current baseline includes:
 - Per-contract API routes under `/api/contracts/[slug]`
 - Synthetic scenario endpoint at `/api/synthetic/scenarios`
 - Per-scenario synthetic API routes under `/api/synthetic/scenarios/[slug]`
+- Synthetic validation endpoint at `/api/synthetic/validation`
+- Per-scenario validation API routes under `/api/synthetic/validation/[slug]`
 - Quality gates endpoint at `/api/quality/gates`
 - Hub summary endpoint at `/api/hub/summary`
 - Vercel deployment configuration
@@ -53,7 +57,7 @@ Because Vercel is green, GitHub Actions and local package-manager verification a
 Current active quality path:
 
 1. Vercel deployment status is the primary deploy gate.
-2. Synthetic clinical scenarios validate workflow behavior without live patient data.
+2. Executable synthetic clinical assertions validate workflow behavior without live patient data.
 3. Integration contracts define the data boundary before real connectors are implemented.
 4. Hub readiness and event endpoints expose operational status.
 5. Quality gates make every active, planned, and bypassed validation path explicit.
@@ -66,7 +70,7 @@ Current bypassed or deferred checks:
 
 Replacement path:
 
-- Vercel deployment plus synthetic validation is the current active build-quality path.
+- Vercel deployment plus executable synthetic validation is the current active build-quality path.
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
 
@@ -116,6 +120,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added `/hub/readiness` and `/hub/events` console views.
 - Added detailed pages and per-contract API routes for every integration contract.
 - Added synthetic clinical scenarios, `/synthetic`, scenario detail pages, `/api/synthetic/scenarios`, and per-scenario API routes.
+- Added deterministic synthetic validation checks, `/synthetic/validation`, `/api/synthetic/validation`, and per-scenario validation APIs.
 - Added quality gate modeling, `/quality`, and `/api/quality/gates`.
 - Wired quality gates into the Hub route inventory, readiness checks, event stream, homepage, and Hub console.
 - Replaced the failing or unavailable verification path with a documented Vercel plus synthetic validation process.
@@ -124,7 +129,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
 2. Add generated request and response fixtures for each integration contract.
-3. Add deterministic assertions for every synthetic scenario so the validation layer can evolve from descriptive fixtures into executable checks.
+3. Promote synthetic validation results into the quality gates summary after fixture payloads are added.
 4. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
 5. Add visual smoke checks for `/`, `/hub`, `/quality`, `/synthetic`, `/integrations`, and `/trust` once local browser/build tooling is available.
 6. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.

@@ -32,7 +32,7 @@ const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "OS Hub", value: "/hub" },
   { label: "Quality", value: "/api/quality/gates" },
-  { label: "Synthetic", value: "/api/synthetic/scenarios" },
+  { label: "Synthetic", value: "/api/synthetic/validation" },
   { label: "Contracts", value: "/api/contracts" }
 ];
 

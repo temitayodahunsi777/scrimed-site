@@ -15,9 +15,9 @@ export const qualityGates: QualityGate[] = [
   },
   {
     name: "Synthetic clinical scenarios",
-    route: "/synthetic",
+    route: "/synthetic/validation",
     state: "active",
-    role: "Workflow validation without live patient data."
+    role: "Executable workflow validation without live patient data."
   },
   {
     name: "Integration contracts",
@@ -36,7 +36,7 @@ export const qualityGates: QualityGate[] = [
     route: "https://github.com/temitayodahunsi777/scrimed-site/blob/main/.github/workflows/ci.yml",
     state: "bypassed",
     role: "Secondary build verification once workflow visibility and lockfile support are available.",
-    replacement: "Vercel deployment plus synthetic validation are the current active quality path."
+    replacement: "Vercel deployment plus executable synthetic validation are the current active quality path."
   },
   {
     name: "Live clinical integrations",
