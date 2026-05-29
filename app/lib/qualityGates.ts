@@ -33,7 +33,7 @@ export const qualityGates: QualityGate[] = [
   },
   {
     name: "GitHub Actions CI",
-    route: "/.github/workflows/ci.yml",
+    route: "https://github.com/temitayodahunsi777/scrimed-site/blob/main/.github/workflows/ci.yml",
     state: "bypassed",
     role: "Secondary build verification once workflow visibility and lockfile support are available.",
     replacement: "Vercel deployment plus synthetic validation are the current active quality path."
