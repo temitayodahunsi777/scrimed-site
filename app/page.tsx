@@ -31,8 +31,8 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "OS Hub", value: "/hub" },
-  { label: "Contracts", value: "/api/contracts" },
-  { label: "Readiness", value: "/api/readiness" }
+  { label: "Synthetic", value: "/api/synthetic/scenarios" },
+  { label: "Contracts", value: "/api/contracts" }
 ];
 
 export default function Home() {
@@ -47,6 +47,7 @@ export default function Home() {
           <div className="nav-links">
             <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
+            <a href="/synthetic">Synthetic</a>
             <a href="/integrations">Integrations</a>
             <a href="/trust">Trust</a>
           </div>
@@ -61,7 +62,7 @@ export default function Home() {
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
               <a className="primary-action" href="/hub">Open OS Hub</a>
-              <a className="secondary-action" href="/integrations">View contracts</a>
+              <a className="secondary-action" href="/synthetic">Synthetic validation</a>
             </div>
           </div>
 
@@ -83,7 +84,7 @@ export default function Home() {
                 <span className="trace-dot" /> Watchtower monitoring active
               </div>
               <div>
-                <span className="trace-dot trace-dot-alt" /> Integration contracts defined
+                <span className="trace-dot trace-dot-alt" /> Synthetic workflow fixtures ready
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated
@@ -129,7 +130,7 @@ export default function Home() {
       <section className="section-band roadmap-band" id="roadmap">
         <div className="section-heading">
           <p className="eyebrow">Execution path</p>
-          <h2>Current focus: turn the deployment foundation into a working product surface.</h2>
+          <h2>Current focus: validate product workflows with synthetic clinical fixtures before live integrations.</h2>
         </div>
         <div className="roadmap-list">
           <article>
@@ -139,13 +140,13 @@ export default function Home() {
           </article>
           <article>
             <span>Phase 2</span>
-            <h3>Intelligence layer</h3>
-            <p>Define the clinical reasoning, summarization, and population health surfaces.</p>
+            <h3>Synthetic validation</h3>
+            <p>Exercise workflows against deterministic scenarios without production clinical data.</p>
           </article>
           <article>
             <span>Phase 3</span>
             <h3>Workflow systems</h3>
-            <p>Bring DocuTwin, CarePath, TrialCore, and reporting workflows into the product.</p>
+            <p>Bring DocuTwin, CarePath, TrialCore, and reporting workflows into validated product paths.</p>
           </article>
         </div>
       </section>
