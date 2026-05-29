@@ -18,6 +18,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
+  { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
   { name: "github_actions", status: "watch", detail: "CI is configured, but run visibility is not confirmed in this session." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
 ];
@@ -48,10 +49,16 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-28"
   },
   {
+    id: "scrimed-synthetic-validation",
+    type: "operations",
+    summary: "Added synthetic clinical scenarios to validate workflows without live clinical data.",
+    date: "2026-05-29"
+  },
+  {
     id: "scrimed-ci-bypass-vercel-gate",
     type: "deployment",
     summary: "Kept Vercel as the working deploy gate while GitHub Actions visibility remains unresolved.",
-    date: "2026-05-28"
+    date: "2026-05-29"
   }
 ];
 
@@ -63,8 +70,8 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel as the current deploy gate and continue product-console development before clinical workflow integration.",
-    updated: "2026-05-28"
+    recommendation: "Use Vercel as the current deploy gate and validate workflow behavior through synthetic scenarios before clinical workflow integration.",
+    updated: "2026-05-29"
   };
 }
 
