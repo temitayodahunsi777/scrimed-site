@@ -41,8 +41,8 @@ export default function SyntheticValidationPage() {
               <h2>{result.scenarioId}</h2>
             </div>
             <p>{result.passed} passed, {result.failed} failed</p>
-            <a className="module-link" href={`/synthetic/${result.scenarioId}`}>
-              Review scenario and assertions
+            <a className="module-link" href={result.fixtureRoute ?? `/synthetic/${result.scenarioId}`}>
+              Review fixture and assertions
             </a>
           </article>
         ))}

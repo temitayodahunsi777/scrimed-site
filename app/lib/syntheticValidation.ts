@@ -1,4 +1,5 @@
 import { SyntheticScenario, syntheticScenarios } from "./syntheticClinical";
+import { getSyntheticFixtureBySlug } from "./syntheticFixtures";
 
 export type SyntheticValidationStatus = "pass" | "fail";
 
@@ -12,6 +13,7 @@ export type SyntheticValidationCheck = {
 export type SyntheticValidationResult = {
   scenarioId: string;
   route: string;
+  fixtureRoute?: string;
   status: SyntheticValidationStatus;
   passed: number;
   failed: number;
@@ -51,7 +53,9 @@ function createCheck(
 export function validateSyntheticScenario(
   scenario: SyntheticScenario
 ): SyntheticValidationResult {
+  const fixture = getSyntheticFixtureBySlug(scenario.id);
   const text = scenarioText(scenario);
+  const fixtureText = fixture ? JSON.stringify(fixture) : "";
   const lowerText = text.toLowerCase();
 
   const checks = [
@@ -68,9 +72,28 @@ export function validateSyntheticScenario(
       "Scenario content must not include obvious SSN, MRN, email, or phone identifiers."
     ),
     createCheck(
+      "fixture_payload",
+      "Fixture payload present",
+      Boolean(fixture),
+      "Scenario must have a structured request and expected-output fixture."
+    ),
+    createCheck(
+      "fixture_identifier_safety",
+      "Fixture identifier safety",
+      Boolean(fixture) && !productionIdentifierPattern.test(fixtureText),
+      "Fixture payload must not include obvious SSN, MRN, email, or phone identifiers."
+    ),
+    createCheck(
+      "fixture_synthetic_only",
+      "Fixture synthetic-only flag",
+      fixture?.request.syntheticOnly === true,
+      "Fixture request must be explicitly marked synthetic-only."
+    ),
+    createCheck(
       "contract_boundary",
       "Contract boundary",
-      scenario.contractSlug === "synthetic-clinical-test-environment",
+      scenario.contractSlug === "synthetic-clinical-test-environment" &&
+        fixture?.contractSlug === scenario.contractSlug,
       "Synthetic validation scenarios must stay bound to the synthetic clinical test contract."
     ),
     createCheck(
@@ -86,15 +109,34 @@ export function validateSyntheticScenario(
       "Scenario must expose at least four deterministic workflow trace steps."
     ),
     createCheck(
+      "fixture_trace_alignment",
+      "Fixture trace alignment",
+      Boolean(fixture) &&
+        fixture!.expectedOutput.requiredTrace.every((step) =>
+          scenario.workflowTrace.includes(step)
+        ),
+      "Fixture expected trace must align with the scenario workflow trace."
+    ),
+    createCheck(
       "assertions",
       "Assertions mapped",
       scenario.assertions.length >= 4 && scenario.assertions.every(Boolean),
       "Scenario must include at least four explicit assertions."
     ),
     createCheck(
+      "fixture_output_contract",
+      "Fixture output contract",
+      Boolean(fixture) &&
+        fixture!.expectedOutput.outputSignals.length >= 3 &&
+        fixture!.expectedOutput.prohibitedClaims.length >= 3,
+      "Fixture must define expected output signals and prohibited claims."
+    ),
+    createCheck(
       "human_review_guardrail",
       "Human review guardrail",
-      /review|required|draft|no final|no enrollment|watchtower/i.test(text),
+      /review|required|draft|no final|no enrollment|watchtower/i.test(
+        `${text} ${fixtureText}`
+      ),
       "Scenario must retain a review, draft, no-final-claim, or Watchtower guardrail."
     )
   ];
@@ -105,6 +147,7 @@ export function validateSyntheticScenario(
   return {
     scenarioId: scenario.id,
     route: scenario.route,
+    fixtureRoute: fixture?.route,
     status: failed === 0 ? "pass" : "fail",
     passed,
     failed,

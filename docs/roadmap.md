@@ -9,7 +9,7 @@ SCRIMED is being developed as a modular AI healthcare intelligence platform desi
 Execution should move through explicit gates instead of ambiguous blockers:
 
 - Vercel is the active deploy gate.
-- Executable synthetic clinical assertions validate workflows before live clinical data is connected.
+- Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
 - Quality gates document active, planned, and bypassed checks.
 - GitHub Actions and local package-manager builds remain hardening items until tooling and run visibility are available.
@@ -46,17 +46,20 @@ Completed foundations:
 - Integration contracts page and API
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
+- Synthetic request and expected-output fixture model
 - Synthetic scenario page and API
 - Scenario detail pages and per-scenario API routes
+- Fixture contract pages and APIs
 - Synthetic validation page and API
-- Deterministic checks for labels, identifier safety, contract boundaries, trace completeness, assertions, and human review guardrails
+- Deterministic checks for labels, identifier safety, fixture presence, contract boundaries, trace alignment, assertions, expected outputs, prohibited claims, and human review guardrails
 - Quality gates page and API
+- Synthetic validation status promoted into quality gates
 
 Next build targets:
 
-- Generated request and response fixtures for every integration contract
-- Fixture payload schemas for each synthetic scenario
-- Quality gate promotion for executable synthetic validation results
+- Generated request and response fixtures for every non-synthetic integration contract
+- Fixture diffing for expected output changes
+- First module workflow implementation against fixture-backed synthetic inputs
 
 ## Phase 3 - Intelligence Layer
 

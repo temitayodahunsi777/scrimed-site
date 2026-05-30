@@ -19,6 +19,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
+  { name: "synthetic_fixtures", status: "pass", detail: "/synthetic/fixtures and /api/synthetic/fixtures are available." },
   { name: "synthetic_assertions", status: "pass", detail: "/synthetic/validation and /api/synthetic/validation are available." },
   { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates are available with a managed bypass path for CI visibility gaps." },
   { name: "github_actions", status: "watch", detail: "CI is configured, but run visibility is not confirmed in this session." },
@@ -66,6 +67,12 @@ export const hubEvents: HubEvent[] = [
     id: "scrimed-synthetic-assertion-runner",
     type: "operations",
     summary: "Added deterministic synthetic scenario checks for labels, identifier safety, contract boundaries, trace completeness, assertions, and human review guardrails.",
+    date: "2026-05-29"
+  },
+  {
+    id: "scrimed-synthetic-fixture-contracts",
+    type: "operations",
+    summary: "Added structured synthetic request and expected-output fixtures for CarePath AI, DocuTwin, and TrialCore validation.",
     date: "2026-05-29"
   },
   {

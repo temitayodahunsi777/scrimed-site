@@ -12,7 +12,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
-- Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
+- Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
 - Quality gates: `/quality` and `/api/quality/gates`
 - Core operational APIs: `/api/health`, `/api/status`, `/api/readiness`, `/api/events`, and `/api/hub/summary`
 
@@ -55,7 +55,7 @@ SCRIMED currently uses a managed quality path instead of letting one blocked too
 Active gates:
 
 - Vercel deployment status as the primary deploy gate
-- Executable synthetic clinical assertions for workflow validation without live patient data
+- Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
 - Hub readiness checks for operational visibility
 
@@ -67,7 +67,7 @@ Managed bypasses:
 
 Replacement process:
 
-- Vercel deployment plus executable synthetic validation replaces unavailable local build verification.
+- Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 
@@ -77,10 +77,14 @@ Each synthetic scenario now receives deterministic checks for:
 
 - synthetic-only labeling
 - absence of obvious production identifiers
+- structured request and expected-output fixture presence
+- fixture synthetic-only flag
 - synthetic clinical test contract binding
 - risk marker retention
 - workflow trace completeness
+- fixture trace alignment
 - assertion completeness
+- expected output signals and prohibited claims
 - human review, draft, no-final-claim, or Watchtower guardrails
 
 ## Watchtower Monitoring System

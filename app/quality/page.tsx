@@ -1,6 +1,8 @@
-import { qualityGates } from "../lib/qualityGates";
+import { getQualityGateSummary } from "../lib/qualityGates";
 
 export default function QualityPage() {
+  const summary = getQualityGateSummary();
+
   return (
     <main>
       <section className="page-hero">
@@ -12,8 +14,27 @@ export default function QualityPage() {
         </p>
       </section>
 
+      <section className="section-band hub-summary" aria-label="SCRIMED quality gate summary">
+        <article>
+          <span>Status</span>
+          <strong>{summary.status}</strong>
+        </article>
+        <article>
+          <span>Active</span>
+          <strong>{summary.active}</strong>
+        </article>
+        <article>
+          <span>Bypassed</span>
+          <strong>{summary.bypassed}</strong>
+        </article>
+        <article>
+          <span>Synthetic checks</span>
+          <strong>{summary.syntheticValidation.passedChecks}</strong>
+        </article>
+      </section>
+
       <section className="table-section" aria-label="SCRIMED quality gates">
-        {qualityGates.map((gate) => (
+        {summary.gates.map((gate) => (
           <article className="module-row" key={gate.name}>
             <div>
               <span>{gate.state}</span>

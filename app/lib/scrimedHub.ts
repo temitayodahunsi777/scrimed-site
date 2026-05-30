@@ -1,4 +1,5 @@
 import { integrationContracts } from "./integrationContracts";
+import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
 
@@ -78,7 +79,8 @@ const contractRoutes = integrationContracts.flatMap((contract) => [
 const syntheticRoutes = syntheticScenarios.flatMap((scenario) => [
   scenario.route,
   `/api/synthetic/scenarios/${scenario.id}`,
-  `/api/synthetic/validation/${scenario.id}`
+  `/api/synthetic/validation/${scenario.id}`,
+  `/api/synthetic/fixtures/${scenario.id}`
 ]);
 
 export const hubRoutes = [
@@ -91,8 +93,10 @@ export const hubRoutes = [
   "/integrations",
   "/synthetic",
   "/synthetic/validation",
+  "/synthetic/fixtures",
   "/quality",
   ...syntheticScenarios.map((scenario) => scenario.route),
+  ...syntheticFixtures.map((fixture) => fixture.route),
   ...integrationContracts.map((contract) => contract.route),
   "/modules/clinical-copilot",
   "/modules/docutwin",
@@ -106,6 +110,7 @@ export const hubRoutes = [
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/synthetic/scenarios",
+  "/api/synthetic/fixtures",
   "/api/synthetic/validation",
   ...syntheticRoutes.filter((route) => route.startsWith("/api/synthetic/")),
   "/api/quality/gates",

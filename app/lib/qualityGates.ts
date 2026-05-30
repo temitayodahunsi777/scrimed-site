@@ -1,3 +1,5 @@
+import { getSyntheticValidationResults } from "./syntheticValidation";
+
 export type QualityGate = {
   name: string;
   route: string;
@@ -48,13 +50,16 @@ export const qualityGates: QualityGate[] = [
 ];
 
 export function getQualityGateSummary() {
+  const syntheticValidation = getSyntheticValidationResults();
+
   return {
     service: "scrimed-quality-gates",
-    status: "active-with-managed-bypass",
+    status: syntheticValidation.status === "pass" ? "active-with-managed-bypass" : "attention-required",
     gates: qualityGates,
     active: qualityGates.filter((gate) => gate.state === "active").length,
     bypassed: qualityGates.filter((gate) => gate.state === "bypassed").length,
     planned: qualityGates.filter((gate) => gate.state === "planned").length,
+    syntheticValidation,
     updated: "2026-05-29"
   };
 }

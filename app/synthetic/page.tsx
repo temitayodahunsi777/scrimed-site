@@ -59,6 +59,10 @@ export default function SyntheticClinicalPage() {
           </div>
           <div className="layer-row">
             <span>02</span>
+            <a className="module-link" href="/synthetic/fixtures">Open fixture contracts</a>
+          </div>
+          <div className="layer-row">
+            <span>03</span>
             <a className="module-link" href="/api/synthetic/validation">Inspect validation API</a>
           </div>
         </div>
