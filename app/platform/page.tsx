@@ -35,6 +35,13 @@ const modules = [
     outcome: "Monitor drift, regressions, latency, cost, traces, and trust signals."
   },
   {
+    name: "Agent Commander",
+    href: "/agents",
+    maturity: "Foundation",
+    users: "Workflow, governance, compliance, and clinical operations teams",
+    outcome: "Govern specialized healthcare agents through explicit permissions, audit events, and review policies."
+  },
+  {
     name: "SCRIMED Atlas",
     href: "/atlas",
     maturity: "Operating model",

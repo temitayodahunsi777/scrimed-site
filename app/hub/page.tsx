@@ -12,6 +12,11 @@ const consoleViews = [
     summary: "Review SCRIMED's mission, principles, operating models, and decision framework."
   },
   {
+    name: "Agents",
+    href: "/agents",
+    summary: "Review governed agent workflows, permissions, audit events, and human-review boundaries."
+  },
+  {
     name: "Quality",
     href: "/quality",
     summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."

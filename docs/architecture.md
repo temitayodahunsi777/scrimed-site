@@ -11,6 +11,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Public platform surface: `/`, `/platform`, `/trust`
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
 - Master operating context: `/operating-context`, `/atlas`, `/faithcore`, and `/api/operating-context`
+- Agent workflow registry: `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
@@ -25,6 +26,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Shared operating context model in `app/lib/operatingContext.ts`
 - Faith-neutral SCRIMED Atlas enterprise model for hospitals, governments, payers, and large organizations
 - FaithCore opt-in spiritual support model with explicit boundaries against replacing clinical judgment, emergency care, consent, or professional standards
+- Agent workflow registry requiring owner, permissions, inputs, outputs, audit events, guardrails, interoperability targets, and human-review policy before workflow execution
 - Quality standard requiring secure, scalable, maintainable, interoperable, compliant, explainable, trustworthy, user-friendly, future-proof, and clinically useful delivery
 
 ### Data Layer
@@ -47,6 +49,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - DocuTwin for structured draft documentation workflows
 - CarePath AI for intake, triage, and navigation operations
 - TrialCore for research matching workflows
+- Agent Commander registry for specialized governed agents across clinical, administrative, research, interoperability, compliance, and operational workflows
 - Watchtower for reliability, safety, and operational traces
 
 ### Trust Layer
@@ -55,6 +58,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Runtime trace visibility
 - Safety and review requirements before clinical use
 - Deployment and readiness monitoring
+- Agent permissions, audit events, human-review triggers, and guardrails
 - Explicit quality gates for active, planned, and bypassed checks
 - Master operating context as an active doctrine and decision gate before product expansion
 
@@ -67,6 +71,7 @@ Active gates:
 - Vercel deployment status as the primary deploy gate
 - Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
+- Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
 Managed bypasses:

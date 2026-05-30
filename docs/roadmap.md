@@ -10,6 +10,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 
 - Vercel is the active deploy gate.
 - The SCRIMED master operating context is an active decision gate for mission alignment, quality standard, Atlas, FaithCore, interoperability, and security.
+- The agent workflow registry is the active scope gate for specialized agents before workflow execution.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
 - Quality gates document active, planned, and bypassed checks.
@@ -32,6 +33,7 @@ Completed foundations:
 - Homepage and public platform surface
 - Master operating context model, documentation, page, and API
 - SCRIMED Atlas and FaithCore operating-model surfaces with explicit boundaries
+- Agent workflow registry with permissions, audit events, guardrails, interoperability targets, and human-review policies
 - SCRIMED OS Hub at `/hub`
 - Readiness and events consoles
 - Health, status, readiness, events, and hub summary APIs
@@ -60,10 +62,9 @@ Completed foundations:
 
 Next build targets:
 
-- Agent workflow registry for specialized governed agents, permissions, human review, audit events, and observability requirements
 - Generated request and response fixtures for every non-synthetic integration contract
 - Fixture diffing for expected output changes
-- First module workflow implementation against fixture-backed synthetic inputs
+- First module workflow implementation mapped to an agent workflow and fixture-backed synthetic inputs
 
 ## Phase 3 - Intelligence Layer
 
@@ -92,6 +93,7 @@ Modules include:
 - CarePath AI for patient intake, triage, and navigation
 - TrialCore for clinical trial discovery and matching
 - Watchtower for trust, safety, and reliability operations
+- Agent Commander for governed specialized agents and workflow promotion control
 
 Entry condition:
 

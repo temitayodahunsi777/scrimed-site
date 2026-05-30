@@ -40,6 +40,12 @@ export const qualityGates: QualityGate[] = [
     role: "Company doctrine, decision framework, Atlas boundary, FaithCore boundary, and quality standard before product expansion."
   },
   {
+    name: "Agent workflow registry",
+    route: "/agents",
+    state: "active",
+    role: "Permission, input, output, audit-event, guardrail, interoperability, and human-review scope before specialized agent execution."
+  },
+  {
     name: "GitHub Actions CI",
     route: "https://github.com/temitayodahunsi777/scrimed-site/blob/main/.github/workflows/ci.yml",
     state: "bypassed",

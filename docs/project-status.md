@@ -15,6 +15,8 @@ Current baseline includes:
 - Hub events console at `/hub/events`
 - Platform page at `/platform`
 - Master operating context at `/operating-context`
+- Agent workflow registry at `/agents`
+- Agent workflow detail routes under `/agents/[slug]`
 - SCRIMED Atlas operating model at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
@@ -30,6 +32,7 @@ Current baseline includes:
 - Shared Hub model in `app/lib/scrimedHub.ts`
 - Shared Hub operations model in `app/lib/hubOperations.ts`
 - Shared operating context model in `app/lib/operatingContext.ts`
+- Shared agent workflow model in `app/lib/agentWorkflows.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared synthetic scenario model in `app/lib/syntheticClinical.ts`
 - Shared synthetic fixture model in `app/lib/syntheticFixtures.ts`
@@ -41,6 +44,8 @@ Current baseline includes:
 - Readiness endpoint at `/api/readiness`
 - Platform events endpoint at `/api/events`
 - Operating context endpoint at `/api/operating-context`
+- Agent workflow registry endpoint at `/api/agents/workflows`
+- Per-agent workflow endpoints under `/api/agents/workflows/[slug]`
 - Integration contracts endpoint at `/api/contracts`
 - Per-contract API routes under `/api/contracts/[slug]`
 - Synthetic scenario endpoint at `/api/synthetic/scenarios`
@@ -69,9 +74,10 @@ Current active quality path:
 1. Vercel deployment status is the primary deploy gate.
 2. Synthetic fixture contracts and executable assertions validate workflow behavior without live patient data.
 3. The master operating context defines the mission, decision framework, Atlas boundary, FaithCore boundary, and delivery standard.
-4. Integration contracts define the data boundary before real connectors are implemented.
-5. Hub readiness and event endpoints expose operational status.
-6. Quality gates make every active, planned, and bypassed validation path explicit.
+4. The agent workflow registry defines owner, permissions, inputs, outputs, audit events, guardrails, interoperability targets, and human-review policy before agent execution.
+5. Integration contracts define the data boundary before real connectors are implemented.
+6. Hub readiness and event endpoints expose operational status.
+7. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -108,6 +114,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Watchtower / TrustWatch for AI reliability, drift detection, and safety monitoring
 - SCRIMED Atlas for faith-neutral enterprise governance, compliance, interoperability, ROI, and agentic operations
 - FaithCore for opt-in spiritually aligned encouragement and trust support with explicit clinical boundaries
+- Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Synthetic validation before live clinical data or production integrations
 
@@ -141,15 +148,16 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Replaced the failing or unavailable verification path with a documented Vercel plus synthetic validation process.
 - Codified the SCRIMED SOLUTIONS master operating context in `docs/master-operating-context.md`, `app/lib/operatingContext.ts`, `/operating-context`, and `/api/operating-context`.
 - Added SCRIMED Atlas and FaithCore surfaces with explicit enterprise, faith, and clinical-safety boundaries.
+- Added a governed agent workflow registry in `app/lib/agentWorkflows.ts`, `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
-2. Add an agent workflow registry that maps each planned SCRIMED agent to owner, permissions, inputs, outputs, audit events, and human review requirements.
-3. Add generated request and response fixtures for each non-synthetic integration contract.
-4. Add fixture diffing so expected output changes are reviewed before workflow implementation.
+2. Add generated request and response fixtures for each non-synthetic integration contract.
+3. Add fixture diffing so expected output changes are reviewed before workflow implementation.
+4. Map the first module workflow implementation to an agent workflow, synthetic fixture, integration contract, and quality gate.
 5. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-6. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, and `/trust` once local browser/build tooling is available.
+6. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, and `/trust` once local browser/build tooling is available.
 7. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.
 
 ## Notes

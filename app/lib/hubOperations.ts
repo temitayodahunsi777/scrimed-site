@@ -19,6 +19,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
   { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
+  { name: "agent_workflow_registry", status: "pass", detail: "/agents and /api/agents/workflows are available with permissions, audit events, and human-review boundaries." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
   { name: "synthetic_fixtures", status: "pass", detail: "/synthetic/fixtures and /api/synthetic/fixtures are available." },
@@ -84,6 +85,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-29"
   },
   {
+    id: "scrimed-agent-workflow-registry",
+    type: "operations",
+    summary: "Added a governed agent workflow registry with owners, permissions, inputs, outputs, audit events, guardrails, interoperability targets, and human-review policies.",
+    date: "2026-05-29"
+  },
+  {
     id: "scrimed-ci-bypass-vercel-gate",
     type: "deployment",
     summary: "Kept Vercel as the working deploy gate while GitHub Actions visibility remains unresolved.",
@@ -99,7 +106,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, executable synthetic assertions, the agent workflow registry, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-05-29"
   };
 }

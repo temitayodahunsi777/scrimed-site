@@ -1,3 +1,4 @@
+import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
 import { integrationContracts } from "./integrationContracts";
 import { operatingContext } from "./operatingContext";
 import { syntheticFixtures } from "./syntheticFixtures";
@@ -67,6 +68,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Quality gates", value: "managed bypass active", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
+  { name: "Agent registry", value: "governance scoped", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
@@ -94,6 +96,7 @@ export const hubRoutes = [
   "/trust",
   "/integrations",
   "/operating-context",
+  "/agents",
   "/atlas",
   "/faithcore",
   "/synthetic",
@@ -103,6 +106,7 @@ export const hubRoutes = [
   ...syntheticScenarios.map((scenario) => scenario.route),
   ...syntheticFixtures.map((fixture) => fixture.route),
   ...integrationContracts.map((contract) => contract.route),
+  ...agentWorkflows.map((workflow) => workflow.route),
   "/modules/clinical-copilot",
   "/modules/docutwin",
   "/modules/carepath-ai",
@@ -113,6 +117,8 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/operating-context",
+  "/api/agents/workflows",
+  ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/synthetic/scenarios",
@@ -127,6 +133,7 @@ export function getHubSummary() {
   const activeModules = hubModules.filter((module) => module.phase === "foundation").length;
   const stagedModules = hubModules.filter((module) => module.phase === "staged").length;
   const syntheticValidation = getSyntheticValidationResults();
+  const agentWorkflowSummary = getAgentWorkflowSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -143,6 +150,7 @@ export function getHubSummary() {
       mission: operatingContext.mission,
       operatingModels: operatingContext.operatingModels
     },
+    agentWorkflowSummary,
     syntheticValidation,
     modules: hubModules,
     updated: "2026-05-29"

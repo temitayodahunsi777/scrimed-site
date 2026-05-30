@@ -32,6 +32,7 @@ const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "OS Hub", value: "/hub" },
   { label: "Context", value: "/api/operating-context" },
+  { label: "Agents", value: "/api/agents/workflows" },
   { label: "Quality", value: "/api/quality/gates" },
   { label: "Synthetic", value: "/api/synthetic/validation" },
   { label: "Contracts", value: "/api/contracts" }
@@ -49,6 +50,7 @@ export default function Home() {
           <div className="nav-links">
             <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
+            <a href="/agents">Agents</a>
             <a href="/quality">Quality</a>
             <a href="/synthetic">Synthetic</a>
             <a href="/integrations">Integrations</a>
@@ -94,6 +96,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Global operating doctrine codified
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Agent governance registry online
               </div>
             </div>
           </aside>
