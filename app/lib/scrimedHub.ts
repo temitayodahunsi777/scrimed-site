@@ -1,4 +1,5 @@
 import { integrationContracts } from "./integrationContracts";
+import { operatingContext } from "./operatingContext";
 import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
@@ -65,6 +66,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Quality gates", value: "managed bypass active", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
+  { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
@@ -91,6 +93,9 @@ export const hubRoutes = [
   "/platform",
   "/trust",
   "/integrations",
+  "/operating-context",
+  "/atlas",
+  "/faithcore",
   "/synthetic",
   "/synthetic/validation",
   "/synthetic/fixtures",
@@ -107,6 +112,7 @@ export const hubRoutes = [
   "/api/status",
   "/api/readiness",
   "/api/events",
+  "/api/operating-context",
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/synthetic/scenarios",
@@ -131,6 +137,12 @@ export function getHubSummary() {
     moduleCount: hubModules.length,
     routes: hubRoutes,
     signals: hubSignals,
+    operatingContext: {
+      company: operatingContext.company,
+      slogan: operatingContext.slogan,
+      mission: operatingContext.mission,
+      operatingModels: operatingContext.operatingModels
+    },
     syntheticValidation,
     modules: hubModules,
     updated: "2026-05-29"

@@ -7,6 +7,11 @@ const consoleViews = [
     summary: "Review foundation checks, non-blocking watches, and gated clinical integrations."
   },
   {
+    name: "Context",
+    href: "/operating-context",
+    summary: "Review SCRIMED's mission, principles, operating models, and decision framework."
+  },
+  {
     name: "Quality",
     href: "/quality",
     summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."

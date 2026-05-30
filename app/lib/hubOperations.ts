@@ -17,6 +17,8 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "status_endpoint", status: "pass", detail: "/api/status is available." },
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
+  { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
+  { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
   { name: "synthetic_fixtures", status: "pass", detail: "/synthetic/fixtures and /api/synthetic/fixtures are available." },
@@ -73,6 +75,12 @@ export const hubEvents: HubEvent[] = [
     id: "scrimed-synthetic-fixture-contracts",
     type: "operations",
     summary: "Added structured synthetic request and expected-output fixtures for CarePath AI, DocuTwin, and TrialCore validation.",
+    date: "2026-05-29"
+  },
+  {
+    id: "scrimed-master-operating-context",
+    type: "operations",
+    summary: "Codified SCRIMED SOLUTIONS mission, quality standard, interoperability strategy, Atlas, FaithCore, global regions, and decision framework.",
     date: "2026-05-29"
   },
   {

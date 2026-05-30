@@ -31,6 +31,7 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "OS Hub", value: "/hub" },
+  { label: "Context", value: "/api/operating-context" },
   { label: "Quality", value: "/api/quality/gates" },
   { label: "Synthetic", value: "/api/synthetic/validation" },
   { label: "Contracts", value: "/api/contracts" }
@@ -60,11 +61,11 @@ export default function Home() {
             <p className="eyebrow">AI-native healthcare intelligence</p>
             <h1>SCRIMED is building the operating intelligence layer for modern healthcare.</h1>
             <p className="hero-text">
-              A modular platform for clinical decision support, workflow automation, healthcare data interoperability, and continuous trust monitoring across AI-enabled care systems.
+              Solving For A Better Tomorrow through clinical intelligence, workflow automation, healthcare data interoperability, trustworthy AI agents, and continuous trust monitoring across AI-enabled care systems.
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
               <a className="primary-action" href="/hub">Open OS Hub</a>
-              <a className="secondary-action" href="/synthetic">Synthetic validation</a>
+              <a className="secondary-action" href="/operating-context">Operating context</a>
             </div>
           </div>
 
@@ -90,6 +91,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated
+              </div>
+              <div>
+                <span className="trace-dot" /> Global operating doctrine codified
               </div>
             </div>
           </aside>

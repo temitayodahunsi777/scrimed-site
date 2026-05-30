@@ -34,6 +34,12 @@ export const qualityGates: QualityGate[] = [
     role: "Operational readiness visibility for product, API, and integration foundations."
   },
   {
+    name: "Master operating context",
+    route: "/operating-context",
+    state: "active",
+    role: "Company doctrine, decision framework, Atlas boundary, FaithCore boundary, and quality standard before product expansion."
+  },
+  {
     name: "GitHub Actions CI",
     route: "https://github.com/temitayodahunsi777/scrimed-site/blob/main/.github/workflows/ci.yml",
     state: "bypassed",

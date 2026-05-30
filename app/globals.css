@@ -450,6 +450,22 @@ h3 {
   padding: 24px;
 }
 
+.compact-list {
+  color: var(--muted);
+  display: grid;
+  font-size: 14px;
+  gap: 8px;
+  line-height: 1.45;
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+}
+
+.compact-list li {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
 .hub-summary {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

@@ -33,6 +33,20 @@ const modules = [
     maturity: "Foundation",
     users: "Platform, safety, and compliance teams",
     outcome: "Monitor drift, regressions, latency, cost, traces, and trust signals."
+  },
+  {
+    name: "SCRIMED Atlas",
+    href: "/atlas",
+    maturity: "Operating model",
+    users: "Hospitals, governments, payers, and enterprise healthcare organizations",
+    outcome: "Govern trust, compliance, interoperability, ROI, and agentic healthcare operations."
+  },
+  {
+    name: "FaithCore",
+    href: "/faithcore",
+    maturity: "Trust layer",
+    users: "Opt-in communities, patients, care teams, and aligned organizations",
+    outcome: "Support dignity, encouragement, ethics, and trust while preserving clinical boundaries."
   }
 ];
 

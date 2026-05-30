@@ -9,6 +9,7 @@ SCRIMED is being developed as a modular AI healthcare intelligence platform desi
 Execution should move through explicit gates instead of ambiguous blockers:
 
 - Vercel is the active deploy gate.
+- The SCRIMED master operating context is an active decision gate for mission alignment, quality standard, Atlas, FaithCore, interoperability, and security.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
 - Quality gates document active, planned, and bypassed checks.
@@ -29,6 +30,8 @@ Completed foundations:
 - Next.js App Router application baseline
 - Vercel deployment configuration
 - Homepage and public platform surface
+- Master operating context model, documentation, page, and API
+- SCRIMED Atlas and FaithCore operating-model surfaces with explicit boundaries
 - SCRIMED OS Hub at `/hub`
 - Readiness and events consoles
 - Health, status, readiness, events, and hub summary APIs
@@ -57,6 +60,7 @@ Completed foundations:
 
 Next build targets:
 
+- Agent workflow registry for specialized governed agents, permissions, human review, audit events, and observability requirements
 - Generated request and response fixtures for every non-synthetic integration contract
 - Fixture diffing for expected output changes
 - First module workflow implementation against fixture-backed synthetic inputs
@@ -125,6 +129,7 @@ Expansion areas:
 - research collaboration tools
 - population health insights platform
 - partner connector certification
+- region-aware deployment packages for the United States, UAE, Saudi Arabia, Kuwait, Nigeria, Kenya, Rwanda, Ghana, and Europe
 
 Entry condition:
 

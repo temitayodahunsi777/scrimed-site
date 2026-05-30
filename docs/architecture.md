@@ -10,6 +10,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Public platform surface: `/`, `/platform`, `/trust`
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
+- Master operating context: `/operating-context`, `/atlas`, `/faithcore`, and `/api/operating-context`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
@@ -17,6 +18,14 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Core operational APIs: `/api/health`, `/api/status`, `/api/readiness`, `/api/events`, and `/api/hub/summary`
 
 ## System Layers
+
+### Operating Doctrine Layer
+
+- SCRIMED SOLUTIONS mission, slogan, long-term vision, principles, and decision framework
+- Shared operating context model in `app/lib/operatingContext.ts`
+- Faith-neutral SCRIMED Atlas enterprise model for hospitals, governments, payers, and large organizations
+- FaithCore opt-in spiritual support model with explicit boundaries against replacing clinical judgment, emergency care, consent, or professional standards
+- Quality standard requiring secure, scalable, maintainable, interoperable, compliant, explainable, trustworthy, user-friendly, future-proof, and clinically useful delivery
 
 ### Data Layer
 
@@ -47,6 +56,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Safety and review requirements before clinical use
 - Deployment and readiness monitoring
 - Explicit quality gates for active, planned, and bypassed checks
+- Master operating context as an active doctrine and decision gate before product expansion
 
 ## Quality Gate Model
 
@@ -103,4 +113,4 @@ This architecture keeps clinical integration work gated until reliability signal
 
 ## Vision
 
-SCRIMED is designed to function as the intelligence layer above existing healthcare systems, enabling providers, payers, researchers, and public health organizations to operate with more insight, automation, and trust.
+SCRIMED is designed to function as the intelligence layer above existing healthcare systems, enabling providers, payers, researchers, governments, and public health organizations to operate with more insight, automation, interoperability, and trust.

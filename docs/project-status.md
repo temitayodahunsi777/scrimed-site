@@ -4,7 +4,7 @@ Updated: 2026-05-29
 
 ## Current Baseline
 
-The active `scrimed-site` baseline is a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface with an OS Hub command layer, integration contract boundary, synthetic clinical validation layer, and explicit quality gates.
+The active `scrimed-site` baseline is a Next.js App Router site on `main`. PR #10 established the deployable Vercel foundation, and subsequent execution converted the placeholder root page into a serious SCRIMED platform surface with an OS Hub command layer, master operating context, integration contract boundary, synthetic clinical validation layer, and explicit quality gates.
 
 Current baseline includes:
 
@@ -14,6 +14,9 @@ Current baseline includes:
 - Hub readiness console at `/hub/readiness`
 - Hub events console at `/hub/events`
 - Platform page at `/platform`
+- Master operating context at `/operating-context`
+- SCRIMED Atlas operating model at `/atlas`
+- FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
 - Detailed contract routes under `/contracts/[slug]`
 - Synthetic clinical environment at `/synthetic`
@@ -26,6 +29,7 @@ Current baseline includes:
 - Module pages for Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower
 - Shared Hub model in `app/lib/scrimedHub.ts`
 - Shared Hub operations model in `app/lib/hubOperations.ts`
+- Shared operating context model in `app/lib/operatingContext.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared synthetic scenario model in `app/lib/syntheticClinical.ts`
 - Shared synthetic fixture model in `app/lib/syntheticFixtures.ts`
@@ -36,6 +40,7 @@ Current baseline includes:
 - Platform status endpoint at `/api/status`
 - Readiness endpoint at `/api/readiness`
 - Platform events endpoint at `/api/events`
+- Operating context endpoint at `/api/operating-context`
 - Integration contracts endpoint at `/api/contracts`
 - Per-contract API routes under `/api/contracts/[slug]`
 - Synthetic scenario endpoint at `/api/synthetic/scenarios`
@@ -63,9 +68,10 @@ Current active quality path:
 
 1. Vercel deployment status is the primary deploy gate.
 2. Synthetic fixture contracts and executable assertions validate workflow behavior without live patient data.
-3. Integration contracts define the data boundary before real connectors are implemented.
-4. Hub readiness and event endpoints expose operational status.
-5. Quality gates make every active, planned, and bypassed validation path explicit.
+3. The master operating context defines the mission, decision framework, Atlas boundary, FaithCore boundary, and delivery standard.
+4. Integration contracts define the data boundary before real connectors are implemented.
+5. Hub readiness and event endpoints expose operational status.
+6. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -100,6 +106,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - CarePath AI for patient intake, triage, and navigation
 - TrialCore for clinical trial discovery and matching
 - Watchtower / TrustWatch for AI reliability, drift detection, and safety monitoring
+- SCRIMED Atlas for faith-neutral enterprise governance, compliance, interoperability, ROI, and agentic operations
+- FaithCore for opt-in spiritually aligned encouragement and trust support with explicit clinical boundaries
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Synthetic validation before live clinical data or production integrations
 
@@ -131,15 +139,18 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Promoted executable synthetic validation into the quality gates summary.
 - Wired quality gates into the Hub route inventory, readiness checks, event stream, homepage, and Hub console.
 - Replaced the failing or unavailable verification path with a documented Vercel plus synthetic validation process.
+- Codified the SCRIMED SOLUTIONS master operating context in `docs/master-operating-context.md`, `app/lib/operatingContext.ts`, `/operating-context`, and `/api/operating-context`.
+- Added SCRIMED Atlas and FaithCore surfaces with explicit enterprise, faith, and clinical-safety boundaries.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
-2. Add generated request and response fixtures for each non-synthetic integration contract.
-3. Add fixture diffing so expected output changes are reviewed before workflow implementation.
-4. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-5. Add visual smoke checks for `/`, `/hub`, `/quality`, `/synthetic`, `/integrations`, and `/trust` once local browser/build tooling is available.
-6. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.
+2. Add an agent workflow registry that maps each planned SCRIMED agent to owner, permissions, inputs, outputs, audit events, and human review requirements.
+3. Add generated request and response fixtures for each non-synthetic integration contract.
+4. Add fixture diffing so expected output changes are reviewed before workflow implementation.
+5. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
+6. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, and `/trust` once local browser/build tooling is available.
+7. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.
 
 ## Notes
 
