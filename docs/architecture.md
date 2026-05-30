@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-05-29
+Updated: 2026-05-30
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -14,6 +14,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Agent workflow registry: `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
+- Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
 - Quality gates: `/quality` and `/api/quality/gates`
 - Core operational APIs: `/api/health`, `/api/status`, `/api/readiness`, `/api/events`, and `/api/hub/summary`
@@ -33,6 +34,8 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Healthcare interoperability contracts for FHIR and HL7
 - Claims, utilization, and pricing transparency contract boundaries
+- Synthetic request and expected-response fixtures for non-synthetic integration contracts
+- Fixture validation diffs for required-signal coverage, safeguard mapping, trace completeness, live-review gating, and expected-output fingerprints
 - Synthetic clinical fixtures for safe workflow validation
 - Future clinical records ingestion after contracts and synthetic checks are stable
 
@@ -71,6 +74,7 @@ Active gates:
 - Vercel deployment status as the primary deploy gate
 - Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
+- Integration fixture validation for non-synthetic connector coverage and expected-output change review
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
@@ -83,6 +87,7 @@ Managed bypasses:
 Replacement process:
 
 - Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
+- Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 

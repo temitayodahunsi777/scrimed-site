@@ -1,6 +1,6 @@
 # SCRIMED Project Status
 
-Updated: 2026-05-29
+Updated: 2026-05-30
 
 ## Current Baseline
 
@@ -20,6 +20,8 @@ Current baseline includes:
 - SCRIMED Atlas operating model at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
+- Integration fixture contracts at `/integrations/fixtures`
+- Integration fixture validation at `/integrations/fixture-validation`
 - Detailed contract routes under `/contracts/[slug]`
 - Synthetic clinical environment at `/synthetic`
 - Synthetic scenario routes under `/synthetic/[slug]`
@@ -34,6 +36,8 @@ Current baseline includes:
 - Shared operating context model in `app/lib/operatingContext.ts`
 - Shared agent workflow model in `app/lib/agentWorkflows.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
+- Shared integration fixture model in `app/lib/integrationFixtures.ts`
+- Shared integration fixture validation model in `app/lib/integrationFixtureValidation.ts`
 - Shared synthetic scenario model in `app/lib/syntheticClinical.ts`
 - Shared synthetic fixture model in `app/lib/syntheticFixtures.ts`
 - Shared synthetic validation model in `app/lib/syntheticValidation.ts`
@@ -46,6 +50,9 @@ Current baseline includes:
 - Operating context endpoint at `/api/operating-context`
 - Agent workflow registry endpoint at `/api/agents/workflows`
 - Per-agent workflow endpoints under `/api/agents/workflows/[slug]`
+- Integration fixture endpoint at `/api/integration-fixtures`
+- Per-fixture integration endpoints under `/api/integration-fixtures/[slug]`
+- Integration fixture validation endpoint at `/api/integration-fixtures/validation`
 - Integration contracts endpoint at `/api/contracts`
 - Per-contract API routes under `/api/contracts/[slug]`
 - Synthetic scenario endpoint at `/api/synthetic/scenarios`
@@ -75,9 +82,10 @@ Current active quality path:
 2. Synthetic fixture contracts and executable assertions validate workflow behavior without live patient data.
 3. The master operating context defines the mission, decision framework, Atlas boundary, FaithCore boundary, and delivery standard.
 4. The agent workflow registry defines owner, permissions, inputs, outputs, audit events, guardrails, interoperability targets, and human-review policy before agent execution.
-5. Integration contracts define the data boundary before real connectors are implemented.
-6. Hub readiness and event endpoints expose operational status.
-7. Quality gates make every active, planned, and bypassed validation path explicit.
+5. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
+6. Integration contracts define the data boundary before real connectors are implemented.
+7. Hub readiness and event endpoints expose operational status.
+8. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -116,6 +124,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - FaithCore for opt-in spiritually aligned encouragement and trust support with explicit clinical boundaries
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
+- Integration fixtures and validation diffs before live connector implementation
 - Synthetic validation before live clinical data or production integrations
 
 ## Completed Execution
@@ -149,16 +158,17 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Codified the SCRIMED SOLUTIONS master operating context in `docs/master-operating-context.md`, `app/lib/operatingContext.ts`, `/operating-context`, and `/api/operating-context`.
 - Added SCRIMED Atlas and FaithCore surfaces with explicit enterprise, faith, and clinical-safety boundaries.
 - Added a governed agent workflow registry in `app/lib/agentWorkflows.ts`, `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`.
+- Added synthetic request and expected-response fixtures for FHIR, HL7, claims/utilization, and pricing transparency contracts.
+- Added integration fixture validation and diff fingerprints in `/integrations/fixture-validation` and `/api/integration-fixtures/validation`.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
-2. Add generated request and response fixtures for each non-synthetic integration contract.
-3. Add fixture diffing so expected output changes are reviewed before workflow implementation.
-4. Map the first module workflow implementation to an agent workflow, synthetic fixture, integration contract, and quality gate.
-5. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-6. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, and `/trust` once local browser/build tooling is available.
-7. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.
+2. Map the first module workflow implementation to an agent workflow, synthetic fixture, integration contract, integration fixture, and quality gate.
+3. Add fixture change review notes so changed expected-output fingerprints are explicitly approved before workflow implementation.
+4. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
+5. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+6. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.
 
 ## Notes
 

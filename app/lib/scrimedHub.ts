@@ -1,4 +1,6 @@
 import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
+import { getIntegrationFixtureValidationResults } from "./integrationFixtureValidation";
+import { integrationFixtures } from "./integrationFixtures";
 import { integrationContracts } from "./integrationContracts";
 import { operatingContext } from "./operatingContext";
 import { syntheticFixtures } from "./syntheticFixtures";
@@ -69,6 +71,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Repository", value: "main baseline clean", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Agent registry", value: "governance scoped", tone: "good" },
+  { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
@@ -95,6 +98,8 @@ export const hubRoutes = [
   "/platform",
   "/trust",
   "/integrations",
+  "/integrations/fixtures",
+  "/integrations/fixture-validation",
   "/operating-context",
   "/agents",
   "/atlas",
@@ -106,6 +111,7 @@ export const hubRoutes = [
   ...syntheticScenarios.map((scenario) => scenario.route),
   ...syntheticFixtures.map((fixture) => fixture.route),
   ...integrationContracts.map((contract) => contract.route),
+  ...integrationFixtures.map((fixture) => fixture.route),
   ...agentWorkflows.map((workflow) => workflow.route),
   "/modules/clinical-copilot",
   "/modules/docutwin",
@@ -119,6 +125,9 @@ export const hubRoutes = [
   "/api/operating-context",
   "/api/agents/workflows",
   ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
+  "/api/integration-fixtures",
+  "/api/integration-fixtures/validation",
+  ...integrationFixtures.map((fixture) => `/api/integration-fixtures/${fixture.contractSlug}`),
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/synthetic/scenarios",
@@ -134,6 +143,7 @@ export function getHubSummary() {
   const stagedModules = hubModules.filter((module) => module.phase === "staged").length;
   const syntheticValidation = getSyntheticValidationResults();
   const agentWorkflowSummary = getAgentWorkflowSummary();
+  const integrationFixtureValidation = getIntegrationFixtureValidationResults();
 
   return {
     service: "scrimed-os-hub",
@@ -151,8 +161,9 @@ export function getHubSummary() {
       operatingModels: operatingContext.operatingModels
     },
     agentWorkflowSummary,
+    integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-05-29"
+    updated: "2026-05-30"
   };
 }

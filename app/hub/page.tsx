@@ -35,6 +35,11 @@ const consoleViews = [
     name: "Contracts",
     href: "/integrations",
     summary: "Inspect integration contracts before any live clinical data connector is implemented."
+  },
+  {
+    name: "Fixtures",
+    href: "/integrations/fixture-validation",
+    summary: "Review integration fixture coverage, safeguard mapping, and expected-output fingerprints."
   }
 ];
 

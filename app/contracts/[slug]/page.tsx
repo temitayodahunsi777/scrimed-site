@@ -4,6 +4,8 @@ import {
   getIntegrationContractBySlug,
   integrationContracts
 } from "../../lib/integrationContracts";
+import { getIntegrationFixtureBySlug } from "../../lib/integrationFixtures";
+import { validateIntegrationFixtureBySlug } from "../../lib/integrationFixtureValidation";
 
 export function generateStaticParams() {
   return integrationContracts.map((contract) => ({
@@ -18,6 +20,8 @@ export default async function ContractDetailPage({
 }) {
   const { slug } = await params;
   const contract = getIntegrationContractBySlug(slug);
+  const fixture = getIntegrationFixtureBySlug(slug);
+  const validation = validateIntegrationFixtureBySlug(slug);
 
   if (!contract) {
     notFound();
@@ -50,6 +54,27 @@ export default async function ContractDetailPage({
           <strong>{contract.safeguards.length}</strong>
         </article>
       </section>
+
+      {fixture && validation ? (
+        <section className="section-band hub-summary" aria-label="Contract fixture summary">
+          <article>
+            <span>Fixture</span>
+            <strong>{validation.status}</strong>
+          </article>
+          <article>
+            <span>Fingerprint</span>
+            <strong>{validation.diff.fingerprint}</strong>
+          </article>
+          <article>
+            <span>Checks passed</span>
+            <strong>{validation.passed}</strong>
+          </article>
+          <article>
+            <span>Fixture route</span>
+            <strong>{fixture.route}</strong>
+          </article>
+        </section>
+      ) : null}
 
       <section className="section-band split-band">
         <div>

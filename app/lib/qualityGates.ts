@@ -1,4 +1,5 @@
 import { getSyntheticValidationResults } from "./syntheticValidation";
+import { getIntegrationFixtureValidationResults } from "./integrationFixtureValidation";
 
 export type QualityGate = {
   name: string;
@@ -26,6 +27,12 @@ export const qualityGates: QualityGate[] = [
     route: "/integrations",
     state: "active",
     role: "Interface boundary before FHIR, HL7, claims, pricing, or synthetic connectors are implemented."
+  },
+  {
+    name: "Integration fixture validation",
+    route: "/integrations/fixture-validation",
+    state: "active",
+    role: "Synthetic request and expected-response fixture coverage, safeguard mapping, and diff fingerprints before live connector implementation."
   },
   {
     name: "Hub readiness checks",
@@ -63,15 +70,21 @@ export const qualityGates: QualityGate[] = [
 
 export function getQualityGateSummary() {
   const syntheticValidation = getSyntheticValidationResults();
+  const integrationFixtureValidation = getIntegrationFixtureValidationResults();
 
   return {
     service: "scrimed-quality-gates",
-    status: syntheticValidation.status === "pass" ? "active-with-managed-bypass" : "attention-required",
+    status:
+      syntheticValidation.status === "pass" &&
+      integrationFixtureValidation.status === "pass"
+        ? "active-with-managed-bypass"
+        : "attention-required",
     gates: qualityGates,
     active: qualityGates.filter((gate) => gate.state === "active").length,
     bypassed: qualityGates.filter((gate) => gate.state === "bypassed").length,
     planned: qualityGates.filter((gate) => gate.state === "planned").length,
     syntheticValidation,
-    updated: "2026-05-29"
+    integrationFixtureValidation,
+    updated: "2026-05-30"
   };
 }

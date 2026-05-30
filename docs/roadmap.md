@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-05-29
+Updated: 2026-05-30
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -11,6 +11,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Vercel is the active deploy gate.
 - The SCRIMED master operating context is an active decision gate for mission alignment, quality standard, Atlas, FaithCore, interoperability, and security.
 - The agent workflow registry is the active scope gate for specialized agents before workflow execution.
+- Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
 - Quality gates document active, planned, and bypassed checks.
@@ -49,6 +50,8 @@ Objective: Validate product workflows without live patient data and define conne
 Completed foundations:
 
 - Integration contracts page and API
+- Integration fixture pages and APIs
+- Integration fixture validation with coverage checks, safeguard mapping, and diff fingerprints
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
@@ -62,9 +65,9 @@ Completed foundations:
 
 Next build targets:
 
-- Generated request and response fixtures for every non-synthetic integration contract
-- Fixture diffing for expected output changes
-- First module workflow implementation mapped to an agent workflow and fixture-backed synthetic inputs
+- Fixture change review notes for expected-output fingerprint changes
+- First module workflow implementation mapped to an agent workflow, integration fixture, and fixture-backed synthetic inputs
+- Module workflow execution API for one staged workflow before live connector work
 
 ## Phase 3 - Intelligence Layer
 
@@ -97,7 +100,7 @@ Modules include:
 
 Entry condition:
 
-- Each workflow should have a route, API contract, synthetic fixture, expected outcome, and review requirement before production integration.
+- Each workflow should have a route, API contract, integration fixture, synthetic fixture, expected outcome, and review requirement before production integration.
 
 ## Phase 5 - Trust and Safety Infrastructure
 

@@ -34,6 +34,7 @@ const readinessSignals = [
   { label: "Context", value: "/api/operating-context" },
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Quality", value: "/api/quality/gates" },
+  { label: "Fixtures", value: "/api/integration-fixtures/validation" },
   { label: "Synthetic", value: "/api/synthetic/validation" },
   { label: "Contracts", value: "/api/contracts" }
 ];
@@ -99,6 +100,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Agent governance registry online
+              </div>
+              <div>
+                <span className="trace-dot" /> Integration fixture diffs active
               </div>
             </div>
           </aside>

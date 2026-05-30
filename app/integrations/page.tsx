@@ -13,6 +13,16 @@ export default function IntegrationsPage() {
       </section>
 
       <section className="table-section" aria-label="SCRIMED integration contracts">
+        <article className="module-row">
+          <div>
+            <span>active validation</span>
+            <h2>Integration fixture validation</h2>
+          </div>
+          <p>synthetic request and expected-response fixtures</p>
+          <a className="module-link" href="/integrations/fixture-validation">
+            Review coverage, safeguard mapping, and fixture diff fingerprints before live connector work.
+          </a>
+        </article>
         {integrationContracts.map((contract) => (
           <article className="module-row" key={contract.name}>
             <div>
