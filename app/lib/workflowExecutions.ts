@@ -4,6 +4,7 @@ import { validateIntegrationFixtureBySlug } from "./integrationFixtureValidation
 import { getSyntheticFixtureBySlug } from "./syntheticFixtures";
 import { getSyntheticValidationResultBySlug } from "./syntheticValidation";
 import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
+import { getWorkflowExecutionResultBySlug } from "./workflowExecutionResults";
 
 export type WorkflowExecutionStatus = "synthetic-ready" | "attention-required";
 
@@ -107,6 +108,134 @@ export const workflowExecutions: WorkflowExecution[] = [
       "treatment order",
       "production data ingestion"
     ]
+  },
+  {
+    slug: "docutwin-draft-note-review",
+    name: "DocuTwin Draft Note Review",
+    module: "DocuTwin",
+    route: "/workflows/docutwin-draft-note-review",
+    apiRoute: "/api/workflows/executions/docutwin-draft-note-review",
+    status: "staged",
+    objective:
+      "Generate a reviewable synthetic draft note while preserving source traceability, draft-only status, and clinician authorship.",
+    agentWorkflowSlug: "documentation-agent",
+    syntheticScenarioId: "docutwin-note-review",
+    integrationFixtureSlugs: ["fhir-clinical-record-intake", "hl7-event-feed"],
+    qualityGateRoutes: [
+      "/synthetic/validation",
+      "/integrations/fixture-validation",
+      "/fixtures/change-review",
+      "/workflows/results",
+      "/quality"
+    ],
+    requiredInputs: [
+      "synthetic structured vitals",
+      "synthetic medication list",
+      "conversation summary",
+      "template requirements",
+      "review owner"
+    ],
+    expectedOutputs: [
+      "draft note",
+      "source trace",
+      "missing context prompts",
+      "clinician review required",
+      "no final signature"
+    ],
+    executionSteps: [
+      "load synthetic fixture",
+      "validate documentation boundary",
+      "attach source trace",
+      "prepare draft-only note",
+      "record Watchtower trace",
+      "hold for clinician review"
+    ],
+    watchtowerTrace: [
+      "synthetic_fixture_loaded",
+      "documentation_boundary_checked",
+      "source_trace_attached",
+      "draft_note_prepared",
+      "clinician_review_required"
+    ],
+    humanReview: "licensed clinician review before documentation becomes part of the record",
+    promotionCriteria: [
+      "synthetic validation passes",
+      "fixture change reviews are approved",
+      "source trace remains attached",
+      "draft-only guardrail is retained",
+      "no live connector dependency is introduced"
+    ],
+    prohibitedActions: [
+      "signed note",
+      "final medical record",
+      "uncited diagnosis insertion",
+      "autonomous documentation filing",
+      "production data ingestion"
+    ]
+  },
+  {
+    slug: "trialcore-eligibility-review-queue",
+    name: "TrialCore Eligibility Review Queue",
+    module: "TrialCore",
+    route: "/workflows/trialcore-eligibility-review-queue",
+    apiRoute: "/api/workflows/executions/trialcore-eligibility-review-queue",
+    status: "staged",
+    objective:
+      "Compare synthetic oncology signals against mock trial criteria and create a review queue without enrollment or treatment claims.",
+    agentWorkflowSlug: "trial-matching-agent",
+    syntheticScenarioId: "trialcore-eligibility-screen",
+    integrationFixtureSlugs: ["fhir-clinical-record-intake", "claims-utilization-dataset"],
+    qualityGateRoutes: [
+      "/synthetic/validation",
+      "/integrations/fixture-validation",
+      "/fixtures/change-review",
+      "/workflows/results",
+      "/quality"
+    ],
+    requiredInputs: [
+      "synthetic oncology profile",
+      "prior therapy summary",
+      "mock trial criteria",
+      "lab recency signal",
+      "review owner"
+    ],
+    expectedOutputs: [
+      "candidate match rationale",
+      "missing evidence list",
+      "exclusion flags",
+      "criteria trace",
+      "research coordinator review required"
+    ],
+    executionSteps: [
+      "load synthetic fixture",
+      "validate trial matching boundary",
+      "compare mock criteria",
+      "retain criteria trace",
+      "create research review queue",
+      "hold for coordinator review"
+    ],
+    watchtowerTrace: [
+      "synthetic_fixture_loaded",
+      "trial_matching_boundary_checked",
+      "criteria_trace_retained",
+      "review_queue_created",
+      "research_review_required"
+    ],
+    humanReview: "research coordinator or qualified clinician review before outreach, enrollment, or recommendation",
+    promotionCriteria: [
+      "synthetic validation passes",
+      "fixture change reviews are approved",
+      "criteria trace remains attached",
+      "enrollment claims remain blocked",
+      "no live connector dependency is introduced"
+    ],
+    prohibitedActions: [
+      "enrollment guarantee",
+      "eligibility certification",
+      "treatment recommendation",
+      "patient outreach",
+      "production data ingestion"
+    ]
   }
 ];
 
@@ -143,6 +272,7 @@ export function validateWorkflowExecution(
     getIntegrationFixtureBySlug(slug)
   );
   const fixtureChangeReview = getFixtureChangeReviewSummary();
+  const executionResult = getWorkflowExecutionResultBySlug(workflow.slug);
 
   const checks = [
     createCheck(
@@ -204,7 +334,31 @@ export function validateWorkflowExecution(
       "no_live_connector_dependency",
       "No live connector dependency",
       workflow.prohibitedActions.includes("production data ingestion"),
-      "First workflow execution must remain synthetic-only and block production data ingestion."
+      "Workflow execution must remain synthetic-only and block production data ingestion."
+    ),
+    createCheck(
+      "execution_result_fixture",
+      "Execution result fixture",
+      Boolean(executionResult) && executionResult?.syntheticOnly === true,
+      "Workflow execution must have a deterministic synthetic result fixture."
+    ),
+    createCheck(
+      "execution_result_trace",
+      "Execution result trace",
+      Boolean(executionResult) &&
+        workflow.watchtowerTrace.every((step) =>
+          executionResult!.watchtowerTrace.includes(step)
+        ),
+      "Execution result fixture must preserve the workflow Watchtower trace."
+    ),
+    createCheck(
+      "execution_result_outputs",
+      "Execution result outputs",
+      Boolean(executionResult) &&
+        workflow.expectedOutputs.every((signal) =>
+          executionResult!.outputSignals.includes(signal)
+        ),
+      "Execution result fixture must preserve every expected workflow output signal."
     )
   ];
 
@@ -244,6 +398,6 @@ export function getWorkflowExecutionSummary() {
     attentionRequired,
     workflows: workflowExecutions,
     readiness,
-    updated: "2026-05-30"
+    updated: "2026-05-31"
   };
 }

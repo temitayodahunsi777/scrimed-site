@@ -21,7 +21,8 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "official_website", status: "pass", detail: "The official SCRIMED SOLUTIONS website is recorded as https://www.scrimedsolutions.com through Wix." },
   { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
   { name: "agent_workflow_registry", status: "pass", detail: "/agents and /api/agents/workflows are available with permissions, audit events, and human-review boundaries." },
-  { name: "workflow_execution_surface", status: "pass", detail: "/workflows and /api/workflows/executions stage synthetic-only workflow execution readiness." },
+  { name: "workflow_execution_surface", status: "pass", detail: "/workflows and /api/workflows/executions stage synthetic-only workflow execution readiness for CarePath AI, DocuTwin, and TrialCore." },
+  { name: "workflow_execution_results", status: "pass", detail: "/workflows/results and /api/workflows/results expose deterministic synthetic result fixtures." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "integration_fixtures", status: "pass", detail: "/integrations/fixtures and /api/integration-fixtures are available for non-synthetic connector contracts." },
   { name: "integration_fixture_validation", status: "pass", detail: "/integrations/fixture-validation and /api/integration-fixtures/validation expose coverage, safeguard mapping, and diff fingerprints." },
@@ -108,6 +109,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-30"
   },
   {
+    id: "scrimed-workflow-result-fixtures",
+    type: "operations",
+    summary: "Expanded workflow readiness to CarePath AI, DocuTwin, and TrialCore, then added deterministic execution-result fixtures for each staged workflow.",
+    date: "2026-05-31"
+  },
+  {
     id: "scrimed-official-website-context",
     type: "product",
     summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
@@ -129,8 +136,8 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, the first synthetic workflow execution surface, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
-    updated: "2026-05-30"
+    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    updated: "2026-05-31"
   };
 }
 

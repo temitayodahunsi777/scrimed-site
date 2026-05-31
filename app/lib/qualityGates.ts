@@ -1,6 +1,7 @@
 import { getSyntheticValidationResults } from "./syntheticValidation";
 import { getIntegrationFixtureValidationResults } from "./integrationFixtureValidation";
 import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
+import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
 
 export type QualityGate = {
@@ -46,7 +47,13 @@ export const qualityGates: QualityGate[] = [
     name: "Synthetic workflow execution",
     route: "/workflows",
     state: "active",
-    role: "First module workflow execution readiness mapped to an agent workflow, fixtures, quality gates, and Watchtower traces."
+    role: "Staged module workflow execution readiness mapped to agent workflows, fixtures, quality gates, result fixtures, and Watchtower traces."
+  },
+  {
+    name: "Workflow execution result fixtures",
+    route: "/workflows/results",
+    state: "active",
+    role: "Deterministic synthetic result fixtures for staged workflow outputs, traces, review states, and blocked actions."
   },
   {
     name: "Hub readiness checks",
@@ -87,6 +94,7 @@ export function getQualityGateSummary() {
   const integrationFixtureValidation = getIntegrationFixtureValidationResults();
   const fixtureChangeReview = getFixtureChangeReviewSummary();
   const workflowExecution = getWorkflowExecutionSummary();
+  const workflowExecutionResults = getWorkflowExecutionResultSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -94,7 +102,8 @@ export function getQualityGateSummary() {
       syntheticValidation.status === "pass" &&
       integrationFixtureValidation.status === "pass" &&
       fixtureChangeReview.status === "pass" &&
-      workflowExecution.status === "synthetic-ready"
+      workflowExecution.status === "synthetic-ready" &&
+      workflowExecutionResults.status === "result-fixtures-ready"
         ? "active-with-managed-bypass"
         : "attention-required",
     gates: qualityGates,
@@ -105,6 +114,7 @@ export function getQualityGateSummary() {
     integrationFixtureValidation,
     fixtureChangeReview,
     workflowExecution,
-    updated: "2026-05-30"
+    workflowExecutionResults,
+    updated: "2026-05-31"
   };
 }

@@ -34,6 +34,7 @@ const readinessSignals = [
   { label: "Context", value: "/api/operating-context" },
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Workflows", value: "/api/workflows/executions" },
+  { label: "Results", value: "/api/workflows/results" },
   { label: "Quality", value: "/api/quality/gates" },
   { label: "Reviews", value: "/api/fixtures/change-review" },
   { label: "Fixtures", value: "/api/integration-fixtures/validation" },
@@ -108,6 +109,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> CarePath synthetic workflow staged
+              </div>
+              <div>
+                <span className="trace-dot" /> DocuTwin and TrialCore workflows staged
               </div>
             </div>
           </aside>

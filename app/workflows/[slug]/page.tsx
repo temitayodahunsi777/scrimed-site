@@ -4,6 +4,7 @@ import {
   getWorkflowExecutionReadinessBySlug,
   workflowExecutions
 } from "../../lib/workflowExecutions";
+import { getWorkflowExecutionResultBySlug } from "../../lib/workflowExecutionResults";
 
 export function generateStaticParams() {
   return workflowExecutions.map((workflow) => ({
@@ -19,6 +20,7 @@ export default async function WorkflowExecutionDetailPage({
   const { slug } = await params;
   const workflow = getWorkflowExecutionBySlug(slug);
   const readiness = getWorkflowExecutionReadinessBySlug(slug);
+  const result = getWorkflowExecutionResultBySlug(slug);
 
   if (!workflow || !readiness) {
     notFound();
@@ -50,6 +52,10 @@ export default async function WorkflowExecutionDetailPage({
           <span>Failed</span>
           <strong>{readiness.failed}</strong>
         </article>
+        <article>
+          <span>Result</span>
+          <strong>{result?.decisionState ?? "missing"}</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
@@ -75,6 +81,24 @@ export default async function WorkflowExecutionDetailPage({
           </article>
         ))}
       </section>
+
+      {result ? (
+        <section className="section-band split-band">
+          <div>
+            <p className="eyebrow">Result fixture</p>
+            <h2>{result.resultId}</h2>
+            <p className="section-copy">{result.reviewState}</p>
+          </div>
+          <div className="layer-list">
+            {result.outputSignals.map((signal, index) => (
+              <div className="layer-row" key={signal}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{signal}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="section-band split-band">
         <div>

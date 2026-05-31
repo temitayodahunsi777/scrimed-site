@@ -13,7 +13,7 @@ export default function WorkflowExecutionsPage() {
         <p className="eyebrow">Workflow execution</p>
         <h1>SCRIMED stages workflow execution against synthetic fixtures before live clinical operations.</h1>
         <p className="hero-text">
-          The first execution surface maps CarePath AI to a governed agent workflow, synthetic fixture, integration fixtures, quality gates, and Watchtower trace requirements.
+          CarePath AI, DocuTwin, and TrialCore now map to governed agent workflows, synthetic fixtures, integration fixtures, quality gates, result fixtures, and Watchtower trace requirements.
         </p>
       </section>
 
@@ -37,6 +37,16 @@ export default function WorkflowExecutionsPage() {
       </section>
 
       <section className="table-section" aria-label="Synthetic workflow executions">
+        <article className="module-row">
+          <div>
+            <span>result fixtures</span>
+            <h2>Workflow execution results</h2>
+          </div>
+          <p>deterministic synthetic output evidence</p>
+          <a className="module-link" href="/workflows/results">
+            Review result fixtures before live workflow automation.
+          </a>
+        </article>
         {summary.workflows.map((workflow) => {
           const readiness = validateWorkflowExecution(workflow);
 

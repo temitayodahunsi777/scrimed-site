@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-05-30
+Updated: 2026-05-31
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -12,7 +12,8 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - The SCRIMED master operating context is an active decision gate for mission alignment, quality standard, Atlas, FaithCore, interoperability, and security.
 - The agent workflow registry is the active scope gate for specialized agents before workflow execution.
 - Fixture change review is the active expected-output approval gate before implementation depends on changed fixtures.
-- Synthetic workflow execution is the active first-module execution gate before live workflow automation.
+- Synthetic workflow execution is the active staged-module execution gate before live workflow automation.
+- Workflow execution result fixtures are the active output, trace, review-state, and blocked-action gate before implementation.
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
@@ -55,7 +56,8 @@ Completed foundations:
 - Integration fixture pages and APIs
 - Integration fixture validation with coverage checks, safeguard mapping, and diff fingerprints
 - Fixture change-review page and API for expected-output fingerprint approval
-- First CarePath AI synthetic workflow execution readiness surface
+- Synthetic workflow execution readiness surfaces for CarePath AI, DocuTwin, and TrialCore
+- Deterministic workflow execution result fixtures for staged workflow outputs, traces, review states, blocked actions, and quality evidence
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
@@ -66,12 +68,13 @@ Completed foundations:
 - Deterministic checks for labels, identifier safety, fixture presence, contract boundaries, trace alignment, assertions, expected outputs, prohibited claims, and human review guardrails
 - Quality gates page and API
 - Synthetic validation status promoted into quality gates
+- Workflow execution result fixture status promoted into quality gates
 
 Next build targets:
 
-- Add workflow execution records for DocuTwin and TrialCore after the CarePath path is stable
-- Add promotion-review notes for workflow readiness changes
-- Add module workflow execution result fixtures before live connector work
+- Add promotion-review notes for workflow readiness and result-fixture changes
+- Add execution-result validation or diff checks for expected outputs, result output signals, Watchtower traces, and blocked actions
+- Add governed execution API contracts only after result-fixture validation is stable
 
 ## Phase 3 - Intelligence Layer
 
@@ -104,7 +107,7 @@ Modules include:
 
 Entry condition:
 
-- Each workflow should have a route, API contract, integration fixture, synthetic fixture, expected outcome, and review requirement before production integration.
+- Each workflow should have a route, API contract, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
 
 ## Phase 5 - Trust and Safety Infrastructure
 

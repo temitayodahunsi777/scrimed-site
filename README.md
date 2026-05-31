@@ -64,6 +64,7 @@ Current focus areas include:
 
 - AI agent architecture
 - synthetic workflow execution readiness
+- deterministic workflow execution result fixtures
 - clinical workflow automation
 - healthcare data interoperability
 - fixture change review and quality gates

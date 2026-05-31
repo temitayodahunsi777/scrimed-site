@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-05-30
+Updated: 2026-05-31
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -14,6 +14,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Master operating context: `/operating-context`, `/atlas`, `/faithcore`, and `/api/operating-context`
 - Agent workflow registry: `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`
 - Synthetic workflow execution: `/workflows`, `/workflows/[slug]`, `/api/workflows/executions`, and `/api/workflows/executions/[slug]`
+- Workflow execution result fixtures: `/workflows/results`, `/workflows/results/[slug]`, `/api/workflows/results`, and `/api/workflows/results/[slug]`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
@@ -40,6 +41,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Synthetic request and expected-response fixtures for non-synthetic integration contracts
 - Fixture validation diffs for required-signal coverage, safeguard mapping, trace completeness, live-review gating, and expected-output fingerprints
 - Fixture change-review records for integration and synthetic expected-output fingerprints
+- Workflow execution result fixtures for deterministic synthetic outputs, review state, blocked actions, quality evidence, and Watchtower trace retention
 - Synthetic clinical fixtures for safe workflow validation
 - Future clinical records ingestion after contracts and synthetic checks are stable
 
@@ -55,7 +57,8 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Clinical Copilot for clinician-facing decision support
 - DocuTwin for structured draft documentation workflows
 - CarePath AI for intake, triage, and navigation operations
-- First synthetic execution surface for CarePath high-risk follow-up routing
+- Synthetic execution readiness for CarePath high-risk follow-up routing, DocuTwin draft note review, and TrialCore eligibility review queue
+- Deterministic result fixtures before workflow execution can move toward live automation
 - TrialCore for research matching workflows
 - Agent Commander registry for specialized governed agents across clinical, administrative, research, interoperability, compliance, and operational workflows
 - Watchtower for reliability, safety, and operational traces
@@ -81,7 +84,7 @@ Active gates:
 - Integration contracts for future connector boundaries
 - Integration fixture validation for non-synthetic connector coverage and expected-output change review
 - Fixture change review for expected-output fingerprint approval
-- Synthetic workflow execution readiness for staged module workflows
+- Synthetic workflow execution readiness and deterministic result fixtures for staged module workflows
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
@@ -96,7 +99,7 @@ Replacement process:
 - Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
-- Synthetic workflow execution readiness replaces premature live workflow automation.
+- Synthetic workflow execution readiness and deterministic result fixtures replace premature live workflow automation.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 
@@ -115,6 +118,19 @@ Each synthetic scenario now receives deterministic checks for:
 - assertion completeness
 - expected output signals and prohibited claims
 - human review, draft, no-final-claim, or Watchtower guardrails
+
+## Workflow Execution Result Fixtures
+
+Each staged workflow execution now requires a synthetic-only result fixture that preserves:
+
+- expected output signals
+- Watchtower trace steps
+- human review state
+- reviewer role
+- prohibited or blocked actions
+- quality evidence before promotion
+
+The current staged workflows cover CarePath AI, DocuTwin, and TrialCore. This keeps the platform moving toward executable workflows while blocking live patient routing, final documentation, enrollment claims, treatment recommendations, and production data ingestion until promotion review and connector governance are explicit.
 
 ## Watchtower Monitoring System
 
