@@ -2,6 +2,8 @@
 
 SCRIMED is an AI-driven healthcare intelligence platform designed to support clinical decision-making, workflow automation, and population health insights through advanced artificial intelligence systems.
 
+Official website: https://www.scrimedsolutions.com
+
 The mission of SCRIMED is to help modernize healthcare operations, improve patient outcomes, and reduce systemic inefficiencies by building trustworthy, scalable AI infrastructure for the healthcare ecosystem.
 
 ---
@@ -61,8 +63,10 @@ SCRIMED is currently under active development. The platform is being designed an
 Current focus areas include:
 
 - AI agent architecture
+- synthetic workflow execution readiness
 - clinical workflow automation
 - healthcare data interoperability
+- fixture change review and quality gates
 - safety and governance infrastructure
 - deployment monitoring systems
 

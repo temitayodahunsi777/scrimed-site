@@ -49,6 +49,9 @@ export default function OperatingContextPage() {
         <div>
           <p className="eyebrow">Mission</p>
           <h2>{operatingContext.mission}</h2>
+          <p className="section-copy">
+            Official website: {operatingContext.officialWebsite} via {operatingContext.websiteProvider}.
+          </p>
         </div>
         <div className="layer-list">
           {operatingContext.principles.map((principle, index) => (

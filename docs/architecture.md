@@ -8,13 +8,16 @@ SCRIMED is designed as an AI-native healthcare intelligence platform composed of
 
 The current `scrimed-site` application is a Next.js App Router platform surface with these foundation layers:
 
+- Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
 - Master operating context: `/operating-context`, `/atlas`, `/faithcore`, and `/api/operating-context`
 - Agent workflow registry: `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`
+- Synthetic workflow execution: `/workflows`, `/workflows/[slug]`, `/api/workflows/executions`, and `/api/workflows/executions/[slug]`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
+- Fixture change review: `/fixtures/change-review` and `/api/fixtures/change-review`
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
 - Quality gates: `/quality` and `/api/quality/gates`
 - Core operational APIs: `/api/health`, `/api/status`, `/api/readiness`, `/api/events`, and `/api/hub/summary`
@@ -36,6 +39,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Claims, utilization, and pricing transparency contract boundaries
 - Synthetic request and expected-response fixtures for non-synthetic integration contracts
 - Fixture validation diffs for required-signal coverage, safeguard mapping, trace completeness, live-review gating, and expected-output fingerprints
+- Fixture change-review records for integration and synthetic expected-output fingerprints
 - Synthetic clinical fixtures for safe workflow validation
 - Future clinical records ingestion after contracts and synthetic checks are stable
 
@@ -51,6 +55,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Clinical Copilot for clinician-facing decision support
 - DocuTwin for structured draft documentation workflows
 - CarePath AI for intake, triage, and navigation operations
+- First synthetic execution surface for CarePath high-risk follow-up routing
 - TrialCore for research matching workflows
 - Agent Commander registry for specialized governed agents across clinical, administrative, research, interoperability, compliance, and operational workflows
 - Watchtower for reliability, safety, and operational traces
@@ -75,6 +80,8 @@ Active gates:
 - Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
 - Integration fixture validation for non-synthetic connector coverage and expected-output change review
+- Fixture change review for expected-output fingerprint approval
+- Synthetic workflow execution readiness for staged module workflows
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
@@ -88,6 +95,8 @@ Replacement process:
 
 - Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
+- Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
+- Synthetic workflow execution readiness replaces premature live workflow automation.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 

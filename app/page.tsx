@@ -33,7 +33,9 @@ const readinessSignals = [
   { label: "OS Hub", value: "/hub" },
   { label: "Context", value: "/api/operating-context" },
   { label: "Agents", value: "/api/agents/workflows" },
+  { label: "Workflows", value: "/api/workflows/executions" },
   { label: "Quality", value: "/api/quality/gates" },
+  { label: "Reviews", value: "/api/fixtures/change-review" },
   { label: "Fixtures", value: "/api/integration-fixtures/validation" },
   { label: "Synthetic", value: "/api/synthetic/validation" },
   { label: "Contracts", value: "/api/contracts" }
@@ -68,7 +70,7 @@ export default function Home() {
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
               <a className="primary-action" href="/hub">Open OS Hub</a>
-              <a className="secondary-action" href="/operating-context">Operating context</a>
+              <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>
           </div>
 
@@ -103,6 +105,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Integration fixture diffs active
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> CarePath synthetic workflow staged
               </div>
             </div>
           </aside>

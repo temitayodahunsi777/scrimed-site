@@ -11,6 +11,8 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Vercel is the active deploy gate.
 - The SCRIMED master operating context is an active decision gate for mission alignment, quality standard, Atlas, FaithCore, interoperability, and security.
 - The agent workflow registry is the active scope gate for specialized agents before workflow execution.
+- Fixture change review is the active expected-output approval gate before implementation depends on changed fixtures.
+- Synthetic workflow execution is the active first-module execution gate before live workflow automation.
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
@@ -52,6 +54,8 @@ Completed foundations:
 - Integration contracts page and API
 - Integration fixture pages and APIs
 - Integration fixture validation with coverage checks, safeguard mapping, and diff fingerprints
+- Fixture change-review page and API for expected-output fingerprint approval
+- First CarePath AI synthetic workflow execution readiness surface
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
@@ -65,9 +69,9 @@ Completed foundations:
 
 Next build targets:
 
-- Fixture change review notes for expected-output fingerprint changes
-- First module workflow implementation mapped to an agent workflow, integration fixture, and fixture-backed synthetic inputs
-- Module workflow execution API for one staged workflow before live connector work
+- Add workflow execution records for DocuTwin and TrialCore after the CarePath path is stable
+- Add promotion-review notes for workflow readiness changes
+- Add module workflow execution result fixtures before live connector work
 
 ## Phase 3 - Intelligence Layer
 

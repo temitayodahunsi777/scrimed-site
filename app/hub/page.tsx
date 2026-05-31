@@ -17,6 +17,11 @@ const consoleViews = [
     summary: "Review governed agent workflows, permissions, audit events, and human-review boundaries."
   },
   {
+    name: "Workflows",
+    href: "/workflows",
+    summary: "Review synthetic workflow execution readiness for staged module workflows."
+  },
+  {
     name: "Quality",
     href: "/quality",
     summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."
@@ -40,6 +45,11 @@ const consoleViews = [
     name: "Fixtures",
     href: "/integrations/fixture-validation",
     summary: "Review integration fixture coverage, safeguard mapping, and expected-output fingerprints."
+  },
+  {
+    name: "Review",
+    href: "/fixtures/change-review",
+    summary: "Review approved fixture fingerprints before workflow and connector changes depend on them."
   }
 ];
 

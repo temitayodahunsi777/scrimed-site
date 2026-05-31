@@ -1,5 +1,7 @@
 import { getSyntheticValidationResults } from "./syntheticValidation";
 import { getIntegrationFixtureValidationResults } from "./integrationFixtureValidation";
+import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
+import { getWorkflowExecutionSummary } from "./workflowExecutions";
 
 export type QualityGate = {
   name: string;
@@ -33,6 +35,18 @@ export const qualityGates: QualityGate[] = [
     route: "/integrations/fixture-validation",
     state: "active",
     role: "Synthetic request and expected-response fixture coverage, safeguard mapping, and diff fingerprints before live connector implementation."
+  },
+  {
+    name: "Fixture change review",
+    route: "/fixtures/change-review",
+    state: "active",
+    role: "Expected-output fingerprint approval before workflows, agents, or connectors depend on fixture changes."
+  },
+  {
+    name: "Synthetic workflow execution",
+    route: "/workflows",
+    state: "active",
+    role: "First module workflow execution readiness mapped to an agent workflow, fixtures, quality gates, and Watchtower traces."
   },
   {
     name: "Hub readiness checks",
@@ -71,12 +85,16 @@ export const qualityGates: QualityGate[] = [
 export function getQualityGateSummary() {
   const syntheticValidation = getSyntheticValidationResults();
   const integrationFixtureValidation = getIntegrationFixtureValidationResults();
+  const fixtureChangeReview = getFixtureChangeReviewSummary();
+  const workflowExecution = getWorkflowExecutionSummary();
 
   return {
     service: "scrimed-quality-gates",
     status:
       syntheticValidation.status === "pass" &&
-      integrationFixtureValidation.status === "pass"
+      integrationFixtureValidation.status === "pass" &&
+      fixtureChangeReview.status === "pass" &&
+      workflowExecution.status === "synthetic-ready"
         ? "active-with-managed-bypass"
         : "attention-required",
     gates: qualityGates,
@@ -85,6 +103,8 @@ export function getQualityGateSummary() {
     planned: qualityGates.filter((gate) => gate.state === "planned").length,
     syntheticValidation,
     integrationFixtureValidation,
+    fixtureChangeReview,
+    workflowExecution,
     updated: "2026-05-30"
   };
 }

@@ -10,6 +10,8 @@ export type OperatingContext = {
   company: string;
   founder: string;
   slogan: string;
+  officialWebsite: string;
+  websiteProvider: string;
   mission: string;
   longTermVision: string;
   principles: string[];
@@ -32,6 +34,8 @@ export const operatingContext: OperatingContext = {
   company: "SCRIMED SOLUTIONS",
   founder: "Temitayo Dahunsi",
   slogan: "Solving For A Better Tomorrow.",
+  officialWebsite: "https://www.scrimedsolutions.com",
+  websiteProvider: "Wix",
   mission:
     "Improve healthcare worldwide through intelligent, trustworthy, scalable, secure, and interoperable AI systems that create measurable value for patients, clinicians, health systems, payers, governments, researchers, and underserved populations.",
   longTermVision:
@@ -186,7 +190,7 @@ export const operatingContext: OperatingContext = {
   ],
   ultimateObjective:
     "Build the most trusted healthcare intelligence company in the world and improve healthcare globally through excellence, integrity, safety, interoperability, scalability, and long-term thinking.",
-  updated: "2026-05-29"
+  updated: "2026-05-30"
 };
 
 export function getOperatingContextSummary() {
@@ -194,6 +198,8 @@ export function getOperatingContextSummary() {
     service: "scrimed-operating-context",
     company: operatingContext.company,
     slogan: operatingContext.slogan,
+    officialWebsite: operatingContext.officialWebsite,
+    websiteProvider: operatingContext.websiteProvider,
     mission: operatingContext.mission,
     longTermVision: operatingContext.longTermVision,
     operatingModels: operatingContext.operatingModels,

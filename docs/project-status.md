@@ -8,6 +8,7 @@ The active `scrimed-site` baseline is a Next.js App Router site on `main`. PR #1
 
 Current baseline includes:
 
+- Official public website context for https://www.scrimedsolutions.com through Wix
 - Next.js App Router project structure
 - Root page at `/`
 - SCRIMED OS Hub console at `/hub`
@@ -17,11 +18,14 @@ Current baseline includes:
 - Master operating context at `/operating-context`
 - Agent workflow registry at `/agents`
 - Agent workflow detail routes under `/agents/[slug]`
+- Synthetic workflow execution readiness at `/workflows`
+- Workflow execution detail routes under `/workflows/[slug]`
 - SCRIMED Atlas operating model at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
 - Integration fixture contracts at `/integrations/fixtures`
 - Integration fixture validation at `/integrations/fixture-validation`
+- Fixture change review at `/fixtures/change-review`
 - Detailed contract routes under `/contracts/[slug]`
 - Synthetic clinical environment at `/synthetic`
 - Synthetic scenario routes under `/synthetic/[slug]`
@@ -35,9 +39,11 @@ Current baseline includes:
 - Shared Hub operations model in `app/lib/hubOperations.ts`
 - Shared operating context model in `app/lib/operatingContext.ts`
 - Shared agent workflow model in `app/lib/agentWorkflows.ts`
+- Shared workflow execution model in `app/lib/workflowExecutions.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared integration fixture model in `app/lib/integrationFixtures.ts`
 - Shared integration fixture validation model in `app/lib/integrationFixtureValidation.ts`
+- Shared fixture change-review model in `app/lib/fixtureChangeReviews.ts`
 - Shared synthetic scenario model in `app/lib/syntheticClinical.ts`
 - Shared synthetic fixture model in `app/lib/syntheticFixtures.ts`
 - Shared synthetic validation model in `app/lib/syntheticValidation.ts`
@@ -50,6 +56,9 @@ Current baseline includes:
 - Operating context endpoint at `/api/operating-context`
 - Agent workflow registry endpoint at `/api/agents/workflows`
 - Per-agent workflow endpoints under `/api/agents/workflows/[slug]`
+- Workflow execution endpoint at `/api/workflows/executions`
+- Per-workflow execution endpoints under `/api/workflows/executions/[slug]`
+- Fixture change-review endpoint at `/api/fixtures/change-review`
 - Integration fixture endpoint at `/api/integration-fixtures`
 - Per-fixture integration endpoints under `/api/integration-fixtures/[slug]`
 - Integration fixture validation endpoint at `/api/integration-fixtures/validation`
@@ -70,7 +79,7 @@ Current baseline includes:
 
 ## Deployment Status
 
-Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. GitHub Actions build verification is configured, but workflow runs are not visible through the current connector and the local Codex environment does not currently have npm, pnpm, yarn, corepack, or `gh` available for independent local build or Actions-log inspection.
+Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub Actions build verification is configured, but workflow runs are not visible through the current connector and the local Codex environment does not currently have npm, pnpm, yarn, corepack, or `gh` available for independent local build or Actions-log inspection.
 
 Because Vercel is green, GitHub Actions and local package-manager verification are not treated as product or deploy blockers right now. They remain hardening items behind a managed quality-process bypass.
 
@@ -82,10 +91,12 @@ Current active quality path:
 2. Synthetic fixture contracts and executable assertions validate workflow behavior without live patient data.
 3. The master operating context defines the mission, decision framework, Atlas boundary, FaithCore boundary, and delivery standard.
 4. The agent workflow registry defines owner, permissions, inputs, outputs, audit events, guardrails, interoperability targets, and human-review policy before agent execution.
-5. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
-6. Integration contracts define the data boundary before real connectors are implemented.
-7. Hub readiness and event endpoints expose operational status.
-8. Quality gates make every active, planned, and bypassed validation path explicit.
+5. Fixture change review records expected-output fingerprints before workflows or connectors depend on fixture changes.
+6. Synthetic workflow execution readiness maps a staged module workflow to agent, synthetic, integration, quality, and Watchtower gates.
+7. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
+8. Integration contracts define the data boundary before real connectors are implemented.
+9. Hub readiness and event endpoints expose operational status.
+10. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -96,6 +107,7 @@ Current bypassed or deferred checks:
 Replacement path:
 
 - Vercel deployment plus fixture-backed executable synthetic validation is the current active build-quality path.
+- Fixture change review and workflow execution readiness replace silent fixture drift and premature live workflow automation.
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
 
@@ -125,6 +137,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Integration fixtures and validation diffs before live connector implementation
+- Fixture change review and synthetic workflow execution readiness before module automation
 - Synthetic validation before live clinical data or production integrations
 
 ## Completed Execution
@@ -160,15 +173,18 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added a governed agent workflow registry in `app/lib/agentWorkflows.ts`, `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`.
 - Added synthetic request and expected-response fixtures for FHIR, HL7, claims/utilization, and pricing transparency contracts.
 - Added integration fixture validation and diff fingerprints in `/integrations/fixture-validation` and `/api/integration-fixtures/validation`.
+- Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.
+- Added fixture change-review fingerprints in `app/lib/fixtureChangeReviews.ts`, `/fixtures/change-review`, and `/api/fixtures/change-review`.
+- Added the first synthetic workflow execution readiness surface for CarePath AI in `app/lib/workflowExecutions.ts`, `/workflows`, `/workflows/[slug]`, `/api/workflows/executions`, and `/api/workflows/executions/[slug]`.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
-2. Map the first module workflow implementation to an agent workflow, synthetic fixture, integration contract, integration fixture, and quality gate.
-3. Add fixture change review notes so changed expected-output fingerprints are explicitly approved before workflow implementation.
+2. Add workflow execution records for DocuTwin and TrialCore using the same synthetic-only readiness standard.
+3. Add promotion-review notes for workflow readiness changes so each workflow status change has explicit approval context.
 4. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-5. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
-6. Start the first module workflow implementation against synthetic inputs before any live clinical connector is introduced.
+5. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+6. Convert the CarePath readiness surface into a deterministic execution-result fixture before any live clinical connector is introduced.
 
 ## Notes
 

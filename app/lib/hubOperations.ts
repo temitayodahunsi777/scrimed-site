@@ -18,11 +18,14 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
+  { name: "official_website", status: "pass", detail: "The official SCRIMED SOLUTIONS website is recorded as https://www.scrimedsolutions.com through Wix." },
   { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
   { name: "agent_workflow_registry", status: "pass", detail: "/agents and /api/agents/workflows are available with permissions, audit events, and human-review boundaries." },
+  { name: "workflow_execution_surface", status: "pass", detail: "/workflows and /api/workflows/executions stage synthetic-only workflow execution readiness." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "integration_fixtures", status: "pass", detail: "/integrations/fixtures and /api/integration-fixtures are available for non-synthetic connector contracts." },
   { name: "integration_fixture_validation", status: "pass", detail: "/integrations/fixture-validation and /api/integration-fixtures/validation expose coverage, safeguard mapping, and diff fingerprints." },
+  { name: "fixture_change_review", status: "pass", detail: "/fixtures/change-review and /api/fixtures/change-review expose expected-output fingerprint review." },
   { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
   { name: "synthetic_fixtures", status: "pass", detail: "/synthetic/fixtures and /api/synthetic/fixtures are available." },
   { name: "synthetic_assertions", status: "pass", detail: "/synthetic/validation and /api/synthetic/validation are available." },
@@ -99,6 +102,18 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-30"
   },
   {
+    id: "scrimed-fixture-review-workflow-execution",
+    type: "operations",
+    summary: "Added fixture change-review fingerprints and the first synthetic workflow execution readiness surface for CarePath AI.",
+    date: "2026-05-30"
+  },
+  {
+    id: "scrimed-official-website-context",
+    type: "product",
+    summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
+    date: "2026-05-30"
+  },
+  {
     id: "scrimed-ci-bypass-vercel-gate",
     type: "deployment",
     summary: "Kept Vercel as the working deploy gate while GitHub Actions visibility remains unresolved.",
@@ -114,7 +129,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, the first synthetic workflow execution surface, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-05-30"
   };
 }

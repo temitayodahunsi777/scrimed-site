@@ -1,10 +1,12 @@
 # SCRIMED SOLUTIONS Master Operating Context
 
-Updated: 2026-05-29
+Updated: 2026-05-30
 
-Company: SCRIMED SOLUTIONS  
-Founder and CEO: Temitayo Dahunsi  
+Company: SCRIMED SOLUTIONS
+Founder and CEO: Temitayo Dahunsi
 Slogan: "Solving For A Better Tomorrow."
+Official website: https://www.scrimedsolutions.com
+Website provider: Wix
 
 ## Mission
 
@@ -41,6 +43,10 @@ Every SCRIMED deliverable should be designed, engineered, documented, and presen
 - Explainability and auditability layers
 - Security-by-design
 - Compliance-by-design
+
+## Web Presence
+
+The official public website is https://www.scrimedsolutions.com, currently operated through Wix. The `scrimed-site` application remains the product and platform execution surface for SCRIMED OS, governance, synthetic validation, workflow readiness, and future healthcare intelligence modules.
 
 ## Human + AI Philosophy
 

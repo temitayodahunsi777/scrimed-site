@@ -1,4 +1,5 @@
 import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
+import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
 import { getIntegrationFixtureValidationResults } from "./integrationFixtureValidation";
 import { integrationFixtures } from "./integrationFixtures";
 import { integrationContracts } from "./integrationContracts";
@@ -6,6 +7,7 @@ import { operatingContext } from "./operatingContext";
 import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
+import { getWorkflowExecutionSummary, workflowExecutions } from "./workflowExecutions";
 
 export type HubModule = {
   name: string;
@@ -70,7 +72,10 @@ export const hubSignals: HubSignal[] = [
   { name: "Quality gates", value: "managed bypass active", tone: "good" },
   { name: "Repository", value: "main baseline clean", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
+  { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Agent registry", value: "governance scoped", tone: "good" },
+  { name: "Workflow execution", value: "synthetic path staged", tone: "good" },
+  { name: "Fixture reviews", value: "fingerprints approved", tone: "good" },
   { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
@@ -100,8 +105,10 @@ export const hubRoutes = [
   "/integrations",
   "/integrations/fixtures",
   "/integrations/fixture-validation",
+  "/fixtures/change-review",
   "/operating-context",
   "/agents",
+  "/workflows",
   "/atlas",
   "/faithcore",
   "/synthetic",
@@ -113,6 +120,7 @@ export const hubRoutes = [
   ...integrationContracts.map((contract) => contract.route),
   ...integrationFixtures.map((fixture) => fixture.route),
   ...agentWorkflows.map((workflow) => workflow.route),
+  ...workflowExecutions.map((workflow) => workflow.route),
   "/modules/clinical-copilot",
   "/modules/docutwin",
   "/modules/carepath-ai",
@@ -125,6 +133,9 @@ export const hubRoutes = [
   "/api/operating-context",
   "/api/agents/workflows",
   ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
+  "/api/workflows/executions",
+  ...workflowExecutions.map((workflow) => workflow.apiRoute),
+  "/api/fixtures/change-review",
   "/api/integration-fixtures",
   "/api/integration-fixtures/validation",
   ...integrationFixtures.map((fixture) => `/api/integration-fixtures/${fixture.contractSlug}`),
@@ -144,6 +155,8 @@ export function getHubSummary() {
   const syntheticValidation = getSyntheticValidationResults();
   const agentWorkflowSummary = getAgentWorkflowSummary();
   const integrationFixtureValidation = getIntegrationFixtureValidationResults();
+  const fixtureChangeReview = getFixtureChangeReviewSummary();
+  const workflowExecutionSummary = getWorkflowExecutionSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -157,10 +170,14 @@ export function getHubSummary() {
     operatingContext: {
       company: operatingContext.company,
       slogan: operatingContext.slogan,
+      officialWebsite: operatingContext.officialWebsite,
+      websiteProvider: operatingContext.websiteProvider,
       mission: operatingContext.mission,
       operatingModels: operatingContext.operatingModels
     },
     agentWorkflowSummary,
+    fixtureChangeReview,
+    workflowExecutionSummary,
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,

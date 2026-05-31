@@ -34,6 +34,16 @@ export default function IntegrationFixtureValidationPage() {
       </section>
 
       <section className="table-section" aria-label="Integration fixture validation results">
+        <article className="module-row">
+          <div>
+            <span>review gate</span>
+            <h2>Fixture change review</h2>
+          </div>
+          <p>expected-output fingerprint approval</p>
+          <a className="module-link" href="/fixtures/change-review">
+            Review fixture fingerprints before workflows or connectors depend on changed outputs.
+          </a>
+        </article>
         {summary.results.map((result) => (
           <article className="module-row" key={result.contractSlug}>
             <div>
