@@ -47,6 +47,14 @@ export default function QualityPage() {
           <span>Result fixtures</span>
           <strong>{summary.workflowExecutionResults.resultCount}</strong>
         </article>
+        <article>
+          <span>Result checks</span>
+          <strong>{summary.workflowResultValidation.passedChecks}</strong>
+        </article>
+        <article>
+          <span>Promotion</span>
+          <strong>{summary.workflowPromotionReview.approved}</strong>
+        </article>
       </section>
 
       <section className="table-section" aria-label="SCRIMED quality gates">

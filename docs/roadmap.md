@@ -14,6 +14,8 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Fixture change review is the active expected-output approval gate before implementation depends on changed fixtures.
 - Synthetic workflow execution is the active staged-module execution gate before live workflow automation.
 - Workflow execution result fixtures are the active output, trace, review-state, and blocked-action gate before implementation.
+- Workflow result validation is the active diff gate before result fixtures can support governed execution APIs.
+- Workflow promotion review is the active synthetic-only approval gate before production automation.
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
@@ -58,6 +60,8 @@ Completed foundations:
 - Fixture change-review page and API for expected-output fingerprint approval
 - Synthetic workflow execution readiness surfaces for CarePath AI, DocuTwin, and TrialCore
 - Deterministic workflow execution result fixtures for staged workflow outputs, traces, review states, blocked actions, and quality evidence
+- Workflow result validation diffs for expected outputs, result output signals, Watchtower traces, review state, and blocked actions
+- Workflow promotion-review records for synthetic-only staging approval and retained blocked actions
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
@@ -69,11 +73,12 @@ Completed foundations:
 - Quality gates page and API
 - Synthetic validation status promoted into quality gates
 - Workflow execution result fixture status promoted into quality gates
+- Workflow result validation and promotion-review status promoted into quality gates
 
 Next build targets:
 
-- Add promotion-review notes for workflow readiness and result-fixture changes
-- Add execution-result validation or diff checks for expected outputs, result output signals, Watchtower traces, and blocked actions
+- Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
+- Add a controlled package lockfile and restore package-manager cache when npm tooling is available
 - Add governed execution API contracts only after result-fixture validation is stable
 
 ## Phase 3 - Intelligence Layer

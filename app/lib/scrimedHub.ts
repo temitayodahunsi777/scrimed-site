@@ -7,10 +7,12 @@ import { operatingContext } from "./operatingContext";
 import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
+import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import {
   getWorkflowExecutionResultSummary,
   workflowExecutionResults
 } from "./workflowExecutionResults";
+import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionSummary, workflowExecutions } from "./workflowExecutions";
 
 export type HubModule = {
@@ -80,6 +82,8 @@ export const hubSignals: HubSignal[] = [
   { name: "Agent registry", value: "governance scoped", tone: "good" },
   { name: "Workflow execution", value: "three synthetic paths staged", tone: "good" },
   { name: "Execution results", value: "deterministic fixtures ready", tone: "good" },
+  { name: "Result validation", value: "diff checks passing", tone: "good" },
+  { name: "Promotion review", value: "synthetic staging approved", tone: "good" },
   { name: "Fixture reviews", value: "fingerprints approved", tone: "good" },
   { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
@@ -114,7 +118,9 @@ export const hubRoutes = [
   "/operating-context",
   "/agents",
   "/workflows",
+  "/workflows/promotion-review",
   "/workflows/results",
+  "/workflows/results/validation",
   "/atlas",
   "/faithcore",
   "/synthetic",
@@ -142,7 +148,9 @@ export const hubRoutes = [
   ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
   "/api/workflows/executions",
   ...workflowExecutions.map((workflow) => workflow.apiRoute),
+  "/api/workflows/promotion-review",
   "/api/workflows/results",
+  "/api/workflows/results/validation",
   ...workflowExecutionResults.map((result) => result.apiRoute),
   "/api/fixtures/change-review",
   "/api/integration-fixtures",
@@ -167,6 +175,8 @@ export function getHubSummary() {
   const fixtureChangeReview = getFixtureChangeReviewSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
+  const workflowResultValidationSummary = getWorkflowResultValidationResults();
+  const workflowPromotionReviewSummary = getWorkflowPromotionReviewSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -189,6 +199,8 @@ export function getHubSummary() {
     fixtureChangeReview,
     workflowExecutionSummary,
     workflowExecutionResultSummary,
+    workflowResultValidationSummary,
+    workflowPromotionReviewSummary,
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,

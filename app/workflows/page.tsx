@@ -47,6 +47,16 @@ export default function WorkflowExecutionsPage() {
             Review result fixtures before live workflow automation.
           </a>
         </article>
+        <article className="module-row">
+          <div>
+            <span>promotion review</span>
+            <h2>Workflow promotion review</h2>
+          </div>
+          <p>synthetic-only approval before production automation</p>
+          <a className="module-link" href="/workflows/promotion-review">
+            Review promotion records and retained blocked actions.
+          </a>
+        </article>
         {summary.workflows.map((workflow) => {
           const readiness = validateWorkflowExecution(workflow);
 

@@ -5,6 +5,8 @@ import {
   workflowExecutions
 } from "../../lib/workflowExecutions";
 import { getWorkflowExecutionResultBySlug } from "../../lib/workflowExecutionResults";
+import { getWorkflowPromotionReviewBySlug } from "../../lib/workflowPromotionReviews";
+import { validateWorkflowResultBySlug } from "../../lib/workflowResultValidation";
 
 export function generateStaticParams() {
   return workflowExecutions.map((workflow) => ({
@@ -21,6 +23,8 @@ export default async function WorkflowExecutionDetailPage({
   const workflow = getWorkflowExecutionBySlug(slug);
   const readiness = getWorkflowExecutionReadinessBySlug(slug);
   const result = getWorkflowExecutionResultBySlug(slug);
+  const resultValidation = validateWorkflowResultBySlug(slug);
+  const promotionReview = getWorkflowPromotionReviewBySlug(slug);
 
   if (!workflow || !readiness) {
     notFound();
@@ -55,6 +59,14 @@ export default async function WorkflowExecutionDetailPage({
         <article>
           <span>Result</span>
           <strong>{result?.decisionState ?? "missing"}</strong>
+        </article>
+        <article>
+          <span>Validation</span>
+          <strong>{resultValidation?.status ?? "missing"}</strong>
+        </article>
+        <article>
+          <span>Promotion</span>
+          <strong>{promotionReview?.status ?? "missing"}</strong>
         </article>
       </section>
 
@@ -94,6 +106,35 @@ export default async function WorkflowExecutionDetailPage({
               <div className="layer-row" key={signal}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{signal}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {resultValidation ? (
+        <section className="section-band principle-grid" aria-label="Workflow result validation checks">
+          {resultValidation.checks.map((check) => (
+            <article key={check.id}>
+              <h3>{check.label}</h3>
+              <p>{check.status}: {check.detail}</p>
+            </article>
+          ))}
+        </section>
+      ) : null}
+
+      {promotionReview ? (
+        <section className="section-band split-band">
+          <div>
+            <p className="eyebrow">Promotion review</p>
+            <h2>{promotionReview.status}</h2>
+            <p className="section-copy">{promotionReview.reviewNote}</p>
+          </div>
+          <div className="layer-list">
+            {promotionReview.requiredBeforePromotion.map((requirement, index) => (
+              <div className="layer-row" key={requirement}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{requirement}</strong>
               </div>
             ))}
           </div>

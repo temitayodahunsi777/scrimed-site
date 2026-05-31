@@ -35,6 +35,8 @@ const readinessSignals = [
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Workflows", value: "/api/workflows/executions" },
   { label: "Results", value: "/api/workflows/results" },
+  { label: "Validation", value: "/api/workflows/results/validation" },
+  { label: "Promotion", value: "/api/workflows/promotion-review" },
   { label: "Quality", value: "/api/quality/gates" },
   { label: "Reviews", value: "/api/fixtures/change-review" },
   { label: "Fixtures", value: "/api/integration-fixtures/validation" },
@@ -108,10 +110,10 @@ export default function Home() {
                 <span className="trace-dot" /> Integration fixture diffs active
               </div>
               <div>
-                <span className="trace-dot trace-dot-alt" /> CarePath synthetic workflow staged
+                <span className="trace-dot trace-dot-alt" /> Three synthetic workflows staged
               </div>
               <div>
-                <span className="trace-dot" /> DocuTwin and TrialCore workflows staged
+                <span className="trace-dot" /> Result validation and promotion review active
               </div>
             </div>
           </aside>

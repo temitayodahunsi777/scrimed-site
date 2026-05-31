@@ -30,6 +30,16 @@ export default function WorkflowExecutionResultsPage() {
       </section>
 
       <section className="table-section" aria-label="Workflow execution result fixtures">
+        <article className="module-row">
+          <div>
+            <span>validation</span>
+            <h2>Workflow result validation</h2>
+          </div>
+          <p>expected-output, trace, review-state, and blocked-action diff checks</p>
+          <a className="module-link" href="/workflows/results/validation">
+            Open result validation gate.
+          </a>
+        </article>
         {summary.results.map((result) => (
           <article className="module-row" key={result.workflowSlug}>
             <div>

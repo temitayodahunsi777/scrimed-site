@@ -22,6 +22,21 @@ const consoleViews = [
     summary: "Review synthetic workflow execution readiness for staged module workflows."
   },
   {
+    name: "Results",
+    href: "/workflows/results",
+    summary: "Review deterministic result fixtures and validation diffs before live automation."
+  },
+  {
+    name: "Result Check",
+    href: "/workflows/results/validation",
+    summary: "Inspect result-fixture diff checks for expected outputs, traces, reviews, and blocked actions."
+  },
+  {
+    name: "Promotion",
+    href: "/workflows/promotion-review",
+    summary: "Review synthetic-only promotion approvals and retained blocked actions."
+  },
+  {
     name: "Quality",
     href: "/quality",
     summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."

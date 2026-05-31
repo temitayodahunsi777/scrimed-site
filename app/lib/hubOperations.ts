@@ -23,6 +23,8 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "agent_workflow_registry", status: "pass", detail: "/agents and /api/agents/workflows are available with permissions, audit events, and human-review boundaries." },
   { name: "workflow_execution_surface", status: "pass", detail: "/workflows and /api/workflows/executions stage synthetic-only workflow execution readiness for CarePath AI, DocuTwin, and TrialCore." },
   { name: "workflow_execution_results", status: "pass", detail: "/workflows/results and /api/workflows/results expose deterministic synthetic result fixtures." },
+  { name: "workflow_result_validation", status: "pass", detail: "/workflows/results/validation and /api/workflows/results/validation compare expected outputs, traces, blocked actions, and review states." },
+  { name: "workflow_promotion_review", status: "pass", detail: "/workflows/promotion-review and /api/workflows/promotion-review record synthetic-only promotion approval before live automation." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "integration_fixtures", status: "pass", detail: "/integrations/fixtures and /api/integration-fixtures are available for non-synthetic connector contracts." },
   { name: "integration_fixture_validation", status: "pass", detail: "/integrations/fixture-validation and /api/integration-fixtures/validation expose coverage, safeguard mapping, and diff fingerprints." },
@@ -115,6 +117,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-31"
   },
   {
+    id: "scrimed-workflow-validation-promotion-review",
+    type: "operations",
+    summary: "Added workflow result validation diffs and synthetic-only promotion review records before production automation.",
+    date: "2026-05-31"
+  },
+  {
     id: "scrimed-official-website-context",
     type: "product",
     summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
@@ -136,7 +144,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-05-31"
   };
 }

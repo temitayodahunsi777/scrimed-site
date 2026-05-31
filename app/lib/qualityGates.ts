@@ -1,7 +1,9 @@
 import { getSyntheticValidationResults } from "./syntheticValidation";
 import { getIntegrationFixtureValidationResults } from "./integrationFixtureValidation";
 import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
+import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
+import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
 
 export type QualityGate = {
@@ -56,6 +58,18 @@ export const qualityGates: QualityGate[] = [
     role: "Deterministic synthetic result fixtures for staged workflow outputs, traces, review states, and blocked actions."
   },
   {
+    name: "Workflow result validation",
+    route: "/workflows/results/validation",
+    state: "active",
+    role: "Validation diff gate comparing result fixtures against expected outputs, Watchtower traces, blocked actions, and review-state requirements."
+  },
+  {
+    name: "Workflow promotion review",
+    route: "/workflows/promotion-review",
+    state: "active",
+    role: "Synthetic-only promotion approval records before any staged workflow can move toward production connectors or automation."
+  },
+  {
     name: "Hub readiness checks",
     route: "/hub/readiness",
     state: "active",
@@ -95,6 +109,8 @@ export function getQualityGateSummary() {
   const fixtureChangeReview = getFixtureChangeReviewSummary();
   const workflowExecution = getWorkflowExecutionSummary();
   const workflowExecutionResults = getWorkflowExecutionResultSummary();
+  const workflowResultValidation = getWorkflowResultValidationResults();
+  const workflowPromotionReview = getWorkflowPromotionReviewSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -103,7 +119,9 @@ export function getQualityGateSummary() {
       integrationFixtureValidation.status === "pass" &&
       fixtureChangeReview.status === "pass" &&
       workflowExecution.status === "synthetic-ready" &&
-      workflowExecutionResults.status === "result-fixtures-ready"
+      workflowExecutionResults.status === "result-fixtures-ready" &&
+      workflowResultValidation.status === "pass" &&
+      workflowPromotionReview.status === "pass"
         ? "active-with-managed-bypass"
         : "attention-required",
     gates: qualityGates,
@@ -115,6 +133,8 @@ export function getQualityGateSummary() {
     fixtureChangeReview,
     workflowExecution,
     workflowExecutionResults,
+    workflowResultValidation,
+    workflowPromotionReview,
     updated: "2026-05-31"
   };
 }
