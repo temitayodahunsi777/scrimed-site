@@ -34,6 +34,7 @@ const readinessSignals = [
   { label: "Context", value: "/api/operating-context" },
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Workflows", value: "/api/workflows/executions" },
+  { label: "Exec API", value: "/api/workflows/contracts" },
   { label: "Results", value: "/api/workflows/results" },
   { label: "Validation", value: "/api/workflows/results/validation" },
   { label: "Promotion", value: "/api/workflows/promotion-review" },
@@ -115,6 +116,9 @@ export default function Home() {
               <div>
                 <span className="trace-dot" /> Result validation and promotion review active
               </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Governed execution contracts defined
+              </div>
             </div>
           </aside>
         </div>
@@ -156,7 +160,7 @@ export default function Home() {
       <section className="section-band roadmap-band" id="roadmap">
         <div className="section-heading">
           <p className="eyebrow">Execution path</p>
-          <h2>Current focus: validate product workflows with synthetic clinical fixtures before live integrations.</h2>
+          <h2>Current focus: govern product workflows with synthetic fixtures and contract-only execution boundaries before live integrations.</h2>
         </div>
         <div className="roadmap-list">
           <article>

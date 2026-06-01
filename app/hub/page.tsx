@@ -22,6 +22,11 @@ const consoleViews = [
     summary: "Review synthetic workflow execution readiness for staged module workflows."
   },
   {
+    name: "Contracts",
+    href: "/workflows/contracts",
+    summary: "Review governed execution API contracts before any workflow execution endpoint is implemented."
+  },
+  {
     name: "Results",
     href: "/workflows/results",
     summary: "Review deterministic result fixtures and validation diffs before live automation."
@@ -52,7 +57,7 @@ const consoleViews = [
     summary: "Track repository, product, operations, integration, and deployment milestones."
   },
   {
-    name: "Contracts",
+    name: "Integrations",
     href: "/integrations",
     summary: "Inspect integration contracts before any live clinical data connector is implemented."
   },

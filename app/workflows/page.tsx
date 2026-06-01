@@ -39,6 +39,16 @@ export default function WorkflowExecutionsPage() {
       <section className="table-section" aria-label="Synthetic workflow executions">
         <article className="module-row">
           <div>
+            <span>execution contracts</span>
+            <h2>Governed execution API contracts</h2>
+          </div>
+          <p>contract-only boundary before executable workflow APIs</p>
+          <a className="module-link" href="/workflows/contracts">
+            Review request, response, audit, and denied-capability contracts.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
             <span>result fixtures</span>
             <h2>Workflow execution results</h2>
           </div>
