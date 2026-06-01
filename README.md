@@ -69,6 +69,7 @@ Current focus areas include:
 - governed execution API contracts
 - deny-by-default governed execution endpoints
 - denied execution audit boundaries
+- audit persistence readiness
 - clinical workflow automation
 - healthcare data interoperability
 - fixture change review and quality gates

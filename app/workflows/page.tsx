@@ -69,6 +69,16 @@ export default function WorkflowExecutionsPage() {
         </article>
         <article className="module-row">
           <div>
+            <span>audit persistence</span>
+            <h2>Audit persistence readiness</h2>
+          </div>
+          <p>storage, retention, access, encryption, incident response, residency, and alerting decisions</p>
+          <a className="module-link" href="/workflows/audit-persistence">
+            Review durable audit logging prerequisites before execution moves beyond deny-by-default.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
             <span>result fixtures</span>
             <h2>Workflow execution results</h2>
           </div>

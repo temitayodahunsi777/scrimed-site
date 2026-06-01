@@ -4,6 +4,7 @@ import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
 import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowExecutionAuditSummary } from "./workflowExecutionAudit";
+import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
@@ -91,6 +92,13 @@ export const qualityGates: QualityGate[] = [
     role: "Metadata-only audit envelope, evidence headers, and never-capture policy for denied governed execution attempts."
   },
   {
+    name: "Audit persistence readiness",
+    route: "/workflows/audit-persistence",
+    state: "planned",
+    role: "Decision register for durable denied-event audit storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting.",
+    replacement: "Metadata-only denied execution audit boundaries remain the active replacement until persistence is approved."
+  },
+  {
     name: "Hub readiness checks",
     route: "/hub/readiness",
     state: "active",
@@ -135,6 +143,7 @@ export function getQualityGateSummary() {
   const workflowExecutionContracts = getWorkflowExecutionContractSummary();
   const workflowImplementationReadiness = getWorkflowImplementationReadinessSummary();
   const workflowExecutionAudit = getWorkflowExecutionAuditSummary();
+  const auditPersistenceReadiness = getAuditPersistenceReadinessSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -165,6 +174,7 @@ export function getQualityGateSummary() {
     workflowExecutionContracts,
     workflowImplementationReadiness,
     workflowExecutionAudit,
+    auditPersistenceReadiness,
     updated: "2026-06-01"
   };
 }

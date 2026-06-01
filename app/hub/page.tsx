@@ -37,6 +37,11 @@ const consoleViews = [
     summary: "Review metadata-only evidence headers and never-capture policy for denied execution attempts."
   },
   {
+    name: "Audit Store",
+    href: "/workflows/audit-persistence",
+    summary: "Review durable audit storage, retention, access, encryption, incident response, regional residency, and alerting decisions."
+  },
+  {
     name: "Results",
     href: "/workflows/results",
     summary: "Review deterministic result fixtures and validation diffs before live automation."

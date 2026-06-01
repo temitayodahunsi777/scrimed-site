@@ -30,6 +30,7 @@ Current baseline includes:
 - Governed execution implementation detail routes under `/workflows/implementation-readiness/[slug]`
 - Denied execution audit boundaries at `/workflows/execution-audit`
 - Denied execution audit boundary detail routes under `/workflows/execution-audit/[slug]`
+- Audit persistence readiness at `/workflows/audit-persistence`
 - SCRIMED Atlas operating model at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
@@ -56,6 +57,7 @@ Current baseline includes:
 - Shared workflow execution contract model in `app/lib/workflowExecutionContracts.ts`
 - Shared workflow implementation readiness model in `app/lib/workflowImplementationReadiness.ts`
 - Shared workflow execution audit-boundary model in `app/lib/workflowExecutionAudit.ts`
+- Shared audit persistence readiness model in `app/lib/auditPersistenceReadiness.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared integration fixture model in `app/lib/integrationFixtures.ts`
 - Shared integration fixture validation model in `app/lib/integrationFixtureValidation.ts`
@@ -83,6 +85,7 @@ Current baseline includes:
 - Workflow implementation readiness endpoint at `/api/workflows/implementation-readiness`
 - Workflow execution audit-boundary endpoint at `/api/workflows/execution-audit`
 - Per-workflow execution audit-boundary endpoints under `/api/workflows/execution-audit/[slug]`
+- Audit persistence readiness endpoint at `/api/workflows/audit-persistence`
 - Deny-by-default governed execution endpoints under `/api/workflows/governed-execution/[slug]`
 - Fixture change-review endpoint at `/api/fixtures/change-review`
 - Integration fixture endpoint at `/api/integration-fixtures`
@@ -127,10 +130,11 @@ Current active quality path:
 10. Governed execution API contracts define request schema, response schema, preconditions, audit events, observability signals, and denied capabilities before implementation.
 11. Deny-by-default governed execution endpoints reject execution before request-body parsing, connector access, workflow mutation, or patient-facing action.
 12. Denied execution audit boundaries define metadata-only capture, evidence headers, audit-envelope fields, and never-capture policy before durable logging.
-13. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
-14. Integration contracts define the data boundary before real connectors are implemented.
-15. Hub readiness and event endpoints expose operational status.
-16. Quality gates make every active, planned, and bypassed validation path explicit.
+13. Audit persistence readiness defines durable storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting decisions before denied-event metadata can be persisted.
+14. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
+15. Integration contracts define the data boundary before real connectors are implemented.
+16. Hub readiness and event endpoints expose operational status.
+17. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -141,7 +145,7 @@ Current bypassed or deferred checks:
 Replacement path:
 
 - Vercel deployment plus fixture-backed executable synthetic validation is the current active build-quality path.
-- Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, promotion review, governed execution contracts, deny-by-default execution endpoints, and denied-execution audit boundaries replace silent fixture drift and premature live workflow automation.
+- Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, promotion review, governed execution contracts, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace silent fixture drift and premature live workflow automation.
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
 
@@ -171,7 +175,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Integration fixtures and validation diffs before live connector implementation
-- Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, deny-by-default execution endpoints, and denied-execution audit boundaries before module automation
+- Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness before module automation
 - Synthetic validation before live clinical data or production integrations
 
 ## Completed Execution
@@ -223,13 +227,15 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added denied execution audit boundaries in `app/lib/workflowExecutionAudit.ts`, `/workflows/execution-audit`, `/workflows/execution-audit/[slug]`, `/api/workflows/execution-audit`, and `/api/workflows/execution-audit/[slug]`.
 - Added evidence headers to locked governed execution POST responses without parsing request bodies.
 - Promoted denied-execution audit boundaries into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow console navigation.
+- Added audit persistence readiness in `app/lib/auditPersistenceReadiness.ts`, `/workflows/audit-persistence`, and `/api/workflows/audit-persistence`.
+- Promoted audit persistence readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow console navigation while keeping durable logging decision-required.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
 2. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected API smoke-test routes should become publicly reachable.
 3. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
 5. Promote governed execution beyond deny-by-default only after auth, identity, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 
 ## Notes

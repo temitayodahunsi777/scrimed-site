@@ -16,6 +16,7 @@ import {
   getWorkflowExecutionAuditBoundaries,
   getWorkflowExecutionAuditSummary
 } from "./workflowExecutionAudit";
+import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import {
   getWorkflowImplementationReadiness,
   getWorkflowImplementationReadinessSummary
@@ -99,6 +100,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Execution contracts", value: "contract-only APIs defined", tone: "good" },
   { name: "Execution deny stubs", value: "locked endpoints online", tone: "good" },
   { name: "Execution audit", value: "metadata boundary defined", tone: "good" },
+  { name: "Audit persistence", value: "decision register active", tone: "watch" },
   { name: "Fixture reviews", value: "fingerprints approved", tone: "good" },
   { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
@@ -139,6 +141,7 @@ export const hubRoutes = [
   "/workflows",
   "/workflows/contracts",
   "/workflows/execution-audit",
+  "/workflows/audit-persistence",
   "/workflows/implementation-readiness",
   "/workflows/promotion-review",
   "/workflows/results",
@@ -177,6 +180,7 @@ export const hubRoutes = [
   ...workflowExecutionContracts.map((contract) => contract.apiRoute),
   "/api/workflows/execution-audit",
   ...workflowExecutionAuditBoundaries.map((boundary) => boundary.apiRoute),
+  "/api/workflows/audit-persistence",
   "/api/workflows/implementation-readiness",
   ...workflowImplementationReadiness.map((workflow) => workflow.apiRoute),
   "/api/workflows/promotion-review",
@@ -211,6 +215,7 @@ export function getHubSummary() {
   const workflowExecutionContractSummary = getWorkflowExecutionContractSummary();
   const workflowImplementationReadinessSummary = getWorkflowImplementationReadinessSummary();
   const workflowExecutionAuditSummary = getWorkflowExecutionAuditSummary();
+  const auditPersistenceReadinessSummary = getAuditPersistenceReadinessSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -238,6 +243,7 @@ export function getHubSummary() {
     workflowExecutionContractSummary,
     workflowImplementationReadinessSummary,
     workflowExecutionAuditSummary,
+    auditPersistenceReadinessSummary,
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,

@@ -19,6 +19,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Governed execution API contracts are the active request, response, precondition, audit, observability, and denied-capability gate before executable POST routes.
 - Deny-by-default governed execution endpoints are the active runtime safety gate before production execution.
 - Denied execution audit boundaries are the active metadata and never-capture gate before durable audit logging.
+- Audit persistence readiness is the active decision gate before denied-event metadata moves into durable storage.
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
@@ -68,6 +69,7 @@ Completed foundations:
 - Governed execution API contracts for staged workflows after validation and promotion review
 - Deny-by-default governed execution endpoints that reject workflow execution before body parsing or connector access
 - Denied execution audit boundaries with evidence headers, metadata capture policy, and never-capture policy
+- Audit persistence readiness for storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
@@ -118,7 +120,7 @@ Modules include:
 
 Entry condition:
 
-- Each workflow should have a route, API contract, governed execution contract, deny-by-default endpoint, denied-execution audit boundary, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
+- Each workflow should have a route, API contract, governed execution contract, deny-by-default endpoint, denied-execution audit boundary, audit persistence readiness, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
 
 ## Phase 5 - Trust and Safety Infrastructure
 
