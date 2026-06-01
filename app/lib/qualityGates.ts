@@ -3,6 +3,7 @@ import { getIntegrationFixtureValidationResults } from "./integrationFixtureVali
 import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
 import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
+import { getWorkflowExecutionAuditSummary } from "./workflowExecutionAudit";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
@@ -84,6 +85,12 @@ export const qualityGates: QualityGate[] = [
     role: "Deny-by-default execution endpoints that reject workflow execution before request-body parsing, connector access, workflow mutation, or patient-facing action."
   },
   {
+    name: "Denied execution audit boundary",
+    route: "/workflows/execution-audit",
+    state: "active",
+    role: "Metadata-only audit envelope, evidence headers, and never-capture policy for denied governed execution attempts."
+  },
+  {
     name: "Hub readiness checks",
     route: "/hub/readiness",
     state: "active",
@@ -127,6 +134,7 @@ export function getQualityGateSummary() {
   const workflowPromotionReview = getWorkflowPromotionReviewSummary();
   const workflowExecutionContracts = getWorkflowExecutionContractSummary();
   const workflowImplementationReadiness = getWorkflowImplementationReadinessSummary();
+  const workflowExecutionAudit = getWorkflowExecutionAuditSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -139,7 +147,8 @@ export function getQualityGateSummary() {
       workflowResultValidation.status === "pass" &&
       workflowPromotionReview.status === "pass" &&
       workflowExecutionContracts.status === "contract-ready" &&
-      workflowImplementationReadiness.status === "deny-stub-ready"
+      workflowImplementationReadiness.status === "deny-stub-ready" &&
+      workflowExecutionAudit.status === "audit-boundary-ready"
         ? "active-with-managed-bypass"
         : "attention-required",
     gates: qualityGates,
@@ -155,6 +164,7 @@ export function getQualityGateSummary() {
     workflowPromotionReview,
     workflowExecutionContracts,
     workflowImplementationReadiness,
-    updated: "2026-05-31"
+    workflowExecutionAudit,
+    updated: "2026-06-01"
   };
 }

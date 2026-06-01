@@ -32,6 +32,11 @@ const consoleViews = [
     summary: "Review locked execution endpoints and production prerequisites before any workflow can run."
   },
   {
+    name: "Audit",
+    href: "/workflows/execution-audit",
+    summary: "Review metadata-only evidence headers and never-capture policy for denied execution attempts."
+  },
+  {
     name: "Results",
     href: "/workflows/results",
     summary: "Review deterministic result fixtures and validation diffs before live automation."

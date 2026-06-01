@@ -36,6 +36,7 @@ const readinessSignals = [
   { label: "Workflows", value: "/api/workflows/executions" },
   { label: "Exec API", value: "/api/workflows/contracts" },
   { label: "Deny Stub", value: "/api/workflows/implementation-readiness" },
+  { label: "Audit", value: "/api/workflows/execution-audit" },
   { label: "Results", value: "/api/workflows/results" },
   { label: "Validation", value: "/api/workflows/results/validation" },
   { label: "Promotion", value: "/api/workflows/promotion-review" },
@@ -122,6 +123,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Execution endpoints locked by default
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Denied execution audit boundary active
               </div>
             </div>
           </aside>

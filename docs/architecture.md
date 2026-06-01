@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-05-31
+Updated: 2026-06-01
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -19,6 +19,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow promotion review: `/workflows/promotion-review` and `/api/workflows/promotion-review`
 - Governed execution API contracts: `/workflows/contracts`, `/workflows/contracts/[slug]`, `/api/workflows/contracts`, and `/api/workflows/contracts/[slug]`
 - Governed execution implementation readiness: `/workflows/implementation-readiness`, `/workflows/implementation-readiness/[slug]`, `/api/workflows/implementation-readiness`, and `/api/workflows/governed-execution/[slug]`
+- Denied execution audit boundaries: `/workflows/execution-audit`, `/workflows/execution-audit/[slug]`, `/api/workflows/execution-audit`, and `/api/workflows/execution-audit/[slug]`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
@@ -50,6 +51,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow promotion-review records for synthetic-only approval before production automation
 - Governed execution API contracts for request schemas, response schemas, preconditions, audit events, observability signals, and denied capabilities
 - Deny-by-default execution endpoints that reject requests before body parsing, connector access, workflow mutation, or patient-facing action
+- Denied execution audit boundaries for metadata-only evidence headers, audit-envelope fields, and never-capture policy
 - Synthetic clinical fixtures for safe workflow validation
 - Future clinical records ingestion after contracts and synthetic checks are stable
 
@@ -70,6 +72,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Validation and promotion gates before result fixtures can move toward governed execution APIs
 - Contract-only governed execution API boundaries before executable POST routes are implemented
 - Locked governed execution endpoints that return a controlled rejection until production prerequisites are approved
+- Metadata-only audit boundaries for denied governed execution attempts before durable storage is approved
 - TrialCore for research matching workflows
 - Agent Commander registry for specialized governed agents across clinical, administrative, research, interoperability, compliance, and operational workflows
 - Watchtower for reliability, safety, and operational traces
@@ -99,6 +102,7 @@ Active gates:
 - Workflow result validation and synthetic-only promotion review for staged module workflows
 - Governed execution API contracts for staged workflows before implementation
 - Deny-by-default governed execution endpoints before production execution
+- Denied execution audit boundaries before durable audit logging
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
@@ -113,7 +117,7 @@ Replacement process:
 - Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
-- Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, governed execution contracts, and deny-by-default execution endpoints replace premature live workflow automation.
+- Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, governed execution contracts, deny-by-default execution endpoints, and denied-execution audit boundaries replace premature live workflow automation.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 
@@ -186,6 +190,18 @@ Before any endpoint can move beyond deny-by-default, SCRIMED must explicitly app
 - PHI/PII privacy and security handling
 - production connector scope
 - rate limits, misuse monitoring, and emergency shutdown controls
+
+## Denied Execution Audit Boundaries
+
+Denied execution attempts now have a metadata-only audit boundary before durable logging is selected. The boundary defines:
+
+- event name and event version
+- evidence headers returned by locked POST routes
+- metadata fields allowed for capture
+- request body, PHI, clinical free text, connector payloads, secrets, and insurance identifiers that must never be captured
+- durable persistence status as a decision-required item
+
+This creates observability without pretending SCRIMED has approved production audit storage. Durable audit logging remains gated behind storage, retention, access review, incident response, privacy, and security decisions.
 
 ## Watchtower Monitoring System
 

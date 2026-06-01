@@ -59,6 +59,16 @@ export default function WorkflowExecutionsPage() {
         </article>
         <article className="module-row">
           <div>
+            <span>execution audit</span>
+            <h2>Denied execution audit boundary</h2>
+          </div>
+          <p>metadata-only evidence headers and never-capture policy</p>
+          <a className="module-link" href="/workflows/execution-audit">
+            Review denied-attempt audit envelope before durable logging is enabled.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
             <span>result fixtures</span>
             <h2>Workflow execution results</h2>
           </div>

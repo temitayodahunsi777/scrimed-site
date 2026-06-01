@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getWorkflowExecutionAuditBoundaryBySlug } from "../../../../lib/workflowExecutionAudit";
 import { getWorkflowImplementationReadinessBySlug } from "../../../../lib/workflowImplementationReadiness";
 
 export async function GET(
@@ -21,6 +22,7 @@ export async function POST(
 ) {
   const { slug } = await params;
   const readiness = getWorkflowImplementationReadinessBySlug(slug);
+  const auditBoundary = getWorkflowExecutionAuditBoundaryBySlug(slug);
 
   if (!readiness) {
     return NextResponse.json({ error: "Workflow implementation readiness not found" }, { status: 404 });
@@ -39,6 +41,14 @@ export async function POST(
       contractRoute: readiness.contractRoute,
       readinessRoute: readiness.route
     },
-    { status: readiness.deniedResponse.statusCode }
+    {
+      status: readiness.deniedResponse.statusCode,
+      headers: {
+        "x-scrimed-guard": "deny-by-default",
+        "x-scrimed-audit-event": auditBoundary?.eventName ?? "workflow.execution.denied",
+        "x-scrimed-workflow": readiness.slug,
+        "x-scrimed-body-handling": "not-parsed"
+      }
+    }
   );
 }

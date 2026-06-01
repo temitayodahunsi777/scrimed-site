@@ -142,6 +142,6 @@ export function getWorkflowImplementationReadinessSummary() {
     attentionRequired,
     runtimeMode: "deny-by-default",
     workflows,
-    updated: "2026-05-31"
+    updated: "2026-06-01"
   };
 }

@@ -13,6 +13,10 @@ import {
   getWorkflowExecutionContracts
 } from "./workflowExecutionContracts";
 import {
+  getWorkflowExecutionAuditBoundaries,
+  getWorkflowExecutionAuditSummary
+} from "./workflowExecutionAudit";
+import {
   getWorkflowImplementationReadiness,
   getWorkflowImplementationReadinessSummary
 } from "./workflowImplementationReadiness";
@@ -94,6 +98,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Promotion review", value: "synthetic staging approved", tone: "good" },
   { name: "Execution contracts", value: "contract-only APIs defined", tone: "good" },
   { name: "Execution deny stubs", value: "locked endpoints online", tone: "good" },
+  { name: "Execution audit", value: "metadata boundary defined", tone: "good" },
   { name: "Fixture reviews", value: "fingerprints approved", tone: "good" },
   { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
@@ -116,6 +121,7 @@ const syntheticRoutes = syntheticScenarios.flatMap((scenario) => [
 
 const workflowExecutionContracts = getWorkflowExecutionContracts();
 const workflowImplementationReadiness = getWorkflowImplementationReadiness();
+const workflowExecutionAuditBoundaries = getWorkflowExecutionAuditBoundaries();
 
 export const hubRoutes = [
   "/",
@@ -132,6 +138,7 @@ export const hubRoutes = [
   "/agents",
   "/workflows",
   "/workflows/contracts",
+  "/workflows/execution-audit",
   "/workflows/implementation-readiness",
   "/workflows/promotion-review",
   "/workflows/results",
@@ -149,6 +156,7 @@ export const hubRoutes = [
   ...agentWorkflows.map((workflow) => workflow.route),
   ...workflowExecutions.map((workflow) => workflow.route),
   ...workflowExecutionContracts.map((contract) => contract.route),
+  ...workflowExecutionAuditBoundaries.map((boundary) => boundary.route),
   ...workflowImplementationReadiness.map((workflow) => workflow.route),
   ...workflowExecutionResults.map((result) => result.route),
   "/modules/clinical-copilot",
@@ -167,6 +175,8 @@ export const hubRoutes = [
   ...workflowExecutions.map((workflow) => workflow.apiRoute),
   "/api/workflows/contracts",
   ...workflowExecutionContracts.map((contract) => contract.apiRoute),
+  "/api/workflows/execution-audit",
+  ...workflowExecutionAuditBoundaries.map((boundary) => boundary.apiRoute),
   "/api/workflows/implementation-readiness",
   ...workflowImplementationReadiness.map((workflow) => workflow.apiRoute),
   "/api/workflows/promotion-review",
@@ -200,6 +210,7 @@ export function getHubSummary() {
   const workflowPromotionReviewSummary = getWorkflowPromotionReviewSummary();
   const workflowExecutionContractSummary = getWorkflowExecutionContractSummary();
   const workflowImplementationReadinessSummary = getWorkflowImplementationReadinessSummary();
+  const workflowExecutionAuditSummary = getWorkflowExecutionAuditSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -226,9 +237,10 @@ export function getHubSummary() {
     workflowPromotionReviewSummary,
     workflowExecutionContractSummary,
     workflowImplementationReadinessSummary,
+    workflowExecutionAuditSummary,
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-05-31"
+    updated: "2026-06-01"
   };
 }
