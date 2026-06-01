@@ -67,6 +67,7 @@ Current focus areas include:
 - deterministic workflow execution result fixtures
 - workflow result validation and synthetic-only promotion review
 - governed execution API contracts
+- identity and access readiness
 - deny-by-default governed execution endpoints
 - denied execution audit boundaries
 - audit persistence readiness

@@ -27,6 +27,11 @@ const consoleViews = [
     summary: "Review governed execution API contracts before any workflow execution endpoint is implemented."
   },
   {
+    name: "Identity",
+    href: "/workflows/identity-access",
+    summary: "Review production authentication, tenant isolation, roles, patient context, service auth, consent, and break-glass decisions."
+  },
+  {
     name: "Deny Stubs",
     href: "/workflows/implementation-readiness",
     summary: "Review locked execution endpoints and production prerequisites before any workflow can run."

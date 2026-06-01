@@ -17,6 +17,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Workflow result validation is the active diff gate before result fixtures can support governed execution APIs.
 - Workflow promotion review is the active synthetic-only approval gate before production automation.
 - Governed execution API contracts are the active request, response, precondition, audit, observability, and denied-capability gate before executable POST routes.
+- Identity and access readiness is the active decision gate before governed execution can accept authenticated requests.
 - Deny-by-default governed execution endpoints are the active runtime safety gate before production execution.
 - Denied execution audit boundaries are the active metadata and never-capture gate before durable audit logging.
 - Audit persistence readiness is the active decision gate before denied-event metadata moves into durable storage.
@@ -67,6 +68,7 @@ Completed foundations:
 - Workflow result validation diffs for expected outputs, result output signals, Watchtower traces, review state, and blocked actions
 - Workflow promotion-review records for synthetic-only staging approval and retained blocked actions
 - Governed execution API contracts for staged workflows after validation and promotion review
+- Identity and access readiness for production identity provider, tenant isolation, role permissions, patient-context authorization, service authentication, session lifecycle, consent, break-glass access, audit linkage, and regional identity controls
 - Deny-by-default governed execution endpoints that reject workflow execution before body parsing or connector access
 - Denied execution audit boundaries with evidence headers, metadata capture policy, and never-capture policy
 - Audit persistence readiness for storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting
@@ -120,7 +122,7 @@ Modules include:
 
 Entry condition:
 
-- Each workflow should have a route, API contract, governed execution contract, deny-by-default endpoint, denied-execution audit boundary, audit persistence readiness, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
+- Each workflow should have a route, API contract, governed execution contract, identity and access readiness, deny-by-default endpoint, denied-execution audit boundary, audit persistence readiness, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
 
 ## Phase 5 - Trust and Safety Infrastructure
 

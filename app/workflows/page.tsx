@@ -49,6 +49,16 @@ export default function WorkflowExecutionsPage() {
         </article>
         <article className="module-row">
           <div>
+            <span>identity access</span>
+            <h2>Identity and access readiness</h2>
+          </div>
+          <p>production authentication, tenant isolation, role permissions, patient context, service auth, consent, and break-glass decisions</p>
+          <a className="module-link" href="/workflows/identity-access">
+            Review identity and access prerequisites before execution moves beyond deny-by-default.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
             <span>deny stubs</span>
             <h2>Governed execution implementation readiness</h2>
           </div>

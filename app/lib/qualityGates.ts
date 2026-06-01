@@ -5,6 +5,7 @@ import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowExecutionAuditSummary } from "./workflowExecutionAudit";
 import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
+import { getIdentityAccessReadinessSummary } from "./identityAccessReadiness";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
@@ -80,6 +81,13 @@ export const qualityGates: QualityGate[] = [
     role: "Contract-only request, response, precondition, audit, observability, and denied-capability boundary before governed execution APIs are implemented."
   },
   {
+    name: "Identity and access readiness",
+    route: "/workflows/identity-access",
+    state: "planned",
+    role: "Decision register for production identity provider, tenant isolation, role permissions, patient-context authorization, service authentication, consent, break-glass access, audit linkage, and regional identity controls.",
+    replacement: "Deny-by-default governed execution endpoints remain the active replacement until production identity and access are approved."
+  },
+  {
     name: "Governed execution deny stubs",
     route: "/workflows/implementation-readiness",
     state: "active",
@@ -144,6 +152,7 @@ export function getQualityGateSummary() {
   const workflowImplementationReadiness = getWorkflowImplementationReadinessSummary();
   const workflowExecutionAudit = getWorkflowExecutionAuditSummary();
   const auditPersistenceReadiness = getAuditPersistenceReadinessSummary();
+  const identityAccessReadiness = getIdentityAccessReadinessSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -175,6 +184,7 @@ export function getQualityGateSummary() {
     workflowImplementationReadiness,
     workflowExecutionAudit,
     auditPersistenceReadiness,
+    identityAccessReadiness,
     updated: "2026-06-01"
   };
 }
