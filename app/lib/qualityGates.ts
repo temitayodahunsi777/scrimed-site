@@ -4,6 +4,7 @@ import { getFixtureChangeReviewSummary } from "./fixtureChangeReviews";
 import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
+import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
 
 export type QualityGate = {
@@ -70,6 +71,12 @@ export const qualityGates: QualityGate[] = [
     role: "Synthetic-only promotion approval records before any staged workflow can move toward production connectors or automation."
   },
   {
+    name: "Governed execution API contracts",
+    route: "/workflows/contracts",
+    state: "active",
+    role: "Contract-only request, response, precondition, audit, observability, and denied-capability boundary before governed execution APIs are implemented."
+  },
+  {
     name: "Hub readiness checks",
     route: "/hub/readiness",
     state: "active",
@@ -111,6 +118,7 @@ export function getQualityGateSummary() {
   const workflowExecutionResults = getWorkflowExecutionResultSummary();
   const workflowResultValidation = getWorkflowResultValidationResults();
   const workflowPromotionReview = getWorkflowPromotionReviewSummary();
+  const workflowExecutionContracts = getWorkflowExecutionContractSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -121,7 +129,8 @@ export function getQualityGateSummary() {
       workflowExecution.status === "synthetic-ready" &&
       workflowExecutionResults.status === "result-fixtures-ready" &&
       workflowResultValidation.status === "pass" &&
-      workflowPromotionReview.status === "pass"
+      workflowPromotionReview.status === "pass" &&
+      workflowExecutionContracts.status === "contract-ready"
         ? "active-with-managed-bypass"
         : "attention-required",
     gates: qualityGates,
@@ -135,6 +144,7 @@ export function getQualityGateSummary() {
     workflowExecutionResults,
     workflowResultValidation,
     workflowPromotionReview,
+    workflowExecutionContracts,
     updated: "2026-05-31"
   };
 }
