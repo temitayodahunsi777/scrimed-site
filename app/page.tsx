@@ -35,6 +35,7 @@ const readinessSignals = [
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Workflows", value: "/api/workflows/executions" },
   { label: "Exec API", value: "/api/workflows/contracts" },
+  { label: "Deny Stub", value: "/api/workflows/implementation-readiness" },
   { label: "Results", value: "/api/workflows/results" },
   { label: "Validation", value: "/api/workflows/results/validation" },
   { label: "Promotion", value: "/api/workflows/promotion-review" },
@@ -118,6 +119,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Governed execution contracts defined
+              </div>
+              <div>
+                <span className="trace-dot" /> Execution endpoints locked by default
               </div>
             </div>
           </aside>

@@ -5,6 +5,7 @@ import { getWorkflowPromotionReviewSummary } from "./workflowPromotionReviews";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
+import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
 
 export type QualityGate = {
@@ -77,6 +78,12 @@ export const qualityGates: QualityGate[] = [
     role: "Contract-only request, response, precondition, audit, observability, and denied-capability boundary before governed execution APIs are implemented."
   },
   {
+    name: "Governed execution deny stubs",
+    route: "/workflows/implementation-readiness",
+    state: "active",
+    role: "Deny-by-default execution endpoints that reject workflow execution before request-body parsing, connector access, workflow mutation, or patient-facing action."
+  },
+  {
     name: "Hub readiness checks",
     route: "/hub/readiness",
     state: "active",
@@ -119,6 +126,7 @@ export function getQualityGateSummary() {
   const workflowResultValidation = getWorkflowResultValidationResults();
   const workflowPromotionReview = getWorkflowPromotionReviewSummary();
   const workflowExecutionContracts = getWorkflowExecutionContractSummary();
+  const workflowImplementationReadiness = getWorkflowImplementationReadinessSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -130,7 +138,8 @@ export function getQualityGateSummary() {
       workflowExecutionResults.status === "result-fixtures-ready" &&
       workflowResultValidation.status === "pass" &&
       workflowPromotionReview.status === "pass" &&
-      workflowExecutionContracts.status === "contract-ready"
+      workflowExecutionContracts.status === "contract-ready" &&
+      workflowImplementationReadiness.status === "deny-stub-ready"
         ? "active-with-managed-bypass"
         : "attention-required",
     gates: qualityGates,
@@ -145,6 +154,7 @@ export function getQualityGateSummary() {
     workflowResultValidation,
     workflowPromotionReview,
     workflowExecutionContracts,
+    workflowImplementationReadiness,
     updated: "2026-05-31"
   };
 }

@@ -26,6 +26,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "workflow_result_validation", status: "pass", detail: "/workflows/results/validation and /api/workflows/results/validation compare expected outputs, traces, blocked actions, and review states." },
   { name: "workflow_promotion_review", status: "pass", detail: "/workflows/promotion-review and /api/workflows/promotion-review record synthetic-only promotion approval before live automation." },
   { name: "workflow_execution_contracts", status: "pass", detail: "/workflows/contracts and /api/workflows/contracts define governed execution API contracts while keeping live automation blocked." },
+  { name: "workflow_execution_deny_stubs", status: "pass", detail: "/workflows/implementation-readiness and /api/workflows/governed-execution/[slug] reject execution before body parsing, connector access, workflow mutation, or patient-facing action." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
   { name: "integration_fixtures", status: "pass", detail: "/integrations/fixtures and /api/integration-fixtures are available for non-synthetic connector contracts." },
   { name: "integration_fixture_validation", status: "pass", detail: "/integrations/fixture-validation and /api/integration-fixtures/validation expose coverage, safeguard mapping, and diff fingerprints." },
@@ -130,6 +131,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-31"
   },
   {
+    id: "scrimed-governed-execution-deny-stubs",
+    type: "operations",
+    summary: "Added deny-by-default governed execution endpoints that reject workflow execution before processing any request body.",
+    date: "2026-05-31"
+  },
+  {
     id: "scrimed-official-website-context",
     type: "product",
     summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
@@ -151,7 +158,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, deny-by-default execution endpoints, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-05-31"
   };
 }

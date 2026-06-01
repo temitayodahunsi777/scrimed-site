@@ -67,6 +67,7 @@ Current focus areas include:
 - deterministic workflow execution result fixtures
 - workflow result validation and synthetic-only promotion review
 - governed execution API contracts
+- deny-by-default governed execution endpoints
 - clinical workflow automation
 - healthcare data interoperability
 - fixture change review and quality gates

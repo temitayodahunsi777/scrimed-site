@@ -17,6 +17,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Workflow result validation is the active diff gate before result fixtures can support governed execution APIs.
 - Workflow promotion review is the active synthetic-only approval gate before production automation.
 - Governed execution API contracts are the active request, response, precondition, audit, observability, and denied-capability gate before executable POST routes.
+- Deny-by-default governed execution endpoints are the active runtime safety gate before production execution.
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
@@ -64,6 +65,7 @@ Completed foundations:
 - Workflow result validation diffs for expected outputs, result output signals, Watchtower traces, review state, and blocked actions
 - Workflow promotion-review records for synthetic-only staging approval and retained blocked actions
 - Governed execution API contracts for staged workflows after validation and promotion review
+- Deny-by-default governed execution endpoints that reject workflow execution before body parsing or connector access
 - Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
@@ -81,7 +83,7 @@ Next build targets:
 
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
 - Add a controlled package lockfile and restore package-manager cache when npm tooling is available
-- Add governed execution POST route implementation stubs only after auth, identity, persistence, audit logging, privacy/security review, and connector boundaries are explicit
+- Promote governed execution beyond deny-by-default only after auth, identity, persistence, audit logging, privacy/security review, connector boundaries, rate limits, and shutdown controls are explicit
 
 ## Phase 3 - Intelligence Layer
 
@@ -114,7 +116,7 @@ Modules include:
 
 Entry condition:
 
-- Each workflow should have a route, API contract, governed execution contract, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
+- Each workflow should have a route, API contract, governed execution contract, deny-by-default endpoint, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
 
 ## Phase 5 - Trust and Safety Infrastructure
 

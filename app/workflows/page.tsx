@@ -49,6 +49,16 @@ export default function WorkflowExecutionsPage() {
         </article>
         <article className="module-row">
           <div>
+            <span>deny stubs</span>
+            <h2>Governed execution implementation readiness</h2>
+          </div>
+          <p>locked POST endpoints before production execution</p>
+          <a className="module-link" href="/workflows/implementation-readiness">
+            Review auth, identity, persistence, audit, privacy, and connector prerequisites.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
             <span>result fixtures</span>
             <h2>Workflow execution results</h2>
           </div>
