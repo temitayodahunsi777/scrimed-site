@@ -17,6 +17,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow execution result fixtures: `/workflows/results`, `/workflows/results/[slug]`, `/api/workflows/results`, and `/api/workflows/results/[slug]`
 - Workflow result validation: `/workflows/results/validation` and `/api/workflows/results/validation`
 - Workflow promotion review: `/workflows/promotion-review` and `/api/workflows/promotion-review`
+- Governed execution API contracts: `/workflows/contracts`, `/workflows/contracts/[slug]`, `/api/workflows/contracts`, and `/api/workflows/contracts/[slug]`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
@@ -46,6 +47,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow execution result fixtures for deterministic synthetic outputs, review state, blocked actions, quality evidence, and Watchtower trace retention
 - Workflow result validation diffs for expected output signals, Watchtower traces, review state, route inventory, and blocked-action retention
 - Workflow promotion-review records for synthetic-only approval before production automation
+- Governed execution API contracts for request schemas, response schemas, preconditions, audit events, observability signals, and denied capabilities
 - Synthetic clinical fixtures for safe workflow validation
 - Future clinical records ingestion after contracts and synthetic checks are stable
 
@@ -64,6 +66,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Synthetic execution readiness for CarePath high-risk follow-up routing, DocuTwin draft note review, and TrialCore eligibility review queue
 - Deterministic result fixtures before workflow execution can move toward live automation
 - Validation and promotion gates before result fixtures can move toward governed execution APIs
+- Contract-only governed execution API boundaries before executable POST routes are implemented
 - TrialCore for research matching workflows
 - Agent Commander registry for specialized governed agents across clinical, administrative, research, interoperability, compliance, and operational workflows
 - Watchtower for reliability, safety, and operational traces
@@ -91,6 +94,7 @@ Active gates:
 - Fixture change review for expected-output fingerprint approval
 - Synthetic workflow execution readiness and deterministic result fixtures for staged module workflows
 - Workflow result validation and synthetic-only promotion review for staged module workflows
+- Governed execution API contracts for staged workflows before implementation
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
@@ -105,7 +109,7 @@ Replacement process:
 - Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
-- Synthetic workflow execution readiness, deterministic result fixtures, result validation, and promotion review replace premature live workflow automation.
+- Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, and governed execution contracts replace premature live workflow automation.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 
@@ -150,6 +154,20 @@ Before staged workflows can move toward governed execution APIs, SCRIMED now val
 - page and API route inventory
 
 Promotion review records approve workflows for synthetic staging only. They retain blocked actions and require result validation, fixture fingerprints, explicit human-review roles, production connector boundary review, and privacy/security approval before any live automation path is considered.
+
+## Governed Execution API Contracts
+
+Each staged workflow now has a synthetic-only governed execution contract before any executable POST route is implemented. The contract layer defines:
+
+- planned endpoint and method
+- request schema and response schema
+- required preconditions and approval gates
+- audit events and observability signals
+- human-review requirement
+- denied capabilities
+- promotion boundary
+
+These contracts are intentionally non-executing. They keep CarePath AI, DocuTwin, and TrialCore moving toward implementation while blocking live patient routing, final documentation, enrollment claims, treatment recommendations, production connector use, and production data ingestion until auth, identity, persistence, audit logging, privacy/security review, and connector governance are explicit.
 
 ## Watchtower Monitoring System
 

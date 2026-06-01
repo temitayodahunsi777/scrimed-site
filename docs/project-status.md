@@ -24,6 +24,8 @@ Current baseline includes:
 - Workflow execution result detail routes under `/workflows/results/[slug]`
 - Workflow result validation at `/workflows/results/validation`
 - Workflow promotion review at `/workflows/promotion-review`
+- Governed execution API contracts at `/workflows/contracts`
+- Governed execution API contract detail routes under `/workflows/contracts/[slug]`
 - SCRIMED Atlas operating model at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
@@ -47,6 +49,7 @@ Current baseline includes:
 - Shared workflow execution result model in `app/lib/workflowExecutionResults.ts`
 - Shared workflow result validation model in `app/lib/workflowResultValidation.ts`
 - Shared workflow promotion-review model in `app/lib/workflowPromotionReviews.ts`
+- Shared workflow execution contract model in `app/lib/workflowExecutionContracts.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared integration fixture model in `app/lib/integrationFixtures.ts`
 - Shared integration fixture validation model in `app/lib/integrationFixtureValidation.ts`
@@ -69,6 +72,8 @@ Current baseline includes:
 - Per-workflow execution result endpoints under `/api/workflows/results/[slug]`
 - Workflow result validation endpoint at `/api/workflows/results/validation`
 - Workflow promotion-review endpoint at `/api/workflows/promotion-review`
+- Workflow execution contract endpoint at `/api/workflows/contracts`
+- Per-workflow execution contract endpoints under `/api/workflows/contracts/[slug]`
 - Fixture change-review endpoint at `/api/fixtures/change-review`
 - Integration fixture endpoint at `/api/integration-fixtures`
 - Per-fixture integration endpoints under `/api/integration-fixtures/[slug]`
@@ -109,10 +114,11 @@ Current active quality path:
 7. Workflow execution result fixtures capture deterministic outputs, review state, blocked actions, and quality evidence for each staged workflow.
 8. Workflow result validation compares expected outputs, result output signals, Watchtower traces, review state, and blocked actions before promotion.
 9. Workflow promotion review records synthetic-only approval and retained blocked actions before production automation.
-10. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
-11. Integration contracts define the data boundary before real connectors are implemented.
-12. Hub readiness and event endpoints expose operational status.
-13. Quality gates make every active, planned, and bypassed validation path explicit.
+10. Governed execution API contracts define request schema, response schema, preconditions, audit events, observability signals, and denied capabilities before implementation.
+11. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
+12. Integration contracts define the data boundary before real connectors are implemented.
+13. Hub readiness and event endpoints expose operational status.
+14. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -123,7 +129,7 @@ Current bypassed or deferred checks:
 Replacement path:
 
 - Vercel deployment plus fixture-backed executable synthetic validation is the current active build-quality path.
-- Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, and promotion review replace silent fixture drift and premature live workflow automation.
+- Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, promotion review, and governed execution contracts replace silent fixture drift and premature live workflow automation.
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
 
@@ -153,7 +159,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Integration fixtures and validation diffs before live connector implementation
-- Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, and synthetic-only promotion review before module automation
+- Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, and governed execution API contracts before module automation
 - Synthetic validation before live clinical data or production integrations
 
 ## Completed Execution
@@ -198,14 +204,16 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added workflow result validation diffs in `app/lib/workflowResultValidation.ts`, `/workflows/results/validation`, and `/api/workflows/results/validation`.
 - Added workflow promotion review records in `app/lib/workflowPromotionReviews.ts`, `/workflows/promotion-review`, and `/api/workflows/promotion-review`.
 - Promoted workflow result validation and promotion review into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow detail pages.
+- Added governed execution API contracts in `app/lib/workflowExecutionContracts.ts`, `/workflows/contracts`, `/workflows/contracts/[slug]`, `/api/workflows/contracts`, and `/api/workflows/contracts/[slug]`.
+- Promoted governed execution API contracts into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow console navigation.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
 2. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected API smoke-test routes should become publicly reachable.
 3. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
-5. Convert the staged workflow/result fixtures into a governed execution API only after promotion review, validation diffs, and connector boundaries are stable.
+4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+5. Add implementation stubs for governed execution POST routes only after auth, identity, persistence, audit logging, privacy/security review, and connector boundary decisions are explicit.
 
 ## Notes
 
