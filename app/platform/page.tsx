@@ -1,5 +1,12 @@
 const modules = [
   {
+    name: "SCRIMED Product Console",
+    href: "/product",
+    maturity: "Commercial pilot",
+    users: "Healthcare executives, operators, clinical leaders, payers, governments, and implementation teams",
+    outcome: "Package SCRIMED into sellable pilot offers, buyer workflows, proof routes, deployment stages, and safety boundaries."
+  },
+  {
     name: "Clinical Copilot",
     href: "/modules/clinical-copilot",
     maturity: "Design",

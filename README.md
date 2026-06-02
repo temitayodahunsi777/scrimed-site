@@ -70,6 +70,7 @@ Current focus areas include:
 - identity and access readiness
 - execution-attempt readiness
 - runtime safety readiness
+- product console and commercial pilot packaging
 - deny-by-default governed execution endpoints
 - denied execution audit boundaries
 - audit persistence readiness
