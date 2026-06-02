@@ -27,6 +27,11 @@ const consoleViews = [
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."
   },
   {
+    name: "Operations",
+    href: "/operations",
+    summary: "Review publishing, deployment, DNS, Wix routing, quality tooling, and security blockers with owners and fallbacks."
+  },
+  {
     name: "AgentOS Evaluation",
     href: "/evaluation",
     summary: "Generate synthetic AgentOS plans with Atlas Trust Cards, structural document intelligence, audit preview, and observability signals."

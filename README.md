@@ -120,6 +120,7 @@ Core enterprise evaluation surfaces:
 
 - `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
+- `/operations` - company operations readiness, blockers, owners, fallbacks, and buyer route checklist
 - `/evaluation` - interactive AgentOS synthetic evaluation workspace
 - `/workflows` - workflow engine and sandbox runtime
 - `/memory` - session, operational, and knowledge memory fabric
@@ -132,6 +133,7 @@ Core APIs:
 
 - `/api/agent-os`
 - `/api/commercial/pricing`
+- `/api/operations/readiness`
 - `/api/agent-os/evaluation`
 - `/api/agent-os/tasks`
 - `/api/atlas/intelligence-core`
@@ -143,6 +145,10 @@ Core APIs:
 The task-planning API accepts synthetic pilot and enterprise assessment requests only. Production requests are explicitly denied until tenant identity, live connector controls, durable audit logging, privacy/security review, business associate agreement readiness, and human approval controls are approved.
 
 Recommended buyer path: keep the official Wix site at `scrimedsolutions.com`, link product CTAs to `app.scrimedsolutions.com`, and route buyers into `/product`, `/pricing`, `/evaluation`, and `/pilot` without requiring buyers to have Vercel accounts.
+
+Current go-live blockers are tracked in `/operations`: GitHub push authentication, local package-manager availability, direct Vercel deploy path, `app.scrimedsolutions.com` DNS, Wix CTA routing, and deployment-protection decisions.
+
+The Product Console and readiness brief also include operations readiness so buyer, investor, and operator reviews see launch blockers, owners, fallback paths, and remaining manual actions in one place.
 
 ---
 

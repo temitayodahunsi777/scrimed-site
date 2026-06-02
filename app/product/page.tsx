@@ -20,6 +20,14 @@ export default function ProductConsolePage() {
           <strong>{summary.status}</strong>
         </article>
         <article>
+          <span>Ops blockers</span>
+          <strong>{summary.companyOperationsSummary.blocked}</strong>
+        </article>
+        <article>
+          <span>Ops actions</span>
+          <strong>{summary.companyOperationsSummary.manualAction}</strong>
+        </article>
+        <article>
           <span>Services</span>
           <strong>{summary.serviceOfferCount}</strong>
         </article>

@@ -45,6 +45,7 @@ const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
   { label: "Pricing", value: "/api/commercial/pricing" },
+  { label: "Operations", value: "/api/operations/readiness" },
   { label: "Pilot", value: "/pilot" },
   { label: "Evaluation", value: "/api/agent-os/evaluation" },
   { label: "OS Hub", value: "/hub" },
@@ -62,7 +63,7 @@ const readinessSignals = [
   { label: "Identity", value: "/api/workflows/identity-access" },
   { label: "Attempts", value: "/api/workflows/execution-attempts" },
   { label: "Deny Stub", value: "/api/workflows/implementation-readiness" },
-  { label: "Audit", value: "/api/workflows/execution-audit" },
+  { label: "Exec Audit", value: "/api/workflows/execution-audit" },
   { label: "Audit Store", value: "/api/workflows/audit-persistence" },
   { label: "Results", value: "/api/workflows/results" },
   { label: "Validation", value: "/api/workflows/results/validation" },
@@ -86,6 +87,7 @@ export default function Home() {
           <div className="nav-links">
             <a href="/product">Product</a>
             <a href="/pricing">Pricing</a>
+            <a href="/operations">Operations</a>
             <a href="/pilot">Pilot</a>
             <a href="/evaluation">Evaluation</a>
             <a href="/hub">Hub</a>
@@ -139,6 +141,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Pricing and sales motion ready
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-muted" /> Operations blocker register active
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated

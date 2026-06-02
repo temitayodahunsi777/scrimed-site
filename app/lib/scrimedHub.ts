@@ -9,6 +9,7 @@ import { getAgentEvaluationWorkspaceSummary } from "./agentEvaluationWorkspace";
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
 import { getCommercialStrategySummary } from "./commercialStrategy";
+import { getCompanyOperationsSummary } from "./companyOperations";
 import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
@@ -102,6 +103,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
+  { name: "Operations readiness", value: "blocker register active", tone: "watch" },
   { name: "AgentOS Evaluation", value: "interactive synthetic workspace ready", tone: "good" },
   { name: "AgentOS", value: "multi-agent control plane online", tone: "good" },
   { name: "Memory fabric", value: "session, operational, knowledge scoped", tone: "good" },
@@ -152,6 +154,7 @@ export const hubRoutes = [
   "/hub/events",
   "/pilot",
   "/pricing",
+  "/operations",
   "/evaluation",
   "/platform",
   "/memory",
@@ -202,6 +205,7 @@ export const hubRoutes = [
   "/api/events",
   "/api/pilot/intake",
   "/api/commercial/pricing",
+  "/api/operations/readiness",
   "/api/agent-os/evaluation",
   "/api/agent-os",
   "/api/agent-os/tasks",
@@ -263,6 +267,7 @@ export function getHubSummary() {
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
   const pilotIntakeSummary = getPilotIntakeSummary();
   const commercialStrategySummary = getCommercialStrategySummary();
+  const companyOperationsSummary = getCompanyOperationsSummary();
   const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
@@ -286,6 +291,7 @@ export function getHubSummary() {
     },
     pilotIntakeSummary,
     commercialStrategySummary,
+    companyOperationsSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

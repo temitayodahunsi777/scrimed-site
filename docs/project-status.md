@@ -13,6 +13,7 @@ Current baseline includes:
 - Root page at `/`
 - Product console at `/product`
 - Pricing and sales strategy at `/pricing`
+- Company operations readiness at `/operations`
 - Enterprise pilot intake at `/pilot`
 - AgentOS Evaluation Workspace at `/evaluation`
 - SCRIMED AgentOS v1 at `/agents`
@@ -88,6 +89,7 @@ Current baseline includes:
 - Product console endpoint at `/api/product/console`
 - Product readiness brief endpoint at `/api/product/readiness-brief`
 - Pricing and sales strategy endpoint at `/api/commercial/pricing`
+- Company operations readiness endpoint at `/api/operations/readiness`
 - Enterprise pilot intake endpoint at `/api/pilot/intake`
 - AgentOS Evaluation Workspace endpoint at `/api/agent-os/evaluation`
 - AgentOS summary endpoint at `/api/agent-os`
@@ -169,9 +171,11 @@ Current active quality path:
 19. Quality gates make every active, planned, and bypassed validation path explicit.
 20. Enterprise pilot intake validates buyer requests, blocks PHI-style content, and packages sanitized CRM-ready handoff payloads for HubSpot, Wix, Zapier/Make, or secure CRM webhook routing.
 21. Pricing and sales strategy defines public preview, paid assessment, synthetic pilot, protected enterprise pilot, enterprise license, strategic partnership, buyer routing, value metrics, and commercial guardrails.
-22. AgentOS v1 defines planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, task planning, RBAC, sandbox runtime, observability, and HIPAA-ready architecture controls.
-23. Atlas Intelligence Core v1 defines structural document intelligence, evidence retrieval contracts, Trust Cards, agent sandbox runtime, continuous validation metrics, AI Asset Registry, shadow AI detection, and reimbursement readiness boundaries.
-24. AgentOS Evaluation Workspace converts synthetic document packets into bounded task plans, structural document-intelligence assignments, Atlas Trust Cards, audit previews, and observability-ready outcome records.
+22. Company operations readiness defines publishing, deployment, app domain, Wix routing, local quality tooling, deployment protection, owners, resolution paths, and fallbacks.
+23. AgentOS v1 defines planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, task planning, RBAC, sandbox runtime, observability, and HIPAA-ready architecture controls.
+24. Atlas Intelligence Core v1 defines structural document intelligence, evidence retrieval contracts, Trust Cards, agent sandbox runtime, continuous validation metrics, AI Asset Registry, shadow AI detection, and reimbursement readiness boundaries.
+25. AgentOS Evaluation Workspace converts synthetic document packets into bounded task plans, structural document-intelligence assignments, Atlas Trust Cards, audit previews, and observability-ready outcome records.
+26. React and React DOM package pins are held at the current 19.2.4 patch line for the Next.js App Router security baseline.
 
 Current bypassed or deferred checks:
 
@@ -212,6 +216,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Enterprise pilot intake and CRM-ready buyer handoff for synthetic SCRIMED Atlas evaluations and healthcare AI readiness assessments
 - Pricing and sales strategy for public preview, assessment, synthetic pilot, protected pilot, enterprise license, and strategic partnerships
+- Company operations readiness for GitHub auth, Vercel deployment, app subdomain DNS, Wix CTA routing, local build tooling, and deployment protection
 - SCRIMED AgentOS v1 for governed planner/router/specialist orchestration, memory, audit, TrustQA, RBAC, MCP connectors, sandbox runtime, and task planning
 - AgentOS Evaluation Workspace for interactive synthetic buyer packets, Trust Cards, audit previews, and observability records
 - SCRIMED Atlas Intelligence Core v1 for structural document understanding, evidence-backed reasoning, Trust Cards, continuous validation, AI governance, and reimbursement-aware operating design
@@ -278,21 +283,26 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added the expanded Product Console operating layer with services, agents, workflow engine examples, governance controls, evidence metrics, buyer actions, and downloadable readiness brief.
 - Added `/pilot`, `/api/pilot/intake`, and `app/lib/pilotIntake.ts` for governed enterprise pilot intake, no-PHI validation, synthetic/evaluation-only acknowledgement, qualification, and CRM-ready handoff packaging.
 - Added `/pricing`, `/api/commercial/pricing`, and `app/lib/commercialStrategy.ts` for recommended pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails.
+- Added `/operations`, `/api/operations/readiness`, and `app/lib/companyOperations.ts` for go-live blocker tracking, buyer-route checklist, owner assignments, resolution paths, and fallback processes.
 - Added SCRIMED AgentOS v1 in `app/lib/agentOS.ts`, `/agents`, `/api/agent-os`, and `/api/agent-os/tasks` with planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, sandbox runtime, RBAC, observability, and production-gated task planning.
 - Added SCRIMED Atlas Intelligence Core v1 in `app/lib/atlasIntelligenceCore.ts`, `/atlas`, and `/api/atlas/intelligence-core` with structural document intelligence, evidence source contracts, Trust Cards, continuous validation metrics, AI Asset Registry, shadow-AI detection, and reimbursement-aware posture.
 - Added `/memory`, `/audit`, `/observability`, `/api/memory`, `/api/audit`, `/api/observability`, and `/api/trust/cards` to expose the memory fabric, audit/governance layer, continuous validation dashboard, and Trust Card system.
 - Promoted AgentOS and Atlas Core into the homepage, Hub, Product Console, Workflow Console, Trust surface, readiness brief, route inventory, and commercial positioning while preserving the synthetic pilot and enterprise assessment boundary.
 - Added the interactive AgentOS Evaluation Workspace in `/evaluation`, `app/lib/agentEvaluationWorkspace.ts`, and `/api/agent-os/evaluation` to generate synthetic task plans, structural parser assignments, Atlas Trust Cards, evidence sources, audit previews, blocked capabilities, and observability outcome records.
+- Promoted company operations readiness into the Product Console proof stack and downloadable readiness brief so go-live blockers, manual actions, owners, and fallbacks are visible during buyer and investor review.
+- Updated `react` and `react-dom` to `19.2.4` in `package.json`; regenerate and commit the lockfile from a controlled npm environment when package-manager access is restored.
 
 ## Recommended Next Steps
 
-1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
-2. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected API smoke-test routes should become publicly reachable.
-3. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-5. Add visual smoke checks for `/`, `/product`, `/pricing`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
-6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
-7. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
+1. Resolve local GitHub authentication, push the queued `main` commits, and confirm Vercel deploys the latest product routes.
+2. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
+3. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected public-preview routes should be reachable without Vercel login.
+4. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
+5. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
+6. Connect `app.scrimedsolutions.com` to the Vercel product app and add Wix CTAs for Product Console, Pricing, Evaluation, and Pilot Intake.
+7. Add visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+8. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+9. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
 
 ## Notes
 

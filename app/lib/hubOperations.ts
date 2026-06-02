@@ -18,6 +18,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "pilot_intake", status: "pass", detail: "/pilot and /api/pilot/intake capture enterprise pilot requests, validate synthetic-only boundaries, and package CRM-ready handoff payloads." },
+  { name: "operations_readiness", status: "watch", detail: "/operations and /api/operations/readiness expose publishing, deployment, domain, sales-routing, quality-tooling, and deployment-protection blockers with owners and fallback paths." },
   { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
   { name: "official_website", status: "pass", detail: "The official SCRIMED SOLUTIONS website is recorded as https://www.scrimedsolutions.com through Wix." },
   { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
@@ -42,6 +43,9 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "synthetic_assertions", status: "pass", detail: "/synthetic/validation and /api/synthetic/validation are available." },
   { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates are available with a managed bypass path for CI visibility gaps." },
   { name: "github_actions", status: "watch", detail: "CI is configured, but run visibility is not confirmed in this session." },
+  { name: "github_push_auth", status: "watch", detail: "Local GitHub HTTPS push is blocked until credentials or GitHub CLI auth are configured; connector-backed publishing remains the fallback." },
+  { name: "app_subdomain_dns", status: "watch", detail: "app.scrimedsolutions.com is the recommended product domain, but Vercel domain binding and DNS verification require domain administrator action." },
+  { name: "local_package_manager", status: "watch", detail: "npm, pnpm, yarn, corepack, and tsc are unavailable in the current Codex PATH; Vercel remote build remains the build source of truth until local tooling is restored." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
 ];
 
@@ -179,6 +183,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-06-02"
   },
   {
+    id: "scrimed-operations-readiness",
+    type: "operations",
+    summary: "Added operations readiness for GitHub auth, package-manager tooling, Vercel deployment path, app subdomain/DNS, Wix CTA routing, and deployment-protection decisions.",
+    date: "2026-06-02"
+  },
+  {
     id: "scrimed-official-website-context",
     type: "product",
     summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
@@ -200,7 +210,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, pilot intake validation, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, operations readiness, pilot intake validation, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-06-02"
   };
 }
