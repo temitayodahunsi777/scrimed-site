@@ -17,6 +17,11 @@ const consoleViews = [
     summary: "Review SCRIMED Atlas Pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
   },
   {
+    name: "Pilot Intake",
+    href: "/pilot",
+    summary: "Capture enterprise buyer segment, workflow targets, readiness needs, governance requirements, and CRM handoff scope."
+  },
+  {
     name: "Agents",
     href: "/agents",
     summary: "Review governed agent workflows, permissions, audit events, and human-review boundaries."
