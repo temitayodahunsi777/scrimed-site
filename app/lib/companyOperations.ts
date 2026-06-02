@@ -38,7 +38,7 @@ export const operationsBlockers: OperationsBlocker[] = [
     impact:
       "SCRIMED commits can now be pushed through the authenticated GitHub CLI path, allowing Vercel Git integration to deploy from `main`.",
     currentEvidence:
-      "GitHub CLI authenticated as `temitayodahunsi777`; `git push origin main` advanced `main` from `0a0977b` to `bea1a27`.",
+      "GitHub CLI authenticated as `temitayodahunsi777`; `git push origin main` successfully publishes reviewed local commits to GitHub.",
     owner: "Repository administrator",
     resolutionPath: [
       "Keep GitHub CLI authentication active for future local pushes.",
@@ -73,7 +73,7 @@ export const operationsBlockers: OperationsBlocker[] = [
     impact:
       "Production deploys can proceed through GitHub push even without a local Vercel CLI install.",
     currentEvidence:
-      "Vercel production deployment `dpl_H3PtqdXSCmKNxzpV5bLn7A8AVVLd` is READY from GitHub commit `bea1a27`.",
+      "Vercel production deploys from pushed GitHub `main` commits and has returned READY for the latest pushed SCRIMED product builds.",
     owner: "Engineering",
     resolutionPath: [
       "Use GitHub push as the primary deploy trigger.",

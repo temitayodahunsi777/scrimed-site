@@ -140,7 +140,7 @@ Current baseline includes:
 
 ## Deployment Status
 
-Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub CLI authentication is configured for local pushes, and Vercel production deployment `dpl_H3PtqdXSCmKNxzpV5bLn7A8AVVLd` is READY from GitHub commit `bea1a27`. GitHub Actions build verification is configured, but workflow runs are not visible through the current connector and the local Codex environment does not currently have npm, pnpm, yarn, or corepack available for independent local build or Actions-log inspection.
+Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub CLI authentication is configured for local pushes, and Vercel production deploys from pushed GitHub `main` commits have reached READY for the current SCRIMED product build path. GitHub Actions build verification is configured, but workflow runs are not visible through the current connector and the local Codex environment does not currently have npm, pnpm, yarn, or corepack available for independent local build or Actions-log inspection.
 
 Because Vercel is green, GitHub Actions and local package-manager verification are not treated as product or deploy blockers right now. They remain hardening items behind a managed quality-process bypass.
 
@@ -291,7 +291,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added the interactive AgentOS Evaluation Workspace in `/evaluation`, `app/lib/agentEvaluationWorkspace.ts`, and `/api/agent-os/evaluation` to generate synthetic task plans, structural parser assignments, Atlas Trust Cards, evidence sources, audit previews, blocked capabilities, and observability outcome records.
 - Promoted company operations readiness into the Product Console proof stack and downloadable readiness brief so go-live blockers, manual actions, owners, and fallbacks are visible during buyer and investor review.
 - Updated `react` and `react-dom` to `19.2.4` in `package.json`; regenerate and commit the lockfile from a controlled npm environment when package-manager access is restored.
-- Authenticated GitHub CLI, pushed `main` from `0a0977b` to `bea1a27`, and confirmed Vercel production deployment `dpl_H3PtqdXSCmKNxzpV5bLn7A8AVVLd` reached READY.
+- Authenticated GitHub CLI, pushed queued `main` commits, and confirmed Vercel production deployments reach READY through the Git integration path.
 
 ## Recommended Next Steps
 
