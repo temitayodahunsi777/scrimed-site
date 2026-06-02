@@ -7,8 +7,8 @@ export default function ProductConsolePage() {
     <main>
       <section className="page-hero">
         <a className="back-link" href="/hub">Hub</a>
-        <p className="eyebrow">Product console</p>
-        <h1>SCRIMED is packaged as a sellable healthcare operating-system pilot.</h1>
+        <p className="eyebrow">SCRIMED Product Console</p>
+        <h1>SCRIMED Product Console packages a sellable healthcare operating-system pilot.</h1>
         <p className="hero-text">
           This console turns SCRIMED from a readiness foundation into a commercial product surface: buyer offers, workflow demos, proof routes, deployment stages, and production safety boundaries.
         </p>
