@@ -12,9 +12,9 @@ const consoleViews = [
     summary: "Review SCRIMED's mission, principles, operating models, and decision framework."
   },
   {
-    name: "Product",
+    name: "SCRIMED Product Console",
     href: "/product",
-    summary: "Review sellable pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
+    summary: "Review SCRIMED Atlas Pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
   },
   {
     name: "Agents",

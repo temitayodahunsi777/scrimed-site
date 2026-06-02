@@ -30,6 +30,7 @@ const systemLayers = [
 
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
+  { label: "Product", value: "/product" },
   { label: "OS Hub", value: "/hub" },
   { label: "Context", value: "/api/operating-context" },
   { label: "Agents", value: "/api/agents/workflows" },
@@ -60,6 +61,7 @@ export default function Home() {
             <span>SCRIMED</span>
           </a>
           <div className="nav-links">
+            <a href="/product">Product</a>
             <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
             <a href="/agents">Agents</a>
@@ -78,7 +80,8 @@ export default function Home() {
               Solving For A Better Tomorrow through clinical intelligence, workflow automation, healthcare data interoperability, trustworthy AI agents, and continuous trust monitoring across AI-enabled care systems.
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
-              <a className="primary-action" href="/hub">Open OS Hub</a>
+              <a className="primary-action" href="/product">Open Product Console</a>
+              <a className="secondary-action" href="/hub">Open OS Hub</a>
               <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>
           </div>
