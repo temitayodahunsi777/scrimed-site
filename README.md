@@ -6,6 +6,8 @@ Official website: https://www.scrimedsolutions.com
 
 The mission of SCRIMED is to help modernize healthcare operations, improve patient outcomes, and reduce systemic inefficiencies by building trustworthy, scalable AI infrastructure for the healthcare ecosystem.
 
+Current product boundary: this repository presents SCRIMED as a governed synthetic pilot and enterprise evaluation product. It does not execute live clinical care, autonomous diagnosis, payer submission, patient outreach, or production medical-record workflows.
+
 ---
 
 ## Core Vision
@@ -39,6 +41,12 @@ AI-assisted clinical trial discovery and patient matching.
 ### TrustWatch (Watchtower)
 Continuous post-deployment monitoring system designed to detect AI performance regressions, model drift, trust signals, and system reliability across healthcare workflows.
 
+### SCRIMED AgentOS
+Governed multi-agent orchestration layer with planner, router, specialist registry, memory fabric, TrustQA verification, audit logging, human approval checkpoints, RBAC posture, MCP connector framework, sandbox runtime, and task-planning endpoints.
+
+### SCRIMED Atlas Intelligence Core
+Enterprise intelligence layer for structural document understanding, evidence-backed reasoning, Trust Cards, agent sandbox posture, continuous validation, AI asset governance, shadow-AI detection, and reimbursement-aware operating design.
+
 ---
 
 ## Watchtower Monitoring System
@@ -63,6 +71,10 @@ SCRIMED is currently under active development. The platform is being designed an
 Current focus areas include:
 
 - AI agent architecture
+- SCRIMED AgentOS v1 multi-agent orchestration
+- SCRIMED Atlas Intelligence Core v1
+- Trust Cards, evidence attribution, and TrustQA checks
+- memory fabric, audit surfaces, and observability dashboards
 - enterprise pilot intake and CRM-ready buyer handoff
 - synthetic workflow execution readiness
 - deterministic workflow execution result fixtures
@@ -99,6 +111,32 @@ SCRIMED now includes a governed buyer-intake surface at `/pilot` and a validated
 The intake captures business-contact information, buyer segment, target workflows, readiness needs, governance requirements, timeline, interoperability context, and pilot goals. It explicitly rejects protected health information, patient identifiers, live clinical records, diagnosis details, payer member identifiers, and production clinical data.
 
 If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards a sanitized CRM-ready handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. Without that variable, the endpoint returns a manual CRM-ready handoff packet.
+
+---
+
+## AgentOS and Atlas Core Routes
+
+Core enterprise evaluation surfaces:
+
+- `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
+- `/workflows` - workflow engine and sandbox runtime
+- `/memory` - session, operational, and knowledge memory fabric
+- `/audit` - audit channels, AI Asset Registry, and approval checkpoints
+- `/trust` - TrustQA, Trust Cards, and evidence governance
+- `/observability` - continuous validation and operational metrics
+- `/atlas` - Atlas Intelligence Core v1 subsystems
+
+Core APIs:
+
+- `/api/agent-os`
+- `/api/agent-os/tasks`
+- `/api/atlas/intelligence-core`
+- `/api/memory`
+- `/api/audit`
+- `/api/trust/cards`
+- `/api/observability`
+
+The task-planning API accepts synthetic pilot and enterprise assessment requests only. Production requests are explicitly denied until tenant identity, live connector controls, durable audit logging, privacy/security review, business associate agreement readiness, and human approval controls are approved.
 
 ---
 

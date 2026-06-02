@@ -1,4 +1,6 @@
 import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
+import { getAgentOSSummary } from "./agentOS";
+import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
 import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
@@ -391,6 +393,8 @@ export function getProductConsoleSummary() {
   const workflowExecutionContractSummary = getWorkflowExecutionContractSummary();
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
   const agentWorkflowSummary = getAgentWorkflowSummary();
+  const agentOSSummary = getAgentOSSummary();
+  const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
   const qualityGateSummary = getQualityGateSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
@@ -409,6 +413,9 @@ export function getProductConsoleSummary() {
     sellablePilots,
     workflowCount: productWorkflows.length,
     workflowEngineCount: workflowEngineExamples.length,
+    agentOSControlPlaneCount: agentOSSummary.controlPlane.length,
+    atlasSubsystemCount: atlasIntelligenceCoreSummary.subsystems.length,
+    trustCardCount: atlasIntelligenceCoreSummary.trustCards.length,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -421,7 +428,11 @@ export function getProductConsoleSummary() {
     evidenceMetrics,
     buyerActions,
     deploymentStages,
+    agentOSSummary,
+    atlasIntelligenceCoreSummary,
     proofStack: {
+      agentOS: agentOSSummary.status,
+      atlasIntelligenceCore: atlasIntelligenceCoreSummary.status,
       workflowExecution: workflowExecutionSummary.status,
       workflowResults: workflowExecutionResultSummary.status,
       resultValidation: workflowResultValidationSummary.status,
@@ -433,7 +444,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Package SCRIMED Atlas Pilot with three buyer-specific workflow demos, executive governance scorecard, integration map, and production-readiness decision register.",
+      "Package SCRIMED Atlas Pilot with AgentOS orchestration, Atlas Intelligence Core, three buyer-specific workflow demos, executive governance scorecard, integration map, and production-readiness decision register.",
     updated: "2026-06-02"
   };
 }
@@ -460,6 +471,16 @@ export function getProductReadinessBrief() {
     "",
     "## Governance Controls",
     ...summary.governanceControls.map((control) => `- ${control.control}: ${control.detail}`),
+    "",
+    "## AgentOS v1",
+    `Status: ${summary.agentOSSummary.status}`,
+    `Control plane agents: ${summary.agentOSControlPlaneCount}`,
+    `Task engine: ${summary.agentOSSummary.taskApiRoute}`,
+    "",
+    "## Atlas Intelligence Core v1",
+    `Status: ${summary.atlasIntelligenceCoreSummary.status}`,
+    `Subsystems: ${summary.atlasSubsystemCount}`,
+    `Trust Cards: ${summary.trustCardCount}`,
     "",
     "## Evidence Metrics",
     ...summary.evidenceMetrics.map((metric) => `- ${metric.metric}: ${metric.measurementBoundary}`),

@@ -18,14 +18,27 @@ const platformModules = [
   {
     name: "Watchtower",
     summary: "Regression monitoring, drift detection, trust signals, and deployment scorecards."
+  },
+  {
+    name: "AgentOS",
+    summary: "Planner, router, specialist agents, memory, TrustQA, sandboxing, audit, RBAC, and human approvals."
+  },
+  {
+    name: "Atlas Intelligence Core",
+    summary: "Structural document intelligence, evidence attribution, Trust Cards, validation, governance, and reimbursement posture."
+  },
+  {
+    name: "PayerIQ",
+    summary: "Prior authorization and RCM intelligence for policy-aware, review-gated payer workflows."
   }
 ];
 
 const systemLayers = [
   "Healthcare data interoperability",
+  "Agent orchestration and sandbox runtime",
   "AI reasoning and summarization",
-  "Workflow automation",
-  "Trust, safety, and observability"
+  "Evidence-backed workflow automation",
+  "Trust, governance, safety, and observability"
 ];
 
 const readinessSignals = [
@@ -33,10 +46,16 @@ const readinessSignals = [
   { label: "Product", value: "/product" },
   { label: "Pilot", value: "/pilot" },
   { label: "OS Hub", value: "/hub" },
+  { label: "AgentOS", value: "/api/agent-os" },
+  { label: "Atlas Core", value: "/api/atlas/intelligence-core" },
   { label: "Context", value: "/api/operating-context" },
   { label: "Intake API", value: "/api/pilot/intake" },
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Workflows", value: "/api/workflows/executions" },
+  { label: "Memory", value: "/api/memory" },
+  { label: "Audit", value: "/api/audit" },
+  { label: "Trust Cards", value: "/api/trust/cards" },
+  { label: "Observability", value: "/api/observability" },
   { label: "Exec API", value: "/api/workflows/contracts" },
   { label: "Identity", value: "/api/workflows/identity-access" },
   { label: "Attempts", value: "/api/workflows/execution-attempts" },
@@ -66,8 +85,10 @@ export default function Home() {
             <a href="/product">Product</a>
             <a href="/pilot">Pilot</a>
             <a href="/hub">Hub</a>
+            <a href="/atlas">Atlas</a>
             <a href="/platform">Platform</a>
             <a href="/agents">Agents</a>
+            <a href="/observability">Observability</a>
             <a href="/quality">Quality</a>
             <a href="/synthetic">Synthetic</a>
             <a href="/integrations">Integrations</a>
@@ -118,6 +139,15 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Agent governance registry online
+              </div>
+              <div>
+                <span className="trace-dot" /> AgentOS planner and router layer online
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Atlas Trust Cards staged
+              </div>
+              <div>
+                <span className="trace-dot" /> Memory, audit, and observability surfaces exposed
               </div>
               <div>
                 <span className="trace-dot" /> Integration fixture diffs active

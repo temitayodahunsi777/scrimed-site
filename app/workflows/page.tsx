@@ -2,18 +2,22 @@ import {
   getWorkflowExecutionSummary,
   validateWorkflowExecution
 } from "../lib/workflowExecutions";
+import { getAgentOSSummary } from "../lib/agentOS";
+import { getAtlasIntelligenceCoreSummary } from "../lib/atlasIntelligenceCore";
 
 export default function WorkflowExecutionsPage() {
   const summary = getWorkflowExecutionSummary();
+  const agentOS = getAgentOSSummary();
+  const atlas = getAtlasIntelligenceCoreSummary();
 
   return (
     <main>
       <section className="page-hero">
         <a className="back-link" href="/hub">Hub</a>
-        <p className="eyebrow">Workflow execution</p>
-        <h1>SCRIMED stages workflow execution against synthetic fixtures before live clinical operations.</h1>
+        <p className="eyebrow">Workflow and task execution engine</p>
+        <h1>SCRIMED turns healthcare workflows into sandboxed, audited, human-reviewed task plans.</h1>
         <p className="hero-text">
-          CarePath AI, DocuTwin, and TrialCore now map to governed agent workflows, synthetic fixtures, integration fixtures, quality gates, result fixtures, and Watchtower trace requirements.
+          CarePath AI, DocuTwin, TrialCore, Sanar AI, PayerIQ, and future services map to synthetic fixtures, sandbox runtimes, TrustQA, human approvals, result validation, and production deny gates.
         </p>
       </section>
 
@@ -34,6 +38,54 @@ export default function WorkflowExecutionsPage() {
           <span>Attention</span>
           <strong>{summary.attentionRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" id="sandbox-runtime" aria-label="Agent sandbox runtimes">
+        <div className="section-heading">
+          <p className="eyebrow">Agent Sandbox Runtime</p>
+          <h2>Every agent receives isolated memory, files, workflow tools, and audit logs.</h2>
+          <p className="section-copy">{atlas.boundary}</p>
+        </div>
+        {agentOS.sandboxRuntimes.map((runtime) => (
+          <article className="module-row" key={runtime.workflow}>
+            <div>
+              <span>{runtime.agent}</span>
+              <h2>{runtime.workflow}</h2>
+            </div>
+            <p>{runtime.isolation}</p>
+            <div>
+              <strong>{runtime.boundary}</strong>
+              <ul className="compact-list">
+                <li>Memory: {runtime.memory.join(", ")}</li>
+                <li>Tools: {runtime.tools.join(", ")}</li>
+                <li>Audit: {runtime.audit.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="AgentOS task templates">
+        <div className="section-heading">
+          <p className="eyebrow">Task execution engine</p>
+          <h2>Task plans route through Planner, Router, specialist agents, TrustQA, and approval checkpoints.</h2>
+        </div>
+        {agentOS.taskExecutionEngine.map((task) => (
+          <article className="module-row" key={task.slug}>
+            <div>
+              <span>{task.executionMode.join(", ")}</span>
+              <h2>{task.name}</h2>
+            </div>
+            <p>{task.owner}. {task.plannerSteps.join(", ")}</p>
+            <div>
+              <a className="module-link" href={task.route}>{task.specialistAgents.join(", ")}</a>
+              <ul className="compact-list">
+                <li>Approvals: {task.humanApprovals.join(", ")}</li>
+                <li>Blocked: {task.deniedCapabilities.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Synthetic workflow executions">

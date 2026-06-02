@@ -13,6 +13,10 @@ Current baseline includes:
 - Root page at `/`
 - Product console at `/product`
 - Enterprise pilot intake at `/pilot`
+- SCRIMED AgentOS v1 at `/agents`
+- Memory fabric at `/memory`
+- Audit and governance layer at `/audit`
+- Observability and continuous validation dashboard at `/observability`
 - SCRIMED OS Hub console at `/hub`
 - Hub readiness console at `/hub/readiness`
 - Hub events console at `/hub/events`
@@ -35,7 +39,7 @@ Current baseline includes:
 - Denied execution audit boundaries at `/workflows/execution-audit`
 - Denied execution audit boundary detail routes under `/workflows/execution-audit/[slug]`
 - Audit persistence readiness at `/workflows/audit-persistence`
-- SCRIMED Atlas operating model at `/atlas`
+- SCRIMED Atlas Intelligence Core v1 at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
 - Integration fixture contracts at `/integrations/fixtures`
@@ -74,12 +78,21 @@ Current baseline includes:
 - Shared quality gate model in `app/lib/qualityGates.ts`
 - Shared product console model in `app/lib/productConsole.ts`
 - Shared pilot intake model in `app/lib/pilotIntake.ts`
+- Shared AgentOS model in `app/lib/agentOS.ts`
+- Shared Atlas Intelligence Core model in `app/lib/atlasIntelligenceCore.ts`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
 - Platform status endpoint at `/api/status`
 - Product console endpoint at `/api/product/console`
 - Product readiness brief endpoint at `/api/product/readiness-brief`
 - Enterprise pilot intake endpoint at `/api/pilot/intake`
+- AgentOS summary endpoint at `/api/agent-os`
+- AgentOS task planning endpoint at `/api/agent-os/tasks`
+- Atlas Intelligence Core endpoint at `/api/atlas/intelligence-core`
+- Memory fabric endpoint at `/api/memory`
+- Audit and governance endpoint at `/api/audit`
+- Observability endpoint at `/api/observability`
+- Trust Card endpoint at `/api/trust/cards`
 - Readiness endpoint at `/api/readiness`
 - Platform events endpoint at `/api/events`
 - Operating context endpoint at `/api/operating-context`
@@ -151,6 +164,8 @@ Current active quality path:
 18. Hub readiness and event endpoints expose operational status.
 19. Quality gates make every active, planned, and bypassed validation path explicit.
 20. Enterprise pilot intake validates buyer requests, blocks PHI-style content, and packages sanitized CRM-ready handoff payloads for HubSpot, Wix, Zapier/Make, or secure CRM webhook routing.
+21. AgentOS v1 defines planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, task planning, RBAC, sandbox runtime, observability, and HIPAA-ready architecture controls.
+22. Atlas Intelligence Core v1 defines structural document intelligence, evidence retrieval contracts, Trust Cards, agent sandbox runtime, continuous validation metrics, AI Asset Registry, shadow AI detection, and reimbursement readiness boundaries.
 
 Current bypassed or deferred checks:
 
@@ -190,6 +205,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - FaithCore for opt-in spiritually aligned encouragement and trust support with explicit clinical boundaries
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Enterprise pilot intake and CRM-ready buyer handoff for synthetic SCRIMED Atlas evaluations and healthcare AI readiness assessments
+- SCRIMED AgentOS v1 for governed planner/router/specialist orchestration, memory, audit, TrustQA, RBAC, MCP connectors, sandbox runtime, and task planning
+- SCRIMED Atlas Intelligence Core v1 for structural document understanding, evidence-backed reasoning, Trust Cards, continuous validation, AI governance, and reimbursement-aware operating design
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Integration fixtures and validation diffs before live connector implementation
 - Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness before module automation
@@ -252,6 +269,10 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Promoted execution-attempt readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, workflow console navigation, and deny-by-default evidence headers while keeping attempt creation disabled.
 - Added the expanded Product Console operating layer with services, agents, workflow engine examples, governance controls, evidence metrics, buyer actions, and downloadable readiness brief.
 - Added `/pilot`, `/api/pilot/intake`, and `app/lib/pilotIntake.ts` for governed enterprise pilot intake, no-PHI validation, synthetic/evaluation-only acknowledgement, qualification, and CRM-ready handoff packaging.
+- Added SCRIMED AgentOS v1 in `app/lib/agentOS.ts`, `/agents`, `/api/agent-os`, and `/api/agent-os/tasks` with planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, sandbox runtime, RBAC, observability, and production-gated task planning.
+- Added SCRIMED Atlas Intelligence Core v1 in `app/lib/atlasIntelligenceCore.ts`, `/atlas`, and `/api/atlas/intelligence-core` with structural document intelligence, evidence source contracts, Trust Cards, continuous validation metrics, AI Asset Registry, shadow-AI detection, and reimbursement-aware posture.
+- Added `/memory`, `/audit`, `/observability`, `/api/memory`, `/api/audit`, `/api/observability`, and `/api/trust/cards` to expose the memory fabric, audit/governance layer, continuous validation dashboard, and Trust Card system.
+- Promoted AgentOS and Atlas Core into the homepage, Hub, Product Console, Workflow Console, Trust surface, readiness brief, route inventory, and commercial positioning while preserving the synthetic pilot and enterprise assessment boundary.
 
 ## Recommended Next Steps
 
@@ -259,8 +280,9 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 2. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected API smoke-test routes should become publicly reachable.
 3. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
 4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-5. Add visual smoke checks for `/`, `/product`, `/pilot`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+5. Add visual smoke checks for `/`, `/product`, `/pilot`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
 6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+7. Build the first interactive AgentOS evaluation workspace: buyer uploads synthetic documents, AgentOS creates a bounded plan, Atlas generates Trust Cards, and Observability records outcome metrics without ingesting live PHI.
 
 ## Notes
 

@@ -24,7 +24,27 @@ const consoleViews = [
   {
     name: "Agents",
     href: "/agents",
-    summary: "Review governed agent workflows, permissions, audit events, and human-review boundaries."
+    summary: "Review SCRIMED AgentOS v1 control plane, planner, router, specialist registry, RBAC, MCP connectors, and human-review boundaries."
+  },
+  {
+    name: "Memory",
+    href: "/memory",
+    summary: "Review session, operational, and knowledge memory fabric with retention, prohibited data, RBAC, and audit policies."
+  },
+  {
+    name: "Audit",
+    href: "/audit",
+    summary: "Review audit channels, human approval checkpoints, AI Asset Registry, shadow AI detection, and governance trails."
+  },
+  {
+    name: "Observability",
+    href: "/observability",
+    summary: "Review continuous validation metrics for denial reduction, time saved, revenue impact, escalation, override, and trust signals."
+  },
+  {
+    name: "Atlas Intelligence Core",
+    href: "/atlas",
+    summary: "Review structural document intelligence, evidence layer, Trust Cards, sandbox runtime, reimbursement posture, and governance systems."
   },
   {
     name: "Workflows",
@@ -57,7 +77,7 @@ const consoleViews = [
     summary: "Review locked execution endpoints and production prerequisites before any workflow can run."
   },
   {
-    name: "Audit",
+    name: "Execution Audit",
     href: "/workflows/execution-audit",
     summary: "Review metadata-only evidence headers and never-capture policy for denied execution attempts."
   },

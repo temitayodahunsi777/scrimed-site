@@ -5,6 +5,8 @@ import { integrationFixtures } from "./integrationFixtures";
 import { integrationContracts } from "./integrationContracts";
 import { operatingContext } from "./operatingContext";
 import { getPilotIntakeSummary } from "./pilotIntake";
+import { getAgentOSSummary } from "./agentOS";
+import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
 import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
@@ -93,10 +95,16 @@ export const hubModules: HubModule[] = [
 export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Quality gates", value: "managed bypass active", tone: "good" },
-  { name: "Repository", value: "main baseline clean", tone: "good" },
+  { name: "Repository", value: "main baseline documented", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
+  { name: "AgentOS", value: "multi-agent control plane online", tone: "good" },
+  { name: "Memory fabric", value: "session, operational, knowledge scoped", tone: "good" },
+  { name: "Audit governance", value: "AI asset registry active", tone: "good" },
+  { name: "Observability", value: "continuous validation ready", tone: "good" },
+  { name: "Atlas Intelligence Core", value: "evidence and document intelligence staged", tone: "good" },
+  { name: "Trust Cards", value: "provenance contracts active", tone: "good" },
   { name: "Agent registry", value: "governance scoped", tone: "good" },
   { name: "Workflow execution", value: "three synthetic paths staged", tone: "good" },
   { name: "Execution results", value: "deterministic fixtures ready", tone: "good" },
@@ -140,6 +148,9 @@ export const hubRoutes = [
   "/hub/events",
   "/pilot",
   "/platform",
+  "/memory",
+  "/audit",
+  "/observability",
   "/trust",
   "/integrations",
   "/integrations/fixtures",
@@ -184,6 +195,13 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/pilot/intake",
+  "/api/agent-os",
+  "/api/agent-os/tasks",
+  "/api/atlas/intelligence-core",
+  "/api/memory",
+  "/api/audit",
+  "/api/observability",
+  "/api/trust/cards",
   "/api/operating-context",
   "/api/agents/workflows",
   ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
@@ -236,6 +254,8 @@ export function getHubSummary() {
   const executionAttemptReadinessSummary = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
   const pilotIntakeSummary = getPilotIntakeSummary();
+  const agentOSSummary = getAgentOSSummary();
+  const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -255,6 +275,8 @@ export function getHubSummary() {
       operatingModels: operatingContext.operatingModels
     },
     pilotIntakeSummary,
+    agentOSSummary,
+    atlasIntelligenceCoreSummary,
     agentWorkflowSummary,
     fixtureChangeReview,
     workflowExecutionSummary,
