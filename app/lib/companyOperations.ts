@@ -33,20 +33,20 @@ export const operationsBlockers: OperationsBlocker[] = [
   {
     id: "github-auth",
     area: "publishing",
-    status: "blocked",
-    blocker: "Local GitHub HTTPS push cannot read credentials.",
+    status: "ready",
+    blocker: "GitHub push authentication is configured for the current workspace.",
     impact:
-      "Local commits for AgentOS, Atlas, Evaluation, Pricing, and Operations Readiness are ready but not visible on GitHub or Vercel until pushed.",
+      "SCRIMED commits can now be pushed through the authenticated GitHub CLI path, allowing Vercel Git integration to deploy from `main`.",
     currentEvidence:
-      "`git push origin main` fails with: could not read Username for 'https://github.com'. Vercel production still points at GitHub commit 0a0977b.",
-    owner: "Founder or repository administrator",
+      "GitHub CLI authenticated as `temitayodahunsi777`; `git push origin main` advanced `main` from `0a0977b` to `bea1a27`.",
+    owner: "Repository administrator",
     resolutionPath: [
-      "Install and authenticate GitHub CLI with `gh auth login`, or configure a GitHub personal access token in the macOS keychain.",
-      "Run `git push origin main` from the `scrimed-site` repository.",
-      "Confirm Vercel creates a production deployment from the pushed `main` branch."
+      "Keep GitHub CLI authentication active for future local pushes.",
+      "Prefer normal `git push origin main` after local commits are reviewed.",
+      "Use GitHub connector publishing only as a fallback when local Git auth is unavailable."
     ],
     fallback:
-      "Use the connected GitHub app for a connector-backed branch or squash commit only after accepting the local/remote history reconciliation plan."
+      "Re-run GitHub device auth or use the connected GitHub app for a connector-backed branch after accepting the history reconciliation plan."
   },
   {
     id: "package-manager",
@@ -68,19 +68,20 @@ export const operationsBlockers: OperationsBlocker[] = [
   {
     id: "vercel-cli",
     area: "deployment",
-    status: "manual-action",
-    blocker: "Direct Vercel deploy from local workspace is unavailable without Vercel CLI or pushed Git integration.",
+    status: "ready",
+    blocker: "Vercel Git deployment path is working from GitHub `main`.",
     impact:
-      "Vercel cannot deploy the latest local commits until GitHub push works or Vercel CLI is installed/authenticated.",
-    currentEvidence: "Connected Vercel deploy helper returns CLI instructions; local `vercel` command is unavailable.",
-    owner: "Engineering or Vercel project administrator",
+      "Production deploys can proceed through GitHub push even without a local Vercel CLI install.",
+    currentEvidence:
+      "Vercel production deployment `dpl_H3PtqdXSCmKNxzpV5bLn7A8AVVLd` is READY from GitHub commit `bea1a27`.",
+    owner: "Engineering",
     resolutionPath: [
-      "Prefer GitHub push to trigger Vercel Git integration.",
-      "Alternatively install Vercel CLI, link the project, and deploy from the repository root.",
-      "Confirm latest production deployment contains `/pricing`, `/evaluation`, `/agents`, and `/api/commercial/pricing`."
+      "Use GitHub push as the primary deploy trigger.",
+      "Monitor Vercel production deployments after each pushed commit.",
+      "Install Vercel CLI only if manual deployment, env management, or domain operations require it."
     ],
     fallback:
-      "Keep current production deployment live while local commits remain queued."
+      "Use the Vercel dashboard or connector inspection if the CLI is unavailable."
   },
   {
     id: "app-subdomain",

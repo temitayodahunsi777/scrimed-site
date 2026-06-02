@@ -43,7 +43,8 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "synthetic_assertions", status: "pass", detail: "/synthetic/validation and /api/synthetic/validation are available." },
   { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates are available with a managed bypass path for CI visibility gaps." },
   { name: "github_actions", status: "watch", detail: "CI is configured, but run visibility is not confirmed in this session." },
-  { name: "github_push_auth", status: "watch", detail: "Local GitHub HTTPS push is blocked until credentials or GitHub CLI auth are configured; connector-backed publishing remains the fallback." },
+  { name: "github_push_auth", status: "pass", detail: "GitHub CLI authentication is configured and `main` was pushed to commit bea1a27." },
+  { name: "vercel_git_deployment", status: "pass", detail: "Vercel production deployment dpl_H3PtqdXSCmKNxzpV5bLn7A8AVVLd is READY from GitHub commit bea1a27." },
   { name: "app_subdomain_dns", status: "watch", detail: "app.scrimedsolutions.com is the recommended product domain, but Vercel domain binding and DNS verification require domain administrator action." },
   { name: "local_package_manager", status: "watch", detail: "npm, pnpm, yarn, corepack, and tsc are unavailable in the current Codex PATH; Vercel remote build remains the build source of truth until local tooling is restored." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
