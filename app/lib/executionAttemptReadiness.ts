@@ -135,11 +135,11 @@ export const executionAttemptControls: ExecutionAttemptControl[] = [
       "Partial failures could be hidden, retried unsafely, or left without accountable operational recovery."
   },
   {
-    name: "Rate limits and misuse throttles",
+    name: "Rate-limit handoff and misuse throttles",
     state: "decision-required",
     owner: "Security operations",
     requirement:
-      "Approve tenant, user, service, workflow, region, and emergency shutdown limits before executable attempts are accepted.",
+      "Approve the execution-attempt handoff into runtime safety readiness for tenant, user, service, workflow, patient-context, regional, throttle, misuse, and shutdown decisions before executable attempts are accepted.",
     riskIfMissing:
       "Attackers, misconfigured clients, or runaway agents could flood execution surfaces and overwhelm review or connector systems."
   },
@@ -176,7 +176,7 @@ export function getExecutionAttemptReadinessSummary() {
     decisionRequired,
     runtimeBoundary: "attempt-creation-disabled",
     activeReplacement:
-      "Deny-by-default governed execution endpoints remain the active replacement until idempotency, durable attempt storage, concurrency, retry, failure quarantine, rate-limit, privacy, and regional attempt-compliance decisions are approved.",
+      "Deny-by-default governed execution endpoints remain the active replacement until idempotency, durable attempt storage, concurrency, retry, failure quarantine, runtime-safety handoff, privacy, and regional attempt-compliance decisions are approved.",
     requiredBeforeExecution:
       "Governed execution must not create, persist, retry, replay, or release execution attempts until execution-attempt readiness is approved.",
     attemptEnvelope: executionAttemptEnvelope,

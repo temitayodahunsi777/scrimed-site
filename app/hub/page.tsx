@@ -37,6 +37,11 @@ const consoleViews = [
     summary: "Review idempotency, durable attempt state, retry, replay, concurrency, failure quarantine, and rate-limit decisions."
   },
   {
+    name: "Safety",
+    href: "/workflows/runtime-safety",
+    summary: "Review throttles, abuse signals, connector containment, emergency shutdown, escalation, override, restoration, and safety-drill decisions."
+  },
+  {
     name: "Deny Stubs",
     href: "/workflows/implementation-readiness",
     summary: "Review locked execution endpoints and production prerequisites before any workflow can run."

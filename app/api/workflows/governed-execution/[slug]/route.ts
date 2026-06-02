@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getExecutionAttemptReadinessSummary } from "../../../../lib/executionAttemptReadiness";
+import { getRuntimeSafetyReadinessSummary } from "../../../../lib/runtimeSafetyReadiness";
 import { getWorkflowExecutionAuditBoundaryBySlug } from "../../../../lib/workflowExecutionAudit";
 import { getWorkflowImplementationReadinessBySlug } from "../../../../lib/workflowImplementationReadiness";
 
@@ -25,6 +26,7 @@ export async function POST(
   const readiness = getWorkflowImplementationReadinessBySlug(slug);
   const auditBoundary = getWorkflowExecutionAuditBoundaryBySlug(slug);
   const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
+  const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
 
   if (!readiness) {
     return NextResponse.json({ error: "Workflow implementation readiness not found" }, { status: 404 });
@@ -43,10 +45,16 @@ export async function POST(
       attemptBoundary: executionAttemptReadiness.runtimeBoundary,
       attemptCreated: false,
       idempotencyDecision: "not-evaluated",
+      runtimeSafetyReadiness: runtimeSafetyReadiness.status,
+      runtimeSafetyBoundary: runtimeSafetyReadiness.runtimeBoundary,
+      emergencyShutdownBoundary: runtimeSafetyReadiness.shutdownBoundary,
+      throttleDecision: "not-evaluated",
+      shutdownDecision: "not-evaluated",
       requiredBeforeExecution: readiness.requiredBeforeExecution,
       contractRoute: readiness.contractRoute,
       readinessRoute: readiness.route,
-      attemptReadinessRoute: "/workflows/execution-attempts"
+      attemptReadinessRoute: "/workflows/execution-attempts",
+      runtimeSafetyRoute: "/workflows/runtime-safety"
     },
     {
       status: readiness.deniedResponse.statusCode,
@@ -56,7 +64,10 @@ export async function POST(
         "x-scrimed-workflow": readiness.slug,
         "x-scrimed-body-handling": "not-parsed",
         "x-scrimed-execution-mode": "attempt-creation-disabled",
-        "x-scrimed-idempotency": "decision-required"
+        "x-scrimed-idempotency": "decision-required",
+        "x-scrimed-runtime-safety": runtimeSafetyReadiness.status,
+        "x-scrimed-throttle": "not-evaluated",
+        "x-scrimed-shutdown": "not-enabled"
       }
     }
   );

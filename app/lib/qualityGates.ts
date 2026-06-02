@@ -7,6 +7,7 @@ import { getWorkflowExecutionAuditSummary } from "./workflowExecutionAudit";
 import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import { getIdentityAccessReadinessSummary } from "./identityAccessReadiness";
 import { getExecutionAttemptReadinessSummary } from "./executionAttemptReadiness";
+import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
@@ -92,8 +93,15 @@ export const qualityGates: QualityGate[] = [
     name: "Execution attempt readiness",
     route: "/workflows/execution-attempts",
     state: "planned",
-    role: "Decision register for attempt identity, idempotency, durable attempt state, concurrency, retry, failure quarantine, rate limits, privacy boundaries, and regional attempt compliance.",
+    role: "Decision register for attempt identity, idempotency, durable attempt state, concurrency, retry, failure quarantine, runtime-safety handoff, privacy boundaries, and regional attempt compliance.",
     replacement: "Deny-by-default governed execution endpoints remain the active replacement until execution attempts can be deduplicated, persisted, audited, and safely replayed."
+  },
+  {
+    name: "Runtime safety readiness",
+    route: "/workflows/runtime-safety",
+    state: "planned",
+    role: "Decision register for runtime safety envelope, throttle policy, abuse signals, connector containment, emergency shutdown, Watchtower escalation, override rules, restoration protocol, and synthetic safety drills.",
+    replacement: "Deny-by-default governed execution endpoints remain the active replacement until runtime acceptance, throttling, and emergency shutdown controls are approved."
   },
   {
     name: "Governed execution deny stubs",
@@ -162,6 +170,7 @@ export function getQualityGateSummary() {
   const auditPersistenceReadiness = getAuditPersistenceReadinessSummary();
   const identityAccessReadiness = getIdentityAccessReadinessSummary();
   const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
+  const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -195,6 +204,7 @@ export function getQualityGateSummary() {
     auditPersistenceReadiness,
     identityAccessReadiness,
     executionAttemptReadiness,
+    runtimeSafetyReadiness,
     updated: "2026-06-01"
   };
 }

@@ -70,7 +70,7 @@ const prerequisiteTemplate: WorkflowImplementationPrerequisite[] = [
   {
     name: "Rate limits and abuse controls",
     state: "decision-required",
-    requirement: "Define throttling, misuse monitoring, alerting, and emergency shutdown controls."
+    requirement: "Approve runtime safety readiness for throttling, abuse signals, connector containment, alerting, emergency shutdown, overrides, restoration, and synthetic safety drills."
   }
 ];
 
@@ -112,7 +112,7 @@ function buildReadiness(slug: string): WorkflowImplementationReadiness | undefin
       "auditable execution-attempt logging",
       "privacy and security approval",
       "production connector boundary approval",
-      "rate-limit, misuse, and shutdown controls"
+      "runtime safety readiness for rate-limit, misuse, and shutdown controls"
     ],
     auditDisposition:
       "Execution attempts are rejected before body parsing, connector access, workflow mutation, or patient-facing action."

@@ -1,20 +1,20 @@
-import { getExecutionAttemptReadinessSummary } from "../../lib/executionAttemptReadiness";
+import { getRuntimeSafetyReadinessSummary } from "../../lib/runtimeSafetyReadiness";
 
-export default function ExecutionAttemptReadinessPage() {
-  const summary = getExecutionAttemptReadinessSummary();
+export default function RuntimeSafetyReadinessPage() {
+  const summary = getRuntimeSafetyReadinessSummary();
 
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/implementation-readiness">Implementation readiness</a>
-        <p className="eyebrow">Execution attempt readiness</p>
-        <h1>Governed execution cannot create attempts until idempotency, replay, concurrency, and failure paths are explicit.</h1>
+        <a className="back-link" href="/workflows/execution-attempts">Execution attempts</a>
+        <p className="eyebrow">Runtime safety readiness</p>
+        <h1>Governed execution stays locked until abuse throttles and emergency shutdown controls are explicit.</h1>
         <p className="hero-text">
-          SCRIMED keeps executable workflow attempts disabled while the platform defines attempt identity, idempotency, durable state, retry behavior, failure quarantine, runtime-safety handoff, privacy boundaries, and global compliance expectations.
+          SCRIMED keeps executable requests disabled while the platform defines runtime safety envelopes, throttles, abuse signals, connector containment, shutdown authority, Watchtower escalation, restoration protocol, and synthetic safety drills.
         </p>
       </section>
 
-      <section className="section-band hub-summary" aria-label="Execution attempt readiness summary">
+      <section className="section-band hub-summary" aria-label="Runtime safety readiness summary">
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
@@ -46,18 +46,18 @@ export default function ExecutionAttemptReadinessPage() {
           </div>
           <div className="layer-row">
             <span>02</span>
-            <strong>No executable workflow should create, replay, retry, or release an attempt without a durable idempotency and audit-linked state model.</strong>
+            <strong>{summary.shutdownBoundary}</strong>
           </div>
         </div>
       </section>
 
       <section className="section-band split-band">
         <div>
-          <p className="eyebrow">Attempt envelope</p>
-          <h2>Every future attempt needs stable identity before it can run.</h2>
+          <p className="eyebrow">Runtime envelope</p>
+          <h2>Every future executable request needs safety context before it can run.</h2>
         </div>
         <div className="layer-list">
-          {summary.attemptEnvelope.map((field, index) => (
+          {summary.safetyEnvelope.map((field, index) => (
             <div className="layer-row" key={field}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{field}</strong>
@@ -66,22 +66,22 @@ export default function ExecutionAttemptReadinessPage() {
         </div>
       </section>
 
-      <section className="table-section" aria-label="Execution attempt state machine">
-        {summary.stateMachine.map((state) => (
+      <section className="table-section" aria-label="Runtime safety state model">
+        {summary.states.map((state) => (
           <article className="module-row" key={state.state}>
             <div>
               <span>state</span>
               <h2>{state.state}</h2>
             </div>
-            <p>attempt lifecycle</p>
-            <a className="module-link" href="/workflows/execution-attempts">
+            <p>runtime safety lifecycle</p>
+            <a className="module-link" href="/workflows/runtime-safety">
               {state.disposition}
             </a>
           </article>
         ))}
       </section>
 
-      <section className="table-section" aria-label="Execution attempt readiness controls">
+      <section className="table-section" aria-label="Runtime safety readiness controls">
         {summary.controls.map((control) => (
           <article className="module-row" key={control.name}>
             <div>
@@ -89,7 +89,7 @@ export default function ExecutionAttemptReadinessPage() {
               <h2>{control.name}</h2>
             </div>
             <p>{control.owner}</p>
-            <a className="module-link" href="/workflows/execution-attempts">
+            <a className="module-link" href="/workflows/runtime-safety">
               {control.requirement}
             </a>
           </article>

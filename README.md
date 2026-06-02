@@ -69,6 +69,7 @@ Current focus areas include:
 - governed execution API contracts
 - identity and access readiness
 - execution-attempt readiness
+- runtime safety readiness
 - deny-by-default governed execution endpoints
 - denied execution audit boundaries
 - audit persistence readiness

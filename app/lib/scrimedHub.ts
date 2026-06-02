@@ -19,6 +19,7 @@ import {
 import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import { getIdentityAccessReadinessSummary } from "./identityAccessReadiness";
 import { getExecutionAttemptReadinessSummary } from "./executionAttemptReadiness";
+import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import {
   getWorkflowImplementationReadiness,
   getWorkflowImplementationReadinessSummary
@@ -102,6 +103,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Execution contracts", value: "contract-only APIs defined", tone: "good" },
   { name: "Identity and access", value: "decision register active", tone: "watch" },
   { name: "Execution attempts", value: "idempotency model pending", tone: "watch" },
+  { name: "Runtime safety", value: "shutdown controls pending", tone: "watch" },
   { name: "Execution deny stubs", value: "locked endpoints online", tone: "good" },
   { name: "Execution audit", value: "metadata boundary defined", tone: "good" },
   { name: "Audit persistence", value: "decision register active", tone: "watch" },
@@ -146,6 +148,7 @@ export const hubRoutes = [
   "/workflows/contracts",
   "/workflows/identity-access",
   "/workflows/execution-attempts",
+  "/workflows/runtime-safety",
   "/workflows/execution-audit",
   "/workflows/audit-persistence",
   "/workflows/implementation-readiness",
@@ -186,6 +189,7 @@ export const hubRoutes = [
   ...workflowExecutionContracts.map((contract) => contract.apiRoute),
   "/api/workflows/identity-access",
   "/api/workflows/execution-attempts",
+  "/api/workflows/runtime-safety",
   "/api/workflows/execution-audit",
   ...workflowExecutionAuditBoundaries.map((boundary) => boundary.apiRoute),
   "/api/workflows/audit-persistence",
@@ -226,6 +230,7 @@ export function getHubSummary() {
   const auditPersistenceReadinessSummary = getAuditPersistenceReadinessSummary();
   const identityAccessReadinessSummary = getIdentityAccessReadinessSummary();
   const executionAttemptReadinessSummary = getExecutionAttemptReadinessSummary();
+  const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -256,6 +261,7 @@ export function getHubSummary() {
     auditPersistenceReadinessSummary,
     identityAccessReadinessSummary,
     executionAttemptReadinessSummary,
+    runtimeSafetyReadinessSummary,
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,

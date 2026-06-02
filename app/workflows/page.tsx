@@ -62,9 +62,19 @@ export default function WorkflowExecutionsPage() {
             <span>attempt model</span>
             <h2>Execution attempt readiness</h2>
           </div>
-          <p>idempotency, durable attempt state, replay, concurrency, failure quarantine, rate limits, privacy boundaries, and regional compliance</p>
+          <p>idempotency, durable attempt state, replay, concurrency, failure quarantine, runtime-safety handoff, privacy boundaries, and regional compliance</p>
           <a className="module-link" href="/workflows/execution-attempts">
             Review the attempt lifecycle before any governed execution route can create or replay work.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
+            <span>runtime safety</span>
+            <h2>Runtime safety readiness</h2>
+          </div>
+          <p>throttle policy, abuse signals, connector containment, emergency shutdown, Watchtower escalation, overrides, restoration, and safety drills</p>
+          <a className="module-link" href="/workflows/runtime-safety">
+            Review runtime acceptance controls before any governed execution route can accept executable requests.
           </a>
         </article>
         <article className="module-row">
