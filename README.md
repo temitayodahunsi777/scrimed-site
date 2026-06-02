@@ -119,6 +119,7 @@ If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards 
 Core enterprise evaluation surfaces:
 
 - `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
+- `/evaluation` - interactive AgentOS synthetic evaluation workspace
 - `/workflows` - workflow engine and sandbox runtime
 - `/memory` - session, operational, and knowledge memory fabric
 - `/audit` - audit channels, AI Asset Registry, and approval checkpoints
@@ -129,6 +130,7 @@ Core enterprise evaluation surfaces:
 Core APIs:
 
 - `/api/agent-os`
+- `/api/agent-os/evaluation`
 - `/api/agent-os/tasks`
 - `/api/atlas/intelligence-core`
 - `/api/memory`

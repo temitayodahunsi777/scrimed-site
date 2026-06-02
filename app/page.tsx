@@ -45,6 +45,7 @@ const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
   { label: "Pilot", value: "/pilot" },
+  { label: "Evaluation", value: "/api/agent-os/evaluation" },
   { label: "OS Hub", value: "/hub" },
   { label: "AgentOS", value: "/api/agent-os" },
   { label: "Atlas Core", value: "/api/atlas/intelligence-core" },
@@ -84,6 +85,7 @@ export default function Home() {
           <div className="nav-links">
             <a href="/product">Product</a>
             <a href="/pilot">Pilot</a>
+            <a href="/evaluation">Evaluation</a>
             <a href="/hub">Hub</a>
             <a href="/atlas">Atlas</a>
             <a href="/platform">Platform</a>
@@ -139,6 +141,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Agent governance registry online
+              </div>
+              <div>
+                <span className="trace-dot" /> AgentOS evaluation workspace ready
               </div>
               <div>
                 <span className="trace-dot" /> AgentOS planner and router layer online

@@ -1,4 +1,5 @@
 import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
+import { getAgentEvaluationWorkspaceSummary } from "./agentEvaluationWorkspace";
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
 import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
@@ -320,6 +321,12 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Pilot scope remains synthetic and review-only until production controls are approved."
   },
   {
+    label: "Run AgentOS Evaluation",
+    href: "/evaluation",
+    purpose: "Generate a synthetic AgentOS plan, Atlas Trust Card, audit preview, and observability packet.",
+    boundary: "Evaluation uses synthetic workflow packets only and keeps production execution denied."
+  },
+  {
     label: "View Product Console",
     href: "/product",
     purpose: "Review the live product surface, agents, workflows, proof stack, and governance posture.",
@@ -393,6 +400,7 @@ export function getProductConsoleSummary() {
   const workflowExecutionContractSummary = getWorkflowExecutionContractSummary();
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
   const agentWorkflowSummary = getAgentWorkflowSummary();
+  const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
   const qualityGateSummary = getQualityGateSummary();
@@ -406,6 +414,8 @@ export function getProductConsoleSummary() {
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",
     pilotIntakeApiRoute: "/api/pilot/intake",
+    evaluationRoute: agentEvaluationWorkspaceSummary.route,
+    evaluationApiRoute: agentEvaluationWorkspaceSummary.apiRoute,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -428,10 +438,12 @@ export function getProductConsoleSummary() {
     evidenceMetrics,
     buyerActions,
     deploymentStages,
+    agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
     proofStack: {
       agentOS: agentOSSummary.status,
+      agentEvaluationWorkspace: agentEvaluationWorkspaceSummary.status,
       atlasIntelligenceCore: atlasIntelligenceCoreSummary.status,
       workflowExecution: workflowExecutionSummary.status,
       workflowResults: workflowExecutionResultSummary.status,
@@ -444,7 +456,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Package SCRIMED Atlas Pilot with AgentOS orchestration, Atlas Intelligence Core, three buyer-specific workflow demos, executive governance scorecard, integration map, and production-readiness decision register.",
+      "Use the AgentOS Evaluation Workspace to turn synthetic buyer packets into Atlas Trust Cards, task plans, audit previews, observability records, and a production-readiness decision register.",
     updated: "2026-06-02"
   };
 }
@@ -476,6 +488,8 @@ export function getProductReadinessBrief() {
     `Status: ${summary.agentOSSummary.status}`,
     `Control plane agents: ${summary.agentOSControlPlaneCount}`,
     `Task engine: ${summary.agentOSSummary.taskApiRoute}`,
+    `Evaluation workspace: ${summary.evaluationRoute}`,
+    `Evaluation API: ${summary.evaluationApiRoute}`,
     "",
     "## Atlas Intelligence Core v1",
     `Status: ${summary.atlasIntelligenceCoreSummary.status}`,

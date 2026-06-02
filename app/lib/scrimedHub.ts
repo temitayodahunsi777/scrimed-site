@@ -5,6 +5,7 @@ import { integrationFixtures } from "./integrationFixtures";
 import { integrationContracts } from "./integrationContracts";
 import { operatingContext } from "./operatingContext";
 import { getPilotIntakeSummary } from "./pilotIntake";
+import { getAgentEvaluationWorkspaceSummary } from "./agentEvaluationWorkspace";
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
 import { syntheticFixtures } from "./syntheticFixtures";
@@ -99,6 +100,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
+  { name: "AgentOS Evaluation", value: "interactive synthetic workspace ready", tone: "good" },
   { name: "AgentOS", value: "multi-agent control plane online", tone: "good" },
   { name: "Memory fabric", value: "session, operational, knowledge scoped", tone: "good" },
   { name: "Audit governance", value: "AI asset registry active", tone: "good" },
@@ -147,6 +149,7 @@ export const hubRoutes = [
   "/hub/readiness",
   "/hub/events",
   "/pilot",
+  "/evaluation",
   "/platform",
   "/memory",
   "/audit",
@@ -195,6 +198,7 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/pilot/intake",
+  "/api/agent-os/evaluation",
   "/api/agent-os",
   "/api/agent-os/tasks",
   "/api/atlas/intelligence-core",
@@ -254,6 +258,7 @@ export function getHubSummary() {
   const executionAttemptReadinessSummary = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
   const pilotIntakeSummary = getPilotIntakeSummary();
+  const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
 
@@ -275,6 +280,7 @@ export function getHubSummary() {
       operatingModels: operatingContext.operatingModels
     },
     pilotIntakeSummary,
+    agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
     agentWorkflowSummary,

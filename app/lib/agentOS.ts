@@ -701,7 +701,7 @@ export function getAgentOSSummary() {
     taskExecutionEngine,
     observabilitySignals,
     hipaaReadyArchitectureControls,
-    exposedRoutes: ["/agents", "/workflows", "/memory", "/audit", "/trust", "/observability"],
+    exposedRoutes: ["/agents", "/evaluation", "/workflows", "/memory", "/audit", "/trust", "/observability"],
     updated: "2026-06-02"
   };
 }

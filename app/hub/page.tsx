@@ -22,6 +22,11 @@ const consoleViews = [
     summary: "Capture enterprise buyer segment, workflow targets, readiness needs, governance requirements, and CRM handoff scope."
   },
   {
+    name: "AgentOS Evaluation",
+    href: "/evaluation",
+    summary: "Generate synthetic AgentOS plans with Atlas Trust Cards, structural document intelligence, audit preview, and observability signals."
+  },
+  {
     name: "Agents",
     href: "/agents",
     summary: "Review SCRIMED AgentOS v1 control plane, planner, router, specialist registry, RBAC, MCP connectors, and human-review boundaries."

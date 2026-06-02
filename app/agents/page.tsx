@@ -136,6 +136,12 @@ export default function AgentsPage() {
             <p>Task execution is currently a synthetic planning engine with production requests denied by default.</p>
             <a className="module-link" href="/api/agent-os/tasks">Inspect task engine</a>
           </article>
+          <article>
+            <span>Evaluation</span>
+            <h3>Interactive workspace</h3>
+            <p>Generate synthetic AgentOS task plans, Atlas Trust Cards, audit preview, and observability packets.</p>
+            <a className="module-link" href="/evaluation">Open evaluation workspace</a>
+          </article>
         </div>
       </section>
     </main>
