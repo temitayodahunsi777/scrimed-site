@@ -31,8 +31,10 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
+  { label: "Pilot", value: "/pilot" },
   { label: "OS Hub", value: "/hub" },
   { label: "Context", value: "/api/operating-context" },
+  { label: "Intake API", value: "/api/pilot/intake" },
   { label: "Agents", value: "/api/agents/workflows" },
   { label: "Workflows", value: "/api/workflows/executions" },
   { label: "Exec API", value: "/api/workflows/contracts" },
@@ -62,6 +64,7 @@ export default function Home() {
           </a>
           <div className="nav-links">
             <a href="/product">Product</a>
+            <a href="/pilot">Pilot</a>
             <a href="/hub">Hub</a>
             <a href="/platform">Platform</a>
             <a href="/agents">Agents</a>
@@ -80,7 +83,8 @@ export default function Home() {
               Solving For A Better Tomorrow through clinical intelligence, workflow automation, healthcare data interoperability, trustworthy AI agents, and continuous trust monitoring across AI-enabled care systems.
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
-              <a className="primary-action" href="/product">Open Product Console</a>
+              <a className="primary-action" href="/pilot">Request Pilot</a>
+              <a className="secondary-action" href="/product">Open Product Console</a>
               <a className="secondary-action" href="/hub">Open OS Hub</a>
               <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>

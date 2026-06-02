@@ -63,6 +63,7 @@ SCRIMED is currently under active development. The platform is being designed an
 Current focus areas include:
 
 - AI agent architecture
+- enterprise pilot intake and CRM-ready buyer handoff
 - synthetic workflow execution readiness
 - deterministic workflow execution result fixtures
 - workflow result validation and synthetic-only promotion review
@@ -71,6 +72,7 @@ Current focus areas include:
 - execution-attempt readiness
 - runtime safety readiness
 - product console and commercial pilot packaging
+- governed synthetic pilot request capture at `/pilot` and `/api/pilot/intake`
 - deny-by-default governed execution endpoints
 - denied execution audit boundaries
 - audit persistence readiness
@@ -87,6 +89,16 @@ Current focus areas include:
 This repository serves as part of the SCRIMED development environment and will contain components related to the SCRIMED web platform and supporting infrastructure.
 
 Additional repositories and modules will be added as the SCRIMED platform expands.
+
+---
+
+## Enterprise Pilot Intake
+
+SCRIMED now includes a governed buyer-intake surface at `/pilot` and a validated API endpoint at `/api/pilot/intake`.
+
+The intake captures business-contact information, buyer segment, target workflows, readiness needs, governance requirements, timeline, interoperability context, and pilot goals. It explicitly rejects protected health information, patient identifiers, live clinical records, diagnosis details, payer member identifiers, and production clinical data.
+
+If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards a sanitized CRM-ready handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. Without that variable, the endpoint returns a manual CRM-ready handoff packet.
 
 ---
 

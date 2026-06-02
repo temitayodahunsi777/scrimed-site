@@ -313,7 +313,7 @@ export const evidenceMetrics: EvidenceMetric[] = [
 export const buyerActions: BuyerAction[] = [
   {
     label: "Request Pilot",
-    href: "https://www.scrimedsolutions.com",
+    href: "/pilot?offer=synthetic-pilot-evaluation",
     purpose: "Start a synthetic SCRIMED Atlas Pilot conversation for a healthcare organization.",
     boundary: "Pilot scope remains synthetic and review-only until production controls are approved."
   },
@@ -325,7 +325,7 @@ export const buyerActions: BuyerAction[] = [
   },
   {
     label: "Book Enterprise Assessment",
-    href: "https://www.scrimedsolutions.com",
+    href: "/pilot?offer=workflow-intelligence-assessment",
     purpose: "Discuss workflow intelligence, AI readiness, governance, and automation roadmap needs.",
     boundary: "Assessment output is operational planning and governance guidance, not clinical advice."
   },
@@ -400,6 +400,8 @@ export function getProductConsoleSummary() {
     service: "scrimed-product-console",
     route: "/product",
     apiRoute: "/api/product/console",
+    pilotIntakeRoute: "/pilot",
+    pilotIntakeApiRoute: "/api/pilot/intake",
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -464,6 +466,10 @@ export function getProductReadinessBrief() {
     "",
     "## Next Commercial Move",
     summary.nextCommercialMove,
+    "",
+    "## Enterprise Intake",
+    `Pilot intake route: ${summary.pilotIntakeRoute}`,
+    `Pilot intake API: ${summary.pilotIntakeApiRoute}`,
     "",
     `Updated: ${summary.updated}`
   ].join("\n");

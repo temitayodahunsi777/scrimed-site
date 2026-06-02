@@ -17,6 +17,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "status_endpoint", status: "pass", detail: "/api/status is available." },
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
+  { name: "pilot_intake", status: "pass", detail: "/pilot and /api/pilot/intake capture enterprise pilot requests, validate synthetic-only boundaries, and package CRM-ready handoff payloads." },
   { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
   { name: "official_website", status: "pass", detail: "The official SCRIMED SOLUTIONS website is recorded as https://www.scrimedsolutions.com through Wix." },
   { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
@@ -172,6 +173,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-06-01"
   },
   {
+    id: "scrimed-enterprise-pilot-intake",
+    type: "product",
+    summary: "Added a governed enterprise pilot intake route and API for buyer segment, workflow target, readiness, governance, and CRM handoff capture without PHI.",
+    date: "2026-06-02"
+  },
+  {
     id: "scrimed-official-website-context",
     type: "product",
     summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
@@ -193,8 +200,8 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
-    updated: "2026-06-01"
+    recommendation: "Use Vercel, pilot intake validation, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    updated: "2026-06-02"
   };
 }
 

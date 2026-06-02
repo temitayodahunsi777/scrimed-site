@@ -1,6 +1,6 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-01
+Updated: 2026-06-02
 
 ## Current Baseline
 
@@ -11,6 +11,8 @@ Current baseline includes:
 - Official public website context for https://www.scrimedsolutions.com through Wix
 - Next.js App Router project structure
 - Root page at `/`
+- Product console at `/product`
+- Enterprise pilot intake at `/pilot`
 - SCRIMED OS Hub console at `/hub`
 - Hub readiness console at `/hub/readiness`
 - Hub events console at `/hub/events`
@@ -70,9 +72,14 @@ Current baseline includes:
 - Shared synthetic fixture model in `app/lib/syntheticFixtures.ts`
 - Shared synthetic validation model in `app/lib/syntheticValidation.ts`
 - Shared quality gate model in `app/lib/qualityGates.ts`
+- Shared product console model in `app/lib/productConsole.ts`
+- Shared pilot intake model in `app/lib/pilotIntake.ts`
 - Global visual system in `app/globals.css`
 - Health endpoint at `/api/health`
 - Platform status endpoint at `/api/status`
+- Product console endpoint at `/api/product/console`
+- Product readiness brief endpoint at `/api/product/readiness-brief`
+- Enterprise pilot intake endpoint at `/api/pilot/intake`
 - Readiness endpoint at `/api/readiness`
 - Platform events endpoint at `/api/events`
 - Operating context endpoint at `/api/operating-context`
@@ -143,6 +150,7 @@ Current active quality path:
 17. Integration contracts define the data boundary before real connectors are implemented.
 18. Hub readiness and event endpoints expose operational status.
 19. Quality gates make every active, planned, and bypassed validation path explicit.
+20. Enterprise pilot intake validates buyer requests, blocks PHI-style content, and packages sanitized CRM-ready handoff payloads for HubSpot, Wix, Zapier/Make, or secure CRM webhook routing.
 
 Current bypassed or deferred checks:
 
@@ -152,7 +160,7 @@ Current bypassed or deferred checks:
 
 Replacement path:
 
-- Vercel deployment plus fixture-backed executable synthetic validation is the current active build-quality path.
+- Vercel deployment plus pilot intake validation and fixture-backed executable synthetic validation is the current active build-quality path.
 - Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace silent fixture drift and premature live workflow automation.
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
@@ -181,6 +189,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - SCRIMED Atlas for faith-neutral enterprise governance, compliance, interoperability, ROI, and agentic operations
 - FaithCore for opt-in spiritually aligned encouragement and trust support with explicit clinical boundaries
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
+- Enterprise pilot intake and CRM-ready buyer handoff for synthetic SCRIMED Atlas evaluations and healthcare AI readiness assessments
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Integration fixtures and validation diffs before live connector implementation
 - Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness before module automation
@@ -241,14 +250,17 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Promoted identity and access readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow console navigation while keeping governed execution deny-by-default.
 - Added execution-attempt readiness in `app/lib/executionAttemptReadiness.ts`, `/workflows/execution-attempts`, and `/api/workflows/execution-attempts`.
 - Promoted execution-attempt readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, workflow console navigation, and deny-by-default evidence headers while keeping attempt creation disabled.
+- Added the expanded Product Console operating layer with services, agents, workflow engine examples, governance controls, evidence metrics, buyer actions, and downloadable readiness brief.
+- Added `/pilot`, `/api/pilot/intake`, and `app/lib/pilotIntake.ts` for governed enterprise pilot intake, no-PHI validation, synthetic/evaluation-only acknowledgement, qualification, and CRM-ready handoff packaging.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
 2. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected API smoke-test routes should become publicly reachable.
 3. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
-5. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
+5. Add visual smoke checks for `/`, `/product`, `/pilot`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 
 ## Notes
 

@@ -4,6 +4,7 @@ import { getIntegrationFixtureValidationResults } from "./integrationFixtureVali
 import { integrationFixtures } from "./integrationFixtures";
 import { integrationContracts } from "./integrationContracts";
 import { operatingContext } from "./operatingContext";
+import { getPilotIntakeSummary } from "./pilotIntake";
 import { syntheticFixtures } from "./syntheticFixtures";
 import { syntheticScenarios } from "./syntheticClinical";
 import { getSyntheticValidationResults } from "./syntheticValidation";
@@ -95,6 +96,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Repository", value: "main baseline clean", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
+  { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
   { name: "Agent registry", value: "governance scoped", tone: "good" },
   { name: "Workflow execution", value: "three synthetic paths staged", tone: "good" },
   { name: "Execution results", value: "deterministic fixtures ready", tone: "good" },
@@ -136,6 +138,7 @@ export const hubRoutes = [
   "/hub",
   "/hub/readiness",
   "/hub/events",
+  "/pilot",
   "/platform",
   "/trust",
   "/integrations",
@@ -180,6 +183,7 @@ export const hubRoutes = [
   "/api/status",
   "/api/readiness",
   "/api/events",
+  "/api/pilot/intake",
   "/api/operating-context",
   "/api/agents/workflows",
   ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
@@ -231,6 +235,7 @@ export function getHubSummary() {
   const identityAccessReadinessSummary = getIdentityAccessReadinessSummary();
   const executionAttemptReadinessSummary = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
+  const pilotIntakeSummary = getPilotIntakeSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -249,6 +254,7 @@ export function getHubSummary() {
       mission: operatingContext.mission,
       operatingModels: operatingContext.operatingModels
     },
+    pilotIntakeSummary,
     agentWorkflowSummary,
     fixtureChangeReview,
     workflowExecutionSummary,
@@ -265,6 +271,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-01"
+    updated: "2026-06-02"
   };
 }
