@@ -1,4 +1,4 @@
-import { getAgentWorkflowSummary } from "./agentWorkflows";
+import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
 import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
@@ -32,6 +32,54 @@ export type DeploymentStage = {
   stage: string;
   buyerDecision: string;
   scrimedProof: string;
+};
+
+export type ProductAgent = {
+  name: string;
+  status: string;
+  domain: string;
+  owner: string;
+  capability: string;
+  workflowRoute: string;
+  governanceFlags: string[];
+};
+
+export type EnterpriseServiceOffer = {
+  name: string;
+  status: "sellable" | "assessment" | "blueprint";
+  buyer: string;
+  deliverable: string;
+  proof: string;
+  boundary: string;
+};
+
+export type WorkflowEngineExample = {
+  name: string;
+  status: "synthetic-ready" | "design-ready";
+  agent: string;
+  buyerValue: string;
+  inspectableOutput: string;
+  governanceBoundary: string;
+};
+
+export type GovernanceControl = {
+  control: string;
+  status: "active" | "planned" | "required";
+  detail: string;
+};
+
+export type EvidenceMetric = {
+  metric: string;
+  signal: string;
+  proof: string;
+  measurementBoundary: string;
+};
+
+export type BuyerAction = {
+  label: string;
+  href: string;
+  purpose: string;
+  boundary: string;
 };
 
 export const productOffers: ProductOffer[] = [
@@ -97,6 +145,198 @@ export const productOffers: ProductOffer[] = [
   }
 ];
 
+export const enterpriseServiceOffers: EnterpriseServiceOffer[] = [
+  {
+    name: "Synthetic Pilot Evaluation",
+    status: "sellable",
+    buyer: "Enterprise healthcare leaders evaluating governed AI workflow value before live integration.",
+    deliverable:
+      "A 30 to 90 day synthetic pilot with workflow maps, agent scopes, validation evidence, risk controls, and executive findings.",
+    proof: "Product Console, workflow fixtures, result validation, quality gates, and readiness brief.",
+    boundary:
+      "Synthetic data only; no live patient routing, diagnosis, order entry, payer submission, or autonomous clinical execution."
+  },
+  {
+    name: "Workflow Intelligence Assessment",
+    status: "assessment",
+    buyer: "Operations, clinical transformation, access, revenue, and research teams with fragmented workflow queues.",
+    deliverable:
+      "Workflow inventory, friction map, automation candidate scorecard, interoperability targets, and human-review design.",
+    proof: "Workflow Engine examples, agent registry, integration fixture contracts, and buyer-specific operating map.",
+    boundary:
+      "Assessment output is operational intelligence for human leaders; it is not clinical advice or a production automation approval."
+  },
+  {
+    name: "AI Readiness + Governance Audit",
+    status: "assessment",
+    buyer: "Compliance, security, clinical governance, innovation, and executive sponsors preparing AI deployment policy.",
+    deliverable:
+      "Governance gap report covering privacy posture, auditability, role controls, runtime safety, model/workflow oversight, and approval gates.",
+    proof: "Trust and governance controls, runtime safety register, identity register, audit persistence register, and quality gate stack.",
+    boundary:
+      "Audit identifies readiness and risk controls; production use requires buyer approval, security review, and implementation validation."
+  },
+  {
+    name: "Clinical Operations Automation Blueprint",
+    status: "blueprint",
+    buyer: "Hospitals, clinics, payers, and public-sector health teams planning safe automation roadmaps.",
+    deliverable:
+      "Prioritized automation roadmap with agent responsibilities, connector plan, review queues, safety boundaries, and phased deployment path.",
+    proof: "Agent registry, deployment stages, service offers, proof stack, and synthetic workflow demonstrations.",
+    boundary:
+      "Blueprint remains review-only until approved production controls, live connectors, and human operating procedures are in place."
+  }
+];
+
+export const workflowEngineExamples: WorkflowEngineExample[] = [
+  {
+    name: "Referral intake automation",
+    status: "design-ready",
+    agent: "Scheduling Agent",
+    buyerValue: "Organizes incoming referral context, missing information, urgency signals, and routing constraints for review.",
+    inspectableOutput: "Referral workqueue state, missing-evidence list, routing rationale, and escalation reason.",
+    governanceBoundary: "No autonomous referral acceptance, clinical triage replacement, or patient-facing action."
+  },
+  {
+    name: "Prior authorization support",
+    status: "design-ready",
+    agent: "Prior Authorization Agent",
+    buyerValue: "Prepares reviewable authorization packets from policy context, order details, and supporting documentation.",
+    inspectableOutput: "Packet draft, cited policy rationale, missing-evidence list, and reviewer approval state.",
+    governanceBoundary: "No payer submission, coverage guarantee, or clinical necessity determination without human approval."
+  },
+  {
+    name: "Patient onboarding triage",
+    status: "synthetic-ready",
+    agent: "Scheduling Agent",
+    buyerValue: "Routes synthetic onboarding profiles into operational queues based on access needs, constraints, and review triggers.",
+    inspectableOutput: "Navigation recommendation, urgency rationale, Watchtower trace, and human-review requirement.",
+    governanceBoundary: "No live patient routing, diagnosis, emergency triage replacement, or autonomous outreach."
+  },
+  {
+    name: "Ambient documentation review",
+    status: "synthetic-ready",
+    agent: "Documentation Agent",
+    buyerValue: "Creates draft-only documentation support with source trace, missing context, and clinician review prompts.",
+    inspectableOutput: "Draft note, source trace, missing-data prompts, review checklist, and blocked final-signature state.",
+    governanceBoundary: "No final note, EHR filing, diagnosis insertion, or record update without licensed clinician review."
+  },
+  {
+    name: "RCM denial risk review",
+    status: "design-ready",
+    agent: "Revenue Cycle Agent",
+    buyerValue: "Surfaces documentation, policy, and claim-workqueue risk signals before revenue leakage compounds.",
+    inspectableOutput: "Denial-risk rationale, documentation gap list, appeal draft outline, and coding-review queue.",
+    governanceBoundary: "No final coding, billing, appeal, claim submission, or reimbursement claim without qualified review."
+  },
+  {
+    name: "Care gap detection",
+    status: "design-ready",
+    agent: "Clinical Intelligence Agent",
+    buyerValue: "Identifies reviewable care-gap signals from structured context and care-pathway rules for human teams.",
+    inspectableOutput: "Care-gap signal list, context summary, review prompt, source trace, and escalation boundary.",
+    governanceBoundary: "No diagnosis, treatment recommendation, order entry, or patient instruction without licensed clinician review."
+  }
+];
+
+export const governanceControls: GovernanceControl[] = [
+  {
+    control: "Human review required",
+    status: "active",
+    detail: "Every staged workflow and agent action remains review-gated before external, clinical, payer, or patient-facing use."
+  },
+  {
+    control: "Synthetic data only",
+    status: "active",
+    detail: "Current pilots use deterministic synthetic fixtures and do not ingest production clinical records."
+  },
+  {
+    control: "No autonomous diagnosis",
+    status: "active",
+    detail: "SCRIMED surfaces operational intelligence and review prompts; it does not diagnose or replace clinician judgment."
+  },
+  {
+    control: "Audit trail enabled",
+    status: "active",
+    detail: "Workflow, result, denial, and quality surfaces retain inspectable traces and metadata-only evidence boundaries."
+  },
+  {
+    control: "HIPAA-ready posture",
+    status: "required",
+    detail: "Architecture is designed toward HIPAA-grade privacy, security, and audit controls before live protected health information."
+  },
+  {
+    control: "Privacy-by-design",
+    status: "active",
+    detail: "The product keeps clinical execution gated, avoids request-body capture in denied execution paths, and minimizes data exposure."
+  },
+  {
+    control: "Role-based access planned",
+    status: "planned",
+    detail: "Production workflow use requires approved tenant identity, role permissions, service auth, consent, and break-glass policy."
+  }
+];
+
+export const evidenceMetrics: EvidenceMetric[] = [
+  {
+    metric: "Time saved",
+    signal: "Manual workflow review effort targeted for reduction.",
+    proof: "Synthetic workqueue states show missing evidence, next action, reviewer owner, and blocked unsafe actions.",
+    measurementBoundary: "Time savings must be measured in buyer pilots against approved baseline workflows."
+  },
+  {
+    metric: "Workflow friction reduced",
+    signal: "Fragmented intake, referral, authorization, documentation, and research queues become structured for review.",
+    proof: "Workflow Engine examples map inputs, outputs, agents, review gates, and interoperability targets.",
+    measurementBoundary: "Friction reduction is an operational pilot metric, not a live-care outcome claim."
+  },
+  {
+    metric: "Documentation quality improved",
+    signal: "Draft-only documentation can preserve source trace, missing-context prompts, and review state.",
+    proof: "DocuTwin fixtures retain source trace, missing-data prompts, clinician review, and no final signature.",
+    measurementBoundary: "Quality improvement requires clinician review and buyer-approved documentation scoring."
+  },
+  {
+    metric: "Revenue leakage identified",
+    signal: "RCM workqueues can surface denial risk, missing documentation, and policy gaps before escalation.",
+    proof: "Revenue Cycle Agent boundaries support gap detection and appeal drafts without final billing action.",
+    measurementBoundary: "Financial impact must be validated against buyer revenue-cycle data under approved controls."
+  },
+  {
+    metric: "Patient access bottlenecks surfaced",
+    signal: "Access workflows can expose scheduling constraints, referral gaps, and care-navigation barriers.",
+    proof: "CarePath and Scheduling Agent examples create reviewable routing states without autonomous outreach.",
+    measurementBoundary: "Access impact is measured during protected pilots after privacy, consent, and review workflows are approved."
+  }
+];
+
+export const buyerActions: BuyerAction[] = [
+  {
+    label: "Request Pilot",
+    href: "https://www.scrimedsolutions.com",
+    purpose: "Start a synthetic SCRIMED Atlas Pilot conversation for a healthcare organization.",
+    boundary: "Pilot scope remains synthetic and review-only until production controls are approved."
+  },
+  {
+    label: "View Product Console",
+    href: "/product",
+    purpose: "Review the live product surface, agents, workflows, proof stack, and governance posture.",
+    boundary: "Console evidence is for enterprise evaluation and does not represent live clinical execution."
+  },
+  {
+    label: "Book Enterprise Assessment",
+    href: "https://www.scrimedsolutions.com",
+    purpose: "Discuss workflow intelligence, AI readiness, governance, and automation roadmap needs.",
+    boundary: "Assessment output is operational planning and governance guidance, not clinical advice."
+  },
+  {
+    label: "Download Readiness Brief",
+    href: "/api/product/readiness-brief",
+    purpose: "Export a concise readiness brief for executive, investor, or buyer review.",
+    boundary: "Brief summarizes current synthetic-pilot readiness and production gates."
+  }
+];
+
 export const deploymentStages: DeploymentStage[] = [
   {
     stage: "1. Synthetic demo",
@@ -114,6 +354,22 @@ export const deploymentStages: DeploymentStage[] = [
     scrimedProof: "Approved runtime safety, durable audit, production connectors, monitoring, incident response, and restoration policy."
   }
 ];
+
+export function getProductAgents(): ProductAgent[] {
+  return agentWorkflows.map((workflow) => ({
+    name: workflow.name,
+    status: workflow.status,
+    domain: workflow.domain,
+    owner: workflow.owner,
+    capability: workflow.objective,
+    workflowRoute: workflow.route,
+    governanceFlags: [
+      workflow.humanReview.required ? "Human review required" : "Human review policy required",
+      workflow.guardrails[0],
+      workflow.guardrails[1] ?? "Audit trail required"
+    ]
+  }));
+}
 
 export function getProductWorkflows(): ProductWorkflow[] {
   return workflowExecutions.map((workflow) => ({
@@ -136,6 +392,7 @@ export function getProductConsoleSummary() {
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
   const agentWorkflowSummary = getAgentWorkflowSummary();
   const qualityGateSummary = getQualityGateSummary();
+  const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
 
@@ -145,11 +402,22 @@ export function getProductConsoleSummary() {
     apiRoute: "/api/product/console",
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
+    serviceOfferCount: enterpriseServiceOffers.length,
+    agentCount: productAgents.length,
     sellablePilots,
     workflowCount: productWorkflows.length,
+    workflowEngineCount: workflowEngineExamples.length,
+    governanceControlCount: governanceControls.length,
+    evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
     productOffers,
+    enterpriseServiceOffers,
+    productAgents,
     productWorkflows,
+    workflowEngineExamples,
+    governanceControls,
+    evidenceMetrics,
+    buyerActions,
     deploymentStages,
     proofStack: {
       workflowExecution: workflowExecutionSummary.status,
@@ -166,4 +434,37 @@ export function getProductConsoleSummary() {
       "Package SCRIMED Atlas Pilot with three buyer-specific workflow demos, executive governance scorecard, integration map, and production-readiness decision register.",
     updated: "2026-06-02"
   };
+}
+
+export function getProductReadinessBrief() {
+  const summary = getProductConsoleSummary();
+
+  return [
+    "# SCRIMED Product Readiness Brief",
+    "",
+    `Status: ${summary.status}`,
+    `Boundary: ${summary.productionBoundary}`,
+    "",
+    "## Enterprise Offers",
+    ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
+    "",
+    "## Agents",
+    ...summary.productAgents.map((agent) => `- ${agent.name} (${agent.status}): ${agent.capability}`),
+    "",
+    "## Workflow Engine",
+    ...summary.workflowEngineExamples.map(
+      (workflow) => `- ${workflow.name}: ${workflow.inspectableOutput}`
+    ),
+    "",
+    "## Governance Controls",
+    ...summary.governanceControls.map((control) => `- ${control.control}: ${control.detail}`),
+    "",
+    "## Evidence Metrics",
+    ...summary.evidenceMetrics.map((metric) => `- ${metric.metric}: ${metric.measurementBoundary}`),
+    "",
+    "## Next Commercial Move",
+    summary.nextCommercialMove,
+    "",
+    `Updated: ${summary.updated}`
+  ].join("\n");
 }
