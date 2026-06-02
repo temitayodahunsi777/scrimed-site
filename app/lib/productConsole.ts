@@ -2,6 +2,7 @@ import { agentWorkflows, getAgentWorkflowSummary } from "./agentWorkflows";
 import { getAgentEvaluationWorkspaceSummary } from "./agentEvaluationWorkspace";
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
+import { getCommercialStrategySummary } from "./commercialStrategy";
 import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
@@ -321,6 +322,12 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Pilot scope remains synthetic and review-only until production controls are approved."
   },
   {
+    label: "Review Pricing",
+    href: "/pricing",
+    purpose: "Review SCRIMED's recommended enterprise tiers, sales motion, value metrics, and commercial guardrails.",
+    boundary: "Pricing is framed for governed evaluations and enterprise pilots, not live autonomous clinical execution."
+  },
+  {
     label: "Run AgentOS Evaluation",
     href: "/evaluation",
     purpose: "Generate a synthetic AgentOS plan, Atlas Trust Card, audit preview, and observability packet.",
@@ -403,6 +410,7 @@ export function getProductConsoleSummary() {
   const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
+  const commercialStrategySummary = getCommercialStrategySummary();
   const qualityGateSummary = getQualityGateSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
@@ -416,6 +424,8 @@ export function getProductConsoleSummary() {
     pilotIntakeApiRoute: "/api/pilot/intake",
     evaluationRoute: agentEvaluationWorkspaceSummary.route,
     evaluationApiRoute: agentEvaluationWorkspaceSummary.apiRoute,
+    pricingRoute: commercialStrategySummary.route,
+    pricingApiRoute: commercialStrategySummary.apiRoute,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -441,7 +451,9 @@ export function getProductConsoleSummary() {
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
+    commercialStrategySummary,
     proofStack: {
+      pricingAndSales: commercialStrategySummary.status,
       agentOS: agentOSSummary.status,
       agentEvaluationWorkspace: agentEvaluationWorkspaceSummary.status,
       atlasIntelligenceCore: atlasIntelligenceCoreSummary.status,
@@ -472,6 +484,14 @@ export function getProductReadinessBrief() {
     "",
     "## Enterprise Offers",
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
+    "",
+    "## Pricing and Sales",
+    `Pricing route: ${summary.pricingRoute}`,
+    `Pricing API: ${summary.pricingApiRoute}`,
+    `Recommended model: ${summary.commercialStrategySummary.recommendedModel}`,
+    ...summary.commercialStrategySummary.pricingTiers.map(
+      (tier) => `- ${tier.name}: ${tier.recommendedDisplayPrice}`
+    ),
     "",
     "## Agents",
     ...summary.productAgents.map((agent) => `- ${agent.name} (${agent.status}): ${agent.capability}`),

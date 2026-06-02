@@ -22,6 +22,11 @@ const consoleViews = [
     summary: "Capture enterprise buyer segment, workflow targets, readiness needs, governance requirements, and CRM handoff scope."
   },
   {
+    name: "Pricing",
+    href: "/pricing",
+    summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."
+  },
+  {
     name: "AgentOS Evaluation",
     href: "/evaluation",
     summary: "Generate synthetic AgentOS plans with Atlas Trust Cards, structural document intelligence, audit preview, and observability signals."

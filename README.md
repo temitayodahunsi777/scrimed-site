@@ -119,6 +119,7 @@ If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards 
 Core enterprise evaluation surfaces:
 
 - `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
+- `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
 - `/evaluation` - interactive AgentOS synthetic evaluation workspace
 - `/workflows` - workflow engine and sandbox runtime
 - `/memory` - session, operational, and knowledge memory fabric
@@ -130,6 +131,7 @@ Core enterprise evaluation surfaces:
 Core APIs:
 
 - `/api/agent-os`
+- `/api/commercial/pricing`
 - `/api/agent-os/evaluation`
 - `/api/agent-os/tasks`
 - `/api/atlas/intelligence-core`
@@ -139,6 +141,8 @@ Core APIs:
 - `/api/observability`
 
 The task-planning API accepts synthetic pilot and enterprise assessment requests only. Production requests are explicitly denied until tenant identity, live connector controls, durable audit logging, privacy/security review, business associate agreement readiness, and human approval controls are approved.
+
+Recommended buyer path: keep the official Wix site at `scrimedsolutions.com`, link product CTAs to `app.scrimedsolutions.com`, and route buyers into `/product`, `/pricing`, `/evaluation`, and `/pilot` without requiring buyers to have Vercel accounts.
 
 ---
 

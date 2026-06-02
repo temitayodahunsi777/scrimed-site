@@ -44,6 +44,7 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
+  { label: "Pricing", value: "/api/commercial/pricing" },
   { label: "Pilot", value: "/pilot" },
   { label: "Evaluation", value: "/api/agent-os/evaluation" },
   { label: "OS Hub", value: "/hub" },
@@ -84,6 +85,7 @@ export default function Home() {
           </a>
           <div className="nav-links">
             <a href="/product">Product</a>
+            <a href="/pricing">Pricing</a>
             <a href="/pilot">Pilot</a>
             <a href="/evaluation">Evaluation</a>
             <a href="/hub">Hub</a>
@@ -108,6 +110,8 @@ export default function Home() {
             <div className="hero-actions" aria-label="Primary calls to action">
               <a className="primary-action" href="/pilot">Request Pilot</a>
               <a className="secondary-action" href="/product">Open Product Console</a>
+              <a className="secondary-action" href="/pricing">Review Pricing</a>
+              <a className="secondary-action" href="/evaluation">Run Evaluation</a>
               <a className="secondary-action" href="/hub">Open OS Hub</a>
               <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>
@@ -132,6 +136,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Synthetic workflow fixtures ready
+              </div>
+              <div>
+                <span className="trace-dot" /> Pricing and sales motion ready
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated
