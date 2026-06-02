@@ -48,9 +48,9 @@ const prerequisiteTemplate: WorkflowImplementationPrerequisite[] = [
     requirement: "Define organization, workspace, user, role, and patient-context authorization boundaries."
   },
   {
-    name: "Persistence model",
+    name: "Persistence and idempotency model",
     state: "decision-required",
-    requirement: "Select durable storage for execution attempts, idempotency keys, review state, and trace evidence."
+    requirement: "Select durable storage and idempotency policy for execution attempts, replay handling, review state, and trace evidence."
   },
   {
     name: "Audit logging",
@@ -97,7 +97,7 @@ function buildReadiness(slug: string): WorkflowImplementationReadiness | undefin
     contractStatus: contract.status,
     runtimeMode: "deny-by-default",
     bodyHandling:
-      "The guarded POST route intentionally does not parse request bodies until auth, persistence, privacy, audit, and connector boundaries are approved.",
+      "The guarded POST route intentionally does not parse request bodies until auth, identity, attempt idempotency, persistence, privacy, audit, and connector boundaries are approved.",
     deniedResponse: {
       statusCode: 423,
       code: "SCRIMED_EXECUTION_NOT_ENABLED",
@@ -108,7 +108,7 @@ function buildReadiness(slug: string): WorkflowImplementationReadiness | undefin
     requiredBeforeExecution: [
       "production authentication and authorization decision",
       "tenant and role-bound identity model",
-      "durable persistence and idempotency model",
+      "durable execution-attempt persistence and idempotency model",
       "auditable execution-attempt logging",
       "privacy and security approval",
       "production connector boundary approval",

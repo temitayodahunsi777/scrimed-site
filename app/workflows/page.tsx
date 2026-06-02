@@ -59,12 +59,22 @@ export default function WorkflowExecutionsPage() {
         </article>
         <article className="module-row">
           <div>
+            <span>attempt model</span>
+            <h2>Execution attempt readiness</h2>
+          </div>
+          <p>idempotency, durable attempt state, replay, concurrency, failure quarantine, rate limits, privacy boundaries, and regional compliance</p>
+          <a className="module-link" href="/workflows/execution-attempts">
+            Review the attempt lifecycle before any governed execution route can create or replay work.
+          </a>
+        </article>
+        <article className="module-row">
+          <div>
             <span>deny stubs</span>
             <h2>Governed execution implementation readiness</h2>
           </div>
           <p>locked POST endpoints before production execution</p>
           <a className="module-link" href="/workflows/implementation-readiness">
-            Review auth, identity, persistence, audit, privacy, and connector prerequisites.
+            Review auth, identity, idempotency, persistence, audit, privacy, and connector prerequisites.
           </a>
         </article>
         <article className="module-row">

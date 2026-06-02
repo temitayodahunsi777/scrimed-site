@@ -10,7 +10,7 @@ export default function QualityPage() {
         <p className="eyebrow">Quality gates</p>
         <h1>SCRIMED keeps execution moving by replacing blockers with explicit, safer quality gates.</h1>
         <p className="hero-text">
-          GitHub Actions remains a hardening item, while Vercel deployment, executable synthetic validation, fixture change review, synthetic workflow execution, execution-result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, integration fixture validation, readiness checks, and integration contracts form the current active quality path.
+          GitHub Actions remains a hardening item, while Vercel deployment, executable synthetic validation, fixture change review, synthetic workflow execution, execution-result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, integration fixture validation, readiness checks, and integration contracts form the current active quality path.
         </p>
       </section>
 
@@ -62,6 +62,10 @@ export default function QualityPage() {
         <article>
           <span>Identity</span>
           <strong>{summary.identityAccessReadiness.status}</strong>
+        </article>
+        <article>
+          <span>Attempts</span>
+          <strong>{summary.executionAttemptReadiness.status}</strong>
         </article>
         <article>
           <span>Deny stubs</span>

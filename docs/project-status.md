@@ -27,6 +27,7 @@ Current baseline includes:
 - Governed execution API contracts at `/workflows/contracts`
 - Governed execution API contract detail routes under `/workflows/contracts/[slug]`
 - Identity and access readiness at `/workflows/identity-access`
+- Execution-attempt readiness at `/workflows/execution-attempts`
 - Governed execution implementation readiness at `/workflows/implementation-readiness`
 - Governed execution implementation detail routes under `/workflows/implementation-readiness/[slug]`
 - Denied execution audit boundaries at `/workflows/execution-audit`
@@ -57,6 +58,7 @@ Current baseline includes:
 - Shared workflow promotion-review model in `app/lib/workflowPromotionReviews.ts`
 - Shared workflow execution contract model in `app/lib/workflowExecutionContracts.ts`
 - Shared identity and access readiness model in `app/lib/identityAccessReadiness.ts`
+- Shared execution-attempt readiness model in `app/lib/executionAttemptReadiness.ts`
 - Shared workflow implementation readiness model in `app/lib/workflowImplementationReadiness.ts`
 - Shared workflow execution audit-boundary model in `app/lib/workflowExecutionAudit.ts`
 - Shared audit persistence readiness model in `app/lib/auditPersistenceReadiness.ts`
@@ -85,6 +87,7 @@ Current baseline includes:
 - Workflow execution contract endpoint at `/api/workflows/contracts`
 - Per-workflow execution contract endpoints under `/api/workflows/contracts/[slug]`
 - Identity and access readiness endpoint at `/api/workflows/identity-access`
+- Execution-attempt readiness endpoint at `/api/workflows/execution-attempts`
 - Workflow implementation readiness endpoint at `/api/workflows/implementation-readiness`
 - Workflow execution audit-boundary endpoint at `/api/workflows/execution-audit`
 - Per-workflow execution audit-boundary endpoints under `/api/workflows/execution-audit/[slug]`
@@ -132,13 +135,14 @@ Current active quality path:
 9. Workflow promotion review records synthetic-only approval and retained blocked actions before production automation.
 10. Governed execution API contracts define request schema, response schema, preconditions, audit events, observability signals, and denied capabilities before implementation.
 11. Identity and access readiness defines production identity provider, tenant isolation, role permissions, patient-context authorization, service authentication, session lifecycle, consent, break-glass access, audit linkage, and regional identity controls before governed execution can accept authenticated requests.
-12. Deny-by-default governed execution endpoints reject execution before request-body parsing, connector access, workflow mutation, or patient-facing action.
-13. Denied execution audit boundaries define metadata-only capture, evidence headers, audit-envelope fields, and never-capture policy before durable logging.
-14. Audit persistence readiness defines durable storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting decisions before denied-event metadata can be persisted.
-15. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
-16. Integration contracts define the data boundary before real connectors are implemented.
-17. Hub readiness and event endpoints expose operational status.
-18. Quality gates make every active, planned, and bypassed validation path explicit.
+12. Execution-attempt readiness defines attempt identity, idempotency policy, durable state, concurrency, retry, failure quarantine, rate limits, privacy boundaries, and regional compliance before any governed execution route can create or replay work.
+13. Deny-by-default governed execution endpoints reject execution before request-body parsing, connector access, workflow mutation, attempt creation, or patient-facing action.
+14. Denied execution audit boundaries define metadata-only capture, evidence headers, audit-envelope fields, and never-capture policy before durable logging.
+15. Audit persistence readiness defines durable storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting decisions before denied-event metadata can be persisted.
+16. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
+17. Integration contracts define the data boundary before real connectors are implemented.
+18. Hub readiness and event endpoints expose operational status.
+19. Quality gates make every active, planned, and bypassed validation path explicit.
 
 Current bypassed or deferred checks:
 
@@ -149,7 +153,7 @@ Current bypassed or deferred checks:
 Replacement path:
 
 - Vercel deployment plus fixture-backed executable synthetic validation is the current active build-quality path.
-- Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace silent fixture drift and premature live workflow automation.
+- Fixture change review, workflow execution readiness, workflow execution result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace silent fixture drift and premature live workflow automation.
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
 
@@ -179,7 +183,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Agent Commander and governed specialized agents for prior authorization, revenue cycle, scheduling, trial matching, documentation, compliance, interoperability, clinical intelligence, research, governance, and supply chain workflows
 - Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
 - Integration fixtures and validation diffs before live connector implementation
-- Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness before module automation
+- Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness before module automation
 - Synthetic validation before live clinical data or production integrations
 
 ## Completed Execution
@@ -235,14 +239,16 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Promoted audit persistence readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow console navigation while keeping durable logging decision-required.
 - Added identity and access readiness in `app/lib/identityAccessReadiness.ts`, `/workflows/identity-access`, and `/api/workflows/identity-access`.
 - Promoted identity and access readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, and workflow console navigation while keeping governed execution deny-by-default.
+- Added execution-attempt readiness in `app/lib/executionAttemptReadiness.ts`, `/workflows/execution-attempts`, and `/api/workflows/execution-attempts`.
+- Promoted execution-attempt readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, workflow console navigation, and deny-by-default evidence headers while keeping attempt creation disabled.
 
 ## Recommended Next Steps
 
 1. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
 2. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected API smoke-test routes should become publicly reachable.
 3. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
-5. Promote governed execution beyond deny-by-default only after auth, identity, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+4. Add visual smoke checks for `/`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
+5. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 
 ## Notes
 

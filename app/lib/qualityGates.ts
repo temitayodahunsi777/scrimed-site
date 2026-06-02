@@ -6,6 +6,7 @@ import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowExecutionAuditSummary } from "./workflowExecutionAudit";
 import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import { getIdentityAccessReadinessSummary } from "./identityAccessReadiness";
+import { getExecutionAttemptReadinessSummary } from "./executionAttemptReadiness";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
@@ -88,10 +89,17 @@ export const qualityGates: QualityGate[] = [
     replacement: "Deny-by-default governed execution endpoints remain the active replacement until production identity and access are approved."
   },
   {
+    name: "Execution attempt readiness",
+    route: "/workflows/execution-attempts",
+    state: "planned",
+    role: "Decision register for attempt identity, idempotency, durable attempt state, concurrency, retry, failure quarantine, rate limits, privacy boundaries, and regional attempt compliance.",
+    replacement: "Deny-by-default governed execution endpoints remain the active replacement until execution attempts can be deduplicated, persisted, audited, and safely replayed."
+  },
+  {
     name: "Governed execution deny stubs",
     route: "/workflows/implementation-readiness",
     state: "active",
-    role: "Deny-by-default execution endpoints that reject workflow execution before request-body parsing, connector access, workflow mutation, or patient-facing action."
+    role: "Deny-by-default execution endpoints that reject workflow execution before request-body parsing, attempt creation, connector access, workflow mutation, or patient-facing action."
   },
   {
     name: "Denied execution audit boundary",
@@ -153,6 +161,7 @@ export function getQualityGateSummary() {
   const workflowExecutionAudit = getWorkflowExecutionAuditSummary();
   const auditPersistenceReadiness = getAuditPersistenceReadinessSummary();
   const identityAccessReadiness = getIdentityAccessReadinessSummary();
+  const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -185,6 +194,7 @@ export function getQualityGateSummary() {
     workflowExecutionAudit,
     auditPersistenceReadiness,
     identityAccessReadiness,
+    executionAttemptReadiness,
     updated: "2026-06-01"
   };
 }

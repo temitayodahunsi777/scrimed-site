@@ -36,6 +36,7 @@ const readinessSignals = [
   { label: "Workflows", value: "/api/workflows/executions" },
   { label: "Exec API", value: "/api/workflows/contracts" },
   { label: "Identity", value: "/api/workflows/identity-access" },
+  { label: "Attempts", value: "/api/workflows/execution-attempts" },
   { label: "Deny Stub", value: "/api/workflows/implementation-readiness" },
   { label: "Audit", value: "/api/workflows/execution-audit" },
   { label: "Audit Store", value: "/api/workflows/audit-persistence" },
@@ -125,6 +126,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Identity and access decision register active
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-muted" /> Execution-attempt idempotency model pending
               </div>
               <div>
                 <span className="trace-dot" /> Execution endpoints locked by default

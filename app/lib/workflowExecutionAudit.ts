@@ -54,7 +54,9 @@ function buildAuditBoundary(slug: string): WorkflowExecutionAuditBoundary | unde
       "x-scrimed-guard: deny-by-default",
       "x-scrimed-audit-event: workflow.execution.denied",
       `x-scrimed-workflow: ${readiness.slug}`,
-      "x-scrimed-body-handling: not-parsed"
+      "x-scrimed-body-handling: not-parsed",
+      "x-scrimed-execution-mode: attempt-creation-disabled",
+      "x-scrimed-idempotency: decision-required"
     ],
     capturePolicy: {
       capture: [
@@ -65,7 +67,9 @@ function buildAuditBoundary(slug: string): WorkflowExecutionAuditBoundary | unde
         "runtime mode",
         "contract route",
         "readiness route",
-        "request trace id when supplied in headers"
+        "attempt readiness route",
+        "request trace id when supplied in headers",
+        "idempotency decision state"
       ],
       neverCapture: [
         "request body",
@@ -88,12 +92,14 @@ function buildAuditBoundary(slug: string): WorkflowExecutionAuditBoundary | unde
       "connectorAccessed",
       "workflowMutated",
       "patientFacingAction",
+      "attemptCreated",
+      "idempotencyDecision",
       "requiredBeforeExecution"
     ],
     privacyBoundary:
-      "The denied execution audit boundary is metadata-only and explicitly excludes request bodies, patient identifiers, clinical free text, and connector payloads until a persistence and privacy model is approved.",
+      "The denied execution audit boundary is metadata-only and explicitly excludes request bodies, patient identifiers, clinical free text, and connector payloads until execution-attempt, persistence, and privacy models are approved.",
     promotionRequirement:
-      "Durable audit storage, retention policy, access review, and incident response ownership must be approved before governed execution moves beyond deny-by-default."
+      "Durable audit storage, retention policy, access review, execution-attempt idempotency, and incident response ownership must be approved before governed execution moves beyond deny-by-default."
   };
 }
 

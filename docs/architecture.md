@@ -19,6 +19,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow promotion review: `/workflows/promotion-review` and `/api/workflows/promotion-review`
 - Governed execution API contracts: `/workflows/contracts`, `/workflows/contracts/[slug]`, `/api/workflows/contracts`, and `/api/workflows/contracts/[slug]`
 - Identity and access readiness: `/workflows/identity-access` and `/api/workflows/identity-access`
+- Execution-attempt readiness: `/workflows/execution-attempts` and `/api/workflows/execution-attempts`
 - Governed execution implementation readiness: `/workflows/implementation-readiness`, `/workflows/implementation-readiness/[slug]`, `/api/workflows/implementation-readiness`, and `/api/workflows/governed-execution/[slug]`
 - Denied execution audit boundaries: `/workflows/execution-audit`, `/workflows/execution-audit/[slug]`, `/api/workflows/execution-audit`, and `/api/workflows/execution-audit/[slug]`
 - Audit persistence readiness: `/workflows/audit-persistence` and `/api/workflows/audit-persistence`
@@ -53,7 +54,8 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow promotion-review records for synthetic-only approval before production automation
 - Governed execution API contracts for request schemas, response schemas, preconditions, audit events, observability signals, and denied capabilities
 - Identity and access readiness for production identity provider, tenant isolation, role permissions, patient-context authorization, service authentication, session lifecycle, consent, break-glass access, audit linkage, and regional identity controls
-- Deny-by-default execution endpoints that reject requests before body parsing, connector access, workflow mutation, or patient-facing action
+- Execution-attempt readiness for attempt identity, idempotency, durable attempt state, concurrency, retry, failure quarantine, rate limits, privacy boundaries, and regional attempt compliance
+- Deny-by-default execution endpoints that reject requests before body parsing, connector access, workflow mutation, attempt creation, or patient-facing action
 - Denied execution audit boundaries for metadata-only evidence headers, audit-envelope fields, and never-capture policy
 - Audit persistence readiness for durable storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting decisions
 - Synthetic clinical fixtures for safe workflow validation
@@ -76,6 +78,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Validation and promotion gates before result fixtures can move toward governed execution APIs
 - Contract-only governed execution API boundaries before executable POST routes are implemented
 - Identity and access readiness before governed execution can accept authenticated requests
+- Execution-attempt readiness before governed execution can create, persist, retry, replay, or release workflow attempts
 - Locked governed execution endpoints that return a controlled rejection until production prerequisites are approved
 - Metadata-only audit boundaries for denied governed execution attempts before durable storage is approved
 - Audit persistence readiness before denied execution metadata can move into durable storage
@@ -108,6 +111,7 @@ Active gates:
 - Workflow result validation and synthetic-only promotion review for staged module workflows
 - Governed execution API contracts for staged workflows before implementation
 - Identity and access readiness before production authentication, tenant boundaries, roles, patient context, service auth, consent, break-glass access, and regional identity controls are implemented
+- Execution-attempt readiness before idempotent, durable, replay-safe workflow attempts are implemented
 - Deny-by-default governed execution endpoints before production execution
 - Denied execution audit boundaries before durable audit logging
 - Audit persistence readiness before storage, retention, access, encryption, incident response, residency, and alerting are implemented
@@ -125,7 +129,7 @@ Replacement process:
 - Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
-- Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace premature live workflow automation.
+- Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace premature live workflow automation.
 - Contract and scenario APIs replace live connector assumptions.
 - Readiness, event, and quality endpoints replace manual status tracking.
 
@@ -183,7 +187,7 @@ Each staged workflow now has a synthetic-only governed execution contract before
 - denied capabilities
 - promotion boundary
 
-These contracts are intentionally non-executing. They keep CarePath AI, DocuTwin, and TrialCore moving toward implementation while blocking live patient routing, final documentation, enrollment claims, treatment recommendations, production connector use, and production data ingestion until auth, identity, persistence, audit logging, privacy/security review, and connector governance are explicit.
+These contracts are intentionally non-executing. They keep CarePath AI, DocuTwin, and TrialCore moving toward implementation while blocking live patient routing, final documentation, enrollment claims, treatment recommendations, production connector use, and production data ingestion until auth, identity, execution-attempt idempotency, persistence, audit logging, privacy/security review, and connector governance are explicit.
 
 ## Identity and Access Readiness
 
@@ -202,6 +206,21 @@ SCRIMED now exposes an identity and access readiness register before any governe
 
 Until those decisions are approved, deny-by-default governed execution endpoints remain the active replacement.
 
+## Execution Attempt Readiness
+
+SCRIMED now exposes an execution-attempt readiness register before any governed execution endpoint can create, persist, retry, replay, or release work. The register keeps attempt creation in `decision-required` status until SCRIMED approves:
+
+- idempotency key generation, uniqueness scope, TTL, replay response, conflict response, expiration behavior, and required client headers
+- durable storage for attempt identity, idempotency records, state transitions, review state, trace references, retry counters, and audit linkage
+- concurrency and lock behavior by workflow, tenant, patient context, and idempotency key
+- retry windows, replay eligibility, deterministic response reuse, retry-after behavior, and operator-visible retry history
+- failure quarantine, compensation workflow, escalation owners, incident linkage, and blocked-action retention
+- tenant, user, service, workflow, region, and emergency shutdown limits
+- metadata-only privacy boundaries for attempt-readiness records
+- regional retention, residency, failover, export, deletion, and legal-hold behavior for priority global markets
+
+Until those decisions are approved, deny-by-default governed execution endpoints continue to return `attempt-creation-disabled` evidence and do not evaluate idempotency or persist attempts.
+
 ## Deny-By-Default Execution Endpoints
 
 SCRIMED now exposes governed execution endpoint stubs under `/api/workflows/governed-execution/[slug]`. These endpoints intentionally reject POST requests with `SCRIMED_EXECUTION_NOT_ENABLED` before parsing request bodies. This converts a vague future endpoint into a controlled safety boundary.
@@ -211,6 +230,7 @@ Before any endpoint can move beyond deny-by-default, SCRIMED must explicitly app
 - production authentication and authorization
 - tenant, organization, role, and patient-context identity boundaries
 - durable persistence and idempotency
+- execution-attempt state, replay, concurrency, and failure quarantine
 - auditable execution-attempt logging
 - PHI/PII privacy and security handling
 - production connector scope

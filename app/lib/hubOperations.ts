@@ -27,6 +27,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "workflow_promotion_review", status: "pass", detail: "/workflows/promotion-review and /api/workflows/promotion-review record synthetic-only promotion approval before live automation." },
   { name: "workflow_execution_contracts", status: "pass", detail: "/workflows/contracts and /api/workflows/contracts define governed execution API contracts while keeping live automation blocked." },
   { name: "identity_access_readiness", status: "watch", detail: "/workflows/identity-access and /api/workflows/identity-access define the production identity, tenant, role, service-auth, consent, break-glass, audit-linkage, and regional identity decisions required before execution moves beyond deny-by-default." },
+  { name: "execution_attempt_readiness", status: "watch", detail: "/workflows/execution-attempts and /api/workflows/execution-attempts define the idempotency, durable attempt state, replay, concurrency, failure quarantine, rate-limit, privacy, and regional attempt-compliance decisions required before governed execution can create attempts." },
   { name: "workflow_execution_deny_stubs", status: "pass", detail: "/workflows/implementation-readiness and /api/workflows/governed-execution/[slug] reject execution before body parsing, connector access, workflow mutation, or patient-facing action." },
   { name: "workflow_execution_audit_boundary", status: "pass", detail: "/workflows/execution-audit and /api/workflows/execution-audit define metadata-only evidence headers, audit envelope fields, and never-capture policy for denied execution attempts." },
   { name: "audit_persistence_readiness", status: "watch", detail: "/workflows/audit-persistence and /api/workflows/audit-persistence define the durable audit storage decisions required before execution moves beyond deny-by-default." },
@@ -158,6 +159,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-06-01"
   },
   {
+    id: "scrimed-execution-attempt-readiness",
+    type: "operations",
+    summary: "Added an execution-attempt readiness register for attempt identity, idempotency, durable state, concurrency, retry, failure quarantine, rate limits, privacy boundaries, and regional compliance.",
+    date: "2026-06-01"
+  },
+  {
     id: "scrimed-official-website-context",
     type: "product",
     summary: "Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.",
@@ -179,7 +186,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-06-01"
   };
 }

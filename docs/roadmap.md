@@ -18,6 +18,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Workflow promotion review is the active synthetic-only approval gate before production automation.
 - Governed execution API contracts are the active request, response, precondition, audit, observability, and denied-capability gate before executable POST routes.
 - Identity and access readiness is the active decision gate before governed execution can accept authenticated requests.
+- Execution-attempt readiness is the active decision gate before governed execution can create, retry, replay, persist, or release work.
 - Deny-by-default governed execution endpoints are the active runtime safety gate before production execution.
 - Denied execution audit boundaries are the active metadata and never-capture gate before durable audit logging.
 - Audit persistence readiness is the active decision gate before denied-event metadata moves into durable storage.
@@ -69,6 +70,7 @@ Completed foundations:
 - Workflow promotion-review records for synthetic-only staging approval and retained blocked actions
 - Governed execution API contracts for staged workflows after validation and promotion review
 - Identity and access readiness for production identity provider, tenant isolation, role permissions, patient-context authorization, service authentication, session lifecycle, consent, break-glass access, audit linkage, and regional identity controls
+- Execution-attempt readiness for attempt identity, idempotency policy, durable attempt state, concurrency, retry, failure quarantine, rate limits, privacy boundaries, and regional attempt compliance
 - Deny-by-default governed execution endpoints that reject workflow execution before body parsing or connector access
 - Denied execution audit boundaries with evidence headers, metadata capture policy, and never-capture policy
 - Audit persistence readiness for storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting
@@ -89,7 +91,7 @@ Next build targets:
 
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
 - Add a controlled package lockfile and restore package-manager cache when npm tooling is available
-- Promote governed execution beyond deny-by-default only after auth, identity, persistence, durable audit logging, privacy/security review, connector boundaries, rate limits, and shutdown controls are explicit
+- Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundaries, rate limits, and shutdown controls are explicit
 
 ## Phase 3 - Intelligence Layer
 
@@ -122,7 +124,7 @@ Modules include:
 
 Entry condition:
 
-- Each workflow should have a route, API contract, governed execution contract, identity and access readiness, deny-by-default endpoint, denied-execution audit boundary, audit persistence readiness, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
+- Each workflow should have a route, API contract, governed execution contract, identity and access readiness, execution-attempt readiness, deny-by-default endpoint, denied-execution audit boundary, audit persistence readiness, integration fixture, synthetic fixture, deterministic result fixture, expected outcome, blocked-action list, and review requirement before production integration.
 
 ## Phase 5 - Trust and Safety Infrastructure
 

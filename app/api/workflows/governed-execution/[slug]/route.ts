@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getExecutionAttemptReadinessSummary } from "../../../../lib/executionAttemptReadiness";
 import { getWorkflowExecutionAuditBoundaryBySlug } from "../../../../lib/workflowExecutionAudit";
 import { getWorkflowImplementationReadinessBySlug } from "../../../../lib/workflowImplementationReadiness";
 
@@ -23,6 +24,7 @@ export async function POST(
   const { slug } = await params;
   const readiness = getWorkflowImplementationReadinessBySlug(slug);
   const auditBoundary = getWorkflowExecutionAuditBoundaryBySlug(slug);
+  const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
 
   if (!readiness) {
     return NextResponse.json({ error: "Workflow implementation readiness not found" }, { status: 404 });
@@ -37,9 +39,14 @@ export async function POST(
       runtimeMode: readiness.runtimeMode,
       bodyHandling: readiness.bodyHandling,
       auditDisposition: readiness.auditDisposition,
+      executionAttemptReadiness: executionAttemptReadiness.status,
+      attemptBoundary: executionAttemptReadiness.runtimeBoundary,
+      attemptCreated: false,
+      idempotencyDecision: "not-evaluated",
       requiredBeforeExecution: readiness.requiredBeforeExecution,
       contractRoute: readiness.contractRoute,
-      readinessRoute: readiness.route
+      readinessRoute: readiness.route,
+      attemptReadinessRoute: "/workflows/execution-attempts"
     },
     {
       status: readiness.deniedResponse.statusCode,
@@ -47,7 +54,9 @@ export async function POST(
         "x-scrimed-guard": "deny-by-default",
         "x-scrimed-audit-event": auditBoundary?.eventName ?? "workflow.execution.denied",
         "x-scrimed-workflow": readiness.slug,
-        "x-scrimed-body-handling": "not-parsed"
+        "x-scrimed-body-handling": "not-parsed",
+        "x-scrimed-execution-mode": "attempt-creation-disabled",
+        "x-scrimed-idempotency": "decision-required"
       }
     }
   );
