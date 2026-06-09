@@ -120,7 +120,7 @@ const consoleViews = [
   {
     name: "Quality",
     href: "/quality",
-    summary: "Inspect active quality gates, managed bypasses, and replacement validation paths."
+    summary: "Inspect active quality gates, planned production requirements, and replacement validation paths."
   },
   {
     name: "Synthetic",
@@ -136,6 +136,11 @@ const consoleViews = [
     name: "Interoperability",
     href: "/interoperability",
     summary: "Review FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, and terminology conformance boundaries."
+  },
+  {
+    name: "Conformance",
+    href: "/interoperability/evaluations",
+    summary: "Inspect executable FHIR R4 and US Core, SMART App Launch, and DICOMweb synthetic test kits with retained live-use blockers."
   },
   {
     name: "Integrations",

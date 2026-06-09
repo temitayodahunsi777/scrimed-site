@@ -35,6 +35,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "workflow_execution_audit_boundary", status: "pass", detail: "/workflows/execution-audit and /api/workflows/execution-audit define metadata-only evidence headers, audit envelope fields, and never-capture policy for denied execution attempts." },
   { name: "audit_persistence_readiness", status: "watch", detail: "/workflows/audit-persistence and /api/workflows/audit-persistence define the durable audit storage decisions required before execution moves beyond deny-by-default." },
   { name: "interoperability_standards_registry", status: "pass", detail: "/interoperability, /api/interoperability/standards, and /api/interoperability/conformance expose standards targets, conformance controls, and live-use boundaries." },
+  { name: "interoperability_conformance_evaluations", status: "pass", detail: "/interoperability/evaluations and /api/interoperability/evaluations expose executable FHIR R4 and US Core, SMART App Launch, and DICOMweb synthetic test kits while retaining production blockers." },
   { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts bind connector data boundaries to standards and conformance targets." },
   { name: "integration_fixtures", status: "pass", detail: "/integrations/fixtures and /api/integration-fixtures are available for non-synthetic connector contracts." },
   { name: "integration_fixture_validation", status: "pass", detail: "/integrations/fixture-validation and /api/integration-fixtures/validation expose coverage, safeguard mapping, and diff fingerprints." },
@@ -84,6 +85,12 @@ export const hubEvents: HubEvent[] = [
     date: "2026-06-09"
   },
   {
+    id: "scrimed-interoperability-conformance-evaluations",
+    type: "integration",
+    summary: "Added executable synthetic conformance test kits for FHIR R4 and US Core, SMART App Launch, and DICOMweb with evidence artifacts, agent ownership, and retained live-use blockers.",
+    date: "2026-06-09"
+  },
+  {
     id: "scrimed-synthetic-validation",
     type: "operations",
     summary: "Added synthetic clinical scenarios to validate workflows without live clinical data.",
@@ -92,7 +99,7 @@ export const hubEvents: HubEvent[] = [
   {
     id: "scrimed-quality-gates",
     type: "operations",
-    summary: "Added explicit quality gates for Vercel deployment, synthetic validation, integration contracts, readiness checks, and managed CI bypass.",
+    summary: "Added explicit quality gates for Vercel deployment, GitHub Actions, synthetic validation, integration contracts, readiness checks, and production-gated controls.",
     date: "2026-05-29"
   },
   {
@@ -204,10 +211,10 @@ export const hubEvents: HubEvent[] = [
     date: "2026-05-30"
   },
   {
-    id: "scrimed-ci-bypass-vercel-gate",
+    id: "scrimed-ci-vercel-independent-gates",
     type: "deployment",
-    summary: "Kept Vercel as the working deploy gate while GitHub Actions visibility remains unresolved.",
-    date: "2026-05-29"
+    summary: "Established GitHub Actions, local verification, and Vercel production deployment as independent, passing quality gates.",
+    date: "2026-06-09"
   }
 ];
 
@@ -219,7 +226,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, operations readiness, pilot intake validation, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, the interoperability control plane, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use Vercel, GitHub Actions, operations readiness, pilot intake validation, executable synthetic assertions, interoperability conformance evaluations, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, the interoperability control plane, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
     updated: "2026-06-09"
   };
 }

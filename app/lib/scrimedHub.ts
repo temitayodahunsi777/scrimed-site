@@ -40,6 +40,10 @@ import {
   getInteroperabilitySummary,
   interoperabilityStandards
 } from "./interoperabilityStandards";
+import {
+  getInteroperabilityConformanceEvaluationSummary,
+  getInteroperabilityConformanceEvaluations
+} from "./interoperabilityConformanceEvaluations";
 
 export type HubModule = {
   name: string;
@@ -133,6 +137,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Build verification", value: "local, CI, and Vercel active", tone: "good" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
+  { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
 ];
 
@@ -151,6 +156,7 @@ const syntheticRoutes = syntheticScenarios.flatMap((scenario) => [
 const workflowExecutionContracts = getWorkflowExecutionContracts();
 const workflowImplementationReadiness = getWorkflowImplementationReadiness();
 const workflowExecutionAuditBoundaries = getWorkflowExecutionAuditBoundaries();
+const interoperabilityConformanceEvaluations = getInteroperabilityConformanceEvaluations();
 
 export const hubRoutes = [
   "/",
@@ -167,6 +173,7 @@ export const hubRoutes = [
   "/observability",
   "/trust",
   "/interoperability",
+  "/interoperability/evaluations",
   "/integrations",
   "/integrations/fixtures",
   "/integrations/fixture-validation",
@@ -194,6 +201,7 @@ export const hubRoutes = [
   ...syntheticFixtures.map((fixture) => fixture.route),
   ...integrationContracts.map((contract) => contract.route),
   ...interoperabilityStandards.map((standard) => `/interoperability/${standard.slug}`),
+  ...interoperabilityConformanceEvaluations.map((evaluation) => evaluation.route),
   ...integrationFixtures.map((fixture) => fixture.route),
   ...agentWorkflows.map((workflow) => workflow.route),
   ...workflowExecutions.map((workflow) => workflow.route),
@@ -248,7 +256,9 @@ export const hubRoutes = [
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
   "/api/interoperability/standards",
   "/api/interoperability/conformance",
+  "/api/interoperability/evaluations",
   ...interoperabilityStandards.map((standard) => `/api/interoperability/standards/${standard.slug}`),
+  ...interoperabilityConformanceEvaluations.map((evaluation) => evaluation.apiRoute),
   "/api/synthetic/scenarios",
   "/api/synthetic/fixtures",
   "/api/synthetic/validation",
@@ -282,6 +292,7 @@ export function getHubSummary() {
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
   const interoperabilitySummary = getInteroperabilitySummary();
+  const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -307,6 +318,7 @@ export function getHubSummary() {
     agentOSSummary,
     atlasIntelligenceCoreSummary,
     interoperabilitySummary,
+    interoperabilityConformanceSummary,
     agentWorkflowSummary,
     fixtureChangeReview,
     workflowExecutionSummary,

@@ -40,6 +40,14 @@ export default function ProductConsolePage() {
           <span>Workflow engine</span>
           <strong>{summary.workflowEngineCount}</strong>
         </article>
+        <article>
+          <span>Conformance kits</span>
+          <strong>{summary.interoperabilityConformanceSummary.syntheticPassed}</strong>
+        </article>
+        <article>
+          <span>Live connectors</span>
+          <strong>{summary.interoperabilityConformanceSummary.liveBlocked} blocked</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">

@@ -132,6 +132,7 @@ Core enterprise evaluation surfaces:
 - `/observability` - continuous validation and operational metrics
 - `/atlas` - Atlas Intelligence Core v1 subsystems
 - `/interoperability` - standards registry, conformance controls, terminology resolution, and connector bindings
+- `/interoperability/evaluations` - executable FHIR R4 and US Core, SMART App Launch, and DICOMweb synthetic conformance test kits
 - `/integrations` - standards-bound connector contracts and synthetic fixture validation
 
 Core APIs:
@@ -148,10 +149,11 @@ Core APIs:
 - `/api/observability`
 - `/api/interoperability/standards`
 - `/api/interoperability/conformance`
+- `/api/interoperability/evaluations`
 
 The task-planning API accepts synthetic pilot and enterprise assessment requests only. Production requests are explicitly denied until tenant identity, live connector controls, durable audit logging, privacy/security review, business associate agreement readiness, and human approval controls are approved.
 
-Interoperability status means that standards targets and synthetic conformance gates are defined. It does not mean a live connector is implemented, certified, trading-partner approved, or authorized to exchange production healthcare data.
+Interoperability evaluations execute deterministic checks against synthetic fixtures and connector contracts while retaining exact live-use blockers. A synthetic pass does not mean a live connector is implemented, certified, trading-partner approved, or authorized to exchange production healthcare data.
 
 Recommended buyer path: keep the official Wix site at `scrimedsolutions.com`, link product CTAs to `app.scrimedsolutions.com`, and route buyers into `/product`, `/pricing`, `/evaluation`, and `/pilot` without requiring buyers to have Vercel accounts.
 

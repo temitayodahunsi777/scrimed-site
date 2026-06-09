@@ -47,6 +47,8 @@ Current baseline includes:
 - Integration contracts page at `/integrations`
 - Interoperability control plane at `/interoperability`
 - Interoperability standard detail routes under `/interoperability/[slug]`
+- Executable interoperability conformance evaluations at `/interoperability/evaluations`
+- Conformance evaluation detail routes under `/interoperability/evaluations/[slug]`
 - Integration fixture contracts at `/integrations/fixtures`
 - Integration fixture validation at `/integrations/fixture-validation`
 - Fixture change review at `/fixtures/change-review`
@@ -75,6 +77,7 @@ Current baseline includes:
 - Shared audit persistence readiness model in `app/lib/auditPersistenceReadiness.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
 - Shared interoperability standards and conformance model in `app/lib/interoperabilityStandards.ts`
+- Shared executable interoperability conformance evaluation model in `app/lib/interoperabilityConformanceEvaluations.ts`
 - Shared integration fixture model in `app/lib/integrationFixtures.ts`
 - Shared integration fixture validation model in `app/lib/integrationFixtureValidation.ts`
 - Shared fixture change-review model in `app/lib/fixtureChangeReviews.ts`
@@ -129,6 +132,7 @@ Current baseline includes:
 - Integration contracts endpoint at `/api/contracts`
 - Interoperability standards endpoint at `/api/interoperability/standards`
 - Interoperability conformance endpoint at `/api/interoperability/conformance`
+- Interoperability conformance evaluation endpoints at `/api/interoperability/evaluations` and `/api/interoperability/evaluations/[slug]`
 - Per-contract API routes under `/api/contracts/[slug]`
 - Synthetic scenario endpoint at `/api/synthetic/scenarios`
 - Per-scenario synthetic API routes under `/api/synthetic/scenarios/[slug]`
@@ -252,6 +256,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Wired homepage, status, and readiness surfaces to the Hub layer.
 - Added integration contracts for FHIR, HL7 v2, DICOM/DICOMweb, claims/utilization, pricing transparency, and synthetic clinical testing.
 - Added the interoperability control plane with typed standards, official-source references, conformance requirements, APIs, and contract bindings.
+- Added executable synthetic conformance test kits for FHIR R4 and US Core, SMART App Launch, and DICOMweb with deterministic checks, evidence artifacts, Interoperability Agent ownership, and exact live-use blockers.
 - Added `/integrations` and `/api/contracts`, then wired contracts into Hub, readiness, and homepage surfaces.
 - Fixed the likely CI workflow failure caused by npm caching without a lockfile.
 - Added shared Hub operations data and backed `/api/readiness` and `/api/events` with it.
@@ -310,7 +315,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 2. Keep Vercel, GitHub Actions, and local build verification as independent active deploy-quality gates.
 3. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected public-preview routes should be reachable without Vercel login.
 4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-5. Add automated visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/interoperability`, `/integrations`, `/integrations/fixture-validation`, and `/trust`.
+5. Add automated visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/interoperability`, `/interoperability/evaluations`, `/integrations`, `/integrations/fixture-validation`, and `/trust`.
 6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 7. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
 

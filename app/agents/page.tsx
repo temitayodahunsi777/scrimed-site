@@ -129,13 +129,13 @@ export default function AgentsPage() {
             <span>MCP</span>
             <h3>{agentOS.mcpConnectorFramework.length} connector groups</h3>
             <p>Connector planning across EHR, payer, knowledge, and CRM systems with no-PHI pilot boundaries.</p>
-            <a className="module-link" href="/api/agent-os">Inspect AgentOS API</a>
+            <Link className="module-link" href="/api/agent-os">Inspect AgentOS API</Link>
           </article>
           <article>
             <span>Tasks</span>
             <h3>{agentOS.taskExecutionEngine.length} templates</h3>
             <p>Task execution is currently a synthetic planning engine with production requests denied by default.</p>
-            <a className="module-link" href="/api/agent-os/tasks">Inspect task engine</a>
+            <Link className="module-link" href="/api/agent-os/tasks">Inspect task engine</Link>
           </article>
           <article>
             <span>Evaluation</span>

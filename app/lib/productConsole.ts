@@ -11,6 +11,7 @@ import { getWorkflowExecutionSummary, workflowExecutions } from "./workflowExecu
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getQualityGateSummary } from "./qualityGates";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
+import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -318,10 +319,10 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
-    label: "Inspect Interoperability",
-    href: "/interoperability",
-    purpose: "Review standards targets, conformance controls, connector contracts, and synthetic validation evidence.",
-    boundary: "Registry and fixture evidence does not represent live connector certification or production data exchange."
+    label: "Inspect Conformance Evidence",
+    href: "/interoperability/evaluations",
+    purpose: "Review executable synthetic test kits, passed checks, evidence artifacts, and exact production blockers.",
+    boundary: "Synthetic conformance evidence does not represent live connector certification, partner acceptance, or production data exchange."
   },
   {
     label: "Request Pilot",
@@ -428,6 +429,7 @@ export function getProductConsoleSummary() {
   const companyOperationsSummary = getCompanyOperationsSummary();
   const qualityGateSummary = getQualityGateSummary();
   const interoperabilitySummary = getInteroperabilitySummary();
+  const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -472,6 +474,7 @@ export function getProductConsoleSummary() {
     commercialStrategySummary,
     companyOperationsSummary,
     interoperabilitySummary,
+    interoperabilityConformanceSummary,
     proofStack: {
       pricingAndSales: commercialStrategySummary.status,
       operationsReadiness: companyOperationsSummary.status,
@@ -485,6 +488,7 @@ export function getProductConsoleSummary() {
       runtimeSafety: runtimeSafetyReadiness.status,
       agentGovernance: agentWorkflowSummary.status,
       interoperability: interoperabilitySummary.status,
+      interoperabilityConformance: interoperabilityConformanceSummary.status,
       qualityGates: qualityGateSummary.status
     },
     productionBoundary:
@@ -533,6 +537,10 @@ export function getProductReadinessBrief() {
     `Standards: ${summary.interoperabilitySummary.standardCount}`,
     `Required before live: ${summary.interoperabilitySummary.requiredBeforeLive}`,
     "Control plane: /interoperability",
+    `Synthetic test kits: ${summary.interoperabilityConformanceSummary.evaluationCount}`,
+    `Synthetic passes: ${summary.interoperabilityConformanceSummary.syntheticPassed}`,
+    `Live blocked: ${summary.interoperabilityConformanceSummary.liveBlocked}`,
+    "Conformance evaluations: /interoperability/evaluations",
     "",
     "## Workflow Engine",
     ...summary.workflowEngineExamples.map(

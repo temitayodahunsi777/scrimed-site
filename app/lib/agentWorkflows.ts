@@ -148,15 +148,15 @@ export const agentWorkflows: AgentWorkflow[] = [
     slug: "interoperability-agent",
     name: "Interoperability Agent",
     route: "/agents/interoperability-agent",
-    status: "foundation",
+    status: "staged",
     domain: "Data interoperability",
     owner: "Integration fabric",
     objective: "Map workflow needs to FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, terminology, and future healthcare connector contracts.",
-    inputs: ["contract definition", "source schema", "target workflow", "synthetic fixture"],
-    outputs: ["mapping plan", "contract gap list", "connector readiness recommendation"],
-    permissions: ["read integration contracts", "read synthetic fixtures", "propose mappings"],
-    auditEvents: ["contract mapped", "schema gap detected", "connector readiness scored", "review requested"],
-    guardrails: ["no production data pull", "synthetic-first validation", "schema drift flagged"],
+    inputs: ["contract definition", "source schema", "target workflow", "synthetic fixture", "conformance test kit"],
+    outputs: ["mapping plan", "contract gap list", "synthetic conformance evaluation", "connector readiness recommendation"],
+    permissions: ["read integration contracts", "read synthetic fixtures", "execute deterministic conformance checks", "propose mappings"],
+    auditEvents: ["contract mapped", "schema gap detected", "synthetic conformance evaluated", "live blockers retained", "review requested"],
+    guardrails: ["no production data pull", "synthetic-first validation", "no certification claim", "schema drift flagged"],
     humanReview: {
       required: true,
       trigger: "before live connector implementation or schema promotion",
@@ -260,6 +260,6 @@ export function getAgentWorkflowSummary() {
     planned: agentWorkflows.filter((workflow) => workflow.status === "planned").length,
     humanReviewRequired: agentWorkflows.filter((workflow) => workflow.humanReview.required).length,
     workflows: agentWorkflows,
-    updated: "2026-05-29"
+    updated: "2026-06-09"
   };
 }

@@ -5,6 +5,7 @@ import {
   interoperabilityTerminologyResolutions
 } from "../../../lib/interoperabilityStandards";
 import { getIntegrationFixtureValidationResults } from "../../../lib/integrationFixtureValidation";
+import { getInteroperabilityConformanceEvaluationSummary } from "../../../lib/interoperabilityConformanceEvaluations";
 
 export async function GET() {
   return NextResponse.json({
@@ -14,6 +15,7 @@ export async function GET() {
     controls: interoperabilityConformanceControls,
     terminologyResolutions: interoperabilityTerminologyResolutions,
     fixtureValidation: getIntegrationFixtureValidationResults(),
+    evaluations: getInteroperabilityConformanceEvaluationSummary(),
     updated: "2026-06-09"
   });
 }

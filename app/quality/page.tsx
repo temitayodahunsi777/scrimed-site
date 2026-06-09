@@ -41,6 +41,14 @@ export default function QualityPage() {
           <strong>{summary.interoperability.standardCount}</strong>
         </article>
         <article>
+          <span>Conformance kits</span>
+          <strong>{summary.interoperabilityEvaluations.syntheticPassed}</strong>
+        </article>
+        <article>
+          <span>Live blocked</span>
+          <strong>{summary.interoperabilityEvaluations.liveBlocked}</strong>
+        </article>
+        <article>
           <span>Fixture reviews</span>
           <strong>{summary.fixtureChangeReview.approved}</strong>
         </article>

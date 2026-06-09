@@ -3,6 +3,7 @@ import {
   getInteroperabilitySummary,
   interoperabilityStandards
 } from "../lib/interoperabilityStandards";
+import { getInteroperabilityConformanceEvaluationSummary } from "../lib/interoperabilityConformanceEvaluations";
 
 export const metadata = {
   title: "SCRIMED Interoperability Control Plane",
@@ -12,6 +13,7 @@ export const metadata = {
 
 export default function InteroperabilityPage() {
   const summary = getInteroperabilitySummary();
+  const evaluations = getInteroperabilityConformanceEvaluationSummary();
 
   return (
     <main>
@@ -21,7 +23,8 @@ export default function InteroperabilityPage() {
         <h1>Standards become testable contracts before they become live healthcare connectors.</h1>
         <p className="hero-text">{summary.boundary}</p>
         <div className="hero-actions">
-          <Link className="primary-action" href="/integrations">Review connector contracts</Link>
+          <Link className="primary-action" href="/interoperability/evaluations">Run synthetic conformance review</Link>
+          <Link className="secondary-action" href="/integrations">Review connector contracts</Link>
           <Link className="secondary-action" href="/integrations/fixture-validation">Inspect synthetic validation</Link>
         </div>
       </section>
@@ -43,6 +46,31 @@ export default function InteroperabilityPage() {
           <span>Required before live</span>
           <strong>{summary.requiredBeforeLive}</strong>
         </article>
+        <article>
+          <span>Test kits</span>
+          <strong>{evaluations.evaluationCount}</strong>
+        </article>
+        <article>
+          <span>Live blocked</span>
+          <strong>{evaluations.liveBlocked}</strong>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Executable interoperability conformance evaluations">
+        <div className="section-heading">
+          <p className="eyebrow">Executable evidence</p>
+          <h2>Synthetic test kits make conformance targets inspectable while retaining every production blocker.</h2>
+        </div>
+        {evaluations.evaluations.map((evaluation) => (
+          <article className="module-row" key={evaluation.slug}>
+            <div>
+              <span>{evaluation.status}</span>
+              <h2>{evaluation.name}</h2>
+            </div>
+            <p>{evaluation.liveReadiness} · {evaluation.blockedChecks} pre-live checks blocked</p>
+            <Link className="module-link" href={evaluation.route}>{evaluation.targetProfile}</Link>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Healthcare interoperability standards registry">

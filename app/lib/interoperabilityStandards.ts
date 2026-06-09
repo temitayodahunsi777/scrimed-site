@@ -70,7 +70,7 @@ export const interoperabilityStandards: InteroperabilityStandard[] = [
     status: "profile-selection-required",
     implementationTarget:
       "Use SMART App Launch profiles for approved user-facing FHIR applications with least-privilege scopes and tenant-aware authorization.",
-    versionsAndProfiles: ["SMART App Launch 2.2", "FHIR R4-based launch context"],
+    versionsAndProfiles: ["SMART App Launch 2.2.0", "FHIR R4-based launch context"],
     capabilities: ["OAuth 2.0 authorization", "OIDC identity context", "scoped FHIR access", "EHR launch"],
     conformanceEvidence: ["approved scopes", "launch-context tests", "token audience validation", "revocation tests"],
     requiredControls: ["least privilege", "tenant isolation", "patient-context authorization", "token audience checks", "audit linkage"],

@@ -25,6 +25,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
 - The interoperability control plane defines FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, terminology, pricing, and synthetic data boundaries before connector implementation.
+- Executable synthetic conformance evaluations are the active evidence gate for FHIR R4 and US Core, SMART App Launch, and DICOMweb before partner testing or live connector work.
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 
@@ -62,6 +63,7 @@ Completed foundations:
 
 - Integration contracts page and API
 - Typed interoperability standards registry, detail routes, APIs, and conformance controls
+- Executable FHIR R4 and US Core, SMART App Launch, and DICOMweb synthetic conformance evaluations with evidence artifacts and retained live-use blockers
 - Integration fixture pages and APIs
 - Integration fixture validation with coverage checks, safeguard mapping, and diff fingerprints
 - Fixture change-review page and API for expected-output fingerprint approval
@@ -91,7 +93,8 @@ Completed foundations:
 Next build targets:
 
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
-- Select and test deployment-specific standards profiles, conformance artifacts, identity, consent, and audit controls before live connector work
+- Add tenant-authenticated persisted conformance runs and downloadable partner evidence packets after storage and identity controls are approved
+- Select and test deployment-specific standards profiles, conformance artifacts, identity, consent, audit, security, and partner acceptance controls before live connector work
 - Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundaries, rate limits, and shutdown controls are explicit
 
 ## Phase 3 - Intelligence Layer

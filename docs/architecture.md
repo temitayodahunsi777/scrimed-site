@@ -26,6 +26,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
 - Interoperability control plane: `/interoperability`, `/interoperability/[slug]`, `/api/interoperability/standards`, `/api/interoperability/standards/[slug]`, and `/api/interoperability/conformance`
+- Executable interoperability conformance evaluations: `/interoperability/evaluations`, `/interoperability/evaluations/[slug]`, `/api/interoperability/evaluations`, and `/api/interoperability/evaluations/[slug]`
 - Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
 - Fixture change review: `/fixtures/change-review` and `/api/fixtures/change-review`
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
@@ -47,6 +48,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Typed healthcare interoperability standards registry for FHIR, SMART App Launch, HL7 v2, DICOM/DICOMweb, X12, C-CDA, IHE profiles, NCPDP SCRIPT, ISO/IEEE 11073, and clinical terminology
 - Contract-to-standard bindings with explicit versions, profiles, conformance artifacts, controls, and pre-live implementation requirements
+- Deterministic FHIR R4 and US Core, SMART App Launch, and DICOMweb synthetic conformance test kits with evidence artifacts, agent ownership, and retained live-use blockers
 - Claims, utilization, and pricing transparency contract boundaries
 - Synthetic request and expected-response fixtures for non-synthetic integration contracts
 - Fixture validation diffs for required-signal coverage, safeguard mapping, trace completeness, live-review gating, and expected-output fingerprints
@@ -108,6 +110,7 @@ Active gates:
 - Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
 - Interoperability standards registry and conformance controls before connector implementation claims
+- Executable synthetic interoperability conformance evaluations before partner testing or production connector implementation
 - Integration fixture validation for non-synthetic connector coverage and expected-output change review
 - Fixture change review for expected-output fingerprint approval
 - Synthetic workflow execution readiness and deterministic result fixtures for staged module workflows
@@ -123,12 +126,13 @@ Active gates:
 
 Deferred production gates:
 
-- Live clinical integrations remain gated until synthetic scenarios and contracts are stable.
+- Live clinical integrations remain gated until identity, consent, purpose-of-use, durable audit, security, deployment profile, certification, and partner-acceptance requirements are approved.
 
 Replacement process:
 
 - Vercel deployment, GitHub Actions, and local package-manager verification provide independent build evidence.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
+- Synthetic interoperability conformance evaluations replace untested standards claims with deterministic checks, linked evidence, and explicit production blockers.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
 - Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace premature live workflow automation.
 - Contract and scenario APIs replace live connector assumptions.

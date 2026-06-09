@@ -1,5 +1,6 @@
 import { agentWorkflows } from "./agentWorkflows";
 import { workflowExecutions } from "./workflowExecutions";
+import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 
 export type AgentOSStatus = "foundation-online" | "synthetic-runtime-ready" | "production-gated";
 export type AgentRole = "planner" | "router" | "specialist" | "trustqa" | "governance";
@@ -361,6 +362,13 @@ export const auditChannels: AuditChannel[] = [
 
 export const mcpConnectorFramework: McpConnector[] = [
   {
+    name: "Interoperability conformance connector framework",
+    status: "synthetic-only",
+    system: "FHIR, SMART App Launch, HL7 v2, DICOM/DICOMweb, X12, IHE, and terminology ecosystems",
+    supportedWorkflows: ["standards-profile-selection", "synthetic-conformance-evaluation", "connector-readiness-review"],
+    minimumControls: ["synthetic-only fixture", "contract binding", "evidence artifacts", "live blocker retention", "integration architect review"]
+  },
+  {
     name: "EHR connector framework",
     status: "planned",
     system: "Epic, Cerner, athenahealth, and other EHR/FHIR ecosystems",
@@ -419,6 +427,16 @@ export const rbacPermissions: RbacRole[] = [
 
 export const sandboxRuntimes: SandboxRuntime[] = [
   {
+    workflow: "Interoperability conformance evaluation",
+    route: "/interoperability/evaluations",
+    agent: "Interoperability Agent",
+    isolation: "Per-test-kit sandbox with synthetic fixtures, standards references, connector contracts, deterministic checks, and live-blocker retention.",
+    memory: ["session", "operational", "knowledge"],
+    tools: ["contract reader", "fixture validator", "conformance check runner", "evidence packet builder"],
+    audit: ["test kit opened", "synthetic checks executed", "evidence artifacts linked", "live blockers retained"],
+    boundary: "No live connector execution, certification claim, partner acceptance claim, or production healthcare data exchange."
+  },
+  {
     workflow: "Prior authorization support",
     route: "/workflows/contracts",
     agent: "Prior Authorization Agent",
@@ -461,6 +479,19 @@ export const sandboxRuntimes: SandboxRuntime[] = [
 ];
 
 export const taskExecutionEngine: TaskExecutionTemplate[] = [
+  {
+    slug: "interoperability-conformance-assessment",
+    name: "Interoperability Conformance Assessment",
+    route: "/interoperability/evaluations",
+    owner: "Interoperability Agent",
+    executionMode: ["enterprise-assessment", "synthetic-pilot"],
+    plannerSteps: ["select test kit", "bind connector contract", "execute synthetic checks", "retain live blockers"],
+    routerRules: ["route to Interoperability Agent", "attach TrustQA", "block certification claim", "require integration architect review"],
+    specialistAgents: ["Interoperability Agent", "Governance Agent", "TrustQA Verification Agent"],
+    humanApprovals: ["Governance review", "Executive sponsor review"],
+    trustChecks: ["Boundary verification", "Evidence attribution", "Human approval checkpoint"],
+    deniedCapabilities: ["live connector execution", "certification claim", "production healthcare data exchange"]
+  },
   {
     slug: "enterprise-workflow-assessment",
     name: "Enterprise Workflow Assessment",
@@ -677,6 +708,7 @@ export function buildAgentOSTaskPlan(request: AgentOSTaskRequest): AgentOSTaskPl
 export function getAgentOSSummary() {
   const foundationAgents = agentOSControlPlane.filter((agent) => agent.status === "foundation-online").length;
   const syntheticReadyAgents = agentOSControlPlane.filter((agent) => agent.status === "synthetic-runtime-ready").length;
+  const interoperabilityConformance = getInteroperabilityConformanceEvaluationSummary();
 
   return {
     service: "scrimed-agentos-v1",
@@ -701,7 +733,8 @@ export function getAgentOSSummary() {
     taskExecutionEngine,
     observabilitySignals,
     hipaaReadyArchitectureControls,
-    exposedRoutes: ["/agents", "/evaluation", "/workflows", "/memory", "/audit", "/trust", "/observability"],
-    updated: "2026-06-02"
+    interoperabilityConformance,
+    exposedRoutes: ["/agents", "/evaluation", "/workflows", "/memory", "/audit", "/trust", "/observability", "/interoperability", "/interoperability/evaluations"],
+    updated: "2026-06-09"
   };
 }

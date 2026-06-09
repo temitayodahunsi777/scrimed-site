@@ -13,6 +13,7 @@ import { getWorkflowExecutionContractSummary } from "./workflowExecutionContract
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
+import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 
 export type QualityGate = {
   name: string;
@@ -40,6 +41,12 @@ export const qualityGates: QualityGate[] = [
     route: "/interoperability",
     state: "active",
     role: "Standards registry, profile targets, conformance evidence, terminology governance, and explicit pre-live requirements for healthcare connectors."
+  },
+  {
+    name: "Synthetic interoperability conformance evaluations",
+    route: "/interoperability/evaluations",
+    state: "active",
+    role: "Executable FHIR R4 and US Core, SMART App Launch, and DICOMweb synthetic test kits with evidence artifacts and retained live-use blockers."
   },
   {
     name: "Integration contracts",
@@ -157,8 +164,8 @@ export const qualityGates: QualityGate[] = [
     name: "Live clinical integrations",
     route: "/integrations",
     state: "planned",
-    role: "Future connector validation after synthetic scenarios and contracts are stable.",
-    replacement: "Synthetic fixtures and contract pages remain the gate until live integration work is explicitly approved."
+    role: "Future partner connector implementation and production validation after identity, consent, audit, security, profile, certification, and acceptance requirements are approved.",
+    replacement: "Synthetic conformance evaluations, fixtures, contracts, and explicit live blockers remain the active gate until production integration work is approved."
   }
 ];
 
@@ -178,6 +185,7 @@ export function getQualityGateSummary() {
   const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
   const interoperability = getInteroperabilitySummary();
+  const interoperabilityEvaluations = getInteroperabilityConformanceEvaluationSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -192,7 +200,8 @@ export function getQualityGateSummary() {
       workflowExecutionContracts.status === "contract-ready" &&
       workflowImplementationReadiness.status === "deny-stub-ready" &&
       workflowExecutionAudit.status === "audit-boundary-ready" &&
-      interoperability.status === "standards-control-plane-defined"
+      interoperability.status === "standards-control-plane-defined" &&
+      interoperabilityEvaluations.status === "synthetic-conformance-evaluations-ready"
         ? "active"
         : "attention-required",
     gates: qualityGates,
@@ -214,6 +223,7 @@ export function getQualityGateSummary() {
     executionAttemptReadiness,
     runtimeSafetyReadiness,
     interoperability,
+    interoperabilityEvaluations,
     updated: "2026-06-09"
   };
 }
