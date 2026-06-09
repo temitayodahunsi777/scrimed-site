@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAgentOSSummary } from "../lib/agentOS";
 import { getAtlasIntelligenceCoreSummary } from "../lib/atlasIntelligenceCore";
 
@@ -8,7 +9,7 @@ export default function AuditPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/agents">AgentOS</a>
+        <Link className="back-link" href="/agents">AgentOS</Link>
         <p className="eyebrow">Audit and governance layer</p>
         <h1>Every agent, source, prompt, connector, approval, and exception needs a trace.</h1>
         <p className="hero-text">

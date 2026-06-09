@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getWorkflowExecutionAuditBoundaries,
@@ -25,7 +26,7 @@ export default async function WorkflowExecutionAuditDetailPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/execution-audit">Execution audit</a>
+        <Link className="back-link" href="/workflows/execution-audit">Execution audit</Link>
         <p className="eyebrow">{boundary.module} audit boundary</p>
         <h1>{boundary.name}</h1>
         <p className="hero-text">{boundary.privacyBoundary}</p>

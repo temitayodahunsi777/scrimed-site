@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getContractSlug,
@@ -30,7 +31,7 @@ export default async function ContractDetailPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/integrations">Integrations</a>
+        <Link className="back-link" href="/integrations">Integrations</Link>
         <p className="eyebrow">{contract.sourceType} contract</p>
         <h1>{contract.name}</h1>
         <p className="hero-text">{contract.purpose}</p>

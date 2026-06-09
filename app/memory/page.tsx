@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAgentOSSummary } from "../lib/agentOS";
 
 export default function MemoryPage() {
@@ -6,7 +7,7 @@ export default function MemoryPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/agents">AgentOS</a>
+        <Link className="back-link" href="/agents">AgentOS</Link>
         <p className="eyebrow">Memory Fabric</p>
         <h1>SCRIMED memory is scoped, auditable, and separated by session, operational, and knowledge layers.</h1>
         <p className="hero-text">{agentOS.boundary}</p>

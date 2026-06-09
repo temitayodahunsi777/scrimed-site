@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   agentWorkflows,
@@ -25,7 +26,7 @@ export default async function AgentWorkflowPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/agents">Agents</a>
+        <Link className="back-link" href="/agents">Agents</Link>
         <p className="eyebrow">{workflow.domain}</p>
         <h1>{workflow.name}</h1>
         <p className="hero-text">{workflow.objective}</p>

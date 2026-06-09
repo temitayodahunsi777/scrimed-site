@@ -46,7 +46,8 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "github_push_auth", status: "pass", detail: "GitHub CLI authentication is configured and `main` pushes now publish through the normal Git path." },
   { name: "vercel_git_deployment", status: "pass", detail: "Vercel production deploys from pushed GitHub `main` commits and returns READY for the current product build path." },
   { name: "app_subdomain_dns", status: "watch", detail: "app.scrimedsolutions.com is the recommended product domain, but Vercel domain binding and DNS verification require domain administrator action." },
-  { name: "local_package_manager", status: "watch", detail: "npm, pnpm, yarn, corepack, and tsc are unavailable in the current Codex PATH; Vercel remote build remains the build source of truth until local tooling is restored." },
+  { name: "local_package_manager", status: "pass", detail: "A controlled Node.js 22 and npm toolchain completed deterministic install, zero-vulnerability audit, lint, typecheck, and production build; the committed lockfile supports reproducible CI installs." },
+  { name: "wix_cta_routing", status: "pass", detail: "The website administrator confirmed Wix CTAs are connected to SCRIMED product routes; branded app-domain routing remains a separate DNS action." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
 ];
 

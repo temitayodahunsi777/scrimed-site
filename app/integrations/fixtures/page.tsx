@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getIntegrationFixtureValidationResults } from "../../lib/integrationFixtureValidation";
 import { integrationFixtures } from "../../lib/integrationFixtures";
 
@@ -7,7 +8,7 @@ export default function IntegrationFixturesPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/integrations">Integrations</a>
+        <Link className="back-link" href="/integrations">Integrations</Link>
         <p className="eyebrow">Integration fixtures</p>
         <h1>Connector contracts now have synthetic request and expected-response fixtures.</h1>
         <p className="hero-text">
@@ -42,9 +43,9 @@ export default function IntegrationFixturesPage() {
               <h2>{fixture.contractSlug}</h2>
             </div>
             <p>{fixture.request.sourceSystem}</p>
-            <a className="module-link" href={fixture.route}>
+            <Link className="module-link" href={fixture.route}>
               {fixture.expectedResponse.reviewBeforeLive}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

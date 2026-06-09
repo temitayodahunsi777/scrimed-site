@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getHubSummary, hubModules, hubSignals } from "../lib/scrimedHub";
 
 const consoleViews = [
@@ -154,7 +155,7 @@ export default function HubPage() {
   return (
     <main>
       <section className="page-hero hub-hero">
-        <a className="back-link" href="/">SCRIMED</a>
+        <Link className="back-link" href="/">SCRIMED</Link>
         <p className="eyebrow">SCRIMED OS Hub</p>
         <h1>A command surface for platform readiness, module state, and trust signals.</h1>
         <p className="hero-text">
@@ -186,7 +187,7 @@ export default function HubPage() {
           <article key={view.name}>
             <h3>{view.name}</h3>
             <p>{view.summary}</p>
-            <a className="module-link" href={view.href}>Open {view.name}</a>
+            <Link className="module-link" href={view.href}>Open {view.name}</Link>
           </article>
         ))}
       </section>
@@ -214,7 +215,7 @@ export default function HubPage() {
               <h2>{module.name}</h2>
             </div>
             <p>{module.owner}</p>
-            <a className="module-link" href={module.route}>{module.objective}</a>
+            <Link className="module-link" href={module.route}>{module.objective}</Link>
           </article>
         ))}
       </section>

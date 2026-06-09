@@ -1,3 +1,4 @@
+import Link from "next/link";
 const platformModules = [
   {
     name: "Clinical Copilot",
@@ -85,20 +86,20 @@ export default function Home() {
             <span>SCRIMED</span>
           </a>
           <div className="nav-links">
-            <a href="/product">Product</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/operations">Operations</a>
-            <a href="/pilot">Pilot</a>
-            <a href="/evaluation">Evaluation</a>
-            <a href="/hub">Hub</a>
-            <a href="/atlas">Atlas</a>
-            <a href="/platform">Platform</a>
-            <a href="/agents">Agents</a>
-            <a href="/observability">Observability</a>
-            <a href="/quality">Quality</a>
-            <a href="/synthetic">Synthetic</a>
-            <a href="/integrations">Integrations</a>
-            <a href="/trust">Trust</a>
+            <Link href="/product">Product</Link>
+            <Link href="/pricing">Pricing</Link>
+            <Link href="/operations">Operations</Link>
+            <Link href="/pilot">Pilot</Link>
+            <Link href="/evaluation">Evaluation</Link>
+            <Link href="/hub">Hub</Link>
+            <Link href="/atlas">Atlas</Link>
+            <Link href="/platform">Platform</Link>
+            <Link href="/agents">Agents</Link>
+            <Link href="/observability">Observability</Link>
+            <Link href="/quality">Quality</Link>
+            <Link href="/synthetic">Synthetic</Link>
+            <Link href="/integrations">Integrations</Link>
+            <Link href="/trust">Trust</Link>
           </div>
         </nav>
 
@@ -110,11 +111,11 @@ export default function Home() {
               Solving For A Better Tomorrow through clinical intelligence, workflow automation, healthcare data interoperability, trustworthy AI agents, and continuous trust monitoring across AI-enabled care systems.
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
-              <a className="primary-action" href="/pilot">Request Pilot</a>
-              <a className="secondary-action" href="/product">Open Product Console</a>
-              <a className="secondary-action" href="/pricing">Review Pricing</a>
-              <a className="secondary-action" href="/evaluation">Run Evaluation</a>
-              <a className="secondary-action" href="/hub">Open OS Hub</a>
+              <Link className="primary-action" href="/pilot">Request Pilot</Link>
+              <Link className="secondary-action" href="/product">Open Product Console</Link>
+              <Link className="secondary-action" href="/pricing">Review Pricing</Link>
+              <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
+              <Link className="secondary-action" href="/hub">Open OS Hub</Link>
               <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>
           </div>

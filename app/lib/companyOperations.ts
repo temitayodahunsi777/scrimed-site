@@ -51,19 +51,20 @@ export const operationsBlockers: OperationsBlocker[] = [
   {
     id: "package-manager",
     area: "quality",
-    status: "blocked",
-    blocker: "Local npm, pnpm, yarn, corepack, and tsc are unavailable in the current Codex PATH.",
+    status: "ready",
+    blocker: "A controlled Node.js and npm toolchain is available for local quality verification.",
     impact:
-      "Local typecheck/build commands cannot run from this session, so Vercel remains the build source of truth.",
-    currentEvidence: "`npm run typecheck` and `npm run build` fail with command not found.",
+      "Dependency installation, security audit, TypeScript validation, and production builds can run before promotion.",
+    currentEvidence:
+      "Node.js 22.22.3 and npm 10.9.8 completed `npm ci`, a zero-vulnerability `npm audit`, `npm run lint`, `npm run typecheck`, and `npm run build`; a committed lockfile now supports reproducible CI installs.",
     owner: "Engineering",
     resolutionPath: [
-      "Install Node.js with npm available in the shell PATH, or enable corepack.",
-      "Run `npm install` from a controlled environment.",
-      "Run `npm run typecheck` and `npm run build` before production promotion."
+      "Keep the committed lockfile synchronized with intentional dependency changes.",
+      "Run `npm ci`, `npm audit --audit-level=moderate`, `npm run lint`, `npm run typecheck`, and `npm run build` before production promotion.",
+      "Keep the controlled local toolchain out of source control."
     ],
     fallback:
-      "Continue using `git diff --check`, typed App Router patterns, and Vercel remote builds as the managed quality path."
+      "Restore the official Node.js 22 toolchain, then use Vercel and GitHub Actions as independent remote verification paths."
   },
   {
     id: "vercel-cli",
@@ -104,16 +105,17 @@ export const operationsBlockers: OperationsBlocker[] = [
   {
     id: "wix-cta-routing",
     area: "sales",
-    status: "manual-action",
-    blocker: "Wix CTAs need to be wired to SCRIMED product routes.",
+    status: "ready",
+    blocker: "Wix CTAs are connected to SCRIMED product routes.",
     impact:
-      "Buyers may see the official website but not reach the product console, pricing, evaluation workspace, or pilot intake.",
-    currentEvidence: "Product route strategy is defined in `/pricing` and `app/lib/commercialStrategy.ts`.",
+      "Buyers can move from the official website into product, pricing, evaluation, and pilot-intake experiences.",
+    currentEvidence:
+      "The website administrator confirmed the Wix CTAs are connected; route behavior should be rechecked after `app.scrimedsolutions.com` DNS is activated.",
     owner: "Website administrator",
     resolutionPath: [
-      "Add Wix buttons for View Product Console, Review Pricing, Run Evaluation, and Request Pilot.",
-      "Point buttons to `https://app.scrimedsolutions.com/product`, `/pricing`, `/evaluation`, and `/pilot` after DNS is live.",
-      "Temporarily point buttons to the current Vercel deployment URL if DNS is not ready."
+      "Keep View Product Console, Review Pricing, Run Evaluation, and Request Pilot buttons mapped to the intended routes.",
+      "Move CTA targets to `https://app.scrimedsolutions.com/product`, `/pricing`, `/evaluation`, and `/pilot` after DNS is live.",
+      "Re-run buyer-path smoke checks after any Wix or product-domain change."
     ],
     fallback:
       "Share direct Vercel links manually during buyer conversations."

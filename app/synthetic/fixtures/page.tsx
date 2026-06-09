@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { syntheticFixtures } from "../../lib/syntheticFixtures";
 
 export default function SyntheticFixturesPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/synthetic">Synthetic</a>
+        <Link className="back-link" href="/synthetic">Synthetic</Link>
         <p className="eyebrow">Synthetic fixtures</p>
         <h1>Structured request and expected-output fixtures make SCRIMED validation repeatable.</h1>
         <p className="hero-text">
@@ -20,9 +21,9 @@ export default function SyntheticFixturesPage() {
               <h2>{fixture.scenarioId}</h2>
             </div>
             <p>{fixture.expectedOutput.decisionState}</p>
-            <a className="module-link" href={fixture.route}>
+            <Link className="module-link" href={fixture.route}>
               Open fixture contract
-            </a>
+            </Link>
           </article>
         ))}
       </section>

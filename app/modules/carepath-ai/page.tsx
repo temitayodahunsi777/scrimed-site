@@ -1,3 +1,4 @@
+import Link from "next/link";
 const capabilities = [
   "Patient intake support",
   "Triage signal organization",
@@ -9,7 +10,7 @@ export default function CarePathPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/platform">Platform</a>
+        <Link className="back-link" href="/platform">Platform</Link>
         <p className="eyebrow">CarePath AI</p>
         <h1>Navigation intelligence for intake, triage, routing, and care pathway coordination.</h1>
         <p className="hero-text">

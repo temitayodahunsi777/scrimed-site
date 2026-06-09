@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getWorkflowPromotionReviewSummary } from "../../lib/workflowPromotionReviews";
 
 export default function WorkflowPromotionReviewPage() {
@@ -6,7 +7,7 @@ export default function WorkflowPromotionReviewPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows">Workflows</a>
+        <Link className="back-link" href="/workflows">Workflows</Link>
         <p className="eyebrow">Promotion review</p>
         <h1>Workflow promotion is approved for synthetic staging only until production gates are complete.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function WorkflowPromotionReviewPage() {
               <h2>{review.workflowSlug}</h2>
             </div>
             <p>{review.reviewerRole}</p>
-            <a className="module-link" href={review.workflowRoute}>
+            <Link className="module-link" href={review.workflowRoute}>
               {review.blockedActions.length} blocked actions retained before promotion
-            </a>
+            </Link>
           </article>
         ))}
       </section>

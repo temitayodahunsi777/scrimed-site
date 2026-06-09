@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getProductConsoleSummary } from "../lib/productConsole";
 
 export default function ProductConsolePage() {
@@ -6,7 +7,7 @@ export default function ProductConsolePage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">SCRIMED Product Console</p>
         <h1>SCRIMED Product Console packages a sellable healthcare operating-system pilot.</h1>
         <p className="hero-text">
@@ -73,7 +74,7 @@ export default function ProductConsolePage() {
             </div>
             <p>{offer.buyer}</p>
             <div>
-              <a className="module-link" href="/product">{offer.deliverable}</a>
+              <Link className="module-link" href="/product">{offer.deliverable}</Link>
               <ul className="compact-list">
                 <li>{offer.proof}</li>
                 <li>{offer.boundary}</li>
@@ -99,7 +100,7 @@ export default function ProductConsolePage() {
             </div>
             <p>{agent.domain}. {agent.owner}</p>
             <div>
-              <a className="module-link" href={agent.workflowRoute}>{agent.capability}</a>
+              <Link className="module-link" href={agent.workflowRoute}>{agent.capability}</Link>
               <ul className="compact-list">
                 {agent.governanceFlags.map((flag) => (
                   <li key={flag}>{flag}</li>
@@ -181,11 +182,11 @@ export default function ProductConsolePage() {
         </div>
         <div className="action-grid">
           {summary.buyerActions.map((action) => (
-            <a className="action-card" href={action.href} key={action.label}>
+            <Link className="action-card" href={action.href} key={action.label}>
               <span>{action.label}</span>
               <strong>{action.purpose}</strong>
               <p>{action.boundary}</p>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -202,9 +203,9 @@ export default function ProductConsolePage() {
               <h2>{offer.name}</h2>
             </div>
             <p>{offer.buyer}. {offer.problem}</p>
-            <a className="module-link" href={offer.proofRoutes[0]}>
+            <Link className="module-link" href={offer.proofRoutes[0]}>
               {offer.pilotOutcome}
-            </a>
+            </Link>
           </article>
         ))}
       </section>
@@ -216,10 +217,10 @@ export default function ProductConsolePage() {
         </div>
         <div className="layer-list">
           {summary.productWorkflows.map((workflow, index) => (
-            <a className="layer-row" href={workflow.workflowRoute} key={workflow.name}>
+            <Link className="layer-row" href={workflow.workflowRoute} key={workflow.name}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{workflow.module}: {workflow.name}</strong>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -232,9 +233,9 @@ export default function ProductConsolePage() {
               <h2>{stage.stage}</h2>
             </div>
             <p>{stage.buyerDecision}</p>
-            <a className="module-link" href="/quality">
+            <Link className="module-link" href="/quality">
               {stage.scrimedProof}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

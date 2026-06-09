@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAgentOSSummary } from "../lib/agentOS";
 import { getAtlasIntelligenceCoreSummary } from "../lib/atlasIntelligenceCore";
 
@@ -8,7 +9,7 @@ export default function ObservabilityPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Observability and continuous validation</p>
         <h1>SCRIMED measures workflow outcomes, trust, review friction, and enterprise impact.</h1>
         <p className="hero-text">

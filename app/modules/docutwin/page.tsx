@@ -1,3 +1,4 @@
+import Link from "next/link";
 const capabilities = [
   "Structured note generation",
   "Conversation-to-document workflows",
@@ -9,7 +10,7 @@ export default function DocuTwinPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/platform">Platform</a>
+        <Link className="back-link" href="/platform">Platform</Link>
         <p className="eyebrow">DocuTwin</p>
         <h1>Medical documentation workflows that turn clinical context into reviewable outputs.</h1>
         <p className="hero-text">

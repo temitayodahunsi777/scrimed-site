@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAgentOSSummary } from "../lib/agentOS";
 import { getAtlasIntelligenceCoreSummary } from "../lib/atlasIntelligenceCore";
 
@@ -23,7 +24,7 @@ export default function TrustPage() {
   return (
     <main>
       <section className="page-hero trust-hero">
-        <a className="back-link" href="/">SCRIMED</a>
+        <Link className="back-link" href="/">SCRIMED</Link>
         <p className="eyebrow">Watchtower, TrustQA, and Trust Cards</p>
         <h1>Every SCRIMED recommendation needs provenance, confidence, validation, and human review.</h1>
         <p className="hero-text">

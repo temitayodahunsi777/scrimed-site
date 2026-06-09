@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getPilotIntakeSummary } from "../lib/pilotIntake";
 import PilotIntakeForm from "./PilotIntakeForm";
 
@@ -7,13 +8,22 @@ export const metadata = {
     "Request a governed SCRIMED synthetic pilot, workflow intelligence assessment, AI readiness audit, or clinical operations automation blueprint."
 };
 
-export default function PilotIntakePage() {
+type PilotIntakePageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function PilotIntakePage({ searchParams }: PilotIntakePageProps) {
   const summary = getPilotIntakeSummary();
+  const params = await searchParams;
+  const prefill = {
+    offer: firstParamValue(params.offer),
+    workflow: firstParamValue(params.workflow)
+  };
 
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/product">Product Console</a>
+        <Link className="back-link" href="/product">Product Console</Link>
         <p className="eyebrow">Enterprise pilot intake</p>
         <h1>Request a governed SCRIMED synthetic pilot or enterprise assessment.</h1>
         <p className="hero-text">
@@ -66,7 +76,7 @@ export default function PilotIntakePage() {
             scored for pilot readiness, and routed to a configured CRM webhook when available.
           </p>
         </div>
-        <PilotIntakeForm summary={summary} />
+        <PilotIntakeForm prefill={prefill} summary={summary} />
       </section>
 
       <section className="table-section" aria-label="SCRIMED pilot routing outcomes">
@@ -101,4 +111,8 @@ export default function PilotIntakePage() {
       </section>
     </main>
   );
+}
+
+function firstParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
 }

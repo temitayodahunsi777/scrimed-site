@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getIntegrationFixtureValidationResults } from "../../lib/integrationFixtureValidation";
 
 export default function IntegrationFixtureValidationPage() {
@@ -6,7 +7,7 @@ export default function IntegrationFixtureValidationPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/integrations">Integrations</a>
+        <Link className="back-link" href="/integrations">Integrations</Link>
         <p className="eyebrow">Fixture validation</p>
         <h1>Integration fixture diffs expose contract coverage before connector buildout.</h1>
         <p className="hero-text">
@@ -40,9 +41,9 @@ export default function IntegrationFixtureValidationPage() {
             <h2>Fixture change review</h2>
           </div>
           <p>expected-output fingerprint approval</p>
-          <a className="module-link" href="/fixtures/change-review">
+          <Link className="module-link" href="/fixtures/change-review">
             Review fixture fingerprints before workflows or connectors depend on changed outputs.
-          </a>
+          </Link>
         </article>
         {summary.results.map((result) => (
           <article className="module-row" key={result.contractSlug}>
@@ -51,9 +52,9 @@ export default function IntegrationFixtureValidationPage() {
               <h2>{result.contractSlug}</h2>
             </div>
             <p>{result.diff.fingerprint}</p>
-            <a className="module-link" href={result.fixtureRoute ?? result.route}>
+            <Link className="module-link" href={result.fixtureRoute ?? result.route}>
               {result.passed} passed, {result.failed} failed
-            </a>
+            </Link>
           </article>
         ))}
       </section>

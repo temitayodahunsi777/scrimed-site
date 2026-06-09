@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getWorkflowImplementationReadiness,
@@ -25,7 +26,7 @@ export default async function WorkflowImplementationReadinessDetailPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/implementation-readiness">Readiness</a>
+        <Link className="back-link" href="/workflows/implementation-readiness">Readiness</Link>
         <p className="eyebrow">{workflow.module} execution readiness</p>
         <h1>{workflow.name}</h1>
         <p className="hero-text">{workflow.auditDisposition}</p>

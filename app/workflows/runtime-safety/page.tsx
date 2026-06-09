@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getRuntimeSafetyReadinessSummary } from "../../lib/runtimeSafetyReadiness";
 
 export default function RuntimeSafetyReadinessPage() {
@@ -6,7 +7,7 @@ export default function RuntimeSafetyReadinessPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/execution-attempts">Execution attempts</a>
+        <Link className="back-link" href="/workflows/execution-attempts">Execution attempts</Link>
         <p className="eyebrow">Runtime safety readiness</p>
         <h1>Governed execution stays locked until abuse throttles and emergency shutdown controls are explicit.</h1>
         <p className="hero-text">
@@ -74,9 +75,9 @@ export default function RuntimeSafetyReadinessPage() {
               <h2>{state.state}</h2>
             </div>
             <p>runtime safety lifecycle</p>
-            <a className="module-link" href="/workflows/runtime-safety">
+            <Link className="module-link" href="/workflows/runtime-safety">
               {state.disposition}
-            </a>
+            </Link>
           </article>
         ))}
       </section>
@@ -89,9 +90,9 @@ export default function RuntimeSafetyReadinessPage() {
               <h2>{control.name}</h2>
             </div>
             <p>{control.owner}</p>
-            <a className="module-link" href="/workflows/runtime-safety">
+            <Link className="module-link" href="/workflows/runtime-safety">
               {control.requirement}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

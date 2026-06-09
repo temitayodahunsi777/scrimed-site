@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getFixtureChangeReviewSummary } from "../../lib/fixtureChangeReviews";
 
 export default function FixtureChangeReviewPage() {
@@ -6,7 +7,7 @@ export default function FixtureChangeReviewPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/quality">Quality</a>
+        <Link className="back-link" href="/quality">Quality</Link>
         <p className="eyebrow">Fixture change review</p>
         <h1>Expected-output fingerprints require approval before workflows depend on them.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function FixtureChangeReviewPage() {
               <h2>{review.fixtureId}</h2>
             </div>
             <p>{review.fingerprint}</p>
-            <a className="module-link" href={review.fixtureRoute}>
+            <Link className="module-link" href={review.fixtureRoute}>
               {review.fixtureType} fixture reviewed by {review.reviewerRole}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { syntheticScenarios } from "../lib/syntheticClinical";
 import { getSyntheticValidationResults } from "../lib/syntheticValidation";
 
@@ -7,7 +8,7 @@ export default function SyntheticClinicalPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Synthetic clinical environment</p>
         <h1>SCRIMED validates workflows against synthetic scenarios before clinical data is connected.</h1>
         <p className="hero-text">
@@ -42,7 +43,7 @@ export default function SyntheticClinicalPage() {
               <h2>{scenario.id}</h2>
             </div>
             <p>{scenario.contractSlug}</p>
-            <a className="module-link" href={scenario.route}>{scenario.expectedOutcome}</a>
+            <Link className="module-link" href={scenario.route}>{scenario.expectedOutcome}</Link>
           </article>
         ))}
       </section>
@@ -55,14 +56,16 @@ export default function SyntheticClinicalPage() {
         <div className="layer-list">
           <div className="layer-row">
             <span>01</span>
-            <a className="module-link" href="/synthetic/validation">Open validation results</a>
+            <Link className="module-link" href="/synthetic/validation">Open validation results</Link>
           </div>
           <div className="layer-row">
             <span>02</span>
-            <a className="module-link" href="/synthetic/fixtures">Open fixture contracts</a>
+            <Link className="module-link" href="/synthetic/fixtures">Open fixture contracts</Link>
           </div>
           <div className="layer-row">
             <span>03</span>
+            {/* API inspection intentionally uses a document navigation instead of the App Router. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a className="module-link" href="/api/synthetic/validation">Inspect validation API</a>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { operatingContext } from "../lib/operatingContext";
 import { getAtlasIntelligenceCoreSummary } from "../lib/atlasIntelligenceCore";
 
@@ -9,7 +10,7 @@ export default function AtlasPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/operating-context">Operating Context</a>
+        <Link className="back-link" href="/operating-context">Operating Context</Link>
         <p className="eyebrow">SCRIMED Atlas Intelligence Core v1</p>
         <h1>A continuously validated healthcare intelligence operating system.</h1>
         <p className="hero-text">
@@ -44,10 +45,10 @@ export default function AtlasPage() {
         </div>
         <div className="layer-list">
           {core.subsystems.map((subsystem, index) => (
-            <a className="layer-row" href={subsystem.route} key={subsystem.name}>
+            <Link className="layer-row" href={subsystem.route} key={subsystem.name}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{subsystem.name}: {subsystem.status}</strong>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -105,7 +106,7 @@ export default function AtlasPage() {
             </div>
             <p>{subsystem.purpose}</p>
             <div>
-              <a className="module-link" href={subsystem.route}>{subsystem.route}</a>
+              <Link className="module-link" href={subsystem.route}>{subsystem.route}</Link>
               <ul className="compact-list">
                 {subsystem.controls.map((control) => (
                   <li key={control}>{control}</li>

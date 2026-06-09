@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getExecutionAttemptReadinessSummary } from "../../lib/executionAttemptReadiness";
 
 export default function ExecutionAttemptReadinessPage() {
@@ -6,7 +7,7 @@ export default function ExecutionAttemptReadinessPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/implementation-readiness">Implementation readiness</a>
+        <Link className="back-link" href="/workflows/implementation-readiness">Implementation readiness</Link>
         <p className="eyebrow">Execution attempt readiness</p>
         <h1>Governed execution cannot create attempts until idempotency, replay, concurrency, and failure paths are explicit.</h1>
         <p className="hero-text">
@@ -74,9 +75,9 @@ export default function ExecutionAttemptReadinessPage() {
               <h2>{state.state}</h2>
             </div>
             <p>attempt lifecycle</p>
-            <a className="module-link" href="/workflows/execution-attempts">
+            <Link className="module-link" href="/workflows/execution-attempts">
               {state.disposition}
-            </a>
+            </Link>
           </article>
         ))}
       </section>
@@ -89,9 +90,9 @@ export default function ExecutionAttemptReadinessPage() {
               <h2>{control.name}</h2>
             </div>
             <p>{control.owner}</p>
-            <a className="module-link" href="/workflows/execution-attempts">
+            <Link className="module-link" href="/workflows/execution-attempts">
               {control.requirement}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

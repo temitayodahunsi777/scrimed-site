@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { agentWorkflows, getAgentWorkflowSummary } from "../lib/agentWorkflows";
 import { getAgentOSSummary } from "../lib/agentOS";
 
@@ -8,7 +9,7 @@ export default function AgentsPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">SCRIMED AgentOS v1</p>
         <h1>A governed multi-agent operating layer for healthcare intelligence workflows.</h1>
         <p className="hero-text">
@@ -43,10 +44,10 @@ export default function AgentsPage() {
         </div>
         <div className="layer-list">
           {agentOS.exposedRoutes.map((route, index) => (
-            <a className="layer-row" href={route} key={route}>
+            <Link className="layer-row" href={route} key={route}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{route}</strong>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -107,7 +108,7 @@ export default function AgentsPage() {
               <h2>{workflow.name}</h2>
             </div>
             <p>{workflow.owner}</p>
-            <a className="module-link" href={workflow.route}>{workflow.objective}</a>
+            <Link className="module-link" href={workflow.route}>{workflow.objective}</Link>
           </article>
         ))}
       </section>
@@ -122,7 +123,7 @@ export default function AgentsPage() {
             <span>RBAC</span>
             <h3>{agentOS.rbacPermissions.length} roles</h3>
             <p>Least-privilege enterprise permissions for admins, clinicians, RCM reviewers, and runtime services.</p>
-            <a className="module-link" href="/memory">Open memory fabric</a>
+            <Link className="module-link" href="/memory">Open memory fabric</Link>
           </article>
           <article>
             <span>MCP</span>
@@ -140,7 +141,7 @@ export default function AgentsPage() {
             <span>Evaluation</span>
             <h3>Interactive workspace</h3>
             <p>Generate synthetic AgentOS task plans, Atlas Trust Cards, audit preview, and observability packets.</p>
-            <a className="module-link" href="/evaluation">Open evaluation workspace</a>
+            <Link className="module-link" href="/evaluation">Open evaluation workspace</Link>
           </article>
         </div>
       </section>

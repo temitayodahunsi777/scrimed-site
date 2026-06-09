@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getWorkflowExecutionAuditSummary } from "../../lib/workflowExecutionAudit";
 
 export default function WorkflowExecutionAuditPage() {
@@ -6,7 +7,7 @@ export default function WorkflowExecutionAuditPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows">Workflows</a>
+        <Link className="back-link" href="/workflows">Workflows</Link>
         <p className="eyebrow">Execution audit</p>
         <h1>Denied execution attempts now have a metadata-only audit boundary.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function WorkflowExecutionAuditPage() {
               <h2>{boundary.name}</h2>
             </div>
             <p>{boundary.eventName}</p>
-            <a className="module-link" href={boundary.route}>
+            <Link className="module-link" href={boundary.route}>
               Review metadata capture and never-capture policy.
-            </a>
+            </Link>
           </article>
         ))}
       </section>

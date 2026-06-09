@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { operatingContext } from "../lib/operatingContext";
 
 export default function OperatingContextPage() {
@@ -37,7 +38,7 @@ export default function OperatingContextPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Master operating context</p>
         <h1>{operatingContext.company} is building a trusted healthcare intelligence ecosystem.</h1>
         <p className="hero-text">
@@ -71,7 +72,7 @@ export default function OperatingContextPage() {
               <h2>{model.name}</h2>
             </div>
             <p>{model.boundary}</p>
-            <a className="module-link" href={model.route}>{model.role}</a>
+            <Link className="module-link" href={model.route}>{model.role}</Link>
           </article>
         ))}
       </section>

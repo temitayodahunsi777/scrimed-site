@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getWorkflowExecutionContractBySlug,
@@ -25,7 +26,7 @@ export default async function WorkflowExecutionContractDetailPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/contracts">Contracts</a>
+        <Link className="back-link" href="/workflows/contracts">Contracts</Link>
         <p className="eyebrow">{contract.module} execution contract</p>
         <h1>{contract.name}</h1>
         <p className="hero-text">{contract.promotionBoundary}</p>

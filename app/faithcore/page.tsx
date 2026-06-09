@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { operatingContext } from "../lib/operatingContext";
 
 const faithCore = operatingContext.operatingModels.find((model) => model.name === "FaithCore");
@@ -6,7 +7,7 @@ export default function FaithCorePage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/operating-context">Operating Context</a>
+        <Link className="back-link" href="/operating-context">Operating Context</Link>
         <p className="eyebrow">FaithCore</p>
         <h1>A spiritually aligned trust and encouragement layer with clear clinical boundaries.</h1>
         <p className="hero-text">

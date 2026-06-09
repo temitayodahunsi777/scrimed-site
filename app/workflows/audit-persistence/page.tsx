@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAuditPersistenceReadinessSummary } from "../../lib/auditPersistenceReadiness";
 
 export default function AuditPersistenceReadinessPage() {
@@ -6,7 +7,7 @@ export default function AuditPersistenceReadinessPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/execution-audit">Execution audit</a>
+        <Link className="back-link" href="/workflows/execution-audit">Execution audit</Link>
         <p className="eyebrow">Audit persistence readiness</p>
         <h1>Durable audit logging remains blocked until the persistence model is explicit.</h1>
         <p className="hero-text">
@@ -59,9 +60,9 @@ export default function AuditPersistenceReadinessPage() {
               <h2>{control.name}</h2>
             </div>
             <p>{control.owner}</p>
-            <a className="module-link" href="/workflows/audit-persistence">
+            <Link className="module-link" href="/workflows/audit-persistence">
               {control.requirement}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

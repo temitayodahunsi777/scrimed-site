@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { validateIntegrationFixtureBySlug } from "../../../lib/integrationFixtureValidation";
 import {
@@ -27,7 +28,7 @@ export default async function IntegrationFixturePage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/integrations/fixtures">Integration Fixtures</a>
+        <Link className="back-link" href="/integrations/fixtures">Integration Fixtures</Link>
         <p className="eyebrow">{fixture.request.sourceSystem}</p>
         <h1>{fixture.contractSlug}</h1>
         <p className="hero-text">{fixture.expectedResponse.reviewBeforeLive}</p>

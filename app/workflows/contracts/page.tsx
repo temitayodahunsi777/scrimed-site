@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getWorkflowExecutionContractSummary } from "../../lib/workflowExecutionContracts";
 
 export default function WorkflowExecutionContractsPage() {
@@ -6,7 +7,7 @@ export default function WorkflowExecutionContractsPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows">Workflows</a>
+        <Link className="back-link" href="/workflows">Workflows</Link>
         <p className="eyebrow">Execution contracts</p>
         <h1>Governed execution API contracts define the next boundary before live automation.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function WorkflowExecutionContractsPage() {
               <h2>{contract.name}</h2>
             </div>
             <p>{contract.runtimeMode}</p>
-            <a className="module-link" href={contract.route}>
+            <Link className="module-link" href={contract.route}>
               {contract.requestSchema.length} request fields, {contract.responseSchema.length} response fields
-            </a>
+            </Link>
           </article>
         ))}
       </section>

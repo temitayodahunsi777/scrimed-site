@@ -1,3 +1,4 @@
+import Link from "next/link";
 const capabilities = [
   "Trial discovery workflows",
   "Eligibility signal mapping",
@@ -9,7 +10,7 @@ export default function TrialCorePage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/platform">Platform</a>
+        <Link className="back-link" href="/platform">Platform</Link>
         <p className="eyebrow">TrialCore</p>
         <h1>Clinical trial discovery and matching infrastructure for research operations.</h1>
         <p className="hero-text">

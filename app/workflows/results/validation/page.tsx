@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getWorkflowResultValidationResults } from "../../../lib/workflowResultValidation";
 
 export default function WorkflowResultValidationPage() {
@@ -6,7 +7,7 @@ export default function WorkflowResultValidationPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/results">Results</a>
+        <Link className="back-link" href="/workflows/results">Results</Link>
         <p className="eyebrow">Result validation</p>
         <h1>Workflow result fixtures are validated against expected outputs, traces, and blocked actions.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function WorkflowResultValidationPage() {
               <h2>{result.workflowSlug}</h2>
             </div>
             <p>{result.diff.fingerprint}</p>
-            <a className="module-link" href={result.resultRoute ?? result.workflowRoute}>
+            <Link className="module-link" href={result.resultRoute ?? result.workflowRoute}>
               {result.passed} checks passed, {result.failed} checks failed
-            </a>
+            </Link>
           </article>
         ))}
       </section>

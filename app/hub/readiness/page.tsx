@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getReadinessSummary } from "../../lib/hubOperations";
 
 export default function HubReadinessPage() {
@@ -6,7 +7,7 @@ export default function HubReadinessPage() {
   return (
     <main>
       <section className="page-hero hub-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Readiness console</p>
         <h1>Foundation readiness is visible, practical, and intentionally gated before clinical integrations.</h1>
         <p className="hero-text">{summary.recommendation}</p>

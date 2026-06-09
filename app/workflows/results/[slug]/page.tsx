@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getWorkflowExecutionResultBySlug,
@@ -25,7 +26,7 @@ export default async function WorkflowExecutionResultDetailPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/results">Results</a>
+        <Link className="back-link" href="/workflows/results">Results</Link>
         <p className="eyebrow">Synthetic result fixture</p>
         <h1>{result.resultId}</h1>
         <p className="hero-text">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 const capabilities = [
   "Regression monitoring",
   "Model drift detection",
@@ -9,7 +10,7 @@ export default function WatchtowerPage() {
   return (
     <main>
       <section className="page-hero trust-hero">
-        <a className="back-link" href="/trust">Trust</a>
+        <Link className="back-link" href="/trust">Trust</Link>
         <p className="eyebrow">Watchtower</p>
         <h1>Continuous reliability infrastructure for healthcare AI behavior after deployment.</h1>
         <p className="hero-text">

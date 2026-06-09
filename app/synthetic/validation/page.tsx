@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSyntheticValidationResults } from "../../lib/syntheticValidation";
 
 export default function SyntheticValidationPage() {
@@ -6,7 +7,7 @@ export default function SyntheticValidationPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/synthetic">Synthetic</a>
+        <Link className="back-link" href="/synthetic">Synthetic</Link>
         <p className="eyebrow">Synthetic validation</p>
         <h1>Executable checks keep SCRIMED synthetic workflows honest before live integrations.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function SyntheticValidationPage() {
               <h2>{result.scenarioId}</h2>
             </div>
             <p>{result.passed} passed, {result.failed} failed</p>
-            <a className="module-link" href={result.fixtureRoute ?? `/synthetic/${result.scenarioId}`}>
+            <Link className="module-link" href={result.fixtureRoute ?? `/synthetic/${result.scenarioId}`}>
               Review fixture and assertions
-            </a>
+            </Link>
           </article>
         ))}
       </section>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCommercialStrategySummary } from "../lib/commercialStrategy";
 
 export const metadata = {
@@ -12,7 +13,7 @@ export default function PricingPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/product">Product Console</a>
+        <Link className="back-link" href="/product">Product Console</Link>
         <p className="eyebrow">Pricing and sales strategy</p>
         <h1>Sell SCRIMED as a governed healthcare intelligence operating layer, not a generic AI tool.</h1>
         <p className="hero-text">
@@ -49,10 +50,10 @@ export default function PricingPage() {
         </div>
         <div className="layer-list">
           {summary.productAccessRoutes.map((route, index) => (
-            <a className="layer-row" href={route.route} key={route.surface}>
+            <Link className="layer-row" href={route.route} key={route.surface}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{route.surface}: {route.buyerIntent}</strong>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -76,7 +77,7 @@ export default function PricingPage() {
                 <li>Expansion: {tier.expansionPath}</li>
                 <li>{tier.boundary}</li>
               </ul>
-              <a className="module-link" href={tier.primaryAction.href}>{tier.primaryAction.label}</a>
+              <Link className="module-link" href={tier.primaryAction.href}>{tier.primaryAction.label}</Link>
             </div>
           </article>
         ))}

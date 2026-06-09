@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getIdentityAccessReadinessSummary } from "../../lib/identityAccessReadiness";
 
 export default function IdentityAccessReadinessPage() {
@@ -6,7 +7,7 @@ export default function IdentityAccessReadinessPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows/implementation-readiness">Implementation readiness</a>
+        <Link className="back-link" href="/workflows/implementation-readiness">Implementation readiness</Link>
         <p className="eyebrow">Identity and access readiness</p>
         <h1>Governed execution stays blocked until identity, tenant, role, and patient-context boundaries are explicit.</h1>
         <p className="hero-text">
@@ -59,9 +60,9 @@ export default function IdentityAccessReadinessPage() {
               <h2>{control.name}</h2>
             </div>
             <p>{control.owner}</p>
-            <a className="module-link" href="/workflows/identity-access">
+            <Link className="module-link" href="/workflows/identity-access">
               {control.requirement}
-            </a>
+            </Link>
           </article>
         ))}
       </section>

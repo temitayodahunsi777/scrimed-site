@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getQualityGateSummary } from "../lib/qualityGates";
 
 export default function QualityPage() {
@@ -6,7 +7,7 @@ export default function QualityPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Quality gates</p>
         <h1>SCRIMED keeps execution moving by replacing blockers with explicit, safer quality gates.</h1>
         <p className="hero-text">
@@ -93,7 +94,7 @@ export default function QualityPage() {
               <h2>{gate.name}</h2>
             </div>
             <p>{gate.replacement ?? "active gate"}</p>
-            <a className="module-link" href={gate.route}>{gate.role}</a>
+            <Link className="module-link" href={gate.route}>{gate.role}</Link>
           </article>
         ))}
       </section>

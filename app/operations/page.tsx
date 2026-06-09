@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCompanyOperationsSummary } from "../lib/companyOperations";
 
 export const metadata = {
@@ -12,7 +13,7 @@ export default function OperationsPage() {
   return (
     <main>
       <section className="page-hero hub-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Operations readiness</p>
         <h1>Make every blocker visible, owned, and replaceable before it slows SCRIMED down.</h1>
         <p className="hero-text">{summary.boundary}</p>

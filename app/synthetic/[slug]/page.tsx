@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getSyntheticScenarioBySlug,
@@ -27,7 +28,7 @@ export default async function SyntheticScenarioPage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/synthetic">Synthetic</a>
+        <Link className="back-link" href="/synthetic">Synthetic</Link>
         <p className="eyebrow">Synthetic scenario</p>
         <h1>{scenario.id}</h1>
         <p className="hero-text">{scenario.scenario}</p>

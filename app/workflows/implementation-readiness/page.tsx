@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getWorkflowImplementationReadinessSummary } from "../../lib/workflowImplementationReadiness";
 
 export default function WorkflowImplementationReadinessPage() {
@@ -6,7 +7,7 @@ export default function WorkflowImplementationReadinessPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows">Workflows</a>
+        <Link className="back-link" href="/workflows">Workflows</Link>
         <p className="eyebrow">Implementation readiness</p>
         <h1>Governed execution remains deny-by-default until production boundaries are explicit.</h1>
         <p className="hero-text">
@@ -41,9 +42,9 @@ export default function WorkflowImplementationReadinessPage() {
               <h2>{workflow.name}</h2>
             </div>
             <p>{workflow.deniedResponse.code}</p>
-            <a className="module-link" href={workflow.route}>
+            <Link className="module-link" href={workflow.route}>
               Review locked endpoint and production prerequisites.
-            </a>
+            </Link>
           </article>
         ))}
       </section>

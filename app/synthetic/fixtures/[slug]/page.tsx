@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getSyntheticFixtureBySlug,
@@ -25,7 +26,7 @@ export default async function SyntheticFixturePage({
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/synthetic/fixtures">Fixtures</a>
+        <Link className="back-link" href="/synthetic/fixtures">Fixtures</Link>
         <p className="eyebrow">Synthetic fixture</p>
         <h1>{fixture.scenarioId}</h1>
         <p className="hero-text">{fixture.request.workflowRequest}</p>

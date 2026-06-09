@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getEventSummary } from "../../lib/hubOperations";
 
 export default function HubEventsPage() {
@@ -6,7 +7,7 @@ export default function HubEventsPage() {
   return (
     <main>
       <section className="page-hero hub-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Event console</p>
         <h1>Execution events show how the SCRIMED foundation has been shaped and verified.</h1>
         <p className="hero-text">

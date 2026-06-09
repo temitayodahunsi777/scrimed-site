@@ -140,9 +140,9 @@ Current baseline includes:
 
 ## Deployment Status
 
-Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub CLI authentication is configured for local pushes, and Vercel production deploys from pushed GitHub `main` commits have reached READY for the current SCRIMED product build path. GitHub Actions build verification is configured, but workflow runs are not visible through the current connector and the local Codex environment does not currently have npm, pnpm, yarn, or corepack available for independent local build or Actions-log inspection.
+Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub CLI authentication is configured for local pushes, and Vercel production deploys from pushed GitHub `main` commits have reached READY for the current SCRIMED product build path. A controlled local Node.js 22 and npm toolchain now independently verifies deterministic dependency installation, security audit, lint, TypeScript validation, and production builds. GitHub Actions build verification is configured, but workflow-run visibility is not confirmed through the current connector.
 
-Because Vercel is green, GitHub Actions and local package-manager verification are not treated as product or deploy blockers right now. They remain hardening items behind a managed quality-process bypass.
+Vercel, local package-manager verification, and the committed lockfile provide active build-quality paths. GitHub Actions run visibility remains a hardening item behind a managed quality-process bypass.
 
 Direct unauthenticated HTTP requests to protected Vercel deployment URLs can return Vercel Authentication instead of the app response. Connector-authenticated Vercel checks are the current source of truth for protected deployment API smoke tests unless SCRIMED intentionally disables deployment protection or configures public API access.
 
@@ -180,7 +180,6 @@ Current active quality path:
 Current bypassed or deferred checks:
 
 - GitHub Actions CI is bypassed as a blocking gate until workflow run visibility is available.
-- Local package-manager builds are bypassed inside this workspace until npm, pnpm, yarn, or corepack is available.
 - Live clinical integrations remain planned until synthetic fixtures and contracts are stable.
 
 Replacement path:
@@ -190,17 +189,21 @@ Replacement path:
 - Contract pages and APIs replace live connector assumptions until connector implementation is explicitly approved.
 - Readiness, events, and quality gate endpoints replace ambiguous manual status tracking.
 
-## CI Failure Root Cause
+## CI Dependency Hardening
 
-The CI workflow previously configured `actions/setup-node` with `cache: npm`, but the repository does not have a `package-lock.json`. That combination can fail before the install/build step because npm caching expects lockfile metadata.
+The repository now has a controlled, committed `package-lock.json`, allowing reproducible installs and npm caching without the earlier missing-lockfile failure mode.
 
 Fix applied:
 
-- Removed `cache: npm` from `.github/workflows/ci.yml`.
-- Kept `npm install` as the install command so the build does not require a committed lockfile yet.
+- Restored `cache: npm` in `.github/workflows/ci.yml`.
+- Replaced `npm install` with deterministic `npm ci`.
+- Added `npm audit --audit-level=moderate` as a CI security gate.
+- Replaced the removed Next.js `next lint` command with the supported ESLint CLI and matching Next.js configuration.
+- Migrated internal anchors to Next.js links and removed effect-driven pilot-prefill state so lint completes without errors.
 - Added `npm run typecheck` to CI.
 - Added a `typecheck` script to `package.json`.
-- Verified the resulting `main` state through successful Vercel deployments.
+- Updated Next.js to `16.2.7` and overrode its vulnerable transitive PostCSS dependency with patched `8.5.15`.
+- Verified zero audit findings, TypeScript success, and a successful production build locally.
 
 ## Product Direction
 
@@ -290,19 +293,18 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Promoted AgentOS and Atlas Core into the homepage, Hub, Product Console, Workflow Console, Trust surface, readiness brief, route inventory, and commercial positioning while preserving the synthetic pilot and enterprise assessment boundary.
 - Added the interactive AgentOS Evaluation Workspace in `/evaluation`, `app/lib/agentEvaluationWorkspace.ts`, and `/api/agent-os/evaluation` to generate synthetic task plans, structural parser assignments, Atlas Trust Cards, evidence sources, audit previews, blocked capabilities, and observability outcome records.
 - Promoted company operations readiness into the Product Console proof stack and downloadable readiness brief so go-live blockers, manual actions, owners, and fallbacks are visible during buyer and investor review.
-- Updated `react` and `react-dom` to `19.2.4` in `package.json`; regenerate and commit the lockfile from a controlled npm environment when package-manager access is restored.
+- Updated `react` and `react-dom` to `19.2.4`, Next.js to `16.2.7`, and committed a controlled lockfile with patched PostCSS `8.5.15`.
 - Authenticated GitHub CLI, pushed queued `main` commits, and confirmed Vercel production deployments reach READY through the Git integration path.
 
 ## Recommended Next Steps
 
-1. Connect `app.scrimedsolutions.com` to the Vercel product app and add Wix CTAs for Product Console, Pricing, Evaluation, and Pilot Intake.
-2. Keep Vercel as the active deploy gate until GitHub Actions visibility and package-manager tooling are available.
+1. Connect `app.scrimedsolutions.com` to the Vercel product app and revalidate the connected Wix CTAs against the branded domain.
+2. Keep Vercel and local build verification as active deploy gates until GitHub Actions visibility is confirmed.
 3. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected public-preview routes should be reachable without Vercel login.
-4. Add a committed `package-lock.json` from a controlled npm environment, then re-enable npm caching in CI.
-5. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-6. Add visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust` once local browser/build tooling is available.
-7. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
-8. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
+4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
+5. Add visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust`.
+6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+7. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
 
 ## Notes
 

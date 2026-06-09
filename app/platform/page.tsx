@@ -1,3 +1,4 @@
+import Link from "next/link";
 const modules = [
   {
     name: "SCRIMED Product Console",
@@ -68,7 +69,7 @@ export default function PlatformPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/">SCRIMED</a>
+        <Link className="back-link" href="/">SCRIMED</Link>
         <p className="eyebrow">Platform architecture</p>
         <h1>The SCRIMED platform is organized around care intelligence, workflow execution, and trust monitoring.</h1>
         <p className="hero-text">
@@ -84,7 +85,7 @@ export default function PlatformPage() {
               <h2>{module.name}</h2>
             </div>
             <p>{module.users}</p>
-            <a className="module-link" href={module.href}>{module.outcome}</a>
+            <Link className="module-link" href={module.href}>{module.outcome}</Link>
           </article>
         ))}
       </section>

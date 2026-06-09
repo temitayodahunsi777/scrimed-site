@@ -146,7 +146,7 @@ The task-planning API accepts synthetic pilot and enterprise assessment requests
 
 Recommended buyer path: keep the official Wix site at `scrimedsolutions.com`, link product CTAs to `app.scrimedsolutions.com`, and route buyers into `/product`, `/pricing`, `/evaluation`, and `/pilot` without requiring buyers to have Vercel accounts.
 
-Current go-live blockers and manual actions are tracked in `/operations`: local package-manager availability, `app.scrimedsolutions.com` DNS, Wix CTA routing, and deployment-protection decisions. GitHub push authentication and Vercel Git deployment are now working through the authenticated CLI plus Git integration path.
+Current go-live blockers and manual actions are tracked in `/operations`: `app.scrimedsolutions.com` DNS and deployment-protection decisions remain open. GitHub push authentication, Wix CTA routing, local package-manager verification, and Vercel Git deployment are working.
 
 The Product Console and readiness brief also include operations readiness so buyer, investor, and operator reviews see launch blockers, owners, fallback paths, and remaining manual actions in one place.
 

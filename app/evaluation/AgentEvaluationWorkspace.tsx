@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import type {
   AgentEvaluationRecord,
@@ -247,9 +249,9 @@ export default function AgentEvaluationWorkspace({
           <a className="secondary-action" href="/api/agent-os/evaluation">
             Inspect API
           </a>
-          <a className="secondary-action" href="/trust">
+          <Link className="secondary-action" href="/trust">
             View Trust Cards
-          </a>
+          </Link>
         </div>
       </form>
 

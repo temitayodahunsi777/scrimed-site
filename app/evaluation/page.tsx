@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AgentEvaluationWorkspace from "./AgentEvaluationWorkspace";
 import { getAgentEvaluationWorkspaceSummary } from "../lib/agentEvaluationWorkspace";
 
@@ -13,7 +14,7 @@ export default function EvaluationPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/product">Product Console</a>
+        <Link className="back-link" href="/product">Product Console</Link>
         <p className="eyebrow">AgentOS Evaluation Workspace</p>
         <h1>Turn a synthetic healthcare workflow packet into an AgentOS plan and Atlas Trust Card.</h1>
         <p className="hero-text">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getWorkflowExecutionResultSummary } from "../../lib/workflowExecutionResults";
 
 export default function WorkflowExecutionResultsPage() {
@@ -6,7 +7,7 @@ export default function WorkflowExecutionResultsPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/workflows">Workflows</a>
+        <Link className="back-link" href="/workflows">Workflows</Link>
         <p className="eyebrow">Execution result fixtures</p>
         <h1>Workflow outputs are captured as deterministic synthetic result fixtures.</h1>
         <p className="hero-text">
@@ -36,9 +37,9 @@ export default function WorkflowExecutionResultsPage() {
             <h2>Workflow result validation</h2>
           </div>
           <p>expected-output, trace, review-state, and blocked-action diff checks</p>
-          <a className="module-link" href="/workflows/results/validation">
+          <Link className="module-link" href="/workflows/results/validation">
             Open result validation gate.
-          </a>
+          </Link>
         </article>
         {summary.results.map((result) => (
           <article className="module-row" key={result.workflowSlug}>
@@ -47,9 +48,9 @@ export default function WorkflowExecutionResultsPage() {
               <h2>{result.resultId}</h2>
             </div>
             <p>{result.reviewState}</p>
-            <a className="module-link" href={result.route}>
+            <Link className="module-link" href={result.route}>
               {result.outputSignals.length} outputs, {result.watchtowerTrace.length} trace events
-            </a>
+            </Link>
           </article>
         ))}
       </section>

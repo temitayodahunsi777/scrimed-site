@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { integrationContracts } from "../lib/integrationContracts";
 
 export default function IntegrationsPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Integration contracts</p>
         <h1>SCRIMED defines data boundaries before connecting clinical, financial, or operational systems.</h1>
         <p className="hero-text">
@@ -19,9 +20,9 @@ export default function IntegrationsPage() {
             <h2>Integration fixture validation</h2>
           </div>
           <p>synthetic request and expected-response fixtures</p>
-          <a className="module-link" href="/integrations/fixture-validation">
+          <Link className="module-link" href="/integrations/fixture-validation">
             Review coverage, safeguard mapping, and fixture diff fingerprints before live connector work.
-          </a>
+          </Link>
         </article>
         {integrationContracts.map((contract) => (
           <article className="module-row" key={contract.name}>
@@ -30,7 +31,7 @@ export default function IntegrationsPage() {
               <h2>{contract.name}</h2>
             </div>
             <p>{contract.sourceType}</p>
-            <a className="module-link" href={contract.route}>{contract.purpose}</a>
+            <Link className="module-link" href={contract.route}>{contract.purpose}</Link>
           </article>
         ))}
       </section>

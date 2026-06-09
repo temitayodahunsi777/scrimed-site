@@ -1,3 +1,4 @@
+import Link from "next/link";
 const capabilities = [
   "Patient context summarization",
   "Decision support signal surfacing",
@@ -9,7 +10,7 @@ export default function ClinicalCopilotPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/platform">Platform</a>
+        <Link className="back-link" href="/platform">Platform</Link>
         <p className="eyebrow">Clinical Copilot</p>
         <h1>Clinician-facing intelligence for summarization, decision support, and care team workflow.</h1>
         <p className="hero-text">

@@ -1,6 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
+
+import { FormEvent, useState } from "react";
 import type { PilotIntakeOption, PilotIntakeSubmission, PilotIntakeSummary } from "../lib/pilotIntake";
 
 type IntakeResult = {
@@ -32,26 +34,23 @@ type FieldError = {
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
-export default function PilotIntakeForm({ summary }: { summary: PilotIntakeSummary }) {
-  const [form, setForm] = useState<PilotIntakeSubmission>(() => createInitialFormState(summary));
+type PilotIntakePrefill = {
+  offer?: string;
+  workflow?: string;
+};
+
+export default function PilotIntakeForm({
+  prefill,
+  summary
+}: {
+  prefill: PilotIntakePrefill;
+  summary: PilotIntakeSummary;
+}) {
+  const [form, setForm] = useState<PilotIntakeSubmission>(() => createInitialFormState(summary, prefill));
   const [status, setStatus] = useState<FormStatus>("idle");
   const [fieldErrors, setFieldErrors] = useState<FieldError[]>([]);
   const [message, setMessage] = useState("");
   const [result, setResult] = useState<IntakeResult | null>(null);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const offer = params.get("offer");
-    const workflow = params.get("workflow");
-
-    setForm((current) => ({
-      ...current,
-      offerInterest: isOptionValue(summary.serviceOffers, offer) ? offer : current.offerInterest,
-      workflowTargets: isOptionValue(summary.workflowTargets, workflow)
-        ? Array.from(new Set([...current.workflowTargets, workflow]))
-        : current.workflowTargets
-    }));
-  }, [summary.serviceOffers, summary.workflowTargets]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -285,9 +284,9 @@ export default function PilotIntakeForm({ summary }: { summary: PilotIntakeSumma
           <a className="secondary-action" href="/api/product/readiness-brief">
             Download Readiness Brief
           </a>
-          <a className="secondary-action" href="/product">
+          <Link className="secondary-action" href="/product">
             View Product Console
-          </a>
+          </Link>
         </div>
       </form>
 
@@ -428,7 +427,16 @@ function isOptionValue(options: PilotIntakeOption[], value: string | null): valu
   return Boolean(value && options.some((option) => option.value === value));
 }
 
-function createInitialFormState(summary: PilotIntakeSummary): PilotIntakeSubmission {
+function createInitialFormState(summary: PilotIntakeSummary, prefill: PilotIntakePrefill): PilotIntakeSubmission {
+  const requestedOffer = prefill.offer ?? null;
+  const requestedWorkflow = prefill.workflow ?? null;
+  const offerInterest = isOptionValue(summary.serviceOffers, requestedOffer)
+    ? requestedOffer
+    : summary.serviceOffers[0]?.value ?? "";
+  const workflowTargets = isOptionValue(summary.workflowTargets, requestedWorkflow)
+    ? Array.from(new Set(["referral-intake", requestedWorkflow]))
+    : ["referral-intake"];
+
   return {
     fullName: "",
     workEmail: "",
@@ -439,8 +447,8 @@ function createInitialFormState(summary: PilotIntakeSummary): PilotIntakeSubmiss
     buyerSegment: summary.buyerSegments[0]?.value ?? "",
     organizationSize: summary.organizationSizes[1]?.value ?? "",
     region: summary.regions[0]?.value ?? "",
-    offerInterest: summary.serviceOffers[0]?.value ?? "",
-    workflowTargets: ["referral-intake"],
+    offerInterest,
+    workflowTargets,
     readinessNeeds: ["workflow-map", "synthetic-demo"],
     governanceRequirements: ["human-review", "synthetic-only", "no-autonomous-diagnosis"],
     timeline: "30-90-days",

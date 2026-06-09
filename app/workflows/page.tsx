@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   getWorkflowExecutionSummary,
   validateWorkflowExecution
@@ -13,7 +14,7 @@ export default function WorkflowExecutionsPage() {
   return (
     <main>
       <section className="page-hero">
-        <a className="back-link" href="/hub">Hub</a>
+        <Link className="back-link" href="/hub">Hub</Link>
         <p className="eyebrow">Workflow and task execution engine</p>
         <h1>SCRIMED turns healthcare workflows into sandboxed, audited, human-reviewed task plans.</h1>
         <p className="hero-text">
@@ -78,7 +79,7 @@ export default function WorkflowExecutionsPage() {
             </div>
             <p>{task.owner}. {task.plannerSteps.join(", ")}</p>
             <div>
-              <a className="module-link" href={task.route}>{task.specialistAgents.join(", ")}</a>
+              <Link className="module-link" href={task.route}>{task.specialistAgents.join(", ")}</Link>
               <ul className="compact-list">
                 <li>Approvals: {task.humanApprovals.join(", ")}</li>
                 <li>Blocked: {task.deniedCapabilities.join(", ")}</li>
@@ -95,9 +96,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Governed execution API contracts</h2>
           </div>
           <p>contract-only boundary before executable workflow APIs</p>
-          <a className="module-link" href="/workflows/contracts">
+          <Link className="module-link" href="/workflows/contracts">
             Review request, response, audit, and denied-capability contracts.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -105,9 +106,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Identity and access readiness</h2>
           </div>
           <p>production authentication, tenant isolation, role permissions, patient context, service auth, consent, and break-glass decisions</p>
-          <a className="module-link" href="/workflows/identity-access">
+          <Link className="module-link" href="/workflows/identity-access">
             Review identity and access prerequisites before execution moves beyond deny-by-default.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -115,9 +116,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Execution attempt readiness</h2>
           </div>
           <p>idempotency, durable attempt state, replay, concurrency, failure quarantine, runtime-safety handoff, privacy boundaries, and regional compliance</p>
-          <a className="module-link" href="/workflows/execution-attempts">
+          <Link className="module-link" href="/workflows/execution-attempts">
             Review the attempt lifecycle before any governed execution route can create or replay work.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -125,9 +126,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Runtime safety readiness</h2>
           </div>
           <p>throttle policy, abuse signals, connector containment, emergency shutdown, Watchtower escalation, overrides, restoration, and safety drills</p>
-          <a className="module-link" href="/workflows/runtime-safety">
+          <Link className="module-link" href="/workflows/runtime-safety">
             Review runtime acceptance controls before any governed execution route can accept executable requests.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -135,9 +136,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Governed execution implementation readiness</h2>
           </div>
           <p>locked POST endpoints before production execution</p>
-          <a className="module-link" href="/workflows/implementation-readiness">
+          <Link className="module-link" href="/workflows/implementation-readiness">
             Review auth, identity, idempotency, persistence, audit, privacy, and connector prerequisites.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -145,9 +146,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Denied execution audit boundary</h2>
           </div>
           <p>metadata-only evidence headers and never-capture policy</p>
-          <a className="module-link" href="/workflows/execution-audit">
+          <Link className="module-link" href="/workflows/execution-audit">
             Review denied-attempt audit envelope before durable logging is enabled.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -155,9 +156,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Audit persistence readiness</h2>
           </div>
           <p>storage, retention, access, encryption, incident response, residency, and alerting decisions</p>
-          <a className="module-link" href="/workflows/audit-persistence">
+          <Link className="module-link" href="/workflows/audit-persistence">
             Review durable audit logging prerequisites before execution moves beyond deny-by-default.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -165,9 +166,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Workflow execution results</h2>
           </div>
           <p>deterministic synthetic output evidence</p>
-          <a className="module-link" href="/workflows/results">
+          <Link className="module-link" href="/workflows/results">
             Review result fixtures before live workflow automation.
-          </a>
+          </Link>
         </article>
         <article className="module-row">
           <div>
@@ -175,9 +176,9 @@ export default function WorkflowExecutionsPage() {
             <h2>Workflow promotion review</h2>
           </div>
           <p>synthetic-only approval before production automation</p>
-          <a className="module-link" href="/workflows/promotion-review">
+          <Link className="module-link" href="/workflows/promotion-review">
             Review promotion records and retained blocked actions.
-          </a>
+          </Link>
         </article>
         {summary.workflows.map((workflow) => {
           const readiness = validateWorkflowExecution(workflow);
@@ -189,9 +190,9 @@ export default function WorkflowExecutionsPage() {
                 <h2>{workflow.name}</h2>
               </div>
               <p>{workflow.module}</p>
-              <a className="module-link" href={workflow.route}>
+              <Link className="module-link" href={workflow.route}>
                 {readiness.passed} checks passed, {readiness.failed} checks failed
-              </a>
+              </Link>
             </article>
           );
         })}
