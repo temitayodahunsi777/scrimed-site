@@ -69,6 +69,18 @@ export const productAccessRoutes: ProductAccessRoute[] = [
     owner: "Product and sales"
   },
   {
+    surface: "Demo Center",
+    route: "/demos",
+    buyerIntent: "Inspect executable product demos, proof routes, outcome signals, governance boundaries, and production exclusions.",
+    owner: "Sales engineering and product"
+  },
+  {
+    surface: "Pilot Programs",
+    route: "/pilots",
+    buyerIntent: "Compare structured enterprise programs by duration, deliverables, inputs, metrics, gates, and engagement model.",
+    owner: "Enterprise sales and delivery"
+  },
+  {
     surface: "AgentOS Evaluation Workspace",
     route: "/evaluation",
     buyerIntent: "Run a synthetic workflow packet through AgentOS and Atlas Trust Cards before a sales call.",

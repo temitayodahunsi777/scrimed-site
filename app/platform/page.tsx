@@ -8,6 +8,13 @@ const modules = [
     outcome: "Package SCRIMED into sellable pilot offers, buyer workflows, proof routes, deployment stages, and safety boundaries."
   },
   {
+    name: "Demo & Pilot Center",
+    href: "/demos",
+    maturity: "Sellable evaluation",
+    users: "Healthcare buyers, sales engineering, transformation leaders, governance teams, and executive sponsors",
+    outcome: "Connect executable product proof to measurable pilot programs, buyer inputs, governance gates, and enterprise decisions."
+  },
+  {
     name: "Clinical Copilot",
     href: "/modules/clinical-copilot",
     maturity: "Design",

@@ -297,6 +297,9 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added execution-attempt readiness in `app/lib/executionAttemptReadiness.ts`, `/workflows/execution-attempts`, and `/api/workflows/execution-attempts`.
 - Promoted execution-attempt readiness into Hub route inventory, readiness checks, events, quality gates, homepage signals, workflow console navigation, and deny-by-default evidence headers while keeping attempt creation disabled.
 - Added the expanded Product Console operating layer with services, agents, workflow engine examples, governance controls, evidence metrics, buyer actions, and downloadable readiness brief.
+- Added `/demos`, `/demos/[slug]`, `/api/demos`, and `/api/demos/[slug]` with five executable buyer demos that connect named products and agents to guided steps, proof routes, outcomes, governance boundaries, and production exclusions.
+- Added `/pilots`, `/pilots/[slug]`, `/api/pilots`, and `/api/pilots/[slug]` with four sellable enterprise programs that define duration, engagement model, included demos, deliverables, buyer inputs, success metrics, governance gates, and production exclusions.
+- Promoted the Demo and Pilot Center into the Product Console, Hub, readiness checks, event stream, quality gates, homepage buyer path, platform catalog, commercial routing, readiness brief, and documentation.
 - Added `/pilot`, `/api/pilot/intake`, and `app/lib/pilotIntake.ts` for governed enterprise pilot intake, no-PHI validation, synthetic/evaluation-only acknowledgement, qualification, and CRM-ready handoff packaging.
 - Added `/pricing`, `/api/commercial/pricing`, and `app/lib/commercialStrategy.ts` for recommended pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails.
 - Added `/operations`, `/api/operations/readiness`, and `app/lib/companyOperations.ts` for go-live blocker tracking, buyer-route checklist, owner assignments, resolution paths, and fallback processes.
@@ -311,13 +314,12 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 
 ## Recommended Next Steps
 
-1. Revalidate the connected Wix CTAs against `app.scrimedsolutions.com`.
-2. Keep Vercel, GitHub Actions, and local build verification as independent active deploy-quality gates.
-3. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected public-preview routes should be reachable without Vercel login.
-4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-5. Add automated visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/interoperability`, `/interoperability/evaluations`, `/integrations`, `/integrations/fixture-validation`, and `/trust`.
+1. Route Wix product CTAs to `/demos`, `/pilots`, `/product`, and `/pilot` based on buyer intent.
+2. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
+3. Add persisted synthetic demo sessions and downloadable buyer proof packets once storage and auth are configured.
+4. Add tenant-authenticated pilot workspaces with scoped evidence upload only after identity, privacy, retention, and durable audit controls are approved.
+5. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.
 6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
-7. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
 
 ## Notes
 

@@ -10,6 +10,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
+- Demo and pilot center: `/demos`, `/demos/[slug]`, `/pilots`, `/pilots/[slug]`, `/api/demos`, `/api/demos/[slug]`, `/api/pilots`, and `/api/pilots/[slug]`
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
 - Master operating context: `/operating-context`, `/atlas`, `/faithcore`, and `/api/operating-context`
 - Agent workflow registry: `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`
@@ -74,6 +75,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 ### Workflow Layer
 
+- Buyer-ready demo and pilot packaging that connects executable proof to workflow outcomes, buyer inputs, governance gates, commercial engagement models, and explicit production exclusions
 - Clinical Copilot for clinician-facing decision support
 - DocuTwin for structured draft documentation workflows
 - CarePath AI for intake, triage, and navigation operations
@@ -106,6 +108,7 @@ SCRIMED currently uses a managed quality path instead of letting one blocked too
 
 Active gates:
 
+- Buyer-facing demo and pilot proof packets that preserve synthetic-only evidence boundaries
 - Vercel deployment status as the primary deploy gate
 - Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries

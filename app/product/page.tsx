@@ -41,6 +41,14 @@ export default function ProductConsolePage() {
           <strong>{summary.workflowEngineCount}</strong>
         </article>
         <article>
+          <span>Product demos</span>
+          <strong>{summary.executableDemos}</strong>
+        </article>
+        <article>
+          <span>Pilot programs</span>
+          <strong>{summary.pilotProgramCount}</strong>
+        </article>
+        <article>
           <span>Conformance kits</span>
           <strong>{summary.interoperabilityConformanceSummary.syntheticPassed}</strong>
         </article>
@@ -64,6 +72,49 @@ export default function ProductConsolePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED product demos">
+        <div className="section-heading">
+          <p className="eyebrow">Product demos</p>
+          <h2>Buyer-facing product evidence is executable, guided, and explicitly governed.</h2>
+          <p className="section-copy">
+            Each demo connects a buyer problem to a named product, agent, workflow, proof routes, measurable signals, and retained production exclusions.
+          </p>
+        </div>
+        {summary.demoPilotProgramSummary.productDemos.map((demo) => (
+          <article className="module-row" key={demo.slug}>
+            <div>
+              <span>{demo.status}</span>
+              <h2>{demo.name}</h2>
+            </div>
+            <p>{demo.buyer}</p>
+            <div>
+              <Link className="module-link" href={demo.route}>{demo.objective}</Link>
+              <ul className="compact-list">
+                <li>{demo.product} · {demo.agent}</li>
+                <li>{demo.proofRoutes.length} linked proof routes</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED pilot programs">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot programs</p>
+          <h2>Sellable programs translate product proof into a governed enterprise decision.</h2>
+        </div>
+        {summary.demoPilotProgramSummary.pilotPrograms.map((pilot) => (
+          <article className="module-row" key={pilot.slug}>
+            <div>
+              <span>{pilot.status} · {pilot.duration}</span>
+              <h2>{pilot.name}</h2>
+            </div>
+            <p>{pilot.engagementModel}</p>
+            <Link className="module-link" href={pilot.route}>{pilot.objective}</Link>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED enterprise services and offers">

@@ -73,6 +73,7 @@ SCRIMED is currently under active development. The platform is being designed an
 
 Current focus areas include:
 
+- buyer-ready product demos and structured pilot programs
 - AI agent architecture
 - SCRIMED AgentOS v1 multi-agent orchestration
 - SCRIMED Atlas Intelligence Core v1
@@ -115,6 +116,16 @@ The intake captures business-contact information, buyer segment, target workflow
 
 If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards a sanitized CRM-ready handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. Without that variable, the endpoint returns a manual CRM-ready handoff packet.
 
+## Demo and Pilot Center
+
+SCRIMED now packages existing executable proof into buyer-ready product and service paths:
+
+- `/demos` and `/api/demos` expose five governed product demos for CarePath AI, DocuTwin, TrialCore, Atlas interoperability readiness, and AgentOS governance evaluation.
+- `/pilots` and `/api/pilots` expose four structured enterprise programs with duration, engagement model, deliverables, buyer inputs, success metrics, governance gates, and production exclusions.
+- `/demos/[slug]`, `/api/demos/[slug]`, `/pilots/[slug]`, and `/api/pilots/[slug]` expose detailed proof and program packets.
+
+All demos and programs preserve the synthetic evaluation boundary. They do not authorize live clinical execution, production data exchange, autonomous diagnosis, payer submission, or patient outreach.
+
 ---
 
 ## AgentOS and Atlas Core Routes
@@ -122,6 +133,8 @@ If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards 
 Core enterprise evaluation surfaces:
 
 - `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
+- `/demos` - executable buyer demos with guided proof paths and retained production exclusions
+- `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
 - `/operations` - company operations readiness, blockers, owners, fallbacks, and buyer route checklist
 - `/evaluation` - interactive AgentOS synthetic evaluation workspace
@@ -138,6 +151,8 @@ Core enterprise evaluation surfaces:
 Core APIs:
 
 - `/api/agent-os`
+- `/api/demos`
+- `/api/pilots`
 - `/api/commercial/pricing`
 - `/api/operations/readiness`
 - `/api/agent-os/evaluation`

@@ -23,6 +23,16 @@ const consoleViews = [
     summary: "Capture enterprise buyer segment, workflow targets, readiness needs, governance requirements, and CRM handoff scope."
   },
   {
+    name: "Demo Center",
+    href: "/demos",
+    summary: "Inspect five executable buyer demos with guided steps, proof routes, outcomes, governance boundaries, and production exclusions."
+  },
+  {
+    name: "Pilot Programs",
+    href: "/pilots",
+    summary: "Compare structured enterprise programs by duration, deliverables, buyer inputs, success metrics, governance gates, and engagement model."
+  },
+  {
     name: "Pricing",
     href: "/pricing",
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."
@@ -189,6 +199,14 @@ export default function HubPage() {
         <article>
           <span>Foundation</span>
           <strong>{summary.activeModules}</strong>
+        </article>
+        <article>
+          <span>Product demos</span>
+          <strong>{summary.demoPilotProgramSummary.executableDemos}</strong>
+        </article>
+        <article>
+          <span>Pilot programs</span>
+          <strong>{summary.demoPilotProgramSummary.pilotCount}</strong>
         </article>
       </section>
 

@@ -18,6 +18,8 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "hub_console", status: "pass", detail: "/hub and /api/hub/summary are available." },
   { name: "product_pages", status: "pass", detail: "Platform, trust, and module pages are available." },
   { name: "pilot_intake", status: "pass", detail: "/pilot and /api/pilot/intake capture enterprise pilot requests, validate synthetic-only boundaries, and package CRM-ready handoff payloads." },
+  { name: "demo_center", status: "pass", detail: "/demos, /demos/[slug], /api/demos, and /api/demos/[slug] package executable product proof with guided steps, measurable signals, governance boundaries, and production exclusions." },
+  { name: "pilot_program_catalog", status: "pass", detail: "/pilots, /pilots/[slug], /api/pilots, and /api/pilots/[slug] package sellable enterprise engagements with duration, deliverables, buyer inputs, metrics, governance gates, and exclusions." },
   { name: "operations_readiness", status: "watch", detail: "/operations and /api/operations/readiness expose publishing, deployment, domain, sales-routing, quality-tooling, and deployment-protection blockers with owners and fallback paths." },
   { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
   { name: "official_website", status: "pass", detail: "The official SCRIMED SOLUTIONS website is recorded as https://www.scrimedsolutions.com through Wix." },
@@ -88,6 +90,12 @@ export const hubEvents: HubEvent[] = [
     id: "scrimed-interoperability-conformance-evaluations",
     type: "integration",
     summary: "Added executable synthetic conformance test kits for FHIR R4 and US Core, SMART App Launch, and DICOMweb with evidence artifacts, agent ownership, and retained live-use blockers.",
+    date: "2026-06-09"
+  },
+  {
+    id: "scrimed-demo-pilot-center",
+    type: "product",
+    summary: "Added five executable buyer demos and four sellable pilot programs that bind product proof to measurable outcomes, buyer inputs, governance gates, and explicit production exclusions.",
     date: "2026-06-09"
   },
   {
@@ -226,7 +234,7 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, GitHub Actions, operations readiness, pilot intake validation, executable synthetic assertions, interoperability conformance evaluations, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, the interoperability control plane, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    recommendation: "Use the Demo Center and Pilot Programs to package buyer-ready proof while Vercel, GitHub Actions, operations readiness, pilot intake validation, executable synthetic assertions, interoperability conformance evaluations, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, the interoperability control plane, integration fixtures, integration contracts, and quality gates remain the active deploy-quality path before clinical workflow integration.",
     updated: "2026-06-09"
   };
 }

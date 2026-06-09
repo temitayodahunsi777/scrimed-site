@@ -12,6 +12,7 @@ import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getQualityGateSummary } from "./qualityGates";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
+import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -319,6 +320,18 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Inspect Product Demos",
+    href: "/demos",
+    purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
+    boundary: "Demos use governed synthetic evidence and do not represent live clinical execution."
+  },
+  {
+    label: "Compare Pilot Programs",
+    href: "/pilots",
+    purpose: "Compare structured enterprise programs by duration, deliverables, buyer inputs, metrics, and governance gates.",
+    boundary: "Pilot programs remain synthetic or protected-evaluation engagements until production controls are approved."
+  },
+  {
     label: "Inspect Conformance Evidence",
     href: "/interoperability/evaluations",
     purpose: "Review executable synthetic test kits, passed checks, evidence artifacts, and exact production blockers.",
@@ -430,6 +443,7 @@ export function getProductConsoleSummary() {
   const qualityGateSummary = getQualityGateSummary();
   const interoperabilitySummary = getInteroperabilitySummary();
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
+  const demoPilotProgramSummary = getDemoPilotProgramSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -446,11 +460,18 @@ export function getProductConsoleSummary() {
     pricingApiRoute: commercialStrategySummary.apiRoute,
     operationsRoute: companyOperationsSummary.route,
     operationsApiRoute: companyOperationsSummary.apiRoute,
+    demoRoute: demoPilotProgramSummary.demoRoute,
+    demoApiRoute: demoPilotProgramSummary.demoApiRoute,
+    pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
+    pilotProgramApiRoute: demoPilotProgramSummary.pilotApiRoute,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
     agentCount: productAgents.length,
     sellablePilots,
+    demoCount: demoPilotProgramSummary.demoCount,
+    executableDemos: demoPilotProgramSummary.executableDemos,
+    pilotProgramCount: demoPilotProgramSummary.pilotCount,
     workflowCount: productWorkflows.length,
     workflowEngineCount: workflowEngineExamples.length,
     agentOSControlPlaneCount: agentOSSummary.controlPlane.length,
@@ -473,10 +494,12 @@ export function getProductConsoleSummary() {
     atlasIntelligenceCoreSummary,
     commercialStrategySummary,
     companyOperationsSummary,
+    demoPilotProgramSummary,
     interoperabilitySummary,
     interoperabilityConformanceSummary,
     proofStack: {
       pricingAndSales: commercialStrategySummary.status,
+      demosAndPilots: demoPilotProgramSummary.status,
       operationsReadiness: companyOperationsSummary.status,
       agentOS: agentOSSummary.status,
       agentEvaluationWorkspace: agentEvaluationWorkspaceSummary.status,
@@ -494,7 +517,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use the AgentOS Evaluation Workspace to turn synthetic buyer packets into Atlas Trust Cards, task plans, audit previews, observability records, and a production-readiness decision register.",
+      "Use the Demo Center to select an inspectable product proof path, then package it into a defined Pilot Program with buyer-approved metrics, governance gates, and a production-readiness decision.",
     updated: "2026-06-09"
   };
 }
@@ -510,6 +533,16 @@ export function getProductReadinessBrief() {
     "",
     "## Enterprise Offers",
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
+    "",
+    "## Product Demos and Pilot Programs",
+    `Demo Center: ${summary.demoRoute}`,
+    `Pilot Programs: ${summary.pilotProgramRoute}`,
+    ...summary.demoPilotProgramSummary.productDemos.map(
+      (demo) => `- Demo: ${demo.name} (${demo.status}) -> ${demo.route}`
+    ),
+    ...summary.demoPilotProgramSummary.pilotPrograms.map(
+      (pilot) => `- Pilot: ${pilot.name} (${pilot.duration}) -> ${pilot.route}`
+    ),
     "",
     "## Pricing and Sales",
     `Pricing route: ${summary.pricingRoute}`,

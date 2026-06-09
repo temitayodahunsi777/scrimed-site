@@ -49,6 +49,14 @@ export default function QualityPage() {
           <strong>{summary.interoperabilityEvaluations.liveBlocked}</strong>
         </article>
         <article>
+          <span>Product demos</span>
+          <strong>{summary.demoPilotPrograms.executableDemos}</strong>
+        </article>
+        <article>
+          <span>Pilot programs</span>
+          <strong>{summary.demoPilotPrograms.pilotCount}</strong>
+        </article>
+        <article>
           <span>Fixture reviews</span>
           <strong>{summary.fixtureChangeReview.approved}</strong>
         </article>

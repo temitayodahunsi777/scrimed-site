@@ -44,6 +44,11 @@ import {
   getInteroperabilityConformanceEvaluationSummary,
   getInteroperabilityConformanceEvaluations
 } from "./interoperabilityConformanceEvaluations";
+import {
+  getDemoPilotProgramSummary,
+  getPilotPrograms,
+  getProductDemos
+} from "./demoPilotPrograms";
 
 export type HubModule = {
   name: string;
@@ -111,6 +116,8 @@ export const hubSignals: HubSignal[] = [
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
+  { name: "Demo Center", value: "five executable buyer demos ready", tone: "good" },
+  { name: "Pilot programs", value: "four governed programs packaged", tone: "good" },
   { name: "Operations readiness", value: "blocker register active", tone: "watch" },
   { name: "AgentOS Evaluation", value: "interactive synthetic workspace ready", tone: "good" },
   { name: "AgentOS", value: "multi-agent control plane online", tone: "good" },
@@ -157,6 +164,8 @@ const workflowExecutionContracts = getWorkflowExecutionContracts();
 const workflowImplementationReadiness = getWorkflowImplementationReadiness();
 const workflowExecutionAuditBoundaries = getWorkflowExecutionAuditBoundaries();
 const interoperabilityConformanceEvaluations = getInteroperabilityConformanceEvaluations();
+const productDemos = getProductDemos();
+const pilotPrograms = getPilotPrograms();
 
 export const hubRoutes = [
   "/",
@@ -164,6 +173,8 @@ export const hubRoutes = [
   "/hub/readiness",
   "/hub/events",
   "/pilot",
+  "/pilots",
+  "/demos",
   "/pricing",
   "/operations",
   "/evaluation",
@@ -202,6 +213,8 @@ export const hubRoutes = [
   ...integrationContracts.map((contract) => contract.route),
   ...interoperabilityStandards.map((standard) => `/interoperability/${standard.slug}`),
   ...interoperabilityConformanceEvaluations.map((evaluation) => evaluation.route),
+  ...productDemos.map((demo) => demo.route),
+  ...pilotPrograms.map((pilot) => pilot.route),
   ...integrationFixtures.map((fixture) => fixture.route),
   ...agentWorkflows.map((workflow) => workflow.route),
   ...workflowExecutions.map((workflow) => workflow.route),
@@ -219,6 +232,8 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/pilot/intake",
+  "/api/pilots",
+  "/api/demos",
   "/api/commercial/pricing",
   "/api/operations/readiness",
   "/api/agent-os/evaluation",
@@ -259,6 +274,8 @@ export const hubRoutes = [
   "/api/interoperability/evaluations",
   ...interoperabilityStandards.map((standard) => `/api/interoperability/standards/${standard.slug}`),
   ...interoperabilityConformanceEvaluations.map((evaluation) => evaluation.apiRoute),
+  ...productDemos.map((demo) => demo.apiRoute),
+  ...pilotPrograms.map((pilot) => pilot.apiRoute),
   "/api/synthetic/scenarios",
   "/api/synthetic/fixtures",
   "/api/synthetic/validation",
@@ -293,6 +310,7 @@ export function getHubSummary() {
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
   const interoperabilitySummary = getInteroperabilitySummary();
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
+  const demoPilotProgramSummary = getDemoPilotProgramSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -319,6 +337,7 @@ export function getHubSummary() {
     atlasIntelligenceCoreSummary,
     interoperabilitySummary,
     interoperabilityConformanceSummary,
+    demoPilotProgramSummary,
     agentWorkflowSummary,
     fixtureChangeReview,
     workflowExecutionSummary,

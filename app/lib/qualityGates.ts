@@ -14,6 +14,7 @@ import { getWorkflowImplementationReadinessSummary } from "./workflowImplementat
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
+import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 
 export type QualityGate = {
   name: string;
@@ -35,6 +36,12 @@ export const qualityGates: QualityGate[] = [
     route: "/synthetic/validation",
     state: "active",
     role: "Executable workflow validation without live patient data."
+  },
+  {
+    name: "Demo and pilot proof packets",
+    route: "/demos",
+    state: "active",
+    role: "Buyer-facing guided demos and structured pilot programs that bind executable synthetic proof to metrics, governance gates, buyer inputs, and production exclusions."
   },
   {
     name: "Interoperability standards control plane",
@@ -186,6 +193,7 @@ export function getQualityGateSummary() {
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
   const interoperability = getInteroperabilitySummary();
   const interoperabilityEvaluations = getInteroperabilityConformanceEvaluationSummary();
+  const demoPilotPrograms = getDemoPilotProgramSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -201,7 +209,8 @@ export function getQualityGateSummary() {
       workflowImplementationReadiness.status === "deny-stub-ready" &&
       workflowExecutionAudit.status === "audit-boundary-ready" &&
       interoperability.status === "standards-control-plane-defined" &&
-      interoperabilityEvaluations.status === "synthetic-conformance-evaluations-ready"
+      interoperabilityEvaluations.status === "synthetic-conformance-evaluations-ready" &&
+      demoPilotPrograms.status === "buyer-ready-synthetic-evaluations"
         ? "active"
         : "attention-required",
     gates: qualityGates,
@@ -224,6 +233,7 @@ export function getQualityGateSummary() {
     runtimeSafetyReadiness,
     interoperability,
     interoperabilityEvaluations,
+    demoPilotPrograms,
     updated: "2026-06-09"
   };
 }

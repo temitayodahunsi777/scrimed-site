@@ -45,6 +45,8 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
+  { label: "Demos", value: "/demos" },
+  { label: "Programs", value: "/pilots" },
   { label: "Pricing", value: "/api/commercial/pricing" },
   { label: "Operations", value: "/api/operations/readiness" },
   { label: "Pilot", value: "/pilot" },
@@ -87,6 +89,8 @@ export default function Home() {
           </a>
           <div className="nav-links">
             <Link href="/product">Product</Link>
+            <Link href="/demos">Demos</Link>
+            <Link href="/pilots">Programs</Link>
             <Link href="/pricing">Pricing</Link>
             <Link href="/operations">Operations</Link>
             <Link href="/pilot">Pilot</Link>
@@ -112,6 +116,8 @@ export default function Home() {
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
               <Link className="primary-action" href="/pilot">Request Pilot</Link>
+              <Link className="secondary-action" href="/demos">Inspect Demos</Link>
+              <Link className="secondary-action" href="/pilots">Compare Pilot Programs</Link>
               <Link className="secondary-action" href="/product">Open Product Console</Link>
               <Link className="secondary-action" href="/pricing">Review Pricing</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
@@ -157,6 +163,12 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> AgentOS evaluation workspace ready
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Five executable buyer demos ready
+              </div>
+              <div>
+                <span className="trace-dot" /> Four governed pilot programs packaged
               </div>
               <div>
                 <span className="trace-dot" /> AgentOS planner and router layer online

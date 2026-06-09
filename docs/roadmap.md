@@ -28,6 +28,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Executable synthetic conformance evaluations are the active evidence gate for FHIR R4 and US Core, SMART App Launch, and DICOMweb before partner testing or live connector work.
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
+- Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
 
 Reasoning level:
 
@@ -41,6 +42,7 @@ Objective: Establish the foundational architecture, deployment surface, document
 
 Completed foundations:
 
+- Five executable product demos and four structured enterprise pilot programs
 - Next.js App Router application baseline
 - Vercel deployment configuration
 - Homepage and public platform surface
@@ -92,6 +94,7 @@ Completed foundations:
 
 Next build targets:
 
+- Add authenticated pilot workspaces and downloadable proof packets after storage, identity, privacy, retention, and durable audit controls are approved
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
 - Add tenant-authenticated persisted conformance runs and downloadable partner evidence packets after storage and identity controls are approved
 - Select and test deployment-specific standards profiles, conformance artifacts, identity, consent, audit, security, and partner acceptance controls before live connector work
