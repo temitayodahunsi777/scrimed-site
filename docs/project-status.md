@@ -207,6 +207,7 @@ Fix applied:
 - Added `npm run typecheck` to CI.
 - Added a `typecheck` script to `package.json`.
 - Added a generated-workspace integrity precheck so duplicate-suffixed `@types` or `.next/types` artifacts fail with a precise repair path before TypeScript resolution is corrupted.
+- Upgraded GitHub Actions checkout and Node setup steps to their Node 24-based v6 releases and set explicit read-only repository contents permission.
 - Updated Next.js to `16.2.7` and overrode its vulnerable transitive PostCSS dependency with patched `8.5.15`.
 - Verified zero audit findings, TypeScript success, and a successful production build locally.
 
