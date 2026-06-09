@@ -1,6 +1,6 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-02
+Updated: 2026-06-09
 
 ## Current Baseline
 
@@ -45,6 +45,8 @@ Current baseline includes:
 - SCRIMED Atlas Intelligence Core v1 at `/atlas`
 - FaithCore operating model at `/faithcore`
 - Integration contracts page at `/integrations`
+- Interoperability control plane at `/interoperability`
+- Interoperability standard detail routes under `/interoperability/[slug]`
 - Integration fixture contracts at `/integrations/fixtures`
 - Integration fixture validation at `/integrations/fixture-validation`
 - Fixture change review at `/fixtures/change-review`
@@ -72,6 +74,7 @@ Current baseline includes:
 - Shared workflow execution audit-boundary model in `app/lib/workflowExecutionAudit.ts`
 - Shared audit persistence readiness model in `app/lib/auditPersistenceReadiness.ts`
 - Shared integration contract model in `app/lib/integrationContracts.ts`
+- Shared interoperability standards and conformance model in `app/lib/interoperabilityStandards.ts`
 - Shared integration fixture model in `app/lib/integrationFixtures.ts`
 - Shared integration fixture validation model in `app/lib/integrationFixtureValidation.ts`
 - Shared fixture change-review model in `app/lib/fixtureChangeReviews.ts`
@@ -124,6 +127,8 @@ Current baseline includes:
 - Per-fixture integration endpoints under `/api/integration-fixtures/[slug]`
 - Integration fixture validation endpoint at `/api/integration-fixtures/validation`
 - Integration contracts endpoint at `/api/contracts`
+- Interoperability standards endpoint at `/api/interoperability/standards`
+- Interoperability conformance endpoint at `/api/interoperability/conformance`
 - Per-contract API routes under `/api/contracts/[slug]`
 - Synthetic scenario endpoint at `/api/synthetic/scenarios`
 - Per-scenario synthetic API routes under `/api/synthetic/scenarios/[slug]`
@@ -140,9 +145,9 @@ Current baseline includes:
 
 ## Deployment Status
 
-Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub CLI authentication is configured for local pushes, and Vercel production deploys from pushed GitHub `main` commits have reached READY for the current SCRIMED product build path. A controlled local Node.js 22 and npm toolchain now independently verifies deterministic dependency installation, security audit, lint, TypeScript validation, and production builds. GitHub Actions build verification is configured, but workflow-run visibility is not confirmed through the current connector.
+Vercel is the current working deploy gate and has repeatedly reported success for the `scrimed-site` deployment. The Vercel connector now resolves the `scrimed-site` project under the `temitayo-dahunsis-projects` team. GitHub CLI authentication is configured for local pushes, and Vercel production deploys from pushed GitHub `main` commits have reached READY for the current SCRIMED product build path. A controlled local Node.js 22 and npm toolchain independently verifies deterministic dependency installation, security audit, lint, TypeScript validation, and production builds. GitHub Actions run visibility is available and recent CI runs pass.
 
-Vercel, local package-manager verification, and the committed lockfile provide active build-quality paths. GitHub Actions run visibility remains a hardening item behind a managed quality-process bypass.
+Vercel, GitHub Actions, local package-manager verification, and the committed lockfile provide active independent build-quality paths.
 
 Direct unauthenticated HTTP requests to protected Vercel deployment URLs can return Vercel Authentication instead of the app response. Connector-authenticated Vercel checks are the current source of truth for protected deployment API smoke tests unless SCRIMED intentionally disables deployment protection or configures public API access.
 
@@ -166,7 +171,7 @@ Current active quality path:
 14. Denied execution audit boundaries define metadata-only capture, evidence headers, audit-envelope fields, and never-capture policy before durable logging.
 15. Audit persistence readiness defines durable storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting decisions before denied-event metadata can be persisted.
 16. Integration fixtures define synthetic request and expected-response shapes for non-synthetic connector contracts.
-17. Integration contracts define the data boundary before real connectors are implemented.
+17. Interoperability standards, profiles, conformance evidence, and integration contracts define the data boundary before real connectors are implemented.
 18. Hub readiness and event endpoints expose operational status.
 19. Quality gates make every active, planned, and bypassed validation path explicit.
 20. Enterprise pilot intake validates buyer requests, blocks PHI-style content, and packages sanitized CRM-ready handoff payloads for HubSpot, Wix, Zapier/Make, or secure CRM webhook routing.
@@ -179,7 +184,6 @@ Current active quality path:
 
 Current bypassed or deferred checks:
 
-- GitHub Actions CI is bypassed as a blocking gate until workflow run visibility is available.
 - Live clinical integrations remain planned until synthetic fixtures and contracts are stable.
 
 Replacement path:
@@ -202,6 +206,7 @@ Fix applied:
 - Migrated internal anchors to Next.js links and removed effect-driven pilot-prefill state so lint completes without errors.
 - Added `npm run typecheck` to CI.
 - Added a `typecheck` script to `package.json`.
+- Added a generated-workspace integrity precheck so duplicate-suffixed `@types` or `.next/types` artifacts fail with a precise repair path before TypeScript resolution is corrupted.
 - Updated Next.js to `16.2.7` and overrode its vulnerable transitive PostCSS dependency with patched `8.5.15`.
 - Verified zero audit findings, TypeScript success, and a successful production build locally.
 
@@ -223,7 +228,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - SCRIMED AgentOS v1 for governed planner/router/specialist orchestration, memory, audit, TrustQA, RBAC, MCP connectors, sandbox runtime, and task planning
 - AgentOS Evaluation Workspace for interactive synthetic buyer packets, Trust Cards, audit previews, and observability records
 - SCRIMED Atlas Intelligence Core v1 for structural document understanding, evidence-backed reasoning, Trust Cards, continuous validation, AI governance, and reimbursement-aware operating design
-- Integration contracts for future FHIR, HL7, claims, pricing, and synthetic clinical test data
+- Standards-bound integration contracts for future FHIR, HL7 v2, DICOM/DICOMweb, X12, pricing, and synthetic clinical test data
+- Interoperability registry and conformance controls for exchange, imaging, payer, pharmacy, device, profile, and terminology standards
 - Integration fixtures and validation diffs before live connector implementation
 - Fixture change review, synthetic workflow execution readiness, deterministic workflow result fixtures, result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness before module automation
 - Synthetic validation before live clinical data or production integrations
@@ -243,7 +249,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Linked module pages from `/platform` and exposed module routes from `/api/status`.
 - Added the SCRIMED OS Hub data model, `/hub` console, and `/api/hub/summary` endpoint.
 - Wired homepage, status, and readiness surfaces to the Hub layer.
-- Added integration contracts for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing.
+- Added integration contracts for FHIR, HL7 v2, DICOM/DICOMweb, claims/utilization, pricing transparency, and synthetic clinical testing.
+- Added the interoperability control plane with typed standards, official-source references, conformance requirements, APIs, and contract bindings.
 - Added `/integrations` and `/api/contracts`, then wired contracts into Hub, readiness, and homepage surfaces.
 - Fixed the likely CI workflow failure caused by npm caching without a lockfile.
 - Added shared Hub operations data and backed `/api/readiness` and `/api/events` with it.
@@ -259,7 +266,7 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Codified the SCRIMED SOLUTIONS master operating context in `docs/master-operating-context.md`, `app/lib/operatingContext.ts`, `/operating-context`, and `/api/operating-context`.
 - Added SCRIMED Atlas and FaithCore surfaces with explicit enterprise, faith, and clinical-safety boundaries.
 - Added a governed agent workflow registry in `app/lib/agentWorkflows.ts`, `/agents`, `/agents/[slug]`, `/api/agents/workflows`, and `/api/agents/workflows/[slug]`.
-- Added synthetic request and expected-response fixtures for FHIR, HL7, claims/utilization, and pricing transparency contracts.
+- Added synthetic request and expected-response fixtures for FHIR, HL7 v2, DICOM/DICOMweb, claims/utilization, and pricing transparency contracts.
 - Added integration fixture validation and diff fingerprints in `/integrations/fixture-validation` and `/api/integration-fixtures/validation`.
 - Recorded https://www.scrimedsolutions.com as the official SCRIMED SOLUTIONS website through Wix.
 - Added fixture change-review fingerprints in `app/lib/fixtureChangeReviews.ts`, `/fixtures/change-review`, and `/api/fixtures/change-review`.
@@ -299,10 +306,10 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 ## Recommended Next Steps
 
 1. Revalidate the connected Wix CTAs against `app.scrimedsolutions.com`.
-2. Keep Vercel and local build verification as active deploy gates until GitHub Actions visibility is confirmed.
+2. Keep Vercel, GitHub Actions, and local build verification as independent active deploy-quality gates.
 3. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected public-preview routes should be reachable without Vercel login.
 4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-5. Add visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/integrations`, `/integrations/fixture-validation`, and `/trust`.
+5. Add automated visual smoke checks for `/`, `/product`, `/pricing`, `/operations`, `/pilot`, `/evaluation`, `/hub`, `/operating-context`, `/agents`, `/workflows`, `/memory`, `/audit`, `/observability`, `/workflows/contracts`, `/workflows/identity-access`, `/workflows/execution-attempts`, `/workflows/implementation-readiness`, `/workflows/execution-audit`, `/workflows/audit-persistence`, `/workflows/results`, `/workflows/results/validation`, `/workflows/promotion-review`, `/fixtures/change-review`, `/atlas`, `/faithcore`, `/quality`, `/synthetic`, `/interoperability`, `/integrations`, `/integrations/fixture-validation`, and `/trust`.
 6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 7. Add persisted synthetic evaluation records and downloadable enterprise evaluation packets once storage and auth are configured.
 

@@ -133,6 +133,11 @@ const consoleViews = [
     summary: "Track repository, product, operations, integration, and deployment milestones."
   },
   {
+    name: "Interoperability",
+    href: "/interoperability",
+    summary: "Review FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, and terminology conformance boundaries."
+  },
+  {
     name: "Integrations",
     href: "/integrations",
     summary: "Inspect integration contracts before any live clinical data connector is implemented."

@@ -65,7 +65,7 @@ const prerequisiteTemplate: WorkflowImplementationPrerequisite[] = [
   {
     name: "Connector boundary",
     state: "decision-required",
-    requirement: "Approve FHIR, HL7, claims, pricing, and workflow connector scope before live data movement."
+    requirement: "Approve FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, terminology, pricing, and workflow connector scope before live data movement."
   },
   {
     name: "Rate limits and abuse controls",

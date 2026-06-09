@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-06-01
+Updated: 2026-06-09
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -25,6 +25,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Audit persistence readiness: `/workflows/audit-persistence` and `/api/workflows/audit-persistence`
 - Product modules: Clinical Copilot, DocuTwin, CarePath AI, TrialCore, and Watchtower pages under `/modules/*`
 - Integration contracts: `/integrations`, `/contracts/[slug]`, `/api/contracts`, and `/api/contracts/[slug]`
+- Interoperability control plane: `/interoperability`, `/interoperability/[slug]`, `/api/interoperability/standards`, `/api/interoperability/standards/[slug]`, and `/api/interoperability/conformance`
 - Integration fixtures: `/integrations/fixtures`, `/integrations/fixtures/[slug]`, `/integrations/fixture-validation`, `/api/integration-fixtures`, `/api/integration-fixtures/[slug]`, and `/api/integration-fixtures/validation`
 - Fixture change review: `/fixtures/change-review` and `/api/fixtures/change-review`
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
@@ -44,7 +45,8 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 ### Data Layer
 
-- Healthcare interoperability contracts for FHIR and HL7
+- Typed healthcare interoperability standards registry for FHIR, SMART App Launch, HL7 v2, DICOM/DICOMweb, X12, C-CDA, IHE profiles, NCPDP SCRIPT, ISO/IEEE 11073, and clinical terminology
+- Contract-to-standard bindings with explicit versions, profiles, conformance artifacts, controls, and pre-live implementation requirements
 - Claims, utilization, and pricing transparency contract boundaries
 - Synthetic request and expected-response fixtures for non-synthetic integration contracts
 - Fixture validation diffs for required-signal coverage, safeguard mapping, trace completeness, live-review gating, and expected-output fingerprints
@@ -105,6 +107,7 @@ Active gates:
 - Vercel deployment status as the primary deploy gate
 - Fixture-backed executable synthetic clinical assertions for workflow validation without live patient data
 - Integration contracts for future connector boundaries
+- Interoperability standards registry and conformance controls before connector implementation claims
 - Integration fixture validation for non-synthetic connector coverage and expected-output change review
 - Fixture change review for expected-output fingerprint approval
 - Synthetic workflow execution readiness and deterministic result fixtures for staged module workflows
@@ -118,15 +121,13 @@ Active gates:
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
-Managed bypasses:
+Deferred production gates:
 
-- GitHub Actions CI is configured but not treated as a blocking gate until workflow run visibility is available.
-- Local package-manager builds are not available in the current Codex workspace because npm, pnpm, yarn, and corepack are not installed.
 - Live clinical integrations remain gated until synthetic scenarios and contracts are stable.
 
 Replacement process:
 
-- Vercel deployment plus fixture-backed executable synthetic validation replaces unavailable local build verification.
+- Vercel deployment, GitHub Actions, and local package-manager verification provide independent build evidence.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.
 - Synthetic workflow execution readiness, deterministic result fixtures, result validation, promotion review, governed execution contracts, identity and access readiness, execution-attempt readiness, deny-by-default execution endpoints, denied-execution audit boundaries, and audit persistence readiness replace premature live workflow automation.

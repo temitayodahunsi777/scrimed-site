@@ -205,7 +205,7 @@ export const pilotReadinessNeeds: PilotIntakeOption[] = [
   {
     value: "integration-map",
     label: "Integration map",
-    description: "FHIR, HL7, claims, EHR, data warehouse, device, or public-health connector planning."
+    description: "FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, EHR, data warehouse, device, or public-health connector planning."
   },
   {
     value: "security-review",

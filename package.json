@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run integrity && next build",
     "start": "next start",
+    "integrity": "node scripts/check-generated-integrity.mjs",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "npm run integrity && tsc --noEmit"
   },
   "dependencies": {
     "next": "16.2.7",

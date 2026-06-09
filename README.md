@@ -47,6 +47,9 @@ Governed multi-agent orchestration layer with planner, router, specialist regist
 ### SCRIMED Atlas Intelligence Core
 Enterprise intelligence layer for structural document understanding, evidence-backed reasoning, Trust Cards, agent sandbox posture, continuous validation, AI asset governance, shadow-AI detection, and reimbursement-aware operating design.
 
+### SCRIMED Interoperability Control Plane
+Standards-aware connector governance for FHIR, SMART App Launch, HL7 v2, DICOM/DICOMweb, X12, C-CDA, IHE profiles, NCPDP SCRIPT, ISO/IEEE 11073, and clinical terminology. The control plane binds standards to synthetic connector contracts, conformance evidence, required controls, and explicit pre-live gates.
+
 ---
 
 ## Watchtower Monitoring System
@@ -128,6 +131,8 @@ Core enterprise evaluation surfaces:
 - `/trust` - TrustQA, Trust Cards, and evidence governance
 - `/observability` - continuous validation and operational metrics
 - `/atlas` - Atlas Intelligence Core v1 subsystems
+- `/interoperability` - standards registry, conformance controls, terminology resolution, and connector bindings
+- `/integrations` - standards-bound connector contracts and synthetic fixture validation
 
 Core APIs:
 
@@ -141,8 +146,12 @@ Core APIs:
 - `/api/audit`
 - `/api/trust/cards`
 - `/api/observability`
+- `/api/interoperability/standards`
+- `/api/interoperability/conformance`
 
 The task-planning API accepts synthetic pilot and enterprise assessment requests only. Production requests are explicitly denied until tenant identity, live connector controls, durable audit logging, privacy/security review, business associate agreement readiness, and human approval controls are approved.
+
+Interoperability status means that standards targets and synthetic conformance gates are defined. It does not mean a live connector is implemented, certified, trading-partner approved, or authorized to exchange production healthcare data.
 
 Recommended buyer path: keep the official Wix site at `scrimedsolutions.com`, link product CTAs to `app.scrimedsolutions.com`, and route buyers into `/product`, `/pricing`, `/evaluation`, and `/pilot` without requiring buyers to have Vercel accounts.
 

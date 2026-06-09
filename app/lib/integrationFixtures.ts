@@ -128,6 +128,58 @@ export const integrationFixtures: IntegrationFixture[] = [
     }
   },
   {
+    contractSlug: "dicom-imaging-exchange",
+    contractRoute: "/contracts/dicom-imaging-exchange",
+    route: "/integrations/fixtures/dicom-imaging-exchange",
+    request: {
+      fixtureId: "fixture-dicom-imaging-exchange-v1",
+      syntheticOnly: true,
+      contractSlug: "dicom-imaging-exchange",
+      sourceSystem: "synthetic-dicomweb-endpoint",
+      schemaVersion: "dicomweb-imaging-synthetic-v1",
+      requestSignals: {
+        study: "Synthetic study identifier and study-level metadata.",
+        series: "Synthetic series identifier and series-level metadata.",
+        instance: "Synthetic SOP instance identifier without production image data.",
+        patientReference: "Synthetic patient pointer without production identifiers.",
+        modality: "Synthetic imaging modality code.",
+        accession: "Synthetic accession reference.",
+        acquisitionTimestamp: "Synthetic acquisition timestamp preserved from the source fixture.",
+        sourceEndpoint: "Synthetic DICOMweb endpoint identifier."
+      },
+      samplePayload: {
+        exchangeType: "DICOMweb-metadata",
+        syntheticOnly: true,
+        services: ["QIDO-RS", "WADO-RS", "STOW-RS"],
+        modality: "SYN-CT",
+        includesPixelData: false
+      },
+      guardrails: [
+        "DICOM conformance statement required",
+        "de-identification profile required",
+        "transfer syntax validation required",
+        "metadata and pixel separation required",
+        "no diagnostic interpretation",
+        "human review",
+        "reject production identifiers",
+        "no live image exchange before approved conformance testing"
+      ]
+    },
+    expectedResponse: {
+      normalizedSignals: ["study", "series", "instance", "patientReference", "modality", "accession", "acquisitionTimestamp", "sourceEndpoint"],
+      requiredTrace: [
+        "imaging_request_received",
+        "dicom_metadata_validated",
+        "transfer_syntax_policy_checked",
+        "de_identification_policy_checked",
+        "imaging_review_required"
+      ],
+      rejectedIfMissing: ["study", "series", "instance", "sourceEndpoint"],
+      reviewBeforeLive: "imaging informatics, privacy, and clinical governance review before live DICOM or DICOMweb exchange",
+      prohibitedActions: ["diagnostic interpretation", "production image exchange", "unreviewed record mutation"]
+    }
+  },
+  {
     contractSlug: "claims-utilization-dataset",
     contractRoute: "/contracts/claims-utilization-dataset",
     route: "/integrations/fixtures/claims-utilization-dataset",
@@ -250,6 +302,6 @@ export function getIntegrationFixtureSummary() {
     nonSyntheticContractCount: nonSyntheticContracts.length,
     coveredContractCount: coveredContracts.length,
     fixtures: integrationFixtures,
-    updated: "2026-05-30"
+    updated: "2026-06-09"
   };
 }

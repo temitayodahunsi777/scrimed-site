@@ -34,21 +34,22 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "workflow_execution_deny_stubs", status: "pass", detail: "/workflows/implementation-readiness and /api/workflows/governed-execution/[slug] reject execution before body parsing, connector access, workflow mutation, or patient-facing action." },
   { name: "workflow_execution_audit_boundary", status: "pass", detail: "/workflows/execution-audit and /api/workflows/execution-audit define metadata-only evidence headers, audit envelope fields, and never-capture policy for denied execution attempts." },
   { name: "audit_persistence_readiness", status: "watch", detail: "/workflows/audit-persistence and /api/workflows/audit-persistence define the durable audit storage decisions required before execution moves beyond deny-by-default." },
-  { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts are available." },
+  { name: "interoperability_standards_registry", status: "pass", detail: "/interoperability, /api/interoperability/standards, and /api/interoperability/conformance expose standards targets, conformance controls, and live-use boundaries." },
+  { name: "integration_contracts", status: "pass", detail: "/integrations and /api/contracts bind connector data boundaries to standards and conformance targets." },
   { name: "integration_fixtures", status: "pass", detail: "/integrations/fixtures and /api/integration-fixtures are available for non-synthetic connector contracts." },
   { name: "integration_fixture_validation", status: "pass", detail: "/integrations/fixture-validation and /api/integration-fixtures/validation expose coverage, safeguard mapping, and diff fingerprints." },
   { name: "fixture_change_review", status: "pass", detail: "/fixtures/change-review and /api/fixtures/change-review expose expected-output fingerprint review." },
   { name: "synthetic_environment", status: "pass", detail: "/synthetic and /api/synthetic/scenarios are available." },
   { name: "synthetic_fixtures", status: "pass", detail: "/synthetic/fixtures and /api/synthetic/fixtures are available." },
   { name: "synthetic_assertions", status: "pass", detail: "/synthetic/validation and /api/synthetic/validation are available." },
-  { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates are available with a managed bypass path for CI visibility gaps." },
-  { name: "github_actions", status: "watch", detail: "CI is configured, but run visibility is not confirmed in this session." },
+  { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates expose active build, interoperability, synthetic validation, and production-readiness gates." },
+  { name: "github_actions", status: "pass", detail: "GitHub Actions CI is visible and passing deterministic install, dependency audit, lint, typecheck, and production build." },
   { name: "github_push_auth", status: "pass", detail: "GitHub CLI authentication is configured and `main` pushes now publish through the normal Git path." },
   { name: "vercel_git_deployment", status: "pass", detail: "Vercel production deploys from pushed GitHub `main` commits and returns READY for the current product build path." },
   { name: "app_subdomain_dns", status: "pass", detail: "app.scrimedsolutions.com is bound to the Vercel production deployment and its health endpoint returns ready." },
   { name: "local_package_manager", status: "pass", detail: "A controlled Node.js 22 and npm toolchain completed deterministic install, zero-vulnerability audit, lint, typecheck, and production build; the committed lockfile supports reproducible CI installs." },
   { name: "wix_cta_routing", status: "pass", detail: "The website administrator confirmed Wix CTAs are connected to SCRIMED product routes; branded app-domain routing remains a separate DNS action." },
-  { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7, and clinical data connectors are not active yet." }
+  { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, and terminology-aware live connectors are not active yet." }
 ];
 
 export const hubEvents: HubEvent[] = [
@@ -75,6 +76,12 @@ export const hubEvents: HubEvent[] = [
     type: "integration",
     summary: "Defined future integration contracts for FHIR, HL7, claims, pricing, and synthetic clinical testing.",
     date: "2026-05-28"
+  },
+  {
+    id: "scrimed-interoperability-control-plane",
+    type: "integration",
+    summary: "Added a governed standards registry and conformance control plane for FHIR, SMART, HL7 v2, DICOM/DICOMweb, X12, C-CDA, IHE, NCPDP SCRIPT, ISO/IEEE 11073, and clinical terminology.",
+    date: "2026-06-09"
   },
   {
     id: "scrimed-synthetic-validation",
@@ -212,8 +219,8 @@ export function getReadinessSummary() {
     status: "ready-for-foundation-review",
     score: passed / readinessChecks.length,
     checks: readinessChecks,
-    recommendation: "Use Vercel, operations readiness, pilot intake validation, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
-    updated: "2026-06-02"
+    recommendation: "Use Vercel, operations readiness, pilot intake validation, executable synthetic assertions, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, the interoperability control plane, integration fixtures, integration contracts, and quality gates as the active deploy-quality path before clinical workflow integration.",
+    updated: "2026-06-09"
   };
 }
 

@@ -12,6 +12,7 @@ import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionContractSummary } from "./workflowExecutionContracts";
 import { getWorkflowImplementationReadinessSummary } from "./workflowImplementationReadiness";
 import { getWorkflowExecutionSummary } from "./workflowExecutions";
+import { getInteroperabilitySummary } from "./interoperabilityStandards";
 
 export type QualityGate = {
   name: string;
@@ -35,10 +36,16 @@ export const qualityGates: QualityGate[] = [
     role: "Executable workflow validation without live patient data."
   },
   {
+    name: "Interoperability standards control plane",
+    route: "/interoperability",
+    state: "active",
+    role: "Standards registry, profile targets, conformance evidence, terminology governance, and explicit pre-live requirements for healthcare connectors."
+  },
+  {
     name: "Integration contracts",
     route: "/integrations",
     state: "active",
-    role: "Interface boundary before FHIR, HL7, claims, pricing, or synthetic connectors are implemented."
+    role: "Standards-bound interface boundary before FHIR, HL7 v2, DICOM/DICOMweb, X12, pricing, or synthetic connectors are implemented."
   },
   {
     name: "Integration fixture validation",
@@ -143,9 +150,8 @@ export const qualityGates: QualityGate[] = [
   {
     name: "GitHub Actions CI",
     route: "https://github.com/temitayodahunsi777/scrimed-site/blob/main/.github/workflows/ci.yml",
-    state: "bypassed",
-    role: "Secondary build verification once workflow visibility and lockfile support are available.",
-    replacement: "Vercel deployment plus executable synthetic validation are the current active quality path."
+    state: "active",
+    role: "Independent CI gate for deterministic install, dependency audit, lint, typecheck, and production build."
   },
   {
     name: "Live clinical integrations",
@@ -171,6 +177,7 @@ export function getQualityGateSummary() {
   const identityAccessReadiness = getIdentityAccessReadinessSummary();
   const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
+  const interoperability = getInteroperabilitySummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -184,8 +191,9 @@ export function getQualityGateSummary() {
       workflowPromotionReview.status === "pass" &&
       workflowExecutionContracts.status === "contract-ready" &&
       workflowImplementationReadiness.status === "deny-stub-ready" &&
-      workflowExecutionAudit.status === "audit-boundary-ready"
-        ? "active-with-managed-bypass"
+      workflowExecutionAudit.status === "audit-boundary-ready" &&
+      interoperability.status === "standards-control-plane-defined"
+        ? "active"
         : "attention-required",
     gates: qualityGates,
     active: qualityGates.filter((gate) => gate.state === "active").length,
@@ -205,6 +213,7 @@ export function getQualityGateSummary() {
     identityAccessReadiness,
     executionAttemptReadiness,
     runtimeSafetyReadiness,
-    updated: "2026-06-01"
+    interoperability,
+    updated: "2026-06-09"
   };
 }

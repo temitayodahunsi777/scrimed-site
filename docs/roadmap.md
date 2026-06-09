@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-06-01
+Updated: 2026-06-09
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -24,9 +24,9 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Audit persistence readiness is the active decision gate before denied-event metadata moves into durable storage.
 - Integration fixture validation is the active connector-readiness gate for non-synthetic contracts.
 - Fixture-backed executable synthetic clinical assertions validate workflows before live clinical data is connected.
-- Integration contracts define FHIR, HL7, claims, pricing, and synthetic data boundaries before connector implementation.
-- Quality gates document active, planned, and bypassed checks.
-- GitHub Actions and local package-manager builds remain hardening items until tooling and run visibility are available.
+- The interoperability control plane defines FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, terminology, pricing, and synthetic data boundaries before connector implementation.
+- Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
+- GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 
 Reasoning level:
 
@@ -61,6 +61,7 @@ Objective: Validate product workflows without live patient data and define conne
 Completed foundations:
 
 - Integration contracts page and API
+- Typed interoperability standards registry, detail routes, APIs, and conformance controls
 - Integration fixture pages and APIs
 - Integration fixture validation with coverage checks, safeguard mapping, and diff fingerprints
 - Fixture change-review page and API for expected-output fingerprint approval
@@ -74,7 +75,7 @@ Completed foundations:
 - Deny-by-default governed execution endpoints that reject workflow execution before body parsing or connector access
 - Denied execution audit boundaries with evidence headers, metadata capture policy, and never-capture policy
 - Audit persistence readiness for storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting
-- Detailed contract routes for FHIR, HL7, claims/utilization, pricing transparency, and synthetic clinical testing
+- Detailed contract routes for FHIR, HL7 v2, DICOM/DICOMweb, claims/utilization, pricing transparency, and synthetic clinical testing
 - Synthetic clinical scenario model
 - Synthetic request and expected-output fixture model
 - Synthetic scenario page and API
@@ -90,7 +91,7 @@ Completed foundations:
 Next build targets:
 
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
-- Add a controlled package lockfile and restore package-manager cache when npm tooling is available
+- Select and test deployment-specific standards profiles, conformance artifacts, identity, consent, and audit controls before live connector work
 - Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundaries, rate limits, and shutdown controls are explicit
 
 ## Phase 3 - Intelligence Layer

@@ -116,7 +116,7 @@ export const runtimeSafetyControls: RuntimeSafetyControl[] = [
     state: "defined",
     owner: "Interoperability",
     requirement:
-      "Keep runtime safety checks upstream of FHIR, HL7, claims, pricing, research, device, and workflow connectors so denied or throttled requests never create connector side effects.",
+      "Keep runtime safety checks upstream of FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, terminology, pricing, research, device, and workflow connectors so denied or throttled requests never create connector side effects.",
     riskIfMissing:
       "Unsafe requests could reach production healthcare systems before SCRIMED has applied containment controls."
   },

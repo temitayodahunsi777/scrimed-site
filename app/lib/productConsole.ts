@@ -10,6 +10,7 @@ import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowExecutionSummary, workflowExecutions } from "./workflowExecutions";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getQualityGateSummary } from "./qualityGates";
+import { getInteroperabilitySummary } from "./interoperabilityStandards";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -317,6 +318,12 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Inspect Interoperability",
+    href: "/interoperability",
+    purpose: "Review standards targets, conformance controls, connector contracts, and synthetic validation evidence.",
+    boundary: "Registry and fixture evidence does not represent live connector certification or production data exchange."
+  },
+  {
     label: "Request Pilot",
     href: "/pilot?offer=synthetic-pilot-evaluation",
     purpose: "Start a synthetic SCRIMED Atlas Pilot conversation for a healthcare organization.",
@@ -420,6 +427,7 @@ export function getProductConsoleSummary() {
   const commercialStrategySummary = getCommercialStrategySummary();
   const companyOperationsSummary = getCompanyOperationsSummary();
   const qualityGateSummary = getQualityGateSummary();
+  const interoperabilitySummary = getInteroperabilitySummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -463,6 +471,7 @@ export function getProductConsoleSummary() {
     atlasIntelligenceCoreSummary,
     commercialStrategySummary,
     companyOperationsSummary,
+    interoperabilitySummary,
     proofStack: {
       pricingAndSales: commercialStrategySummary.status,
       operationsReadiness: companyOperationsSummary.status,
@@ -475,13 +484,14 @@ export function getProductConsoleSummary() {
       executionContracts: workflowExecutionContractSummary.status,
       runtimeSafety: runtimeSafetyReadiness.status,
       agentGovernance: agentWorkflowSummary.status,
+      interoperability: interoperabilitySummary.status,
       qualityGates: qualityGateSummary.status
     },
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
       "Use the AgentOS Evaluation Workspace to turn synthetic buyer packets into Atlas Trust Cards, task plans, audit previews, observability records, and a production-readiness decision register.",
-    updated: "2026-06-02"
+    updated: "2026-06-09"
   };
 }
 
@@ -517,6 +527,12 @@ export function getProductReadinessBrief() {
     "",
     "## Agents",
     ...summary.productAgents.map((agent) => `- ${agent.name} (${agent.status}): ${agent.capability}`),
+    "",
+    "## Interoperability",
+    `Status: ${summary.interoperabilitySummary.status}`,
+    `Standards: ${summary.interoperabilitySummary.standardCount}`,
+    `Required before live: ${summary.interoperabilitySummary.requiredBeforeLive}`,
+    "Control plane: /interoperability",
     "",
     "## Workflow Engine",
     ...summary.workflowEngineExamples.map(

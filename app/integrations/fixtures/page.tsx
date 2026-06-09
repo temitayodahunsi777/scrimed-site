@@ -12,7 +12,7 @@ export default function IntegrationFixturesPage() {
         <p className="eyebrow">Integration fixtures</p>
         <h1>Connector contracts now have synthetic request and expected-response fixtures.</h1>
         <p className="hero-text">
-          FHIR, HL7, claims, and pricing integrations are backed by deterministic fixture contracts so live connector work stays gated behind coverage, traceability, review, and prohibited-action checks.
+          FHIR, HL7 v2, DICOM/DICOMweb, claims, and pricing integrations are backed by deterministic fixture contracts so live connector work stays gated behind coverage, traceability, review, and prohibited-action checks.
         </p>
       </section>
 

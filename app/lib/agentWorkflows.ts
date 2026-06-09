@@ -151,7 +151,7 @@ export const agentWorkflows: AgentWorkflow[] = [
     status: "foundation",
     domain: "Data interoperability",
     owner: "Integration fabric",
-    objective: "Map workflow needs to FHIR, HL7, claims, pricing, device, and future healthcare connector contracts.",
+    objective: "Map workflow needs to FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, terminology, and future healthcare connector contracts.",
     inputs: ["contract definition", "source schema", "target workflow", "synthetic fixture"],
     outputs: ["mapping plan", "contract gap list", "connector readiness recommendation"],
     permissions: ["read integration contracts", "read synthetic fixtures", "propose mappings"],
@@ -162,7 +162,7 @@ export const agentWorkflows: AgentWorkflow[] = [
       trigger: "before live connector implementation or schema promotion",
       reviewer: "integration architect or data governance owner"
     },
-    interoperabilityTargets: ["FHIR", "HL7", "claims/utilization", "pricing transparency", "devices"]
+    interoperabilityTargets: ["FHIR", "HL7 v2", "DICOM/DICOMweb", "X12", "IHE profiles", "clinical terminology", "devices"]
   },
   {
     slug: "clinical-intelligence-agent",

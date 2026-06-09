@@ -54,6 +54,14 @@ export default async function ContractDetailPage({
           <span>Safeguards</span>
           <strong>{contract.safeguards.length}</strong>
         </article>
+        <article>
+          <span>Standards</span>
+          <strong>{contract.standardIds.length}</strong>
+        </article>
+        <article>
+          <span>Conformance targets</span>
+          <strong>{contract.conformanceTargets.length}</strong>
+        </article>
       </section>
 
       {fixture && validation ? (
@@ -97,6 +105,37 @@ export default async function ContractDetailPage({
           <article key={safeguard}>
             <h3>{safeguard}</h3>
             <p>Required before this contract can move from planning into live integration work.</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-band split-band" aria-label="Contract standards">
+        <div>
+          <p className="eyebrow">Standards binding</p>
+          <h2>Implementation claims remain gated by profile selection and conformance evidence.</h2>
+          <Link className="module-link" href="/interoperability">Open interoperability control plane</Link>
+        </div>
+        <div className="layer-list">
+          {contract.standardIds.length > 0 ? contract.standardIds.map((standardId, index) => (
+            <div className="layer-row" key={standardId}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong><Link href={`/interoperability/${standardId}`}>{standardId}</Link></strong>
+            </div>
+          )) : (
+            <div className="layer-row">
+              <span>NA</span>
+              <strong>Synthetic fixture schema; no external exchange standard.</strong>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="section-band principle-grid" aria-label="Contract conformance targets">
+        {contract.conformanceTargets.map((target) => (
+          <article key={target}>
+            <span>required target</span>
+            <h3>{target}</h3>
+            <p>Must be selected, evidenced, and reviewed before this connector can move beyond synthetic validation.</p>
           </article>
         ))}
       </section>

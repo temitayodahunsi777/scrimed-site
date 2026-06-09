@@ -36,6 +36,10 @@ import {
 } from "./workflowExecutionResults";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
 import { getWorkflowExecutionSummary, workflowExecutions } from "./workflowExecutions";
+import {
+  getInteroperabilitySummary,
+  interoperabilityStandards
+} from "./interoperabilityStandards";
 
 export type HubModule = {
   name: string;
@@ -97,7 +101,7 @@ export const hubModules: HubModule[] = [
 
 export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
-  { name: "Quality gates", value: "managed bypass active", tone: "good" },
+  { name: "Quality gates", value: "active", tone: "good" },
   { name: "Repository", value: "main baseline documented", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
@@ -126,8 +130,9 @@ export const hubSignals: HubSignal[] = [
   { name: "Fixture reviews", value: "fingerprints approved", tone: "good" },
   { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
-  { name: "Build verification", value: "Vercel active, CI bypassed", tone: "watch" },
+  { name: "Build verification", value: "local, CI, and Vercel active", tone: "good" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
+  { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Clinical integrations", value: "not connected", tone: "planned" }
 ];
 
@@ -161,6 +166,7 @@ export const hubRoutes = [
   "/audit",
   "/observability",
   "/trust",
+  "/interoperability",
   "/integrations",
   "/integrations/fixtures",
   "/integrations/fixture-validation",
@@ -187,6 +193,7 @@ export const hubRoutes = [
   ...syntheticScenarios.map((scenario) => scenario.route),
   ...syntheticFixtures.map((fixture) => fixture.route),
   ...integrationContracts.map((contract) => contract.route),
+  ...interoperabilityStandards.map((standard) => `/interoperability/${standard.slug}`),
   ...integrationFixtures.map((fixture) => fixture.route),
   ...agentWorkflows.map((workflow) => workflow.route),
   ...workflowExecutions.map((workflow) => workflow.route),
@@ -239,6 +246,9 @@ export const hubRoutes = [
   ...integrationFixtures.map((fixture) => `/api/integration-fixtures/${fixture.contractSlug}`),
   "/api/contracts",
   ...contractRoutes.filter((route) => route.startsWith("/api/contracts/")),
+  "/api/interoperability/standards",
+  "/api/interoperability/conformance",
+  ...interoperabilityStandards.map((standard) => `/api/interoperability/standards/${standard.slug}`),
   "/api/synthetic/scenarios",
   "/api/synthetic/fixtures",
   "/api/synthetic/validation",
@@ -271,6 +281,7 @@ export function getHubSummary() {
   const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
+  const interoperabilitySummary = getInteroperabilitySummary();
 
   return {
     service: "scrimed-os-hub",
@@ -295,6 +306,7 @@ export function getHubSummary() {
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
+    interoperabilitySummary,
     agentWorkflowSummary,
     fixtureChangeReview,
     workflowExecutionSummary,
@@ -311,6 +323,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-02"
+    updated: "2026-06-09"
   };
 }

@@ -150,6 +150,6 @@ export function getFixtureChangeReviewSummary() {
     approved,
     attentionRequired,
     reviews,
-    updated: "2026-05-30"
+    updated: "2026-06-09"
   };
 }
