@@ -15,7 +15,7 @@ export default function InteroperabilityEvaluationsPage() {
       <section className="page-hero trust-hero">
         <Link className="back-link" href="/interoperability">Interoperability</Link>
         <p className="eyebrow">Executable conformance evaluations</p>
-        <h1>Synthetic test kits turn standards targets into inspectable evidence without overstating live readiness.</h1>
+        <h1>Executable healthcare interoperability evidence.</h1>
         <p className="hero-text">{summary.boundary}</p>
       </section>
 
