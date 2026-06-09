@@ -110,11 +110,11 @@ export const operationsBlockers: OperationsBlocker[] = [
     impact:
       "Buyers can move from the official website into product, pricing, evaluation, and pilot-intake experiences.",
     currentEvidence:
-      "The website administrator confirmed the Wix CTAs are connected; route behavior should be rechecked after `app.scrimedsolutions.com` DNS is activated.",
+      "The website administrator confirmed the Wix CTAs are connected, and the branded product domain is active.",
     owner: "Website administrator",
     resolutionPath: [
       "Keep View Product Console, Review Pricing, Run Evaluation, and Request Pilot buttons mapped to the intended routes.",
-      "Move CTA targets to `https://app.scrimedsolutions.com/product`, `/pricing`, `/evaluation`, and `/pilot` after DNS is live.",
+      "Keep CTA targets on `https://app.scrimedsolutions.com/product`, `/pricing`, `/evaluation`, and `/pilot`.",
       "Re-run buyer-path smoke checks after any Wix or product-domain change."
     ],
     fallback:
@@ -144,14 +144,14 @@ export const buyerRouteChecklist: BuyerRouteChecklist[] = [
     step: "1. Website discovery",
     source: "https://www.scrimedsolutions.com",
     destination: "https://app.scrimedsolutions.com/product",
-    requiredAction: "Add a primary Wix CTA labeled View Product Console.",
+    requiredAction: "Keep the primary Wix View Product Console CTA mapped to the branded product route.",
     verification: "CTA opens Product Console without requiring buyer-owned Vercel access."
   },
   {
     step: "2. Commercial review",
     source: "https://www.scrimedsolutions.com",
     destination: "https://app.scrimedsolutions.com/pricing",
-    requiredAction: "Add a Wix CTA labeled Review Pricing or Enterprise Pricing.",
+    requiredAction: "Keep the Wix Review Pricing or Enterprise Pricing CTA mapped to the branded pricing route.",
     verification: "Pricing page shows public preview, assessment, synthetic pilot, protected pilot, enterprise license, and strategic partnership tiers."
   },
   {
@@ -211,6 +211,6 @@ export function getCompanyOperationsSummary() {
     operationsBlockers,
     buyerRouteChecklist,
     smoothOpsPrinciples,
-    updated: "2026-06-02"
+    updated: "2026-06-09"
   };
 }
