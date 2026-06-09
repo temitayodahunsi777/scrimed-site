@@ -87,20 +87,20 @@ export const operationsBlockers: OperationsBlocker[] = [
   {
     id: "app-subdomain",
     area: "domain",
-    status: "manual-action",
-    blocker: "`app.scrimedsolutions.com` is recommended but not yet verified as connected to the Vercel app.",
+    status: "ready",
+    blocker: "`app.scrimedsolutions.com` is connected to the Vercel product app.",
     impact:
-      "Buyers can use Vercel deployment URLs, but the ideal branded product URL is not yet active.",
+      "Buyers can reach the SCRIMED product through a branded domain without needing Vercel accounts.",
     currentEvidence:
-      "Vercel project domains currently list `scrimed-site.vercel.app`, `scrimed-site-temitayo-dahunsis-projects.vercel.app`, and the `main` branch alias; `app.scrimedsolutions.com` is not present.",
+      "The production deployment lists `app.scrimedsolutions.com` as an alias, and `https://app.scrimedsolutions.com/api/health` returns HTTP 200 with SCRIMED ready status.",
     owner: "Domain/DNS administrator",
     resolutionPath: [
-      "Add `app.scrimedsolutions.com` to the Vercel `scrimed-site` project domains.",
-      "Create the required DNS CNAME record in the domain provider or Wix DNS manager.",
-      "Wait for Vercel domain verification and SSL provisioning."
+      "Keep `app.scrimedsolutions.com` attached to the Vercel `scrimed-site` production deployment.",
+      "Monitor DNS, SSL, and health-route availability after domain or deployment changes.",
+      "Keep Wix product CTAs pointed to the branded app domain."
     ],
     fallback:
-      "Use the current Vercel deployment URL for internal review until branded DNS is ready."
+      "Use `https://scrimed-site.vercel.app` if the branded product domain experiences an outage."
   },
   {
     id: "wix-cta-routing",

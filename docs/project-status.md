@@ -294,11 +294,11 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added the interactive AgentOS Evaluation Workspace in `/evaluation`, `app/lib/agentEvaluationWorkspace.ts`, and `/api/agent-os/evaluation` to generate synthetic task plans, structural parser assignments, Atlas Trust Cards, evidence sources, audit previews, blocked capabilities, and observability outcome records.
 - Promoted company operations readiness into the Product Console proof stack and downloadable readiness brief so go-live blockers, manual actions, owners, and fallbacks are visible during buyer and investor review.
 - Updated `react` and `react-dom` to `19.2.4`, Next.js to `16.2.7`, and committed a controlled lockfile with patched PostCSS `8.5.15`.
-- Authenticated GitHub CLI, pushed queued `main` commits, and confirmed Vercel production deployments reach READY through the Git integration path.
+- Authenticated GitHub CLI, pushed queued `main` commits, confirmed Vercel production deployments reach READY through the Git integration path, and verified `app.scrimedsolutions.com` returns SCRIMED health status.
 
 ## Recommended Next Steps
 
-1. Connect `app.scrimedsolutions.com` to the Vercel product app and revalidate the connected Wix CTAs against the branded domain.
+1. Revalidate the connected Wix CTAs against `app.scrimedsolutions.com`.
 2. Keep Vercel and local build verification as active deploy gates until GitHub Actions visibility is confirmed.
 3. Decide whether protected Vercel deployment URLs should keep requiring authentication or whether selected public-preview routes should be reachable without Vercel login.
 4. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
