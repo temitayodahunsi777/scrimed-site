@@ -7,6 +7,7 @@ Updated: 2026-06-10
 - Added `/pilot-workspace` as the protected enterprise pilot control surface.
 - Added `/pilot-workspace/access` as the invite-only authenticated tenant workspace console.
 - Selected Supabase Auth plus Postgres row-level security for tenant identity, isolation, durable synthetic sessions, and append-only audit events.
+- Provisioned the `scrimed-protected-pilot` Supabase project in `us-east-1`, applied both protected-pilot migrations, confirmed RLS on every exposed pilot table, and cleared all security and missing-index advisor findings.
 - Added authenticated protected APIs for tenant workspace discovery, durable sessions, audit inspection, and audited proof-packet downloads.
 - Added a hardened SQL migration that withholds direct mutation rights and commits synthetic sessions with audit events transactionally.
 - Added downloadable synthetic enterprise proof packets and a public preview export.

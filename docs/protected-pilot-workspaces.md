@@ -17,8 +17,8 @@ Runtime APIs do not use a Supabase service-role key. Authorization is based on p
 
 ## Activation
 
-1. Provision the approved Supabase project.
-2. Apply `supabase/migrations/202606100001_protected_pilot_workspaces.sql`.
+1. Provision the approved Supabase project. Completed on 2026-06-10 in `us-east-1`.
+2. Apply `supabase/migrations/20260610185445_protected_pilot_workspaces.sql` and `supabase/migrations/20260610185540_protected_pilot_foreign_key_indexes.sql`. Completed and advisor-verified on 2026-06-10.
 3. Create tenant, membership, and workspace bootstrap records through an approved administrative process.
 4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel.
 5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL.
