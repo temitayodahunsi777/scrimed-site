@@ -14,6 +14,7 @@ import { getInteroperabilitySummary } from "./interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
+import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -321,6 +322,12 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Review Protected Pilot Workspace",
+    href: "/pilot-workspace",
+    purpose: "Inspect tenant isolation, durable synthetic sessions, append-only audit controls, and downloadable proof packets.",
+    boundary: "Protected mutations remain unavailable until production identity and durable storage are connected and verified."
+  },
+  {
     label: "Inspect Product Demos",
     href: "/demos",
     purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
@@ -452,6 +459,7 @@ export function getProductConsoleSummary() {
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
+  const protectedPilotWorkspaceSummary = getProtectedPilotWorkspaceSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -474,6 +482,7 @@ export function getProductConsoleSummary() {
     demoApiRoute: demoPilotProgramSummary.demoApiRoute,
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
     pilotProgramApiRoute: demoPilotProgramSummary.pilotApiRoute,
+    protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -508,6 +517,7 @@ export function getProductConsoleSummary() {
     demoPilotProgramSummary,
     interoperabilitySummary,
     interoperabilityConformanceSummary,
+    protectedPilotWorkspaceSummary,
     proofStack: {
       pricingAndSales: commercialStrategySummary.status,
       demosAndPilots: demoPilotProgramSummary.status,
@@ -524,6 +534,7 @@ export function getProductConsoleSummary() {
       agentGovernance: agentWorkflowSummary.status,
       interoperability: interoperabilitySummary.status,
       interoperabilityConformance: interoperabilityConformanceSummary.status,
+      protectedPilotWorkspaces: protectedPilotWorkspaceSummary.status,
       qualityGates: qualityGateSummary.status
     },
     productionBoundary:
@@ -555,6 +566,8 @@ export function getProductReadinessBrief() {
     ...summary.demoPilotProgramSummary.pilotPrograms.map(
       (pilot) => `- Pilot: ${pilot.name} (${pilot.duration}) -> ${pilot.route}`
     ),
+    `Protected pilot workspace: ${summary.protectedPilotWorkspaceRoute}`,
+    `Protected pilot status: ${summary.protectedPilotWorkspaceSummary.status}`,
     "",
     "## Pricing and Sales",
     `Pricing route: ${summary.pricingRoute}`,

@@ -1,0 +1,48 @@
+# SCRIMED Protected Pilot Workspaces
+
+## Product Boundary
+
+Protected pilot workspaces retain governed synthetic evaluation evidence only. They do not accept live PHI, execute clinical care, submit payer transactions, contact patients, or authorize autonomous diagnosis or treatment.
+
+## Selected Architecture
+
+- Identity: Supabase Auth, verified server-side from bearer tokens.
+- Tenant isolation: PostgreSQL row-level security backed by tenant memberships.
+- Durable evidence: Supabase Postgres synthetic session records.
+- Durable audit: append-only audit events created through hardened transactional functions.
+- Rate limiting: Upstash Redis in production, with a bounded in-process baseline when Redis is not configured.
+- Proof packets: server-generated Markdown exports built from tenant-isolated synthetic session evidence.
+
+Runtime APIs do not use a Supabase service-role key. Authorization is based on provider identity and database membership, never user-editable profile metadata.
+
+## Activation
+
+1. Provision the approved Supabase project.
+2. Apply `supabase/migrations/202606100001_protected_pilot_workspaces.sql`.
+3. Create tenant, membership, and workspace bootstrap records through an approved administrative process.
+4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel.
+5. Configure production sign-in, MFA, session lifetime, and enterprise SSO policy.
+6. Provision Upstash Redis and configure its REST environment variables.
+7. Run Supabase security and performance advisors.
+8. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events.
+
+## Protected Routes
+
+- `GET /api/pilot-workspaces`
+- `GET /api/pilot-workspaces/{workspaceSlug}/sessions`
+- `POST /api/pilot-workspaces/{workspaceSlug}/sessions`
+- `GET /api/pilot-workspaces/{workspaceSlug}/audit`
+- `GET /api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet`
+
+Protected routes fail closed with `503` until identity and durable storage are configured. They require a verified bearer token after activation.
+
+## Active Public Controls
+
+- `POST /api/pilot/intake` is rate limited to five requests per ten-minute request fingerprint.
+- Protected session creation is rate limited to twenty requests per ten-minute request fingerprint.
+- Upstash Redis provides distributed enforcement when configured.
+- The bounded memory fallback reduces abuse on a single runtime instance but is not the final distributed production control.
+
+## Proof Packet Contents
+
+Proof packets include the tenant and workspace, scenario, workflow target, Trust Card, evidence source attribution, validation timestamps, human approval checkpoints, denied capabilities, outcome signals, measurement boundary, and retained synthetic-only product boundary.

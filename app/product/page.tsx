@@ -49,6 +49,10 @@ export default function ProductConsolePage() {
           <strong>{summary.pilotProgramCount}</strong>
         </article>
         <article>
+          <span>Protected workspace</span>
+          <strong>{summary.protectedPilotWorkspaceSummary.infrastructure.protectedMutationsEnabled ? "connected" : "contract ready"}</strong>
+        </article>
+        <article>
           <span>Conformance kits</span>
           <strong>{summary.interoperabilityConformanceSummary.syntheticPassed}</strong>
         </article>

@@ -57,6 +57,10 @@ export default function QualityPage() {
           <strong>{summary.demoPilotPrograms.pilotCount}</strong>
         </article>
         <article>
+          <span>Protected pilots</span>
+          <strong>{summary.protectedPilotWorkspaces.status}</strong>
+        </article>
+        <article>
           <span>Fixture reviews</span>
           <strong>{summary.fixtureChangeReview.approved}</strong>
         </article>

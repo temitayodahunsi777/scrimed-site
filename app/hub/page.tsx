@@ -33,6 +33,11 @@ const consoleViews = [
     summary: "Compare structured enterprise programs by duration, deliverables, buyer inputs, success metrics, governance gates, and engagement model."
   },
   {
+    name: "Protected Pilot Workspace",
+    href: "/pilot-workspace",
+    summary: "Inspect tenant identity, durable synthetic sessions, append-only audit controls, rate limits, and downloadable proof packets."
+  },
+  {
     name: "Pricing",
     href: "/pricing",
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."

@@ -2,14 +2,16 @@
 
 Updated: 2026-06-10
 
-## Latest Enterprise Readiness Release
+## Latest Protected Pilot Workspace Release
 
-- Added a public Trust and Enterprise Readiness Center across legal, security, privacy, brand, governance, marketing, PR, sales, and advertising.
-- Added a claims-control register for approved, evidence-required, and prohibited public statements.
-- Added a downloadable enterprise diligence brief and machine-readable readiness APIs.
-- Added baseline content security policy, content-type, framing, referrer, permissions, and opener response headers.
-- Integrated enterprise readiness into Product Console, Hub, quality gates, operations, trust, homepage, and documentation.
-- Preserved the current commercial boundary: governed synthetic evaluations are sellable; live clinical execution and unsupported compliance claims remain blocked.
+- Added `/pilot-workspace` as the protected enterprise pilot control surface.
+- Selected Supabase Auth plus Postgres row-level security for tenant identity, isolation, durable synthetic sessions, and append-only audit events.
+- Added authenticated protected APIs for tenant workspace discovery, durable sessions, audit inspection, and audited proof-packet downloads.
+- Added a hardened SQL migration that withholds direct mutation rights and commits synthetic sessions with audit events transactionally.
+- Added downloadable synthetic enterprise proof packets and a public preview export.
+- Added active rate limiting to public pilot intake and protected session creation, with Upstash Redis selected for distributed production enforcement.
+- Fixed the recurring generated-cache build fault by expanding integrity checks across the full `.next` tree.
+- Preserved the commercial boundary: protected pilot evidence is synthetic only; live clinical execution remains denied.
 
 ## Current Baseline
 
@@ -26,6 +28,7 @@ Current baseline includes:
 - Trust and enterprise readiness center at `/trust-center`
 - Public claims register at `/claims`
 - Enterprise pilot intake at `/pilot`
+- Protected pilot workspace at `/pilot-workspace`
 - AgentOS Evaluation Workspace at `/evaluation`
 - SCRIMED AgentOS v1 at `/agents`
 - Memory fabric at `/memory`
@@ -108,6 +111,11 @@ Current baseline includes:
 - Pricing and sales strategy endpoint at `/api/commercial/pricing`
 - Company operations readiness endpoint at `/api/operations/readiness`
 - Enterprise pilot intake endpoint at `/api/pilot/intake`
+- Protected pilot readiness endpoint at `/api/pilot-workspaces/readiness`
+- Tenant-authenticated workspace discovery at `/api/pilot-workspaces`
+- Tenant-authenticated durable session endpoints under `/api/pilot-workspaces/[workspaceSlug]/sessions`
+- Tenant-authenticated append-only audit inspection under `/api/pilot-workspaces/[workspaceSlug]/audit`
+- Audited downloadable proof packets under `/api/pilot-workspaces/[workspaceSlug]/sessions/[sessionId]/proof-packet`
 - AgentOS Evaluation Workspace endpoint at `/api/agent-os/evaluation`
 - AgentOS summary endpoint at `/api/agent-os`
 - AgentOS task planning endpoint at `/api/agent-os/tasks`
@@ -196,6 +204,8 @@ Current active quality path:
 24. Atlas Intelligence Core v1 defines structural document intelligence, evidence retrieval contracts, Trust Cards, agent sandbox runtime, continuous validation metrics, AI Asset Registry, shadow AI detection, and reimbursement readiness boundaries.
 25. AgentOS Evaluation Workspace converts synthetic document packets into bounded task plans, structural document-intelligence assignments, Atlas Trust Cards, audit previews, and observability-ready outcome records.
 26. React and React DOM package pins are held at the current 19.2.4 patch line for the Next.js App Router security baseline.
+27. Protected pilot workspaces define tenant-authenticated discovery, row-level isolation, durable synthetic sessions, append-only audit events, audited proof packets, and fail-closed activation gates.
+28. Public pilot intake and protected session creation enforce active request limits, with Upstash Redis selected for distributed production counters.
 
 Current bypassed or deferred checks:
 
@@ -221,7 +231,7 @@ Fix applied:
 - Migrated internal anchors to Next.js links and removed effect-driven pilot-prefill state so lint completes without errors.
 - Added `npm run typecheck` to CI.
 - Added a `typecheck` script to `package.json`.
-- Added a generated-workspace integrity precheck so duplicate-suffixed `@types` or `.next/types` artifacts fail with a precise repair path before TypeScript resolution is corrupted.
+- Added a generated-workspace integrity precheck so duplicate-suffixed `@types` or `.next` artifacts fail with a precise repair path before TypeScript resolution or builds are corrupted.
 - Upgraded GitHub Actions checkout and Node setup steps to their Node 24-based v6 releases and set explicit read-only repository contents permission.
 - Updated Next.js to `16.2.7` and overrode its vulnerable transitive PostCSS dependency with patched `8.5.15`.
 - Verified zero audit findings, TypeScript success, and a successful production build locally.

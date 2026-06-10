@@ -6,6 +6,7 @@ import {
   validatePilotIntakePayload,
   type PilotIntakeHandoffPayload
 } from "../../../lib/pilotIntake";
+import { enforceRequestRateLimit, rateLimitHeaders } from "../../../lib/requestRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,25 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const rateLimit = await enforceRequestRateLimit(request, {
+    namespace: "public-pilot-intake",
+    limit: 5,
+    windowSeconds: 600
+  });
+  const headers = rateLimitHeaders(rateLimit);
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "rate-limit-exceeded",
+          message: "Pilot intake is temporarily rate limited. Retry after the current intake window."
+        }
+      },
+      { status: 429, headers }
+    );
+  }
+
   const contentLength = Number(request.headers.get("content-length") ?? "0");
 
   if (contentLength > 25000) {
@@ -31,7 +51,7 @@ export async function POST(request: Request) {
           message: "Pilot intake payload is too large. Submit workflow-scope information only."
         }
       },
-      { status: 413 }
+      { status: 413, headers }
     );
   }
 
@@ -43,7 +63,7 @@ export async function POST(request: Request) {
           message: "Submit pilot intake as application/json."
         }
       },
-      { status: 415 }
+      { status: 415, headers }
     );
   }
 
@@ -59,7 +79,7 @@ export async function POST(request: Request) {
           message: "Request body must be valid JSON."
         }
       },
-      { status: 400 }
+      { status: 400, headers }
     );
   }
 
@@ -74,7 +94,7 @@ export async function POST(request: Request) {
           fields: validation.errors
         }
       },
-      { status: 400 }
+      { status: 400, headers }
     );
   }
 
@@ -105,7 +125,7 @@ export async function POST(request: Request) {
         "Define pilot metrics, workflow owners, governance gates, and CRM follow-up owner."
       ]
     },
-    { status: accepted ? 202 : 502 }
+    { status: accepted ? 202 : 502, headers }
   );
 }
 

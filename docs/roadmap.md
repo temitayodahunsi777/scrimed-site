@@ -46,6 +46,8 @@ Completed foundations:
 - Five executable product demos and four structured enterprise pilot programs
 - Nine-domain enterprise readiness and claims-control plane with downloadable diligence brief
 - Baseline browser response-security headers across application routes
+- Protected pilot workspace contract with Supabase Auth, Postgres row-level security, durable synthetic sessions, append-only audit events, and audited proof packets
+- Active public intake and protected session rate limiting with Upstash Redis selected for distributed enforcement
 - Next.js App Router application baseline
 - Vercel deployment configuration
 - Homepage and public platform surface
@@ -97,9 +99,11 @@ Completed foundations:
 
 Next build targets:
 
-- Select and implement production identity, protected tenant workspaces, durable audit storage, and rate-limited public intake
+- Provision the approved Supabase project, apply the protected pilot migration, bootstrap the first tenant, and verify security and performance advisors
+- Provision Upstash Redis and verify distributed intake and protected mutation limits across Vercel regions
+- Configure production sign-in, MFA, session lifetime, account lifecycle, and enterprise SSO policy
 - Complete qualified counsel, privacy, regulatory, trademark, insurance, incident-response, and independent security reviews
-- Add authenticated pilot workspaces and downloadable proof packets after storage, identity, privacy, retention, and durable audit controls are approved
+- Add tenant administration and approved membership lifecycle workflows after identity policy is approved
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
 - Add tenant-authenticated persisted conformance runs and downloadable partner evidence packets after storage and identity controls are approved
 - Select and test deployment-specific standards profiles, conformance artifacts, identity, consent, audit, security, and partner acceptance controls before live connector work
