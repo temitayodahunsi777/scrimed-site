@@ -3,7 +3,11 @@
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
-import type { PilotSessionRecord, PilotWorkspaceRecord } from "../lib/protectedPilotWorkspace";
+import type {
+  PilotAuditEventRecord,
+  PilotSessionRecord,
+  PilotWorkspaceRecord
+} from "../lib/protectedPilotWorkspace";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -22,6 +26,11 @@ type PilotWorkspaceResponse = {
 type PilotSessionResponse = {
   sessions?: PilotSessionRecord[];
   session?: PilotSessionRecord;
+  error?: { message?: string };
+};
+
+type PilotAuditResponse = {
+  events?: PilotAuditEventRecord[];
   error?: { message?: string };
 };
 
@@ -63,6 +72,7 @@ export default function ProtectedPilotAccess({
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
+  const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
 
   useEffect(() => {
     const client = supabase;
@@ -96,6 +106,7 @@ export default function ProtectedPilotAccess({
         setWorkspaces([]);
         setSelectedWorkspace(null);
         setSessions([]);
+        setAuditEvents([]);
         setStatus("signed-out");
         return;
       }
@@ -143,7 +154,10 @@ export default function ProtectedPilotAccess({
       setStatus("ready");
 
       if (nextWorkspaces[0]) {
-        await loadSessions(activeSession, nextWorkspaces[0]);
+        await Promise.all([
+          loadSessions(activeSession, nextWorkspaces[0]),
+          loadAuditEvents(activeSession, nextWorkspaces[0])
+        ]);
       }
     }
 
@@ -165,6 +179,26 @@ export default function ProtectedPilotAccess({
       }
 
       setSessions(body.sessions ?? []);
+    }
+
+    async function loadAuditEvents(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/audit`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as PilotAuditResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected pilot audit events could not be loaded.");
+        return;
+      }
+
+      setAuditEvents(body.events ?? []);
     }
 
     initializeAccess();
@@ -237,7 +271,24 @@ export default function ProtectedPilotAccess({
     }
 
     setSessions(body.sessions ?? []);
+    await refreshAuditEvents(session, workspace);
     setStatus("ready");
+  }
+
+  async function refreshAuditEvents(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/audit`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as PilotAuditResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected pilot audit events could not be loaded.");
+      return;
+    }
+
+    setAuditEvents(body.events ?? []);
   }
 
   async function createSyntheticSession() {
@@ -266,6 +317,7 @@ export default function ProtectedPilotAccess({
     if (body.session) {
       setSessions((current) => [body.session!, ...current]);
     }
+    await refreshAuditEvents(session, selectedWorkspace);
     setStatus("ready");
     setMessage("Governed synthetic pilot session created with durable audit evidence.");
   }
@@ -298,6 +350,7 @@ export default function ProtectedPilotAccess({
     link.download = `scrimed-${selectedWorkspace.slug}-${pilotSession.id}-proof-packet.md`;
     link.click();
     URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Proof packet downloaded and its audit event was committed.");
   }
 
@@ -379,8 +432,8 @@ export default function ProtectedPilotAccess({
           <strong>{sessions.length}</strong>
         </article>
         <article>
-          <span>Boundary</span>
-          <strong>synthetic only</strong>
+          <span>Audit events</span>
+          <strong>{auditEvents.length}</strong>
         </article>
       </section>
 
@@ -422,51 +475,84 @@ export default function ProtectedPilotAccess({
       </section>
 
       {selectedWorkspace ? (
-        <section className="table-section" aria-label="Durable synthetic pilot sessions">
-          <div className="section-heading">
-            <p className="eyebrow">Durable pilot sessions</p>
-            <h2>{selectedWorkspace.name}</h2>
-            <p className="section-copy">{selectedWorkspace.boundary}</p>
-            <div className="form-actions">
-              <button
-                className="primary-action"
-                disabled={status === "creating-session"}
-                onClick={createSyntheticSession}
-                type="button"
-              >
-                {status === "creating-session" ? "Creating Session" : "Create Synthetic Evaluation Session"}
-              </button>
-            </div>
-            {message ? <div className="intake-alert">{message}</div> : null}
-          </div>
-          {sessions.length > 0 ? (
-            sessions.map((pilotSession) => (
-              <article className="module-row" key={pilotSession.id}>
-                <div>
-                  <span>{pilotSession.status}</span>
-                  <h2>{pilotSession.evaluation.scenario.name}</h2>
-                </div>
-                <p>{pilotSession.createdAt}</p>
+        <>
+          <section className="table-section" aria-label="Durable synthetic pilot sessions">
+            <div className="section-heading">
+              <p className="eyebrow">Durable pilot sessions</p>
+              <h2>{selectedWorkspace.name}</h2>
+              <p className="section-copy">{selectedWorkspace.boundary}</p>
+              <div className="form-actions">
                 <button
-                  className="module-link button-link"
-                  onClick={() => downloadProofPacket(pilotSession)}
+                  className="primary-action"
+                  disabled={status === "creating-session"}
+                  onClick={createSyntheticSession}
                   type="button"
                 >
-                  Download Audited Proof Packet
+                  {status === "creating-session" ? "Creating Session" : "Create Synthetic Evaluation Session"}
                 </button>
-              </article>
-            ))
-          ) : (
-            <article className="module-row">
-              <div>
-                <span>empty workspace</span>
-                <h2>No durable synthetic sessions yet.</h2>
               </div>
-              <p>Create the first governed synthetic evaluation session.</p>
-              <strong>Live clinical execution remains denied.</strong>
-            </article>
-          )}
-        </section>
+              {message ? <div className="intake-alert">{message}</div> : null}
+            </div>
+            {sessions.length > 0 ? (
+              sessions.map((pilotSession) => (
+                <article className="module-row" key={pilotSession.id}>
+                  <div>
+                    <span>{pilotSession.status}</span>
+                    <h2>{pilotSession.evaluation.scenario.name}</h2>
+                  </div>
+                  <p>{pilotSession.createdAt}</p>
+                  <button
+                    className="module-link button-link"
+                    onClick={() => downloadProofPacket(pilotSession)}
+                    type="button"
+                  >
+                    Download Audited Proof Packet
+                  </button>
+                </article>
+              ))
+            ) : (
+              <article className="module-row">
+                <div>
+                  <span>empty workspace</span>
+                  <h2>No durable synthetic sessions yet.</h2>
+                </div>
+                <p>Create the first governed synthetic evaluation session.</p>
+                <strong>Live clinical execution remains denied.</strong>
+              </article>
+            )}
+          </section>
+
+          <section className="table-section" aria-label="Append-only pilot audit trail">
+            <div className="section-heading">
+              <p className="eyebrow">Append-only audit trail</p>
+              <h2>Governance evidence for protected pilot activity.</h2>
+              <p className="section-copy">
+                Tenant members can inspect committed evidence activity, while direct audit mutation remains denied.
+              </p>
+            </div>
+            {auditEvents.length > 0 ? (
+              auditEvents.map((event) => (
+                <article className="module-row" key={event.id}>
+                  <div>
+                    <span>{event.eventType}</span>
+                    <h2>{event.sessionId ? "Session evidence activity" : "Workspace evidence activity"}</h2>
+                  </div>
+                  <p>{event.createdAt}</p>
+                  <strong>{event.sessionId ?? "Workspace-level event"}</strong>
+                </article>
+              ))
+            ) : (
+              <article className="module-row">
+                <div>
+                  <span>empty audit trail</span>
+                  <h2>No committed pilot activity yet.</h2>
+                </div>
+                <p>Audit events appear after governed session and proof-packet activity.</p>
+                <strong>Direct mutation remains denied.</strong>
+              </article>
+            )}
+          </section>
+        </>
       ) : null}
     </>
   );

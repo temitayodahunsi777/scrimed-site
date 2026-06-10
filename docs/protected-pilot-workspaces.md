@@ -19,13 +19,13 @@ Runtime APIs do not use a Supabase service-role key. Authorization is based on p
 
 1. Provision the approved Supabase project. Completed on 2026-06-10 in `us-east-1`.
 2. Apply `supabase/migrations/20260610185445_protected_pilot_workspaces.sql` and `supabase/migrations/20260610185540_protected_pilot_foreign_key_indexes.sql`. Completed and advisor-verified on 2026-06-10.
-3. Create tenant, membership, and workspace bootstrap records through an approved administrative process.
+3. Create tenant, membership, and workspace bootstrap records through an approved administrative process. Completed for the first SCRIMED tenant-admin and Atlas governed synthetic workspace on 2026-06-10.
 4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel. Completed for Production and Preview on 2026-06-10.
 5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL. Completed on 2026-06-10.
 6. Configure invite-only production sign-in, MFA, session lifetime, and enterprise SSO policy. Public signups are disabled; MFA, session lifetime, and enterprise SSO decisions remain pending.
 7. Provision Upstash Redis and configure its REST environment variables. Completed through the Vercel Marketplace free plan in `iad1` on 2026-06-10.
-8. Run Supabase security and performance advisors.
-9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events.
+8. Run Supabase security and performance advisors. Database security findings are clear; leaked-password protection is unavailable on the current free plan and the protected-pilot console uses passwordless magic-link access.
+9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events. Completed transactionally and through the authenticated production workspace on 2026-06-10.
 
 ## Protected Routes
 
@@ -46,6 +46,16 @@ Protected routes fail closed with `503` until identity and durable storage are c
 - Protected session creation is rate limited to twenty requests per ten-minute request fingerprint.
 - Upstash Redis provides distributed enforcement through direct Upstash or Vercel Marketplace credentials.
 - The bounded memory fallback reduces abuse on a single runtime instance during a distributed-provider outage.
+
+## First Tenant Activation
+
+- Tenant: `scrimed-solutions`
+- Tenant-admin identity: `scrimedsolutions@gmail.com`
+- Workspace: `scrimed-atlas-protected-pilot`
+- First durable synthetic evaluation and audited proof-packet download: completed on 2026-06-10
+- Cross-tenant RLS verification: passed
+- Anonymous workspace access: denied
+- Direct authenticated insert, update, and audit-delete privileges: denied
 
 ## Proof Packet Contents
 

@@ -7,10 +7,15 @@ Updated: 2026-06-10
 - Added `/pilot-workspace` as the protected enterprise pilot control surface.
 - Added `/pilot-workspace/access` as the invite-only authenticated tenant workspace console.
 - Selected Supabase Auth plus Postgres row-level security for tenant identity, isolation, durable synthetic sessions, and append-only audit events.
-- Provisioned the `scrimed-protected-pilot` Supabase project in `us-east-1`, applied both protected-pilot migrations, confirmed RLS on every exposed pilot table, and cleared all security and missing-index advisor findings.
+- Provisioned the `scrimed-protected-pilot` Supabase project in `us-east-1`, applied both protected-pilot migrations, confirmed RLS on every exposed pilot table, and cleared all database security and missing-index advisor findings.
 - Connected Supabase to the Vercel Production and Preview runtimes, configured the production Auth site and redirect URLs, and disabled public user signups.
 - Provisioned the `scrimed-protected-pilot-rate-limit` Upstash Redis database on the Vercel Marketplace free plan in `iad1` and connected Production and Preview credentials.
 - Verified the branded production runtime against Supabase and Upstash; `/api/pilot-workspaces/readiness` now reports `productionActivationVerified: true`.
+- Activated `scrimedsolutions@gmail.com` as the first tenant-admin, bootstrapped the SCRIMED tenant and Atlas governed synthetic workspace, and verified authenticated workspace access.
+- Created the first durable synthetic evaluation, downloaded its audited proof packet, and confirmed the committed `synthetic-session-created` then `proof-packet-downloaded` event sequence.
+- Verified cross-tenant RLS isolation, anonymous access denial, and withheld direct mutation privileges without retaining synthetic verification artifacts.
+- Added append-only audit-trail visibility to the authenticated protected-pilot workspace.
+- Hardened repository quality gates to ignore quarantined generated Next.js caches, preventing recurrence of generated-cache lint stalls.
 - Added authenticated protected APIs for tenant workspace discovery, durable sessions, audit inspection, and audited proof-packet downloads.
 - Added a hardened SQL migration that withholds direct mutation rights and commits synthetic sessions with audit events transactionally.
 - Added downloadable synthetic enterprise proof packets and a public preview export.

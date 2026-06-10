@@ -123,7 +123,7 @@ export const protectedPilotApiContracts = [
 ];
 
 export const protectedPilotActivationGates = [
-  "Bootstrap approved tenant memberships and verify cross-tenant row-level isolation.",
+  "Operationalize tenant onboarding, offboarding, and periodic access review beyond the first approved SCRIMED tenant.",
   "Configure production sign-in, MFA, session lifetime, and enterprise SSO policy.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
