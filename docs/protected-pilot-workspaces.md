@@ -10,7 +10,7 @@ Protected pilot workspaces retain governed synthetic evaluation evidence only. T
 - Tenant isolation: PostgreSQL row-level security backed by tenant memberships.
 - Durable evidence: Supabase Postgres synthetic session records.
 - Durable audit: append-only audit events created through hardened transactional functions.
-- Rate limiting: Upstash Redis in production, with a bounded in-process baseline when Redis is not configured.
+- Rate limiting: Upstash Redis in production, with a bounded in-process fallback if Redis becomes unavailable.
 - Proof packets: server-generated Markdown exports built from tenant-isolated synthetic session evidence.
 
 Runtime APIs do not use a Supabase service-role key. Authorization is based on provider identity and database membership, never user-editable profile metadata.
@@ -23,7 +23,7 @@ Runtime APIs do not use a Supabase service-role key. Authorization is based on p
 4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel. Completed for Production and Preview on 2026-06-10.
 5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL. Completed on 2026-06-10.
 6. Configure invite-only production sign-in, MFA, session lifetime, and enterprise SSO policy. Public signups are disabled; MFA, session lifetime, and enterprise SSO decisions remain pending.
-7. Provision Upstash Redis and configure its REST environment variables.
+7. Provision Upstash Redis and configure its REST environment variables. Completed through the Vercel Marketplace free plan in `iad1` on 2026-06-10.
 8. Run Supabase security and performance advisors.
 9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events.
 
@@ -44,8 +44,8 @@ Protected routes fail closed with `503` until identity and durable storage are c
 
 - `POST /api/pilot/intake` is rate limited to five requests per ten-minute request fingerprint.
 - Protected session creation is rate limited to twenty requests per ten-minute request fingerprint.
-- Upstash Redis provides distributed enforcement when configured.
-- The bounded memory fallback reduces abuse on a single runtime instance but is not the final distributed production control.
+- Upstash Redis provides distributed enforcement through direct Upstash or Vercel Marketplace credentials.
+- The bounded memory fallback reduces abuse on a single runtime instance during a distributed-provider outage.
 
 ## Proof Packet Contents
 

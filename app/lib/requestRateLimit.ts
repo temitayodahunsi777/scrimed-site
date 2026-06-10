@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { getUpstashRedisCredentials } from "./upstashRuntime";
 
 type MemoryBucket = {
   count: number;
@@ -44,7 +45,9 @@ function requestFingerprint(request: Request, namespace: string) {
 }
 
 function getUpstashLimiter(options: RateLimitOptions) {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const credentials = getUpstashRedisCredentials();
+
+  if (!credentials) {
     return null;
   }
 
@@ -56,7 +59,7 @@ function getUpstashLimiter(options: RateLimitOptions) {
   }
 
   const limiter = new Ratelimit({
-    redis: Redis.fromEnv(),
+    redis: new Redis(credentials),
     limiter: Ratelimit.slidingWindow(options.limit, `${options.windowSeconds} s`),
     analytics: true,
     prefix: `scrimed:${options.namespace}`
@@ -137,7 +140,9 @@ export function rateLimitHeaders(result: RateLimitResult) {
 }
 
 export async function verifyDistributedRateLimitProvider() {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const credentials = getUpstashRedisCredentials();
+
+  if (!credentials) {
     return {
       configured: false,
       verified: false,
@@ -146,14 +151,14 @@ export async function verifyDistributedRateLimitProvider() {
   }
 
   try {
-    const response = await Redis.fromEnv().ping();
+    const response = await new Redis(credentials).ping();
 
     return {
       configured: true,
       verified: response === "PONG",
       detail:
         response === "PONG"
-          ? "Upstash Redis distributed rate-limit storage is reachable."
+          ? `Upstash Redis distributed rate-limit storage is reachable through ${credentials.source}.`
           : "Upstash Redis did not return the expected verification response."
     };
   } catch {

@@ -1,4 +1,5 @@
 import type { AgentEvaluationRecord } from "./agentEvaluationWorkspace";
+import { isUpstashRedisConfigured } from "./upstashRuntime";
 
 export type PilotWorkspaceRole = "tenant-admin" | "pilot-lead" | "reviewer" | "observer";
 
@@ -124,7 +125,6 @@ export const protectedPilotApiContracts = [
 export const protectedPilotActivationGates = [
   "Bootstrap approved tenant memberships and verify cross-tenant row-level isolation.",
   "Configure production sign-in, MFA, session lifetime, and enterprise SSO policy.",
-  "Provision Upstash Redis and verify distributed intake and workspace mutation limits.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
 ];
@@ -145,9 +145,7 @@ export function getProtectedPilotInfrastructure(): ProtectedPilotInfrastructure 
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
       (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   );
-  const rateLimitConfigured = Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  const rateLimitConfigured = isUpstashRedisConfigured();
 
   return {
     identity: {
