@@ -167,7 +167,7 @@ export function getProtectedPilotInfrastructure(): ProtectedPilotInfrastructure 
     rateLimit: {
       provider: "Upstash Redis",
       configured: rateLimitConfigured,
-      fallback: "A bounded in-process limiter remains active until the distributed store is connected."
+      fallback: "A bounded in-process limiter is retained for temporary distributed-provider outages."
     },
     protectedMutationsEnabled: supabaseConfigured
   };
