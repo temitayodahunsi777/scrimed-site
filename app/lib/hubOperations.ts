@@ -21,6 +21,10 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "demo_center", status: "pass", detail: "/demos, /demos/[slug], /api/demos, and /api/demos/[slug] package executable product proof with guided steps, measurable signals, governance boundaries, and production exclusions." },
   { name: "pilot_program_catalog", status: "pass", detail: "/pilots, /pilots/[slug], /api/pilots, and /api/pilots/[slug] package sellable enterprise engagements with duration, deliverables, buyer inputs, metrics, governance gates, and exclusions." },
   { name: "operations_readiness", status: "watch", detail: "/operations and /api/operations/readiness expose publishing, deployment, domain, sales-routing, quality-tooling, and deployment-protection blockers with owners and fallback paths." },
+  { name: "enterprise_readiness", status: "pass", detail: "/trust-center, /claims, and /api/enterprise-readiness expose legal, security, privacy, brand, governance, marketing, PR, sales, advertising, claims-control, ownership, and launch-gate readiness." },
+  { name: "security_headers", status: "pass", detail: "Baseline content-type, framing, referrer, permissions, opener, and content-security-policy response headers are configured for all application routes." },
+  { name: "legal_privacy_external_review", status: "watch", detail: "Qualified counsel review, contract stack, privacy notices, processing register, retention schedule, regulatory classification, trademark clearance, insurance, and regional assessments remain required." },
+  { name: "public_intake_abuse_controls", status: "watch", detail: "Public intake validates payload and PHI boundaries; rate limiting, bot protection, monitoring, and scaled-campaign approval remain required." },
   { name: "operating_context", status: "pass", detail: "/operating-context and /api/operating-context are available." },
   { name: "official_website", status: "pass", detail: "The official SCRIMED SOLUTIONS website is recorded as https://www.scrimedsolutions.com through Wix." },
   { name: "atlas_faithcore_models", status: "pass", detail: "/atlas and /faithcore are available with explicit operating boundaries." },
@@ -223,6 +227,12 @@ export const hubEvents: HubEvent[] = [
     type: "deployment",
     summary: "Established GitHub Actions, local verification, and Vercel production deployment as independent, passing quality gates.",
     date: "2026-06-09"
+  },
+  {
+    id: "scrimed-enterprise-readiness-claims-control",
+    type: "operations",
+    summary: "Added a Trust and Enterprise Readiness Center, public claims register, diligence brief, accountable owners, external-review requirements, and launch gates across nine company-readiness domains.",
+    date: "2026-06-10"
   }
 ];
 
@@ -235,7 +245,7 @@ export function getReadinessSummary() {
     score: passed / readinessChecks.length,
     checks: readinessChecks,
     recommendation: "Use the Demo Center and Pilot Programs to package buyer-ready proof while Vercel, GitHub Actions, operations readiness, pilot intake validation, executable synthetic assertions, interoperability conformance evaluations, fixture change review, staged synthetic workflow execution, deterministic execution-result fixtures, workflow result validation, synthetic-only promotion review, governed execution API contracts, identity and access readiness, execution-attempt readiness, runtime safety readiness, deny-by-default execution endpoints, denied-execution audit boundaries, audit persistence readiness, the agent workflow registry, the interoperability control plane, integration fixtures, integration contracts, and quality gates remain the active deploy-quality path before clinical workflow integration.",
-    updated: "2026-06-09"
+    updated: "2026-06-10"
   };
 }
 

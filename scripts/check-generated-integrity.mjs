@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 
 const generatedRoots = ["node_modules/@types", ".next/types"];
-const duplicateSuffixPattern = / 2(?:\.|$)/;
+const duplicateSuffixPattern = / \d+(?:\.|$)/;
 const duplicates = [];
 
 for (const root of generatedRoots) {

@@ -104,6 +104,14 @@ export default function QualityPage() {
           <span>Audit store</span>
           <strong>{summary.auditPersistenceReadiness.status}</strong>
         </article>
+        <article>
+          <span>Readiness controls</span>
+          <strong>{summary.enterpriseReadiness.activeControls}</strong>
+        </article>
+        <article>
+          <span>External reviews</span>
+          <strong>{summary.enterpriseReadiness.externalReviewsRequired}</strong>
+        </article>
       </section>
 
       <section className="table-section" aria-label="SCRIMED quality gates">

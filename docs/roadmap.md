@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-06-09
+Updated: 2026-06-10
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -29,6 +29,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
+- The Trust and Enterprise Readiness Center governs company-level launch gates and public claims before marketing, PR, sales, advertising, protected pilots, or production use.
 
 Reasoning level:
 
@@ -43,6 +44,8 @@ Objective: Establish the foundational architecture, deployment surface, document
 Completed foundations:
 
 - Five executable product demos and four structured enterprise pilot programs
+- Nine-domain enterprise readiness and claims-control plane with downloadable diligence brief
+- Baseline browser response-security headers across application routes
 - Next.js App Router application baseline
 - Vercel deployment configuration
 - Homepage and public platform surface
@@ -94,6 +97,8 @@ Completed foundations:
 
 Next build targets:
 
+- Select and implement production identity, protected tenant workspaces, durable audit storage, and rate-limited public intake
+- Complete qualified counsel, privacy, regulatory, trademark, insurance, incident-response, and independent security reviews
 - Add authenticated pilot workspaces and downloadable proof packets after storage, identity, privacy, retention, and durable audit controls are approved
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated
 - Add tenant-authenticated persisted conformance runs and downloadable partner evidence packets after storage and identity controls are approved

@@ -43,6 +43,16 @@ const consoleViews = [
     summary: "Review publishing, deployment, DNS, Wix routing, quality tooling, and security blockers with owners and fallbacks."
   },
   {
+    name: "Trust Center",
+    href: "/trust-center",
+    summary: "Inspect legal, security, privacy, brand, governance, marketing, PR, sales, advertising, claims controls, owners, and launch gates."
+  },
+  {
+    name: "Claims Register",
+    href: "/claims",
+    summary: "Review approved, evidence-required, and prohibited public statements before website, sales, marketing, PR, partnership, or advertising use."
+  },
+  {
     name: "AgentOS Evaluation",
     href: "/evaluation",
     summary: "Generate synthetic AgentOS plans with Atlas Trust Cards, structural document intelligence, audit preview, and observability signals."
@@ -207,6 +217,14 @@ export default function HubPage() {
         <article>
           <span>Pilot programs</span>
           <strong>{summary.demoPilotProgramSummary.pilotCount}</strong>
+        </article>
+        <article>
+          <span>Readiness domains</span>
+          <strong>{summary.enterpriseReadinessSummary.domainCount}</strong>
+        </article>
+        <article>
+          <span>Controlled claims</span>
+          <strong>{summary.enterpriseReadinessSummary.claims.total}</strong>
         </article>
       </section>
 

@@ -49,6 +49,10 @@ import {
   getPilotPrograms,
   getProductDemos
 } from "./demoPilotPrograms";
+import {
+  getEnterpriseReadinessSummary,
+  getReadinessDomains
+} from "./enterpriseReadiness";
 
 export type HubModule = {
   name: string;
@@ -119,6 +123,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Demo Center", value: "five executable buyer demos ready", tone: "good" },
   { name: "Pilot programs", value: "four governed programs packaged", tone: "good" },
   { name: "Operations readiness", value: "blocker register active", tone: "watch" },
+  { name: "Enterprise readiness", value: "claims and launch gates governed", tone: "watch" },
   { name: "AgentOS Evaluation", value: "interactive synthetic workspace ready", tone: "good" },
   { name: "AgentOS", value: "multi-agent control plane online", tone: "good" },
   { name: "Memory fabric", value: "session, operational, knowledge scoped", tone: "good" },
@@ -166,6 +171,7 @@ const workflowExecutionAuditBoundaries = getWorkflowExecutionAuditBoundaries();
 const interoperabilityConformanceEvaluations = getInteroperabilityConformanceEvaluations();
 const productDemos = getProductDemos();
 const pilotPrograms = getPilotPrograms();
+const readinessDomains = getReadinessDomains();
 
 export const hubRoutes = [
   "/",
@@ -177,6 +183,8 @@ export const hubRoutes = [
   "/demos",
   "/pricing",
   "/operations",
+  "/trust-center",
+  "/claims",
   "/evaluation",
   "/platform",
   "/memory",
@@ -215,6 +223,7 @@ export const hubRoutes = [
   ...interoperabilityConformanceEvaluations.map((evaluation) => evaluation.route),
   ...productDemos.map((demo) => demo.route),
   ...pilotPrograms.map((pilot) => pilot.route),
+  ...readinessDomains.map((domain) => domain.route),
   ...integrationFixtures.map((fixture) => fixture.route),
   ...agentWorkflows.map((workflow) => workflow.route),
   ...workflowExecutions.map((workflow) => workflow.route),
@@ -236,6 +245,9 @@ export const hubRoutes = [
   "/api/demos",
   "/api/commercial/pricing",
   "/api/operations/readiness",
+  "/api/enterprise-readiness",
+  "/api/enterprise-readiness/claims",
+  "/api/enterprise-readiness/diligence-brief",
   "/api/agent-os/evaluation",
   "/api/agent-os",
   "/api/agent-os/tasks",
@@ -276,6 +288,7 @@ export const hubRoutes = [
   ...interoperabilityConformanceEvaluations.map((evaluation) => evaluation.apiRoute),
   ...productDemos.map((demo) => demo.apiRoute),
   ...pilotPrograms.map((pilot) => pilot.apiRoute),
+  ...readinessDomains.map((domain) => domain.apiRoute),
   "/api/synthetic/scenarios",
   "/api/synthetic/fixtures",
   "/api/synthetic/validation",
@@ -311,6 +324,7 @@ export function getHubSummary() {
   const interoperabilitySummary = getInteroperabilitySummary();
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
+  const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -332,6 +346,7 @@ export function getHubSummary() {
     pilotIntakeSummary,
     commercialStrategySummary,
     companyOperationsSummary,
+    enterpriseReadinessSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
@@ -354,6 +369,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-09"
+    updated: "2026-06-10"
   };
 }

@@ -1,6 +1,15 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-09
+Updated: 2026-06-10
+
+## Latest Enterprise Readiness Release
+
+- Added a public Trust and Enterprise Readiness Center across legal, security, privacy, brand, governance, marketing, PR, sales, and advertising.
+- Added a claims-control register for approved, evidence-required, and prohibited public statements.
+- Added a downloadable enterprise diligence brief and machine-readable readiness APIs.
+- Added baseline content security policy, content-type, framing, referrer, permissions, and opener response headers.
+- Integrated enterprise readiness into Product Console, Hub, quality gates, operations, trust, homepage, and documentation.
+- Preserved the current commercial boundary: governed synthetic evaluations are sellable; live clinical execution and unsupported compliance claims remain blocked.
 
 ## Current Baseline
 
@@ -14,6 +23,8 @@ Current baseline includes:
 - Product console at `/product`
 - Pricing and sales strategy at `/pricing`
 - Company operations readiness at `/operations`
+- Trust and enterprise readiness center at `/trust-center`
+- Public claims register at `/claims`
 - Enterprise pilot intake at `/pilot`
 - AgentOS Evaluation Workspace at `/evaluation`
 - SCRIMED AgentOS v1 at `/agents`

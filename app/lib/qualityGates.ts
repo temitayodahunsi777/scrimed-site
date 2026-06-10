@@ -15,6 +15,7 @@ import { getWorkflowExecutionSummary } from "./workflowExecutions";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
+import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 
 export type QualityGate = {
   name: string;
@@ -42,6 +43,12 @@ export const qualityGates: QualityGate[] = [
     route: "/demos",
     state: "active",
     role: "Buyer-facing guided demos and structured pilot programs that bind executable synthetic proof to metrics, governance gates, buyer inputs, and production exclusions."
+  },
+  {
+    name: "Enterprise readiness and claims control",
+    route: "/trust-center",
+    state: "active",
+    role: "Central control plane for legal, security, privacy, brand, governance, marketing, PR, sales, advertising, approved claims, prohibited claims, accountable owners, and launch gates."
   },
   {
     name: "Interoperability standards control plane",
@@ -194,6 +201,7 @@ export function getQualityGateSummary() {
   const interoperability = getInteroperabilitySummary();
   const interoperabilityEvaluations = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotPrograms = getDemoPilotProgramSummary();
+  const enterpriseReadiness = getEnterpriseReadinessSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -234,6 +242,7 @@ export function getQualityGateSummary() {
     interoperability,
     interoperabilityEvaluations,
     demoPilotPrograms,
-    updated: "2026-06-09"
+    enterpriseReadiness,
+    updated: "2026-06-10"
   };
 }

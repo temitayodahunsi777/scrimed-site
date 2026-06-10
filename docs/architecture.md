@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-06-09
+Updated: 2026-06-10
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -10,6 +10,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
+- Trust and enterprise readiness control plane: `/trust-center`, `/trust-center/[slug]`, `/claims`, `/api/enterprise-readiness`, `/api/enterprise-readiness/[slug]`, `/api/enterprise-readiness/claims`, and `/api/enterprise-readiness/diligence-brief`
 - Demo and pilot center: `/demos`, `/demos/[slug]`, `/pilots`, `/pilots/[slug]`, `/api/demos`, `/api/demos/[slug]`, `/api/pilots`, and `/api/pilots/[slug]`
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
 - Master operating context: `/operating-context`, `/atlas`, `/faithcore`, and `/api/operating-context`
@@ -101,6 +102,8 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Agent permissions, audit events, human-review triggers, and guardrails
 - Explicit quality gates for active, planned, and bypassed checks
 - Master operating context as an active doctrine and decision gate before product expansion
+- Enterprise readiness and claims control across legal, security, privacy, brand, governance, marketing, PR, sales, and advertising
+- Baseline content security policy, content-type, framing, referrer, browser-permissions, and cross-origin-opener response headers
 
 ## Quality Gate Model
 

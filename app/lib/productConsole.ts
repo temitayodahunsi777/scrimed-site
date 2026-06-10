@@ -13,6 +13,7 @@ import { getQualityGateSummary } from "./qualityGates";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
+import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -356,6 +357,12 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Operations readiness manages product launch risk; it does not authorize live clinical execution."
   },
   {
+    label: "Review Trust Center",
+    href: "/trust-center",
+    purpose: "Inspect enterprise readiness, accountable owners, approved claims, prohibited claims, launch gates, and external-review requirements.",
+    boundary: "Trust Center readiness is not legal advice, certification, or authorization for live clinical execution."
+  },
+  {
     label: "Run AgentOS Evaluation",
     href: "/evaluation",
     purpose: "Generate a synthetic AgentOS plan, Atlas Trust Card, audit preview, and observability packet.",
@@ -444,6 +451,7 @@ export function getProductConsoleSummary() {
   const interoperabilitySummary = getInteroperabilitySummary();
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
+  const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -460,6 +468,8 @@ export function getProductConsoleSummary() {
     pricingApiRoute: commercialStrategySummary.apiRoute,
     operationsRoute: companyOperationsSummary.route,
     operationsApiRoute: companyOperationsSummary.apiRoute,
+    trustCenterRoute: enterpriseReadinessSummary.route,
+    trustCenterApiRoute: enterpriseReadinessSummary.apiRoute,
     demoRoute: demoPilotProgramSummary.demoRoute,
     demoApiRoute: demoPilotProgramSummary.demoApiRoute,
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
@@ -494,6 +504,7 @@ export function getProductConsoleSummary() {
     atlasIntelligenceCoreSummary,
     commercialStrategySummary,
     companyOperationsSummary,
+    enterpriseReadinessSummary,
     demoPilotProgramSummary,
     interoperabilitySummary,
     interoperabilityConformanceSummary,
@@ -501,6 +512,7 @@ export function getProductConsoleSummary() {
       pricingAndSales: commercialStrategySummary.status,
       demosAndPilots: demoPilotProgramSummary.status,
       operationsReadiness: companyOperationsSummary.status,
+      enterpriseReadiness: enterpriseReadinessSummary.status,
       agentOS: agentOSSummary.status,
       agentEvaluationWorkspace: agentEvaluationWorkspaceSummary.status,
       atlasIntelligenceCore: atlasIntelligenceCoreSummary.status,
@@ -518,7 +530,7 @@ export function getProductConsoleSummary() {
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
       "Use the Demo Center to select an inspectable product proof path, then package it into a defined Pilot Program with buyer-approved metrics, governance gates, and a production-readiness decision.",
-    updated: "2026-06-09"
+    updated: "2026-06-10"
   };
 }
 
@@ -561,6 +573,16 @@ export function getProductReadinessBrief() {
     ...summary.companyOperationsSummary.operationsBlockers.map(
       (item) => `- ${item.blocker}: ${item.fallback}`
     ),
+    "",
+    "## Trust and Enterprise Readiness",
+    `Trust Center: ${summary.trustCenterRoute}`,
+    `Trust Center API: ${summary.trustCenterApiRoute}`,
+    `Status: ${summary.enterpriseReadinessSummary.status}`,
+    `Active controls: ${summary.enterpriseReadinessSummary.activeControls}`,
+    `Decisions required: ${summary.enterpriseReadinessSummary.decisionsRequired}`,
+    `External reviews required: ${summary.enterpriseReadinessSummary.externalReviewsRequired}`,
+    `Legal production ready: ${summary.enterpriseReadinessSummary.legalProductionReady ? "yes" : "no"}`,
+    `Production clinical ready: ${summary.enterpriseReadinessSummary.productionClinicalReady ? "yes" : "no"}`,
     "",
     "## Agents",
     ...summary.productAgents.map((agent) => `- ${agent.name} (${agent.status}): ${agent.capability}`),

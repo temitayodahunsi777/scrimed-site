@@ -30,6 +30,10 @@ export default function TrustPage() {
         <p className="hero-text">
           Watchtower monitors workflows while TrustQA verifies boundary, evidence attribution, confidence, approval checkpoints, and source freshness before outputs leave a sandbox.
         </p>
+        <div className="hero-actions">
+          <Link className="primary-action" href="/trust-center">Open Trust Center</Link>
+          <Link className="secondary-action" href="/claims">Review Claims Register</Link>
+        </div>
       </section>
 
       <section className="section-band hub-summary" aria-label="Trust summary">

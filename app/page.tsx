@@ -49,6 +49,8 @@ const readinessSignals = [
   { label: "Programs", value: "/pilots" },
   { label: "Pricing", value: "/api/commercial/pricing" },
   { label: "Operations", value: "/api/operations/readiness" },
+  { label: "Trust Center", value: "/api/enterprise-readiness" },
+  { label: "Claims", value: "/api/enterprise-readiness/claims" },
   { label: "Pilot", value: "/pilot" },
   { label: "Evaluation", value: "/api/agent-os/evaluation" },
   { label: "OS Hub", value: "/hub" },
@@ -92,25 +94,16 @@ export default function Home() {
             <Link href="/demos">Demos</Link>
             <Link href="/pilots">Programs</Link>
             <Link href="/pricing">Pricing</Link>
-            <Link href="/operations">Operations</Link>
+            <Link href="/trust-center">Trust Center</Link>
             <Link href="/pilot">Pilot</Link>
-            <Link href="/evaluation">Evaluation</Link>
             <Link href="/hub">Hub</Link>
-            <Link href="/atlas">Atlas</Link>
-            <Link href="/platform">Platform</Link>
-            <Link href="/agents">Agents</Link>
-            <Link href="/observability">Observability</Link>
-            <Link href="/quality">Quality</Link>
-            <Link href="/synthetic">Synthetic</Link>
-            <Link href="/integrations">Integrations</Link>
-            <Link href="/trust">Trust</Link>
           </div>
         </nav>
 
         <div className="hero-grid" id="top">
           <div className="hero-copy">
             <p className="eyebrow">AI-native healthcare intelligence</p>
-            <h1>SCRIMED is building the operating intelligence layer for modern healthcare.</h1>
+            <h1>SCRIMED Healthcare Intelligence OS.</h1>
             <p className="hero-text">
               Solving For A Better Tomorrow through clinical intelligence, workflow automation, healthcare data interoperability, trustworthy AI agents, and continuous trust monitoring across AI-enabled care systems.
             </p>
@@ -121,6 +114,7 @@ export default function Home() {
               <Link className="secondary-action" href="/product">Open Product Console</Link>
               <Link className="secondary-action" href="/pricing">Review Pricing</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
+              <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
               <Link className="secondary-action" href="/hub">Open OS Hub</Link>
               <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>
@@ -132,7 +126,7 @@ export default function Home() {
               <strong>Operational</strong>
             </div>
             <div className="signal-grid">
-              {readinessSignals.map((signal) => (
+              {readinessSignals.slice(0, 10).map((signal) => (
                 <div className="signal-tile" key={signal.label}>
                   <span>{signal.label}</span>
                   <strong>{signal.value}</strong>
@@ -151,6 +145,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Operations blocker register active
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Enterprise readiness and claims control active
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated

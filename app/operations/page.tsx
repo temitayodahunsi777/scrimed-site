@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCompanyOperationsSummary } from "../lib/companyOperations";
+import { getEnterpriseReadinessSummary } from "../lib/enterpriseReadiness";
 
 export const metadata = {
   title: "SCRIMED Operations Readiness",
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default function OperationsPage() {
   const summary = getCompanyOperationsSummary();
+  const enterprise = getEnterpriseReadinessSummary();
 
   return (
     <main>
@@ -82,6 +84,24 @@ export default function OperationsPage() {
                 <li>{step.verification}</li>
               </ul>
             </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Enterprise launch gates">
+        <div className="section-heading">
+          <p className="eyebrow">Enterprise launch gates</p>
+          <h2>Company readiness stays visible alongside deployment readiness.</h2>
+          <p className="section-copy">{enterprise.boundary}</p>
+        </div>
+        {enterprise.domains.map((domain) => (
+          <article className="module-row" key={domain.slug}>
+            <div>
+              <span>{domain.status}</span>
+              <h2>{domain.name}</h2>
+            </div>
+            <p>{domain.currentPosture}</p>
+            <Link className="module-link" href={domain.route}>{domain.requirements.length} controlled requirements</Link>
           </article>
         ))}
       </section>

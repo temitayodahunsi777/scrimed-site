@@ -56,6 +56,18 @@ export default function ProductConsolePage() {
           <span>Live connectors</span>
           <strong>{summary.interoperabilityConformanceSummary.liveBlocked} blocked</strong>
         </article>
+        <article>
+          <span>Readiness domains</span>
+          <strong>{summary.enterpriseReadinessSummary.domainCount}</strong>
+        </article>
+        <article>
+          <span>Approved claims</span>
+          <strong>{summary.enterpriseReadinessSummary.claims.approved}</strong>
+        </article>
+        <article>
+          <span>External reviews</span>
+          <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
@@ -212,6 +224,24 @@ export default function ProductConsolePage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED enterprise readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Enterprise readiness</p>
+          <h2>Commercial momentum stays tied to legal, security, privacy, brand, governance, and claims controls.</h2>
+          <p className="section-copy">{summary.enterpriseReadinessSummary.boundary}</p>
+        </div>
+        {summary.enterpriseReadinessSummary.domains.map((domain) => (
+          <article className="module-row" key={domain.slug}>
+            <div>
+              <span>{domain.status}</span>
+              <h2>{domain.name}</h2>
+            </div>
+            <p>{domain.currentPosture}</p>
+            <Link className="module-link" href={domain.route}>{domain.objective}</Link>
+          </article>
+        ))}
       </section>
 
       <section className="section-band" aria-label="SCRIMED evidence and proof stack">

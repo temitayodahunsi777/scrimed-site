@@ -8,6 +8,8 @@ The mission of SCRIMED is to help modernize healthcare operations, improve patie
 
 Current product boundary: this repository presents SCRIMED as a governed synthetic pilot and enterprise evaluation product. It does not execute live clinical care, autonomous diagnosis, payer submission, patient outreach, or production medical-record workflows.
 
+Enterprise readiness boundary: `/trust-center` and `/claims` expose accountable legal, security, privacy, brand, governance, marketing, PR, sales, advertising, and claims-control readiness. These surfaces are operational registers, not legal advice, certification, regulatory approval, or authorization for live clinical execution.
+
 ---
 
 ## Core Vision
@@ -137,6 +139,8 @@ Core enterprise evaluation surfaces:
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
 - `/operations` - company operations readiness, blockers, owners, fallbacks, and buyer route checklist
+- `/trust-center` - enterprise readiness domains, owners, evidence, required actions, launch gates, and external-review requirements
+- `/claims` - approved, evidence-required, and prohibited public claims
 - `/evaluation` - interactive AgentOS synthetic evaluation workspace
 - `/workflows` - workflow engine and sandbox runtime
 - `/memory` - session, operational, and knowledge memory fabric
@@ -155,6 +159,9 @@ Core APIs:
 - `/api/pilots`
 - `/api/commercial/pricing`
 - `/api/operations/readiness`
+- `/api/enterprise-readiness`
+- `/api/enterprise-readiness/claims`
+- `/api/enterprise-readiness/diligence-brief`
 - `/api/agent-os/evaluation`
 - `/api/agent-os/tasks`
 - `/api/atlas/intelligence-core`

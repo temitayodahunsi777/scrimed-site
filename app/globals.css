@@ -82,7 +82,7 @@ main {
 }
 
 .hero-grid {
-  align-items: center;
+  align-items: start;
   display: grid;
   gap: clamp(32px, 5vw, 72px);
   grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.8fr);
@@ -174,7 +174,9 @@ h3 {
 .command-surface {
   background: #0f1713;
   color: white;
+  max-height: 720px;
   min-height: 500px;
+  overflow: auto;
   padding: 24px;
   position: relative;
 }
