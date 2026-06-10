@@ -122,7 +122,6 @@ export const protectedPilotApiContracts = [
 ];
 
 export const protectedPilotActivationGates = [
-  "Connect the approved Supabase project to the production Vercel runtime.",
   "Bootstrap approved tenant memberships and verify cross-tenant row-level isolation.",
   "Configure production sign-in, MFA, session lifetime, and enterprise SSO policy.",
   "Provision Upstash Redis and verify distributed intake and workspace mutation limits.",

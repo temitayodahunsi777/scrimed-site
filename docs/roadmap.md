@@ -101,7 +101,7 @@ Completed foundations:
 
 Next build targets:
 
-- Connect the provisioned Supabase project to Vercel, configure production Auth policy, bootstrap the first approved tenant, and verify cross-tenant isolation
+- Bootstrap the first approved tenant, complete MFA and session-lifetime policy, and verify cross-tenant isolation
 - Provision Upstash Redis and verify distributed intake and protected mutation limits across Vercel regions
 - Configure production sign-in, MFA, session lifetime, account lifecycle, and enterprise SSO policy
 - Complete qualified counsel, privacy, regulatory, trademark, insurance, incident-response, and independent security reviews

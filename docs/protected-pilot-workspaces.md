@@ -20,9 +20,9 @@ Runtime APIs do not use a Supabase service-role key. Authorization is based on p
 1. Provision the approved Supabase project. Completed on 2026-06-10 in `us-east-1`.
 2. Apply `supabase/migrations/20260610185445_protected_pilot_workspaces.sql` and `supabase/migrations/20260610185540_protected_pilot_foreign_key_indexes.sql`. Completed and advisor-verified on 2026-06-10.
 3. Create tenant, membership, and workspace bootstrap records through an approved administrative process.
-4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel.
-5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL.
-6. Configure invite-only production sign-in, MFA, session lifetime, and enterprise SSO policy.
+4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel. Completed for Production and Preview on 2026-06-10.
+5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL. Completed on 2026-06-10.
+6. Configure invite-only production sign-in, MFA, session lifetime, and enterprise SSO policy. Public signups are disabled; MFA, session lifetime, and enterprise SSO decisions remain pending.
 7. Provision Upstash Redis and configure its REST environment variables.
 8. Run Supabase security and performance advisors.
 9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events.
