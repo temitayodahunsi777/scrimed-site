@@ -47,6 +47,8 @@ Completed foundations:
 - Nine-domain enterprise readiness and claims-control plane with downloadable diligence brief
 - Baseline browser response-security headers across application routes
 - Protected pilot workspace contract with Supabase Auth, Postgres row-level security, durable synthetic sessions, append-only audit events, and audited proof packets
+- Invite-only protected pilot access console with authenticated tenant workspace discovery, governed synthetic session creation, and audited proof downloads
+- Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis selected for distributed enforcement
 - Next.js App Router application baseline
 - Vercel deployment configuration

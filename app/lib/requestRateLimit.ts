@@ -135,3 +135,32 @@ export function rateLimitHeaders(result: RateLimitResult) {
     ...(result.retryAfterSeconds > 0 ? { "Retry-After": String(result.retryAfterSeconds) } : {})
   };
 }
+
+export async function verifyDistributedRateLimitProvider() {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return {
+      configured: false,
+      verified: false,
+      detail: "Upstash Redis runtime credentials are not configured."
+    };
+  }
+
+  try {
+    const response = await Redis.fromEnv().ping();
+
+    return {
+      configured: true,
+      verified: response === "PONG",
+      detail:
+        response === "PONG"
+          ? "Upstash Redis distributed rate-limit storage is reachable."
+          : "Upstash Redis did not return the expected verification response."
+    };
+  } catch {
+    return {
+      configured: true,
+      verified: false,
+      detail: "Upstash Redis distributed rate-limit storage could not be reached."
+    };
+  }
+}

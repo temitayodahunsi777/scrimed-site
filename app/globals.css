@@ -328,6 +328,34 @@ h3 {
   min-height: 74px;
 }
 
+.workspace-selector {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.workspace-selector:hover,
+.workspace-selector:focus-visible {
+  background: #e7f1ec;
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+
+.button-link {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
 .layer-row span {
   color: var(--green);
   font-weight: 800;

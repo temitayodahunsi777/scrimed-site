@@ -21,20 +21,24 @@ Runtime APIs do not use a Supabase service-role key. Authorization is based on p
 2. Apply `supabase/migrations/202606100001_protected_pilot_workspaces.sql`.
 3. Create tenant, membership, and workspace bootstrap records through an approved administrative process.
 4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel.
-5. Configure production sign-in, MFA, session lifetime, and enterprise SSO policy.
-6. Provision Upstash Redis and configure its REST environment variables.
-7. Run Supabase security and performance advisors.
-8. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events.
+5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL.
+6. Configure invite-only production sign-in, MFA, session lifetime, and enterprise SSO policy.
+7. Provision Upstash Redis and configure its REST environment variables.
+8. Run Supabase security and performance advisors.
+9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events.
 
 ## Protected Routes
 
 - `GET /api/pilot-workspaces`
+- `/pilot-workspace/access`
 - `GET /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `POST /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `GET /api/pilot-workspaces/{workspaceSlug}/audit`
 - `GET /api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet`
 
 Protected routes fail closed with `503` until identity and durable storage are configured. They require a verified bearer token after activation.
+
+`GET /api/pilot-workspaces/readiness` verifies the deployed runtime against the migrated Supabase schema and Upstash Redis. Environment-variable presence alone does not mark production activation as verified.
 
 ## Active Public Controls
 

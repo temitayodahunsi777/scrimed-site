@@ -13,7 +13,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.vercel-insights.com https://*.vercel.com",
+  "connect-src 'self' https://*.vercel-insights.com https://*.vercel.com https://*.supabase.co wss://*.supabase.co",
   "upgrade-insecure-requests"
 ].join("; ");
 

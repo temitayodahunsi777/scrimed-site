@@ -24,6 +24,9 @@ export default function ProtectedPilotWorkspacePage() {
           while identity, authorization, rate limits, human review, and product boundaries stay explicit.
         </p>
         <div className="hero-actions">
+          <Link className="primary-action" href="/pilot-workspace/access">
+            Access Protected Pilot
+          </Link>
           <a className="primary-action" href="/api/pilot-workspaces/preview-proof-packet">
             Download Synthetic Proof Packet
           </a>

@@ -5,11 +5,13 @@ Updated: 2026-06-10
 ## Latest Protected Pilot Workspace Release
 
 - Added `/pilot-workspace` as the protected enterprise pilot control surface.
+- Added `/pilot-workspace/access` as the invite-only authenticated tenant workspace console.
 - Selected Supabase Auth plus Postgres row-level security for tenant identity, isolation, durable synthetic sessions, and append-only audit events.
 - Added authenticated protected APIs for tenant workspace discovery, durable sessions, audit inspection, and audited proof-packet downloads.
 - Added a hardened SQL migration that withholds direct mutation rights and commits synthetic sessions with audit events transactionally.
 - Added downloadable synthetic enterprise proof packets and a public preview export.
 - Added active rate limiting to public pilot intake and protected session creation, with Upstash Redis selected for distributed production enforcement.
+- Added live runtime verification for the migrated protected pilot schema and distributed Redis provider so configuration presence cannot masquerade as activation.
 - Fixed the recurring generated-cache build fault by expanding integrity checks across the full `.next` tree.
 - Preserved the commercial boundary: protected pilot evidence is synthetic only; live clinical execution remains denied.
 

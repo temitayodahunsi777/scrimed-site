@@ -61,6 +61,40 @@ function getSupabaseConfiguration() {
   };
 }
 
+export async function verifyProtectedPilotStore() {
+  const configuration = getSupabaseConfiguration();
+
+  if (!configuration.url || !configuration.publishableKey) {
+    return {
+      configured: false,
+      verified: false,
+      schemaVersion: null,
+      detail: "Supabase runtime credentials are not configured."
+    };
+  }
+
+  const client = createClient(configuration.url, configuration.publishableKey, {
+    auth: {
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      persistSession: false
+    }
+  });
+  const { data, error } = await client.rpc("protected_pilot_runtime_status");
+  const result = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+
+  return {
+    configured: true,
+    verified: !error && result?.ready === true,
+    schemaVersion: typeof result?.schemaVersion === "string" ? result.schemaVersion : null,
+    detail:
+      error?.message ??
+      (result?.ready === true
+        ? "Supabase Auth, Data API, and the protected pilot schema are reachable."
+        : "Protected pilot schema verification did not return ready.")
+  };
+}
+
 export async function getAuthenticatedPilotContext(request: Request): Promise<AuthenticatedPilotContext> {
   const configuration = getSupabaseConfiguration();
 

@@ -344,6 +344,25 @@ revoke all on function public.record_pilot_proof_packet_download(text, uuid, jso
 grant execute on function public.create_pilot_demo_session(text, text, text, text, jsonb) to authenticated;
 grant execute on function public.record_pilot_proof_packet_download(text, uuid, jsonb) to authenticated;
 
+create or replace function public.protected_pilot_runtime_status()
+returns jsonb
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select jsonb_build_object(
+    'ready', true,
+    'schemaVersion', '2026-06-10.1',
+    'boundary', 'synthetic-pilot-only',
+    'tenantIsolation', 'postgres-row-level-security',
+    'durableAudit', 'append-only'
+  );
+$$;
+
+revoke all on function public.protected_pilot_runtime_status() from public;
+grant execute on function public.protected_pilot_runtime_status() to anon, authenticated;
+
 comment on table public.pilot_demo_sessions is
   'Durable synthetic SCRIMED pilot evidence only. Live PHI and production clinical execution are prohibited.';
 comment on table public.pilot_audit_events is
