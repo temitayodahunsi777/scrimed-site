@@ -4,12 +4,16 @@ Updated: 2026-06-11
 
 ## Latest Sales Operations Release
 
-- Added `/sales-operations` as the invite-only tenant-admin console for durable buyer opportunities.
-- Added protected APIs for opportunity assignment, pipeline stage, next action, audited proposal downloads, and controlled CRM synchronization.
+- Enforced passwordless magic-link plus free TOTP authentication for `/sales-operations`, with AAL2 verification, a twelve-hour maximum session, a two-hour inactivity boundary, and global session termination.
+- Added native vendor-neutral CRM CSV exports so SCRIMED sales operations does not depend on a paid CRM; approved webhook synchronization remains optional.
+- Added durable next-action due dates, automatic due and overdue triage, audited human-reviewed email drafts, and audited follow-up completion.
+- Added audited enterprise assessment calendar invitations with durable schedule state and optional HTTPS meeting links.
+- Added protected APIs for opportunity assignment, cadence, proposals, CRM exports, follow-up drafts, follow-up completion, assessment invitations, and controlled CRM synchronization.
 - Bound new governed buyer intake to the first SCRIMED tenant while retaining the business-contact and workflow-scope-only boundary.
-- Added append-only sales audit events for opportunity updates, proposal releases, and CRM outcomes.
+- Added append-only sales audit events for opportunity updates, commercial artifact releases, follow-up completion, assessment invitations, and CRM outcomes.
 - Kept direct private lead and audit-table access denied; authorization remains enforced inside Postgres through verified tenant-admin membership.
 - Added proposal generation that maps buyer offer interest to the appropriate sellable SCRIMED pilot program without implying live clinical execution.
+- Added a deterministic generated-cache preflight so local quality gates no longer depend on npm availability or fail on duplicated disposable `.next` artifacts.
 
 ## Latest Protected Pilot Workspace Release
 
@@ -362,8 +366,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 
 ## Recommended Next Steps
 
-1. Operate new buyer opportunities through `/sales-operations`, assign an accountable owner, and release audited buyer proposals.
-2. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` when a CRM destination is selected; accepted intake is already retained in the private enterprise intake ledger and visible in Sales Operations.
+1. Operate new buyer opportunities through `/sales-operations`, assign an accountable owner, set a due action, release audited commercial artifacts, and prepare assessment invitations.
+2. Use the vendor-neutral native CRM export immediately; configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` only when an approved CRM destination is selected.
 3. Operationalize tenant onboarding, access review, proof-packet retention, and buyer-specific pilot activation beyond the first verified SCRIMED tenant.
 4. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
 5. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.

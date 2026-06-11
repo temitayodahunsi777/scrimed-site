@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
-  buildSalesOpportunityProposal,
+  buildSalesFollowUpDraft,
   salesOperationsBoundary
 } from "../../../../../lib/salesOperations";
 import {
   getSalesOpportunity,
-  recordSalesProposalDownload
+  recordSalesArtifactDownload
 } from "../../../../../lib/salesOperationsStore";
 
 export const dynamic = "force-dynamic";
@@ -31,33 +31,33 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (result.error || !result.opportunity) {
     return NextResponse.json(
       { error: { code: "sales-opportunity-not-found", message: "No tenant-scoped opportunity is available for this ID." } },
-      { status: result.error?.message.includes("sales-operations-admin-required") ? 403 : 404 }
+      { status: 404 }
     );
   }
 
-  const audit = await recordSalesProposalDownload(context.client, intakeId);
+  const audit = await recordSalesArtifactDownload(
+    context.client,
+    intakeId,
+    "follow-up-draft-downloaded",
+    { format: "message/rfc822", requiresHumanReview: true, noPhiBoundary: true }
+  );
 
   if (audit.error) {
     return NextResponse.json(
-      {
-        error: {
-          code: "sales-proposal-audit-failed",
-          message: "The proposal was not released because its append-only download event could not be committed."
-        }
-      },
+      { error: { code: "follow-up-draft-audit-failed", message: "The follow-up draft was not released because its audit event could not be committed." } },
       { status: 502 }
     );
   }
 
   const safeIntakeId = intakeId.replace(/[^a-z0-9-]/gi, "-");
 
-  return new NextResponse(buildSalesOpportunityProposal(result.opportunity), {
+  return new NextResponse(buildSalesFollowUpDraft(result.opportunity), {
     headers: {
       "Cache-Control": "private, no-store",
-      "Content-Disposition": `attachment; filename="scrimed-${safeIntakeId}-opportunity-proposal.md"`,
-      "Content-Type": "text/markdown; charset=utf-8",
-      "X-SCRIMED-Data-Boundary": "business-contact-and-workflow-scope-only",
-      "X-SCRIMED-Proposal-Audited": "true"
+      "Content-Disposition": `attachment; filename="scrimed-${safeIntakeId}-follow-up.eml"`,
+      "Content-Type": "message/rfc822; charset=utf-8",
+      "X-SCRIMED-Human-Review-Required": "true",
+      "X-SCRIMED-Export-Audited": "true"
     }
   });
 }

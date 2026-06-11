@@ -821,6 +821,45 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.sales-activation-grid {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-top: 28px;
+}
+
+.sales-activation-grid section {
+  display: grid;
+  gap: 18px;
+}
+
+.sales-activation-grid h3 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.mfa-enrollment {
+  align-items: center;
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  padding: 20px;
+}
+
+.mfa-enrollment img {
+  background: white;
+  height: 220px;
+  width: 220px;
+}
+
+.mfa-enrollment p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
 .intake-result {
   background: #f6fbf8;
   border-color: rgba(16, 97, 63, 0.34);
@@ -947,6 +986,8 @@ h3 {
   .result-grid,
   .sales-console-grid,
   .sales-scope-grid,
+  .sales-activation-grid,
+  .mfa-enrollment,
   .evaluation-output-grid {
     grid-template-columns: 1fr;
   }

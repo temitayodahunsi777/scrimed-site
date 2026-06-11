@@ -23,11 +23,18 @@ export type SalesOpportunity = {
   pipelineStage: SalesPipelineStage;
   assignedOwner: string;
   nextAction: string;
+  nextActionDueAt: string | null;
+  nextActionCompletedAt: string | null;
   updatedAt: string;
   updatedBy: string | null;
   lastCrmSyncAt: string | null;
   lastCrmSyncStatus: SalesCrmSyncStatus;
   lastCrmSyncDetail: string;
+  lastCrmExportAt: string | null;
+  assessmentStartAt: string | null;
+  assessmentDurationMinutes: number;
+  assessmentMeetingUrl: string;
+  assessmentStatus: "not-scheduled" | "invitation-prepared" | "confirmed" | "completed" | "cancelled";
   retentionUntil: string;
   payload: PilotIntakeHandoffPayload;
 };
@@ -36,7 +43,14 @@ export type SalesAuditEvent = {
   id: string;
   intakeId: string;
   actorUserId: string;
-  eventType: "opportunity-updated" | "proposal-downloaded" | "crm-sync-recorded";
+  eventType:
+    | "opportunity-updated"
+    | "proposal-downloaded"
+    | "crm-sync-recorded"
+    | "crm-export-downloaded"
+    | "follow-up-draft-downloaded"
+    | "follow-up-completed"
+    | "assessment-invitation-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -49,6 +63,16 @@ export type SalesOperationsDashboard = {
     proposalCount: number;
     pilotPlanningCount: number;
     wonCount: number;
+    dueActionCount: number;
+    overdueActionCount: number;
+    scheduledAssessmentCount: number;
+  };
+  security: {
+    authentication: string;
+    assuranceLevel: string;
+    maximumSessionHours: number;
+    inactivityHours: number;
+    passwordAuthentication: boolean;
   };
   opportunities: SalesOpportunity[];
   auditEvents: SalesAuditEvent[];
@@ -59,6 +83,13 @@ export type SalesOpportunityUpdate = {
   pipelineStage: SalesPipelineStage;
   assignedOwner: string;
   nextAction: string;
+  nextActionDueAt: string | null;
+};
+
+export type SalesAssessmentSchedule = {
+  startAt: string;
+  durationMinutes: number;
+  meetingUrl: string;
 };
 
 const offerPilotMap: Record<string, string> = {
@@ -87,6 +118,28 @@ function cleanMarkdown(value: string) {
   return value.replace(/[\r\n]+/g, " ").trim();
 }
 
+function cleanHeader(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+function csvCell(value: string | number | null) {
+  const raw = value === null ? "" : String(value);
+  const formulaSafe = /^[=+\-@]/.test(raw) ? `'${raw}` : raw;
+  return `"${formulaSafe.replaceAll('"', '""')}"`;
+}
+
+function escapeCalendar(value: string) {
+  return value
+    .replaceAll("\\", "\\\\")
+    .replaceAll("\n", "\\n")
+    .replaceAll(",", "\\,")
+    .replaceAll(";", "\\;");
+}
+
+function calendarTimestamp(value: string) {
+  return new Date(value).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}
+
 export function isSalesPipelineStage(value: unknown): value is SalesPipelineStage {
   return typeof value === "string" && salesPipelineStages.includes(value as SalesPipelineStage);
 }
@@ -102,6 +155,12 @@ export function validateSalesOpportunityUpdate(payload: unknown):
   const pipelineStage = candidate.pipelineStage;
   const assignedOwner = typeof candidate.assignedOwner === "string" ? candidate.assignedOwner.trim() : "";
   const nextAction = typeof candidate.nextAction === "string" ? candidate.nextAction.trim() : "";
+  const nextActionDueAt =
+    candidate.nextActionDueAt === null || candidate.nextActionDueAt === ""
+      ? null
+      : typeof candidate.nextActionDueAt === "string"
+        ? candidate.nextActionDueAt
+        : "invalid";
 
   if (!isSalesPipelineStage(pipelineStage)) {
     return { ok: false, message: "Select a supported sales pipeline stage." };
@@ -109,6 +168,10 @@ export function validateSalesOpportunityUpdate(payload: unknown):
 
   if (assignedOwner.length > 180 || nextAction.length > 500) {
     return { ok: false, message: "Owner or next action exceeds the allowed business-scope length." };
+  }
+
+  if (nextActionDueAt === "invalid" || (nextActionDueAt && Number.isNaN(Date.parse(nextActionDueAt)))) {
+    return { ok: false, message: "Select a valid next-action due date." };
   }
 
   if (prohibitedSalesTextPatterns.some((pattern) => pattern.test(`${assignedOwner} ${nextAction}`))) {
@@ -123,9 +186,37 @@ export function validateSalesOpportunityUpdate(payload: unknown):
     update: {
       pipelineStage,
       assignedOwner,
-      nextAction
+      nextAction,
+      nextActionDueAt
     }
   };
+}
+
+export function validateSalesAssessmentSchedule(payload: unknown):
+  | { ok: true; schedule: SalesAssessmentSchedule }
+  | { ok: false; message: string } {
+  if (!payload || typeof payload !== "object") {
+    return { ok: false, message: "Assessment schedule must be a JSON object." };
+  }
+
+  const candidate = payload as Record<string, unknown>;
+  const startAt = typeof candidate.startAt === "string" ? candidate.startAt : "";
+  const durationMinutes = Number(candidate.durationMinutes);
+  const meetingUrl = typeof candidate.meetingUrl === "string" ? candidate.meetingUrl.trim() : "";
+
+  if (!startAt || Number.isNaN(Date.parse(startAt)) || Date.parse(startAt) < Date.now() - 300_000) {
+    return { ok: false, message: "Select a valid future assessment start time." };
+  }
+
+  if (!Number.isInteger(durationMinutes) || durationMinutes < 15 || durationMinutes > 240) {
+    return { ok: false, message: "Assessment duration must be between 15 and 240 minutes." };
+  }
+
+  if (meetingUrl.length > 500 || (meetingUrl && !meetingUrl.startsWith("https://"))) {
+    return { ok: false, message: "Use an HTTPS meeting URL or leave the meeting URL empty." };
+  }
+
+  return { ok: true, schedule: { startAt, durationMinutes, meetingUrl } };
 }
 
 export function getPilotProgramForOpportunity(opportunity: SalesOpportunity): PilotProgram | null {
@@ -139,11 +230,120 @@ export function getSalesOperationsSummary() {
     route: "/sales-operations",
     apiRoute: "/api/sales-operations",
     status: "tenant-admin-protected",
-    crmConfigured: Boolean(process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL),
+    crmConfigured: true,
+    crmMode: process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL ? "native-export-plus-webhook" : "native-export",
+    crmWebhookConfigured: Boolean(process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL),
+    authentication: "magic-link-plus-totp",
+    sessionPolicy: "12-hour maximum; 2-hour inactivity boundary",
     pipelineStages: salesPipelineStages,
     boundary: salesOperationsBoundary,
     updated: "2026-06-11"
   };
+}
+
+export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
+  const headers = [
+    "Opportunity ID",
+    "Organization",
+    "Buyer Name",
+    "Buyer Email",
+    "Buyer Role",
+    "Region",
+    "Pipeline Stage",
+    "Assigned Owner",
+    "Next Action",
+    "Next Action Due",
+    "Offer Interest",
+    "Timeline",
+    "Workflow Targets",
+    "Governance Requirements",
+    "Interoperability Context",
+    "Product Boundary"
+  ];
+  const row = [
+    opportunity.intakeId,
+    opportunity.payload.organization.name,
+    opportunity.payload.contact.fullName,
+    opportunity.payload.contact.workEmail,
+    opportunity.payload.contact.role,
+    opportunity.payload.organization.region,
+    opportunity.pipelineStage,
+    opportunity.assignedOwner,
+    opportunity.nextAction,
+    opportunity.nextActionDueAt,
+    opportunity.payload.scope.offerInterest,
+    opportunity.payload.scope.timeline,
+    opportunity.payload.scope.workflowTargets.join("; "),
+    opportunity.payload.scope.governanceRequirements.join("; "),
+    opportunity.payload.scope.interoperabilityContext,
+    salesOperationsBoundary
+  ];
+
+  return `${headers.map(csvCell).join(",")}\r\n${row.map(csvCell).join(",")}\r\n`;
+}
+
+export function buildSalesFollowUpDraft(opportunity: SalesOpportunity) {
+  const contactName = cleanHeader(opportunity.payload.contact.fullName).split(" ")[0] || "there";
+  const organizationName = cleanHeader(opportunity.payload.organization.name);
+  const subject = `SCRIMED next step for ${organizationName}`;
+  const nextAction = cleanHeader(opportunity.nextAction || "confirm the enterprise discovery conversation");
+
+  return `To: ${cleanHeader(opportunity.payload.contact.workEmail)}
+Subject: ${subject}
+X-SCRIMED-Opportunity-ID: ${cleanHeader(opportunity.intakeId)}
+Content-Type: text/plain; charset="UTF-8"
+
+Hello ${contactName},
+
+Thank you for exploring SCRIMED with ${organizationName}. Our proposed next step is to ${nextAction.toLowerCase()}.
+
+SCRIMED helps healthcare organizations transform fragmented workflows into decision-grade, human-reviewed operational intelligence. This conversation remains within a governed synthetic pilot and enterprise evaluation boundary. Please do not send patient data, PHI, live clinical records, or payer member information.
+
+Regards,
+${cleanHeader(opportunity.assignedOwner || "SCRIMED Solutions")}
+SCRIMED Solutions
+Solving For A Better Tomorrow.
+`;
+}
+
+export function buildAssessmentInvitation(opportunity: SalesOpportunity) {
+  if (!opportunity.assessmentStartAt) {
+    throw new Error("Assessment start time is required.");
+  }
+
+  const start = new Date(opportunity.assessmentStartAt);
+  const end = new Date(start.getTime() + opportunity.assessmentDurationMinutes * 60_000);
+  const organization = cleanHeader(opportunity.payload.organization.name);
+  const meetingUrl = opportunity.assessmentMeetingUrl;
+  const description = [
+    `Governed SCRIMED enterprise assessment for ${organization}.`,
+    `Opportunity: ${opportunity.intakeId}.`,
+    "Business-contact and workflow-scope discussion only. Do not share PHI, patient identifiers, live clinical records, diagnosis details, or payer member information.",
+    meetingUrl ? `Meeting link: ${meetingUrl}` : "Meeting location to be confirmed."
+  ].join("\n");
+
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//SCRIMED Solutions//Enterprise Assessment//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:REQUEST",
+    "BEGIN:VEVENT",
+    `UID:${escapeCalendar(opportunity.intakeId)}@scrimedsolutions.com`,
+    `DTSTAMP:${calendarTimestamp(new Date().toISOString())}`,
+    `DTSTART:${calendarTimestamp(start.toISOString())}`,
+    `DTEND:${calendarTimestamp(end.toISOString())}`,
+    `SUMMARY:${escapeCalendar(`SCRIMED Enterprise Assessment - ${organization}`)}`,
+    `DESCRIPTION:${escapeCalendar(description)}`,
+    `ORGANIZER;CN=SCRIMED Solutions:mailto:scrimedsolutions@gmail.com`,
+    `ATTENDEE;CN=${escapeCalendar(opportunity.payload.contact.fullName)};RSVP=TRUE:mailto:${cleanHeader(opportunity.payload.contact.workEmail)}`,
+    meetingUrl ? `URL:${escapeCalendar(meetingUrl)}` : "",
+    meetingUrl ? `LOCATION:${escapeCalendar(meetingUrl)}` : "LOCATION:To be confirmed",
+    "STATUS:TENTATIVE",
+    "END:VEVENT",
+    "END:VCALENDAR",
+    ""
+  ].filter(Boolean).join("\r\n");
 }
 
 export function buildSalesOpportunityProposal(opportunity: SalesOpportunity) {

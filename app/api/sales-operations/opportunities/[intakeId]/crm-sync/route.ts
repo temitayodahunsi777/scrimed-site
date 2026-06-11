@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedPilotContext } from "../../../../../lib/protectedPilotStore";
+import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
   buildCrmOpportunityPayload,
   salesOperationsBoundary
@@ -31,7 +31,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     );
   }
 
-  const context = await getAuthenticatedPilotContext(request);
+  const context = await getAuthenticatedSalesContext(request);
 
   if (!context.ok) {
     return NextResponse.json(

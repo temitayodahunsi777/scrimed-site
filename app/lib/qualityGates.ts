@@ -56,7 +56,7 @@ export const qualityGates: QualityGate[] = [
     name: "Tenant-admin sales operations",
     route: "/sales-operations",
     state: "active",
-    role: "Tenant-isolated opportunity management, audited proposal generation, controlled CRM handoff, and append-only sales activity evidence for governed synthetic pilots."
+    role: "AAL2 tenant-isolated opportunity management, due-action cadence, audited commercial artifacts, vendor-neutral CRM handoff, assessment invitations, and append-only sales activity evidence."
   },
   {
     name: "Enterprise readiness and claims control",

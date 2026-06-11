@@ -102,10 +102,10 @@ Completed foundations:
 
 Next build targets:
 
-- Operationalize sales ownership, opportunity review cadence, CRM destination selection, and proposal follow-up through the protected Sales Operations console
-- Complete MFA and session-lifetime policy and continue cross-tenant isolation verification
+- Operate the activated sales ownership, due-action cadence, vendor-neutral CRM export, proposal follow-up, and assessment invitation workflows through the protected Sales Operations console
+- Continue cross-tenant isolation verification and extend AAL2/session policy from Sales Operations to future tenant-administration surfaces
 - Continue monitoring verified Upstash Redis distributed intake and protected mutation limits across Vercel regions
-- Configure production sign-in, MFA, session lifetime, account lifecycle, and enterprise SSO policy
+- Add approved tenant membership lifecycle and enterprise SSO policy when customer demand requires it
 - Complete qualified counsel, privacy, regulatory, trademark, insurance, incident-response, and independent security reviews
 - Add tenant administration and approved membership lifecycle workflows after identity policy is approved
 - Decide whether selected protected Vercel deployment smoke-test routes should be public or remain connector-authenticated

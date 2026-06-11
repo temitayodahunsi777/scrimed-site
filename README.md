@@ -119,7 +119,7 @@ The intake captures business-contact information, buyer segment, target workflow
 
 Validated intake is retained in a private, token-gated Supabase ledger before follow-up. If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API also forwards the sanitized handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. The API does not report an intake as accepted unless a durable destination accepted it.
 
-Approved SCRIMED tenant-admins manage retained intake at `/sales-operations`. The console supports opportunity assignment, pipeline stage and next-action control, audited non-binding proposal downloads, optional CRM synchronization, and an append-only sales audit trail. Direct access to private lead and audit tables remains denied.
+Approved SCRIMED tenant-admins manage retained intake at `/sales-operations`. The console supports AAL2 passwordless access, opportunity assignment, due-action cadence, audited non-binding proposal downloads, vendor-neutral CRM imports, optional webhook synchronization, human-reviewed follow-up drafts, audited assessment invitations, and an append-only sales audit trail. Direct access to private lead and audit tables remains denied.
 
 ## Demo and Pilot Center
 
@@ -139,7 +139,7 @@ All demos and programs preserve the synthetic evaluation boundary. They do not a
 Core enterprise evaluation surfaces:
 
 - `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
-- `/sales-operations` - protected tenant-admin opportunity pipeline, audited proposals, and controlled CRM handoff
+- `/sales-operations` - AAL2 tenant-admin opportunity pipeline, cadence control, audited commercial artifacts, assessment scheduling, and vendor-neutral CRM handoff
 - `/demos` - executable buyer demos with guided proof paths and retained production exclusions
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails

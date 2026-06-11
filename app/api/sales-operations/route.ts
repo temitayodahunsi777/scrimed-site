@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedPilotContext } from "../../lib/protectedPilotStore";
+import { getAuthenticatedSalesContext } from "../../lib/protectedPilotStore";
 import { getSalesOperationsSummary } from "../../lib/salesOperations";
 import { getSalesOperationsDashboard } from "../../lib/salesOperationsStore";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const context = await getAuthenticatedPilotContext(request);
+  const context = await getAuthenticatedSalesContext(request);
   const summary = getSalesOperationsSummary();
 
   if (!context.ok) {

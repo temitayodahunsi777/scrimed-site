@@ -14,7 +14,7 @@ type AuthenticatedPilotContext =
     }
   | {
       ok: false;
-      status: 401 | 503;
+      status: 401 | 403 | 503;
       code: string;
       message: string;
     };
@@ -152,6 +152,52 @@ export async function getAuthenticatedPilotContext(request: Request): Promise<Au
     client,
     user: data.user
   };
+}
+
+function verifiedJwtClaims(token: string) {
+  try {
+    const payload = token.split(".")[1];
+
+    if (!payload) {
+      return null;
+    }
+
+    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+export async function getAuthenticatedSalesContext(request: Request): Promise<AuthenticatedPilotContext> {
+  const context = await getAuthenticatedPilotContext(request);
+
+  if (!context.ok) {
+    return context;
+  }
+
+  const authorization = request.headers.get("authorization") ?? "";
+  const token = authorization.startsWith("Bearer ") ? authorization.slice(7).trim() : "";
+  const claims = verifiedJwtClaims(token);
+
+  if (claims?.aal !== "aal2") {
+    return {
+      ok: false,
+      status: 403,
+      code: "sales-operations-mfa-required",
+      message: "Verify the enrolled authenticator factor before accessing tenant-admin sales operations."
+    };
+  }
+
+  if (typeof claims.session_id !== "string" || !claims.session_id) {
+    return {
+      ok: false,
+      status: 401,
+      code: "sales-operations-session-invalid",
+      message: "This tenant-admin session is missing the required identity-provider session binding."
+    };
+  }
+
+  return context;
 }
 
 function tenantName(row: WorkspaceRow) {
