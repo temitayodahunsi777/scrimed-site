@@ -356,6 +356,155 @@ h3 {
   text-align: left;
 }
 
+.decision-ledger {
+  border-top: 1px solid var(--line);
+}
+
+.decision-ledger-summary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 32px 0 20px;
+}
+
+.decision-ledger-summary article {
+  border: 1px solid var(--line);
+  min-height: 130px;
+  padding: 20px;
+}
+
+.decision-ledger-summary span,
+.decision-detail-heading span,
+.decision-metrics span,
+.decision-list-item span,
+.review-event-list span {
+  color: var(--green);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.decision-ledger-summary strong {
+  color: var(--green-dark);
+  display: block;
+  font-size: 24px;
+  overflow-wrap: anywhere;
+}
+
+.decision-commit-form {
+  margin-bottom: 20px;
+}
+
+.decision-ledger-grid {
+  border: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.5fr);
+}
+
+.decision-list {
+  border-right: 1px solid var(--line);
+}
+
+.decision-list-item {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  min-height: 132px;
+  padding: 20px;
+  text-align: left;
+  width: 100%;
+}
+
+.decision-list-item:hover,
+.decision-list-item:focus-visible,
+.decision-list-item-active {
+  background: #e7f1ec;
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+
+.decision-list-item strong,
+.decision-list-item small {
+  display: block;
+}
+
+.decision-list-item small,
+.review-event-list small {
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.decision-detail {
+  min-width: 0;
+  padding: 26px;
+}
+
+.decision-detail-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+.decision-detail-heading h3 {
+  font-size: 25px;
+  margin: 0;
+}
+
+.decision-metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 24px;
+}
+
+.decision-metrics div {
+  border: 1px solid var(--line);
+  min-height: 108px;
+  padding: 15px;
+}
+
+.decision-metrics strong {
+  color: var(--green-dark);
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.governance-review-form {
+  margin-top: 28px;
+  padding: 20px;
+}
+
+.review-event-list {
+  border-top: 1px solid var(--line);
+  margin-top: 28px;
+  padding-top: 24px;
+}
+
+.review-event-list article {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 0.8fr 1.2fr 0.8fr;
+  padding: 18px 0;
+}
+
+.decision-list-empty {
+  color: var(--muted);
+  line-height: 1.55;
+  padding: 24px;
+}
+
+.decision-list-empty strong {
+  color: var(--green-dark);
+}
+
 .layer-row span {
   color: var(--green);
   font-weight: 800;
@@ -992,8 +1141,21 @@ h3 {
   .sales-scope-grid,
   .sales-activation-grid,
   .mfa-enrollment,
-  .evaluation-output-grid {
+  .evaluation-output-grid,
+  .decision-ledger-summary,
+  .decision-ledger-grid,
+  .decision-metrics,
+  .review-event-list article {
     grid-template-columns: 1fr;
+  }
+
+  .decision-list {
+    border-bottom: 1px solid var(--line);
+    border-right: 0;
+  }
+
+  .decision-detail-heading {
+    flex-direction: column;
   }
 
   .sales-toolbar,

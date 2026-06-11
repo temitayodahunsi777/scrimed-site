@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
 import {
   getAccessiblePilotWorkspace,
-  getAuthenticatedPilotContext,
+  getAuthenticatedGovernanceContext,
   getPilotSession,
   recordProofPacketDownload
 } from "../../../../../../lib/protectedPilotStore";
 import {
   buildEnterpriseProofPacket,
-  protectedPilotBoundary
+  protectedPilotBoundary,
+  protectedPilotNoStoreHeaders
 } from "../../../../../../lib/protectedPilotWorkspace";
+import {
+  enforceRequestRateLimit,
+  rateLimitHeaders
+} from "../../../../../../lib/requestRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +22,26 @@ type RouteContext = {
 };
 
 export async function GET(request: Request, { params }: RouteContext) {
-  const context = await getAuthenticatedPilotContext(request);
+  const rateLimit = await enforceRequestRateLimit(request, {
+    namespace: "protected-pilot-proof-packet",
+    limit: 40,
+    windowSeconds: 600
+  });
+  const headers = { ...protectedPilotNoStoreHeaders, ...rateLimitHeaders(rateLimit) };
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: { code: "rate-limit-exceeded", message: "Protected pilot proof packet downloads are temporarily rate limited." } },
+      { status: 429, headers }
+    );
+  }
+
+  const context = await getAuthenticatedGovernanceContext(request);
 
   if (!context.ok) {
     return NextResponse.json(
       { error: { code: context.code, message: context.message }, boundary: protectedPilotBoundary },
-      { status: context.status }
+      { status: context.status, headers }
     );
   }
 
@@ -37,7 +56,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "No tenant-isolated pilot workspace is available for this member and slug."
         }
       },
-      { status: 404 }
+      { status: 404, headers }
     );
   }
 
@@ -51,7 +70,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "No tenant-isolated pilot session is available for this member and session ID."
         }
       },
-      { status: 404 }
+      { status: 404, headers }
     );
   }
 
@@ -70,7 +89,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "The proof packet was not released because its append-only download audit event could not be committed."
         }
       },
-      { status: 502 }
+      { status: 502, headers }
     );
   }
 
@@ -79,7 +98,7 @@ export async function GET(request: Request, { params }: RouteContext) {
 
   return new NextResponse(packet, {
     headers: {
-      "Cache-Control": "private, no-store",
+      ...headers,
       "Content-Disposition": `attachment; filename="scrimed-${safeWorkspaceSlug}-${sessionId}-proof-packet.md"`,
       "Content-Type": "text/markdown; charset=utf-8",
       "X-SCRIMED-Data-Boundary": "synthetic-only",

@@ -8,6 +8,7 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
+import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -476,6 +477,12 @@ export default function ProtectedPilotAccess({
 
       {selectedWorkspace ? (
         <>
+          <TrustOSDecisionLedgerPanel
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
+          />
+
           <section className="table-section" aria-label="Durable synthetic pilot sessions">
             <div className="section-heading">
               <p className="eyebrow">Durable pilot sessions</p>

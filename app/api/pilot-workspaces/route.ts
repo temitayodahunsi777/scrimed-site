@@ -3,7 +3,10 @@ import {
   getAuthenticatedPilotContext,
   listAccessiblePilotWorkspaces
 } from "../../lib/protectedPilotStore";
-import { protectedPilotBoundary } from "../../lib/protectedPilotWorkspace";
+import {
+  protectedPilotBoundary,
+  protectedPilotNoStoreHeaders
+} from "../../lib/protectedPilotWorkspace";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +22,7 @@ export async function GET(request: Request) {
         },
         boundary: protectedPilotBoundary
       },
-      { status: context.status }
+      { status: context.status, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -33,14 +36,17 @@ export async function GET(request: Request) {
           message: "Tenant-isolated pilot workspaces could not be retrieved."
         }
       },
-      { status: 502 }
+      { status: 502, headers: protectedPilotNoStoreHeaders }
     );
   }
 
-  return NextResponse.json({
-    service: "scrimed-protected-pilot-workspaces",
-    boundary: protectedPilotBoundary,
-    authenticatedUserId: context.user.id,
-    workspaces: result.workspaces
-  });
+  return NextResponse.json(
+    {
+      service: "scrimed-protected-pilot-workspaces",
+      boundary: protectedPilotBoundary,
+      authenticatedUserId: context.user.id,
+      workspaces: result.workspaces
+    },
+    { headers: protectedPilotNoStoreHeaders }
+  );
 }

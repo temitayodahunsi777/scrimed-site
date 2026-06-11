@@ -5,6 +5,12 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "./protectedPilotWorkspace";
+import type {
+  TrustOSDecisionLedgerRecord,
+  TrustOSReviewEventRecord,
+  TrustOSReviewInput
+} from "./trustOSDecisionLedger";
+import type { TrustOSDecisionRecord } from "./trustOS";
 
 type AuthenticatedPilotContext =
   | {
@@ -48,6 +54,35 @@ type AuditEventRow = {
   actor_user_id: string;
   event_type: string;
   event_metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+type TrustOSDecisionRow = {
+  id: string;
+  workspace_id: string;
+  pilot_session_id: string | null;
+  decision_id: string;
+  trace_id: string;
+  policy_version: string;
+  workflow: string;
+  decision: TrustOSDecisionLedgerRecord["decision"];
+  confidence: number;
+  uncertainty: number;
+  decision_record: TrustOSDecisionRecord;
+  created_by: string;
+  created_at: string;
+};
+
+type TrustOSReviewEventRow = {
+  id: string;
+  workspace_id: string;
+  trustos_decision_id: string;
+  actor_user_id: string;
+  event_type: TrustOSReviewEventRecord["eventType"];
+  disposition: TrustOSReviewEventRecord["disposition"];
+  reason_code: TrustOSReviewEventRecord["reasonCode"];
+  notes: string;
+  outcome_metrics: TrustOSReviewEventRecord["outcomeMetrics"];
   created_at: string;
 };
 
@@ -200,6 +235,40 @@ export async function getAuthenticatedSalesContext(request: Request): Promise<Au
   return context;
 }
 
+export async function getAuthenticatedGovernanceContext(
+  request: Request
+): Promise<AuthenticatedPilotContext> {
+  const context = await getAuthenticatedPilotContext(request);
+
+  if (!context.ok) {
+    return context;
+  }
+
+  const authorization = request.headers.get("authorization") ?? "";
+  const token = authorization.startsWith("Bearer ") ? authorization.slice(7).trim() : "";
+  const claims = verifiedJwtClaims(token);
+
+  if (claims?.aal !== "aal2") {
+    return {
+      ok: false,
+      status: 403,
+      code: "governance-mfa-required",
+      message: "Verify the enrolled authenticator factor before accessing the TrustOS Decision Ledger."
+    };
+  }
+
+  if (typeof claims.session_id !== "string" || !claims.session_id) {
+    return {
+      ok: false,
+      status: 401,
+      code: "governance-session-invalid",
+      message: "This governance session is missing the required identity-provider session binding."
+    };
+  }
+
+  return context;
+}
+
 function tenantName(row: WorkspaceRow) {
   if (Array.isArray(row.pilot_tenants)) {
     return row.pilot_tenants[0]?.name ?? "Tenant";
@@ -246,11 +315,48 @@ function mapAuditEvent(row: AuditEventRow): PilotAuditEventRecord {
   };
 }
 
+function mapTrustOSDecision(row: TrustOSDecisionRow): TrustOSDecisionLedgerRecord {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    pilotSessionId: row.pilot_session_id,
+    decisionId: row.decision_id,
+    traceId: row.trace_id,
+    policyVersion: row.policy_version,
+    workflow: row.workflow,
+    decision: row.decision,
+    confidence: row.confidence,
+    uncertainty: row.uncertainty,
+    decisionRecord: row.decision_record,
+    createdBy: row.created_by,
+    createdAt: row.created_at
+  };
+}
+
+function mapTrustOSReviewEvent(row: TrustOSReviewEventRow): TrustOSReviewEventRecord {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    trustOSDecisionId: row.trustos_decision_id,
+    actorUserId: row.actor_user_id,
+    eventType: row.event_type,
+    disposition: row.disposition,
+    reasonCode: row.reason_code,
+    notes: row.notes,
+    outcomeMetrics: row.outcome_metrics,
+    createdAt: row.created_at
+  };
+}
+
 const workspaceSelect = "id, tenant_id, slug, name, status, boundary, created_at, pilot_tenants(name)";
 const sessionSelect =
   "id, workspace_id, scenario_slug, status, boundary, evaluation, created_at, created_by";
 const auditEventSelect =
   "id, workspace_id, session_id, actor_user_id, event_type, event_metadata, created_at";
+const trustOSDecisionSelect =
+  "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
+const trustOSReviewEventSelect =
+  "id, workspace_id, trustos_decision_id, actor_user_id, event_type, disposition, reason_code, notes, outcome_metrics, created_at";
 
 export async function listAccessiblePilotWorkspaces(client: SupabaseClient) {
   const { data, error } = await client.from("pilot_workspaces").select(workspaceSelect).order("created_at");
@@ -348,5 +454,113 @@ export async function recordProofPacketDownload(
       format: "text/markdown",
       syntheticOnly: true
     }
+  });
+}
+
+export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("trustos_decisions")
+    .select(trustOSDecisionSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(250);
+
+  return {
+    decisions: ((data ?? []) as unknown as TrustOSDecisionRow[]).map(mapTrustOSDecision),
+    error
+  };
+}
+
+export async function getTrustOSDecision(
+  client: SupabaseClient,
+  workspaceId: string,
+  decisionId: string
+) {
+  const { data, error } = await client
+    .from("trustos_decisions")
+    .select(trustOSDecisionSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", decisionId)
+    .maybeSingle();
+
+  return {
+    decision: data ? mapTrustOSDecision(data as unknown as TrustOSDecisionRow) : null,
+    error
+  };
+}
+
+export async function persistTrustOSDecision(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  decisionRecord: TrustOSDecisionRecord,
+  workflow: string,
+  pilotSessionId: string | null = null
+) {
+  const { data, error } = await client.rpc("create_trustos_decision", {
+    p_workspace_slug: workspaceSlug,
+    p_pilot_session_id: pilotSessionId,
+    p_policy_version: "trustos-v1.0.0",
+    p_workflow: workflow,
+    p_decision: decisionRecord.decision,
+    p_confidence: decisionRecord.confidence,
+    p_uncertainty: decisionRecord.uncertainty,
+    p_decision_record: decisionRecord
+  });
+
+  return {
+    decisionId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function listTrustOSReviewEvents(
+  client: SupabaseClient,
+  workspaceId: string,
+  decisionId: string
+) {
+  const { data, error } = await client
+    .from("trustos_review_events")
+    .select(trustOSReviewEventSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("trustos_decision_id", decisionId)
+    .order("created_at", { ascending: false })
+    .limit(250);
+
+  return {
+    events: ((data ?? []) as unknown as TrustOSReviewEventRow[]).map(mapTrustOSReviewEvent),
+    error
+  };
+}
+
+export async function recordTrustOSReviewEvent(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  decisionId: string,
+  review: TrustOSReviewInput
+) {
+  return client.rpc("record_trustos_review_event", {
+    p_workspace_slug: workspaceSlug,
+    p_trustos_decision_id: decisionId,
+    p_event_type: review.eventType,
+    p_disposition: review.disposition,
+    p_reason_code: review.reasonCode,
+    p_notes: review.notes,
+    p_outcome_metrics: review.outcomeMetrics
+  });
+}
+
+export async function recordTrustOSGovernancePacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  decisionId: string
+) {
+  return client.rpc("record_trustos_review_event", {
+    p_workspace_slug: workspaceSlug,
+    p_trustos_decision_id: decisionId,
+    p_event_type: "governance-packet-downloaded",
+    p_disposition: "noted",
+    p_reason_code: "packet-export",
+    p_notes: "",
+    p_outcome_metrics: {}
   });
 }

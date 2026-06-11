@@ -62,6 +62,12 @@ export type ProtectedPilotInfrastructure = {
 export const protectedPilotBoundary =
   "Protected pilot workspaces retain governed synthetic evaluation evidence only. They do not accept live PHI, execute clinical care, submit payer transactions, contact patients, or authorize autonomous diagnosis or treatment.";
 
+export const protectedPilotNoStoreHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Authorization",
+  "X-SCRIMED-Data-Boundary": "synthetic-only"
+} as const;
+
 export const pilotWorkspaceRoles: Array<{
   role: PilotWorkspaceRole;
   permissions: string[];
@@ -105,7 +111,7 @@ export const protectedPilotApiContracts = [
   {
     method: "POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions",
-    access: "Bearer token + authorized role + rate limit",
+    access: "AAL2 bearer token + authorized role + server-held runtime authorization + rate limit",
     purpose: "Run and durably retain a governed synthetic AgentOS evaluation with an append-only audit event."
   },
   {
@@ -117,8 +123,26 @@ export const protectedPilotApiContracts = [
   {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
-    access: "Bearer token + workspace membership",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
     purpose: "Download a buyer-ready Markdown proof packet generated from tenant-isolated session evidence."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions",
+    access: "AAL2 bearer token + authorized tenant role + rate limit",
+    purpose: "Inspect or commit metadata-only TrustOS decisions to the tenant-isolated append-only governance ledger."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/reviews",
+    access: "AAL2 bearer token + authorized tenant role + rate limit",
+    purpose: "Inspect or commit human reviewer dispositions, overrides, and controlled workflow outcome signals."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/governance-packet",
+    access: "AAL2 bearer token + authorized tenant role",
+    purpose: "Download an audited governance packet containing decision, control, trace, evidence, and human-review proof."
   }
 ];
 
@@ -194,9 +218,12 @@ export function getProtectedPilotWorkspaceSummary() {
       "Append-only audit events",
       "Human-review and Trust Card evidence",
       "Downloadable enterprise proof packets",
+      "AAL2-protected append-only TrustOS Decision Ledger",
+      "Governed reviewer dispositions, overrides, and outcome-learning signals",
+      "Downloadable audited TrustOS governance packets",
       "Rate-limited public intake and protected session creation"
     ],
-    updated: "2026-06-10"
+    updated: "2026-06-11"
   };
 }
 

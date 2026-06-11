@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import { runAgentEvaluation } from "../../../../lib/agentEvaluationWorkspace";
 import {
   getAccessiblePilotWorkspace,
+  getAuthenticatedGovernanceContext,
   getAuthenticatedPilotContext,
   getPilotSession,
   listPilotSessions,
   persistPilotSession
 } from "../../../../lib/protectedPilotStore";
-import { protectedPilotBoundary } from "../../../../lib/protectedPilotWorkspace";
+import {
+  protectedPilotBoundary,
+  protectedPilotNoStoreHeaders
+} from "../../../../lib/protectedPilotWorkspace";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../../lib/requestRateLimit";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +26,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (!context.ok) {
     return NextResponse.json(
       { error: { code: context.code, message: context.message }, boundary: protectedPilotBoundary },
-      { status: context.status }
+      { status: context.status, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -37,7 +41,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "No tenant-isolated pilot workspace is available for this member and slug."
         }
       },
-      { status: 404 }
+      { status: 404, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -51,16 +55,19 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "Durable synthetic pilot sessions could not be retrieved."
         }
       },
-      { status: 502 }
+      { status: 502, headers: protectedPilotNoStoreHeaders }
     );
   }
 
-  return NextResponse.json({
-    service: "scrimed-protected-pilot-sessions",
-    boundary: protectedPilotBoundary,
-    workspace: workspaceResult.workspace,
-    sessions: result.sessions
-  });
+  return NextResponse.json(
+    {
+      service: "scrimed-protected-pilot-sessions",
+      boundary: protectedPilotBoundary,
+      workspace: workspaceResult.workspace,
+      sessions: result.sessions
+    },
+    { headers: protectedPilotNoStoreHeaders }
+  );
 }
 
 export async function POST(request: Request, { params }: RouteContext) {
@@ -69,7 +76,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     limit: 20,
     windowSeconds: 600
   });
-  const headers = rateLimitHeaders(rateLimit);
+  const headers = { ...protectedPilotNoStoreHeaders, ...rateLimitHeaders(rateLimit) };
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
@@ -83,7 +90,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     );
   }
 
-  const context = await getAuthenticatedPilotContext(request);
+  const context = await getAuthenticatedGovernanceContext(request);
 
   if (!context.ok) {
     return NextResponse.json(

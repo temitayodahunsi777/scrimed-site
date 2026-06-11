@@ -63,7 +63,7 @@ export const qualityGates: QualityGate[] = [
     name: "Executable TrustOS governance",
     route: "/trust-os",
     state: "active",
-    role: "Deterministic request governance through PHI Shield, Agent Firewall, Clinical Guardian, policy controls, vendor-neutral model routing, explainability, human escalation, and metadata-only Clinical Trace."
+    role: "Deterministic request governance plus an AAL2-protected tenant Decision Ledger with append-only decisions, Clinical Trace, reviewer dispositions, outcome signals, and audited governance packets."
   },
   {
     name: "Enterprise readiness and claims control",

@@ -4,7 +4,10 @@ import {
   getAuthenticatedPilotContext,
   listPilotAuditEvents
 } from "../../../../lib/protectedPilotStore";
-import { protectedPilotBoundary } from "../../../../lib/protectedPilotWorkspace";
+import {
+  protectedPilotBoundary,
+  protectedPilotNoStoreHeaders
+} from "../../../../lib/protectedPilotWorkspace";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +21,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (!context.ok) {
     return NextResponse.json(
       { error: { code: context.code, message: context.message }, boundary: protectedPilotBoundary },
-      { status: context.status }
+      { status: context.status, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -33,7 +36,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "No tenant-isolated pilot workspace is available for this member and slug."
         }
       },
-      { status: 404 }
+      { status: 404, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -47,14 +50,17 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "The tenant-isolated append-only audit trail could not be retrieved."
         }
       },
-      { status: 502 }
+      { status: 502, headers: protectedPilotNoStoreHeaders }
     );
   }
 
-  return NextResponse.json({
-    service: "scrimed-protected-pilot-audit",
-    boundary: protectedPilotBoundary,
-    workspace: workspaceResult.workspace,
-    events: result.events
-  });
+  return NextResponse.json(
+    {
+      service: "scrimed-protected-pilot-audit",
+      boundary: protectedPilotBoundary,
+      workspace: workspaceResult.workspace,
+      events: result.events
+    },
+    { headers: protectedPilotNoStoreHeaders }
+  );
 }

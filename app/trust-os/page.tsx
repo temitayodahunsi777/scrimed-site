@@ -22,6 +22,7 @@ export default function TrustOSPage() {
           vendor-neutral model routing, human approval, explainability, and metadata-only Clinical Trace generation.
         </p>
         <div className="hero-actions">
+          <Link className="primary-action" href="/pilot-workspace/access">Open Protected Decision Ledger</Link>
           <a className="secondary-action" href="/api/trust-os">Inspect TrustOS API</a>
           <Link className="secondary-action" href="/evaluation">Run AgentOS Evaluation</Link>
           <Link className="secondary-action" href="/trust-center">Open Trust Center</Link>
