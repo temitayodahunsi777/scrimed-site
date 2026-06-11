@@ -16,6 +16,7 @@ import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
+import { getTrustOSSummary } from "./trustOS";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -323,6 +324,12 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Run TrustOS Decision",
+    href: "/trust-os",
+    purpose: "Evaluate a synthetic agent action through policy, PHI, tool, clinical, model-route, explainability, and trace controls.",
+    boundary: "TrustOS evaluation does not authorize live healthcare data, production tools, or autonomous clinical execution."
+  },
+  {
     label: "Open Sales Operations Console",
     href: "/sales-operations",
     purpose: "Manage retained buyer opportunities, ownership, pipeline stage, audited proposals, and controlled CRM synchronization.",
@@ -468,6 +475,7 @@ export function getProductConsoleSummary() {
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const protectedPilotWorkspaceSummary = getProtectedPilotWorkspaceSummary();
   const salesOperationsSummary = getSalesOperationsSummary();
+  const trustOSSummary = getTrustOSSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -505,6 +513,7 @@ export function getProductConsoleSummary() {
     agentOSControlPlaneCount: agentOSSummary.controlPlane.length,
     atlasSubsystemCount: atlasIntelligenceCoreSummary.subsystems.length,
     trustCardCount: atlasIntelligenceCoreSummary.trustCards.length,
+    trustOSControlCount: trustOSSummary.components.length,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -520,6 +529,7 @@ export function getProductConsoleSummary() {
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
+    trustOSSummary,
     commercialStrategySummary,
     companyOperationsSummary,
     enterpriseReadinessSummary,
@@ -536,6 +546,7 @@ export function getProductConsoleSummary() {
       agentOS: agentOSSummary.status,
       agentEvaluationWorkspace: agentEvaluationWorkspaceSummary.status,
       atlasIntelligenceCore: atlasIntelligenceCoreSummary.status,
+      trustOS: trustOSSummary.status,
       workflowExecution: workflowExecutionSummary.status,
       workflowResults: workflowExecutionResultSummary.status,
       resultValidation: workflowResultValidationSummary.status,
@@ -635,6 +646,12 @@ export function getProductReadinessBrief() {
     `Task engine: ${summary.agentOSSummary.taskApiRoute}`,
     `Evaluation workspace: ${summary.evaluationRoute}`,
     `Evaluation API: ${summary.evaluationApiRoute}`,
+    "",
+    "## TrustOS v1",
+    `Status: ${summary.trustOSSummary.status}`,
+    `Controls: ${summary.trustOSControlCount}`,
+    `Decision workspace: ${summary.trustOSSummary.route}`,
+    `Evaluation API: ${summary.trustOSSummary.evaluationApiRoute}`,
     "",
     "## Atlas Intelligence Core v1",
     `Status: ${summary.atlasIntelligenceCoreSummary.status}`,

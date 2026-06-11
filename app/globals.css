@@ -968,6 +968,10 @@ h3 {
   min-height: 220px;
 }
 
+.trust-control-results {
+  padding: 0;
+}
+
 @media (max-width: 980px) {
   .hero-shell {
     min-height: auto;

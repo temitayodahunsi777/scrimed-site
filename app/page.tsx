@@ -25,6 +25,10 @@ const platformModules = [
     summary: "Planner, router, specialist agents, memory, TrustQA, sandboxing, audit, RBAC, and human approvals."
   },
   {
+    name: "TrustOS",
+    summary: "Executable healthcare AI governance through PHI Shield, Agent Firewall, Clinical Guardian, model routing, explainability, and Clinical Trace."
+  },
+  {
     name: "Atlas Intelligence Core",
     summary: "Structural document intelligence, evidence attribution, Trust Cards, validation, governance, and reimbursement posture."
   },
@@ -63,6 +67,7 @@ const readinessSignals = [
   { label: "Memory", value: "/api/memory" },
   { label: "Audit", value: "/api/audit" },
   { label: "Trust Cards", value: "/api/trust/cards" },
+  { label: "TrustOS", value: "/api/trust-os/evaluate" },
   { label: "Observability", value: "/api/observability" },
   { label: "Exec API", value: "/api/workflows/contracts" },
   { label: "Identity", value: "/api/workflows/identity-access" },
@@ -115,6 +120,7 @@ export default function Home() {
               <Link className="secondary-action" href="/pricing">Review Pricing</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
               <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
+              <Link className="secondary-action" href="/trust-os">Run TrustOS Decision</Link>
               <Link className="secondary-action" href="/hub">Open OS Hub</Link>
               <a className="secondary-action" href="https://www.scrimedsolutions.com">Official website</a>
             </div>
@@ -160,6 +166,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> AgentOS evaluation workspace ready
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> TrustOS governance decisions executable
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Five executable buyer demos ready

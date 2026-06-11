@@ -297,6 +297,10 @@ function EvaluationResult({ result }: { result: AgentEvaluationRecord }) {
           <strong>Confidence</strong>
           <p>{Math.round(result.trustCard.confidence * 100)}%</p>
         </div>
+        <div>
+          <strong>TrustOS decision</strong>
+          <p>{result.trustOSDecision.decision}</p>
+        </div>
       </div>
 
       <div className="evaluation-output-grid">
@@ -341,6 +345,16 @@ function EvaluationResult({ result }: { result: AgentEvaluationRecord }) {
             {result.observabilityRecord.metrics.map((metric) => (
               <li key={metric}>{metric}</li>
             ))}
+          </ul>
+        </article>
+        <article>
+          <span>TrustOS governance</span>
+          <h3>{result.trustOSDecision.summary}</h3>
+          <p>{result.trustOSDecision.clinicalTrace.captureBoundary}</p>
+          <ul className="compact-list">
+            <li>Clinical Trace: {result.trustOSDecision.clinicalTrace.traceId}</li>
+            <li>Confidence: {result.trustOSDecision.confidence}%</li>
+            <li>Uncertainty: {result.trustOSDecision.uncertainty}%</li>
           </ul>
         </article>
       </div>

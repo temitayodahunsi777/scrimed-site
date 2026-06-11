@@ -10,6 +10,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
+- Executable TrustOS governance surface: `/trust-os`, `/api/trust-os`, and `/api/trust-os/evaluate`
 - Trust and enterprise readiness control plane: `/trust-center`, `/trust-center/[slug]`, `/claims`, `/api/enterprise-readiness`, `/api/enterprise-readiness/[slug]`, `/api/enterprise-readiness/claims`, and `/api/enterprise-readiness/diligence-brief`
 - Demo and pilot center: `/demos`, `/demos/[slug]`, `/pilots`, `/pilots/[slug]`, `/api/demos`, `/api/demos/[slug]`, `/api/pilots`, and `/api/pilots/[slug]`
 - SCRIMED OS Hub: `/hub`, `/hub/readiness`, `/hub/events`
@@ -95,6 +96,9 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 ### Trust Layer
 
+- Executable TrustOS policy decisions across PHI Shield, Agent Firewall, Clinical Guardian, Agent Registry, Compliance Monitoring, Explainability Engine, Audit Engine, and Policy Engine
+- Vendor-neutral model-route evaluation with explicit production vendor, BAA, regional, monitoring, and rollback gates
+- Metadata-only Clinical Trace records with confidence, uncertainty, evidence references, approval checkpoints, and outcome-learning hooks
 - Watchtower regression and drift monitoring concepts
 - Runtime trace visibility
 - Safety and review requirements before clinical use

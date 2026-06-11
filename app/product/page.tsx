@@ -65,6 +65,10 @@ export default function ProductConsolePage() {
           <strong>{summary.enterpriseReadinessSummary.domainCount}</strong>
         </article>
         <article>
+          <span>TrustOS controls</span>
+          <strong>{summary.trustOSControlCount}</strong>
+        </article>
+        <article>
           <span>Approved claims</span>
           <strong>{summary.enterpriseReadinessSummary.claims.approved}</strong>
         </article>

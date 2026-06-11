@@ -15,6 +15,10 @@ import {
   type StructuralParser,
   type TrustCard
 } from "./atlasIntelligenceCore";
+import {
+  evaluateTrustOSRequest,
+  type TrustOSDecisionRecord
+} from "./trustOS";
 
 export type EvaluationStatus = "synthetic-evaluation-created" | "production-request-denied";
 
@@ -54,6 +58,7 @@ export type AgentEvaluationRecord = {
   taskPlan: AgentOSTaskPlan;
   documentIntelligence: StructuralParser;
   trustCard: TrustCard;
+  trustOSDecision: TrustOSDecisionRecord;
   evidenceSources: EvidenceSource[];
   observabilityRecord: {
     outcomeSignals: string[];
@@ -275,6 +280,24 @@ export function runAgentEvaluation(payload: unknown): EvaluationValidationResult
   const evidenceSources = atlasEvidenceSources.filter((source) => trustCard.sourceIds.includes(source.id));
   const now = new Date().toISOString();
   const productionDenied = taskPlan.status === "denied-production-request";
+  const trustOSDecision = evaluateTrustOSRequest({
+    mode,
+    workflow: workflowTarget,
+    objective,
+    requestedAction: productionDenied
+      ? "Execute the requested workflow against a production healthcare environment."
+      : "Create a review-only synthetic workflow evaluation packet.",
+    dataClassification: productionDenied ? "live-healthcare-data" : "synthetic",
+    actionRisk: productionDenied ? "prohibited" : "moderate",
+    requestedTools: productionDenied
+      ? ["connector-write"]
+      : ["document-parser", "workflow-planner", "evidence-retrieval"],
+    requestedModelProfile: "evidence-reasoning",
+    evidenceSourceIds: trustCard.sourceIds,
+    humanReviewRole: taskPlan.approvalCheckpoints[0] ?? "Governance reviewer",
+    dataBoundaryAcknowledged,
+    context: syntheticDocumentSummary
+  });
 
   return {
     valid: true,
@@ -294,6 +317,7 @@ export function runAgentEvaluation(payload: unknown): EvaluationValidationResult
       taskPlan,
       documentIntelligence,
       trustCard,
+      trustOSDecision,
       evidenceSources,
       observabilityRecord: {
         outcomeSignals: scenario.outcomeSignals,
@@ -307,6 +331,7 @@ export function runAgentEvaluation(payload: unknown): EvaluationValidationResult
         "layout-first parser assigned",
         "AgentOS task plan generated",
         "Trust Card attached",
+        `TrustOS decision: ${trustOSDecision.decision}`,
         productionDenied ? "production request denied" : "synthetic evaluation created"
       ],
       humanApprovals: taskPlan.approvalCheckpoints,

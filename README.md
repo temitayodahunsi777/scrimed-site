@@ -147,6 +147,7 @@ Core enterprise evaluation surfaces:
 - `/trust-center` - enterprise readiness domains, owners, evidence, required actions, launch gates, and external-review requirements
 - `/claims` - approved, evidence-required, and prohibited public claims
 - `/evaluation` - interactive AgentOS synthetic evaluation workspace
+- `/trust-os` - executable synthetic governance decisions with PHI Shield, Agent Firewall, Clinical Guardian, model routing, explainability, and Clinical Trace
 - `/workflows` - workflow engine and sandbox runtime
 - `/memory` - session, operational, and knowledge memory fabric
 - `/audit` - audit channels, AI Asset Registry, and approval checkpoints
@@ -168,6 +169,8 @@ Core APIs:
 - `/api/enterprise-readiness/claims`
 - `/api/enterprise-readiness/diligence-brief`
 - `/api/agent-os/evaluation`
+- `/api/trust-os`
+- `/api/trust-os/evaluate`
 - `/api/agent-os/tasks`
 - `/api/atlas/intelligence-core`
 - `/api/memory`

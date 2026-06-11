@@ -360,18 +360,22 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added `/memory`, `/audit`, `/observability`, `/api/memory`, `/api/audit`, `/api/observability`, and `/api/trust/cards` to expose the memory fabric, audit/governance layer, continuous validation dashboard, and Trust Card system.
 - Promoted AgentOS and Atlas Core into the homepage, Hub, Product Console, Workflow Console, Trust surface, readiness brief, route inventory, and commercial positioning while preserving the synthetic pilot and enterprise assessment boundary.
 - Added the interactive AgentOS Evaluation Workspace in `/evaluation`, `app/lib/agentEvaluationWorkspace.ts`, and `/api/agent-os/evaluation` to generate synthetic task plans, structural parser assignments, Atlas Trust Cards, evidence sources, audit previews, blocked capabilities, and observability outcome records.
+- Added executable TrustOS v1 in `/trust-os`, `app/lib/trustOS.ts`, `/api/trust-os`, and `/api/trust-os/evaluate` with deterministic PHI Shield, Agent Firewall, Clinical Guardian, policy, model-route, explainability, compliance, human-escalation, and metadata-only Clinical Trace decisions.
+- Embedded TrustOS decisions into AgentOS synthetic evaluations so durable protected-pilot sessions and proof packets carry request governance evidence.
+- Repaired Sales Operations TOTP enrollment recovery so pending factors survive refresh, can be verified into AAL2, or can be safely restarted when a QR setup is lost.
 - Promoted company operations readiness into the Product Console proof stack and downloadable readiness brief so go-live blockers, manual actions, owners, and fallbacks are visible during buyer and investor review.
 - Updated `react` and `react-dom` to `19.2.4`, Next.js to `16.2.7`, and committed a controlled lockfile with patched PostCSS `8.5.15`.
 - Authenticated GitHub CLI, pushed queued `main` commits, confirmed Vercel production deployments reach READY through the Git integration path, and verified `app.scrimedsolutions.com` returns SCRIMED health status.
 
 ## Recommended Next Steps
 
-1. Operate new buyer opportunities through `/sales-operations`, assign an accountable owner, set a due action, release audited commercial artifacts, and prepare assessment invitations.
-2. Use the vendor-neutral native CRM export immediately; configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` only when an approved CRM destination is selected.
-3. Operationalize tenant onboarding, access review, proof-packet retention, and buyer-specific pilot activation beyond the first verified SCRIMED tenant.
-4. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
-5. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.
-6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+1. Use `/trust-os` to evaluate every new synthetic agent action and retain the TrustOS decision inside AgentOS evaluation and proof-packet evidence.
+2. Operate new buyer opportunities through `/sales-operations`, assign an accountable owner, set a due action, release audited commercial artifacts, and prepare assessment invitations.
+3. Use the vendor-neutral native CRM export immediately; configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` only when an approved CRM destination is selected.
+4. Operationalize tenant onboarding, access review, proof-packet retention, and buyer-specific pilot activation beyond the first verified SCRIMED tenant.
+5. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
+6. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.
+7. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 
 ## Notes
 

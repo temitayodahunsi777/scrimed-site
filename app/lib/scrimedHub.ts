@@ -9,6 +9,7 @@ import { getSalesOperationsSummary } from "./salesOperations";
 import { getAgentEvaluationWorkspaceSummary } from "./agentEvaluationWorkspace";
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
+import { getTrustOSSummary } from "./trustOS";
 import { getCommercialStrategySummary } from "./commercialStrategy";
 import { getCompanyOperationsSummary } from "./companyOperations";
 import { syntheticFixtures } from "./syntheticFixtures";
@@ -133,6 +134,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Observability", value: "continuous validation ready", tone: "good" },
   { name: "Atlas Intelligence Core", value: "evidence and document intelligence staged", tone: "good" },
   { name: "Trust Cards", value: "provenance contracts active", tone: "good" },
+  { name: "TrustOS", value: "executable governance decisions ready", tone: "good" },
   { name: "Agent registry", value: "governance scoped", tone: "good" },
   { name: "Workflow execution", value: "three synthetic paths staged", tone: "good" },
   { name: "Execution results", value: "deterministic fixtures ready", tone: "good" },
@@ -194,6 +196,7 @@ export const hubRoutes = [
   "/audit",
   "/observability",
   "/trust",
+  "/trust-os",
   "/interoperability",
   "/interoperability/evaluations",
   "/integrations",
@@ -267,6 +270,8 @@ export const hubRoutes = [
   "/api/audit",
   "/api/observability",
   "/api/trust/cards",
+  "/api/trust-os",
+  "/api/trust-os/evaluate",
   "/api/operating-context",
   "/api/agents/workflows",
   ...agentWorkflows.map((workflow) => `/api/agents/workflows/${workflow.slug}`),
@@ -333,6 +338,7 @@ export function getHubSummary() {
   const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
   const agentOSSummary = getAgentOSSummary();
   const atlasIntelligenceCoreSummary = getAtlasIntelligenceCoreSummary();
+  const trustOSSummary = getTrustOSSummary();
   const interoperabilitySummary = getInteroperabilitySummary();
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
@@ -363,6 +369,7 @@ export function getHubSummary() {
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
+    trustOSSummary,
     interoperabilitySummary,
     interoperabilityConformanceSummary,
     demoPilotProgramSummary,

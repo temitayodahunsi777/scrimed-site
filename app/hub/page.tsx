@@ -58,6 +58,11 @@ const consoleViews = [
     summary: "Inspect legal, security, privacy, brand, governance, marketing, PR, sales, advertising, claims controls, owners, and launch gates."
   },
   {
+    name: "TrustOS",
+    href: "/trust-os",
+    summary: "Run executable governance decisions through PHI Shield, Agent Firewall, Clinical Guardian, model routing, explainability, and Clinical Trace."
+  },
+  {
     name: "Claims Register",
     href: "/claims",
     summary: "Review approved, evidence-required, and prohibited public statements before website, sales, marketing, PR, partnership, or advertising use."

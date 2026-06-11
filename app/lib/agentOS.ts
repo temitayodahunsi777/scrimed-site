@@ -734,7 +734,7 @@ export function getAgentOSSummary() {
     observabilitySignals,
     hipaaReadyArchitectureControls,
     interoperabilityConformance,
-    exposedRoutes: ["/agents", "/evaluation", "/workflows", "/memory", "/audit", "/trust", "/observability", "/interoperability", "/interoperability/evaluations"],
+    exposedRoutes: ["/agents", "/evaluation", "/workflows", "/memory", "/audit", "/trust", "/trust-os", "/observability", "/interoperability", "/interoperability/evaluations"],
     updated: "2026-06-09"
   };
 }

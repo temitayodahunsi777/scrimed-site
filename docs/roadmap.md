@@ -152,6 +152,9 @@ Objective: Ensure healthcare-grade reliability and governance.
 
 Systems include:
 
+- TrustOS executable governance decisions
+- PHI Shield, Agent Firewall, Clinical Guardian, Policy Engine, Explainability Engine, Audit Engine, Compliance Monitoring, and Agent Registry
+- Vendor-neutral Model Router evaluation and metadata-only Clinical Trace generation
 - Watchtower regression monitoring
 - AI safety evaluation pipelines
 - Runtime observability dashboards

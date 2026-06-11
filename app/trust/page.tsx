@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAgentOSSummary } from "../lib/agentOS";
 import { getAtlasIntelligenceCoreSummary } from "../lib/atlasIntelligenceCore";
+import { getTrustOSSummary } from "../lib/trustOS";
 
 const trustSignals = [
   "workflow quality",
@@ -20,6 +21,7 @@ const operatingPrinciples = [
 export default function TrustPage() {
   const agentOS = getAgentOSSummary();
   const atlas = getAtlasIntelligenceCoreSummary();
+  const trustOS = getTrustOSSummary();
 
   return (
     <main>
@@ -31,6 +33,7 @@ export default function TrustPage() {
           Watchtower monitors workflows while TrustQA verifies boundary, evidence attribution, confidence, approval checkpoints, and source freshness before outputs leave a sandbox.
         </p>
         <div className="hero-actions">
+          <Link className="primary-action" href="/trust-os">Run TrustOS Decision</Link>
           <Link className="primary-action" href="/trust-center">Open Trust Center</Link>
           <Link className="secondary-action" href="/claims">Review Claims Register</Link>
         </div>
@@ -53,6 +56,26 @@ export default function TrustPage() {
           <span>Approvals</span>
           <strong>{agentOS.humanApprovalCheckpoints.length}</strong>
         </article>
+        <article>
+          <span>TrustOS controls</span>
+          <strong>{trustOS.components.length}</strong>
+        </article>
+      </section>
+
+      <section className="section-band split-band" aria-label="Executable TrustOS">
+        <div>
+          <p className="eyebrow">Executable governance</p>
+          <h2>TrustOS evaluates requests before an agent, model, or tool can proceed.</h2>
+          <p className="section-copy">{trustOS.boundary}</p>
+        </div>
+        <div className="layer-list">
+          {trustOS.components.map((component, index) => (
+            <Link className="layer-row" href="/trust-os" key={component.name}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{component.name}</strong>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="split-band section-band">

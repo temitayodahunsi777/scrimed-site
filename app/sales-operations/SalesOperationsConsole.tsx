@@ -120,6 +120,7 @@ export default function SalesOperationsConsole({
   const [selected, setSelected] = useState<SalesOpportunity | null>(null);
   const [draft, setDraft] = useState<SalesOpportunityUpdate | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState("");
+  const [mfaFactorStatus, setMfaFactorStatus] = useState<"verified" | "unverified" | "">("");
   const [mfaQrCode, setMfaQrCode] = useState("");
   const [mfaCode, setMfaCode] = useState("");
   const [assessmentStart, setAssessmentStart] = useState(defaultAssessmentStart);
@@ -213,14 +214,20 @@ export default function SalesOperationsConsole({
 
       setUser(data.user);
       const verifiedFactor = factors.data.totp.find((factor) => factor.status === "verified");
-      setMfaFactorId(verifiedFactor?.id ?? "");
+      const pendingFactor = factors.data.all.find(
+        (factor) => factor.factor_type === "totp" && factor.status === "unverified"
+      );
+      setMfaFactorId(verifiedFactor?.id ?? pendingFactor?.id ?? "");
+      setMfaFactorStatus(verifiedFactor ? "verified" : pendingFactor ? "unverified" : "");
 
       if (assurance.data.currentLevel !== "aal2") {
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
             ? "Enter the code from the enrolled authenticator to continue."
-            : "Enroll a free authenticator factor before accessing tenant-admin sales operations."
+            : pendingFactor
+              ? "Finish verifying the authenticator you scanned, or restart setup to generate a new QR code."
+              : "Enroll a free authenticator factor before accessing tenant-admin sales operations."
         );
         return;
       }
@@ -283,6 +290,28 @@ export default function SalesOperationsConsole({
 
     setStatus("mfa-enrolling");
     setMessage("");
+    setMfaQrCode("");
+
+    const factors = await supabase.auth.mfa.listFactors();
+
+    if (factors.error) {
+      setStatus("mfa-required");
+      setMessage(factors.error.message);
+      return;
+    }
+
+    for (const factor of factors.data.all) {
+      if (factor.factor_type === "totp" && factor.status === "unverified") {
+        const removal = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+
+        if (removal.error) {
+          setStatus("mfa-required");
+          setMessage(removal.error.message);
+          return;
+        }
+      }
+    }
+
     const result = await supabase.auth.mfa.enroll({
       factorType: "totp",
       friendlyName: "SCRIMED Sales Operations"
@@ -295,6 +324,7 @@ export default function SalesOperationsConsole({
     }
 
     setMfaFactorId(result.data.id);
+    setMfaFactorStatus("unverified");
     setMfaQrCode(result.data.totp.qr_code);
     setStatus("mfa-required");
     setMessage("Scan the QR code with an authenticator app, then enter its six-digit code.");
@@ -307,17 +337,8 @@ export default function SalesOperationsConsole({
 
     setStatus("mfa-verifying");
     setMessage("");
-    const challenge = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
-
-    if (challenge.error) {
-      setStatus("mfa-required");
-      setMessage(challenge.error.message);
-      return;
-    }
-
-    const verification = await supabase.auth.mfa.verify({
+    const verification = await supabase.auth.mfa.challengeAndVerify({
       factorId: mfaFactorId,
-      challengeId: challenge.data.id,
       code: mfaCode.trim()
     });
 
@@ -328,6 +349,8 @@ export default function SalesOperationsConsole({
     }
 
     setMfaCode("");
+    setMfaFactorStatus("verified");
+    setMessage("Authenticator verified. Upgrading the tenant-admin session to AAL2.");
     window.location.reload();
   }
 
@@ -661,6 +684,16 @@ export default function SalesOperationsConsole({
                 {status === "mfa-enrolling" ? "Preparing Authenticator" : "Enroll Authenticator"}
               </button>
             )}
+            {mfaFactorStatus === "unverified" && !mfaQrCode ? (
+              <button
+                className="secondary-action"
+                disabled={status === "mfa-enrolling"}
+                onClick={beginMfaEnrollment}
+                type="button"
+              >
+                Restart Authenticator Setup
+              </button>
+            ) : null}
             <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
             </button>

@@ -18,6 +18,7 @@ import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
+import { getTrustOSSummary } from "./trustOS";
 
 export type QualityGate = {
   name: string;
@@ -57,6 +58,12 @@ export const qualityGates: QualityGate[] = [
     route: "/sales-operations",
     state: "active",
     role: "AAL2 tenant-isolated opportunity management, due-action cadence, audited commercial artifacts, vendor-neutral CRM handoff, assessment invitations, and append-only sales activity evidence."
+  },
+  {
+    name: "Executable TrustOS governance",
+    route: "/trust-os",
+    state: "active",
+    role: "Deterministic request governance through PHI Shield, Agent Firewall, Clinical Guardian, policy controls, vendor-neutral model routing, explainability, human escalation, and metadata-only Clinical Trace."
   },
   {
     name: "Enterprise readiness and claims control",
@@ -218,6 +225,7 @@ export function getQualityGateSummary() {
   const enterpriseReadiness = getEnterpriseReadinessSummary();
   const protectedPilotWorkspaces = getProtectedPilotWorkspaceSummary();
   const salesOperations = getSalesOperationsSummary();
+  const trustOS = getTrustOSSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -234,7 +242,8 @@ export function getQualityGateSummary() {
       workflowExecutionAudit.status === "audit-boundary-ready" &&
       interoperability.status === "standards-control-plane-defined" &&
       interoperabilityEvaluations.status === "synthetic-conformance-evaluations-ready" &&
-      demoPilotPrograms.status === "buyer-ready-synthetic-evaluations"
+      demoPilotPrograms.status === "buyer-ready-synthetic-evaluations" &&
+      trustOS.status === "executable-synthetic-governance-ready"
         ? "active"
         : "attention-required",
     gates: qualityGates,
@@ -261,6 +270,7 @@ export function getQualityGateSummary() {
     enterpriseReadiness,
     protectedPilotWorkspaces,
     salesOperations,
+    trustOS,
     updated: "2026-06-11"
   };
 }
