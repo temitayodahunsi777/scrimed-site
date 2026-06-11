@@ -4,6 +4,11 @@ import type { PilotIntakeHandoffPayload } from "./pilotIntake";
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
 
+export const salesOperationsNoStoreHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Authorization"
+} as const;
+
 export const salesPipelineStages = [
   "new",
   "qualified",

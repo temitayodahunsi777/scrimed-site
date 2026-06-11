@@ -3,6 +3,7 @@ import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotS
 import {
   buildAssessmentInvitation,
   salesOperationsBoundary,
+  salesOperationsNoStoreHeaders,
   validateSalesAssessmentSchedule
 } from "../../../../../lib/salesOperations";
 import { scheduleSalesAssessment } from "../../../../../lib/salesOperationsStore";
@@ -23,7 +24,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     limit: 20,
     windowSeconds: 600
   });
-  const headers = rateLimitHeaders(rateLimit);
+  const headers = { ...salesOperationsNoStoreHeaders, ...rateLimitHeaders(rateLimit) };
 
   if (!rateLimit.allowed) {
     return NextResponse.json(

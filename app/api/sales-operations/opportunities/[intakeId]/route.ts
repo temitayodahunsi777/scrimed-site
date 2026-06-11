@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedSalesContext } from "../../../../lib/protectedPilotStore";
 import {
   salesOperationsBoundary,
+  salesOperationsNoStoreHeaders,
   validateSalesOpportunityUpdate
 } from "../../../../lib/salesOperations";
 import { updateSalesOpportunity } from "../../../../lib/salesOperationsStore";
@@ -19,7 +20,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     limit: 60,
     windowSeconds: 600
   });
-  const headers = rateLimitHeaders(rateLimit);
+  const headers = { ...salesOperationsNoStoreHeaders, ...rateLimitHeaders(rateLimit) };
 
   if (!rateLimit.allowed) {
     return NextResponse.json(

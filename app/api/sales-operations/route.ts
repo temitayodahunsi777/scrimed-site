@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedSalesContext } from "../../lib/protectedPilotStore";
-import { getSalesOperationsSummary } from "../../lib/salesOperations";
+import {
+  getSalesOperationsSummary,
+  salesOperationsNoStoreHeaders
+} from "../../lib/salesOperations";
 import { getSalesOperationsDashboard } from "../../lib/salesOperationsStore";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +15,7 @@ export async function GET(request: Request) {
   if (!context.ok) {
     return NextResponse.json(
       { error: { code: context.code, message: context.message }, boundary: summary.boundary },
-      { status: context.status }
+      { status: context.status, headers: salesOperationsNoStoreHeaders }
     );
   }
 
@@ -27,13 +30,19 @@ export async function GET(request: Request) {
         },
         boundary: summary.boundary
       },
-      { status: result.error?.message.includes("sales-operations-admin-required") ? 403 : 502 }
+      {
+        status: result.error?.message.includes("sales-operations-admin-required") ? 403 : 502,
+        headers: salesOperationsNoStoreHeaders
+      }
     );
   }
 
-  return NextResponse.json({
-    ...summary,
-    authenticatedUserId: context.user.id,
-    dashboard: result.dashboard
-  });
+  return NextResponse.json(
+    {
+      ...summary,
+      authenticatedUserId: context.user.id,
+      dashboard: result.dashboard
+    },
+    { headers: salesOperationsNoStoreHeaders }
+  );
 }

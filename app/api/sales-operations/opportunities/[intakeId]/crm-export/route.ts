@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
   buildCrmOpportunityCsv,
-  salesOperationsBoundary
+  salesOperationsBoundary,
+  salesOperationsNoStoreHeaders
 } from "../../../../../lib/salesOperations";
 import {
   getSalesOpportunity,
@@ -21,7 +22,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (!context.ok) {
     return NextResponse.json(
       { error: { code: context.code, message: context.message }, boundary: salesOperationsBoundary },
-      { status: context.status }
+      { status: context.status, headers: salesOperationsNoStoreHeaders }
     );
   }
 
@@ -31,7 +32,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (result.error || !result.opportunity) {
     return NextResponse.json(
       { error: { code: "sales-opportunity-not-found", message: "No tenant-scoped opportunity is available for this ID." } },
-      { status: 404 }
+      { status: 404, headers: salesOperationsNoStoreHeaders }
     );
   }
 
@@ -45,7 +46,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (audit.error) {
     return NextResponse.json(
       { error: { code: "crm-export-audit-failed", message: "The CRM export was not released because its audit event could not be committed." } },
-      { status: 502 }
+      { status: 502, headers: salesOperationsNoStoreHeaders }
     );
   }
 
@@ -53,6 +54,7 @@ export async function GET(request: Request, { params }: RouteContext) {
 
   return new NextResponse(buildCrmOpportunityCsv(result.opportunity), {
     headers: {
+      ...salesOperationsNoStoreHeaders,
       "Cache-Control": "private, no-store",
       "Content-Disposition": `attachment; filename="scrimed-${safeIntakeId}-crm-import.csv"`,
       "Content-Type": "text/csv; charset=utf-8",

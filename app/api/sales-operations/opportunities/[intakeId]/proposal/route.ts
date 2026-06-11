@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
   buildSalesOpportunityProposal,
-  salesOperationsBoundary
+  salesOperationsBoundary,
+  salesOperationsNoStoreHeaders
 } from "../../../../../lib/salesOperations";
 import {
   getSalesOpportunity,
@@ -21,7 +22,7 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (!context.ok) {
     return NextResponse.json(
       { error: { code: context.code, message: context.message }, boundary: salesOperationsBoundary },
-      { status: context.status }
+      { status: context.status, headers: salesOperationsNoStoreHeaders }
     );
   }
 
@@ -31,7 +32,10 @@ export async function GET(request: Request, { params }: RouteContext) {
   if (result.error || !result.opportunity) {
     return NextResponse.json(
       { error: { code: "sales-opportunity-not-found", message: "No tenant-scoped opportunity is available for this ID." } },
-      { status: result.error?.message.includes("sales-operations-admin-required") ? 403 : 404 }
+      {
+        status: result.error?.message.includes("sales-operations-admin-required") ? 403 : 404,
+        headers: salesOperationsNoStoreHeaders
+      }
     );
   }
 
@@ -45,7 +49,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           message: "The proposal was not released because its append-only download event could not be committed."
         }
       },
-      { status: 502 }
+      { status: 502, headers: salesOperationsNoStoreHeaders }
     );
   }
 
@@ -53,6 +57,7 @@ export async function GET(request: Request, { params }: RouteContext) {
 
   return new NextResponse(buildSalesOpportunityProposal(result.opportunity), {
     headers: {
+      ...salesOperationsNoStoreHeaders,
       "Cache-Control": "private, no-store",
       "Content-Disposition": `attachment; filename="scrimed-${safeIntakeId}-opportunity-proposal.md"`,
       "Content-Type": "text/markdown; charset=utf-8",

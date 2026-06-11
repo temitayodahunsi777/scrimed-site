@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
   buildCrmOpportunityPayload,
-  salesOperationsBoundary
+  salesOperationsBoundary,
+  salesOperationsNoStoreHeaders
 } from "../../../../../lib/salesOperations";
 import {
   getSalesOpportunity,
@@ -22,7 +23,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     limit: 30,
     windowSeconds: 600
   });
-  const headers = rateLimitHeaders(rateLimit);
+  const headers = { ...salesOperationsNoStoreHeaders, ...rateLimitHeaders(rateLimit) };
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
