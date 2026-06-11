@@ -15,6 +15,7 @@ import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabil
 import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
+import { getSalesOperationsSummary } from "./salesOperations";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -322,6 +323,12 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Open Sales Operations Console",
+    href: "/sales-operations",
+    purpose: "Manage retained buyer opportunities, ownership, pipeline stage, audited proposals, and controlled CRM synchronization.",
+    boundary: "Approved SCRIMED tenant-admin identity is required. Business-contact and workflow-scope data only; no PHI or live clinical execution."
+  },
+  {
     label: "Review Protected Pilot Workspace",
     href: "/pilot-workspace",
     purpose: "Inspect tenant isolation, durable synthetic sessions, append-only audit controls, and downloadable proof packets.",
@@ -460,6 +467,7 @@ export function getProductConsoleSummary() {
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const protectedPilotWorkspaceSummary = getProtectedPilotWorkspaceSummary();
+  const salesOperationsSummary = getSalesOperationsSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -483,6 +491,7 @@ export function getProductConsoleSummary() {
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
     pilotProgramApiRoute: demoPilotProgramSummary.pilotApiRoute,
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
+    salesOperationsRoute: salesOperationsSummary.route,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -518,6 +527,7 @@ export function getProductConsoleSummary() {
     interoperabilitySummary,
     interoperabilityConformanceSummary,
     protectedPilotWorkspaceSummary,
+    salesOperationsSummary,
     proofStack: {
       pricingAndSales: commercialStrategySummary.status,
       demosAndPilots: demoPilotProgramSummary.status,
@@ -535,13 +545,14 @@ export function getProductConsoleSummary() {
       interoperability: interoperabilitySummary.status,
       interoperabilityConformance: interoperabilityConformanceSummary.status,
       protectedPilotWorkspaces: protectedPilotWorkspaceSummary.status,
+      salesOperations: salesOperationsSummary.status,
       qualityGates: qualityGateSummary.status
     },
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use the Demo Center to select an inspectable product proof path, then package it into a defined Pilot Program with buyer-approved metrics, governance gates, and a production-readiness decision.",
-    updated: "2026-06-10"
+      "Use Sales Operations to assign and qualify retained buyer intake, select an inspectable Demo Center proof path, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+    updated: "2026-06-11"
   };
 }
 

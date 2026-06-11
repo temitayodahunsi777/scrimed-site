@@ -23,6 +23,11 @@ const consoleViews = [
     summary: "Capture enterprise buyer segment, workflow targets, readiness needs, governance requirements, and CRM handoff scope."
   },
   {
+    name: "Sales Operations",
+    href: "/sales-operations",
+    summary: "Manage tenant-admin opportunity ownership, pipeline decisions, audited proposals, and controlled CRM synchronization."
+  },
+  {
     name: "Demo Center",
     href: "/demos",
     summary: "Inspect five executable buyer demos with guided steps, proof routes, outcomes, governance boundaries, and production exclusions."

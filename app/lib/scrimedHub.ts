@@ -5,6 +5,7 @@ import { integrationFixtures } from "./integrationFixtures";
 import { integrationContracts } from "./integrationContracts";
 import { operatingContext } from "./operatingContext";
 import { getPilotIntakeSummary } from "./pilotIntake";
+import { getSalesOperationsSummary } from "./salesOperations";
 import { getAgentEvaluationWorkspaceSummary } from "./agentEvaluationWorkspace";
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
@@ -119,6 +120,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
+  { name: "Sales operations", value: "tenant-admin console active", tone: "good" },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
   { name: "Demo Center", value: "five executable buyer demos ready", tone: "good" },
   { name: "Pilot programs", value: "four governed programs packaged", tone: "good" },
@@ -179,6 +181,7 @@ export const hubRoutes = [
   "/hub/readiness",
   "/hub/events",
   "/pilot",
+  "/sales-operations",
   "/pilots",
   "/demos",
   "/pricing",
@@ -241,6 +244,10 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/pilot/intake",
+  "/api/sales-operations",
+  "/api/sales-operations/opportunities/{intakeId}",
+  "/api/sales-operations/opportunities/{intakeId}/proposal",
+  "/api/sales-operations/opportunities/{intakeId}/crm-sync",
   "/api/pilots",
   "/api/demos",
   "/api/commercial/pricing",
@@ -316,6 +323,7 @@ export function getHubSummary() {
   const executionAttemptReadinessSummary = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
   const pilotIntakeSummary = getPilotIntakeSummary();
+  const salesOperationsSummary = getSalesOperationsSummary();
   const commercialStrategySummary = getCommercialStrategySummary();
   const companyOperationsSummary = getCompanyOperationsSummary();
   const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
@@ -344,6 +352,7 @@ export function getHubSummary() {
       operatingModels: operatingContext.operatingModels
     },
     pilotIntakeSummary,
+    salesOperationsSummary,
     commercialStrategySummary,
     companyOperationsSummary,
     enterpriseReadinessSummary,
@@ -369,6 +378,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-10"
+    updated: "2026-06-11"
   };
 }

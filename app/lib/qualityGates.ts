@@ -17,6 +17,7 @@ import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabil
 import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
 import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
+import { getSalesOperationsSummary } from "./salesOperations";
 
 export type QualityGate = {
   name: string;
@@ -50,6 +51,12 @@ export const qualityGates: QualityGate[] = [
     route: "/pilot-workspace",
     state: "active",
     role: "Tenant-authenticated workspace APIs, durable synthetic session schema, row-level isolation, append-only audit functions, proof packet exports, and fail-closed activation gates."
+  },
+  {
+    name: "Tenant-admin sales operations",
+    route: "/sales-operations",
+    state: "active",
+    role: "Tenant-isolated opportunity management, audited proposal generation, controlled CRM handoff, and append-only sales activity evidence for governed synthetic pilots."
   },
   {
     name: "Enterprise readiness and claims control",
@@ -210,6 +217,7 @@ export function getQualityGateSummary() {
   const demoPilotPrograms = getDemoPilotProgramSummary();
   const enterpriseReadiness = getEnterpriseReadinessSummary();
   const protectedPilotWorkspaces = getProtectedPilotWorkspaceSummary();
+  const salesOperations = getSalesOperationsSummary();
 
   return {
     service: "scrimed-quality-gates",
@@ -252,6 +260,7 @@ export function getQualityGateSummary() {
     demoPilotPrograms,
     enterpriseReadiness,
     protectedPilotWorkspaces,
-    updated: "2026-06-10"
+    salesOperations,
+    updated: "2026-06-11"
   };
 }

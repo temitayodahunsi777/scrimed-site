@@ -705,6 +705,122 @@ h3 {
   opacity: 0.68;
 }
 
+.sales-workspace {
+  display: grid;
+  gap: 28px;
+}
+
+.sales-toolbar {
+  align-items: end;
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+}
+
+.sales-toolbar > div:first-child {
+  max-width: 760px;
+}
+
+.sales-console-grid {
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.6fr);
+}
+
+.sales-opportunity-list {
+  border-right: 1px solid var(--line);
+  display: grid;
+  align-content: start;
+}
+
+.sales-opportunity-button {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  text-align: left;
+}
+
+.sales-opportunity-button:hover,
+.sales-opportunity-button-active {
+  background: var(--wash);
+}
+
+.sales-opportunity-button span,
+.sales-detail-heading span,
+.sales-scope-grid span {
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.sales-opportunity-button small,
+.sales-detail-heading p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.sales-empty-state {
+  display: grid;
+  gap: 12px;
+  padding: 24px;
+}
+
+.sales-empty-state p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.sales-opportunity-detail {
+  display: grid;
+  gap: 28px;
+  padding: 28px;
+}
+
+.sales-detail-heading {
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding-bottom: 24px;
+}
+
+.sales-detail-heading h2 {
+  font-size: 32px;
+  margin: 8px 0;
+}
+
+.sales-detail-heading > strong {
+  color: var(--green-dark);
+  max-width: 240px;
+  text-align: right;
+}
+
+.sales-scope-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sales-scope-grid article {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  min-height: 132px;
+  padding: 18px;
+}
+
+.sales-scope-grid strong {
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .intake-result {
   background: #f6fbf8;
   border-color: rgba(16, 97, 63, 0.34);
@@ -829,8 +945,26 @@ h3 {
   .form-grid,
   .checkbox-grid,
   .result-grid,
+  .sales-console-grid,
+  .sales-scope-grid,
   .evaluation-output-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sales-toolbar,
+  .sales-detail-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sales-opportunity-list {
+    border-bottom: 1px solid var(--line);
+    border-right: 0;
+  }
+
+  .sales-detail-heading > strong {
+    max-width: none;
+    text-align: left;
   }
 
   .command-surface {

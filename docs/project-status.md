@@ -1,6 +1,15 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-10
+Updated: 2026-06-11
+
+## Latest Sales Operations Release
+
+- Added `/sales-operations` as the invite-only tenant-admin console for durable buyer opportunities.
+- Added protected APIs for opportunity assignment, pipeline stage, next action, audited proposal downloads, and controlled CRM synchronization.
+- Bound new governed buyer intake to the first SCRIMED tenant while retaining the business-contact and workflow-scope-only boundary.
+- Added append-only sales audit events for opportunity updates, proposal releases, and CRM outcomes.
+- Kept direct private lead and audit-table access denied; authorization remains enforced inside Postgres through verified tenant-admin membership.
+- Added proposal generation that maps buyer offer interest to the appropriate sellable SCRIMED pilot program without implying live clinical execution.
 
 ## Latest Protected Pilot Workspace Release
 
@@ -39,6 +48,7 @@ Current baseline includes:
 - Trust and enterprise readiness center at `/trust-center`
 - Public claims register at `/claims`
 - Enterprise pilot intake at `/pilot`
+- Tenant-admin sales operations at `/sales-operations`
 - Protected pilot workspace at `/pilot-workspace`
 - AgentOS Evaluation Workspace at `/evaluation`
 - SCRIMED AgentOS v1 at `/agents`
@@ -112,6 +122,8 @@ Current baseline includes:
 - Shared quality gate model in `app/lib/qualityGates.ts`
 - Shared product console model in `app/lib/productConsole.ts`
 - Shared pilot intake model in `app/lib/pilotIntake.ts`
+- Shared sales operations model in `app/lib/salesOperations.ts`
+- Shared protected sales operations store in `app/lib/salesOperationsStore.ts`
 - Shared AgentOS model in `app/lib/agentOS.ts`
 - Shared Atlas Intelligence Core model in `app/lib/atlasIntelligenceCore.ts`
 - Global visual system in `app/globals.css`
@@ -122,6 +134,8 @@ Current baseline includes:
 - Pricing and sales strategy endpoint at `/api/commercial/pricing`
 - Company operations readiness endpoint at `/api/operations/readiness`
 - Enterprise pilot intake endpoint at `/api/pilot/intake`
+- Tenant-admin sales operations endpoint at `/api/sales-operations`
+- Protected opportunity mutation, proposal, and CRM synchronization endpoints under `/api/sales-operations/opportunities/[intakeId]`
 - Protected pilot readiness endpoint at `/api/pilot-workspaces/readiness`
 - Tenant-authenticated workspace discovery at `/api/pilot-workspaces`
 - Tenant-authenticated durable session endpoints under `/api/pilot-workspaces/[workspaceSlug]/sessions`
@@ -348,8 +362,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 
 ## Recommended Next Steps
 
-1. Route Wix product CTAs to `/demos`, `/pilots`, `/product`, and `/pilot` based on buyer intent.
-2. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` when a CRM destination is selected; accepted intake is already retained in the private enterprise intake ledger.
+1. Operate new buyer opportunities through `/sales-operations`, assign an accountable owner, and release audited buyer proposals.
+2. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` when a CRM destination is selected; accepted intake is already retained in the private enterprise intake ledger and visible in Sales Operations.
 3. Operationalize tenant onboarding, access review, proof-packet retention, and buyer-specific pilot activation beyond the first verified SCRIMED tenant.
 4. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
 5. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.

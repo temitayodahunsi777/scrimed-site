@@ -167,6 +167,13 @@ export const buyerRouteChecklist: BuyerRouteChecklist[] = [
     destination: "https://app.scrimedsolutions.com/pilot",
     requiredAction: "Route buyers from evaluation to pilot intake.",
     verification: "Pilot intake rejects PHI and produces a CRM-ready handoff packet."
+  },
+  {
+    step: "5. Opportunity operations",
+    source: "https://app.scrimedsolutions.com/pilot",
+    destination: "https://app.scrimedsolutions.com/sales-operations",
+    requiredAction: "Use the protected tenant-admin console to assign ownership, advance the pipeline, release an audited proposal, and synchronize the approved CRM destination.",
+    verification: "Every accepted no-PHI buyer intake is durably retained and every opportunity mutation, proposal download, and CRM result is auditable."
   }
 ];
 
@@ -211,6 +218,6 @@ export function getCompanyOperationsSummary() {
     operationsBlockers,
     buyerRouteChecklist,
     smoothOpsPrinciples,
-    updated: "2026-06-09"
+    updated: "2026-06-11"
   };
 }

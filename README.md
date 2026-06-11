@@ -82,6 +82,7 @@ Current focus areas include:
 - Trust Cards, evidence attribution, and TrustQA checks
 - memory fabric, audit surfaces, and observability dashboards
 - enterprise pilot intake and CRM-ready buyer handoff
+- tenant-admin sales opportunity operations with audited proposals and controlled CRM synchronization
 - synthetic workflow execution readiness
 - deterministic workflow execution result fixtures
 - workflow result validation and synthetic-only promotion review
@@ -118,6 +119,8 @@ The intake captures business-contact information, buyer segment, target workflow
 
 Validated intake is retained in a private, token-gated Supabase ledger before follow-up. If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API also forwards the sanitized handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. The API does not report an intake as accepted unless a durable destination accepted it.
 
+Approved SCRIMED tenant-admins manage retained intake at `/sales-operations`. The console supports opportunity assignment, pipeline stage and next-action control, audited non-binding proposal downloads, optional CRM synchronization, and an append-only sales audit trail. Direct access to private lead and audit tables remains denied.
+
 ## Demo and Pilot Center
 
 SCRIMED now packages existing executable proof into buyer-ready product and service paths:
@@ -136,6 +139,7 @@ All demos and programs preserve the synthetic evaluation boundary. They do not a
 Core enterprise evaluation surfaces:
 
 - `/agents` - SCRIMED AgentOS v1 control plane, service registry, and governance controls
+- `/sales-operations` - protected tenant-admin opportunity pipeline, audited proposals, and controlled CRM handoff
 - `/demos` - executable buyer demos with guided proof paths and retained production exclusions
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails

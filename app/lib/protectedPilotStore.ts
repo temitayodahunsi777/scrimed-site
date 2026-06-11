@@ -57,7 +57,8 @@ function getSupabaseConfiguration() {
     publishableKey:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-      ""
+      "",
+    salesOperationsToken: process.env.SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN ?? ""
   };
 }
 
@@ -123,7 +124,10 @@ export async function getAuthenticatedPilotContext(request: Request): Promise<Au
   const client = createClient(configuration.url, configuration.publishableKey, {
     global: {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        ...(configuration.salesOperationsToken
+          ? { "x-scrimed-sales-operations-token": configuration.salesOperationsToken }
+          : {})
       }
     },
     auth: {

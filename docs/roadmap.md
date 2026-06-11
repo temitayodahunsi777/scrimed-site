@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-06-10
+Updated: 2026-06-11
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -48,6 +48,7 @@ Completed foundations:
 - Baseline browser response-security headers across application routes
 - Protected pilot workspace contract with Supabase Auth, Postgres row-level security, durable synthetic sessions, append-only audit events, and audited proof packets
 - Invite-only protected pilot access console with authenticated tenant workspace discovery, governed synthetic session creation, and audited proof downloads
+- Invite-only tenant-admin sales operations console with durable opportunity assignment, pipeline control, audited proposals, and controlled CRM synchronization
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -101,7 +102,8 @@ Completed foundations:
 
 Next build targets:
 
-- Bootstrap the first approved tenant, complete MFA and session-lifetime policy, and verify cross-tenant isolation
+- Operationalize sales ownership, opportunity review cadence, CRM destination selection, and proposal follow-up through the protected Sales Operations console
+- Complete MFA and session-lifetime policy and continue cross-tenant isolation verification
 - Continue monitoring verified Upstash Redis distributed intake and protected mutation limits across Vercel regions
 - Configure production sign-in, MFA, session lifetime, account lifecycle, and enterprise SSO policy
 - Complete qualified counsel, privacy, regulatory, trademark, insurance, incident-response, and independent security reviews
