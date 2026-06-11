@@ -50,6 +50,10 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
+function formatActorId(value: string) {
+  return `${value.slice(0, 8)}...${value.slice(-4)}`;
+}
+
 function draftFor(opportunity: SalesOpportunity): SalesOpportunityUpdate {
   return {
     pipelineStage: opportunity.pipelineStage,
@@ -382,8 +386,8 @@ export default function SalesOperationsConsole({
     <>
       <section className="section-band hub-summary" aria-label="Sales operations summary">
         <article>
-          <span>Identity</span>
-          <strong>{user.email ?? user.id}</strong>
+          <span>Access role</span>
+          <strong>tenant-admin</strong>
         </article>
         <article>
           <span>Open opportunities</span>
@@ -561,7 +565,7 @@ export default function SalesOperationsConsole({
                 <h2>{event.intakeId}</h2>
               </div>
               <p>{formatDate(event.createdAt)}</p>
-              <strong>Actor: {event.actorUserId}</strong>
+              <strong title={event.actorUserId}>Actor: {formatActorId(event.actorUserId)}</strong>
             </article>
           ))
         ) : (
