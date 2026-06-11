@@ -116,7 +116,7 @@ SCRIMED now includes a governed buyer-intake surface at `/pilot` and a validated
 
 The intake captures business-contact information, buyer segment, target workflows, readiness needs, governance requirements, timeline, interoperability context, and pilot goals. It explicitly rejects protected health information, patient identifiers, live clinical records, diagnosis details, payer member identifiers, and production clinical data.
 
-If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API forwards a sanitized CRM-ready handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. Without that variable, the endpoint returns a manual CRM-ready handoff packet.
+Validated intake is retained in a private, token-gated Supabase ledger before follow-up. If `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` is configured in Vercel, the API also forwards the sanitized handoff payload to the configured HubSpot, Wix, Zapier/Make, or secure CRM webhook. The API does not report an intake as accepted unless a durable destination accepted it.
 
 ## Demo and Pilot Center
 
@@ -125,6 +125,7 @@ SCRIMED now packages existing executable proof into buyer-ready product and serv
 - `/demos` and `/api/demos` expose five governed product demos for CarePath AI, DocuTwin, TrialCore, Atlas interoperability readiness, and AgentOS governance evaluation.
 - `/pilots` and `/api/pilots` expose four structured enterprise programs with duration, engagement model, deliverables, buyer inputs, success metrics, governance gates, and production exclusions.
 - `/demos/[slug]`, `/api/demos/[slug]`, `/pilots/[slug]`, and `/api/pilots/[slug]` expose detailed proof and program packets.
+- `/api/demos/[slug]/brief` and `/api/pilots/[slug]/proposal` generate downloadable buyer-ready demo briefs and non-binding pilot proposals.
 
 All demos and programs preserve the synthetic evaluation boundary. They do not authorize live clinical execution, production data exchange, autonomous diagnosis, payer submission, or patient outreach.
 

@@ -6,15 +6,17 @@ import {
   validatePilotIntakePayload,
   type PilotIntakeHandoffPayload
 } from "../../../lib/pilotIntake";
+import { persistPilotIntake, type PilotIntakePersistenceResult } from "../../../lib/pilotIntakeStore";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../lib/requestRateLimit";
 
 export const dynamic = "force-dynamic";
 
 type HandoffResult = {
-  mode: "webhook" | "manual-crm-handoff";
-  status: "routed" | "pending-configuration" | "failed";
+  mode: "durable-store" | "durable-store-and-webhook" | "webhook" | "unavailable";
+  status: "durably-retained" | "routed-and-retained" | "routed" | "failed";
   destination: string;
   detail: string;
+  persistence: PilotIntakePersistenceResult;
 };
 
 export async function GET() {
@@ -130,15 +132,28 @@ export async function POST(request: Request) {
 }
 
 async function routePilotIntake(payload: PilotIntakeHandoffPayload): Promise<HandoffResult> {
+  const persistence = await persistPilotIntake(payload);
   const webhookUrl = process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL;
 
   if (!webhookUrl) {
+    if (!persistence.retained) {
+      return {
+        mode: "unavailable",
+        status: "failed",
+        destination: "durable enterprise intake ledger",
+        detail:
+          "The intake was validated but could not be durably retained. SCRIMED did not report it as accepted.",
+        persistence
+      };
+    }
+
     return {
-      mode: "manual-crm-handoff",
-      status: "pending-configuration",
-      destination: "manual CRM handoff",
+      mode: "durable-store",
+      status: "durably-retained",
+      destination: "private enterprise intake ledger",
       detail:
-        "No SCRIMED_PILOT_INTAKE_WEBHOOK_URL is configured. Intake was validated and packaged for secure manual HubSpot, Wix, or CRM entry."
+        "Validated no-PHI intake was durably retained for controlled SCRIMED review and CRM follow-up.",
+      persistence
     };
   }
 
@@ -159,26 +174,53 @@ async function routePilotIntake(payload: PilotIntakeHandoffPayload): Promise<Han
     });
 
     if (!response.ok) {
+      if (persistence.retained) {
+        return {
+          mode: "durable-store",
+          status: "durably-retained",
+          destination: "private enterprise intake ledger",
+          detail: `Intake was retained, but the configured CRM webhook returned ${response.status}.`,
+          persistence
+        };
+      }
+
       return {
-        mode: "webhook",
+        mode: "unavailable",
         status: "failed",
-        destination: "configured CRM webhook",
-        detail: `Configured CRM webhook returned ${response.status}.`
+        destination: "durable enterprise intake ledger and configured CRM webhook",
+        detail: `Neither durable storage nor the configured CRM webhook accepted the intake. Webhook returned ${response.status}.`,
+        persistence
       };
     }
 
     return {
-      mode: "webhook",
-      status: "routed",
-      destination: "configured CRM webhook",
-      detail: "Validated intake was routed to the configured HubSpot, Wix, or CRM webhook."
+      mode: persistence.retained ? "durable-store-and-webhook" : "webhook",
+      status: persistence.retained ? "routed-and-retained" : "routed",
+      destination: persistence.retained
+        ? "private enterprise intake ledger and configured CRM webhook"
+        : "configured CRM webhook",
+      detail: persistence.retained
+        ? "Validated intake was durably retained and routed to the configured CRM webhook."
+        : "Validated intake was routed to the configured CRM webhook; durable ledger retention was unavailable.",
+      persistence
     };
   } catch {
+    if (persistence.retained) {
+      return {
+        mode: "durable-store",
+        status: "durably-retained",
+        destination: "private enterprise intake ledger",
+        detail: "Intake was retained, but the configured CRM webhook did not respond within the routing timeout.",
+        persistence
+      };
+    }
+
     return {
-      mode: "webhook",
+      mode: "unavailable",
       status: "failed",
-      destination: "configured CRM webhook",
-      detail: "Configured CRM webhook did not accept the intake within the routing timeout."
+      destination: "durable enterprise intake ledger and configured CRM webhook",
+      detail: "Neither durable storage nor the configured CRM webhook accepted the intake within the routing timeout.",
+      persistence
     };
   } finally {
     clearTimeout(timeout);

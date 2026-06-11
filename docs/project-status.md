@@ -208,7 +208,7 @@ Current active quality path:
 17. Interoperability standards, profiles, conformance evidence, and integration contracts define the data boundary before real connectors are implemented.
 18. Hub readiness and event endpoints expose operational status.
 19. Quality gates make every active, planned, and bypassed validation path explicit.
-20. Enterprise pilot intake validates buyer requests, blocks PHI-style content, and packages sanitized CRM-ready handoff payloads for HubSpot, Wix, Zapier/Make, or secure CRM webhook routing.
+20. Enterprise pilot intake validates buyer requests, blocks PHI-style content, durably retains accepted no-PHI submissions in a private ledger, and packages sanitized CRM-ready handoff payloads for secure CRM routing.
 21. Pricing and sales strategy defines public preview, paid assessment, synthetic pilot, protected enterprise pilot, enterprise license, strategic partnership, buyer routing, value metrics, and commercial guardrails.
 22. Company operations readiness defines publishing, deployment, app domain, Wix routing, local quality tooling, deployment protection, owners, resolution paths, and fallbacks.
 23. AgentOS v1 defines planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, task planning, RBAC, sandbox runtime, observability, and HIPAA-ready architecture controls.
@@ -216,7 +216,7 @@ Current active quality path:
 25. AgentOS Evaluation Workspace converts synthetic document packets into bounded task plans, structural document-intelligence assignments, Atlas Trust Cards, audit previews, and observability-ready outcome records.
 26. React and React DOM package pins are held at the current 19.2.4 patch line for the Next.js App Router security baseline.
 27. Protected pilot workspaces define tenant-authenticated discovery, row-level isolation, durable synthetic sessions, append-only audit events, audited proof packets, and fail-closed activation gates.
-28. Public pilot intake and protected session creation enforce active request limits, with Upstash Redis selected for distributed production counters.
+28. Public pilot intake and protected session creation enforce active request limits, with Upstash Redis connected and verified for distributed production counters.
 
 Current bypassed or deferred checks:
 
@@ -333,6 +333,8 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Added `/pilots`, `/pilots/[slug]`, `/api/pilots`, and `/api/pilots/[slug]` with four sellable enterprise programs that define duration, engagement model, included demos, deliverables, buyer inputs, success metrics, governance gates, and production exclusions.
 - Promoted the Demo and Pilot Center into the Product Console, Hub, readiness checks, event stream, quality gates, homepage buyer path, platform catalog, commercial routing, readiness brief, and documentation.
 - Added `/pilot`, `/api/pilot/intake`, and `app/lib/pilotIntake.ts` for governed enterprise pilot intake, no-PHI validation, synthetic/evaluation-only acknowledgement, qualification, and CRM-ready handoff packaging.
+- Added a private, token-gated Supabase intake ledger so the API does not report a buyer request as accepted unless a durable destination retained it.
+- Added downloadable buyer-ready demo briefs and non-binding pilot proposals for every configured product demo and pilot program.
 - Added `/pricing`, `/api/commercial/pricing`, and `app/lib/commercialStrategy.ts` for recommended pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails.
 - Added `/operations`, `/api/operations/readiness`, and `app/lib/companyOperations.ts` for go-live blocker tracking, buyer-route checklist, owner assignments, resolution paths, and fallback processes.
 - Added SCRIMED AgentOS v1 in `app/lib/agentOS.ts`, `/agents`, `/api/agent-os`, and `/api/agent-os/tasks` with planner, router, specialist registry, memory fabric, TrustQA, audit logging, human approval checkpoints, MCP connector framework, sandbox runtime, RBAC, observability, and production-gated task planning.
@@ -347,9 +349,9 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 ## Recommended Next Steps
 
 1. Route Wix product CTAs to `/demos`, `/pilots`, `/product`, and `/pilot` based on buyer intent.
-2. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` in Vercel to route sanitized pilot intake handoffs into HubSpot, Wix automation, Zapier/Make, or the selected CRM.
-3. Add persisted synthetic demo sessions and downloadable buyer proof packets once storage and auth are configured.
-4. Add tenant-authenticated pilot workspaces with scoped evidence upload only after identity, privacy, retention, and durable audit controls are approved.
+2. Configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` when a CRM destination is selected; accepted intake is already retained in the private enterprise intake ledger.
+3. Operationalize tenant onboarding, access review, proof-packet retention, and buyer-specific pilot activation beyond the first verified SCRIMED tenant.
+4. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
 5. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.
 6. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 

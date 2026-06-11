@@ -568,6 +568,97 @@ export function getDemosForPilot(pilot: PilotProgram) {
     .filter((demo): demo is ProductDemo => Boolean(demo));
 }
 
+function markdownList(items: string[]) {
+  return items.map((item) => `- ${item}`).join("\n");
+}
+
+export function buildDemoBrief(demo: ProductDemo) {
+  const proofRoutes = demo.proofRoutes
+    .map((proof) => `- [${proof.label}](${proof.route}): ${proof.evidence}`)
+    .join("\n");
+
+  return `# ${demo.name}
+
+## Buyer Brief
+- Product: ${demo.product}
+- Buyer: ${demo.buyer}
+- Agent: ${demo.agent}
+- Status: ${demo.status}
+- Executable route: ${demo.runRoute}
+
+## Objective
+${demo.objective}
+
+## Synthetic Scenario
+${demo.scenario}
+
+## Guided Evaluation
+${markdownList(demo.guidedSteps)}
+
+## Inspectable Proof
+${proofRoutes}
+
+## Inspectable Outcomes
+${markdownList(demo.inspectableOutcomes)}
+
+## Success Signals
+${markdownList(demo.successSignals)}
+
+## Governance Boundaries
+${markdownList(demo.governanceBoundaries)}
+
+## Production Exclusions
+${markdownList(demo.productionExclusions)}
+
+## Product Boundary
+${demoPilotBoundary}
+
+This brief supports enterprise evaluation and pilot scoping. It is not clinical advice, a production authorization, a certification claim, or evidence of autonomous clinical execution.
+`;
+}
+
+export function buildPilotProposal(pilot: PilotProgram) {
+  const includedDemos = getDemosForPilot(pilot)
+    .map((demo) => `- [${demo.name}](${demo.route}): ${demo.objective}`)
+    .join("\n");
+
+  return `# ${pilot.name}
+
+## Proposed Engagement
+- Status: ${pilot.status}
+- Duration: ${pilot.duration}
+- Recommended commercial model: ${pilot.engagementModel}
+- Target buyer: ${pilot.buyer}
+- Request route: ${pilot.requestRoute}
+
+## Objective
+${pilot.objective}
+
+## Deliverables
+${markdownList(pilot.deliverables)}
+
+## Included Product Proof
+${includedDemos}
+
+## Decision Metrics
+${markdownList(pilot.successMetrics)}
+
+## Buyer Inputs
+${markdownList(pilot.buyerInputs)}
+
+## Governance Gates
+${markdownList(pilot.governanceGates)}
+
+## Production Exclusions
+${markdownList(pilot.productionExclusions)}
+
+## Product Boundary
+${demoPilotBoundary}
+
+This non-binding proposal is a starting point for enterprise scoping. Final scope, pricing, security requirements, legal terms, success criteria, and production permissions require written buyer and SCRIMED approval.
+`;
+}
+
 export function getDemoPilotProgramSummary() {
   return {
     service: "scrimed-demo-pilot-center",
@@ -584,6 +675,10 @@ export function getDemoPilotProgramSummary() {
     protectedPilots: pilotPrograms.filter((pilot) => pilot.status === "protected-pilot").length,
     productDemos,
     pilotPrograms,
-    updated: "2026-06-09"
+    downloadableArtifacts: {
+      demoBriefPattern: "/api/demos/{slug}/brief",
+      pilotProposalPattern: "/api/pilots/{slug}/proposal"
+    },
+    updated: "2026-06-11"
   };
 }

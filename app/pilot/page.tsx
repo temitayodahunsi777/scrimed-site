@@ -103,10 +103,10 @@ export default async function PilotIntakePage({ searchParams }: PilotIntakePageP
         <article className="module-row">
           <div>
             <span>3. Route</span>
-            <h2>CRM handoff</h2>
+            <h2>Durable intake and CRM handoff</h2>
           </div>
-          <p>Configured deployments can forward the sanitized handoff to HubSpot, Wix automation, Zapier/Make, or a secure CRM webhook.</p>
-          <strong>Until a webhook is configured, the API returns a manual CRM-ready handoff packet.</strong>
+          <p>Accepted no-PHI intake is retained in a private enterprise ledger and can also be forwarded to HubSpot, Wix automation, Zapier/Make, or a secure CRM webhook.</p>
+          <strong>The API fails closed instead of reporting acceptance when no durable destination receives the intake.</strong>
         </article>
       </section>
     </main>

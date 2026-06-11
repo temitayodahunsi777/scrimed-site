@@ -266,12 +266,23 @@ export const pilotTimelineOptions: PilotIntakeOption[] = [
 
 export function getPilotIntakeSummary() {
   const webhookConfigured = Boolean(process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL);
+  const durableStoreConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) &&
+      process.env.SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN
+  );
 
   return {
     service: "scrimed-pilot-intake",
     route: "/pilot",
     apiRoute: "/api/pilot/intake",
-    status: webhookConfigured ? "crm-routing-configured" : "crm-handoff-ready",
+    status: durableStoreConfigured
+      ? webhookConfigured
+        ? "durable-intake-and-crm-routing-configured"
+        : "durable-intake-queue-configured"
+      : webhookConfigured
+        ? "crm-routing-configured"
+        : "activation-required",
     boundary: pilotIntakeBoundary,
     serviceOffers: pilotServiceOffers,
     buyerSegments: pilotBuyerSegments,
@@ -283,8 +294,15 @@ export function getPilotIntakeSummary() {
     timelineOptions: pilotTimelineOptions,
     crmRouting: {
       webhookConfigured,
+      durableStoreConfigured,
       supportedDestinations: ["HubSpot workflow", "Wix automation", "Zapier/Make", "secure CRM webhook"],
-      currentMode: webhookConfigured ? "configured-webhook" : "manual-crm-handoff"
+      currentMode: durableStoreConfigured
+        ? webhookConfigured
+          ? "durable-ledger-plus-configured-webhook"
+          : "durable-enterprise-intake-queue"
+        : webhookConfigured
+          ? "configured-webhook"
+          : "activation-required"
     },
     requiredAcknowledgements: [
       "No protected health information or patient identifiers",
@@ -292,7 +310,7 @@ export function getPilotIntakeSummary() {
       "No autonomous diagnosis, treatment, payer submission, or patient outreach",
       "Human review remains required before production execution"
     ],
-    updated: "2026-06-02"
+    updated: "2026-06-11"
   };
 }
 

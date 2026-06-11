@@ -112,6 +112,11 @@ export default async function DemoDetailPage({
 
       <section className="section-band product-actions" aria-label="Demo buyer actions">
         <div className="action-grid">
+          <a className="action-card" href={`/api/demos/${demo.slug}/brief`}>
+            <span>Brief</span>
+            <strong>Download demo brief</strong>
+            <p>Share the buyer, proof path, outcomes, governance boundaries, and exclusions.</p>
+          </a>
           <Link className="action-card" href={demo.runRoute}>
             <span>Run</span>
             <strong>{demo.runLabel}</strong>

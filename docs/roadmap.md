@@ -49,7 +49,7 @@ Completed foundations:
 - Protected pilot workspace contract with Supabase Auth, Postgres row-level security, durable synthetic sessions, append-only audit events, and audited proof packets
 - Invite-only protected pilot access console with authenticated tenant workspace discovery, governed synthetic session creation, and audited proof downloads
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
-- Active public intake and protected session rate limiting with Upstash Redis selected for distributed enforcement
+- Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
 - Vercel deployment configuration
 - Homepage and public platform surface
@@ -102,7 +102,7 @@ Completed foundations:
 Next build targets:
 
 - Bootstrap the first approved tenant, complete MFA and session-lifetime policy, and verify cross-tenant isolation
-- Provision Upstash Redis and verify distributed intake and protected mutation limits across Vercel regions
+- Continue monitoring verified Upstash Redis distributed intake and protected mutation limits across Vercel regions
 - Configure production sign-in, MFA, session lifetime, account lifecycle, and enterprise SSO policy
 - Complete qualified counsel, privacy, regulatory, trademark, insurance, incident-response, and independent security reviews
 - Add tenant administration and approved membership lifecycle workflows after identity policy is approved

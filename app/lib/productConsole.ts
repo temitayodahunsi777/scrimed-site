@@ -281,9 +281,9 @@ export const governanceControls: GovernanceControl[] = [
     detail: "The product keeps clinical execution gated, avoids request-body capture in denied execution paths, and minimizes data exposure."
   },
   {
-    control: "Role-based access planned",
-    status: "planned",
-    detail: "Production workflow use requires approved tenant identity, role permissions, service auth, consent, and break-glass policy."
+    control: "Protected-pilot role-based access active",
+    status: "active",
+    detail: "Tenant-isolated protected pilots enforce approved roles through Supabase Auth and Postgres row-level security. Production workflow use still requires service auth, consent, break-glass, and deployment-specific access approval."
   }
 ];
 
@@ -325,7 +325,7 @@ export const buyerActions: BuyerAction[] = [
     label: "Review Protected Pilot Workspace",
     href: "/pilot-workspace",
     purpose: "Inspect tenant isolation, durable synthetic sessions, append-only audit controls, and downloadable proof packets.",
-    boundary: "Protected mutations remain unavailable until production identity and durable storage are connected and verified."
+    boundary: "Protected synthetic-pilot mutations are active and verified; live clinical execution and PHI-enabled production workflows remain denied."
   },
   {
     label: "Inspect Product Demos",

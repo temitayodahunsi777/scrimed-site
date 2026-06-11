@@ -134,6 +134,11 @@ export default async function PilotProgramDetailPage({
 
       <section className="section-band product-actions" aria-label="Pilot program actions">
         <div className="action-grid">
+          <a className="action-card" href={`/api/pilots/${pilot.slug}/proposal`}>
+            <span>Proposal</span>
+            <strong>Download pilot proposal</strong>
+            <p>Share the proposed scope, commercial model, metrics, inputs, gates, and exclusions.</p>
+          </a>
           <Link className="action-card" href={pilot.requestRoute}>
             <span>Start</span>
             <strong>Request this pilot</strong>

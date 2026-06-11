@@ -293,7 +293,7 @@ export default function PilotIntakeForm({
       {result ? (
         <aside className="intake-result" aria-live="polite">
           <span>{result.status}</span>
-          <h2>Enterprise intake packaged.</h2>
+          <h2>Enterprise intake accepted.</h2>
           <p>{result.assessment.recommendedNextStep}</p>
           <div className="result-grid">
             <div>
@@ -309,7 +309,7 @@ export default function PilotIntakeForm({
               <p>{result.assessment.qualification}</p>
             </div>
             <div>
-              <strong>CRM handoff</strong>
+              <strong>Intake handoff</strong>
               <p>{result.handoff.status}: {result.handoff.detail}</p>
             </div>
           </div>
