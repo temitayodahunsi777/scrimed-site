@@ -35,6 +35,42 @@ export type PilotAuditEventRecord = {
   createdAt: string;
 };
 
+export type TenantAccessMembership = {
+  userId: string;
+  email: string;
+  role: PilotWorkspaceRole;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: string | null;
+};
+
+export type TenantAccessAuditEvent = {
+  id: string;
+  targetUserId: string;
+  actorUserId: string;
+  eventType: "membership-role-changed";
+  priorRole: PilotWorkspaceRole;
+  nextRole: PilotWorkspaceRole;
+  createdAt: string;
+};
+
+export type TenantAccessDashboard = {
+  tenantId: string;
+  tenantName: string;
+  workspaceId: string;
+  workspaceSlug: string;
+  workspaceName: string;
+  actorUserId: string;
+  memberships: TenantAccessMembership[];
+  auditEvents: TenantAccessAuditEvent[];
+  security: {
+    assuranceLevel: "aal2";
+    finalAdminProtection: true;
+    mutationAuthorization: "tenant-admin-plus-server-runtime-token";
+  };
+  boundary: string;
+};
+
 export type ProtectedPilotInfrastructure = {
   identity: {
     provider: "Supabase Auth";
@@ -121,6 +157,12 @@ export const protectedPilotApiContracts = [
     purpose: "Inspect the tenant-isolated append-only audit trail for workspace evidence activity."
   },
   {
+    method: "GET / PATCH",
+    route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access",
+    access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
+    purpose: "Inspect existing approved memberships and apply audited role changes without exposing identity creation."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
@@ -147,7 +189,7 @@ export const protectedPilotApiContracts = [
 ];
 
 export const protectedPilotActivationGates = [
-  "Operationalize tenant onboarding, offboarding, and periodic access review beyond the first approved SCRIMED tenant.",
+  "Add governed identity invitation, offboarding, recovery, and periodic access review beyond existing approved memberships.",
   "Extend the active magic-link, TOTP MFA, and session-lifetime policy into approved enterprise SSO and multi-tenant identity operations.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
@@ -221,6 +263,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "AAL2-protected append-only TrustOS Decision Ledger",
       "Governed reviewer dispositions, overrides, and outcome-learning signals",
       "Downloadable audited TrustOS governance packets",
+      "AAL2-protected tenant membership visibility and audited role administration",
       "Rate-limited public intake and protected mutations"
     ],
     updated: "2026-06-11"

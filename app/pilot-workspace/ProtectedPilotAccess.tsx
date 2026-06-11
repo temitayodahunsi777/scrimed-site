@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient, type Session, type User } from "@supabase/supabase-js";
+import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import type {
@@ -8,6 +9,7 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
+import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 
 type AccessStatus =
@@ -15,6 +17,9 @@ type AccessStatus =
   | "signed-out"
   | "sending-link"
   | "loading"
+  | "mfa-required"
+  | "mfa-enrolling"
+  | "mfa-verifying"
   | "ready"
   | "creating-session"
   | "error";
@@ -74,6 +79,10 @@ export default function ProtectedPilotAccess({
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
   const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
+  const [mfaFactorId, setMfaFactorId] = useState("");
+  const [mfaFactorStatus, setMfaFactorStatus] = useState<"verified" | "unverified" | "">("");
+  const [mfaQrCode, setMfaQrCode] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
 
   useEffect(() => {
     const client = supabase;
@@ -112,13 +121,17 @@ export default function ProtectedPilotAccess({
         return;
       }
 
-      const { data, error } = await activeClient.auth.getUser(nextSession.access_token);
+      const [{ data, error }, assurance, factors] = await Promise.all([
+        activeClient.auth.getUser(nextSession.access_token),
+        activeClient.auth.mfa.getAuthenticatorAssuranceLevel(),
+        activeClient.auth.mfa.listFactors()
+      ]);
 
       if (!active) {
         return;
       }
 
-      if (error || !data.user) {
+      if (error || !data.user || assurance.error || factors.error) {
         setUser(null);
         setStatus("error");
         setMessage("The identity provider could not verify this session.");
@@ -126,6 +139,29 @@ export default function ProtectedPilotAccess({
       }
 
       setUser(data.user);
+      const verifiedFactor = factors.data.totp.find((factor) => factor.status === "verified");
+      const pendingFactor = factors.data.all.find(
+        (factor) => factor.factor_type === "totp" && factor.status === "unverified"
+      );
+      setMfaFactorId(verifiedFactor?.id ?? pendingFactor?.id ?? "");
+      setMfaFactorStatus(verifiedFactor ? "verified" : pendingFactor ? "unverified" : "");
+
+      if (assurance.data.currentLevel !== "aal2") {
+        setWorkspaces([]);
+        setSelectedWorkspace(null);
+        setSessions([]);
+        setAuditEvents([]);
+        setStatus("mfa-required");
+        setMessage(
+          verifiedFactor
+            ? "Enter the code from the enrolled authenticator to open the protected pilot workspace."
+            : pendingFactor
+              ? "Finish verifying the authenticator you scanned, or restart setup to generate a new QR code."
+              : "Enroll a free authenticator factor before opening the protected pilot workspace."
+        );
+        return;
+      }
+
       await loadWorkspaces(nextSession);
     }
 
@@ -242,12 +278,81 @@ export default function ProtectedPilotAccess({
     setMessage("If this identity is approved, check its enterprise email for the protected pilot access link.");
   }
 
-  async function signOut() {
+  async function beginMfaEnrollment() {
     if (!supabase) {
       return;
     }
 
-    await supabase.auth.signOut();
+    setStatus("mfa-enrolling");
+    setMessage("");
+    setMfaQrCode("");
+
+    const factors = await supabase.auth.mfa.listFactors();
+
+    if (factors.error) {
+      setStatus("mfa-required");
+      setMessage(factors.error.message);
+      return;
+    }
+
+    for (const factor of factors.data.all) {
+      if (factor.factor_type === "totp" && factor.status === "unverified") {
+        const removal = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+
+        if (removal.error) {
+          setStatus("mfa-required");
+          setMessage(removal.error.message);
+          return;
+        }
+      }
+    }
+
+    const result = await supabase.auth.mfa.enroll({
+      factorType: "totp",
+      friendlyName: "SCRIMED Protected Pilot"
+    });
+
+    if (result.error) {
+      setStatus("mfa-required");
+      setMessage(result.error.message);
+      return;
+    }
+
+    setMfaFactorId(result.data.id);
+    setMfaFactorStatus("unverified");
+    setMfaQrCode(result.data.totp.qr_code);
+    setStatus("mfa-required");
+    setMessage("Scan the QR code with an authenticator app, then enter its current six-digit code.");
+  }
+
+  async function verifyMfa() {
+    if (!supabase || !mfaFactorId || !mfaCode.trim()) {
+      return;
+    }
+
+    setStatus("mfa-verifying");
+    setMessage("");
+    const verification = await supabase.auth.mfa.challengeAndVerify({
+      factorId: mfaFactorId,
+      code: mfaCode.trim()
+    });
+
+    if (verification.error) {
+      setStatus("mfa-required");
+      setMessage(verification.error.message);
+      return;
+    }
+
+    setMfaCode("");
+    setMfaFactorStatus("verified");
+    setMessage("Authenticator verified. Upgrading the protected pilot session to AAL2.");
+    window.location.reload();
+  }
+
+  async function signOut(scope: "local" | "global" = "local") {
+    if (supabase) {
+      await supabase.auth.signOut({ scope });
+    }
   }
 
   async function selectWorkspace(workspace: PilotWorkspaceRecord) {
@@ -417,12 +522,88 @@ export default function ProtectedPilotAccess({
     );
   }
 
+  if (status === "mfa-required" || status === "mfa-enrolling" || status === "mfa-verifying") {
+    return (
+      <section className="section-band evaluation-band">
+        <div className="evaluation-form">
+          <div className="form-section">
+            <p className="eyebrow">Protected pilot assurance gate</p>
+            <h2>Verify an authenticator before opening the workspace.</h2>
+            <p className="section-copy">
+              SCRIMED uses passwordless magic-link access plus free TOTP verification. Protected sessions expire
+              after twelve hours and require activity within two hours.
+            </p>
+            {mfaQrCode ? (
+              <div className="mfa-enrollment">
+                <Image
+                  alt="SCRIMED protected pilot authenticator enrollment QR code"
+                  height={220}
+                  src={mfaQrCode}
+                  unoptimized
+                  width={220}
+                />
+                <p>Scan this code in an authenticator app. Then enter the current six-digit code below.</p>
+              </div>
+            ) : null}
+            {mfaFactorId ? (
+              <label className="form-field">
+                <span>Authenticator code</span>
+                <input
+                  autoComplete="one-time-code"
+                  inputMode="numeric"
+                  maxLength={8}
+                  onChange={(event) => setMfaCode(event.target.value.replace(/\D/g, ""))}
+                  value={mfaCode}
+                />
+              </label>
+            ) : null}
+          </div>
+          {message ? <div className="intake-alert">{message}</div> : null}
+          <div className="form-actions">
+            {mfaFactorId ? (
+              <button
+                className="primary-action"
+                disabled={status === "mfa-verifying" || mfaCode.length < 6}
+                onClick={verifyMfa}
+                type="button"
+              >
+                {status === "mfa-verifying" ? "Verifying Authenticator" : "Verify Authenticator"}
+              </button>
+            ) : (
+              <button
+                className="primary-action"
+                disabled={status === "mfa-enrolling"}
+                onClick={beginMfaEnrollment}
+                type="button"
+              >
+                {status === "mfa-enrolling" ? "Preparing Authenticator" : "Enroll Authenticator"}
+              </button>
+            )}
+            {mfaFactorStatus === "unverified" && !mfaQrCode ? (
+              <button
+                className="secondary-action"
+                disabled={status === "mfa-enrolling"}
+                onClick={beginMfaEnrollment}
+                type="button"
+              >
+                Restart Authenticator Setup
+              </button>
+            ) : null}
+            <button className="secondary-action" onClick={() => signOut("local")} type="button">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
       <section className="section-band hub-summary" aria-label="Authenticated pilot workspace access">
         <article>
-          <span>Identity</span>
-          <strong>{user.email ?? user.id}</strong>
+          <span>Access assurance</span>
+          <strong>AAL2 protected pilot</strong>
         </article>
         <article>
           <span>Tenant workspaces</span>
@@ -443,11 +624,15 @@ export default function ProtectedPilotAccess({
           <p className="eyebrow">Tenant workspaces</p>
           <h2>Select the governed enterprise pilot evidence surface.</h2>
           <p className="section-copy">
-            Workspace visibility is constrained by authenticated membership and PostgreSQL row-level security.
+            Signed in as {user.email ?? user.id}. Workspace visibility is constrained by authenticated membership,
+            fresh AAL2 assurance, and PostgreSQL row-level security.
           </p>
           <div className="form-actions">
-            <button className="secondary-action" onClick={signOut} type="button">
+            <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
+            </button>
+            <button className="secondary-action" onClick={() => signOut("global")} type="button">
+              End All Sessions
             </button>
           </div>
         </div>
@@ -482,6 +667,8 @@ export default function ProtectedPilotAccess({
             session={session}
             workspace={selectedWorkspace}
           />
+
+          <TenantAccessAdministrationPanel session={session} workspace={selectedWorkspace} />
 
           <section className="table-section" aria-label="Durable synthetic pilot sessions">
             <div className="section-heading">

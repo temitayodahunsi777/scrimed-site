@@ -346,6 +346,49 @@ h3 {
   outline-offset: -2px;
 }
 
+.tenant-access-panel {
+  border-top: 1px solid var(--line);
+}
+
+.tenant-access-list {
+  border-top: 1px solid var(--line);
+  display: grid;
+}
+
+.tenant-access-list article {
+  align-items: end;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(180px, 0.65fr) auto;
+  padding: 24px 0;
+}
+
+.tenant-access-list h3 {
+  font-size: 22px;
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+
+.tenant-access-list p {
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.tenant-access-list article > div > span {
+  color: var(--green);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.tenant-access-audit-heading {
+  margin-top: 56px;
+}
+
 .button-link {
   background: transparent;
   border: 0;
@@ -1146,6 +1189,11 @@ h3 {
   .decision-ledger-grid,
   .decision-metrics,
   .review-event-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .tenant-access-list article {
+    align-items: stretch;
     grid-template-columns: 1fr;
   }
 

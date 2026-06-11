@@ -3,7 +3,9 @@ import type { AgentEvaluationRecord } from "./agentEvaluationWorkspace";
 import type {
   PilotAuditEventRecord,
   PilotSessionRecord,
-  PilotWorkspaceRecord
+  PilotWorkspaceRecord,
+  PilotWorkspaceRole,
+  TenantAccessDashboard
 } from "./protectedPilotWorkspace";
 import type {
   TrustOSDecisionLedgerRecord,
@@ -563,4 +565,33 @@ export async function recordTrustOSGovernancePacketDownload(
     p_notes: "",
     p_outcome_metrics: {}
   });
+}
+
+export async function getTenantAccessDashboard(client: SupabaseClient, workspaceSlug: string) {
+  const { data, error } = await client.rpc("tenant_access_dashboard", {
+    p_workspace_slug: workspaceSlug
+  });
+
+  return {
+    dashboard: data ? (data as TenantAccessDashboard) : null,
+    error
+  };
+}
+
+export async function updateTenantMembershipRole(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  userId: string,
+  role: PilotWorkspaceRole
+) {
+  const { data, error } = await client.rpc("update_pilot_membership_role", {
+    p_workspace_slug: workspaceSlug,
+    p_target_user_id: userId,
+    p_role: role
+  });
+
+  return {
+    membership: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
 }
