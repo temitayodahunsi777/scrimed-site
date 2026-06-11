@@ -75,17 +75,17 @@ export const pilotWorkspaceRoles: Array<{
 }> = [
   {
     role: "tenant-admin",
-    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Download proof packets"],
+    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Download proof and governance packets"],
     restrictions: ["Cannot enable live clinical execution", "Cannot alter append-only audit events"]
   },
   {
     role: "pilot-lead",
-    permissions: ["Run synthetic evaluations", "View workspace sessions", "Download proof packets"],
+    permissions: ["Run synthetic evaluations", "Commit TrustOS decisions", "Record governed reviewer dispositions", "View workspace sessions", "Download proof and governance packets"],
     restrictions: ["Cannot manage tenant identity", "Cannot alter append-only audit events"]
   },
   {
     role: "reviewer",
-    permissions: ["View workspace sessions", "Review Trust Cards", "Download proof packets"],
+    permissions: ["View workspace sessions", "Review Trust Cards", "Record governed reviewer dispositions and outcome signals", "Download proof and governance packets"],
     restrictions: ["Cannot create sessions", "Cannot manage tenant identity"]
   },
   {
@@ -129,26 +129,26 @@ export const protectedPilotApiContracts = [
   {
     method: "GET / POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions",
-    access: "AAL2 bearer token + authorized tenant role + rate limit",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization for writes + rate limit",
     purpose: "Inspect or commit metadata-only TrustOS decisions to the tenant-isolated append-only governance ledger."
   },
   {
     method: "GET / POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/reviews",
-    access: "AAL2 bearer token + authorized tenant role + rate limit",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization for writes + rate limit",
     purpose: "Inspect or commit human reviewer dispositions, overrides, and controlled workflow outcome signals."
   },
   {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/governance-packet",
-    access: "AAL2 bearer token + authorized tenant role",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
     purpose: "Download an audited governance packet containing decision, control, trace, evidence, and human-review proof."
   }
 ];
 
 export const protectedPilotActivationGates = [
   "Operationalize tenant onboarding, offboarding, and periodic access review beyond the first approved SCRIMED tenant.",
-  "Configure production sign-in, MFA, session lifetime, and enterprise SSO policy.",
+  "Extend the active magic-link, TOTP MFA, and session-lifetime policy into approved enterprise SSO and multi-tenant identity operations.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
 ];
@@ -221,7 +221,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "AAL2-protected append-only TrustOS Decision Ledger",
       "Governed reviewer dispositions, overrides, and outcome-learning signals",
       "Downloadable audited TrustOS governance packets",
-      "Rate-limited public intake and protected session creation"
+      "Rate-limited public intake and protected mutations"
     ],
     updated: "2026-06-11"
   };
