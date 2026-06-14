@@ -645,6 +645,10 @@ h3 {
   margin: 32px 0 20px;
 }
 
+.agent-workspace-dashboard .decision-ledger-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .decision-ledger-summary article {
   border: 1px solid var(--line);
   min-height: 130px;

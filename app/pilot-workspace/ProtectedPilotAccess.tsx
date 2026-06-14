@@ -9,6 +9,7 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
+import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 
@@ -663,6 +664,12 @@ export default function ProtectedPilotAccess({
       {selectedWorkspace ? (
         <>
           <TrustOSDecisionLedgerPanel
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
+          />
+
+          <AgentWorkspaceDashboardPanel
             onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
             session={session}
             workspace={selectedWorkspace}

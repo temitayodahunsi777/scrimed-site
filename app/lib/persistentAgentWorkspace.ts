@@ -1185,7 +1185,7 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "Run authenticated tenant proof-packet smoke scripts with a valid AAL2 session, then implement retention/legal-hold controls, incident export, and buyer-specific workspace dashboards.",
+      "Add governed work-order create and transition controls to the tenant dashboard, then implement retention/legal-hold controls, incident export, and authenticated end-to-end pilot scripts.",
     updated: "2026-06-14"
   };
 }
