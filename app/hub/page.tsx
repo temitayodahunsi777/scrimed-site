@@ -18,6 +18,16 @@ const consoleViews = [
     summary: "Review SCRIMED Atlas Pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
   },
   {
+    name: "Healthcare Intelligence OS",
+    href: "/healthcare-intelligence-os",
+    summary: "Review SCRIMED's Agent Runtime, Clinical Knowledge Graph, Validation Trust Lab, model router, sovereign deployment, and production gates."
+  },
+  {
+    name: "Pilot Evidence Dashboard",
+    href: "/pilot-evidence",
+    summary: "Inspect buyer and investor proof across product console, AgentOS, Atlas, TrustOS, protected workspaces, demos, pilots, and readiness gates."
+  },
+  {
     name: "Pilot Intake",
     href: "/pilot",
     summary: "Capture enterprise buyer segment, workflow targets, readiness needs, governance requirements, and CRM handoff scope."

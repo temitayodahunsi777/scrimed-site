@@ -324,6 +324,18 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Review Pilot Evidence",
+    href: "/pilot-evidence",
+    purpose: "Inspect the enterprise evidence dashboard tying SCRIMED offers, AgentOS, Atlas, TrustOS, protected workspaces, demos, pilots, readiness, and measurable outcomes together.",
+    boundary: "Evidence supports governed synthetic pilots and enterprise evaluation; it is not clinical validation, certification, or live execution authorization."
+  },
+  {
+    label: "Open Healthcare Intelligence OS",
+    href: "/healthcare-intelligence-os",
+    purpose: "Review SCRIMED's operating-system architecture, Clinical Knowledge Graph foundation, Validation Trust Lab, model routing, sovereign deployment, and production gates.",
+    boundary: "Architecture is production-shaped but current execution remains synthetic, review-gated, and non-diagnostic."
+  },
+  {
     label: "Run TrustOS Decision",
     href: "/trust-os",
     purpose: "Evaluate a synthetic agent action through policy, PHI, tool, clinical, model-route, explainability, and trace controls.",
@@ -500,6 +512,8 @@ export function getProductConsoleSummary() {
     pilotProgramApiRoute: demoPilotProgramSummary.pilotApiRoute,
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
+    healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    pilotEvidenceRoute: "/pilot-evidence",
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -539,6 +553,8 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceSummary,
     salesOperationsSummary,
     proofStack: {
+      healthcareIntelligenceOS: "healthcare-intelligence-os-foundation",
+      pilotEvidenceDashboard: "enterprise-evidence-ready",
       pricingAndSales: commercialStrategySummary.status,
       demosAndPilots: demoPilotProgramSummary.status,
       operationsReadiness: companyOperationsSummary.status,
@@ -580,6 +596,8 @@ export function getProductReadinessBrief() {
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
     "",
     "## Product Demos and Pilot Programs",
+    `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
+    `Pilot Evidence Dashboard: ${summary.pilotEvidenceRoute}`,
     `Demo Center: ${summary.demoRoute}`,
     `Pilot Programs: ${summary.pilotProgramRoute}`,
     ...summary.demoPilotProgramSummary.productDemos.map(

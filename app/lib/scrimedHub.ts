@@ -123,6 +123,8 @@ export const hubSignals: HubSignal[] = [
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
   { name: "Sales operations", value: "tenant-admin console active", tone: "good" },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
+  { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
+  { name: "Pilot evidence", value: "enterprise proof dashboard active", tone: "good" },
   { name: "Demo Center", value: "five executable buyer demos ready", tone: "good" },
   { name: "Pilot programs", value: "four governed programs packaged", tone: "good" },
   { name: "Operations readiness", value: "blocker register active", tone: "watch" },
@@ -185,6 +187,8 @@ export const hubRoutes = [
   "/pilot",
   "/pilot-workspace",
   "/pilot-workspace/access",
+  "/healthcare-intelligence-os",
+  "/pilot-evidence",
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -249,6 +253,10 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/pilot/intake",
+  "/api/healthcare-intelligence-os",
+  "/api/healthcare-intelligence-os/brief",
+  "/api/pilot-evidence",
+  "/api/pilot-evidence/brief",
   "/api/sales-operations",
   "/api/sales-operations/opportunities/{intakeId}",
   "/api/sales-operations/opportunities/{intakeId}/proposal",
@@ -398,6 +406,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-11"
+    updated: "2026-06-14"
   };
 }

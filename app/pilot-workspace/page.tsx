@@ -33,6 +33,9 @@ export default function ProtectedPilotWorkspacePage() {
           <a className="secondary-action" href="/api/pilot-workspaces/readiness">
             Inspect Readiness API
           </a>
+          <Link className="secondary-action" href="/pilot-evidence">
+            View Pilot Evidence
+          </Link>
         </div>
       </section>
 

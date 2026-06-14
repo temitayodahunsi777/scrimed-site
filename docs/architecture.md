@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-06-10
+Updated: 2026-06-14
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -10,6 +10,8 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
+- Healthcare Intelligence OS foundation: `/healthcare-intelligence-os`, `/api/healthcare-intelligence-os`, and `/api/healthcare-intelligence-os/brief`
+- Enterprise pilot evidence dashboard: `/pilot-evidence`, `/api/pilot-evidence`, and `/api/pilot-evidence/brief`
 - Executable TrustOS governance surface: `/trust-os`, `/api/trust-os`, and `/api/trust-os/evaluate`
 - Trust and enterprise readiness control plane: `/trust-center`, `/trust-center/[slug]`, `/claims`, `/api/enterprise-readiness`, `/api/enterprise-readiness/[slug]`, `/api/enterprise-readiness/claims`, and `/api/enterprise-readiness/diligence-brief`
 - Demo and pilot center: `/demos`, `/demos/[slug]`, `/pilots`, `/pilots/[slug]`, `/api/demos`, `/api/demos/[slug]`, `/api/pilots`, and `/api/pilots/[slug]`
@@ -35,6 +37,65 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Synthetic validation: `/synthetic`, `/synthetic/[slug]`, `/synthetic/fixtures`, `/synthetic/fixtures/[slug]`, `/synthetic/validation`, `/api/synthetic/scenarios`, `/api/synthetic/scenarios/[slug]`, `/api/synthetic/fixtures`, `/api/synthetic/fixtures/[slug]`, `/api/synthetic/validation`, and `/api/synthetic/validation/[slug]`
 - Quality gates: `/quality` and `/api/quality/gates`
 - Core operational APIs: `/api/health`, `/api/status`, `/api/readiness`, `/api/events`, and `/api/hub/summary`
+
+## Current Engineering Setup
+
+The current repository is a production-shaped Next.js application, not a static brochure. Its primary technical setup is:
+
+- Framework: Next.js App Router with React, TypeScript, server components, and route handlers.
+- Data and auth: Supabase Auth, Supabase Postgres, and Postgres row-level security for protected pilot workspaces.
+- Runtime safety: Upstash Redis rate limiting with bounded fallback for protected mutations.
+- Deployment: Vercel-hosted product app at `app.scrimedsolutions.com`, linked from the official Wix website at `scrimedsolutions.com`.
+- Product boundary: synthetic-only public product, demo, pilot, evidence, and readiness surfaces. Live PHI, production clinical execution, autonomous diagnosis, autonomous treatment, payer submission, and patient routing remain blocked until approved controls exist.
+- Architecture style: typed domain libraries under `app/lib`, public pages under `app/*`, route handlers under `app/api/*`, and database migrations under `supabase/migrations`.
+
+## Healthcare Intelligence OS Build Plan
+
+SCRIMED is now organized around a Healthcare Intelligence OS architecture. The goal is to evolve from individual healthcare AI features into the secure operating system, trust layer, workflow engine, and intelligence fabric that healthcare AI runs inside.
+
+### Phase 1: Agent Runtime, Clinical Knowledge Graph, Validation and Trust Lab
+
+Current foundation:
+
+- Agent Runtime: `AgentOS v1` exposes planner, router, specialist registry, memory fabric, RBAC permissions, MCP connector framework, sandbox runtimes, audit channels, human checkpoints, TrustQA, observability, and synthetic task planning.
+- Clinical Knowledge Graph: `healthcareIntelligenceOS.ts` defines standards, node types, and relationship contracts for FHIR, HL7 v2, DICOM/DICOMweb, SNOMED CT, ICD-10, ICD-11, LOINC, RxNorm, CPT, HCPCS, X12, NCPDP, and IHE-aligned exchange patterns.
+- Validation and Trust Lab: TrustOS and Atlas expose validation fields for clinical correctness, completeness, safety, confidence, source attribution, evidence trail, guideline references, model/provider used, reviewer status, and audit log.
+
+Current boundary:
+
+- Clinical correctness and safety scoring are contract fields, not validated clinical-performance claims.
+- TODO: define licensed clinician scoring rubrics before these fields are used in care delivery.
+- TODO: complete regulatory intended-use review before any public claim implies diagnosis, treatment, clinical decision support, FDA-regulated functionality, or autonomous care execution.
+
+### Phase 2: Persistent Workspaces, Multi-Model Router, Sovereign Deployment
+
+Current foundation:
+
+- Protected Pilot Workspaces provide tenant-authenticated synthetic sessions, durable proof packets, TrustOS governance packets, and append-only audit events.
+- TrustOS model-route profiles define the policy frame for vendor-neutral model routing across cost, latency, safety, context, availability, fallback, PHI sensitivity, and regional constraints.
+- Sovereign deployment contracts describe managed cloud, private cloud, hospital-controlled, government/sovereign cloud, and edge/on-prem modes.
+
+Required before production:
+
+- Durable state, retry, replay, failure quarantine, deletion, residency, legal hold, access review, and incident export for long-running agent workspaces.
+- Provider agreements, BAA/DPA path where applicable, PHI routing policy, regional processing controls, monitoring, and rollback runbooks.
+- Deployment validation where customer clinical data cannot leave a customer-controlled environment.
+
+### Phase 3: Clinical Intelligence OS, Risk Horizon Engine, Population Intelligence
+
+Current foundation:
+
+- Synthetic workflows already model care navigation, documentation review, trial screening, prior authorization support, denial-risk review, and care-gap detection.
+- Evidence metrics are tied to buyer-approved pilot baselines: time saved, workflow friction reduced, documentation quality improved, revenue leakage identified, and patient access bottlenecks surfaced.
+
+Required before production:
+
+- Clinical validation studies, data-quality review, equity review, buyer baseline measurement, and human operating procedures.
+- No risk prediction, diagnosis, treatment, patient instruction, care-plan execution, or population scoring without authorized human review and approved governance.
+
+### Phase 4: Project Ark Healthcare Intelligence Fabric
+
+Project Ark remains a planned expansion that should only proceed after SCRIMED has validated the operating layers above with enterprise deployment evidence, external security/privacy/legal review, clinician governance, and customer-approved production controls.
 
 ## System Layers
 
