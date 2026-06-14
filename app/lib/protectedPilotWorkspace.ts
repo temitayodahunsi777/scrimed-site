@@ -455,6 +455,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "AAL2-protected tenant membership visibility and audited role administration",
       "Governed invitation records with existing-auth-user activation",
       "Audited tenant-admin onboarding packet downloads for manual pilot delivery",
+      "Guided tenant-admin activation runbook with buyer-ready evidence status",
       "Audited tenant activation proof packet for buyer and investor diligence",
       "SMTP delivery readiness metadata with direct-send gate retained",
       "Tenant offboarding, reactivation, and final-admin protection",

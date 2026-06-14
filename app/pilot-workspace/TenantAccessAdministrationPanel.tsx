@@ -6,6 +6,7 @@ import type {
   PilotWorkspaceRecord,
   PilotWorkspaceRole,
   TenantAccessDashboard,
+  TenantAccessInvitation,
   TenantIdentityProviderStatus,
   TenantIdentityReadiness,
   TenantInvitationDeliveryReadiness,
@@ -19,6 +20,24 @@ type TenantAccessResponse = {
 };
 
 type PanelStatus = "loading" | "ready" | "saving" | "unavailable" | "error";
+type ActivationRunbookStatus = "complete" | "ready" | "waiting" | "blocked";
+type ActivationRunbookAction =
+  | "create-invitation"
+  | "download-packet"
+  | "prepare-delivery"
+  | "activate-user"
+  | "download-proof";
+
+type ActivationRunbookStep = {
+  step: string;
+  title: string;
+  status: ActivationRunbookStatus;
+  evidence: string;
+  buyerState: string;
+  boundary: string;
+  action?: ActivationRunbookAction;
+  invitation?: TenantAccessInvitation;
+};
 
 const roles: PilotWorkspaceRole[] = ["tenant-admin", "pilot-lead", "reviewer", "observer"];
 const identityStatuses: TenantIdentityProviderStatus[] = [
@@ -78,6 +97,121 @@ function defaultExpiryDate() {
 function eventMetadataSummary(metadata: Record<string, unknown>) {
   const keys = Object.keys(metadata);
   return keys.length > 0 ? keys.slice(0, 4).join(", ") : "metadata sealed";
+}
+
+function displayRunbookStatus(status: ActivationRunbookStatus) {
+  if (status === "complete") return "Complete";
+  if (status === "ready") return "Ready";
+  if (status === "waiting") return "Waiting";
+  return "Blocked";
+}
+
+function displayRunbookAction(action: ActivationRunbookAction) {
+  if (action === "create-invitation") return "Create Invitation";
+  if (action === "download-packet") return "Download Packet";
+  if (action === "prepare-delivery") return "Prepare Delivery";
+  if (action === "activate-user") return "Activate User";
+  return "Export Proof";
+}
+
+function runbookStatusRank(status: ActivationRunbookStatus) {
+  if (status === "complete") return 4;
+  if (status === "ready") return 3;
+  if (status === "waiting") return 2;
+  return 1;
+}
+
+function latestEventDate(dashboard: TenantAccessDashboard, eventType: TenantAccessDashboard["lifecycleEvents"][number]["eventType"]) {
+  return dashboard.lifecycleEvents.find((event) => event.eventType === eventType)?.createdAt ?? null;
+}
+
+function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRunbookStep[] {
+  const pendingInvitation = dashboard.invitations.find((invitation) => invitation.status === "pending");
+  const packetInvitation =
+    dashboard.invitations.find((invitation) => Boolean(invitation.lastPacketGeneratedAt)) ?? pendingInvitation;
+  const deliveryInvitation =
+    dashboard.invitations.find((invitation) => Boolean(invitation.lastDeliveryPreparedAt)) ?? packetInvitation;
+  const activatedInvitation = dashboard.invitations.find((invitation) => invitation.status === "activated");
+  const invitationCandidate = pendingInvitation ?? activatedInvitation ?? dashboard.invitations[0];
+  const packetReady = Boolean(packetInvitation?.lastPacketGeneratedAt);
+  const deliveryReady = Boolean(deliveryInvitation?.lastDeliveryPreparedAt);
+  const activationReady = Boolean(activatedInvitation?.activatedAt);
+  const activationProofReady = Boolean(latestEventDate(dashboard, "activation-proof-packet-downloaded"));
+  const invitationCreatedAt = latestEventDate(dashboard, "invitation-created") ?? invitationCandidate?.createdAt ?? null;
+  const packetGeneratedAt = latestEventDate(dashboard, "invitation-packet-generated") ?? packetInvitation?.lastPacketGeneratedAt ?? null;
+  const deliveryPreparedAt =
+    latestEventDate(dashboard, "invitation-delivery-prepared") ?? deliveryInvitation?.lastDeliveryPreparedAt ?? null;
+  const activatedAt = latestEventDate(dashboard, "invitation-activated") ?? activatedInvitation?.activatedAt ?? null;
+  const proofGeneratedAt = latestEventDate(dashboard, "activation-proof-packet-downloaded");
+
+  return [
+    {
+      step: "01",
+      title: "Create controlled invitation",
+      status: invitationCandidate ? "complete" : "ready",
+      evidence: invitationCandidate
+        ? `${invitationCandidate.email} recorded ${formatDate(invitationCreatedAt)} as ${displayRole(invitationCandidate.proposedRole)}.`
+        : "No active invitation record has been created for this tenant workspace.",
+      buyerState: invitationCandidate ? "Invitation intent is inspectable." : "Buyer evidence starts with a metadata-only invitation.",
+      boundary: "No user creation, no PHI, and no email send.",
+      action: invitationCandidate ? undefined : "create-invitation"
+    },
+    {
+      step: "02",
+      title: "Download onboarding packet",
+      status: packetReady ? "complete" : pendingInvitation ? "ready" : "blocked",
+      evidence: packetReady
+        ? `${packetInvitation?.email ?? "Invitee"} packet generated ${formatDate(packetGeneratedAt)}.`
+        : pendingInvitation
+          ? `${pendingInvitation.email} is ready for audited packet generation.`
+          : "A pending invitation is required before packet generation.",
+      buyerState: packetReady ? "Onboarding packet evidence is available." : "Packet evidence is not yet available.",
+      boundary: "Packet supports manual enterprise delivery only.",
+      action: packetReady || !pendingInvitation ? undefined : "download-packet",
+      invitation: pendingInvitation
+    },
+    {
+      step: "03",
+      title: "Prepare external delivery",
+      status: deliveryReady ? "complete" : packetReady && pendingInvitation ? "ready" : pendingInvitation ? "waiting" : "blocked",
+      evidence: deliveryReady
+        ? `${deliveryInvitation?.email ?? "Invitee"} delivery prepared ${formatDate(deliveryPreparedAt)}.`
+        : packetReady && pendingInvitation
+          ? `${pendingInvitation.email} packet is ready for delivery preparation.`
+          : "Packet generation must be recorded before external delivery preparation.",
+      buyerState: deliveryReady ? "Manual delivery readiness is evidenced." : "Delivery readiness still needs an audit event.",
+      boundary: "Direct SMTP send remains gated.",
+      action: deliveryReady || !packetReady || !pendingInvitation ? undefined : "prepare-delivery",
+      invitation: pendingInvitation
+    },
+    {
+      step: "04",
+      title: "Activate enrolled user",
+      status: activationReady ? "complete" : deliveryReady && pendingInvitation ? "ready" : pendingInvitation ? "waiting" : "blocked",
+      evidence: activationReady
+        ? `${activatedInvitation?.email ?? "Invitee"} activated ${formatDate(activatedAt)}.`
+        : deliveryReady && pendingInvitation
+          ? `${pendingInvitation.email} can be activated only after SCRIMED authentication enrollment exists.`
+          : "Activation waits for prepared delivery and external enrollment.",
+      buyerState: activationReady ? "Tenant identity lifecycle has activation evidence." : "Activation evidence is not complete.",
+      boundary: "No activation for unknown identities and no bypass of AAL2 governance.",
+      action: activationReady || !deliveryReady || !pendingInvitation ? undefined : "activate-user",
+      invitation: pendingInvitation
+    },
+    {
+      step: "05",
+      title: "Export activation proof",
+      status: activationProofReady ? "complete" : activationReady ? "ready" : "waiting",
+      evidence: activationProofReady
+        ? `Activation proof packet exported ${formatDate(proofGeneratedAt)}.`
+        : activationReady
+          ? "Activation evidence is ready for final proof export."
+          : "Final proof export should follow activation evidence.",
+      buyerState: activationProofReady ? "Buyer-ready lifecycle proof is available." : "Buyer-ready lifecycle proof is not finalized.",
+      boundary: "Diligence artifact only; no clinical or payer authorization.",
+      action: activationProofReady || !activationReady ? undefined : "download-proof"
+    }
+  ];
 }
 
 export default function TenantAccessAdministrationPanel({
@@ -394,6 +528,54 @@ export default function TenantAccessAdministrationPanel({
     return null;
   }
 
+  const activationRunbook = dashboard ? buildActivationRunbook(dashboard) : [];
+  const completedRunbookSteps = activationRunbook.filter((step) => step.status === "complete").length;
+  const actionableRunbookStep = activationRunbook.find((step) => step.status === "ready") ?? null;
+  const runbookEvidenceScore = activationRunbook.reduce(
+    (total, step) => total + runbookStatusRank(step.status),
+    0
+  );
+  const runbookEvidenceMax = activationRunbook.length * runbookStatusRank("complete");
+  const runbookProgress = runbookEvidenceMax > 0 ? Math.round((runbookEvidenceScore / runbookEvidenceMax) * 100) : 0;
+
+  async function commitRunbookAction(step: ActivationRunbookStep) {
+    if (!step.action) {
+      return;
+    }
+
+    if (step.action === "create-invitation") {
+      if (!inviteEmail) {
+        setMessage("Enter a business email in the invitation registry before creating the first runbook record.");
+        return;
+      }
+
+      await createInvitation();
+      return;
+    }
+
+    if (!step.invitation && step.action !== "download-proof") {
+      setMessage("The selected runbook step is waiting for a governed invitation record.");
+      return;
+    }
+
+    if (step.action === "download-packet" && step.invitation) {
+      await downloadInvitationPacket(step.invitation.id, step.invitation.email);
+      return;
+    }
+
+    if (step.action === "prepare-delivery" && step.invitation) {
+      await prepareInvitationDelivery(step.invitation.id);
+      return;
+    }
+
+    if (step.action === "activate-user" && step.invitation) {
+      await activateInvitation(step.invitation.id);
+      return;
+    }
+
+    await downloadActivationProofPacket();
+  }
+
   return (
     <section className="table-section tenant-access-panel" aria-label="Tenant access administration">
       <div className="section-heading">
@@ -457,6 +639,52 @@ export default function TenantAccessAdministrationPanel({
               <strong>{dashboard.summary.accessReviewsDue}</strong>
             </article>
           </div>
+
+          <section className="activation-runbook" aria-label="Tenant activation runbook">
+            <div className="activation-runbook-heading">
+              <div>
+                <span>Activation runbook</span>
+                <h3>Invitation to buyer-ready proof</h3>
+                <p>
+                  {actionableRunbookStep
+                    ? `Next controlled action: ${actionableRunbookStep.title}.`
+                    : "All currently available activation evidence is complete."}
+                </p>
+              </div>
+              <div className="activation-runbook-progress" aria-label={`${runbookProgress}% evidence readiness`}>
+                <strong>{runbookProgress}%</strong>
+                <span>
+                  {completedRunbookSteps}/{activationRunbook.length} complete
+                </span>
+              </div>
+            </div>
+            <div className="activation-runbook-list">
+              {activationRunbook.map((step) => (
+                <article className={`activation-runbook-step is-${step.status}`} key={step.step}>
+                  <div className="activation-runbook-index">
+                    <span>{step.step}</span>
+                  </div>
+                  <div>
+                    <div className="activation-runbook-title">
+                      <h4>{step.title}</h4>
+                      <span>{displayRunbookStatus(step.status)}</span>
+                    </div>
+                    <p>{step.evidence}</p>
+                    <p>{step.buyerState}</p>
+                    <strong>{step.boundary}</strong>
+                  </div>
+                  <button
+                    className="secondary-action"
+                    disabled={status === "saving" || !step.action}
+                    onClick={() => commitRunbookAction(step)}
+                    type="button"
+                  >
+                    {step.action ? displayRunbookAction(step.action) : "Evidence Recorded"}
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
 
           <div className="tenant-access-grid">
             <article className="tenant-access-card">
