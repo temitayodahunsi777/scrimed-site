@@ -7,7 +7,9 @@ import {
   deactivateTenantMembership,
   getAuthenticatedGovernanceContext,
   getTenantAccessDashboard,
+  prepareTenantInvitationDelivery,
   reactivateTenantMembership,
+  updateTenantInvitationDeliveryReadiness,
   updateTenantIdentityReadiness,
   updateTenantMembershipRole
 } from "../../../../lib/protectedPilotStore";
@@ -16,7 +18,8 @@ import {
   protectedPilotBoundary,
   protectedPilotNoStoreHeaders,
   type PilotWorkspaceRole,
-  type TenantIdentityProviderStatus
+  type TenantIdentityProviderStatus,
+  type TenantInvitationDeliveryReadinessStatus
 } from "../../../../lib/protectedPilotWorkspace";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../../lib/requestRateLimit";
 
@@ -34,13 +37,20 @@ type TenantAccessAction =
   | "deactivate-membership"
   | "reactivate-membership"
   | "attest-access-review"
-  | "update-identity-readiness";
+  | "update-identity-readiness"
+  | "prepare-invitation-delivery"
+  | "update-delivery-readiness";
 
 const allowedRoles = new Set<PilotWorkspaceRole>(pilotWorkspaceRoles.map((entry) => entry.role));
 const allowedIdentityStatuses = new Set<TenantIdentityProviderStatus>([
   "passwordless-magic-link",
   "sso-readiness",
   "sso-configured"
+]);
+const allowedDeliveryReadinessStatuses = new Set<TenantInvitationDeliveryReadinessStatus>([
+  "manual-packet-only",
+  "smtp-readiness-review",
+  "smtp-approved-send-gated"
 ]);
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -54,6 +64,7 @@ function statusForTenantAccessError(message: string) {
   if (message.includes("tenant-access-membership-not-found")) return 404;
   if (message.includes("tenant-access-invitation-not-found")) return 404;
   if (message.includes("prohibited-identity-lifecycle-data")) return 422;
+  if (message.includes("tenant-access-delivery-note-too-large")) return 413;
   if (message.includes("tenant-access-invalid")) return 422;
   if (message.includes("too-large")) return 413;
   if (message.includes("role-denied") || message.includes("admin-required")) return 403;
@@ -68,6 +79,7 @@ function tenantAccessErrorCode(message: string) {
   if (message.includes("tenant-access-invitation-not-found")) return "tenant-access-invitation-not-found";
   if (message.includes("tenant-access-membership-not-found")) return "tenant-access-membership-not-found";
   if (message.includes("prohibited-identity-lifecycle-data")) return "prohibited-identity-lifecycle-data";
+  if (message.includes("tenant-access-delivery-note-too-large")) return "tenant-access-delivery-note-too-large";
   if (message.includes("tenant-access-invalid")) return "invalid-tenant-access-action";
   return "tenant-access-action-failed";
 }
@@ -99,6 +111,10 @@ function tenantAccessErrorMessage(message: string) {
 
   if (message.includes("prohibited-identity-lifecycle-data")) {
     return "Identity lifecycle notes must stay metadata-only and cannot include PHI or clinical details.";
+  }
+
+  if (message.includes("tenant-access-delivery-note-too-large")) {
+    return "Invitation delivery notes must remain concise and metadata-only.";
   }
 
   if (message.includes("too-large")) {
@@ -244,7 +260,9 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     | Awaited<ReturnType<typeof deactivateTenantMembership>>
     | Awaited<ReturnType<typeof reactivateTenantMembership>>
     | Awaited<ReturnType<typeof attestTenantAccessReview>>
-    | Awaited<ReturnType<typeof updateTenantIdentityReadiness>>;
+    | Awaited<ReturnType<typeof updateTenantIdentityReadiness>>
+    | Awaited<ReturnType<typeof prepareTenantInvitationDelivery>>
+    | Awaited<ReturnType<typeof updateTenantInvitationDeliveryReadiness>>;
 
   if (action === "update-role") {
     const userId = stringValue(body, "userId", 64);
@@ -360,6 +378,51 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       providerStatus,
       ssoProvider,
       ssoDomain,
+      notes
+    );
+  } else if (action === "prepare-invitation-delivery") {
+    const invitationId = stringValue(body, "invitationId", 64);
+    const note = stringValue(body, "note", 700);
+
+    if (!validUuid(invitationId)) {
+      return NextResponse.json(
+        { error: { code: "invalid-tenant-invitation", message: "A valid invitation identity is required." } },
+        { status: 422, headers }
+      );
+    }
+
+    mutation = await prepareTenantInvitationDelivery(context.client, workspaceSlug, invitationId, note);
+  } else if (action === "update-delivery-readiness") {
+    const deliveryStatus =
+      typeof body.deliveryStatus === "string"
+        ? (body.deliveryStatus as TenantInvitationDeliveryReadinessStatus)
+        : null;
+    const smtpProvider = stringValue(body, "smtpProvider", 120);
+    const smtpFromDomain = stringValue(body, "smtpFromDomain", 160).toLowerCase();
+    const notes = stringValue(body, "notes", 700);
+
+    if (
+      !deliveryStatus ||
+      !allowedDeliveryReadinessStatuses.has(deliveryStatus) ||
+      (smtpFromDomain !== "" && !domainPattern.test(smtpFromDomain))
+    ) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "invalid-delivery-readiness",
+            message: "A valid invitation delivery posture and optional SMTP from-domain are required."
+          }
+        },
+        { status: 422, headers }
+      );
+    }
+
+    mutation = await updateTenantInvitationDeliveryReadiness(
+      context.client,
+      workspaceSlug,
+      deliveryStatus,
+      smtpProvider,
+      smtpFromDomain,
       notes
     );
   } else {

@@ -38,6 +38,26 @@ export default function PilotProgramsPage() {
         </article>
       </section>
 
+      <section className="table-section" aria-label="SCRIMED pilot investor readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot readiness</p>
+          <h2>{summary.investorReadiness.status}</h2>
+          <p className="section-copy">{summary.investorReadiness.nextDiligenceStep}</p>
+        </div>
+        {summary.investorReadiness.revenuePath.map((step, index) => (
+          <article className="module-row" key={step}>
+            <div>
+              <span>step {index + 1}</span>
+              <h2>{step}</h2>
+            </div>
+            <p>{summary.investorReadiness.currentBoundary}</p>
+            <Link className="module-link" href={index < 1 ? "/demos" : index < 3 ? "/pilot" : "/pilot-workspace"}>
+              Inspect conversion surface
+            </Link>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED pilot program catalog">
         <div className="section-heading">
           <p className="eyebrow">Pilot catalog</p>

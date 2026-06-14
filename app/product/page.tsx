@@ -94,6 +94,26 @@ export default function ProductConsolePage() {
         </div>
       </section>
 
+      <section className="table-section" aria-label="SCRIMED investor and buyer proof">
+        <div className="section-heading">
+          <p className="eyebrow">Investor and buyer proof</p>
+          <h2>{summary.demoPilotProgramSummary.investorReadiness.thesis}</h2>
+          <p className="section-copy">
+            {summary.demoPilotProgramSummary.investorReadiness.demoToPilotConversionPath}
+          </p>
+        </div>
+        {summary.demoPilotProgramSummary.investorReadiness.proofSignals.map((signal) => (
+          <article className="module-row" key={signal.label}>
+            <div>
+              <span>{signal.status}</span>
+              <h2>{signal.label}</h2>
+            </div>
+            <p>{signal.evidence}</p>
+            <Link className="module-link" href={signal.route}>Open proof surface</Link>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED product demos">
         <div className="section-heading">
           <p className="eyebrow">Product demos</p>

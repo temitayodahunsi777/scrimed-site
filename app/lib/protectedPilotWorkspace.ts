@@ -54,6 +54,15 @@ export type TenantAccessMembership = {
 };
 
 export type TenantAccessInvitationStatus = "pending" | "cancelled" | "activated" | "expired";
+export type TenantInvitationDeliveryStatus =
+  | "record-only"
+  | "packet-generated"
+  | "external-delivery-prepared"
+  | "smtp-ready-blocked";
+export type TenantInvitationDeliveryReadinessStatus =
+  | "manual-packet-only"
+  | "smtp-readiness-review"
+  | "smtp-approved-send-gated";
 
 export type TenantAccessInvitation = {
   id: string;
@@ -70,6 +79,13 @@ export type TenantAccessInvitation = {
   cancellationReason: string;
   expiresAt: string;
   createdAt: string;
+  deliveryStatus: TenantInvitationDeliveryStatus;
+  lastPacketGeneratedAt: string | null;
+  lastPacketGeneratedBy: string | null;
+  lastDeliveryPreparedAt: string | null;
+  lastDeliveryPreparedBy: string | null;
+  deliveryAttemptCount: number;
+  deliveryNote: string;
 };
 
 export type TenantAccessAuditEvent = {
@@ -91,6 +107,9 @@ export type TenantAccessLifecycleEvent = {
     | "invitation-created"
     | "invitation-cancelled"
     | "invitation-activated"
+    | "invitation-packet-generated"
+    | "invitation-delivery-prepared"
+    | "invitation-delivery-readiness-updated"
     | "membership-deactivated"
     | "membership-reactivated"
     | "access-review-attested"
@@ -113,11 +132,22 @@ export type TenantIdentityReadiness = {
   updatedBy: string | null;
 };
 
+export type TenantInvitationDeliveryReadiness = {
+  status: TenantInvitationDeliveryReadinessStatus;
+  smtpProvider: string;
+  smtpFromDomain: string;
+  notes: string;
+  updatedAt: string | null;
+  updatedBy: string | null;
+};
+
 export type TenantAccessSummary = {
   activeMembers: number;
   inactiveMembers: number;
   pendingInvitations: number;
   accessReviewsDue: number;
+  packetGeneratedInvitations: number;
+  deliveryPreparedInvitations: number;
 };
 
 export type TenantAccessDashboard = {
@@ -132,6 +162,7 @@ export type TenantAccessDashboard = {
   auditEvents: TenantAccessAuditEvent[];
   lifecycleEvents: TenantAccessLifecycleEvent[];
   identityReadiness: TenantIdentityReadiness;
+  deliveryReadiness: TenantInvitationDeliveryReadiness;
   summary: TenantAccessSummary;
   security: {
     assuranceLevel: "aal2";
@@ -139,8 +170,30 @@ export type TenantAccessDashboard = {
     mutationAuthorization: "tenant-admin-plus-server-runtime-token";
     offboardingEnforced: true;
     directInvitationEmail: false;
+    deliveryMode: "manual-onboarding-packet-until-approved-smtp-send";
   };
   boundary: string;
+};
+
+export type TenantInvitationPacket = {
+  tenantId: string;
+  tenantName: string;
+  workspaceId: string;
+  workspaceSlug: string;
+  workspaceName: string;
+  invitationId: string;
+  email: string;
+  proposedRole: PilotWorkspaceRole;
+  status: TenantAccessInvitationStatus;
+  expiresAt: string;
+  createdAt: string;
+  deliveryStatus: TenantInvitationDeliveryStatus;
+  deliveryReadiness: TenantInvitationDeliveryReadinessStatus;
+  smtpProvider: string;
+  smtpFromDomain: string;
+  portalRoute: string;
+  boundary: string;
+  generatedAt: string;
 };
 
 export type ProtectedPilotInfrastructure = {
@@ -232,7 +285,13 @@ export const protectedPilotApiContracts = [
     method: "GET / PATCH",
     route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access",
     access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
-    purpose: "Inspect memberships, record governed invitations, activate existing auth users, offboard/reactivate access, attest access reviews, and maintain SSO-readiness metadata without email delivery or user creation."
+    purpose: "Inspect memberships, record governed invitations, activate existing auth users, offboard/reactivate access, attest access reviews, maintain SSO-readiness metadata, and prepare audited manual delivery without email delivery or user creation."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access/invitations/{invitationId}/onboarding-packet",
+    access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
+    purpose: "Download an audited protected-pilot onboarding packet for manual external delivery while SMTP send remains gated."
   },
   {
     method: "GET",
@@ -261,7 +320,7 @@ export const protectedPilotApiContracts = [
 ];
 
 export const protectedPilotActivationGates = [
-  "Add enterprise email delivery through approved custom SMTP before sending production invitation messages.",
+  "Keep direct invitation send disabled until custom SMTP, legal copy, abuse controls, and delivery monitoring are approved.",
   "Extend the active magic-link, TOTP MFA, and session-lifetime policy into enforced enterprise SSO and multi-tenant identity operations.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
@@ -337,12 +396,14 @@ export function getProtectedPilotWorkspaceSummary() {
       "Downloadable audited TrustOS governance packets",
       "AAL2-protected tenant membership visibility and audited role administration",
       "Governed invitation records with existing-auth-user activation",
+      "Audited tenant-admin onboarding packet downloads for manual pilot delivery",
+      "SMTP delivery readiness metadata with direct-send gate retained",
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",
       "SSO-readiness metadata and identity lifecycle evidence",
       "Rate-limited public intake and protected mutations"
     ],
-    updated: "2026-06-13"
+    updated: "2026-06-14"
   };
 }
 
@@ -401,5 +462,51 @@ ${evaluation.observabilityRecord.measurementBoundary}
 ${session.boundary}
 
 This proof packet documents a governed synthetic pilot evaluation. It is not clinical advice, a production authorization, a reimbursement guarantee, or evidence of autonomous clinical execution.
+`;
+}
+
+export function buildTenantInvitationOnboardingPacket(
+  packet: TenantInvitationPacket,
+  appBaseUrl: string
+) {
+  const portalUrl = `${appBaseUrl.replace(/\/$/, "")}${packet.portalRoute}`;
+
+  return `# SCRIMED Protected Pilot Onboarding Packet
+
+## Recipient
+- Email: ${packet.email}
+- Proposed role: ${packet.proposedRole}
+- Invitation status: ${packet.status}
+- Invitation ID: ${packet.invitationId}
+- Created: ${packet.createdAt}
+- Expires: ${packet.expiresAt}
+
+## Tenant Workspace
+- Tenant: ${packet.tenantName}
+- Workspace: ${packet.workspaceName}
+- Workspace slug: ${packet.workspaceSlug}
+- Access route: ${portalUrl}
+
+## Onboarding Steps
+1. Sign in at the protected pilot access route using the invited email address.
+2. Complete fresh MFA/TOTP verification when prompted by SCRIMED identity controls.
+3. Use the workspace only for governed synthetic pilot evaluation.
+4. Wait for a tenant-admin to activate the invitation after authentication enrollment is complete.
+
+## Delivery Evidence
+- Packet generated: ${packet.generatedAt}
+- Invitation delivery status: ${packet.deliveryStatus}
+- Tenant delivery readiness: ${packet.deliveryReadiness}
+- SMTP provider posture: ${packet.smtpProvider || "Not approved for direct send"}
+- SMTP from-domain posture: ${packet.smtpFromDomain || "Not approved for direct send"}
+- Direct SCRIMED email send: disabled
+
+## Governance Boundary
+- No PHI, live patient data, or clinical details should be entered.
+- No clinical execution, patient outreach, payer submission, autonomous diagnosis, or treatment action is authorized.
+- This packet does not replace a legal, security, privacy, BAA, or procurement approval.
+- Tenant-admin lifecycle actions are append-only audited and require fresh AAL2 assurance.
+
+${packet.boundary}
 `;
 }

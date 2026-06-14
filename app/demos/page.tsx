@@ -38,6 +38,24 @@ export default function DemosPage() {
         </article>
       </section>
 
+      <section className="table-section" aria-label="SCRIMED investor demo proof">
+        <div className="section-heading">
+          <p className="eyebrow">Investor proof</p>
+          <h2>{summary.investorReadiness.thesis}</h2>
+          <p className="section-copy">{summary.investorReadiness.demoToPilotConversionPath}</p>
+        </div>
+        {summary.investorReadiness.proofSignals.map((signal) => (
+          <article className="module-row" key={signal.label}>
+            <div>
+              <span>{signal.status}</span>
+              <h2>{signal.label}</h2>
+            </div>
+            <p>{signal.evidence}</p>
+            <Link className="module-link" href={signal.route}>Inspect proof surface</Link>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED product demos">
         <div className="section-heading">
           <p className="eyebrow">Demo registry</p>

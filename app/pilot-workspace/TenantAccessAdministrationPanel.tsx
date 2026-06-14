@@ -7,7 +7,10 @@ import type {
   PilotWorkspaceRole,
   TenantAccessDashboard,
   TenantIdentityProviderStatus,
-  TenantIdentityReadiness
+  TenantIdentityReadiness,
+  TenantInvitationDeliveryReadiness,
+  TenantInvitationDeliveryReadinessStatus,
+  TenantInvitationDeliveryStatus
 } from "../lib/protectedPilotWorkspace";
 
 type TenantAccessResponse = {
@@ -23,6 +26,11 @@ const identityStatuses: TenantIdentityProviderStatus[] = [
   "sso-readiness",
   "sso-configured"
 ];
+const deliveryReadinessStatuses: TenantInvitationDeliveryReadinessStatus[] = [
+  "manual-packet-only",
+  "smtp-readiness-review",
+  "smtp-approved-send-gated"
+];
 
 function displayRole(role: PilotWorkspaceRole) {
   return role
@@ -35,6 +43,19 @@ function displayIdentityStatus(status: TenantIdentityProviderStatus) {
   if (status === "passwordless-magic-link") return "Passwordless + MFA";
   if (status === "sso-readiness") return "SSO readiness";
   return "SSO configured";
+}
+
+function displayDeliveryReadinessStatus(status: TenantInvitationDeliveryReadinessStatus) {
+  if (status === "manual-packet-only") return "Manual packet only";
+  if (status === "smtp-readiness-review") return "SMTP readiness review";
+  return "SMTP approved, send gated";
+}
+
+function displayInvitationDeliveryStatus(status: TenantInvitationDeliveryStatus) {
+  if (status === "record-only") return "Record only";
+  if (status === "packet-generated") return "Packet generated";
+  if (status === "external-delivery-prepared") return "External delivery prepared";
+  return "SMTP ready, send blocked";
 }
 
 function formatDate(value: string | null) {
@@ -76,8 +97,10 @@ export default function TenantAccessAdministrationPanel({
   const [inviteExpiresAt, setInviteExpiresAt] = useState(defaultExpiryDate);
   const [cancelReasons, setCancelReasons] = useState<Record<string, string>>({});
   const [deactivationReasons, setDeactivationReasons] = useState<Record<string, string>>({});
+  const [deliveryNotes, setDeliveryNotes] = useState<Record<string, string>>({});
   const [reviewNotes, setReviewNotes] = useState("");
   const [identityDraft, setIdentityDraft] = useState<TenantIdentityReadiness | null>(null);
+  const [deliveryDraft, setDeliveryDraft] = useState<TenantInvitationDeliveryReadiness | null>(null);
 
   function applyDashboard(nextDashboard: TenantAccessDashboard) {
     setDashboard(nextDashboard);
@@ -85,6 +108,7 @@ export default function TenantAccessAdministrationPanel({
       Object.fromEntries(nextDashboard.memberships.map((membership) => [membership.userId, membership.role]))
     );
     setIdentityDraft(nextDashboard.identityReadiness);
+    setDeliveryDraft(nextDashboard.deliveryReadiness);
   }
 
   useEffect(() => {
@@ -207,6 +231,50 @@ export default function TenantAccessAdministrationPanel({
     );
   }
 
+  async function downloadInvitationPacket(invitationId: string, email: string) {
+    setStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/tenant-access/invitations/${invitationId}/onboarding-packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as TenantAccessResponse;
+      setStatus("error");
+      setMessage(body.error?.message ?? "The onboarding packet could not be generated.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const safeEmail = email.split("@")[0]?.replace(/[^a-z0-9-]/gi, "-").slice(0, 48) || "invitee";
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${safeEmail}-pilot-onboarding-packet.md`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus("ready");
+    setMessage("Onboarding packet downloaded and recorded in the identity lifecycle trail.");
+  }
+
+  async function prepareInvitationDelivery(invitationId: string) {
+    await commitAction(
+      {
+        action: "prepare-invitation-delivery",
+        invitationId,
+        note: deliveryNotes[invitationId] ?? ""
+      },
+      "External invitation delivery prepared. Direct SCRIMED email send remains gated."
+    );
+  }
+
   async function deactivateMembership(userId: string) {
     await commitAction(
       {
@@ -256,6 +324,23 @@ export default function TenantAccessAdministrationPanel({
     );
   }
 
+  async function updateDeliveryReadiness() {
+    if (!deliveryDraft) {
+      return;
+    }
+
+    await commitAction(
+      {
+        action: "update-delivery-readiness",
+        deliveryStatus: deliveryDraft.status,
+        smtpProvider: deliveryDraft.smtpProvider,
+        smtpFromDomain: deliveryDraft.smtpFromDomain,
+        notes: deliveryDraft.notes
+      },
+      "Invitation delivery readiness metadata updated. Direct send remains gated."
+    );
+  }
+
   if (status === "unavailable") {
     return null;
   }
@@ -267,7 +352,7 @@ export default function TenantAccessAdministrationPanel({
         <h2>Govern protected-pilot identities.</h2>
         <p className="section-copy">
           Tenant-admin lifecycle actions require fresh AAL2 assurance and create append-only access evidence. The
-          workspace remains synthetic-only: no PHI intake, no autonomous care, and no invitation email delivery.
+          workspace remains synthetic-only: no PHI intake, no autonomous care, and no direct invitation email delivery.
         </p>
       </div>
 
@@ -305,6 +390,14 @@ export default function TenantAccessAdministrationPanel({
             <article>
               <span>Pending invites</span>
               <strong>{dashboard.summary.pendingInvitations}</strong>
+            </article>
+            <article>
+              <span>Packets ready</span>
+              <strong>{dashboard.summary.packetGeneratedInvitations}</strong>
+            </article>
+            <article>
+              <span>Delivery prepared</span>
+              <strong>{dashboard.summary.deliveryPreparedInvitations}</strong>
             </article>
             <article>
               <span>Inactive members</span>
@@ -455,6 +548,85 @@ export default function TenantAccessAdministrationPanel({
                 Save Identity Readiness
               </button>
             </article>
+
+            <article className="tenant-access-card">
+              <div>
+                <span>Delivery readiness</span>
+                <h3>{displayDeliveryReadinessStatus((deliveryDraft ?? dashboard.deliveryReadiness).status)}</h3>
+                <p>Last updated {formatDate((deliveryDraft ?? dashboard.deliveryReadiness).updatedAt)}</p>
+              </div>
+              <label className="form-field">
+                <span>Delivery posture</span>
+                <select
+                  disabled={status === "saving"}
+                  onChange={(event) =>
+                    setDeliveryDraft((current) => ({
+                      ...(current ?? dashboard.deliveryReadiness),
+                      status: event.target.value as TenantInvitationDeliveryReadinessStatus
+                    }))
+                  }
+                  value={(deliveryDraft ?? dashboard.deliveryReadiness).status}
+                >
+                  {deliveryReadinessStatuses.map((deliveryStatus) => (
+                    <option key={deliveryStatus} value={deliveryStatus}>
+                      {displayDeliveryReadinessStatus(deliveryStatus)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="tenant-access-two-column">
+                <label className="form-field">
+                  <span>SMTP provider</span>
+                  <input
+                    disabled={status === "saving"}
+                    onChange={(event) =>
+                      setDeliveryDraft((current) => ({
+                        ...(current ?? dashboard.deliveryReadiness),
+                        smtpProvider: event.target.value
+                      }))
+                    }
+                    placeholder="Postmark, SendGrid, SES"
+                    value={(deliveryDraft ?? dashboard.deliveryReadiness).smtpProvider}
+                  />
+                </label>
+                <label className="form-field">
+                  <span>From domain</span>
+                  <input
+                    disabled={status === "saving"}
+                    onChange={(event) =>
+                      setDeliveryDraft((current) => ({
+                        ...(current ?? dashboard.deliveryReadiness),
+                        smtpFromDomain: event.target.value
+                      }))
+                    }
+                    placeholder="scrimedsolutions.com"
+                    value={(deliveryDraft ?? dashboard.deliveryReadiness).smtpFromDomain}
+                  />
+                </label>
+              </div>
+              <label className="form-field">
+                <span>Delivery notes</span>
+                <textarea
+                  disabled={status === "saving"}
+                  onChange={(event) =>
+                    setDeliveryDraft((current) => ({
+                      ...(current ?? dashboard.deliveryReadiness),
+                      notes: event.target.value
+                    }))
+                  }
+                  placeholder="Metadata only. No PHI or clinical details."
+                  value={(deliveryDraft ?? dashboard.deliveryReadiness).notes}
+                />
+              </label>
+              <button
+                className="secondary-action"
+                disabled={status === "saving"}
+                onClick={updateDeliveryReadiness}
+                type="button"
+              >
+                Save Delivery Readiness
+              </button>
+            </article>
           </div>
 
           <div className="section-heading tenant-access-audit-heading">
@@ -581,6 +753,8 @@ export default function TenantAccessAdministrationPanel({
                 <li>Final-admin protection active</li>
                 <li>Offboarding enforced</li>
                 <li>Direct invitation email disabled</li>
+                <li>Onboarding packet downloads audited</li>
+                <li>Outbound SMTP send gated</li>
                 <li>Server runtime token required</li>
               </ul>
             </article>
@@ -601,22 +775,62 @@ export default function TenantAccessAdministrationPanel({
                       {displayRole(invitation.proposedRole)} · expires {formatDate(invitation.expiresAt)}
                     </p>
                     <p>Created {formatDate(invitation.createdAt)}</p>
+                    <p>
+                      {displayInvitationDeliveryStatus(invitation.deliveryStatus)} · packet{" "}
+                      {formatDate(invitation.lastPacketGeneratedAt)}
+                    </p>
+                    <p>
+                      Delivery prepared {formatDate(invitation.lastDeliveryPreparedAt)} · attempts{" "}
+                      {invitation.deliveryAttemptCount}
+                    </p>
                   </div>
-                  <label className="form-field">
-                    <span>Cancellation reason</span>
-                    <input
-                      disabled={status === "saving" || invitation.status !== "pending"}
-                      onChange={(event) =>
-                        setCancelReasons((current) => ({
-                          ...current,
-                          [invitation.id]: event.target.value
-                        }))
-                      }
-                      placeholder="Optional"
-                      value={cancelReasons[invitation.id] ?? ""}
-                    />
-                  </label>
                   <div className="tenant-access-actions">
+                    <label className="form-field">
+                      <span>Delivery note</span>
+                      <input
+                        disabled={status === "saving" || invitation.status !== "pending"}
+                        onChange={(event) =>
+                          setDeliveryNotes((current) => ({
+                            ...current,
+                            [invitation.id]: event.target.value
+                          }))
+                        }
+                        placeholder="Manual delivery channel, no PHI"
+                        value={deliveryNotes[invitation.id] ?? invitation.deliveryNote}
+                      />
+                    </label>
+                    <label className="form-field">
+                      <span>Cancellation reason</span>
+                      <input
+                        disabled={status === "saving" || invitation.status !== "pending"}
+                        onChange={(event) =>
+                          setCancelReasons((current) => ({
+                            ...current,
+                            [invitation.id]: event.target.value
+                          }))
+                        }
+                        placeholder="Optional"
+                        value={cancelReasons[invitation.id] ?? ""}
+                      />
+                    </label>
+                  </div>
+                  <div className="tenant-access-actions">
+                    <button
+                      className="secondary-action"
+                      disabled={status === "saving" || invitation.status !== "pending"}
+                      onClick={() => downloadInvitationPacket(invitation.id, invitation.email)}
+                      type="button"
+                    >
+                      Download Packet
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={status === "saving" || invitation.status !== "pending"}
+                      onClick={() => prepareInvitationDelivery(invitation.id)}
+                      type="button"
+                    >
+                      Prepare Delivery
+                    </button>
                     <button
                       className="secondary-action"
                       disabled={status === "saving" || invitation.status !== "pending"}

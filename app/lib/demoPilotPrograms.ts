@@ -7,6 +7,13 @@ export type DemoProofRoute = {
   evidence: string;
 };
 
+export type InvestorReadinessSignal = {
+  label: string;
+  route: string;
+  status: "active" | "protected" | "ready";
+  evidence: string;
+};
+
 export type ProductDemo = {
   slug: string;
   name: string;
@@ -546,6 +553,45 @@ export const pilotPrograms: PilotProgram[] = [
   }
 ];
 
+export const investorReadinessSignals: InvestorReadinessSignal[] = [
+  {
+    label: "Executable product proof",
+    route: "/demos",
+    status: "active",
+    evidence: "Five buyer-facing synthetic demos connect named products, agents, workflow outputs, proof routes, and production exclusions."
+  },
+  {
+    label: "Sellable pilot packaging",
+    route: "/pilots",
+    status: "ready",
+    evidence: "Four commercial pilot programs define duration, buyer inputs, deliverables, success metrics, governance gates, and exclusions."
+  },
+  {
+    label: "Protected tenant workspace",
+    route: "/pilot-workspace",
+    status: "protected",
+    evidence: "Tenant-authenticated workspaces retain durable synthetic sessions, audit events, proof packets, TrustOS decisions, and governed identity lifecycle evidence."
+  },
+  {
+    label: "Commercial pricing path",
+    route: "/pricing",
+    status: "ready",
+    evidence: "Assessment, pilot, and enterprise expansion tiers establish a credible sales path without unsupported clinical claims."
+  },
+  {
+    label: "Diligence and claims control",
+    route: "/trust-center",
+    status: "active",
+    evidence: "Enterprise readiness surfaces separate approved claims, claims requiring review, external review requirements, and pre-production gates."
+  },
+  {
+    label: "No-PHI buyer intake",
+    route: "/pilot",
+    status: "active",
+    evidence: "Rate-limited intake captures organization, workflow, governance, and readiness context without PHI or live clinical data."
+  }
+];
+
 export function getProductDemos() {
   return productDemos;
 }
@@ -675,10 +721,28 @@ export function getDemoPilotProgramSummary() {
     protectedPilots: pilotPrograms.filter((pilot) => pilot.status === "protected-pilot").length,
     productDemos,
     pilotPrograms,
+    investorReadiness: {
+      status: "investor-ready-synthetic-commercial-proof",
+      thesis:
+        "SCRIMED is positioned as a governed healthcare intelligence infrastructure platform with executable synthetic proof, sellable pilot packaging, tenant-protected evidence, and explicit live-clinical gates.",
+      revenuePath: [
+        "Public product demo inspection",
+        "Workflow Intelligence Assessment",
+        "Synthetic Pilot Evaluation",
+        "Protected Enterprise Atlas Pilot",
+        "Governed annual platform expansion"
+      ],
+      proofSignals: investorReadinessSignals,
+      demoToPilotConversionPath:
+        "Demo Center -> Pilot Programs -> no-PHI buyer intake -> protected tenant workspace -> audited proof and onboarding packets -> enterprise assessment decision",
+      currentBoundary: demoPilotBoundary,
+      nextDiligenceStep:
+        "Use protected pilot onboarding packets and proof packets to support enterprise security, privacy, legal, and budget review."
+    },
     downloadableArtifacts: {
       demoBriefPattern: "/api/demos/{slug}/brief",
       pilotProposalPattern: "/api/pilots/{slug}/proposal"
     },
-    updated: "2026-06-11"
+    updated: "2026-06-14"
   };
 }

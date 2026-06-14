@@ -6,6 +6,7 @@ import type {
   PilotWorkspaceRecord,
   PilotWorkspaceRole,
   TenantIdentityProviderStatus,
+  TenantInvitationDeliveryReadinessStatus,
   TenantAccessDashboard
 } from "./protectedPilotWorkspace";
 import type {
@@ -653,6 +654,40 @@ export async function activateTenantAccessInvitation(
   };
 }
 
+export async function recordTenantInvitationPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  invitationId: string
+) {
+  const { data, error } = await client.rpc("record_pilot_invitation_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_invitation_id: invitationId
+  });
+
+  return {
+    packet: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function prepareTenantInvitationDelivery(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  invitationId: string,
+  note: string
+) {
+  const { data, error } = await client.rpc("prepare_pilot_invitation_delivery", {
+    p_workspace_slug: workspaceSlug,
+    p_invitation_id: invitationId,
+    p_note: note
+  });
+
+  return {
+    delivery: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
 export async function deactivateTenantMembership(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -721,6 +756,28 @@ export async function updateTenantIdentityReadiness(
 
   return {
     identityReadiness: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function updateTenantInvitationDeliveryReadiness(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  deliveryStatus: TenantInvitationDeliveryReadinessStatus,
+  smtpProvider: string,
+  smtpFromDomain: string,
+  notes: string
+) {
+  const { data, error } = await client.rpc("update_tenant_invitation_delivery_readiness", {
+    p_workspace_slug: workspaceSlug,
+    p_delivery_status: deliveryStatus,
+    p_smtp_provider: smtpProvider,
+    p_smtp_from_domain: smtpFromDomain,
+    p_notes: notes
+  });
+
+  return {
+    deliveryReadiness: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
     error
   };
 }

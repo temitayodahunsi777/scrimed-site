@@ -563,7 +563,7 @@ export function getProductConsoleSummary() {
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
       "Use Sales Operations to assign and qualify retained buyer intake, select an inspectable Demo Center proof path, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
-    updated: "2026-06-11"
+    updated: "2026-06-14"
   };
 }
 
@@ -590,6 +590,15 @@ export function getProductReadinessBrief() {
     ),
     `Protected pilot workspace: ${summary.protectedPilotWorkspaceRoute}`,
     `Protected pilot status: ${summary.protectedPilotWorkspaceSummary.status}`,
+    "",
+    "## Investor Readiness",
+    `Status: ${summary.demoPilotProgramSummary.investorReadiness.status}`,
+    `Thesis: ${summary.demoPilotProgramSummary.investorReadiness.thesis}`,
+    `Conversion path: ${summary.demoPilotProgramSummary.investorReadiness.demoToPilotConversionPath}`,
+    `Next diligence step: ${summary.demoPilotProgramSummary.investorReadiness.nextDiligenceStep}`,
+    ...summary.demoPilotProgramSummary.investorReadiness.proofSignals.map(
+      (signal) => `- ${signal.label} (${signal.status}) -> ${signal.route}: ${signal.evidence}`
+    ),
     "",
     "## Pricing and Sales",
     `Pricing route: ${summary.pricingRoute}`,
