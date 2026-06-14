@@ -86,6 +86,8 @@ export default function AgentWorkspacePage() {
           <p className="section-copy">
             Protected work-order mutations now use {summary.workOrderMutationRoute} and detail transitions use{" "}
             {summary.workOrderDetailRoute}. Both routes remain bearer-token, tenant-isolated, and synthetic-only.
+            Audited work-order proof packets use {summary.workOrderProofPacketRoute}; workspace dashboard filters support{" "}
+            {summary.workOrderDashboardFilters.join(", ")}.
           </p>
         </div>
         <div className="layer-list">

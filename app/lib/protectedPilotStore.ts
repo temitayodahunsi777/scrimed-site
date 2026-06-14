@@ -782,6 +782,27 @@ export async function transitionAgentWorkspaceWorkOrder(
   };
 }
 
+export async function recordAgentWorkspaceWorkOrderProofPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  workOrderId: string
+) {
+  const { data, error } = await client.rpc("record_agent_workspace_work_order_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_work_order_id: workOrderId,
+    p_event_metadata: {
+      packetType: "agent-work-order-proof-packet",
+      format: "text/markdown",
+      syntheticOnly: true
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function getTenantAccessDashboard(client: SupabaseClient, workspaceSlug: string) {
   const { data, error } = await client.rpc("tenant_access_dashboard", {
     p_workspace_slug: workspaceSlug

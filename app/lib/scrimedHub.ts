@@ -262,6 +262,7 @@ export const hubRoutes = [
   "/api/agent-workspace/proof-packet",
   "/api/agent-workspaces/[workspaceSlug]/work-orders",
   "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]",
+  "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet",
   "/api/pilot-evidence",
   "/api/pilot-evidence/brief",
   "/api/sales-operations",

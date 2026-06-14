@@ -345,13 +345,19 @@ export const protectedPilotApiContracts = [
     method: "GET / POST",
     route: "/api/agent-workspaces/{workspaceSlug}/work-orders",
     access: "GET: bearer token + tenant membership. POST: AAL2 bearer token + authorized tenant role + rate limit",
-    purpose: "List or create persistent Agent Workspace work orders backed by tenant-scoped RLS tables and append-only events."
+    purpose: "List, filter, summarize, or create persistent Agent Workspace work orders backed by tenant-scoped RLS tables and append-only events."
   },
   {
     method: "GET / PATCH",
     route: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}",
     access: "GET: bearer token + tenant membership. PATCH: AAL2 bearer token + authorized tenant role + rate limit",
     purpose: "Inspect, transition, retry, review, block, or close a persistent Agent Workspace work order."
+  },
+  {
+    method: "GET",
+    route: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only download audit",
+    purpose: "Download an audited Markdown proof packet for a tenant-isolated synthetic Agent Workspace work order."
   }
 ];
 
@@ -474,7 +480,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Periodic access review attestation",
       "SSO-readiness metadata and identity lifecycle evidence",
       "Rate-limited public intake and protected mutations",
-      "Persistent Agent Workspace work-order creation, state transitions, retry tracking, reviewer assignment, closure, and append-only event trails"
+      "Persistent Agent Workspace work-order creation, state transitions, retry tracking, reviewer assignment, closure, dashboard filters, proof-packet export, and append-only event trails"
     ],
     updated: "2026-06-14"
   };

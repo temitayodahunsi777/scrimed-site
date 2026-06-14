@@ -1,6 +1,10 @@
 import { getAgentOSSummary } from "./agentOS";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
-import { getProtectedPilotWorkspaceSummary, previewPilotWorkspace } from "./protectedPilotWorkspace";
+import {
+  getProtectedPilotWorkspaceSummary,
+  previewPilotWorkspace,
+  type PilotWorkspaceRecord
+} from "./protectedPilotWorkspace";
 import { getTrustOSSummary } from "./trustOS";
 
 export type PersistentWorkspaceStatus =
@@ -177,6 +181,52 @@ export type AgentWorkspaceWorkOrderEventRecord = {
   createdAt: string;
 };
 
+export type AgentWorkspaceGovernanceStatus =
+  | "active"
+  | "needs-review"
+  | "blocked"
+  | "proof-ready"
+  | "closed";
+
+export type AgentWorkspaceWorkOrderFilters = {
+  state?: AgentWorkOrderState;
+  workOrderType?: AgentWorkOrderType;
+  assignedReviewerId?: string;
+  minRetryCount?: number;
+  governanceStatus?: AgentWorkspaceGovernanceStatus;
+};
+
+export type AgentWorkspaceWorkOrderDashboard = {
+  totalWorkOrders: number;
+  visibleWorkOrders: number;
+  filteredOutWorkOrders: number;
+  byState: Record<AgentWorkOrderState, number>;
+  visibleByState: Record<AgentWorkOrderState, number>;
+  byWorkOrderType: Record<AgentWorkOrderType, number>;
+  visibleByWorkOrderType: Record<AgentWorkOrderType, number>;
+  governance: Record<AgentWorkspaceGovernanceStatus, number>;
+  visibleGovernance: Record<AgentWorkspaceGovernanceStatus, number>;
+  reviewerQueue: {
+    assigned: number;
+    unassigned: number;
+    reviewHeld: number;
+  };
+  retryQueue: {
+    workOrdersWithRetries: number;
+    maxRetryCount: number;
+  };
+  boundaryControls: string[];
+};
+
+export type AgentWorkspaceWorkOrderProofPacketInput = {
+  workspace: PilotWorkspaceRecord;
+  workOrder: AgentWorkspaceWorkOrderRecord;
+  events: AgentWorkspaceWorkOrderEventRecord[];
+  auditEventId: string;
+  generatedAt: string;
+  appBaseUrl: string;
+};
+
 type ValidationResult<T> =
   | { ok: true; value: T }
   | { ok: false; errors: string[] };
@@ -202,6 +252,14 @@ export const agentWorkOrderEventTypes: AgentWorkspaceWorkOrderEventType[] = [
   "work-order-blocked",
   "work-order-closed",
   "proof-packet-downloaded"
+];
+
+export const agentWorkspaceGovernanceStatuses: AgentWorkspaceGovernanceStatus[] = [
+  "active",
+  "needs-review",
+  "blocked",
+  "proof-ready",
+  "closed"
 ];
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -259,10 +317,10 @@ export const workspaceCapabilities: WorkspaceCapability[] = [
     capability: "Downloadable proof packets",
     status: "active-control",
     implementation:
-      "Workspace proof packets combine work-order plan, Trust Cards, reviewer checkpoints, audit timeline, blocked actions, and limitations register.",
-    proofRoute: "/api/agent-workspace/proof-packet",
+      "Workspace proof packets combine work-order plan, Trust Cards, reviewer checkpoints, audit timeline, blocked actions, limitations register, and explicit legal/privacy/security/safety boundaries.",
+    proofRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
     productionGate:
-      "Production packets need customer branding, legal disclaimers, evidence retention policy, and confidentiality controls."
+      "Production packets need customer branding, legal disclaimers, evidence retention policy, confidentiality controls, and legal/privacy/security review."
   }
 ];
 
@@ -543,7 +601,7 @@ export const workspaceApiContracts: WorkspaceApiContract[] = [
     status: "active-control",
     access: "GET: bearer token + workspace membership. POST: AAL2 bearer token + authorized tenant role + rate limit.",
     purpose:
-      "List and create persistent synthetic work orders through dedicated RLS-backed tables and RPC-only mutations."
+      "List, filter, summarize, and create persistent synthetic work orders through dedicated RLS-backed tables and RPC-only mutations."
   },
   {
     method: "GET / PATCH",
@@ -552,6 +610,14 @@ export const workspaceApiContracts: WorkspaceApiContract[] = [
     access: "GET: bearer token + workspace membership. PATCH: AAL2 bearer token + authorized tenant role + rate limit.",
     purpose:
       "Inspect a work order with its event trail or transition state for review, retry, assignment, proof readiness, blocking, or closure."
+  },
+  {
+    method: "GET",
+    route: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
+    status: "active-control",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only audit event before release.",
+    purpose:
+      "Download an audited Markdown proof packet for one persistent synthetic work order with Trust Card, event trail, reviewer checkpoints, blocked actions, and safety boundaries."
   }
 ];
 
@@ -670,8 +736,207 @@ export function isAgentWorkOrderEventType(value: unknown): value is AgentWorkspa
   return typeof value === "string" && agentWorkOrderEventTypes.includes(value as AgentWorkspaceWorkOrderEventType);
 }
 
+export function isAgentWorkspaceGovernanceStatus(value: unknown): value is AgentWorkspaceGovernanceStatus {
+  return (
+    typeof value === "string" &&
+    agentWorkspaceGovernanceStatuses.includes(value as AgentWorkspaceGovernanceStatus)
+  );
+}
+
 export function getWorkOrderTemplate(workOrderType: AgentWorkOrderType) {
   return workOrderTemplates.find((template) => template.type === workOrderType) ?? workOrderTemplates[0];
+}
+
+export function getAgentWorkspaceGovernanceStatus(
+  workOrder: AgentWorkspaceWorkOrderRecord
+): AgentWorkspaceGovernanceStatus {
+  if (workOrder.state === "blocked") {
+    return "blocked";
+  }
+
+  if (workOrder.state === "proof-ready") {
+    return "proof-ready";
+  }
+
+  if (workOrder.state === "closed") {
+    return "closed";
+  }
+
+  if (workOrder.state === "trustqa-held" || workOrder.state === "human-review") {
+    return "needs-review";
+  }
+
+  return "active";
+}
+
+export function parseAgentWorkspaceWorkOrderFilters(
+  searchParams: URLSearchParams
+): ValidationResult<AgentWorkspaceWorkOrderFilters> {
+  const errors: string[] = [];
+  const filters: AgentWorkspaceWorkOrderFilters = {};
+  const state = searchParams.get("state");
+  const workOrderType = searchParams.get("workOrderType") ?? searchParams.get("type");
+  const assignedReviewerId = searchParams.get("assignedReviewerId") ?? searchParams.get("reviewerId");
+  const minRetryCount = searchParams.get("minRetryCount");
+  const governanceStatus = searchParams.get("governanceStatus");
+
+  if (state) {
+    if (isAgentWorkOrderState(state)) {
+      filters.state = state;
+    } else {
+      errors.push("state must match a supported work-order state");
+    }
+  }
+
+  if (workOrderType) {
+    if (isAgentWorkOrderType(workOrderType)) {
+      filters.workOrderType = workOrderType;
+    } else {
+      errors.push("workOrderType must match a supported work-order template");
+    }
+  }
+
+  if (assignedReviewerId) {
+    if (assignedReviewerId === "unassigned" || uuidPattern.test(assignedReviewerId)) {
+      filters.assignedReviewerId = assignedReviewerId;
+    } else {
+      errors.push("assignedReviewerId must be a valid UUID or unassigned");
+    }
+  }
+
+  if (minRetryCount) {
+    const parsed = Number.parseInt(minRetryCount, 10);
+
+    if (!/^\d+$/.test(minRetryCount) || parsed < 0 || parsed > 10) {
+      errors.push("minRetryCount must be an integer between 0 and 10");
+    } else {
+      filters.minRetryCount = parsed;
+    }
+  }
+
+  if (governanceStatus) {
+    if (isAgentWorkspaceGovernanceStatus(governanceStatus)) {
+      filters.governanceStatus = governanceStatus;
+    } else {
+      errors.push("governanceStatus must match active, needs-review, blocked, proof-ready, or closed");
+    }
+  }
+
+  return errors.length > 0 ? { ok: false, errors } : { ok: true, value: filters };
+}
+
+export function filterAgentWorkspaceWorkOrders(
+  workOrders: AgentWorkspaceWorkOrderRecord[],
+  filters: AgentWorkspaceWorkOrderFilters
+) {
+  return workOrders.filter((workOrder) => {
+    if (filters.state && workOrder.state !== filters.state) {
+      return false;
+    }
+
+    if (filters.workOrderType && workOrder.workOrderType !== filters.workOrderType) {
+      return false;
+    }
+
+    if (filters.assignedReviewerId) {
+      if (filters.assignedReviewerId === "unassigned" && workOrder.assignedReviewerId) {
+        return false;
+      }
+
+      if (filters.assignedReviewerId !== "unassigned" && workOrder.assignedReviewerId !== filters.assignedReviewerId) {
+        return false;
+      }
+    }
+
+    if (filters.minRetryCount !== undefined && workOrder.retryCount < filters.minRetryCount) {
+      return false;
+    }
+
+    if (
+      filters.governanceStatus &&
+      getAgentWorkspaceGovernanceStatus(workOrder) !== filters.governanceStatus
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function emptyStateCounts() {
+  return Object.fromEntries(agentWorkOrderStates.map((state) => [state, 0])) as Record<
+    AgentWorkOrderState,
+    number
+  >;
+}
+
+function emptyTypeCounts() {
+  return Object.fromEntries(workOrderTemplates.map((template) => [template.type, 0])) as Record<
+    AgentWorkOrderType,
+    number
+  >;
+}
+
+function emptyGovernanceCounts() {
+  return Object.fromEntries(agentWorkspaceGovernanceStatuses.map((status) => [status, 0])) as Record<
+    AgentWorkspaceGovernanceStatus,
+    number
+  >;
+}
+
+function countWorkOrders(workOrders: AgentWorkspaceWorkOrderRecord[]) {
+  const byState = emptyStateCounts();
+  const byWorkOrderType = emptyTypeCounts();
+  const governance = emptyGovernanceCounts();
+
+  for (const workOrder of workOrders) {
+    byState[workOrder.state] += 1;
+    byWorkOrderType[workOrder.workOrderType] += 1;
+    governance[getAgentWorkspaceGovernanceStatus(workOrder)] += 1;
+  }
+
+  return { byState, byWorkOrderType, governance };
+}
+
+export function summarizeAgentWorkspaceWorkOrderDashboard(
+  allWorkOrders: AgentWorkspaceWorkOrderRecord[],
+  visibleWorkOrders: AgentWorkspaceWorkOrderRecord[] = allWorkOrders
+): AgentWorkspaceWorkOrderDashboard {
+  const allCounts = countWorkOrders(allWorkOrders);
+  const visibleCounts = countWorkOrders(visibleWorkOrders);
+
+  return {
+    totalWorkOrders: allWorkOrders.length,
+    visibleWorkOrders: visibleWorkOrders.length,
+    filteredOutWorkOrders: allWorkOrders.length - visibleWorkOrders.length,
+    byState: allCounts.byState,
+    visibleByState: visibleCounts.byState,
+    byWorkOrderType: allCounts.byWorkOrderType,
+    visibleByWorkOrderType: visibleCounts.byWorkOrderType,
+    governance: allCounts.governance,
+    visibleGovernance: visibleCounts.governance,
+    reviewerQueue: {
+      assigned: visibleWorkOrders.filter((workOrder) => Boolean(workOrder.assignedReviewerId)).length,
+      unassigned: visibleWorkOrders.filter((workOrder) => !workOrder.assignedReviewerId).length,
+      reviewHeld: visibleWorkOrders.filter(
+        (workOrder) => getAgentWorkspaceGovernanceStatus(workOrder) === "needs-review"
+      ).length
+    },
+    retryQueue: {
+      workOrdersWithRetries: visibleWorkOrders.filter((workOrder) => workOrder.retryCount > 0).length,
+      maxRetryCount: visibleWorkOrders.reduce(
+        (maxRetryCount, workOrder) => Math.max(maxRetryCount, workOrder.retryCount),
+        0
+      )
+    },
+    boundaryControls: [
+      "Synthetic and metadata-only work orders",
+      "No live PHI ingestion",
+      "No autonomous diagnosis, treatment, payer submission, patient outreach, or record mutation",
+      "Human review required before buyer-facing release",
+      "AAL2 governance required for protected mutations and proof-packet downloads"
+    ]
+  };
 }
 
 function defaultTrustCard(template: WorkOrderTemplate) {
@@ -874,6 +1139,15 @@ export function getPersistentAgentWorkspaceSummary() {
     proofPacketRoute: "/api/agent-workspace/proof-packet",
     workOrderMutationRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders",
     workOrderDetailRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}",
+    workOrderProofPacketRoute:
+      "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
+    workOrderDashboardFilters: [
+      "state",
+      "workOrderType",
+      "assignedReviewerId",
+      "minRetryCount",
+      "governanceStatus"
+    ],
     status: "persistent-agent-workspace-v1-ready",
     boundary: persistentAgentWorkspaceBoundary,
     foundation: {
@@ -911,7 +1185,7 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "Apply and verify the agent workspace migration per environment, then add audited work-order proof-packet exports, dashboard filters, retention/legal-hold controls, and authenticated end-to-end pilot scripts.",
+      "Run authenticated tenant proof-packet smoke scripts with a valid AAL2 session, then implement retention/legal-hold controls, incident export, and buyer-specific workspace dashboards.",
     updated: "2026-06-14"
   };
 }
@@ -956,6 +1230,8 @@ export function buildPersistentAgentWorkspaceBrief() {
     `- Durable store: ${summary.foundation.durableStore.provider} - ${summary.foundation.durableStore.control}`,
     `- Work-order mutation route: ${summary.workOrderMutationRoute}`,
     `- Work-order detail route: ${summary.workOrderDetailRoute}`,
+    `- Work-order proof-packet route: ${summary.workOrderProofPacketRoute}`,
+    `- Work-order dashboard filters: ${summary.workOrderDashboardFilters.join(", ")}`,
     `- Work-order states: ${summary.workOrderStateCount}`,
     `- Work-order event types: ${summary.workOrderEventTypeCount}`,
     "",
@@ -1038,5 +1314,112 @@ export function buildPersistentAgentWorkspaceProofPacket() {
     summary.boundary,
     "",
     "This proof packet is a deterministic synthetic workspace packet. It is not clinical advice, a legal opinion, a compliance certification, a reimbursement guarantee, or production authorization."
+  ].join("\n");
+}
+
+function markdownJson(value: unknown) {
+  return `\`\`\`json\n${JSON.stringify(value, null, 2).replace(/```/g, "` ` `")}\n\`\`\``;
+}
+
+function workOrderEventLines(events: AgentWorkspaceWorkOrderEventRecord[]) {
+  const sortedEvents = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+  if (sortedEvents.length === 0) {
+    return "- No work-order events are visible for this tenant member.";
+  }
+
+  return sortedEvents
+    .map(
+      (event) =>
+        `- ${event.createdAt}: ${event.eventType} by ${event.actorUserId}; ${event.priorState ?? "none"} -> ${event.nextState}`
+    )
+    .join("\n");
+}
+
+export function buildAgentWorkspaceWorkOrderProofPacket({
+  workspace,
+  workOrder,
+  events,
+  auditEventId,
+  generatedAt,
+  appBaseUrl
+}: AgentWorkspaceWorkOrderProofPacketInput) {
+  const template = getWorkOrderTemplate(workOrder.workOrderType);
+  const productRoute = `${appBaseUrl.replace(/\/$/, "")}/agent-workspace`;
+  const governanceStatus = getAgentWorkspaceGovernanceStatus(workOrder);
+
+  return [
+    "# SCRIMED Agent Workspace Work-Order Proof Packet",
+    "",
+    "## Packet Control",
+    `- Generated: ${generatedAt}`,
+    `- Audit event ID: ${auditEventId}`,
+    "- Packet type: tenant-authenticated synthetic work-order proof",
+    "- Data boundary: synthetic-only and metadata-only",
+    `- Product route: ${productRoute}`,
+    "",
+    "## Tenant Workspace",
+    `- Tenant: ${workspace.tenantName}`,
+    `- Workspace: ${workspace.name}`,
+    `- Workspace slug: ${workspace.slug}`,
+    `- Workspace status: ${workspace.status}`,
+    "",
+    "## Work Order",
+    `- Work-order ID: ${workOrder.id}`,
+    `- Type: ${workOrder.workOrderType}`,
+    `- Template: ${template.name}`,
+    `- Current state: ${workOrder.state}`,
+    `- Governance status: ${governanceStatus}`,
+    `- Agent owner: ${workOrder.agentOwner}`,
+    `- Assigned reviewer: ${workOrder.assignedReviewerId ?? "unassigned"}`,
+    `- Retry count: ${workOrder.retryCount}`,
+    `- Created: ${workOrder.createdAt}`,
+    `- Updated: ${workOrder.updatedAt}`,
+    "",
+    "## Objective",
+    workOrder.objective,
+    "",
+    "## Memory Scopes",
+    markdownItems(workOrder.memoryScopes),
+    "",
+    "## Tool Scopes",
+    markdownItems(workOrder.toolScopes),
+    "",
+    "## Model Router Policy",
+    workOrder.modelRouterPolicy,
+    "",
+    "## Trust Card",
+    markdownJson(workOrder.trustCard),
+    "",
+    "## Reviewer Checkpoints",
+    markdownItems(workOrder.reviewerCheckpoints),
+    "",
+    "## Blocked Actions",
+    markdownItems(workOrder.blockedActions),
+    "",
+    "## Result Summary",
+    workOrder.resultSummary || "No result summary has been released.",
+    "",
+    "## Outcome Metrics",
+    markdownJson(workOrder.outcomeMetrics),
+    "",
+    "## Failure Or Blocker",
+    workOrder.failureReason || "No blocker has been recorded.",
+    "",
+    "## Event Trail",
+    workOrderEventLines(events),
+    "",
+    "## Legal, Privacy, Security, And Safety Boundary",
+    "- This packet is a governed synthetic pilot artifact only.",
+    "- Do not enter PHI, live patient records, member IDs, payer credentials, secrets, or production connector credentials into this workflow.",
+    "- This packet is not medical advice, clinical decision support authorization, diagnosis, treatment guidance, patient instruction, payer submission, reimbursement guarantee, legal advice, or regulatory advice.",
+    "- This packet is not evidence of HIPAA compliance, SOC 2 certification, FDA clearance, payer approval, reimbursement eligibility, or production readiness.",
+    "- Live clinical, payer, imaging, device, EHR, or patient-facing use requires signed customer authorization, BAA/DPA path where applicable, privacy review, security review, clinical governance, legal review, retention policy, incident response, and deployment approval.",
+    "- When uncertainty, missing evidence, or unsafe scope appears, SCRIMED must escalate to an authorized human reviewer rather than guess or execute autonomously.",
+    "",
+    "## Product Boundary",
+    workOrder.boundary,
+    "",
+    persistentAgentWorkspaceBoundary
   ].join("\n");
 }

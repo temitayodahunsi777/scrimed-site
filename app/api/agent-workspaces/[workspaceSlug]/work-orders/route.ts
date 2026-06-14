@@ -11,7 +11,12 @@ import {
   protectedPilotBoundary,
   protectedPilotNoStoreHeaders
 } from "../../../../lib/protectedPilotWorkspace";
-import { validateAgentWorkspaceWorkOrderPayload } from "../../../../lib/persistentAgentWorkspace";
+import {
+  filterAgentWorkspaceWorkOrders,
+  parseAgentWorkspaceWorkOrderFilters,
+  summarizeAgentWorkspaceWorkOrderDashboard,
+  validateAgentWorkspaceWorkOrderPayload
+} from "../../../../lib/persistentAgentWorkspace";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../../lib/requestRateLimit";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +36,23 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   const { workspaceSlug } = await params;
+  const url = new URL(request.url);
+  const filterValidation = parseAgentWorkspaceWorkOrderFilters(url.searchParams);
+
+  if (!filterValidation.ok) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "invalid-agent-work-order-filters",
+          message: "The work-order dashboard filters are invalid.",
+          fields: filterValidation.errors
+        },
+        boundary: protectedPilotBoundary
+      },
+      { status: 400, headers: protectedPilotNoStoreHeaders }
+    );
+  }
+
   const workspaceResult = await getAccessiblePilotWorkspace(context.client, workspaceSlug);
 
   if (workspaceResult.error || !workspaceResult.workspace) {
@@ -61,12 +83,17 @@ export async function GET(request: Request, { params }: RouteContext) {
     );
   }
 
+  const workOrders = filterAgentWorkspaceWorkOrders(result.workOrders, filterValidation.value);
+  const dashboard = summarizeAgentWorkspaceWorkOrderDashboard(result.workOrders, workOrders);
+
   return NextResponse.json(
     {
       service: "scrimed-agent-workspace-work-orders",
       boundary: protectedPilotBoundary,
       workspace: workspaceResult.workspace,
-      workOrders: result.workOrders
+      filters: filterValidation.value,
+      dashboard,
+      workOrders
     },
     { headers: protectedPilotNoStoreHeaders }
   );
