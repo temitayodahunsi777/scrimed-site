@@ -570,7 +570,7 @@ export const investorReadinessSignals: InvestorReadinessSignal[] = [
     label: "Protected tenant workspace",
     route: "/pilot-workspace",
     status: "protected",
-    evidence: "Tenant-authenticated workspaces retain durable synthetic sessions, audit events, proof packets, TrustOS decisions, and governed identity lifecycle evidence."
+    evidence: "Tenant-authenticated workspaces retain durable synthetic sessions, audit events, onboarding packets, activation proof packets, TrustOS decisions, and governed identity lifecycle evidence."
   },
   {
     label: "Commercial pricing path",
@@ -734,10 +734,10 @@ export function getDemoPilotProgramSummary() {
       ],
       proofSignals: investorReadinessSignals,
       demoToPilotConversionPath:
-        "Demo Center -> Pilot Programs -> no-PHI buyer intake -> protected tenant workspace -> audited proof and onboarding packets -> enterprise assessment decision",
+        "Demo Center -> Pilot Programs -> no-PHI buyer intake -> protected tenant workspace -> audited onboarding packet -> activation proof packet -> enterprise assessment decision",
       currentBoundary: demoPilotBoundary,
       nextDiligenceStep:
-        "Use protected pilot onboarding packets and proof packets to support enterprise security, privacy, legal, and budget review."
+        "Use protected pilot onboarding packets, activation proof packets, and session proof packets to support enterprise security, privacy, legal, and budget review."
     },
     downloadableArtifacts: {
       demoBriefPattern: "/api/demos/{slug}/brief",

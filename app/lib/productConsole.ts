@@ -338,7 +338,7 @@ export const buyerActions: BuyerAction[] = [
   {
     label: "Review Protected Pilot Workspace",
     href: "/pilot-workspace",
-    purpose: "Inspect tenant isolation, durable synthetic sessions, append-only audit controls, and downloadable proof packets.",
+    purpose: "Inspect tenant isolation, durable synthetic sessions, append-only audit controls, onboarding packets, activation proof packets, and downloadable session proof packets.",
     boundary: "Protected synthetic-pilot mutations are active and verified; live clinical execution and PHI-enabled production workflows remain denied."
   },
   {
@@ -590,6 +590,9 @@ export function getProductReadinessBrief() {
     ),
     `Protected pilot workspace: ${summary.protectedPilotWorkspaceRoute}`,
     `Protected pilot status: ${summary.protectedPilotWorkspaceSummary.status}`,
+    `Activation workflow: ${summary.protectedPilotWorkspaceSummary.activationWorkflow
+      .map((workflowStep) => workflowStep.step)
+      .join(" -> ")}`,
     "",
     "## Investor Readiness",
     `Status: ${summary.demoPilotProgramSummary.investorReadiness.status}`,

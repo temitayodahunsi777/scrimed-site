@@ -79,6 +79,27 @@ export default function ProtectedPilotWorkspacePage() {
         </div>
       </section>
 
+      <section className="table-section" aria-label="Protected pilot activation workflow">
+        <div className="section-heading">
+          <p className="eyebrow">Activation workflow</p>
+          <h2>Tenant-admins can move from invitation to buyer-ready lifecycle proof.</h2>
+          <p className="section-copy">
+            The flow is authenticated, AAL2-governed, rate-limited, and synthetic-only. It supports enterprise
+            diligence without creating users, sending email, ingesting PHI, or authorizing clinical execution.
+          </p>
+        </div>
+        {summary.activationWorkflow.map((item, index) => (
+          <article className="module-row" key={item.step}>
+            <div>
+              <span>step {String(index + 1).padStart(2, "0")}</span>
+              <h2>{item.step}</h2>
+            </div>
+            <p>{item.owner}. {item.proof}</p>
+            <strong>{item.boundary}</strong>
+          </article>
+        ))}
+      </section>
+
       <section className="section-band" aria-label="Protected pilot infrastructure">
         <div className="section-heading">
           <p className="eyebrow">Infrastructure</p>

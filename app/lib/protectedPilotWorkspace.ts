@@ -110,6 +110,7 @@ export type TenantAccessLifecycleEvent = {
     | "invitation-packet-generated"
     | "invitation-delivery-prepared"
     | "invitation-delivery-readiness-updated"
+    | "activation-proof-packet-downloaded"
     | "membership-deactivated"
     | "membership-reactivated"
     | "access-review-attested"
@@ -194,6 +195,23 @@ export type TenantInvitationPacket = {
   portalRoute: string;
   boundary: string;
   generatedAt: string;
+};
+
+export type TenantActivationProofPacket = {
+  generatedAt: string;
+  lifecycleEventId: string;
+  tenantId: string;
+  tenantName: string;
+  workspaceId: string;
+  workspaceSlug: string;
+  workspaceName: string;
+  actorUserId: string;
+  activationRunbook: Array<{
+    step: string;
+    evidence: string;
+  }>;
+  dashboard: TenantAccessDashboard;
+  boundary: string;
 };
 
 export type ProtectedPilotInfrastructure = {
@@ -295,6 +313,12 @@ export const protectedPilotApiContracts = [
   },
   {
     method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access/activation-proof-packet",
+    access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
+    purpose: "Download an audited activation proof packet summarizing protected-pilot invitations, onboarding packets, delivery readiness, membership state, identity posture, and lifecycle evidence."
+  },
+  {
+    method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
     purpose: "Download a buyer-ready Markdown proof packet generated from tenant-isolated session evidence."
@@ -324,6 +348,39 @@ export const protectedPilotActivationGates = [
   "Extend the active magic-link, TOTP MFA, and session-lifetime policy into enforced enterprise SSO and multi-tenant identity operations.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
+];
+
+export const protectedPilotActivationWorkflow = [
+  {
+    step: "Create controlled invitation record",
+    owner: "Tenant-admin",
+    proof: "Metadata-only invitation with proposed role, expiration, and governance note.",
+    boundary: "No user creation, no PHI, and no email send."
+  },
+  {
+    step: "Download audited onboarding packet",
+    owner: "Tenant-admin",
+    proof: "Markdown onboarding packet with recipient, role, workspace, access route, and delivery evidence.",
+    boundary: "Packet supports manual enterprise delivery only."
+  },
+  {
+    step: "Prepare external delivery",
+    owner: "Tenant-admin",
+    proof: "Lifecycle event records delivery preparation, delivery note, attempt count, and direct-send status.",
+    boundary: "SMTP direct send remains gated until custom sender controls are approved."
+  },
+  {
+    step: "Activate enrolled user",
+    owner: "Tenant-admin + Identity provider",
+    proof: "Activation succeeds only after the invited email has completed SCRIMED pilot authentication enrollment.",
+    boundary: "No activation for unknown identities and no bypass of AAL2 governance."
+  },
+  {
+    step: "Download activation proof packet",
+    owner: "Tenant-admin",
+    proof: "Audited packet summarizes invitations, onboarding packets, delivery readiness, memberships, reviews, and lifecycle evidence.",
+    boundary: "Diligence artifact only; no production clinical or payer authorization."
+  }
 ];
 
 export const previewPilotWorkspace: PilotWorkspaceRecord = {
@@ -384,6 +441,7 @@ export function getProtectedPilotWorkspaceSummary() {
     roles: pilotWorkspaceRoles,
     apiContracts: protectedPilotApiContracts,
     activationGates: protectedPilotActivationGates,
+    activationWorkflow: protectedPilotActivationWorkflow,
     previewWorkspace: previewPilotWorkspace,
     capabilities: [
       "Tenant-authenticated workspace discovery",
@@ -397,6 +455,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "AAL2-protected tenant membership visibility and audited role administration",
       "Governed invitation records with existing-auth-user activation",
       "Audited tenant-admin onboarding packet downloads for manual pilot delivery",
+      "Audited tenant activation proof packet for buyer and investor diligence",
       "SMTP delivery readiness metadata with direct-send gate retained",
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",
@@ -508,5 +567,102 @@ export function buildTenantInvitationOnboardingPacket(
 - Tenant-admin lifecycle actions are append-only audited and require fresh AAL2 assurance.
 
 ${packet.boundary}
+`;
+}
+
+function markdownItems(items: string[]) {
+  return items.map((item) => `- ${item}`).join("\n");
+}
+
+function lifecycleLines(events: TenantAccessLifecycleEvent[]) {
+  return events
+    .slice(0, 25)
+    .map((event) => `- ${event.createdAt}: ${event.eventType} by ${event.actorUserId}`)
+    .join("\n");
+}
+
+function invitationLines(invitations: TenantAccessInvitation[]) {
+  return invitations
+    .slice(0, 25)
+    .map(
+      (invitation) =>
+        `- ${invitation.email}: ${invitation.status}, role ${invitation.proposedRole}, delivery ${invitation.deliveryStatus}, expires ${invitation.expiresAt}`
+    )
+    .join("\n");
+}
+
+function membershipLines(memberships: TenantAccessMembership[]) {
+  return memberships
+    .map(
+      (membership) =>
+        `- ${membership.email}: ${membership.role}, ${membership.status}, access review due ${membership.accessReviewDueAt}`
+    )
+    .join("\n");
+}
+
+export function buildTenantActivationProofPacket(
+  packet: TenantActivationProofPacket,
+  appBaseUrl: string
+) {
+  const dashboard = packet.dashboard;
+  const portalUrl = `${appBaseUrl.replace(/\/$/, "")}/pilot-workspace/access`;
+  const runbook = packet.activationRunbook.map((step, index) => `${index + 1}. ${step.step}: ${step.evidence}`);
+  const readiness = [
+    `Identity provider posture: ${dashboard.identityReadiness.providerStatus}`,
+    `SSO provider: ${dashboard.identityReadiness.ssoProvider || "Not configured"}`,
+    `SSO domain: ${dashboard.identityReadiness.ssoDomain || "Not configured"}`,
+    `Invitation delivery posture: ${dashboard.deliveryReadiness.status}`,
+    `SMTP provider: ${dashboard.deliveryReadiness.smtpProvider || "Not approved for direct send"}`,
+    `SMTP from-domain: ${dashboard.deliveryReadiness.smtpFromDomain || "Not approved for direct send"}`,
+    `Direct invitation email enabled: ${dashboard.security.directInvitationEmail ? "yes" : "no"}`
+  ];
+
+  return `# SCRIMED Protected Pilot Activation Proof Packet
+
+## Packet
+- Tenant: ${packet.tenantName}
+- Workspace: ${packet.workspaceName}
+- Workspace slug: ${packet.workspaceSlug}
+- Generated: ${packet.generatedAt}
+- Lifecycle event ID: ${packet.lifecycleEventId}
+- Generated by: ${packet.actorUserId}
+- Access route: ${portalUrl}
+
+## Activation Runbook
+${runbook.join("\n")}
+
+## Activation Summary
+- Active members: ${dashboard.summary.activeMembers}
+- Inactive members: ${dashboard.summary.inactiveMembers}
+- Pending invitations: ${dashboard.summary.pendingInvitations}
+- Onboarding packets generated: ${dashboard.summary.packetGeneratedInvitations}
+- External delivery preparations: ${dashboard.summary.deliveryPreparedInvitations}
+- Access reviews due: ${dashboard.summary.accessReviewsDue}
+
+## Identity and Delivery Readiness
+${markdownItems(readiness)}
+
+## Membership Evidence
+${membershipLines(dashboard.memberships) || "- No memberships are visible to this tenant-admin session."}
+
+## Invitation Evidence
+${invitationLines(dashboard.invitations) || "- No invitation records are currently visible for this tenant."}
+
+## Lifecycle Evidence
+${lifecycleLines(dashboard.lifecycleEvents) || "- No lifecycle events are currently visible for this tenant."}
+
+## Security Controls
+- Assurance level: ${dashboard.security.assuranceLevel}
+- Final-admin protection: ${dashboard.security.finalAdminProtection ? "active" : "not active"}
+- Offboarding enforced: ${dashboard.security.offboardingEnforced ? "active" : "not active"}
+- Mutation authorization: ${dashboard.security.mutationAuthorization}
+- Delivery mode: ${dashboard.security.deliveryMode}
+
+## Product Boundary
+${dashboard.boundary}
+
+${packet.boundary}
+
+This activation proof packet supports protected synthetic pilot diligence. It is not clinical advice, legal approval, a BAA, a production authorization, a reimbursement guarantee, or evidence of autonomous clinical execution.
 `;
 }

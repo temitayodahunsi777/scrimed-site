@@ -264,6 +264,55 @@ export default function TenantAccessAdministrationPanel({
     setMessage("Onboarding packet downloaded and recorded in the identity lifecycle trail.");
   }
 
+  async function downloadActivationProofPacket() {
+    if (!dashboard) {
+      return;
+    }
+
+    setStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/tenant-access/activation-proof-packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as TenantAccessResponse;
+      setStatus("error");
+      setMessage(body.error?.message ?? "The activation proof packet could not be generated.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const safeWorkspace = dashboard.workspaceSlug.replace(/[^a-z0-9-]/gi, "-").slice(0, 80) || "workspace";
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${safeWorkspace}-activation-proof-packet.md`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    const dashboardResponse = await fetch(`/api/pilot-workspaces/${workspace.slug}/tenant-access`, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
+    const body = (await dashboardResponse.json().catch(() => ({}))) as TenantAccessResponse;
+
+    if (dashboardResponse.ok && body.dashboard) {
+      applyDashboard(body.dashboard);
+    }
+
+    setStatus("ready");
+    setMessage("Activation proof packet downloaded and recorded in the identity lifecycle trail.");
+  }
+
   async function prepareInvitationDelivery(invitationId: string) {
     await commitAction(
       {
@@ -757,6 +806,14 @@ export default function TenantAccessAdministrationPanel({
                 <li>Outbound SMTP send gated</li>
                 <li>Server runtime token required</li>
               </ul>
+              <button
+                className="secondary-action"
+                disabled={status === "saving"}
+                onClick={downloadActivationProofPacket}
+                type="button"
+              >
+                Download Activation Proof Packet
+              </button>
             </article>
           </div>
 

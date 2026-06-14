@@ -670,6 +670,20 @@ export async function recordTenantInvitationPacketDownload(
   };
 }
 
+export async function recordTenantActivationProofPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string
+) {
+  const { data, error } = await client.rpc("record_tenant_activation_proof_packet_download", {
+    p_workspace_slug: workspaceSlug
+  });
+
+  return {
+    packet: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
 export async function prepareTenantInvitationDelivery(
   client: SupabaseClient,
   workspaceSlug: string,
