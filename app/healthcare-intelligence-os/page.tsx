@@ -25,6 +25,9 @@ export default function HealthcareIntelligenceOSPage() {
           <Link className="primary-action" href="/pilot-evidence">
             View Pilot Evidence
           </Link>
+          <Link className="secondary-action" href="/agent-workspace">
+            Open Agent Workspace
+          </Link>
           <a className="secondary-action" href="/api/healthcare-intelligence-os">
             Inspect OS API
           </a>

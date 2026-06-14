@@ -27,6 +27,9 @@ export default function ProtectedPilotWorkspacePage() {
           <Link className="primary-action" href="/pilot-workspace/access">
             Access Protected Pilot
           </Link>
+          <Link className="secondary-action" href="/agent-workspace">
+            Open Agent Workspace
+          </Link>
           <a className="primary-action" href="/api/pilot-workspaces/preview-proof-packet">
             Download Synthetic Proof Packet
           </a>

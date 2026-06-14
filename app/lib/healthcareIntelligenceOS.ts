@@ -124,6 +124,7 @@ export const healthcareIntelligencePhases: HealthcareIntelligencePhase[] = [
     components: ["Persistent Agent Workspace", "Multi-Model Router", "Sovereign Deployment Mode"],
     currentEvidence: [
       "Protected Pilot Workspaces provide tenant-authenticated synthetic sessions, append-only audits, TrustOS governance packets, and proof downloads.",
+      "Persistent Agent Workspace v1 defines resumable work orders, model-router policy, audit timelines, reviewer checkpoints, limitation-resolution paths, and downloadable workspace proof packets.",
       "TrustOS model-route profiles define cost, latency, safety, context, fallback, and production-vendor gates.",
       "Interoperability and deployment readiness registers keep live connectors blocked until customer-specific controls are approved."
     ],
@@ -629,6 +630,9 @@ export function getHealthcareIntelligenceOSSummary() {
     },
     persistentAgentWorkspace: {
       status: protectedWorkspace.status,
+      agentWorkspaceRoute: "/agent-workspace",
+      agentWorkspaceApiRoute: "/api/agent-workspace",
+      agentWorkspaceProofPacketRoute: "/api/agent-workspace/proof-packet",
       route: protectedWorkspace.route,
       durableStore: protectedWorkspace.infrastructure.durableStore.provider,
       tenantIsolation: protectedWorkspace.infrastructure.tenantIsolation.provider,
@@ -694,7 +698,7 @@ export function getHealthcareIntelligenceOSSummary() {
     },
     implementationPlan: [
       "Phase 1: keep AgentOS, Atlas, and TrustOS as the primary foundation; expose Clinical Knowledge Graph and Validation Trust Lab contracts without live clinical claims.",
-      "Phase 2: harden protected workspaces into resumable agent workspaces, then add production model-router and sovereign-deployment policy gates.",
+      "Phase 2: use Persistent Agent Workspace v1 to harden protected workspaces into resumable agent work orders, then add production model-router and sovereign-deployment policy gates.",
       "Phase 3: build care-journey, risk-horizon, and population surfaces only after validation, data-quality, privacy, and clinician-governance controls mature.",
       "Phase 4: combine the operating layers into Project Ark Healthcare Intelligence Fabric after enterprise deployment evidence exists."
     ],
@@ -738,6 +742,9 @@ export function buildHealthcareIntelligenceOSBrief() {
     `- OS API: ${summary.apiRoute}`,
     `- Agent Runtime: ${summary.agentRuntime.route}`,
     `- Validation Trust Lab: ${summary.validationTrustLab.route}`,
-    `- Protected Workspace: ${summary.persistentAgentWorkspace.route}`
+    `- Protected Workspace: ${summary.persistentAgentWorkspace.route}`,
+    `- Persistent Agent Workspace: ${summary.persistentAgentWorkspace.agentWorkspaceRoute}`,
+    `- Persistent Agent Workspace API: ${summary.persistentAgentWorkspace.agentWorkspaceApiRoute}`,
+    `- Persistent Agent Workspace Proof Packet: ${summary.persistentAgentWorkspace.agentWorkspaceProofPacketRoute}`
   ].join("\n");
 }

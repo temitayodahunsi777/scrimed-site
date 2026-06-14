@@ -17,6 +17,7 @@ import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
 import { getTrustOSSummary } from "./trustOS";
+import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -330,6 +331,12 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Evidence supports governed synthetic pilots and enterprise evaluation; it is not clinical validation, certification, or live execution authorization."
   },
   {
+    label: "Open Agent Workspace",
+    href: "/agent-workspace",
+    purpose: "Review Persistent Agent Workspace v1 work orders, resumable state, model-router decisions, reviewer checkpoints, audit timelines, proof packets, and limitation-resolution paths.",
+    boundary: "Workspace v1 coordinates governed synthetic work orders and proof. It does not authorize PHI, autonomous care, payer submission, patient outreach, or production connector execution."
+  },
+  {
     label: "Open Healthcare Intelligence OS",
     href: "/healthcare-intelligence-os",
     purpose: "Review SCRIMED's operating-system architecture, Clinical Knowledge Graph foundation, Validation Trust Lab, model routing, sovereign deployment, and production gates.",
@@ -488,6 +495,7 @@ export function getProductConsoleSummary() {
   const protectedPilotWorkspaceSummary = getProtectedPilotWorkspaceSummary();
   const salesOperationsSummary = getSalesOperationsSummary();
   const trustOSSummary = getTrustOSSummary();
+  const persistentAgentWorkspaceSummary = getPersistentAgentWorkspaceSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -513,6 +521,7 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
     healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     pilotEvidenceRoute: "/pilot-evidence",
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
@@ -528,6 +537,8 @@ export function getProductConsoleSummary() {
     atlasSubsystemCount: atlasIntelligenceCoreSummary.subsystems.length,
     trustCardCount: atlasIntelligenceCoreSummary.trustCards.length,
     trustOSControlCount: trustOSSummary.components.length,
+    persistentAgentWorkspaceWorkOrderCount: persistentAgentWorkspaceSummary.workOrderCount,
+    persistentAgentWorkspaceLimitationCount: persistentAgentWorkspaceSummary.limitationCount,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -552,8 +563,10 @@ export function getProductConsoleSummary() {
     interoperabilityConformanceSummary,
     protectedPilotWorkspaceSummary,
     salesOperationsSummary,
+    persistentAgentWorkspaceSummary,
     proofStack: {
       healthcareIntelligenceOS: "healthcare-intelligence-os-foundation",
+      persistentAgentWorkspace: persistentAgentWorkspaceSummary.status,
       pilotEvidenceDashboard: "enterprise-evidence-ready",
       pricingAndSales: commercialStrategySummary.status,
       demosAndPilots: demoPilotProgramSummary.status,
@@ -597,6 +610,7 @@ export function getProductReadinessBrief() {
     "",
     "## Product Demos and Pilot Programs",
     `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
+    `Persistent Agent Workspace: ${summary.persistentAgentWorkspaceRoute}`,
     `Pilot Evidence Dashboard: ${summary.pilotEvidenceRoute}`,
     `Demo Center: ${summary.demoRoute}`,
     `Pilot Programs: ${summary.pilotProgramRoute}`,
@@ -676,6 +690,13 @@ export function getProductReadinessBrief() {
     `Task engine: ${summary.agentOSSummary.taskApiRoute}`,
     `Evaluation workspace: ${summary.evaluationRoute}`,
     `Evaluation API: ${summary.evaluationApiRoute}`,
+    "",
+    "## Persistent Agent Workspace v1",
+    `Status: ${summary.persistentAgentWorkspaceSummary.status}`,
+    `Route: ${summary.persistentAgentWorkspaceSummary.route}`,
+    `API: ${summary.persistentAgentWorkspaceSummary.apiRoute}`,
+    `Work orders: ${summary.persistentAgentWorkspaceWorkOrderCount}`,
+    `Known limitations tracked: ${summary.persistentAgentWorkspaceLimitationCount}`,
     "",
     "## TrustOS v1",
     `Status: ${summary.trustOSSummary.status}`,

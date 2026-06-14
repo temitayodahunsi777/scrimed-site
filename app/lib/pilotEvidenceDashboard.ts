@@ -5,6 +5,7 @@ import { getHealthcareIntelligenceOSSummary } from "./healthcareIntelligenceOS";
 import { getProductConsoleSummary } from "./productConsole";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
+import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
 
 export type PilotEvidenceCard = {
   name: string;
@@ -44,6 +45,7 @@ export function getPilotEvidenceDashboard() {
   const product = getProductConsoleSummary();
   const healthcareOS = getHealthcareIntelligenceOSSummary();
   const protectedWorkspace = getProtectedPilotWorkspaceSummary();
+  const persistentWorkspace = getPersistentAgentWorkspaceSummary();
   const demoPilot = getDemoPilotProgramSummary();
   const enterpriseReadiness = getEnterpriseReadinessSummary();
   const commercial = getCommercialStrategySummary();
@@ -102,6 +104,16 @@ export function getPilotEvidenceDashboard() {
       boundary: protectedWorkspace.boundary
     },
     {
+      name: "Persistent Agent Workspace",
+      status: persistentWorkspace.status,
+      route: persistentWorkspace.route,
+      apiRoute: persistentWorkspace.apiRoute,
+      buyerQuestion: "Can SCRIMED keep agent work resumable, auditable, review-gated, and proof-ready across sessions?",
+      currentEvidence:
+        `${persistentWorkspace.workOrderCount} work-order templates, ${persistentWorkspace.modelRouterDecisionCount} model-router policies, ${persistentWorkspace.reviewerCheckpointCount} reviewer checkpoints, and ${persistentWorkspace.limitationCount} limitation-resolution paths are inspectable.`,
+      boundary: persistentWorkspace.boundary
+    },
+    {
       name: "Demo and pilot commercial proof",
       status: demoPilot.status,
       route: demoPilot.demoRoute,
@@ -156,6 +168,14 @@ export function getPilotEvidenceDashboard() {
       nextGate: "Add tenant, user, workflow, region, and emergency-shutdown limits before high-volume production use."
     },
     {
+      track: "Persistent agent work orders",
+      status: persistentWorkspace.status,
+      owner: "Persistent Agent Workspace",
+      evidence:
+        `${persistentWorkspace.workOrderCount} work orders map to saved state, model-router policy, Trust Cards, audit events, reviewer checkpoints, and proof packets.`,
+      nextGate: persistentWorkspace.nextImplementationStep
+    },
+    {
       track: "Clinical validation",
       status: "external-review-required",
       owner: "Validation and Trust Lab",
@@ -187,6 +207,11 @@ export function getPilotEvidenceDashboard() {
       label: "Open Healthcare Intelligence OS",
       href: healthcareOS.route,
       purpose: "Review the operating-system architecture, phase plan, knowledge graph, validation lab, and deployment gates."
+    },
+    {
+      label: "Open Agent Workspace",
+      href: persistentWorkspace.route,
+      purpose: "Inspect long-running agent work orders, saved state, model routing, audit timeline, reviewer checkpoints, and limitation-resolution controls."
     },
     {
       label: "Open Protected Pilot Workspace",

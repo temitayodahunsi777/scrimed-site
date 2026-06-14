@@ -23,6 +23,11 @@ const consoleViews = [
     summary: "Review SCRIMED's Agent Runtime, Clinical Knowledge Graph, Validation Trust Lab, model router, sovereign deployment, and production gates."
   },
   {
+    name: "Agent Workspace",
+    href: "/agent-workspace",
+    summary: "Review Persistent Agent Workspace v1 work orders, resumable state, model-router policy, reviewer checkpoints, audit timeline, proof packets, and limitation-resolution paths."
+  },
+  {
     name: "Pilot Evidence Dashboard",
     href: "/pilot-evidence",
     summary: "Inspect buyer and investor proof across product console, AgentOS, Atlas, TrustOS, protected workspaces, demos, pilots, and readiness gates."
