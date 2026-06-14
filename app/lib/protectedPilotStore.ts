@@ -5,6 +5,7 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord,
   PilotWorkspaceRole,
+  TenantIdentityProviderStatus,
   TenantAccessDashboard
 } from "./protectedPilotWorkspace";
 import type {
@@ -592,6 +593,134 @@ export async function updateTenantMembershipRole(
 
   return {
     membership: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function createTenantAccessInvitation(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  email: string,
+  role: PilotWorkspaceRole,
+  expiresAt: string | null,
+  note: string
+) {
+  const { data, error } = await client.rpc("create_pilot_access_invitation", {
+    p_workspace_slug: workspaceSlug,
+    p_email: email,
+    p_role: role,
+    p_expires_at: expiresAt,
+    p_note: note
+  });
+
+  return {
+    invitation: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function cancelTenantAccessInvitation(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  invitationId: string,
+  reason: string
+) {
+  const { data, error } = await client.rpc("cancel_pilot_access_invitation", {
+    p_workspace_slug: workspaceSlug,
+    p_invitation_id: invitationId,
+    p_reason: reason
+  });
+
+  return {
+    invitation: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function activateTenantAccessInvitation(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  invitationId: string
+) {
+  const { data, error } = await client.rpc("activate_pilot_invitation_for_existing_user", {
+    p_workspace_slug: workspaceSlug,
+    p_invitation_id: invitationId
+  });
+
+  return {
+    membership: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function deactivateTenantMembership(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  userId: string,
+  reason: string
+) {
+  const { data, error } = await client.rpc("deactivate_pilot_membership", {
+    p_workspace_slug: workspaceSlug,
+    p_target_user_id: userId,
+    p_reason: reason
+  });
+
+  return {
+    membership: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function reactivateTenantMembership(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  userId: string
+) {
+  const { data, error } = await client.rpc("reactivate_pilot_membership", {
+    p_workspace_slug: workspaceSlug,
+    p_target_user_id: userId
+  });
+
+  return {
+    membership: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function attestTenantAccessReview(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  notes: string
+) {
+  const { data, error } = await client.rpc("attest_pilot_access_review", {
+    p_workspace_slug: workspaceSlug,
+    p_notes: notes
+  });
+
+  return {
+    review: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
+    error
+  };
+}
+
+export async function updateTenantIdentityReadiness(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  identityProviderStatus: TenantIdentityProviderStatus,
+  ssoProvider: string,
+  ssoDomain: string,
+  notes: string
+) {
+  const { data, error } = await client.rpc("update_tenant_identity_readiness", {
+    p_workspace_slug: workspaceSlug,
+    p_identity_provider_status: identityProviderStatus,
+    p_sso_provider: ssoProvider,
+    p_sso_domain: ssoDomain,
+    p_notes: notes
+  });
+
+  return {
+    identityReadiness: data && typeof data === "object" ? (data as Record<string, unknown>) : null,
     error
   };
 }

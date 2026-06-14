@@ -35,13 +35,41 @@ export type PilotAuditEventRecord = {
   createdAt: string;
 };
 
+export type TenantAccessMembershipStatus = "active" | "inactive";
+
 export type TenantAccessMembership = {
   userId: string;
   email: string;
   role: PilotWorkspaceRole;
+  status: TenantAccessMembershipStatus;
   createdAt: string;
   updatedAt: string;
   updatedBy: string | null;
+  deactivatedAt: string | null;
+  deactivatedBy: string | null;
+  deactivationReason: string;
+  lastAccessReviewedAt: string | null;
+  lastAccessReviewedBy: string | null;
+  accessReviewDueAt: string;
+};
+
+export type TenantAccessInvitationStatus = "pending" | "cancelled" | "activated" | "expired";
+
+export type TenantAccessInvitation = {
+  id: string;
+  email: string;
+  proposedRole: PilotWorkspaceRole;
+  status: TenantAccessInvitationStatus;
+  invitationNote: string;
+  invitedBy: string;
+  activatedBy: string | null;
+  activatedUserId: string | null;
+  activatedAt: string | null;
+  cancelledBy: string | null;
+  cancelledAt: string | null;
+  cancellationReason: string;
+  expiresAt: string;
+  createdAt: string;
 };
 
 export type TenantAccessAuditEvent = {
@@ -54,6 +82,44 @@ export type TenantAccessAuditEvent = {
   createdAt: string;
 };
 
+export type TenantAccessLifecycleEvent = {
+  id: string;
+  targetUserId: string | null;
+  invitationId: string | null;
+  actorUserId: string;
+  eventType:
+    | "invitation-created"
+    | "invitation-cancelled"
+    | "invitation-activated"
+    | "membership-deactivated"
+    | "membership-reactivated"
+    | "access-review-attested"
+    | "sso-readiness-updated";
+  eventMetadata: Record<string, unknown>;
+  createdAt: string;
+};
+
+export type TenantIdentityProviderStatus =
+  | "passwordless-magic-link"
+  | "sso-readiness"
+  | "sso-configured";
+
+export type TenantIdentityReadiness = {
+  providerStatus: TenantIdentityProviderStatus;
+  ssoProvider: string;
+  ssoDomain: string;
+  notes: string;
+  updatedAt: string | null;
+  updatedBy: string | null;
+};
+
+export type TenantAccessSummary = {
+  activeMembers: number;
+  inactiveMembers: number;
+  pendingInvitations: number;
+  accessReviewsDue: number;
+};
+
 export type TenantAccessDashboard = {
   tenantId: string;
   tenantName: string;
@@ -62,11 +128,17 @@ export type TenantAccessDashboard = {
   workspaceName: string;
   actorUserId: string;
   memberships: TenantAccessMembership[];
+  invitations: TenantAccessInvitation[];
   auditEvents: TenantAccessAuditEvent[];
+  lifecycleEvents: TenantAccessLifecycleEvent[];
+  identityReadiness: TenantIdentityReadiness;
+  summary: TenantAccessSummary;
   security: {
     assuranceLevel: "aal2";
     finalAdminProtection: true;
     mutationAuthorization: "tenant-admin-plus-server-runtime-token";
+    offboardingEnforced: true;
+    directInvitationEmail: false;
   };
   boundary: string;
 };
@@ -160,7 +232,7 @@ export const protectedPilotApiContracts = [
     method: "GET / PATCH",
     route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access",
     access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
-    purpose: "Inspect existing approved memberships and apply audited role changes without exposing identity creation."
+    purpose: "Inspect memberships, record governed invitations, activate existing auth users, offboard/reactivate access, attest access reviews, and maintain SSO-readiness metadata without email delivery or user creation."
   },
   {
     method: "GET",
@@ -189,8 +261,8 @@ export const protectedPilotApiContracts = [
 ];
 
 export const protectedPilotActivationGates = [
-  "Add governed identity invitation, offboarding, recovery, and periodic access review beyond existing approved memberships.",
-  "Extend the active magic-link, TOTP MFA, and session-lifetime policy into approved enterprise SSO and multi-tenant identity operations.",
+  "Add enterprise email delivery through approved custom SMTP before sending production invitation messages.",
+  "Extend the active magic-link, TOTP MFA, and session-lifetime policy into enforced enterprise SSO and multi-tenant identity operations.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
 ];
@@ -264,9 +336,13 @@ export function getProtectedPilotWorkspaceSummary() {
       "Governed reviewer dispositions, overrides, and outcome-learning signals",
       "Downloadable audited TrustOS governance packets",
       "AAL2-protected tenant membership visibility and audited role administration",
+      "Governed invitation records with existing-auth-user activation",
+      "Tenant offboarding, reactivation, and final-admin protection",
+      "Periodic access review attestation",
+      "SSO-readiness metadata and identity lifecycle evidence",
       "Rate-limited public intake and protected mutations"
     ],
-    updated: "2026-06-11"
+    updated: "2026-06-13"
   };
 }
 
