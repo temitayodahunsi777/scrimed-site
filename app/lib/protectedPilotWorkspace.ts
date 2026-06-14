@@ -254,18 +254,18 @@ export const pilotWorkspaceRoles: Array<{
 }> = [
   {
     role: "tenant-admin",
-    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Download proof and governance packets"],
+    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Download proof and governance packets"],
     restrictions: ["Cannot enable live clinical execution", "Cannot alter append-only audit events"]
   },
   {
     role: "pilot-lead",
-    permissions: ["Run synthetic evaluations", "Commit TrustOS decisions", "Record governed reviewer dispositions", "View workspace sessions", "Download proof and governance packets"],
+    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Commit TrustOS decisions", "Record governed reviewer dispositions", "View workspace sessions", "Download proof and governance packets"],
     restrictions: ["Cannot manage tenant identity", "Cannot alter append-only audit events"]
   },
   {
     role: "reviewer",
-    permissions: ["View workspace sessions", "Review Trust Cards", "Record governed reviewer dispositions and outcome signals", "Download proof and governance packets"],
-    restrictions: ["Cannot create sessions", "Cannot manage tenant identity"]
+    permissions: ["View workspace sessions", "Review Trust Cards and work orders", "Record governed reviewer dispositions and outcome signals", "Download proof and governance packets"],
+    restrictions: ["Cannot create sessions or new work orders", "Cannot manage tenant identity"]
   },
   {
     role: "observer",
@@ -340,6 +340,18 @@ export const protectedPilotApiContracts = [
     route: "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/governance-packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
     purpose: "Download an audited governance packet containing decision, control, trace, evidence, and human-review proof."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/agent-workspaces/{workspaceSlug}/work-orders",
+    access: "GET: bearer token + tenant membership. POST: AAL2 bearer token + authorized tenant role + rate limit",
+    purpose: "List or create persistent Agent Workspace work orders backed by tenant-scoped RLS tables and append-only events."
+  },
+  {
+    method: "GET / PATCH",
+    route: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}",
+    access: "GET: bearer token + tenant membership. PATCH: AAL2 bearer token + authorized tenant role + rate limit",
+    purpose: "Inspect, transition, retry, review, block, or close a persistent Agent Workspace work order."
   }
 ];
 
@@ -461,7 +473,8 @@ export function getProtectedPilotWorkspaceSummary() {
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",
       "SSO-readiness metadata and identity lifecycle evidence",
-      "Rate-limited public intake and protected mutations"
+      "Rate-limited public intake and protected mutations",
+      "Persistent Agent Workspace work-order creation, state transitions, retry tracking, reviewer assignment, closure, and append-only event trails"
     ],
     updated: "2026-06-14"
   };

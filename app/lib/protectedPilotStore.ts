@@ -15,6 +15,12 @@ import type {
   TrustOSReviewInput
 } from "./trustOSDecisionLedger";
 import type { TrustOSDecisionRecord } from "./trustOS";
+import type {
+  AgentWorkspaceWorkOrderEventRecord,
+  AgentWorkspaceWorkOrderInput,
+  AgentWorkspaceWorkOrderRecord,
+  AgentWorkspaceWorkOrderTransitionInput
+} from "./persistentAgentWorkspace";
 
 type AuthenticatedPilotContext =
   | {
@@ -87,6 +93,51 @@ type TrustOSReviewEventRow = {
   reason_code: TrustOSReviewEventRecord["reasonCode"];
   notes: string;
   outcome_metrics: TrustOSReviewEventRecord["outcomeMetrics"];
+  created_at: string;
+};
+
+type AgentWorkspaceWorkOrderRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  pilot_session_id: string | null;
+  trustos_decision_id: string | null;
+  work_order_type: AgentWorkspaceWorkOrderRecord["workOrderType"];
+  state: AgentWorkspaceWorkOrderRecord["state"];
+  objective: string;
+  agent_owner: string;
+  model_router_policy: string;
+  trust_card: Record<string, unknown>;
+  memory_scopes: string[];
+  tool_scopes: string[];
+  reviewer_checkpoints: string[];
+  blocked_actions: string[];
+  result_summary: string;
+  outcome_metrics: Record<string, unknown>;
+  failure_reason: string;
+  retry_count: number;
+  assigned_reviewer_id: string | null;
+  created_by: string;
+  updated_by: string;
+  reviewed_by: string | null;
+  closed_by: string | null;
+  created_at: string;
+  updated_at: string;
+  review_due_at: string | null;
+  reviewed_at: string | null;
+  closed_at: string | null;
+  boundary: string;
+};
+
+type AgentWorkspaceWorkOrderEventRow = {
+  id: string;
+  workspace_id: string;
+  work_order_id: string;
+  actor_user_id: string;
+  event_type: AgentWorkspaceWorkOrderEventRecord["eventType"];
+  prior_state: AgentWorkspaceWorkOrderEventRecord["priorState"];
+  next_state: AgentWorkspaceWorkOrderEventRecord["nextState"];
+  event_metadata: Record<string, unknown>;
   created_at: string;
 };
 
@@ -352,6 +403,61 @@ function mapTrustOSReviewEvent(row: TrustOSReviewEventRow): TrustOSReviewEventRe
   };
 }
 
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function mapAgentWorkspaceWorkOrder(row: AgentWorkspaceWorkOrderRow): AgentWorkspaceWorkOrderRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    pilotSessionId: row.pilot_session_id,
+    trustOSDecisionId: row.trustos_decision_id,
+    workOrderType: row.work_order_type,
+    state: row.state,
+    objective: row.objective,
+    agentOwner: row.agent_owner,
+    modelRouterPolicy: row.model_router_policy,
+    trustCard: row.trust_card,
+    memoryScopes: asStringArray(row.memory_scopes),
+    toolScopes: asStringArray(row.tool_scopes),
+    reviewerCheckpoints: asStringArray(row.reviewer_checkpoints),
+    blockedActions: asStringArray(row.blocked_actions),
+    resultSummary: row.result_summary,
+    outcomeMetrics: row.outcome_metrics,
+    failureReason: row.failure_reason,
+    retryCount: row.retry_count,
+    assignedReviewerId: row.assigned_reviewer_id,
+    createdBy: row.created_by,
+    updatedBy: row.updated_by,
+    reviewedBy: row.reviewed_by,
+    closedBy: row.closed_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    reviewDueAt: row.review_due_at,
+    reviewedAt: row.reviewed_at,
+    closedAt: row.closed_at,
+    boundary: row.boundary
+  };
+}
+
+function mapAgentWorkspaceWorkOrderEvent(
+  row: AgentWorkspaceWorkOrderEventRow
+): AgentWorkspaceWorkOrderEventRecord {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    workOrderId: row.work_order_id,
+    actorUserId: row.actor_user_id,
+    eventType: row.event_type,
+    priorState: row.prior_state,
+    nextState: row.next_state,
+    eventMetadata: row.event_metadata,
+    createdAt: row.created_at
+  };
+}
+
 const workspaceSelect = "id, tenant_id, slug, name, status, boundary, created_at, pilot_tenants(name)";
 const sessionSelect =
   "id, workspace_id, scenario_slug, status, boundary, evaluation, created_at, created_by";
@@ -361,6 +467,10 @@ const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
   "id, workspace_id, trustos_decision_id, actor_user_id, event_type, disposition, reason_code, notes, outcome_metrics, created_at";
+const agentWorkspaceWorkOrderSelect =
+  "id, tenant_id, workspace_id, pilot_session_id, trustos_decision_id, work_order_type, state, objective, agent_owner, model_router_policy, trust_card, memory_scopes, tool_scopes, reviewer_checkpoints, blocked_actions, result_summary, outcome_metrics, failure_reason, retry_count, assigned_reviewer_id, created_by, updated_by, reviewed_by, closed_by, created_at, updated_at, review_due_at, reviewed_at, closed_at, boundary";
+const agentWorkspaceWorkOrderEventSelect =
+  "id, workspace_id, work_order_id, actor_user_id, event_type, prior_state, next_state, event_metadata, created_at";
 
 export async function listAccessiblePilotWorkspaces(client: SupabaseClient) {
   const { data, error } = await client.from("pilot_workspaces").select(workspaceSelect).order("created_at");
@@ -567,6 +677,109 @@ export async function recordTrustOSGovernancePacketDownload(
     p_notes: "",
     p_outcome_metrics: {}
   });
+}
+
+export async function listAgentWorkspaceWorkOrders(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("agent_workspace_work_orders")
+    .select(agentWorkspaceWorkOrderSelect)
+    .eq("workspace_id", workspaceId)
+    .order("updated_at", { ascending: false })
+    .limit(250);
+
+  return {
+    workOrders: ((data ?? []) as unknown as AgentWorkspaceWorkOrderRow[]).map(mapAgentWorkspaceWorkOrder),
+    error
+  };
+}
+
+export async function getAgentWorkspaceWorkOrder(
+  client: SupabaseClient,
+  workspaceId: string,
+  workOrderId: string
+) {
+  const { data, error } = await client
+    .from("agent_workspace_work_orders")
+    .select(agentWorkspaceWorkOrderSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", workOrderId)
+    .maybeSingle();
+
+  return {
+    workOrder: data ? mapAgentWorkspaceWorkOrder(data as unknown as AgentWorkspaceWorkOrderRow) : null,
+    error
+  };
+}
+
+export async function listAgentWorkspaceWorkOrderEvents(
+  client: SupabaseClient,
+  workspaceId: string,
+  workOrderId: string
+) {
+  const { data, error } = await client
+    .from("agent_workspace_work_order_events")
+    .select(agentWorkspaceWorkOrderEventSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("work_order_id", workOrderId)
+    .order("created_at", { ascending: false })
+    .limit(250);
+
+  return {
+    events: ((data ?? []) as unknown as AgentWorkspaceWorkOrderEventRow[]).map(
+      mapAgentWorkspaceWorkOrderEvent
+    ),
+    error
+  };
+}
+
+export async function createAgentWorkspaceWorkOrder(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: AgentWorkspaceWorkOrderInput
+) {
+  const { data, error } = await client.rpc("create_agent_workspace_work_order", {
+    p_workspace_slug: workspaceSlug,
+    p_work_order_type: input.workOrderType,
+    p_objective: input.objective,
+    p_agent_owner: input.agentOwner,
+    p_model_router_policy: input.modelRouterPolicy,
+    p_memory_scopes: input.memoryScopes,
+    p_tool_scopes: input.toolScopes,
+    p_reviewer_checkpoints: input.reviewerCheckpoints,
+    p_blocked_actions: input.blockedActions,
+    p_trust_card: input.trustCard,
+    p_pilot_session_id: input.pilotSessionId,
+    p_trustos_decision_id: input.trustOSDecisionId
+  });
+
+  return {
+    workOrderId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function transitionAgentWorkspaceWorkOrder(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  workOrderId: string,
+  input: AgentWorkspaceWorkOrderTransitionInput
+) {
+  const { data, error } = await client.rpc("transition_agent_workspace_work_order", {
+    p_workspace_slug: workspaceSlug,
+    p_work_order_id: workOrderId,
+    p_next_state: input.nextState,
+    p_event_type: input.eventType,
+    p_event_metadata: input.eventMetadata,
+    p_result_summary: input.resultSummary,
+    p_outcome_metrics: input.outcomeMetrics,
+    p_failure_reason: input.failureReason,
+    p_assigned_reviewer_id: input.assignedReviewerId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
 }
 
 export async function getTenantAccessDashboard(client: SupabaseClient, workspaceSlug: string) {

@@ -18,7 +18,8 @@ export type AgentWorkOrderState =
   | "trustqa-held"
   | "human-review"
   | "proof-ready"
-  | "blocked";
+  | "blocked"
+  | "closed";
 
 export type AgentWorkOrderType =
   | "rcm-denial-appeal-generation"
@@ -81,7 +82,7 @@ export type WorkspaceReviewerCheckpoint = {
 };
 
 export type WorkspaceApiContract = {
-  method: "GET" | "POST" | "GET / POST" | "future";
+  method: "GET" | "POST" | "PATCH" | "GET / POST" | "GET / PATCH" | "future";
   route: string;
   status: PersistentWorkspaceStatus;
   access: string;
@@ -96,6 +97,114 @@ export type LimitationResolution = {
   proofRoute: string;
   remainingGate: string;
 };
+
+export type AgentWorkspaceWorkOrderEventType =
+  | "work-order-created"
+  | "state-transitioned"
+  | "reviewer-assigned"
+  | "reviewer-disposition-recorded"
+  | "retry-recorded"
+  | "work-order-blocked"
+  | "work-order-closed"
+  | "proof-packet-downloaded";
+
+export type AgentWorkspaceWorkOrderInput = {
+  workOrderType: AgentWorkOrderType;
+  objective: string;
+  agentOwner: string;
+  modelRouterPolicy: string;
+  memoryScopes: string[];
+  toolScopes: string[];
+  reviewerCheckpoints: string[];
+  blockedActions: string[];
+  trustCard: Record<string, unknown>;
+  pilotSessionId: string | null;
+  trustOSDecisionId: string | null;
+};
+
+export type AgentWorkspaceWorkOrderTransitionInput = {
+  nextState: AgentWorkOrderState;
+  eventType: AgentWorkspaceWorkOrderEventType;
+  eventMetadata: Record<string, unknown>;
+  resultSummary: string;
+  outcomeMetrics: Record<string, unknown>;
+  failureReason: string;
+  assignedReviewerId: string | null;
+};
+
+export type AgentWorkspaceWorkOrderRecord = {
+  id: string;
+  tenantId: string;
+  workspaceId: string;
+  pilotSessionId: string | null;
+  trustOSDecisionId: string | null;
+  workOrderType: AgentWorkOrderType;
+  state: AgentWorkOrderState;
+  objective: string;
+  agentOwner: string;
+  modelRouterPolicy: string;
+  trustCard: Record<string, unknown>;
+  memoryScopes: string[];
+  toolScopes: string[];
+  reviewerCheckpoints: string[];
+  blockedActions: string[];
+  resultSummary: string;
+  outcomeMetrics: Record<string, unknown>;
+  failureReason: string;
+  retryCount: number;
+  assignedReviewerId: string | null;
+  createdBy: string;
+  updatedBy: string;
+  reviewedBy: string | null;
+  closedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reviewDueAt: string | null;
+  reviewedAt: string | null;
+  closedAt: string | null;
+  boundary: string;
+};
+
+export type AgentWorkspaceWorkOrderEventRecord = {
+  id: string;
+  workspaceId: string;
+  workOrderId: string;
+  actorUserId: string;
+  eventType: AgentWorkspaceWorkOrderEventType;
+  priorState: AgentWorkOrderState | null;
+  nextState: AgentWorkOrderState;
+  eventMetadata: Record<string, unknown>;
+  createdAt: string;
+};
+
+type ValidationResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; errors: string[] };
+
+export const agentWorkOrderStates: AgentWorkOrderState[] = [
+  "drafted",
+  "planned",
+  "routed",
+  "sandboxed",
+  "trustqa-held",
+  "human-review",
+  "proof-ready",
+  "blocked",
+  "closed"
+];
+
+export const agentWorkOrderEventTypes: AgentWorkspaceWorkOrderEventType[] = [
+  "work-order-created",
+  "state-transitioned",
+  "reviewer-assigned",
+  "reviewer-disposition-recorded",
+  "retry-recorded",
+  "work-order-blocked",
+  "work-order-closed",
+  "proof-packet-downloaded"
+];
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const persistentAgentWorkspaceBoundary =
   "Persistent Agent Workspace v1 coordinates tenant-scoped synthetic work orders, saved state contracts, Trust Cards, audit timelines, reviewer checkpoints, and proof packets. It does not authorize live PHI ingestion, autonomous clinical decisions, payer submission, patient outreach, medical-record mutation, or production connector execution.";
@@ -112,12 +221,12 @@ export const workspaceCapabilities: WorkspaceCapability[] = [
   },
   {
     capability: "Saved work-order state",
-    status: "v1-ready",
+    status: "active-control",
     implementation:
-      "Defines resumable work-order state machines that map to durable synthetic sessions, TrustOS decisions, and audit events.",
-    proofRoute: "/api/agent-workspace",
+      "Adds dedicated RLS-backed work-order and event tables with RPC-only protected mutation contracts for create, resume, transition, retry, review, and close states.",
+    proofRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders",
     productionGate:
-      "Dedicated production work-order tables require migration review, RLS testing, retention policy, and Data API exposure review."
+      "Database migration, RLS verification, authenticated tenant smoke test, retention policy, and advisor review are required per environment."
   },
   {
     capability: "Isolated agent execution",
@@ -429,12 +538,20 @@ export const workspaceApiContracts: WorkspaceApiContract[] = [
     purpose: "Commit TrustOS decisions and model-route governance evidence to the tenant ledger."
   },
   {
-    method: "future",
+    method: "GET / POST",
     route: "/api/agent-workspaces/{workspaceSlug}/work-orders",
-    status: "production-gated",
-    access: "Future AAL2 tenant workspace role + dedicated RLS work-order table",
+    status: "active-control",
+    access: "GET: bearer token + workspace membership. POST: AAL2 bearer token + authorized tenant role + rate limit.",
     purpose:
-      "Create, resume, assign, retry, and close long-running work orders after migration, RLS, retention, and Data API exposure review."
+      "List and create persistent synthetic work orders through dedicated RLS-backed tables and RPC-only mutations."
+  },
+  {
+    method: "GET / PATCH",
+    route: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}",
+    status: "active-control",
+    access: "GET: bearer token + workspace membership. PATCH: AAL2 bearer token + authorized tenant role + rate limit.",
+    purpose:
+      "Inspect a work order with its event trail or transition state for review, retry, assignment, proof readiness, blocking, or closure."
   }
 ];
 
@@ -467,13 +584,13 @@ export const limitationResolutionRegister: LimitationResolution[] = [
     remainingGate: "Clinician rubric, validation study, data-quality review, and governance sign-off."
   },
   {
-    limitation: "Dedicated long-running work-order persistence tables are not added in this release.",
-    impact: "Work-order creation/resume uses typed contracts plus existing durable protected pilot sessions and ledgers, not a new mutation surface.",
-    resolutionStatus: "quality-process-replacement",
+    limitation: "Dedicated long-running work-order persistence requires per-environment migration verification.",
+    impact: "Work-order creation and resume must fail closed until each deployment has the dedicated RLS tables, RPCs, and grants applied.",
+    resolutionStatus: "active-control",
     replacementProcess:
-      "Map work orders to existing RLS-backed sessions, TrustOS ledger, audit events, and proof packets until dedicated schema is reviewed.",
-    proofRoute: "/api/agent-workspace",
-    remainingGate: "Migration design, RLS policies, Data API exposure grants, retention, indexes, and advisor review."
+      "Use dedicated agent workspace work-order tables, append-only work-order events, explicit authenticated grants, and RPC-only mutations with route-level AAL2 and rate-limit checks.",
+    proofRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders",
+    remainingGate: "Apply migration, verify RLS with an authenticated tenant, run database advisors, and approve retention/legal-hold policy."
   },
   {
     limitation: "Production model routing across vendors is not active.",
@@ -513,6 +630,227 @@ export const limitationResolutionRegister: LimitationResolution[] = [
   }
 ];
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function optionalString(value: unknown, fallback = "") {
+  return typeof value === "string" ? value.trim() : fallback;
+}
+
+function optionalUuid(value: unknown) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  return typeof value === "string" && uuidPattern.test(value) ? value : "__invalid_uuid__";
+}
+
+function stringArray(value: unknown, fallback: string[]) {
+  if (value === undefined || value === null) {
+    return fallback;
+  }
+
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string" || !item.trim())) {
+    return ["__invalid_array__"];
+  }
+
+  return value.map((item) => item.trim()).slice(0, 24);
+}
+
+export function isAgentWorkOrderType(value: unknown): value is AgentWorkOrderType {
+  return typeof value === "string" && workOrderTemplates.some((template) => template.type === value);
+}
+
+export function isAgentWorkOrderState(value: unknown): value is AgentWorkOrderState {
+  return typeof value === "string" && agentWorkOrderStates.includes(value as AgentWorkOrderState);
+}
+
+export function isAgentWorkOrderEventType(value: unknown): value is AgentWorkspaceWorkOrderEventType {
+  return typeof value === "string" && agentWorkOrderEventTypes.includes(value as AgentWorkspaceWorkOrderEventType);
+}
+
+export function getWorkOrderTemplate(workOrderType: AgentWorkOrderType) {
+  return workOrderTemplates.find((template) => template.type === workOrderType) ?? workOrderTemplates[0];
+}
+
+function defaultTrustCard(template: WorkOrderTemplate) {
+  return {
+    requirement: template.trustCardRequirement,
+    validationStatus: "human-review-required",
+    sourceAttribution: "SCRIMED governed synthetic work-order template",
+    confidence: "not-clinically-validated",
+    updated: "2026-06-14",
+    syntheticOnly: true
+  };
+}
+
+export function validateAgentWorkspaceWorkOrderPayload(
+  payload: unknown
+): ValidationResult<AgentWorkspaceWorkOrderInput> {
+  const errors: string[] = [];
+
+  if (!isRecord(payload)) {
+    return { ok: false, errors: ["payload must be a JSON object"] };
+  }
+
+  if (!isAgentWorkOrderType(payload.workOrderType)) {
+    return { ok: false, errors: ["workOrderType must match a supported SCRIMED work-order template"] };
+  }
+
+  const template = getWorkOrderTemplate(payload.workOrderType);
+  const objective = optionalString(payload.objective, template.objective);
+  const agentOwner = optionalString(payload.agentOwner, template.agentOwner);
+  const modelRouterPolicy = optionalString(payload.modelRouterPolicy, template.modelRouterPolicy);
+  const memoryScopes = stringArray(payload.memoryScopes, template.memoryScopes);
+  const toolScopes = stringArray(payload.toolScopes, template.toolScopes);
+  const reviewerCheckpoints = stringArray(payload.reviewerCheckpoints, template.reviewerCheckpoints);
+  const blockedActions = stringArray(payload.blockedActions, template.blockedActions);
+  const pilotSessionId = optionalUuid(payload.pilotSessionId);
+  const trustOSDecisionId = optionalUuid(payload.trustOSDecisionId);
+  const trustCard = isRecord(payload.trustCard) ? payload.trustCard : defaultTrustCard(template);
+
+  if (objective.length < 20 || objective.length > 2000) {
+    errors.push("objective must be between 20 and 2000 characters");
+  }
+
+  if (agentOwner.length < 2 || agentOwner.length > 180) {
+    errors.push("agentOwner must be between 2 and 180 characters");
+  }
+
+  if (modelRouterPolicy.length < 20 || modelRouterPolicy.length > 2000) {
+    errors.push("modelRouterPolicy must be between 20 and 2000 characters");
+  }
+
+  if (memoryScopes.includes("__invalid_array__")) {
+    errors.push("memoryScopes must be an array of non-empty strings");
+  }
+
+  if (toolScopes.includes("__invalid_array__")) {
+    errors.push("toolScopes must be an array of non-empty strings");
+  }
+
+  if (reviewerCheckpoints.includes("__invalid_array__")) {
+    errors.push("reviewerCheckpoints must be an array of non-empty strings");
+  }
+
+  if (blockedActions.includes("__invalid_array__")) {
+    errors.push("blockedActions must be an array of non-empty strings");
+  }
+
+  if (pilotSessionId === "__invalid_uuid__") {
+    errors.push("pilotSessionId must be a valid UUID when provided");
+  }
+
+  if (trustOSDecisionId === "__invalid_uuid__") {
+    errors.push("trustOSDecisionId must be a valid UUID when provided");
+  }
+
+  if (errors.length > 0) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: {
+      workOrderType: template.type,
+      objective,
+      agentOwner,
+      modelRouterPolicy,
+      memoryScopes,
+      toolScopes,
+      reviewerCheckpoints,
+      blockedActions,
+      trustCard,
+      pilotSessionId: pilotSessionId === "__invalid_uuid__" ? null : pilotSessionId,
+      trustOSDecisionId: trustOSDecisionId === "__invalid_uuid__" ? null : trustOSDecisionId
+    }
+  };
+}
+
+function defaultEventTypeForState(state: AgentWorkOrderState): AgentWorkspaceWorkOrderEventType {
+  if (state === "blocked") {
+    return "work-order-blocked";
+  }
+
+  if (state === "closed") {
+    return "work-order-closed";
+  }
+
+  if (state === "human-review") {
+    return "reviewer-assigned";
+  }
+
+  if (state === "proof-ready") {
+    return "reviewer-disposition-recorded";
+  }
+
+  return "state-transitioned";
+}
+
+export function validateAgentWorkspaceTransitionPayload(
+  payload: unknown
+): ValidationResult<AgentWorkspaceWorkOrderTransitionInput> {
+  const errors: string[] = [];
+
+  if (!isRecord(payload)) {
+    return { ok: false, errors: ["payload must be a JSON object"] };
+  }
+
+  if (!isAgentWorkOrderState(payload.nextState)) {
+    return { ok: false, errors: ["nextState must match a supported work-order state"] };
+  }
+
+  const eventType =
+    payload.eventType === undefined
+      ? defaultEventTypeForState(payload.nextState)
+      : isAgentWorkOrderEventType(payload.eventType)
+        ? payload.eventType
+        : null;
+  const eventMetadata = isRecord(payload.eventMetadata) ? payload.eventMetadata : {};
+  const resultSummary = optionalString(payload.resultSummary);
+  const outcomeMetrics = isRecord(payload.outcomeMetrics) ? payload.outcomeMetrics : {};
+  const failureReason = optionalString(payload.failureReason);
+  const assignedReviewerId = optionalUuid(payload.assignedReviewerId);
+
+  if (!eventType) {
+    errors.push("eventType must match a supported work-order event type");
+  }
+
+  if (resultSummary.length > 4000) {
+    errors.push("resultSummary must be 4000 characters or fewer");
+  }
+
+  if (failureReason.length > 2000) {
+    errors.push("failureReason must be 2000 characters or fewer");
+  }
+
+  if (payload.nextState === "blocked" && !failureReason) {
+    errors.push("failureReason is required when nextState is blocked");
+  }
+
+  if (assignedReviewerId === "__invalid_uuid__") {
+    errors.push("assignedReviewerId must be a valid UUID when provided");
+  }
+
+  if (errors.length > 0 || !eventType) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: {
+      nextState: payload.nextState,
+      eventType,
+      eventMetadata,
+      resultSummary,
+      outcomeMetrics,
+      failureReason,
+      assignedReviewerId: assignedReviewerId === "__invalid_uuid__" ? null : assignedReviewerId
+    }
+  };
+}
+
 export function getPersistentAgentWorkspaceSummary() {
   const protectedWorkspace = getProtectedPilotWorkspaceSummary();
   const agentOS = getAgentOSSummary();
@@ -534,6 +872,8 @@ export function getPersistentAgentWorkspaceSummary() {
     apiRoute: "/api/agent-workspace",
     briefRoute: "/api/agent-workspace/brief",
     proofPacketRoute: "/api/agent-workspace/proof-packet",
+    workOrderMutationRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders",
+    workOrderDetailRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}",
     status: "persistent-agent-workspace-v1-ready",
     boundary: persistentAgentWorkspaceBoundary,
     foundation: {
@@ -552,6 +892,8 @@ export function getPersistentAgentWorkspaceSummary() {
     previewWorkspace: previewPilotWorkspace,
     capabilityCount: workspaceCapabilities.length,
     workOrderCount: workOrderTemplates.length,
+    workOrderStateCount: agentWorkOrderStates.length,
+    workOrderEventTypeCount: agentWorkOrderEventTypes.length,
     modelRouterDecisionCount: modelRouterWorkspaceDecisions.length,
     reviewerCheckpointCount: workspaceReviewerCheckpoints.length,
     auditTimelineEventCount: workspaceAuditTimeline.length,
@@ -569,7 +911,7 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "After enterprise pilot usage validates the work-order contract, add dedicated RLS-backed work-order persistence tables and protected mutation APIs for create, resume, retry, assign, review, and close actions.",
+      "Apply and verify the agent workspace migration per environment, then add audited work-order proof-packet exports, dashboard filters, retention/legal-hold controls, and authenticated end-to-end pilot scripts.",
     updated: "2026-06-14"
   };
 }
@@ -612,6 +954,10 @@ export function buildPersistentAgentWorkspaceBrief() {
     `- Atlas: ${summary.foundation.atlasStatus} (${summary.foundation.atlasRoute})`,
     `- Tenant isolation: ${summary.foundation.tenantIsolation.provider} - ${summary.foundation.tenantIsolation.control}`,
     `- Durable store: ${summary.foundation.durableStore.provider} - ${summary.foundation.durableStore.control}`,
+    `- Work-order mutation route: ${summary.workOrderMutationRoute}`,
+    `- Work-order detail route: ${summary.workOrderDetailRoute}`,
+    `- Work-order states: ${summary.workOrderStateCount}`,
+    `- Work-order event types: ${summary.workOrderEventTypeCount}`,
     "",
     "## Workspace Capabilities",
     ...summary.capabilities.map(

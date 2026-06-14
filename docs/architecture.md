@@ -11,7 +11,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
 - Healthcare Intelligence OS foundation: `/healthcare-intelligence-os`, `/api/healthcare-intelligence-os`, and `/api/healthcare-intelligence-os/brief`
-- Persistent Agent Workspace v1: `/agent-workspace`, `/api/agent-workspace`, `/api/agent-workspace/brief`, and `/api/agent-workspace/proof-packet`
+- Persistent Agent Workspace v1: `/agent-workspace`, `/api/agent-workspace`, `/api/agent-workspace/brief`, `/api/agent-workspace/proof-packet`, `/api/agent-workspaces/[workspaceSlug]/work-orders`, and `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]`
 - Enterprise pilot evidence dashboard: `/pilot-evidence`, `/api/pilot-evidence`, and `/api/pilot-evidence/brief`
 - Executable TrustOS governance surface: `/trust-os`, `/api/trust-os`, and `/api/trust-os/evaluate`
 - Trust and enterprise readiness control plane: `/trust-center`, `/trust-center/[slug]`, `/claims`, `/api/enterprise-readiness`, `/api/enterprise-readiness/[slug]`, `/api/enterprise-readiness/claims`, and `/api/enterprise-readiness/diligence-brief`
@@ -74,7 +74,7 @@ Current foundation:
 
 - Protected Pilot Workspaces provide tenant-authenticated synthetic sessions, durable proof packets, TrustOS governance packets, and append-only audit events.
 - Persistent Agent Workspace v1 composes protected pilot sessions into resumable synthetic work-order templates for RCM denial appeals, trial matching, pre-visit review, post-visit drafting, investor outreach, security scans, and interoperability data transformation.
-- Persistent Agent Workspace v1 exposes model-router policy decisions, memory scopes, sandbox/tool scopes, reviewer checkpoints, audit timelines, blocked actions, and downloadable proof packets while keeping live PHI and clinical execution blocked.
+- Persistent Agent Workspace v1 exposes model-router policy decisions, memory scopes, sandbox/tool scopes, reviewer checkpoints, audit timelines, blocked actions, dedicated RLS-backed work-order/event tables, RPC-only protected mutations, and downloadable proof packets while keeping live PHI and clinical execution blocked.
 - TrustOS model-route profiles define the policy frame for vendor-neutral model routing across cost, latency, safety, context, availability, fallback, PHI sensitivity, and regional constraints.
 - Sovereign deployment contracts describe managed cloud, private cloud, hospital-controlled, government/sovereign cloud, and edge/on-prem modes.
 
@@ -130,6 +130,7 @@ Project Ark remains a planned expansion that should only proceed after SCRIMED h
 - Denied execution audit boundaries for metadata-only evidence headers, audit-envelope fields, and never-capture policy
 - Audit persistence readiness for durable storage, retention, access, encryption, incident response, regional residency, and Watchtower alerting decisions
 - Persistent Agent Workspace v1 work-order contracts for resumable state, agent ownership, memory scopes, model routing, Trust Cards, reviewer checkpoints, blocked actions, and proof packets
+- Agent workspace work-order persistence migration for tenant-scoped work-order records, append-only work-order events, explicit authenticated grants, and no direct write grants
 - Synthetic clinical fixtures for safe workflow validation
 - Future clinical records ingestion after contracts and synthetic checks are stable
 
@@ -156,6 +157,7 @@ Project Ark remains a planned expansion that should only proceed after SCRIMED h
 - Metadata-only audit boundaries for denied governed execution attempts before durable storage is approved
 - Audit persistence readiness before denied execution metadata can move into durable storage
 - Persistent Agent Workspace work orders before dedicated production work-order mutation tables are introduced
+- Protected Agent Workspace work-order routes before live connector execution, patient outreach, payer submission, or production record mutation
 - TrialCore for research matching workflows
 - Agent Commander registry for specialized governed agents across clinical, administrative, research, interoperability, compliance, and operational workflows
 - Watchtower for reliability, safety, and operational traces
@@ -198,6 +200,7 @@ Active gates:
 - Denied execution audit boundaries before durable audit logging
 - Audit persistence readiness before storage, retention, access, encryption, incident response, residency, and alerting are implemented
 - Persistent Agent Workspace v1 before dedicated long-running work-order persistence, retry, replay, assignment, deletion, legal hold, and residency controls are implemented
+- Agent Workspace work-order migration verification before protected create, transition, retry, review, and close routes are enabled for a tenant pilot
 - Agent workflow registry for specialized agent boundaries before execution
 - Hub readiness checks for operational visibility
 
@@ -210,6 +213,7 @@ Replacement process:
 
 - Vercel deployment, GitHub Actions, and local package-manager verification provide independent build evidence.
 - Persistent Agent Workspace v1 replaces vague long-running agent promises with inspectable synthetic work orders, model-router policies, reviewer checkpoints, audit timelines, blocked actions, and downloadable proof packets.
+- Agent Workspace work-order APIs replace static work-order proof with RLS-backed create, inspect, transition, retry, review, block, and close contracts that fail closed when migration verification is missing.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Synthetic interoperability conformance evaluations replace untested standards claims with deterministic checks, linked evidence, and explicit production blockers.
 - Fixture change review replaces silent fixture drift with explicit expected-output fingerprint approval.

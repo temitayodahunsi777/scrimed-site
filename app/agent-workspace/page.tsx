@@ -48,6 +48,14 @@ export default function AgentWorkspacePage() {
           <strong>{summary.workOrderCount}</strong>
         </article>
         <article>
+          <span>States</span>
+          <strong>{summary.workOrderStateCount}</strong>
+        </article>
+        <article>
+          <span>Event types</span>
+          <strong>{summary.workOrderEventTypeCount}</strong>
+        </article>
+        <article>
           <span>Model routes</span>
           <strong>{summary.modelRouterDecisionCount}</strong>
         </article>
@@ -75,6 +83,10 @@ export default function AgentWorkspacePage() {
           <h2>No limitation is left vague; every gap has a control, replacement path, or external approval gate.</h2>
           <p className="section-copy">{summary.boundary}</p>
           <p className="section-copy">{summary.resolvedPosition}</p>
+          <p className="section-copy">
+            Protected work-order mutations now use {summary.workOrderMutationRoute} and detail transitions use{" "}
+            {summary.workOrderDetailRoute}. Both routes remain bearer-token, tenant-isolated, and synthetic-only.
+          </p>
         </div>
         <div className="layer-list">
           <Link className="layer-row" href={summary.foundation.protectedWorkspaceRoute}>
