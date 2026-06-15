@@ -2,6 +2,15 @@
 
 Updated: 2026-06-15
 
+## Latest Deployment And Market Activation Release
+
+- Added `/deployment-profiles` and `/api/deployment-profiles` for managed cloud, private cloud, hospital-controlled, sovereign/public-sector, and edge/on-prem deployment readiness fixtures.
+- Added deployment profile readiness to protected pilot proof packets so buyer diligence can see environment, cost model, residency posture, metrics, production gates, and blocked claims.
+- Added `/market-activation` and `/api/market-activation` for revenue streams, target audiences, message house, public relations, communications, advertising, and FaithCore market programs.
+- Strengthened `/faithcore` with opt-in programs, revenue use, communications rules, and explicit clinical, emergency, consent, and spiritual-authority boundaries.
+- Added Market Activation and Deployment Profiles to `/hub` and `/product`.
+- Addressed known limitations through code-side workarounds and honest gates: direct Node entrypoints for local `npm` unavailability, Webpack fallback for local Turbopack/SWC code-signature constraints, and external-secret-only handling for authenticated GitHub smoke.
+
 ## Latest Strategic Intelligence And Activation Governance Release
 
 - Added `/strategic-intelligence` and `/api/strategic-intelligence` to translate public platform signals into SCRIMED-specific agents, interoperability, governance, deployment, proof metrics, and next-build paths.

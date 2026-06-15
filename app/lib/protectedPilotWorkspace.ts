@@ -1,4 +1,5 @@
 import type { AgentEvaluationRecord } from "./agentEvaluationWorkspace";
+import { deploymentMetricLines, getDeploymentProfileSummary } from "./deploymentProfiles";
 import type { AgentWorkspaceGovernanceLedgerRecord } from "./persistentAgentWorkspace";
 import { isUpstashRedisConfigured } from "./upstashRuntime";
 
@@ -504,6 +505,10 @@ export function getProtectedPilotWorkspaceSummary() {
 
 export function buildEnterpriseProofPacket(workspace: PilotWorkspaceRecord, session: PilotSessionRecord) {
   const evaluation = session.evaluation;
+  const deploymentProfileSummary = getDeploymentProfileSummary();
+  const defaultDeploymentProfile =
+    deploymentProfileSummary.profiles.find((profile) => profile.slug === "managed-cloud") ??
+    deploymentProfileSummary.profiles[0];
   const evidence = evaluation.evidenceSources
     .map(
       (source) =>
@@ -549,6 +554,25 @@ ${denied || "- No denied capabilities recorded."}
 
 ## Outcome Signals
 ${signals || "- No outcome signals recorded."}
+
+## Deployment Profile Readiness
+- Selected profile: ${defaultDeploymentProfile.name}
+- Status: ${defaultDeploymentProfile.status}
+- Environment: ${defaultDeploymentProfile.environment}
+- Revenue use: ${defaultDeploymentProfile.revenueUse}
+- Cost model: ${defaultDeploymentProfile.costModel}
+- Data residency posture: ${defaultDeploymentProfile.dataResidencyPosture}
+
+### Deployment Metrics
+${deploymentMetricLines(defaultDeploymentProfile)}
+
+### Deployment Production Gates
+${markdownItems(defaultDeploymentProfile.productionGates)}
+
+### Deployment Blocked Claims
+${markdownItems(defaultDeploymentProfile.blockedClaims)}
+
+Deployment boundary: ${deploymentProfileSummary.boundary}
 
 ## Measurement Boundary
 ${evaluation.observabilityRecord.measurementBoundary}

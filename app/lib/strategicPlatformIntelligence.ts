@@ -110,7 +110,7 @@ export const strategicPlatformPatterns: StrategicPlatformPattern[] = [
     proofMetrics: ["latency", "cost-per-work-order", "override rate", "escalation rate", "evidence completeness"],
     blockedClaims: ["production authorized", "HIPAA certified", "autonomous clinical execution"],
     nextBuildStep:
-      "Add deployment-profile fixtures for cloud, private cloud, edge, and sovereign pilots with synthetic throughput metrics."
+      "Connect deployment-profile fixtures to buyer intake, protected workspace activation metadata, and synthetic throughput metrics."
   },
   {
     slug: "patient-centered-interoperability-layer",
@@ -221,7 +221,7 @@ export const strategicPlatformRoadmap: StrategicPlatformRoadmapItem[] = [
     phase: "Phase 2",
     objective: "Operationalize AI factory and interoperability readiness.",
     codedFoundation: "AgentOS, Atlas Intelligence Core, interoperability conformance, observability, and governance packs.",
-    nextBuild: "Add cloud/private/edge/sovereign deployment profiles with synthetic cost, latency, and safety metrics."
+    nextBuild: "Connect cloud/private/edge/sovereign deployment profiles with buyer intake, workspace activation, and proof-packet evidence."
   },
   {
     phase: "Phase 3",
@@ -256,7 +256,7 @@ export function getStrategicPlatformIntelligenceSummary() {
     patterns: strategicPlatformPatterns,
     roadmap: strategicPlatformRoadmap,
     nextBuildStep:
-      "Add deployment-profile fixtures for cloud, private cloud, edge, and sovereign synthetic pilots, then attach their metrics to protected workspace proof packets."
+      "Connect deployment-profile IDs to buyer intake and protected workspace activation, then create synthetic device and imaging scenarios for edge/on-prem evaluation."
   };
 }
 

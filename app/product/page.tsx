@@ -69,6 +69,18 @@ export default function ProductConsolePage() {
           <strong>{summary.strategicIntelligencePatternCount}</strong>
         </article>
         <article>
+          <span>Deployment profiles</span>
+          <strong>{summary.deploymentProfileCount}</strong>
+        </article>
+        <article>
+          <span>Revenue streams</span>
+          <strong>{summary.revenueStreamCount}</strong>
+        </article>
+        <article>
+          <span>Audiences</span>
+          <strong>{summary.targetAudienceCount}</strong>
+        </article>
+        <article>
           <span>TrustOS controls</span>
           <strong>{summary.trustOSControlCount}</strong>
         </article>
@@ -96,6 +108,59 @@ export default function ProductConsolePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED market activation">
+        <div className="section-heading">
+          <p className="eyebrow">Market activation</p>
+          <h2>Revenue, message, audiences, FaithCore, communications, PR, and advertising stay tied to claims controls.</h2>
+          <p className="section-copy">{summary.marketActivationSummary.boundary}</p>
+        </div>
+        {summary.marketActivationSummary.revenueStreams.map((stream) => (
+          <article className="module-row" key={stream.name}>
+            <div>
+              <span>{stream.status}</span>
+              <h2>{stream.name}</h2>
+            </div>
+            <p>{stream.buyer}. {stream.offer}</p>
+            <div>
+              <Link className="module-link" href={summary.marketActivationRoute}>
+                {stream.priceSignal}
+              </Link>
+              <ul className="compact-list">
+                <li>{stream.conversionPath}</li>
+                <li>{stream.guardrails.join(" ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED deployment profiles">
+        <div className="section-heading">
+          <p className="eyebrow">Deployment profiles</p>
+          <h2>Cloud, private, hospital-controlled, sovereign, and edge paths are scoped before production claims.</h2>
+          <p className="section-copy">{summary.deploymentProfileSummary.boundary}</p>
+        </div>
+        {summary.deploymentProfileSummary.profiles.map((profile) => (
+          <article className="module-row" key={profile.slug}>
+            <div>
+              <span>{profile.status}</span>
+              <h2>{profile.name}</h2>
+            </div>
+            <p>{profile.buyer}. {profile.deploymentThesis}</p>
+            <div>
+              <Link className="module-link" href={summary.deploymentProfilesRoute}>
+                {profile.revenueUse}
+              </Link>
+              <ul className="compact-list">
+                <li>{profile.environment}</li>
+                <li>{profile.costModel}</li>
+                <li>Blocked claims: {profile.blockedClaims.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED strategic platform intelligence">

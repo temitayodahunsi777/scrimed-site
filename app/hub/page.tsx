@@ -63,6 +63,16 @@ const consoleViews = [
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."
   },
   {
+    name: "Market Activation",
+    href: "/market-activation",
+    summary: "Review revenue streams, target audiences, FaithCore messaging, communications, PR, advertising, and claims-safe growth controls."
+  },
+  {
+    name: "Deployment Profiles",
+    href: "/deployment-profiles",
+    summary: "Review managed cloud, private cloud, hospital-controlled, sovereign, and edge/on-prem deployment readiness profiles."
+  },
+  {
     name: "Operations",
     href: "/operations",
     summary: "Review publishing, deployment, DNS, Wix routing, quality tooling, and security blockers with owners and fallbacks."

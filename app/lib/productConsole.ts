@@ -19,6 +19,8 @@ import { getSalesOperationsSummary } from "./salesOperations";
 import { getTrustOSSummary } from "./trustOS";
 import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
 import { getStrategicPlatformIntelligenceSummary } from "./strategicPlatformIntelligence";
+import { getDeploymentProfileSummary } from "./deploymentProfiles";
+import { getMarketActivationSummary } from "./marketActivation";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -498,6 +500,8 @@ export function getProductConsoleSummary() {
   const trustOSSummary = getTrustOSSummary();
   const persistentAgentWorkspaceSummary = getPersistentAgentWorkspaceSummary();
   const strategicPlatformIntelligenceSummary = getStrategicPlatformIntelligenceSummary();
+  const deploymentProfileSummary = getDeploymentProfileSummary();
+  const marketActivationSummary = getMarketActivationSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -526,6 +530,10 @@ export function getProductConsoleSummary() {
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
+    deploymentProfilesRoute: deploymentProfileSummary.route,
+    deploymentProfilesApiRoute: deploymentProfileSummary.apiRoute,
+    marketActivationRoute: marketActivationSummary.route,
+    marketActivationApiRoute: marketActivationSummary.apiRoute,
     pilotEvidenceRoute: "/pilot-evidence",
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
@@ -544,6 +552,9 @@ export function getProductConsoleSummary() {
     persistentAgentWorkspaceWorkOrderCount: persistentAgentWorkspaceSummary.workOrderCount,
     persistentAgentWorkspaceLimitationCount: persistentAgentWorkspaceSummary.limitationCount,
     strategicIntelligencePatternCount: strategicPlatformIntelligenceSummary.patternCount,
+    deploymentProfileCount: deploymentProfileSummary.profileCount,
+    revenueStreamCount: marketActivationSummary.revenueStreamCount,
+    targetAudienceCount: marketActivationSummary.targetAudienceCount,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -570,8 +581,12 @@ export function getProductConsoleSummary() {
     salesOperationsSummary,
     persistentAgentWorkspaceSummary,
     strategicPlatformIntelligenceSummary,
+    deploymentProfileSummary,
+    marketActivationSummary,
     proofStack: {
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
+      deploymentProfiles: deploymentProfileSummary.status,
+      marketActivation: marketActivationSummary.status,
       healthcareIntelligenceOS: "healthcare-intelligence-os-foundation",
       persistentAgentWorkspace: persistentAgentWorkspaceSummary.status,
       pilotEvidenceDashboard: "enterprise-evidence-ready",
@@ -598,7 +613,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Operations to assign and qualify retained buyer intake, select an inspectable Demo Center proof path, attach activation governance, and release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+      "Use Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then attach activation governance and release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
     updated: "2026-06-14"
   };
 }
@@ -649,6 +664,27 @@ export function getProductReadinessBrief() {
     `Patterns: ${summary.strategicPlatformIntelligenceSummary.patternCount}`,
     ...summary.strategicPlatformIntelligenceSummary.patterns.map(
       (pattern) => `- ${pattern.title}: ${pattern.nextBuildStep}`
+    ),
+    "",
+    "## Deployment Profiles",
+    `Route: ${summary.deploymentProfilesRoute}`,
+    `API: ${summary.deploymentProfilesApiRoute}`,
+    `Status: ${summary.deploymentProfileSummary.status}`,
+    `Profiles: ${summary.deploymentProfileSummary.profileCount}`,
+    ...summary.deploymentProfileSummary.profiles.map(
+      (profile) => `- ${profile.name} (${profile.status}): ${profile.revenueUse}`
+    ),
+    "",
+    "## Market Activation",
+    `Route: ${summary.marketActivationRoute}`,
+    `API: ${summary.marketActivationApiRoute}`,
+    `Status: ${summary.marketActivationSummary.status}`,
+    `Core message: ${summary.marketActivationSummary.messageHouse.coreMessage}`,
+    ...summary.marketActivationSummary.revenueStreams.map(
+      (stream) => `- ${stream.name}: ${stream.priceSignal}`
+    ),
+    ...summary.marketActivationSummary.targetAudiences.map(
+      (audience) => `- Audience: ${audience.segment} -> ${audience.primaryOffer}`
     ),
     "",
     "## Pricing and Sales",
