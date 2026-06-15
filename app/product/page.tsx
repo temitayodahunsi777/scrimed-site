@@ -65,6 +65,10 @@ export default function ProductConsolePage() {
           <strong>{summary.enterpriseReadinessSummary.domainCount}</strong>
         </article>
         <article>
+          <span>Strategic patterns</span>
+          <strong>{summary.strategicIntelligencePatternCount}</strong>
+        </article>
+        <article>
           <span>TrustOS controls</span>
           <strong>{summary.trustOSControlCount}</strong>
         </article>
@@ -92,6 +96,35 @@ export default function ProductConsolePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED strategic platform intelligence">
+        <div className="section-heading">
+          <p className="eyebrow">Strategic intelligence</p>
+          <h2>Public platform signals are converted into SCRIMED-specific architecture, proof metrics, and guardrails.</h2>
+          <p className="section-copy">
+            The strategic intelligence layer keeps source-informed product direction inspectable while preserving the synthetic pilot boundary and avoiding implied third-party partnerships.
+          </p>
+        </div>
+        {summary.strategicPlatformIntelligenceSummary.patterns.map((pattern) => (
+          <article className="module-row" key={pattern.slug}>
+            <div>
+              <span>{pattern.priority}</span>
+              <h2>{pattern.title}</h2>
+            </div>
+            <p>{pattern.productThesis}</p>
+            <div>
+              <Link className="module-link" href={summary.strategicIntelligenceRoute}>
+                {pattern.nextBuildStep}
+              </Link>
+              <ul className="compact-list">
+                <li>Sources: {pattern.sourceNames.join(", ")}</li>
+                <li>Proof metrics: {pattern.proofMetrics.join(", ")}</li>
+                <li>Blocked claims: {pattern.blockedClaims.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED investor and buyer proof">

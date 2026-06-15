@@ -2,6 +2,14 @@
 
 Updated: 2026-06-15
 
+## Latest Strategic Intelligence And Activation Governance Release
+
+- Added `/strategic-intelligence` and `/api/strategic-intelligence` to translate public platform signals into SCRIMED-specific agents, interoperability, governance, deployment, proof metrics, and next-build paths.
+- Added protected `/api/pilot-workspaces/{workspaceSlug}/activation-governance` so tenant-admins can record the selected governance workflow pack as an append-only activation ledger seed.
+- Added activation governance visibility to tenant activation proof packets after the seed is recorded.
+- Added a tenant-admin runbook step for recording the governance pack seed before invitation, onboarding, activation, and proof export.
+- Preserved the boundary: source-informed strategy is not a partnership claim, certification, live connector authorization, medical device control, payer approval, or autonomous clinical execution.
+
 ## Latest Governance Pack Routing Release
 
 - Added deterministic governance workflow pack routing to enterprise pilot intake.

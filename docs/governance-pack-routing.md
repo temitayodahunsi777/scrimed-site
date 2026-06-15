@@ -25,6 +25,8 @@ Governance packs remain synthetic pilot and enterprise evaluation operating temp
 - Buyer intake API response: `assessment.governanceWorkflowPack`.
 - Durable intake payload: `governance.workflowPack`.
 - Governance ledger metadata seed: `governance.routing.governanceLedgerMetadata`.
+- Protected workspace activation governance API: `/api/pilot-workspaces/{workspaceSlug}/activation-governance`.
+- Protected activation proof packet: Activation Governance Ledger section after the seed is recorded.
 - Sales Operations dashboard: opportunity detail and opportunity list context.
 - Audited opportunity proposal: Governance Workflow Pack section.
 - CRM CSV export: governance pack name, slug, status, and routing reason.
@@ -38,9 +40,10 @@ Governance packs remain synthetic pilot and enterprise evaluation operating temp
 3. The deterministic router selects a governance workflow pack.
 4. Sales Operations inherits the selected pack through the durable intake payload.
 5. The opportunity owner uses the selected pack to confirm customer inputs, required approvals, retention template, blocked claims, and proof-packet boundaries.
-6. When a protected workspace is activated, the selected pack slug should be copied into workspace activation metadata and future governance-ledger events.
+6. When a protected workspace is activated, tenant-admin records the selected pack through `/api/pilot-workspaces/{workspaceSlug}/activation-governance`.
+7. The activation route commits a retention-policy ledger seed with pack slug, retention horizon, approval owners, incident-export gate, blocked claims, and synthetic-only flags.
+8. The activation proof packet includes matching activation governance ledger evidence when exported.
 
 ## Remaining External Gate
 
 Authenticated CI still requires the `SCRIMED_BEARER_TOKEN` GitHub Actions secret. The token must belong to an approved tenant-admin or pilot-lead identity with AAL2 assurance. This secret cannot be safely stored in source code.
-

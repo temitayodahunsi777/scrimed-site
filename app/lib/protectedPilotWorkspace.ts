@@ -1,4 +1,5 @@
 import type { AgentEvaluationRecord } from "./agentEvaluationWorkspace";
+import type { AgentWorkspaceGovernanceLedgerRecord } from "./persistentAgentWorkspace";
 import { isUpstashRedisConfigured } from "./upstashRuntime";
 
 export type PilotWorkspaceRole = "tenant-admin" | "pilot-lead" | "reviewer" | "observer";
@@ -211,6 +212,7 @@ export type TenantActivationProofPacket = {
     evidence: string;
   }>;
   dashboard: TenantAccessDashboard;
+  activationGovernanceLedgerRecords?: AgentWorkspaceGovernanceLedgerRecord[];
   boundary: string;
 };
 
@@ -318,6 +320,12 @@ export const protectedPilotApiContracts = [
     purpose: "Download an audited activation proof packet summarizing protected-pilot invitations, onboarding packets, delivery readiness, membership state, identity posture, and lifecycle evidence."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/activation-governance",
+    access: "GET: bearer token + workspace membership. POST: AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
+    purpose: "Inspect or record the selected governance workflow pack as the first activation ledger seed for retention, legal-review, incident-export, and proof controls."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
@@ -369,6 +377,12 @@ export const protectedPilotActivationGates = [
 ];
 
 export const protectedPilotActivationWorkflow = [
+  {
+    step: "Record activation governance pack",
+    owner: "Tenant-admin",
+    proof: "Selected governance workflow pack is committed to the append-only Agent Workspace governance ledger with retention horizon, approvals, release gates, and blocked claims.",
+    boundary: "Metadata-only activation seed; no PHI, no live connector execution, and no compliance certification claim."
+  },
   {
     step: "Create controlled invitation record",
     owner: "Tenant-admin",
@@ -473,6 +487,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "AAL2-protected tenant membership visibility and audited role administration",
       "Governed invitation records with existing-auth-user activation",
       "Audited tenant-admin onboarding packet downloads for manual pilot delivery",
+      "AAL2-protected activation governance pack seed with retention, legal-review, incident-export, and blocked-claims metadata",
       "Guided tenant-admin activation runbook with buyer-ready evidence status",
       "Audited tenant activation proof packet for buyer and investor diligence",
       "SMTP delivery readiness metadata with direct-send gate retained",
@@ -621,13 +636,33 @@ function membershipLines(memberships: TenantAccessMembership[]) {
     .join("\n");
 }
 
+function activationGovernanceLedgerLines(records: AgentWorkspaceGovernanceLedgerRecord[]) {
+  return records
+    .slice(0, 10)
+    .map((record) => {
+      const packName =
+        typeof record.eventMetadata.governanceWorkflowPackName === "string"
+          ? record.eventMetadata.governanceWorkflowPackName
+          : "Governance workflow pack";
+      const packStatus =
+        typeof record.eventMetadata.governanceWorkflowPackStatus === "string"
+          ? record.eventMetadata.governanceWorkflowPackStatus
+          : "status unavailable";
+
+      return `- ${record.createdAt}: ${packName} (${packStatus}), retention until ${record.retentionUntil ?? "not recorded"}, ledger ${record.id}`;
+    })
+    .join("\n");
+}
+
 export function buildTenantActivationProofPacket(
   packet: TenantActivationProofPacket,
   appBaseUrl: string
 ) {
   const dashboard = packet.dashboard;
   const portalUrl = `${appBaseUrl.replace(/\/$/, "")}/pilot-workspace/access`;
+  const activationGovernanceUrl = `${appBaseUrl.replace(/\/$/, "")}/api/pilot-workspaces/${packet.workspaceSlug}/activation-governance`;
   const runbook = packet.activationRunbook.map((step, index) => `${index + 1}. ${step.step}: ${step.evidence}`);
+  const activationGovernanceRecords = packet.activationGovernanceLedgerRecords ?? [];
   const readiness = [
     `Identity provider posture: ${dashboard.identityReadiness.providerStatus}`,
     `SSO provider: ${dashboard.identityReadiness.ssoProvider || "Not configured"}`,
@@ -671,6 +706,9 @@ ${invitationLines(dashboard.invitations) || "- No invitation records are current
 
 ## Lifecycle Evidence
 ${lifecycleLines(dashboard.lifecycleEvents) || "- No lifecycle events are currently visible for this tenant."}
+
+## Activation Governance Ledger
+${activationGovernanceLedgerLines(activationGovernanceRecords) || `- No activation governance seed is attached to this packet yet. Record it through ${activationGovernanceUrl} before final buyer diligence export.`}
 
 ## Security Controls
 - Assurance level: ${dashboard.security.assuranceLevel}

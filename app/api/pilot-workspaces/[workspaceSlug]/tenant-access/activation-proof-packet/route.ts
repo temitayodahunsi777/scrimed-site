@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getAuthenticatedGovernanceContext,
+  listAgentWorkspaceGovernanceLedger,
   recordTenantActivationProofPacketDownload
 } from "../../../../../lib/protectedPilotStore";
 import {
@@ -10,6 +11,7 @@ import {
   type TenantActivationProofPacket
 } from "../../../../../lib/protectedPilotWorkspace";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../../../lib/requestRateLimit";
+import { findWorkspaceActivationGovernanceLedgerRecords } from "../../../../../lib/workspaceActivationGovernance";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +74,17 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   const packet = result.packet as TenantActivationProofPacket;
-  const markdown = buildTenantActivationProofPacket(packet, new URL(request.url).origin);
+  const ledgerResult = await listAgentWorkspaceGovernanceLedger(context.client, packet.workspaceId);
+  const activationGovernanceLedgerRecords = ledgerResult.error
+    ? []
+    : findWorkspaceActivationGovernanceLedgerRecords(ledgerResult.ledgerRecords);
+  const markdown = buildTenantActivationProofPacket(
+    {
+      ...packet,
+      activationGovernanceLedgerRecords
+    },
+    new URL(request.url).origin
+  );
   const safeWorkspaceSlug = packet.workspaceSlug.replace(/[^a-z0-9-]/gi, "-").slice(0, 80) || "workspace";
 
   return new NextResponse(markdown, {

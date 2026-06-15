@@ -18,6 +18,7 @@ import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
 import { getTrustOSSummary } from "./trustOS";
 import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
+import { getStrategicPlatformIntelligenceSummary } from "./strategicPlatformIntelligence";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -496,6 +497,7 @@ export function getProductConsoleSummary() {
   const salesOperationsSummary = getSalesOperationsSummary();
   const trustOSSummary = getTrustOSSummary();
   const persistentAgentWorkspaceSummary = getPersistentAgentWorkspaceSummary();
+  const strategicPlatformIntelligenceSummary = getStrategicPlatformIntelligenceSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -522,6 +524,8 @@ export function getProductConsoleSummary() {
     salesOperationsRoute: salesOperationsSummary.route,
     healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
+    strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
+    strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
     pilotEvidenceRoute: "/pilot-evidence",
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
@@ -539,6 +543,7 @@ export function getProductConsoleSummary() {
     trustOSControlCount: trustOSSummary.components.length,
     persistentAgentWorkspaceWorkOrderCount: persistentAgentWorkspaceSummary.workOrderCount,
     persistentAgentWorkspaceLimitationCount: persistentAgentWorkspaceSummary.limitationCount,
+    strategicIntelligencePatternCount: strategicPlatformIntelligenceSummary.patternCount,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -564,7 +569,9 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceSummary,
     salesOperationsSummary,
     persistentAgentWorkspaceSummary,
+    strategicPlatformIntelligenceSummary,
     proofStack: {
+      strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       healthcareIntelligenceOS: "healthcare-intelligence-os-foundation",
       persistentAgentWorkspace: persistentAgentWorkspaceSummary.status,
       pilotEvidenceDashboard: "enterprise-evidence-ready",
@@ -591,7 +598,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Operations to assign and qualify retained buyer intake, select an inspectable Demo Center proof path, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+      "Use Sales Operations to assign and qualify retained buyer intake, select an inspectable Demo Center proof path, attach activation governance, and release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
     updated: "2026-06-14"
   };
 }
@@ -633,6 +640,15 @@ export function getProductReadinessBrief() {
     `Next diligence step: ${summary.demoPilotProgramSummary.investorReadiness.nextDiligenceStep}`,
     ...summary.demoPilotProgramSummary.investorReadiness.proofSignals.map(
       (signal) => `- ${signal.label} (${signal.status}) -> ${signal.route}: ${signal.evidence}`
+    ),
+    "",
+    "## Strategic Platform Intelligence",
+    `Route: ${summary.strategicIntelligenceRoute}`,
+    `API: ${summary.strategicIntelligenceApiRoute}`,
+    `Status: ${summary.strategicPlatformIntelligenceSummary.status}`,
+    `Patterns: ${summary.strategicPlatformIntelligenceSummary.patternCount}`,
+    ...summary.strategicPlatformIntelligenceSummary.patterns.map(
+      (pattern) => `- ${pattern.title}: ${pattern.nextBuildStep}`
     ),
     "",
     "## Pricing and Sales",

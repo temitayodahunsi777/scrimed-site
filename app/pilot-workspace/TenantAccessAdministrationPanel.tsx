@@ -1,7 +1,7 @@
 "use client";
 
 import type { Session } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type {
   PilotWorkspaceRecord,
   PilotWorkspaceRole,
@@ -13,15 +13,24 @@ import type {
   TenantInvitationDeliveryReadinessStatus,
   TenantInvitationDeliveryStatus
 } from "../lib/protectedPilotWorkspace";
+import type { WorkspaceActivationGovernanceSummary } from "../lib/workspaceActivationGovernance";
 
 type TenantAccessResponse = {
   dashboard?: TenantAccessDashboard;
+  error?: { code?: string; message?: string };
+};
+type ActivationGovernanceResponse = Omit<
+  Partial<WorkspaceActivationGovernanceSummary>,
+  "status"
+> & {
+  status?: string;
   error?: { code?: string; message?: string };
 };
 
 type PanelStatus = "loading" | "ready" | "saving" | "unavailable" | "error";
 type ActivationRunbookStatus = "complete" | "ready" | "waiting" | "blocked";
 type ActivationRunbookAction =
+  | "record-governance-pack"
   | "create-invitation"
   | "download-packet"
   | "prepare-delivery"
@@ -107,6 +116,7 @@ function displayRunbookStatus(status: ActivationRunbookStatus) {
 }
 
 function displayRunbookAction(action: ActivationRunbookAction) {
+  if (action === "record-governance-pack") return "Record Governance";
   if (action === "create-invitation") return "Create Invitation";
   if (action === "download-packet") return "Download Packet";
   if (action === "prepare-delivery") return "Prepare Delivery";
@@ -125,7 +135,16 @@ function latestEventDate(dashboard: TenantAccessDashboard, eventType: TenantAcce
   return dashboard.lifecycleEvents.find((event) => event.eventType === eventType)?.createdAt ?? null;
 }
 
-function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRunbookStep[] {
+function buildActivationRunbook(
+  dashboard: TenantAccessDashboard,
+  activationGovernance: ActivationGovernanceResponse | null
+): ActivationRunbookStep[] {
+  const activationGovernanceRecorded = Boolean(
+    activationGovernance?.existingActivationLedgerRecords?.length
+  );
+  const governancePackName =
+    activationGovernance?.profile?.selectedPack.name ?? "Enterprise BAA/DPA Readiness Pack";
+  const retentionUntil = activationGovernance?.profile?.retentionUntil ?? null;
   const pendingInvitation = dashboard.invitations.find((invitation) => invitation.status === "pending");
   const packetInvitation =
     dashboard.invitations.find((invitation) => Boolean(invitation.lastPacketGeneratedAt)) ?? pendingInvitation;
@@ -147,6 +166,21 @@ function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRun
   return [
     {
       step: "01",
+      title: "Record governance pack seed",
+      status: activationGovernanceRecorded ? "complete" : activationGovernance ? "ready" : "waiting",
+      evidence: activationGovernanceRecorded
+        ? `${governancePackName} is recorded in the activation governance ledger.`
+        : activationGovernance
+          ? `${governancePackName} is ready for metadata-only activation seeding.`
+          : "Activation governance readiness is loading or unavailable.",
+      buyerState: activationGovernanceRecorded
+        ? `Retention horizon is inspectable${retentionUntil ? ` through ${formatDate(retentionUntil)}` : ""}.`
+        : "Buyer-specific retention, legal review, incident export, and blocked-claims metadata is not yet seeded.",
+      boundary: "No PHI, no live connector execution, and no compliance certification claim.",
+      action: activationGovernanceRecorded || !activationGovernance ? undefined : "record-governance-pack"
+    },
+    {
+      step: "02",
       title: "Create controlled invitation",
       status: invitationCandidate ? "complete" : "ready",
       evidence: invitationCandidate
@@ -157,7 +191,7 @@ function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRun
       action: invitationCandidate ? undefined : "create-invitation"
     },
     {
-      step: "02",
+      step: "03",
       title: "Download onboarding packet",
       status: packetReady ? "complete" : pendingInvitation ? "ready" : "blocked",
       evidence: packetReady
@@ -171,7 +205,7 @@ function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRun
       invitation: pendingInvitation
     },
     {
-      step: "03",
+      step: "04",
       title: "Prepare external delivery",
       status: deliveryReady ? "complete" : packetReady && pendingInvitation ? "ready" : pendingInvitation ? "waiting" : "blocked",
       evidence: deliveryReady
@@ -185,7 +219,7 @@ function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRun
       invitation: pendingInvitation
     },
     {
-      step: "04",
+      step: "05",
       title: "Activate enrolled user",
       status: activationReady ? "complete" : deliveryReady && pendingInvitation ? "ready" : pendingInvitation ? "waiting" : "blocked",
       evidence: activationReady
@@ -199,7 +233,7 @@ function buildActivationRunbook(dashboard: TenantAccessDashboard): ActivationRun
       invitation: pendingInvitation
     },
     {
-      step: "05",
+      step: "06",
       title: "Export activation proof",
       status: activationProofReady ? "complete" : activationReady ? "ready" : "waiting",
       evidence: activationProofReady
@@ -235,6 +269,25 @@ export default function TenantAccessAdministrationPanel({
   const [reviewNotes, setReviewNotes] = useState("");
   const [identityDraft, setIdentityDraft] = useState<TenantIdentityReadiness | null>(null);
   const [deliveryDraft, setDeliveryDraft] = useState<TenantInvitationDeliveryReadiness | null>(null);
+  const [activationGovernance, setActivationGovernance] =
+    useState<ActivationGovernanceResponse | null>(null);
+
+  const refreshActivationGovernance = useCallback(async () => {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/activation-governance`, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
+    const body = (await response.json().catch(() => ({}))) as ActivationGovernanceResponse;
+
+    if (!response.ok || !body.profile) {
+      setActivationGovernance(null);
+      return null;
+    }
+
+    setActivationGovernance(body);
+    return body;
+  }, [session.access_token, workspace.slug]);
 
   function applyDashboard(nextDashboard: TenantAccessDashboard) {
     setDashboard(nextDashboard);
@@ -274,6 +327,7 @@ export default function TenantAccessAdministrationPanel({
       }
 
       applyDashboard(body.dashboard);
+      await refreshActivationGovernance();
       setStatus("ready");
     }
 
@@ -282,7 +336,7 @@ export default function TenantAccessAdministrationPanel({
     return () => {
       active = false;
     };
-  }, [session.access_token, workspace.slug]);
+  }, [session.access_token, workspace.slug, refreshActivationGovernance]);
 
   async function commitAction(payload: Record<string, unknown>, successMessage: string) {
     setStatus("saving");
@@ -524,11 +578,45 @@ export default function TenantAccessAdministrationPanel({
     );
   }
 
+  async function recordActivationGovernance() {
+    setStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/activation-governance`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        governanceWorkflowPackSlug: activationGovernance?.profile?.selectedPack.slug,
+        activationOwner: session.user.email ?? "tenant-admin",
+        notes: "Recorded from the protected pilot tenant activation runbook. Metadata only."
+      })
+    });
+    const body = (await response.json().catch(() => ({}))) as ActivationGovernanceResponse;
+
+    if (!response.ok || !body.profile) {
+      setStatus("error");
+      setMessage(
+        body.error?.message ?? "The activation governance pack could not be recorded."
+      );
+      return;
+    }
+
+    setActivationGovernance(body);
+    setStatus("ready");
+    setMessage(
+      response.status === 200
+        ? "Activation governance pack was already recorded in the workspace ledger."
+        : "Activation governance pack recorded in the append-only workspace ledger."
+    );
+  }
+
   if (status === "unavailable") {
     return null;
   }
 
-  const activationRunbook = dashboard ? buildActivationRunbook(dashboard) : [];
+  const activationRunbook = dashboard ? buildActivationRunbook(dashboard, activationGovernance) : [];
   const completedRunbookSteps = activationRunbook.filter((step) => step.status === "complete").length;
   const actionableRunbookStep = activationRunbook.find((step) => step.status === "ready") ?? null;
   const runbookEvidenceScore = activationRunbook.reduce(
@@ -540,6 +628,11 @@ export default function TenantAccessAdministrationPanel({
 
   async function commitRunbookAction(step: ActivationRunbookStep) {
     if (!step.action) {
+      return;
+    }
+
+    if (step.action === "record-governance-pack") {
+      await recordActivationGovernance();
       return;
     }
 
@@ -1031,6 +1124,7 @@ export default function TenantAccessAdministrationPanel({
                 <li>Offboarding enforced</li>
                 <li>Direct invitation email disabled</li>
                 <li>Onboarding packet downloads audited</li>
+                <li>Activation governance pack seed audited</li>
                 <li>Outbound SMTP send gated</li>
                 <li>Server runtime token required</li>
               </ul>
