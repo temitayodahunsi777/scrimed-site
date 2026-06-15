@@ -35,6 +35,35 @@ export type GovernanceWorkflowPack = {
   pricingUse: string;
 };
 
+export type GovernanceWorkflowPackRoutingInput = {
+  buyerSegment: string;
+  organizationSize?: string;
+  region?: string;
+  offerInterest?: string;
+  workflowTargets: string[];
+  readinessNeeds: string[];
+  governanceRequirements: string[];
+};
+
+export type GovernanceWorkflowPackRecommendation = {
+  slug: string;
+  name: string;
+  status: GovernanceWorkflowPackStatus;
+  route: string;
+  briefRoute: string;
+  reason: string;
+  matchedSignals: string[];
+  customerInputsRequired: string[];
+  requiredApprovals: string[];
+  externalGates: string[];
+  retentionPolicyTemplate: GovernanceWorkflowPack["retentionPolicyTemplate"];
+  incidentExportReleaseGate: string;
+  evidenceArtifacts: string[];
+  automationBoundaries: string[];
+  blockedClaims: string[];
+  boundary: string;
+};
+
 export const governanceWorkflowPackBoundary =
   "SCRIMED governance workflow packs are customer-tailored synthetic pilot operating templates. They are not legal advice, privacy advice, security certification, HIPAA certification, SOC 2 certification, FDA clearance, payer approval, reimbursement assurance, breach determination, or production authorization.";
 
@@ -354,6 +383,106 @@ export const agentWorkspaceGovernanceWorkflowPacks: GovernanceWorkflowPack[] = [
   }
 ];
 
+export function getGovernanceWorkflowPackBySlug(slug: string) {
+  return agentWorkspaceGovernanceWorkflowPacks.find((pack) => pack.slug === slug) ?? null;
+}
+
+export function recommendGovernanceWorkflowPack(
+  input: GovernanceWorkflowPackRoutingInput
+): GovernanceWorkflowPackRecommendation {
+  const normalizedSignals = [
+    input.buyerSegment,
+    input.organizationSize ?? "",
+    input.region ?? "",
+    input.offerInterest ?? "",
+    ...input.workflowTargets,
+    ...input.readinessNeeds,
+    ...input.governanceRequirements
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const matchedSignals: string[] = [];
+  let selectedSlug = "provider-operations-retention-review";
+  let reason =
+    "Provider operations retention controls are the safest default for care-delivery workflow pilots that remain synthetic and human-reviewed.";
+
+  function hasSignal(...patterns: string[]) {
+    return patterns.some((pattern) => normalizedSignals.includes(pattern));
+  }
+
+  function addSignal(signal: string) {
+    if (!matchedSignals.includes(signal)) {
+      matchedSignals.push(signal);
+    }
+  }
+
+  if (hasSignal("research", "life sciences", "trial", "oncology", "eligibility")) {
+    selectedSlug = "trialcore-research-legal-hold";
+    reason =
+      "Research and trial-matching signals require protocol-source handling, research reviewer controls, legal-hold readiness, and no-outreach boundaries.";
+    addSignal("research-or-trial-workflow");
+  } else if (hasSignal("government", "public health", "ministry", "sovereign")) {
+    selectedSlug = "public-sector-sovereign-retention";
+    reason =
+      "Public-sector signals require sovereign retention planning, jurisdictional approval gates, and named incident-release ownership.";
+    addSignal("public-sector-buyer");
+  } else if (hasSignal("payer", "health plan", "prior authorization", "rcm", "denial", "claims")) {
+    selectedSlug = "payer-rcm-incident-export";
+    reason =
+      "Payer, prior-authorization, claims, or RCM signals require no-submission controls, policy-source retention, and incident-export readiness.";
+    addSignal("payer-or-rcm-workflow");
+  } else if (
+    hasSignal("5000", "5,000", "large", "enterprise", "hipaa", "role-based", "security", "baa", "dpa")
+  ) {
+    selectedSlug = "enterprise-baa-dpa-readiness";
+    reason =
+      "Enterprise, HIPAA-readiness, security, or role-control signals require BAA/DPA path planning and contract-readiness governance.";
+    addSignal("enterprise-diligence-required");
+  } else {
+    addSignal("provider-operations-default");
+  }
+
+  if (hasSignal("middle east", "uae", "saudi", "kuwait", "africa", "nigeria", "kenya", "rwanda", "ghana", "global")) {
+    addSignal("regional-or-multiregion-deployment-context");
+  }
+
+  if (hasSignal("synthetic")) {
+    addSignal("synthetic-only-pilot-boundary");
+  }
+
+  if (hasSignal("human review", "no autonomous", "audit")) {
+    addSignal("human-reviewed-governance-boundary");
+  }
+
+  const fallbackPack = getGovernanceWorkflowPackBySlug("provider-operations-retention-review");
+
+  if (!fallbackPack) {
+    throw new Error("Governance workflow pack configuration is missing the provider operations fallback.");
+  }
+
+  const pack = getGovernanceWorkflowPackBySlug(selectedSlug) ?? fallbackPack;
+
+  return {
+    slug: pack.slug,
+    name: pack.name,
+    status: pack.status,
+    route: "/governance-packs",
+    briefRoute: "/api/agent-workspace/governance-packs/brief",
+    reason,
+    matchedSignals,
+    customerInputsRequired: pack.customerInputsRequired,
+    requiredApprovals: pack.legalReviewWorkflow.requiredApprovals,
+    externalGates: pack.legalReviewWorkflow.externalGates,
+    retentionPolicyTemplate: pack.retentionPolicyTemplate,
+    incidentExportReleaseGate: pack.incidentExportWorkflow.releaseGate,
+    evidenceArtifacts: pack.evidenceArtifacts,
+    automationBoundaries: pack.automationBoundaries,
+    blockedClaims: pack.blockedClaims,
+    boundary: governanceWorkflowPackBoundary
+  };
+}
+
 export function getAgentWorkspaceGovernancePacksSummary() {
   return {
     service: "scrimed-agent-workspace-governance-packs",
@@ -364,6 +493,13 @@ export function getAgentWorkspaceGovernancePacksSummary() {
     boundary: governanceWorkflowPackBoundary,
     packCount: agentWorkspaceGovernanceWorkflowPacks.length,
     packs: agentWorkspaceGovernanceWorkflowPacks,
+    routingRules: [
+      "Research, trial, oncology, or eligibility signals route to TrialCore Research Legal Hold Pack.",
+      "Government, public-health, ministry, or sovereignty signals route to Public Sector Sovereign Retention Pack.",
+      "Payer, prior-authorization, claims, denial, or RCM signals route to Payer And RCM Incident Export Pack.",
+      "Enterprise, HIPAA-readiness, security-review, BAA/DPA, or role-based-access signals route to Enterprise BAA/DPA Readiness Pack.",
+      "Provider and clinic operations pilots default to Provider Operations Retention Review Pack."
+    ],
     ciSecretContract: {
       bearerTokenSecret: "SCRIMED_BEARER_TOKEN",
       optionalBaseUrlVariable: "SCRIMED_BASE_URL",
@@ -371,7 +507,7 @@ export function getAgentWorkspaceGovernancePacksSummary() {
       requiredSmokeFlag: "SCRIMED_REQUIRE_AUTHENTICATED_SMOKE=1"
     },
     nextImplementationStep:
-      "Use buyer intake data to select a governance pack, tailor the required customer inputs, and attach the selected pack slug to Agent Workspace governance-ledger metadata.",
+      "Promote selected governance pack slugs from buyer intake into protected workspace activation records and governance-ledger metadata when an enterprise pilot is created.",
     updated: "2026-06-15"
   };
 }

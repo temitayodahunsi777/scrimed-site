@@ -14,6 +14,13 @@ type IntakeResult = {
     qualification: string;
     recommendedOffer: string;
     recommendedNextStep: string;
+    governanceWorkflowPack: {
+      slug: string;
+      name: string;
+      status: string;
+      reason: string;
+      matchedSignals: string[];
+    };
     governanceGates: string[];
     riskFlags: string[];
     crmTags: string[];
@@ -309,10 +316,15 @@ export default function PilotIntakeForm({
               <p>{result.assessment.qualification}</p>
             </div>
             <div>
+              <strong>Governance pack</strong>
+              <p>{result.assessment.governanceWorkflowPack.name}</p>
+            </div>
+            <div>
               <strong>Intake handoff</strong>
               <p>{result.handoff.status}: {result.handoff.detail}</p>
             </div>
           </div>
+          <p className="section-copy">{result.assessment.governanceWorkflowPack.reason}</p>
           <ul className="compact-list">
             {result.nextActions.map((action) => (
               <li key={action}>{action}</li>

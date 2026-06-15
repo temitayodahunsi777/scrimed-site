@@ -1533,7 +1533,7 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "Attach selected governance workflow pack slugs to protected pilot buyer intake, then promote authenticated governance-ledger smoke to required CI once the approved AAL2 tenant secret is stored in GitHub Actions.",
+      "Promote selected governance pack slugs from routed buyer intake into protected workspace activation metadata, then make authenticated governance-ledger smoke required once the approved AAL2 tenant secret is stored in GitHub Actions.",
     updated: "2026-06-15"
   };
 }

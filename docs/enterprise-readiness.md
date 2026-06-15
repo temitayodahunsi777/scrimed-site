@@ -1,6 +1,6 @@
 # SCRIMED Enterprise Readiness and Claims Control
 
-Updated: 2026-06-10
+Updated: 2026-06-15
 
 SCRIMED maintains a public Trust and Enterprise Readiness Center at `/trust-center`, a controlled claims register at `/claims`, and machine-readable readiness APIs under `/api/enterprise-readiness`.
 
@@ -56,7 +56,13 @@ Before protected enterprise pilots or production clinical use, SCRIMED still req
 - formal security program, incident response exercise, and independent penetration test
 - production identity, tenant isolation, durable audit, runtime safety, and connector controls
 - rate limiting, bot protection, monitoring, and abuse response before scaled public campaigns
-- CRM routing, sales handoff, campaign approval, and crisis communications workflows
+- external CRM activation where required, campaign approval, and crisis communications workflows
+
+## Active Sales And Governance Controls
+
+SCRIMED now routes new no-PHI buyer intakes through deterministic governance workflow pack selection. The selected pack is attached to the durable intake payload, shown in Sales Operations, included in audited proposals, exported in CRM CSV files, and sent in the optional CRM webhook payload.
+
+This improves diligence readiness, but it does not replace qualified legal, privacy, security, or regulatory review.
 
 ## Routes
 

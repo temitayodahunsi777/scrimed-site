@@ -62,20 +62,36 @@ export default function GovernancePacksPage() {
         <div className="layer-list">
           <div className="layer-row">
             <span>01</span>
-            <strong>Attach pack to buyer intake and protected pilot scope.</strong>
+            <strong>Buyer intake deterministically selects and attaches a governance pack.</strong>
           </div>
           <div className="layer-row">
             <span>02</span>
-            <strong>Tailor retention, legal review, incident owner, and reviewer authority.</strong>
+            <strong>Sales Operations carries the selected pack into proposals, CRM export, and assessment planning.</strong>
           </div>
           <div className="layer-row">
             <span>03</span>
-            <strong>Record approved actions in the Agent Workspace governance ledger.</strong>
+            <strong>Tailor retention, legal review, incident owner, and reviewer authority.</strong>
           </div>
           <div className="layer-row">
             <span>04</span>
-            <strong>Release proof packets and incident exports only through audited routes.</strong>
+            <strong>Record approved actions in the Agent Workspace governance ledger during workspace activation.</strong>
           </div>
+        </div>
+      </section>
+
+      <section className="section-band" aria-label="Governance pack routing rules">
+        <div className="section-heading">
+          <p className="eyebrow">Routing rules</p>
+          <h2>Buyer intake selects a pack from business-scope signals before sales handoff.</h2>
+        </div>
+        <div className="principle-grid">
+          {summary.routingRules.map((rule) => (
+            <article key={rule}>
+              <span>rule</span>
+              <h3>{rule}</h3>
+              <p>Selection remains deterministic, inspectable, and synthetic-pilot bounded.</p>
+            </article>
+          ))}
         </div>
       </section>
 

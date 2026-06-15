@@ -1,4 +1,8 @@
 import { getPilotProgramBySlug, type PilotProgram } from "./demoPilotPrograms";
+import {
+  recommendGovernanceWorkflowPack,
+  type GovernanceWorkflowPackRecommendation
+} from "./agentWorkspaceGovernancePacks";
 import type { PilotIntakeHandoffPayload } from "./pilotIntake";
 
 export const salesOperationsBoundary =
@@ -99,9 +103,13 @@ export type SalesAssessmentSchedule = {
 
 const offerPilotMap: Record<string, string> = {
   "synthetic-pilot-evaluation": "60-day-governed-automation-pilot",
+  "Synthetic Pilot Evaluation": "60-day-governed-automation-pilot",
   "workflow-intelligence-assessment": "30-day-workflow-intelligence-sprint",
+  "Workflow Intelligence Assessment": "30-day-workflow-intelligence-sprint",
   "ai-readiness-governance-audit": "ai-governance-interoperability-readiness",
-  "clinical-operations-automation-blueprint": "90-day-enterprise-atlas-pilot"
+  "AI Readiness + Governance Audit": "ai-governance-interoperability-readiness",
+  "clinical-operations-automation-blueprint": "90-day-enterprise-atlas-pilot",
+  "Clinical Operations Automation Blueprint": "90-day-enterprise-atlas-pilot"
 };
 
 const prohibitedSalesTextPatterns = [
@@ -229,6 +237,23 @@ export function getPilotProgramForOpportunity(opportunity: SalesOpportunity): Pi
   return pilotSlug ? getPilotProgramBySlug(pilotSlug) ?? null : null;
 }
 
+export function getGovernanceWorkflowPackForOpportunity(
+  opportunity: SalesOpportunity
+): GovernanceWorkflowPackRecommendation {
+  return (
+    opportunity.payload.assessment.governanceWorkflowPack ??
+    recommendGovernanceWorkflowPack({
+      buyerSegment: opportunity.payload.organization.buyerSegment,
+      organizationSize: opportunity.payload.organization.organizationSize,
+      region: opportunity.payload.organization.region,
+      offerInterest: opportunity.payload.scope.offerInterest,
+      workflowTargets: opportunity.payload.scope.workflowTargets,
+      readinessNeeds: opportunity.payload.scope.readinessNeeds,
+      governanceRequirements: opportunity.payload.scope.governanceRequirements
+    })
+  );
+}
+
 export function getSalesOperationsSummary() {
   return {
     service: "scrimed-sales-operations",
@@ -241,12 +266,20 @@ export function getSalesOperationsSummary() {
     authentication: "magic-link-plus-totp",
     sessionPolicy: "12-hour maximum; 2-hour inactivity boundary",
     pipelineStages: salesPipelineStages,
+    governancePackRouting: {
+      status: "enabled",
+      source: "buyer-intake-deterministic-router",
+      route: "/governance-packs",
+      apiRoute: "/api/agent-workspace/governance-packs",
+      crmPayloadField: "governanceWorkflowPack"
+    },
     boundary: salesOperationsBoundary,
-    updated: "2026-06-11"
+    updated: "2026-06-15"
   };
 }
 
 export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
+  const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
   const headers = [
     "Opportunity ID",
     "Organization",
@@ -260,6 +293,10 @@ export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
     "Next Action Due",
     "Offer Interest",
     "Timeline",
+    "Governance Workflow Pack",
+    "Governance Workflow Pack Slug",
+    "Governance Workflow Pack Status",
+    "Governance Routing Reason",
     "Workflow Targets",
     "Governance Requirements",
     "Interoperability Context",
@@ -278,6 +315,10 @@ export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
     opportunity.nextActionDueAt,
     opportunity.payload.scope.offerInterest,
     opportunity.payload.scope.timeline,
+    governancePack.name,
+    governancePack.slug,
+    governancePack.status,
+    governancePack.reason,
     opportunity.payload.scope.workflowTargets.join("; "),
     opportunity.payload.scope.governanceRequirements.join("; "),
     opportunity.payload.scope.interoperabilityContext,
@@ -290,6 +331,7 @@ export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
 export function buildSalesFollowUpDraft(opportunity: SalesOpportunity) {
   const contactName = cleanHeader(opportunity.payload.contact.fullName).split(" ")[0] || "there";
   const organizationName = cleanHeader(opportunity.payload.organization.name);
+  const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
   const subject = `SCRIMED next step for ${organizationName}`;
   const nextAction = cleanHeader(opportunity.nextAction || "confirm the enterprise discovery conversation");
 
@@ -303,6 +345,8 @@ Hello ${contactName},
 Thank you for exploring SCRIMED with ${organizationName}. Our proposed next step is to ${nextAction.toLowerCase()}.
 
 SCRIMED helps healthcare organizations transform fragmented workflows into decision-grade, human-reviewed operational intelligence. This conversation remains within a governed synthetic pilot and enterprise evaluation boundary. Please do not send patient data, PHI, live clinical records, or payer member information.
+
+Recommended governance workflow pack: ${cleanHeader(governancePack.name)}.
 
 Regards,
 ${cleanHeader(opportunity.assignedOwner || "SCRIMED Solutions")}
@@ -319,10 +363,12 @@ export function buildAssessmentInvitation(opportunity: SalesOpportunity) {
   const start = new Date(opportunity.assessmentStartAt);
   const end = new Date(start.getTime() + opportunity.assessmentDurationMinutes * 60_000);
   const organization = cleanHeader(opportunity.payload.organization.name);
+  const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
   const meetingUrl = opportunity.assessmentMeetingUrl;
   const description = [
     `Governed SCRIMED enterprise assessment for ${organization}.`,
     `Opportunity: ${opportunity.intakeId}.`,
+    `Governance workflow pack: ${governancePack.name}.`,
     "Business-contact and workflow-scope discussion only. Do not share PHI, patient identifiers, live clinical records, diagnosis details, or payer member information.",
     meetingUrl ? `Meeting link: ${meetingUrl}` : "Meeting location to be confirmed."
   ].join("\n");
@@ -353,6 +399,7 @@ export function buildAssessmentInvitation(opportunity: SalesOpportunity) {
 
 export function buildSalesOpportunityProposal(opportunity: SalesOpportunity) {
   const pilot = getPilotProgramForOpportunity(opportunity);
+  const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
   const payload = opportunity.payload;
   const pilotSection = pilot
     ? `## Recommended SCRIMED Program
@@ -390,6 +437,9 @@ The recommended engagement requires a SCRIMED commercial and governance review b
 - Pipeline stage: ${opportunity.pipelineStage}
 - SCRIMED owner: ${cleanMarkdown(opportunity.assignedOwner || "Unassigned")}
 - Next action: ${cleanMarkdown(opportunity.nextAction || "Confirm discovery owner and next meeting")}
+- Governance workflow pack: ${cleanMarkdown(governancePack.name)}
+- Governance pack slug: ${cleanMarkdown(governancePack.slug)}
+- Governance pack status: ${cleanMarkdown(governancePack.status)}
 
 ## Buyer Scope
 - Offer interest: ${cleanMarkdown(payload.scope.offerInterest)}
@@ -399,6 +449,16 @@ The recommended engagement requires a SCRIMED commercial and governance review b
 - Governance requirements: ${payload.scope.governanceRequirements.map(cleanMarkdown).join(", ")}
 - Interoperability context: ${cleanMarkdown(payload.scope.interoperabilityContext || "To be confirmed")}
 - Pilot goals: ${cleanMarkdown(payload.scope.pilotGoals)}
+
+## Governance Workflow Pack
+- Recommended pack: ${cleanMarkdown(governancePack.name)}
+- Routing reason: ${cleanMarkdown(governancePack.reason)}
+- Matched signals: ${governancePack.matchedSignals.map(cleanMarkdown).join(", ") || "provider-operations-default"}
+- Customer inputs required: ${governancePack.customerInputsRequired.map(cleanMarkdown).join(", ")}
+- Required approvals: ${governancePack.requiredApprovals.map(cleanMarkdown).join(", ")}
+- External gates: ${governancePack.externalGates.map(cleanMarkdown).join(", ")}
+- Retention template: ${cleanMarkdown(governancePack.retentionPolicyTemplate.defaultDuration)}
+- Incident export release gate: ${cleanMarkdown(governancePack.incidentExportReleaseGate)}
 
 ${pilotSection}
 
@@ -417,6 +477,8 @@ This is a non-binding enterprise scoping proposal. Final scope, pricing, legal t
 }
 
 export function buildCrmOpportunityPayload(opportunity: SalesOpportunity) {
+  const governanceWorkflowPack = getGovernanceWorkflowPackForOpportunity(opportunity);
+
   return {
     source: "SCRIMED Sales Operations",
     opportunityId: opportunity.intakeId,
@@ -428,6 +490,21 @@ export function buildCrmOpportunityPayload(opportunity: SalesOpportunity) {
     contact: opportunity.payload.contact,
     organization: opportunity.payload.organization,
     scope: opportunity.payload.scope,
+    governanceWorkflowPack,
+    governanceRouting: opportunity.payload.governance?.routing ?? {
+      selectedPackSlug: governanceWorkflowPack.slug,
+      source: "sales-operations-derived-router",
+      noPhiBoundary: true,
+      governanceLedgerMetadata: {
+        governanceWorkflowPackSlug: governanceWorkflowPack.slug,
+        governanceWorkflowPackStatus: governanceWorkflowPack.status,
+        governanceWorkflowPackRoute: governanceWorkflowPack.route,
+        governanceWorkflowPackBriefRoute: governanceWorkflowPack.briefRoute,
+        matchedSignals: governanceWorkflowPack.matchedSignals,
+        noPhiBoundary: true,
+        syntheticPilotBoundary: true
+      }
+    },
     assessment: opportunity.payload.assessment
   };
 }

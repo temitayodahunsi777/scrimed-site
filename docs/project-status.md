@@ -1,6 +1,15 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-11
+Updated: 2026-06-15
+
+## Latest Governance Pack Routing Release
+
+- Added deterministic governance workflow pack routing to enterprise pilot intake.
+- Attached the selected governance pack to the durable no-PHI intake payload for sales operations and future protected workspace activation.
+- Added governance-ledger-ready metadata for selected pack slug, status, route, brief route, matched signals, no-PHI boundary, and synthetic pilot boundary.
+- Added selected governance pack visibility to intake confirmation, Sales Operations opportunity detail, audited proposal generation, CRM CSV export, CRM webhook payload, calendar invitation, and follow-up draft.
+- Added `docs/governance-pack-routing.md` as the operator runbook for pack selection, product boundary, sales use, and the remaining authenticated CI secret gate.
+- Preserved the commercial boundary: governance packs are operating templates for synthetic pilots and enterprise evaluations, not legal advice, compliance certification, production authorization, payer approval, or clinical authorization.
 
 ## Latest Sales Operations Release
 

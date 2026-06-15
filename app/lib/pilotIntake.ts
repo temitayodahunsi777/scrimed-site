@@ -1,3 +1,9 @@
+import {
+  governanceWorkflowPackBoundary,
+  recommendGovernanceWorkflowPack,
+  type GovernanceWorkflowPackRecommendation
+} from "./agentWorkspaceGovernancePacks";
+
 export type PilotIntakeOption = {
   value: string;
   label: string;
@@ -35,6 +41,7 @@ export type PilotIntakeAssessment = {
   qualification: "synthetic-pilot-qualified" | "assessment-first" | "governance-first";
   recommendedOffer: string;
   recommendedNextStep: string;
+  governanceWorkflowPack: GovernanceWorkflowPackRecommendation;
   governanceGates: string[];
   riskFlags: string[];
   crmTags: string[];
@@ -65,6 +72,25 @@ export type PilotIntakeHandoffPayload = {
     timeline: string;
     interoperabilityContext: string;
     pilotGoals: string;
+  };
+  governance: {
+    workflowPack: GovernanceWorkflowPackRecommendation;
+    routing: {
+      selectedPackSlug: string;
+      source: "buyer-intake-deterministic-router";
+      selectedAt: string;
+      noPhiBoundary: true;
+      governanceLedgerMetadata: {
+        governanceWorkflowPackSlug: string;
+        governanceWorkflowPackStatus: string;
+        governanceWorkflowPackRoute: string;
+        governanceWorkflowPackBriefRoute: string;
+        matchedSignals: string[];
+        noPhiBoundary: true;
+        syntheticPilotBoundary: true;
+      };
+    };
+    boundary: string;
   };
   assessment: PilotIntakeAssessment;
   source: string;
@@ -291,6 +317,14 @@ export function getPilotIntakeSummary() {
     workflowTargets: pilotWorkflowTargets,
     readinessNeeds: pilotReadinessNeeds,
     governanceRequirements: pilotGovernanceRequirements,
+    governancePackRouting: {
+      status: "deterministic-routing-enabled",
+      route: "/governance-packs",
+      apiRoute: "/api/agent-workspace/governance-packs",
+      briefRoute: "/api/agent-workspace/governance-packs/brief",
+      boundary: governanceWorkflowPackBoundary,
+      attachedToHandoffPayload: true
+    },
     timelineOptions: pilotTimelineOptions,
     crmRouting: {
       webhookConfigured,
@@ -429,6 +463,15 @@ export function buildPilotIntakeAssessment(submission: PilotIntakeSubmission): P
   const workflowLabels = submission.workflowTargets.map((value) => getOptionLabel(pilotWorkflowTargets, value));
   const readinessLabels = submission.readinessNeeds.map((value) => getOptionLabel(pilotReadinessNeeds, value));
   const selectedOffer = getOptionLabel(pilotServiceOffers, submission.offerInterest);
+  const governanceWorkflowPack = recommendGovernanceWorkflowPack({
+    buyerSegment: submission.buyerSegment,
+    organizationSize: submission.organizationSize,
+    region: submission.region,
+    offerInterest: submission.offerInterest,
+    workflowTargets: submission.workflowTargets,
+    readinessNeeds: submission.readinessNeeds,
+    governanceRequirements: submission.governanceRequirements
+  });
   const hasSecurityReview = submission.readinessNeeds.includes("security-review");
   const hasHipaa = submission.governanceRequirements.includes("hipaa-ready");
   const hasSyntheticOnly = submission.governanceRequirements.includes("synthetic-only");
@@ -445,10 +488,11 @@ export function buildPilotIntakeAssessment(submission: PilotIntakeSubmission): P
     recommendedOffer: selectedOffer,
     recommendedNextStep:
       qualification === "governance-first"
-        ? "Run governance and AI-readiness scoping before pilot activation, then define synthetic fixtures and review gates."
+        ? `Run governance and AI-readiness scoping with the ${governanceWorkflowPack.name}, then define synthetic fixtures and review gates.`
         : qualification === "synthetic-pilot-qualified"
-          ? "Confirm executive sponsor, synthetic fixture scope, workflow owners, pilot metrics, and review-state responsibilities."
-          : "Start with workflow intelligence assessment to map friction, automation candidates, and buyer-specific proof routes.",
+          ? `Confirm executive sponsor, synthetic fixture scope, workflow owners, pilot metrics, and ${governanceWorkflowPack.name} ownership.`
+          : `Start with workflow intelligence assessment, then use the ${governanceWorkflowPack.name} to map buyer-specific proof routes.`,
+    governanceWorkflowPack,
     governanceGates: [
       "No PHI or patient identifiers in intake",
       "Synthetic data only until approved production controls",
@@ -464,6 +508,8 @@ export function buildPilotIntakeAssessment(submission: PilotIntakeSubmission): P
       `offer:${submission.offerInterest}`,
       `segment:${submission.buyerSegment}`,
       `timeline:${submission.timeline}`,
+      `governance-pack:${governanceWorkflowPack.slug}`,
+      `governance-pack-status:${governanceWorkflowPack.status}`,
       ...workflowLabels.map((label) => `workflow:${label}`),
       ...readinessLabels.map((label) => `readiness:${label}`)
     ]
@@ -503,6 +549,25 @@ export function buildPilotIntakeHandoffPayload(
       timeline: getOptionLabel(pilotTimelineOptions, submission.timeline),
       interoperabilityContext: submission.interoperabilityContext,
       pilotGoals: submission.pilotGoals
+    },
+    governance: {
+      workflowPack: assessment.governanceWorkflowPack,
+      routing: {
+        selectedPackSlug: assessment.governanceWorkflowPack.slug,
+        source: "buyer-intake-deterministic-router",
+        selectedAt: receivedAt,
+        noPhiBoundary: true,
+        governanceLedgerMetadata: {
+          governanceWorkflowPackSlug: assessment.governanceWorkflowPack.slug,
+          governanceWorkflowPackStatus: assessment.governanceWorkflowPack.status,
+          governanceWorkflowPackRoute: assessment.governanceWorkflowPack.route,
+          governanceWorkflowPackBriefRoute: assessment.governanceWorkflowPack.briefRoute,
+          matchedSignals: assessment.governanceWorkflowPack.matchedSignals,
+          noPhiBoundary: true,
+          syntheticPilotBoundary: true
+        }
+      },
+      boundary: governanceWorkflowPackBoundary
     },
     assessment,
     source: submission.source

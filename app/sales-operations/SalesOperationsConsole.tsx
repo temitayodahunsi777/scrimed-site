@@ -87,6 +87,10 @@ function draftFor(opportunity: SalesOpportunity): SalesOpportunityUpdate {
   };
 }
 
+function governancePackFor(opportunity: SalesOpportunity) {
+  return opportunity.payload.assessment.governanceWorkflowPack ?? opportunity.payload.governance?.workflowPack ?? null;
+}
+
 export default function SalesOperationsConsole({
   supabaseUrl,
   supabasePublishableKey
@@ -703,6 +707,8 @@ export default function SalesOperationsConsole({
     );
   }
 
+  const selectedGovernancePack = selected ? governancePackFor(selected) : null;
+
   return (
     <>
       <section className="section-band hub-summary" aria-label="Sales operations summary">
@@ -770,7 +776,7 @@ export default function SalesOperationsConsole({
                   <small>
                     {opportunity.nextActionDueAt && !opportunity.nextActionCompletedAt
                       ? `Due ${formatDate(opportunity.nextActionDueAt)}`
-                      : opportunity.payload.scope.timeline}
+                      : governancePackFor(opportunity)?.name ?? opportunity.payload.scope.timeline}
                   </small>
                 </button>
               ))
@@ -791,7 +797,7 @@ export default function SalesOperationsConsole({
                   <h2>{selected.payload.organization.name}</h2>
                   <p>{selected.payload.contact.fullName} · {selected.payload.contact.role} · {selected.payload.contact.workEmail}</p>
                 </div>
-                <strong>{displayValue(selected.payload.scope.offerInterest)}</strong>
+                <strong>{selectedGovernancePack?.name ?? displayValue(selected.payload.scope.offerInterest)}</strong>
               </div>
 
               <div className="form-grid">
@@ -894,6 +900,14 @@ export default function SalesOperationsConsole({
                 <article>
                   <span>Governance requirements</span>
                   <strong>{selected.payload.scope.governanceRequirements.map(displayValue).join(", ")}</strong>
+                </article>
+                <article>
+                  <span>Governance workflow pack</span>
+                  <strong>{selectedGovernancePack?.name ?? "Pack routing pending"}</strong>
+                </article>
+                <article>
+                  <span>Pack routing reason</span>
+                  <strong>{selectedGovernancePack?.reason ?? "Legacy opportunity requires repackaging through buyer intake."}</strong>
                 </article>
                 <article>
                   <span>Buyer goals</span>

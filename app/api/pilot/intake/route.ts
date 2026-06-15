@@ -123,8 +123,9 @@ export async function POST(request: Request) {
       handoff,
       nextActions: [
         "Review the packaged scope with the enterprise buyer.",
+        `Attach ${assessment.governanceWorkflowPack.name} to sales operations and protected workspace activation planning.`,
         "Confirm no-PHI synthetic fixture boundaries and pilot sponsor.",
-        "Define pilot metrics, workflow owners, governance gates, and CRM follow-up owner."
+        "Define pilot metrics, workflow owners, governance gates, customer inputs, and CRM follow-up owner."
       ]
     },
     { status: accepted ? 202 : 502, headers }
