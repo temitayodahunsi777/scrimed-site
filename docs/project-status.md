@@ -366,16 +366,19 @@ SCRIMED remains focused on becoming an AI healthcare intelligence platform with 
 - Promoted company operations readiness into the Product Console proof stack and downloadable readiness brief so go-live blockers, manual actions, owners, and fallbacks are visible during buyer and investor review.
 - Updated `react` and `react-dom` to `19.2.4`, Next.js to `16.2.7`, and committed a controlled lockfile with patched PostCSS `8.5.15`.
 - Authenticated GitHub CLI, pushed queued `main` commits, confirmed Vercel production deployments reach READY through the Git integration path, and verified `app.scrimedsolutions.com` returns SCRIMED health status.
+- Added authenticated Agent Workspace cockpit controls for governed synthetic work-order creation, protected state transitions, reviewer assignment, outcome metric capture, local governance export, and append-only event review while preserving no-PHI/no-clinical-execution boundaries.
+- Added `npm run smoke:agent-workspace` for fail-closed public verification and optional authenticated tenant-admin/pilot-lead happy-path testing when an approved AAL2 bearer token is supplied.
 
 ## Recommended Next Steps
 
 1. Use `/trust-os` to evaluate every new synthetic agent action and retain the TrustOS decision inside AgentOS evaluation and proof-packet evidence.
 2. Operate new buyer opportunities through `/sales-operations`, assign an accountable owner, set a due action, release audited commercial artifacts, and prepare assessment invitations.
 3. Use the vendor-neutral native CRM export immediately; configure `SCRIMED_PILOT_INTAKE_WEBHOOK_URL` and optional `SCRIMED_PILOT_INTAKE_WEBHOOK_TOKEN` only when an approved CRM destination is selected.
-4. Operationalize tenant onboarding, access review, proof-packet retention, and buyer-specific pilot activation beyond the first verified SCRIMED tenant.
-5. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
-6. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.
-7. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
+4. Operationalize tenant onboarding, access review, proof-packet retention, buyer-specific pilot activation, and the Agent Workspace authenticated smoke script with approved tenant secrets.
+5. Implement the server-audited retention/legal-hold and incident-export ledger before representing dashboard governance exports as retained legal or incident evidence.
+6. Add scoped evidence upload only after identity, privacy, malware scanning, retention, and durable audit controls are approved.
+7. Keep Vercel, GitHub Actions, local build verification, demo proof packets, and quality gates as independent active deploy-quality paths.
+8. Promote governed execution beyond deny-by-default only after auth, identity, execution-attempt idempotency, persistence, durable audit logging, privacy/security review, connector boundary decisions, rate limits, and shutdown controls are explicit.
 
 ## Notes
 

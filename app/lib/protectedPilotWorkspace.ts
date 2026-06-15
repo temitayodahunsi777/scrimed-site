@@ -480,7 +480,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Periodic access review attestation",
       "SSO-readiness metadata and identity lifecycle evidence",
       "Rate-limited public intake and protected mutations",
-      "Authenticated Agent Workspace dashboard for work-order filters, reviewer queues, retry queues, packet export, and event-trail review",
+      "Authenticated Agent Workspace dashboard for work-order creation, governed transitions, outcome metrics, reviewer queues, retry queues, packet export, governance export, and event-trail review",
       "Persistent Agent Workspace work-order creation, state transitions, retry tracking, reviewer assignment, closure, dashboard filters, proof-packet export, and append-only event trails"
     ],
     updated: "2026-06-14"

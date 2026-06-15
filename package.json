@@ -9,6 +9,7 @@
     "start": "next start",
     "integrity": "node scripts/check-generated-integrity.mjs",
     "lint": "eslint .",
+    "smoke:agent-workspace": "node scripts/agent-workspace-authenticated-smoke.mjs",
     "pretypecheck": "node scripts/clean-generated-cache.mjs",
     "typecheck": "node scripts/check-generated-integrity.mjs && tsc --noEmit"
   },

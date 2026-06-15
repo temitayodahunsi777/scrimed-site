@@ -1185,7 +1185,7 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "Add governed work-order create and transition controls to the tenant dashboard, then implement retention/legal-hold controls, incident export, and authenticated end-to-end pilot scripts.",
+      "Implement a server-audited retention/legal-hold and incident-export ledger, then run the authenticated Agent Workspace smoke script in CI with approved tenant secrets.",
     updated: "2026-06-14"
   };
 }

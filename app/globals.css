@@ -649,6 +649,40 @@ h3 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.agent-readiness-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 24px 0;
+}
+
+.agent-readiness-grid article {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  min-height: 220px;
+  padding: 20px;
+}
+
+.agent-readiness-grid span {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.agent-readiness-grid strong {
+  color: var(--green-dark);
+  font-size: 20px;
+}
+
+.agent-readiness-grid p,
+.agent-readiness-grid small {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
 .decision-ledger-summary article {
   border: 1px solid var(--line);
   min-height: 130px;
@@ -1430,7 +1464,8 @@ h3 {
   .decision-ledger-summary,
   .decision-ledger-grid,
   .decision-metrics,
-  .review-event-list article {
+  .review-event-list article,
+  .agent-readiness-grid {
     grid-template-columns: 1fr;
   }
 
