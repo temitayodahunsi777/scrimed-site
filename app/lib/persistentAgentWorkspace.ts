@@ -1,4 +1,5 @@
 import { getAgentOSSummary } from "./agentOS";
+import { getAgentWorkspaceGovernancePacksSummary } from "./agentWorkspaceGovernancePacks";
 import { getAtlasIntelligenceCoreSummary } from "./atlasIntelligenceCore";
 import {
   getProtectedPilotWorkspaceSummary,
@@ -407,6 +408,15 @@ export const workspaceCapabilities: WorkspaceCapability[] = [
     proofRoute: "/api/agent-workspaces/{workspaceSlug}/governance-ledger",
     productionGate:
       "Customer counsel, privacy owner, incident commander, retention schedule, DPA/BAA path, and customer-specific legal hold workflow must be approved before live regulated data."
+  },
+  {
+    capability: "Customer-specific governance workflow packs",
+    status: "active-control",
+    implementation:
+      "Provides reusable retention, legal-review, legal-hold, incident-export, and blocked-claims workflow packs by buyer archetype for protected enterprise pilots.",
+    proofRoute: "/governance-packs",
+    productionGate:
+      "Each customer pack still requires buyer-specific legal, privacy, security, workflow-owner, and reviewer authority approval before production use."
   }
 ];
 
@@ -720,6 +730,22 @@ export const workspaceApiContracts: WorkspaceApiContract[] = [
     access: "AAL2 bearer token + tenant-admin or pilot-lead role + rate limit + ledger write before Markdown release.",
     purpose:
       "Download a server-audited incident export packet only after the governance-ledger incident-export event is committed."
+  },
+  {
+    method: "GET",
+    route: "/api/agent-workspace/governance-packs",
+    status: "active-control",
+    access: "Public synthetic product API",
+    purpose:
+      "Return customer-tailorable governance workflow packs for retention, legal review, legal hold, incident export, evidence artifacts, and blocked claims."
+  },
+  {
+    method: "GET",
+    route: "/api/agent-workspace/governance-packs/brief",
+    status: "active-control",
+    access: "Public synthetic product API",
+    purpose:
+      "Download a Markdown brief describing the governance workflow packs and authenticated smoke CI secret contract."
   }
 ];
 
@@ -1431,6 +1457,7 @@ export function getPersistentAgentWorkspaceSummary() {
   const agentOS = getAgentOSSummary();
   const trustOS = getTrustOSSummary();
   const atlas = getAtlasIntelligenceCoreSummary();
+  const governancePacks = getAgentWorkspaceGovernancePacksSummary();
   const activeLimitations = limitationResolutionRegister.filter(
     (limitation) => limitation.resolutionStatus === "active-control"
   ).length;
@@ -1453,6 +1480,9 @@ export function getPersistentAgentWorkspaceSummary() {
       "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
     governanceLedgerRoute: "/api/agent-workspaces/{workspaceSlug}/governance-ledger",
     incidentExportRoute: "/api/agent-workspaces/{workspaceSlug}/governance-ledger/incident-export",
+    governancePacksRoute: governancePacks.route,
+    governancePacksApiRoute: governancePacks.apiRoute,
+    governancePacksBriefRoute: governancePacks.briefRoute,
     workOrderDashboardFilters: [
       "state",
       "workOrderType",
@@ -1482,6 +1512,7 @@ export function getPersistentAgentWorkspaceSummary() {
     workOrderEventTypeCount: agentWorkOrderEventTypes.length,
     governanceActionTypeCount: agentWorkspaceGovernanceActionTypes.length,
     incidentSeverityCount: agentWorkspaceIncidentSeverities.length,
+    governanceWorkflowPackCount: governancePacks.packCount,
     modelRouterDecisionCount: modelRouterWorkspaceDecisions.length,
     reviewerCheckpointCount: workspaceReviewerCheckpoints.length,
     auditTimelineEventCount: workspaceAuditTimeline.length,
@@ -1491,6 +1522,9 @@ export function getPersistentAgentWorkspaceSummary() {
     externalApprovals,
     capabilities: workspaceCapabilities,
     workOrders: workOrderTemplates,
+    governanceWorkflowPacks: governancePacks.packs,
+    governanceWorkflowPackBoundary: governancePacks.boundary,
+    governanceSmokeCiSecretContract: governancePacks.ciSecretContract,
     modelRouterDecisions: modelRouterWorkspaceDecisions,
     auditTimeline: workspaceAuditTimeline,
     reviewerCheckpoints: workspaceReviewerCheckpoints,
@@ -1499,7 +1533,7 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "Run the authenticated Agent Workspace governance-ledger smoke script in CI with approved tenant secrets, then add customer-specific retention policy templates and legal-review workflow packs.",
+      "Attach selected governance workflow pack slugs to protected pilot buyer intake, then promote authenticated governance-ledger smoke to required CI once the approved AAL2 tenant secret is stored in GitHub Actions.",
     updated: "2026-06-15"
   };
 }
@@ -1547,11 +1581,14 @@ export function buildPersistentAgentWorkspaceBrief() {
     `- Work-order proof-packet route: ${summary.workOrderProofPacketRoute}`,
     `- Governance ledger route: ${summary.governanceLedgerRoute}`,
     `- Incident export route: ${summary.incidentExportRoute}`,
+    `- Governance packs route: ${summary.governancePacksRoute}`,
+    `- Governance packs API: ${summary.governancePacksApiRoute}`,
     `- Work-order dashboard filters: ${summary.workOrderDashboardFilters.join(", ")}`,
     `- Work-order states: ${summary.workOrderStateCount}`,
     `- Work-order event types: ${summary.workOrderEventTypeCount}`,
     `- Governance action types: ${summary.governanceActionTypeCount}`,
     `- Incident severity levels: ${summary.incidentSeverityCount}`,
+    `- Governance workflow packs: ${summary.governanceWorkflowPackCount}`,
     "",
     "## Workspace Capabilities",
     ...summary.capabilities.map(
@@ -1567,6 +1604,19 @@ export function buildPersistentAgentWorkspaceBrief() {
       (checkpoint) =>
         `- ${checkpoint.checkpoint}: ${checkpoint.requiredFor} Reviewer: ${checkpoint.reviewerRole}. Denial: ${checkpoint.denialEffect}`
     ),
+    "",
+    "## Customer-Specific Governance Workflow Packs",
+    `Boundary: ${summary.governanceWorkflowPackBoundary}`,
+    ...summary.governanceWorkflowPacks.map(
+      (pack) =>
+        `- ${pack.name} (${pack.status}): ${pack.scope} Customer inputs: ${pack.customerInputsRequired.join(", ")}.`
+    ),
+    "",
+    "## Authenticated Governance Smoke CI Contract",
+    `- Secret: ${summary.governanceSmokeCiSecretContract.bearerTokenSecret}`,
+    `- Optional base URL variable: ${summary.governanceSmokeCiSecretContract.optionalBaseUrlVariable}`,
+    `- Optional workspace slug variable: ${summary.governanceSmokeCiSecretContract.optionalWorkspaceSlugVariable}`,
+    `- Required authenticated flag: ${summary.governanceSmokeCiSecretContract.requiredSmokeFlag}`,
     "",
     "## Known Limitations Resolution",
     summary.resolvedPosition,

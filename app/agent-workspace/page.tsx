@@ -31,6 +31,9 @@ export default function AgentWorkspacePage() {
           <a className="secondary-action" href={summary.apiRoute}>
             Inspect Workspace API
           </a>
+          <Link className="secondary-action" href={summary.governancePacksRoute}>
+            Review Governance Packs
+          </Link>
         </div>
       </section>
 
@@ -68,6 +71,10 @@ export default function AgentWorkspacePage() {
           <strong>{summary.auditTimelineEventCount}</strong>
         </article>
         <article>
+          <span>Governance packs</span>
+          <strong>{summary.governanceWorkflowPackCount}</strong>
+        </article>
+        <article>
           <span>Quality replacements</span>
           <strong>{summary.qualityReplacements}</strong>
         </article>
@@ -88,6 +95,7 @@ export default function AgentWorkspacePage() {
             {summary.workOrderDetailRoute}. Both routes remain bearer-token, tenant-isolated, and synthetic-only.
             Audited work-order proof packets use {summary.workOrderProofPacketRoute}; workspace dashboard filters support{" "}
             {summary.workOrderDashboardFilters.join(", ")}.
+            Customer-tailored governance packs are available at {summary.governancePacksRoute}.
           </p>
         </div>
         <div className="layer-list">
@@ -128,6 +136,32 @@ export default function AgentWorkspacePage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Customer governance workflow packs">
+        <div className="section-heading">
+          <p className="eyebrow">Governance packs</p>
+          <h2>Customer-specific retention and legal-review operating packs make the workspace sellable without crossing production boundaries.</h2>
+        </div>
+        {summary.governanceWorkflowPacks.map((pack) => (
+          <article className="module-row" key={pack.slug}>
+            <div>
+              <span>{pack.status}</span>
+              <h2>{pack.name}</h2>
+            </div>
+            <p>{pack.customerArchetype}. {pack.scope}</p>
+            <div>
+              <Link className="module-link" href={summary.governancePacksRoute}>
+                {pack.pricingUse}
+              </Link>
+              <ul className="compact-list">
+                <li>Retention: {pack.retentionPolicyTemplate.defaultDuration}</li>
+                <li>Release gate: {pack.incidentExportWorkflow.releaseGate}</li>
+                <li>Blocked claims: {pack.blockedClaims.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Persistent agent work orders">

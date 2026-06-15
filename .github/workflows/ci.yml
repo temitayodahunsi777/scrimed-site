@@ -32,6 +32,9 @@ jobs:
       - name: Audit dependencies
         run: npm audit --audit-level=moderate
 
+      - name: Generated workspace integrity
+        run: node scripts/check-generated-integrity.mjs
+
       - name: Lint
         run: npm run lint
 

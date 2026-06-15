@@ -2,7 +2,10 @@
 
 const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.com").replace(/\/$/, "");
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG ?? "atlas-synthetic-evaluation";
-const bearerToken = process.env.SCRIMED_BEARER_TOKEN;
+const bearerToken = process.env.SCRIMED_BEARER_TOKEN?.trim();
+const requireAuthenticatedSmoke = ["1", "true", "yes"].includes(
+  (process.env.SCRIMED_REQUIRE_AUTHENTICATED_SMOKE ?? "").toLowerCase()
+);
 
 function endpoint(path) {
   return `${baseUrl}${path}`;
@@ -59,8 +62,17 @@ console.log(
 );
 
 if (!bearerToken) {
+  const missingTokenMessage =
+    "set SCRIMED_BEARER_TOKEN to a tenant-admin or pilot-lead AAL2 bearer token";
+
+  if (requireAuthenticatedSmoke) {
+    throw new Error(
+      `authenticated smoke required but no bearer token was provided; ${missingTokenMessage}.`
+    );
+  }
+
   console.log(
-    "skip authenticated happy path: set SCRIMED_BEARER_TOKEN to a tenant-admin or pilot-lead AAL2 bearer token."
+    `skip authenticated happy path: ${missingTokenMessage}.`
   );
   process.exit(0);
 }

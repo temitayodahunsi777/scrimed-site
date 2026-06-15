@@ -1,0 +1,49 @@
+name: Agent Workspace Governance Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Production app URL to smoke-test.
+        required: true
+        default: https://app.scrimedsolutions.com
+      workspace_slug:
+        description: Protected pilot workspace slug.
+        required: true
+        default: atlas-synthetic-evaluation
+      require_authenticated_path:
+        description: Fail if SCRIMED_BEARER_TOKEN is missing.
+        required: true
+        type: boolean
+        default: true
+  schedule:
+    - cron: "17 10 * * 1-5"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-workspace-governance-smoke
+  cancel-in-progress: false
+
+jobs:
+  governance-smoke:
+    name: Production governance-ledger smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Run Agent Workspace governance smoke
+        env:
+          SCRIMED_BASE_URL: ${{ inputs.base_url || 'https://app.scrimedsolutions.com' }}
+          SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug || 'atlas-synthetic-evaluation' }}
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}
+          SCRIMED_REQUIRE_AUTHENTICATED_SMOKE: ${{ github.event_name == 'workflow_dispatch' && inputs.require_authenticated_path && '1' || '' }}
+        run: node scripts/agent-workspace-authenticated-smoke.mjs
