@@ -4,6 +4,7 @@ import {
   type GovernanceWorkflowPackRecommendation
 } from "./agentWorkspaceGovernancePacks";
 import type { PilotIntakeHandoffPayload } from "./pilotIntake";
+import { getSalesAttributionSummary } from "./salesAttribution";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -254,7 +255,13 @@ export function getGovernanceWorkflowPackForOpportunity(
   );
 }
 
+export function getSalesAttributionForOpportunity(opportunity: SalesOpportunity) {
+  return opportunity.payload.attribution ?? null;
+}
+
 export function getSalesOperationsSummary() {
+  const attributionSummary = getSalesAttributionSummary();
+
   return {
     service: "scrimed-sales-operations",
     route: "/sales-operations",
@@ -273,6 +280,14 @@ export function getSalesOperationsSummary() {
       apiRoute: "/api/agent-workspace/governance-packs",
       crmPayloadField: "governanceWorkflowPack"
     },
+    attribution: {
+      status: attributionSummary.status,
+      route: attributionSummary.route,
+      apiRoute: attributionSummary.apiRoute,
+      sourceSignalCount: attributionSummary.sourceSignalCount,
+      crmPayloadField: "attribution",
+      noPhiBoundary: true
+    },
     boundary: salesOperationsBoundary,
     updated: "2026-06-15"
   };
@@ -280,6 +295,7 @@ export function getSalesOperationsSummary() {
 
 export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
   const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
+  const attribution = getSalesAttributionForOpportunity(opportunity);
   const headers = [
     "Opportunity ID",
     "Organization",
@@ -297,6 +313,18 @@ export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
     "Governance Workflow Pack Slug",
     "Governance Workflow Pack Status",
     "Governance Routing Reason",
+    "Source Category",
+    "Source Route",
+    "Referrer Host",
+    "UTM Source",
+    "UTM Medium",
+    "UTM Campaign",
+    "Matched Campaign Channel",
+    "Target Audience",
+    "Revenue Stream",
+    "Deployment Profile",
+    "Attribution Priority",
+    "First Response SLA",
     "Workflow Targets",
     "Governance Requirements",
     "Interoperability Context",
@@ -319,6 +347,18 @@ export function buildCrmOpportunityCsv(opportunity: SalesOpportunity) {
     governancePack.slug,
     governancePack.status,
     governancePack.reason,
+    attribution?.sourceCategory ?? "legacy-unattributed",
+    attribution?.sourceRoute ?? opportunity.payload.source,
+    attribution?.referrerHost ?? "",
+    attribution?.campaign.source ?? "",
+    attribution?.campaign.medium ?? "",
+    attribution?.campaign.campaign ?? "",
+    attribution?.campaign.matchedChannel ?? "",
+    attribution?.market.targetAudience ?? "",
+    attribution?.market.revenueStream ?? "",
+    attribution?.deployment.profileName ?? "",
+    attribution?.cadence.priority ?? "",
+    attribution?.cadence.firstResponseSla ?? "",
     opportunity.payload.scope.workflowTargets.join("; "),
     opportunity.payload.scope.governanceRequirements.join("; "),
     opportunity.payload.scope.interoperabilityContext,
@@ -332,12 +372,18 @@ export function buildSalesFollowUpDraft(opportunity: SalesOpportunity) {
   const contactName = cleanHeader(opportunity.payload.contact.fullName).split(" ")[0] || "there";
   const organizationName = cleanHeader(opportunity.payload.organization.name);
   const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
+  const attribution = getSalesAttributionForOpportunity(opportunity);
   const subject = `SCRIMED next step for ${organizationName}`;
-  const nextAction = cleanHeader(opportunity.nextAction || "confirm the enterprise discovery conversation");
+  const nextAction = cleanHeader(
+    opportunity.nextAction ||
+      attribution?.cadence.nextActionTemplate ||
+      "confirm the enterprise discovery conversation"
+  );
 
   return `To: ${cleanHeader(opportunity.payload.contact.workEmail)}
 Subject: ${subject}
 X-SCRIMED-Opportunity-ID: ${cleanHeader(opportunity.intakeId)}
+X-SCRIMED-Attribution: ${cleanHeader(attribution?.sourceCategory ?? "legacy-unattributed")}
 Content-Type: text/plain; charset="UTF-8"
 
 Hello ${contactName},
@@ -347,6 +393,9 @@ Thank you for exploring SCRIMED with ${organizationName}. Our proposed next step
 SCRIMED helps healthcare organizations transform fragmented workflows into decision-grade, human-reviewed operational intelligence. This conversation remains within a governed synthetic pilot and enterprise evaluation boundary. Please do not send patient data, PHI, live clinical records, or payer member information.
 
 Recommended governance workflow pack: ${cleanHeader(governancePack.name)}.
+${attribution ? `Recommended commercial route: ${cleanHeader(attribution.market.revenueStream)} for ${cleanHeader(attribution.market.targetAudience)}.
+Recommended first-response SLA: ${cleanHeader(attribution.cadence.firstResponseSla)}.
+Deployment readiness profile: ${cleanHeader(attribution.deployment.profileName)}.` : "Recommended commercial route: confirm during discovery."}
 
 Regards,
 ${cleanHeader(opportunity.assignedOwner || "SCRIMED Solutions")}
@@ -364,11 +413,13 @@ export function buildAssessmentInvitation(opportunity: SalesOpportunity) {
   const end = new Date(start.getTime() + opportunity.assessmentDurationMinutes * 60_000);
   const organization = cleanHeader(opportunity.payload.organization.name);
   const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
+  const attribution = getSalesAttributionForOpportunity(opportunity);
   const meetingUrl = opportunity.assessmentMeetingUrl;
   const description = [
     `Governed SCRIMED enterprise assessment for ${organization}.`,
     `Opportunity: ${opportunity.intakeId}.`,
     `Governance workflow pack: ${governancePack.name}.`,
+    attribution ? `Sales attribution: ${attribution.sourceCategory}, ${attribution.market.revenueStream}, ${attribution.deployment.profileName}.` : "Sales attribution: legacy opportunity.",
     "Business-contact and workflow-scope discussion only. Do not share PHI, patient identifiers, live clinical records, diagnosis details, or payer member information.",
     meetingUrl ? `Meeting link: ${meetingUrl}` : "Meeting location to be confirmed."
   ].join("\n");
@@ -400,6 +451,7 @@ export function buildAssessmentInvitation(opportunity: SalesOpportunity) {
 export function buildSalesOpportunityProposal(opportunity: SalesOpportunity) {
   const pilot = getPilotProgramForOpportunity(opportunity);
   const governancePack = getGovernanceWorkflowPackForOpportunity(opportunity);
+  const attribution = getSalesAttributionForOpportunity(opportunity);
   const payload = opportunity.payload;
   const pilotSection = pilot
     ? `## Recommended SCRIMED Program
@@ -460,6 +512,17 @@ The recommended engagement requires a SCRIMED commercial and governance review b
 - Retention template: ${cleanMarkdown(governancePack.retentionPolicyTemplate.defaultDuration)}
 - Incident export release gate: ${cleanMarkdown(governancePack.incidentExportReleaseGate)}
 
+## Source Attribution And Sales Cadence
+- Source category: ${cleanMarkdown(attribution?.sourceCategory ?? "legacy-unattributed")}
+- Source route: ${cleanMarkdown(attribution?.sourceRoute ?? opportunity.payload.source)}
+- Campaign channel: ${cleanMarkdown(attribution?.campaign.matchedChannel ?? "Not captured")}
+- Target audience: ${cleanMarkdown(attribution?.market.targetAudience ?? "To be confirmed")}
+- Revenue stream: ${cleanMarkdown(attribution?.market.revenueStream ?? "To be confirmed")}
+- Deployment profile: ${cleanMarkdown(attribution?.deployment.profileName ?? "To be confirmed")}
+- First response SLA: ${cleanMarkdown(attribution?.cadence.firstResponseSla ?? "To be confirmed")}
+- Recommended owner: ${cleanMarkdown(attribution?.cadence.recommendedOwner ?? "Enterprise sales")}
+- Source-informed signals: ${attribution?.sourceSignals.map((signal) => cleanMarkdown(signal.sourceName)).join(", ") ?? "To be confirmed"}
+
 ${pilotSection}
 
 ## Required Discovery Decisions
@@ -478,6 +541,7 @@ This is a non-binding enterprise scoping proposal. Final scope, pricing, legal t
 
 export function buildCrmOpportunityPayload(opportunity: SalesOpportunity) {
   const governanceWorkflowPack = getGovernanceWorkflowPackForOpportunity(opportunity);
+  const attribution = getSalesAttributionForOpportunity(opportunity);
 
   return {
     source: "SCRIMED Sales Operations",
@@ -505,6 +569,7 @@ export function buildCrmOpportunityPayload(opportunity: SalesOpportunity) {
         syntheticPilotBoundary: true
       }
     },
+    attribution,
     assessment: opportunity.payload.assessment
   };
 }

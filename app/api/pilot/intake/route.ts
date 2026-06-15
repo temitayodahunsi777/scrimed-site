@@ -12,8 +12,8 @@ import { enforceRequestRateLimit, rateLimitHeaders } from "../../../lib/requestR
 export const dynamic = "force-dynamic";
 
 type HandoffResult = {
-  mode: "durable-store" | "durable-store-and-webhook" | "webhook" | "unavailable";
-  status: "durably-retained" | "routed-and-retained" | "routed" | "failed";
+  mode: "durable-store" | "durable-store-and-webhook" | "webhook" | "manual-review-packet" | "unavailable";
+  status: "durably-retained" | "routed-and-retained" | "routed" | "manual-review-required" | "failed";
   destination: string;
   detail: string;
   persistence: PilotIntakePersistenceResult;
@@ -120,11 +120,12 @@ export async function POST(request: Request) {
       receivedAt,
       boundary: handoffPayload.boundary,
       assessment,
+      attribution: handoffPayload.attribution,
       handoff,
       nextActions: [
         "Review the packaged scope with the enterprise buyer.",
         `Attach ${assessment.governanceWorkflowPack.name} to sales operations and protected workspace activation planning.`,
-        "Confirm no-PHI synthetic fixture boundaries and pilot sponsor.",
+        "Confirm no-PHI synthetic fixture boundaries, source attribution, deployment profile, and pilot sponsor.",
         "Define pilot metrics, workflow owners, governance gates, customer inputs, and CRM follow-up owner."
       ]
     },
@@ -139,11 +140,11 @@ async function routePilotIntake(payload: PilotIntakeHandoffPayload): Promise<Han
   if (!webhookUrl) {
     if (!persistence.retained) {
       return {
-        mode: "unavailable",
-        status: "failed",
-        destination: "durable enterprise intake ledger",
+        mode: "manual-review-packet",
+        status: "manual-review-required",
+        destination: "browser-returned no-PHI review packet",
         detail:
-          "The intake was validated but could not be durably retained. SCRIMED did not report it as accepted.",
+          "The intake was validated and packaged, but durable retention is not currently available. Treat this as a manual-review packet until Supabase or CRM routing confirms retention.",
         persistence
       };
     }
@@ -186,10 +187,10 @@ async function routePilotIntake(payload: PilotIntakeHandoffPayload): Promise<Han
       }
 
       return {
-        mode: "unavailable",
-        status: "failed",
-        destination: "durable enterprise intake ledger and configured CRM webhook",
-        detail: `Neither durable storage nor the configured CRM webhook accepted the intake. Webhook returned ${response.status}.`,
+        mode: "manual-review-packet",
+        status: "manual-review-required",
+        destination: "browser-returned no-PHI review packet",
+        detail: `The intake was validated and packaged, but durable storage was unavailable and the configured CRM webhook returned ${response.status}. Treat this as manual review until retention is confirmed.`,
         persistence
       };
     }
@@ -217,10 +218,11 @@ async function routePilotIntake(payload: PilotIntakeHandoffPayload): Promise<Han
     }
 
     return {
-      mode: "unavailable",
-      status: "failed",
-      destination: "durable enterprise intake ledger and configured CRM webhook",
-      detail: "Neither durable storage nor the configured CRM webhook accepted the intake within the routing timeout.",
+      mode: "manual-review-packet",
+      status: "manual-review-required",
+      destination: "browser-returned no-PHI review packet",
+      detail:
+        "The intake was validated and packaged, but durable storage and CRM routing did not confirm within the routing timeout. Treat this as manual review until retention is confirmed.",
       persistence
     };
   } finally {

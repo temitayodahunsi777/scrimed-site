@@ -708,6 +708,7 @@ export default function SalesOperationsConsole({
   }
 
   const selectedGovernancePack = selected ? governancePackFor(selected) : null;
+  const selectedAttribution = selected?.payload.attribution ?? null;
 
   return (
     <>
@@ -917,7 +918,49 @@ export default function SalesOperationsConsole({
                   <span>Native CRM export</span>
                   <strong>{selected.lastCrmExportAt ? `Last exported ${formatDate(selected.lastCrmExportAt)}` : "Ready"}</strong>
                 </article>
+                <article>
+                  <span>Source attribution</span>
+                  <strong>
+                    {selectedAttribution
+                      ? `${displayValue(selectedAttribution.sourceCategory)} via ${selectedAttribution.campaign.matchedChannel}`
+                      : "Legacy opportunity"}
+                  </strong>
+                </article>
+                <article>
+                  <span>Target audience</span>
+                  <strong>{selectedAttribution?.market.targetAudience ?? "To be confirmed"}</strong>
+                </article>
+                <article>
+                  <span>Deployment profile</span>
+                  <strong>{selectedAttribution?.deployment.profileName ?? "To be confirmed"}</strong>
+                </article>
+                <article>
+                  <span>Follow-up SLA</span>
+                  <strong>
+                    {selectedAttribution
+                      ? `${displayValue(selectedAttribution.cadence.priority)} - ${selectedAttribution.cadence.firstResponseSla}`
+                      : "Set manually"}
+                  </strong>
+                </article>
               </div>
+
+              {selectedAttribution ? (
+                <div className="section-band split-band">
+                  <div>
+                    <p className="eyebrow">Attribution intelligence</p>
+                    <h3>{selectedAttribution.market.revenueStream}</h3>
+                    <p className="section-copy">{selectedAttribution.cadence.nextActionTemplate}</p>
+                  </div>
+                  <div className="layer-list">
+                    {selectedAttribution.sourceSignals.map((signal, index) => (
+                      <div className="layer-row" key={`${signal.sourceName}-${signal.category}`}>
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        <strong>{signal.sourceName}: {signal.scrimedApplication}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               <div className="sales-activation-grid">
                 <section>

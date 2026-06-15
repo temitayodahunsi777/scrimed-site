@@ -8,6 +8,8 @@ Market activation is active as a governed product surface:
 
 - UI: `/market-activation`
 - API: `/api/market-activation`
+- Attribution: `/sales-attribution`
+- Attribution API: `/api/sales-attribution`
 - Product console: `/product`
 - FaithCore page: `/faithcore`
 
@@ -38,6 +40,10 @@ FaithCore is opt-in dignity, encouragement, and trust support. It does not repla
 ## PR, Communications, And Advertising Controls
 
 All public channels must use approved claims, no-PHI intake, explicit synthetic pilot boundaries, no guaranteed outcomes, and legal/privacy/security/brand review when required.
+
+## Attribution Linkage
+
+Sales Attribution v1 now converts approved market activation signals into CRM-safe source routing, audience mapping, deployment profile selection, and human follow-up cadence.
 
 ## Boundary
 

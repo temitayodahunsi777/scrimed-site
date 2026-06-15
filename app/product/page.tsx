@@ -81,6 +81,14 @@ export default function ProductConsolePage() {
           <strong>{summary.targetAudienceCount}</strong>
         </article>
         <article>
+          <span>Source signals</span>
+          <strong>{summary.sourceIntelligenceSourceCount}</strong>
+        </article>
+        <article>
+          <span>Attribution fields</span>
+          <strong>{summary.attributionCapturedFieldCount}</strong>
+        </article>
+        <article>
           <span>TrustOS controls</span>
           <strong>{summary.trustOSControlCount}</strong>
         </article>
@@ -108,6 +116,58 @@ export default function ProductConsolePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED sales attribution">
+        <div className="section-heading">
+          <p className="eyebrow">Sales attribution</p>
+          <h2>Safe buyer signals now route into source-aware revenue, audience, deployment, and follow-up cadence.</h2>
+          <p className="section-copy">{summary.salesAttributionSummary.boundary}</p>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.salesAttributionSummary.status}</span>
+            <h2>{summary.salesAttributionSummary.sampleAttribution.market.revenueStream}</h2>
+          </div>
+          <p>{summary.salesAttributionSummary.sampleAttribution.market.message}</p>
+          <div>
+            <Link className="module-link" href={summary.salesAttributionRoute}>
+              Open attribution layer
+            </Link>
+            <ul className="compact-list">
+              <li>Source: {summary.salesAttributionSummary.sampleAttribution.sourceCategory}</li>
+              <li>Audience: {summary.salesAttributionSummary.sampleAttribution.market.targetAudience}</li>
+              <li>Deployment: {summary.salesAttributionSummary.sampleAttribution.deployment.profileName}</li>
+              <li>Cadence: {summary.salesAttributionSummary.sampleAttribution.cadence.firstResponseSla}</li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED source intelligence">
+        <div className="section-heading">
+          <p className="eyebrow">Source intelligence</p>
+          <h2>Public standards and platform signals are translated into SCRIMED implementation themes.</h2>
+          <p className="section-copy">{summary.sourceIntelligenceSummary.boundary}</p>
+        </div>
+        {summary.sourceIntelligenceSummary.signals.slice(0, 5).map((signal) => (
+          <article className="module-row" key={signal.sourceName}>
+            <div>
+              <span>{signal.category}</span>
+              <h2>{signal.sourceName}</h2>
+            </div>
+            <p>{signal.scrimedApplication}</p>
+            <div>
+              <Link className="module-link" href={summary.sourceIntelligenceRoute}>
+                Review source-informed strategy
+              </Link>
+              <ul className="compact-list">
+                <li>{signal.implementationPath[0]}</li>
+                <li>{signal.governanceBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED market activation">

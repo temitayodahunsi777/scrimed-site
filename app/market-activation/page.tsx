@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getMarketActivationSummary } from "../lib/marketActivation";
+import { getSalesAttributionSummary } from "../lib/salesAttribution";
 
 export const metadata = {
   title: "SCRIMED Market Activation",
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default function MarketActivationPage() {
   const summary = getMarketActivationSummary();
+  const attribution = getSalesAttributionSummary();
 
   return (
     <main>
@@ -22,6 +24,7 @@ export default function MarketActivationPage() {
         <div className="hero-actions">
           <a className="primary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/pricing">Pricing</Link>
+          <Link className="secondary-action" href="/sales-attribution">Attribution</Link>
           <Link className="secondary-action" href="/faithcore">FaithCore</Link>
           <Link className="secondary-action" href="/claims">Claims Register</Link>
         </div>
@@ -52,6 +55,27 @@ export default function MarketActivationPage() {
           <span>FaithCore</span>
           <strong>{summary.faithCoreProgramCount}</strong>
         </article>
+      </section>
+
+      <section className="section-band split-band">
+        <div>
+          <p className="eyebrow">Attribution operations</p>
+          <h2>Market activation now routes safe buyer signals into CRM-ready source attribution.</h2>
+          <p className="section-copy">{attribution.boundary}</p>
+        </div>
+        <div className="layer-list">
+          {[
+            `Captured fields: ${attribution.capturedFields.length}`,
+            `Blocked fields: ${attribution.blockedFields.length}`,
+            `Source signals: ${attribution.sourceSignalCount}`,
+            `Sample cadence: ${attribution.sampleAttribution.cadence.firstResponseSla}`
+          ].map((item, index) => (
+            <div className="layer-row" key={item}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="section-band split-band">

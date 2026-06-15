@@ -68,6 +68,16 @@ const consoleViews = [
     summary: "Review revenue streams, target audiences, FaithCore messaging, communications, PR, advertising, and claims-safe growth controls."
   },
   {
+    name: "Sales Attribution",
+    href: "/sales-attribution",
+    summary: "Review CRM-safe source tracking, UTM/referrer capture, revenue routing, deployment profile mapping, and sales cadence."
+  },
+  {
+    name: "Source Intelligence",
+    href: "/source-intelligence",
+    summary: "Review public standards and platform signals converted into SCRIMED-specific implementation themes and governance boundaries."
+  },
+  {
     name: "Deployment Profiles",
     href: "/deployment-profiles",
     summary: "Review managed cloud, private cloud, hospital-controlled, sovereign, and edge/on-prem deployment readiness profiles."

@@ -372,7 +372,7 @@ export function getMarketActivationSummary() {
     advertisingCampaigns,
     faithCoreMarketPrograms,
     nextBuildStep:
-      "Connect approved campaigns to CRM-safe source tracking, no-PHI intake attribution, and sales operations follow-up cadence.",
+      "Use the Sales Attribution layer to convert approved campaigns into CRM-safe source tracking, then build cohort-level reporting across source, audience, deployment profile, and follow-up outcome.",
     updated: "2026-06-15"
   };
 }

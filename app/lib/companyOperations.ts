@@ -52,19 +52,20 @@ export const operationsBlockers: OperationsBlocker[] = [
     id: "package-manager",
     area: "quality",
     status: "ready",
-    blocker: "A controlled Node.js and npm toolchain is available for local quality verification.",
+    blocker: "A controlled Node.js quality path is available even when npm is unavailable in the local shell.",
     impact:
-      "Dependency installation, security audit, TypeScript validation, and production builds can run before promotion.",
+      "Integrity, lint, TypeScript validation, and production builds can run before promotion without relying on the npm shell command.",
     currentEvidence:
-      "Node.js 22.22.3 and npm 10.9.8 completed `npm ci`, a zero-vulnerability `npm audit`, `npm run lint`, `npm run typecheck`, and `npm run build`; a committed lockfile now supports reproducible CI installs.",
+      "`npm` is unavailable in the current local shell, so SCRIMED uses direct Node entrypoints: `node scripts/check-generated-integrity.mjs`, `node node_modules/eslint/bin/eslint.js .`, `node node_modules/typescript/bin/tsc --noEmit`, and `node node_modules/next/dist/bin/next build --webpack`.",
     owner: "Engineering",
     resolutionPath: [
       "Keep the committed lockfile synchronized with intentional dependency changes.",
-      "Run `npm ci`, `npm audit --audit-level=moderate`, `npm run lint`, `npm run typecheck`, and `npm run build` before production promotion.",
-      "Keep the controlled local toolchain out of source control."
+      "Use direct Node entrypoints when npm is unavailable.",
+      "Use Vercel production deploys and GitHub Actions as independent remote verification paths.",
+      "Restore npm only as a convenience path, not as the single quality gate."
     ],
     fallback:
-      "Restore the official Node.js 22 toolchain, then use Vercel and GitHub Actions as independent remote verification paths."
+      "If local Node entrypoints fail, rely on Vercel deployment status, GitHub Actions, and route smoke checks while the local toolchain is repaired."
   },
   {
     id: "vercel-cli",
@@ -218,6 +219,6 @@ export function getCompanyOperationsSummary() {
     operationsBlockers,
     buyerRouteChecklist,
     smoothOpsPrinciples,
-    updated: "2026-06-11"
+    updated: "2026-06-15"
   };
 }

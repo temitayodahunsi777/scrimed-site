@@ -28,7 +28,7 @@ export default async function PilotIntakePage({ searchParams }: PilotIntakePageP
         <h1>Request a governed SCRIMED synthetic pilot or enterprise assessment.</h1>
         <p className="hero-text">
           This intake packages buyer segment, target workflows, readiness needs, governance requirements, and
-          follow-up routing for SCRIMED Atlas pilots and healthcare AI operating-layer evaluations.
+          source-aware follow-up routing for SCRIMED Atlas pilots and healthcare AI operating-layer evaluations.
         </p>
       </section>
 
@@ -48,6 +48,10 @@ export default async function PilotIntakePage({ searchParams }: PilotIntakePageP
         <article>
           <span>CRM mode</span>
           <strong>{summary.crmRouting.currentMode}</strong>
+        </article>
+        <article>
+          <span>Attribution</span>
+          <strong>{summary.attribution.status}</strong>
         </article>
       </section>
 
@@ -73,7 +77,7 @@ export default async function PilotIntakePage({ searchParams }: PilotIntakePageP
           <h2>Convert enterprise interest into a CRM-ready pilot scope.</h2>
           <p className="section-copy">
             Submissions are validated for business-contact and workflow-scope data, screened for PHI markers,
-            scored for pilot readiness, and routed to a configured CRM webhook when available.
+            scored for pilot readiness, attributed to safe source signals, and routed to durable storage, CRM, or a manual no-PHI review packet when needed.
           </p>
         </div>
         <PilotIntakeForm prefill={prefill} summary={summary} />
@@ -103,10 +107,10 @@ export default async function PilotIntakePage({ searchParams }: PilotIntakePageP
         <article className="module-row">
           <div>
             <span>3. Route</span>
-            <h2>Durable intake and CRM handoff</h2>
+            <h2>Durable intake, attribution, CRM handoff, or manual review</h2>
           </div>
-          <p>Accepted no-PHI intake is retained in a private enterprise ledger and can also be forwarded to HubSpot, Wix automation, Zapier/Make, or a secure CRM webhook.</p>
-          <strong>The API fails closed instead of reporting acceptance when no durable destination receives the intake.</strong>
+          <p>Accepted no-PHI intake is packaged with source attribution, target audience, deployment profile, and sales cadence context. When durable storage or CRM routing is configured, retention is confirmed in the handoff result.</p>
+          <strong>If durable retention is unavailable, the API returns a manual-review-required packet and marks retention as unconfirmed.</strong>
         </article>
       </section>
     </main>

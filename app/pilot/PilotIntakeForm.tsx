@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { FormEvent, useState } from "react";
 import type { PilotIntakeOption, PilotIntakeSubmission, PilotIntakeSummary } from "../lib/pilotIntake";
+import type { SalesAttribution } from "../lib/salesAttribution";
 
 type IntakeResult = {
   status: string;
@@ -31,6 +32,7 @@ type IntakeResult = {
     destination: string;
     detail: string;
   };
+  attribution?: SalesAttribution;
   nextActions: string[];
 };
 
@@ -70,7 +72,10 @@ export default function PilotIntakeForm({
       const response = await fetch("/api/pilot/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          ...form,
+          ...getBrowserAttributionFields(form)
+        })
       });
       const body = await response.json();
 
@@ -323,6 +328,18 @@ export default function PilotIntakeForm({
               <strong>Intake handoff</strong>
               <p>{result.handoff.status}: {result.handoff.detail}</p>
             </div>
+            {result.attribution ? (
+              <>
+                <div>
+                  <strong>Attribution</strong>
+                  <p>{result.attribution.sourceCategory} - {result.attribution.campaign.matchedChannel}</p>
+                </div>
+                <div>
+                  <strong>Sales cadence</strong>
+                  <p>{result.attribution.cadence.priority} - {result.attribution.cadence.firstResponseSla}</p>
+                </div>
+              </>
+            ) : null}
           </div>
           <p className="section-copy">{result.assessment.governanceWorkflowPack.reason}</p>
           <ul className="compact-list">
@@ -334,6 +351,20 @@ export default function PilotIntakeForm({
       ) : null}
     </div>
   );
+}
+
+function getBrowserAttributionFields(form: PilotIntakeSubmission) {
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    source: window.location.pathname,
+    referrer: document.referrer,
+    utmSource: params.get("utm_source") ?? form.utmSource,
+    utmMedium: params.get("utm_medium") ?? form.utmMedium,
+    utmCampaign: params.get("utm_campaign") ?? form.utmCampaign,
+    utmTerm: params.get("utm_term") ?? form.utmTerm,
+    utmContent: params.get("utm_content") ?? form.utmContent
+  };
 }
 
 function TextField({
@@ -468,6 +499,12 @@ function createInitialFormState(summary: PilotIntakeSummary, prefill: PilotIntak
     pilotGoals: "",
     boundaryAcknowledged: false,
     contactConsent: false,
-    source: "/pilot"
+    source: "/pilot",
+    referrer: "",
+    utmSource: "",
+    utmMedium: "",
+    utmCampaign: "",
+    utmTerm: "",
+    utmContent: ""
   };
 }

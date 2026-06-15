@@ -2,6 +2,17 @@
 
 Updated: 2026-06-15
 
+## Latest Sales Attribution And Source Intelligence Release
+
+- Added `/sales-attribution` and `/api/sales-attribution` for CRM-safe source tracking, UTM/referrer capture, target audience routing, revenue-stream mapping, deployment-profile selection, source-informed strategy signals, and human follow-up cadence.
+- Added `/source-intelligence` and `/api/source-intelligence` to encode official public signals from HL7/FHIR, Notion, Figma release notes, Cursor, Hugging Face, Siemens Healthineers, Snowflake, Sierra, and Anthropic into SCRIMED-specific implementation themes and governance boundaries.
+- Extended `/api/pilot/intake` to capture no-PHI attribution metadata and return the routing packet with the accepted intake response.
+- Updated `/pilot` to safely capture browser route, referrer, and UTM fields without exposing the buyer to extra form friction.
+- Added a manual no-PHI review-packet fallback for pilot intake when Supabase durable retention or CRM routing is unavailable, so demos and buyer flows do not fail while retention remains explicitly unconfirmed.
+- Updated Sales Operations exports, CRM webhook payloads, follow-up drafts, assessment invitations, proposals, and opportunity detail UI with attribution, audience, deployment profile, and cadence context.
+- Added Sales Attribution and Source Intelligence to `/hub`, `/product`, readiness brief output, and route registry.
+- Corrected the operations quality blocker to reflect the current direct-Node quality path when `npm` is unavailable locally.
+
 ## Latest Deployment And Market Activation Release
 
 - Added `/deployment-profiles` and `/api/deployment-profiles` for managed cloud, private cloud, hospital-controlled, sovereign/public-sector, and edge/on-prem deployment readiness fixtures.

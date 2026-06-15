@@ -3,6 +3,7 @@ import {
   recommendGovernanceWorkflowPack,
   type GovernanceWorkflowPackRecommendation
 } from "./agentWorkspaceGovernancePacks";
+import { buildSalesAttribution, type SalesAttribution } from "./salesAttribution";
 
 export type PilotIntakeOption = {
   value: string;
@@ -30,6 +31,12 @@ export type PilotIntakeSubmission = {
   boundaryAcknowledged: boolean;
   contactConsent: boolean;
   source: string;
+  referrer: string;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  utmTerm: string;
+  utmContent: string;
 };
 
 export type PilotIntakeValidationError = {
@@ -92,6 +99,7 @@ export type PilotIntakeHandoffPayload = {
     };
     boundary: string;
   };
+  attribution?: SalesAttribution;
   assessment: PilotIntakeAssessment;
   source: string;
 };
@@ -308,7 +316,7 @@ export function getPilotIntakeSummary() {
         : "durable-intake-queue-configured"
       : webhookConfigured
         ? "crm-routing-configured"
-        : "activation-required",
+        : "manual-review-fallback-ready",
     boundary: pilotIntakeBoundary,
     serviceOffers: pilotServiceOffers,
     buyerSegments: pilotBuyerSegments,
@@ -325,18 +333,32 @@ export function getPilotIntakeSummary() {
       boundary: governanceWorkflowPackBoundary,
       attachedToHandoffPayload: true
     },
+    attribution: {
+      status: "crm-safe-source-attribution-enabled",
+      route: "/sales-attribution",
+      apiRoute: "/api/sales-attribution",
+      sourceFields: ["source", "referrer", "utmSource", "utmMedium", "utmCampaign", "utmTerm", "utmContent"],
+      noPhiBoundary: true
+    },
     timelineOptions: pilotTimelineOptions,
     crmRouting: {
       webhookConfigured,
       durableStoreConfigured,
-      supportedDestinations: ["HubSpot workflow", "Wix automation", "Zapier/Make", "secure CRM webhook"],
+      supportedDestinations: [
+        "Supabase durable intake ledger",
+        "HubSpot workflow",
+        "Wix automation",
+        "Zapier/Make",
+        "secure CRM webhook",
+        "manual no-PHI review packet fallback"
+      ],
       currentMode: durableStoreConfigured
         ? webhookConfigured
           ? "durable-ledger-plus-configured-webhook"
           : "durable-enterprise-intake-queue"
         : webhookConfigured
           ? "configured-webhook"
-          : "activation-required"
+          : "manual-review-packet-fallback"
     },
     requiredAcknowledgements: [
       "No protected health information or patient identifiers",
@@ -385,7 +407,13 @@ export function validatePilotIntakePayload(payload: unknown):
   const timeline = readOption(payload, "timeline", pilotTimelineOptions, errors);
   const interoperabilityContext = readText(payload, "interoperabilityContext", 1000, errors, false);
   const pilotGoals = readText(payload, "pilotGoals", 1200, errors, true);
-  const source = readText(payload, "source", 120, errors, false) || "/pilot";
+  const source = readText(payload, "source", 240, errors, false) || "/pilot";
+  const referrer = readText(payload, "referrer", 240, errors, false);
+  const utmSource = readText(payload, "utmSource", 120, errors, false);
+  const utmMedium = readText(payload, "utmMedium", 120, errors, false);
+  const utmCampaign = readText(payload, "utmCampaign", 160, errors, false);
+  const utmTerm = readText(payload, "utmTerm", 160, errors, false);
+  const utmContent = readText(payload, "utmContent", 160, errors, false);
   const boundaryAcknowledged = payload.boundaryAcknowledged === true;
   const contactConsent = payload.contactConsent === true;
 
@@ -413,7 +441,14 @@ export function validatePilotIntakePayload(payload: unknown):
 
   const sensitiveFields = [
     { field: "interoperabilityContext", value: interoperabilityContext },
-    { field: "pilotGoals", value: pilotGoals }
+    { field: "pilotGoals", value: pilotGoals },
+    { field: "source", value: source },
+    { field: "referrer", value: referrer },
+    { field: "utmSource", value: utmSource },
+    { field: "utmMedium", value: utmMedium },
+    { field: "utmCampaign", value: utmCampaign },
+    { field: "utmTerm", value: utmTerm },
+    { field: "utmContent", value: utmContent }
   ];
 
   for (const item of sensitiveFields) {
@@ -451,7 +486,13 @@ export function validatePilotIntakePayload(payload: unknown):
       pilotGoals,
       boundaryAcknowledged,
       contactConsent,
-      source
+      source,
+      referrer,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmTerm,
+      utmContent
     }
   };
 }
@@ -569,6 +610,24 @@ export function buildPilotIntakeHandoffPayload(
       },
       boundary: governanceWorkflowPackBoundary
     },
+    attribution: buildSalesAttribution({
+      source: submission.source,
+      referrer: submission.referrer,
+      utmSource: submission.utmSource,
+      utmMedium: submission.utmMedium,
+      utmCampaign: submission.utmCampaign,
+      utmTerm: submission.utmTerm,
+      utmContent: submission.utmContent,
+      buyerSegment: submission.buyerSegment,
+      organizationSize: submission.organizationSize,
+      region: submission.region,
+      offerInterest: submission.offerInterest,
+      workflowTargets: submission.workflowTargets,
+      readinessNeeds: submission.readinessNeeds,
+      governanceRequirements: submission.governanceRequirements,
+      timeline: submission.timeline,
+      receivedAt
+    }),
     assessment,
     source: submission.source
   };
