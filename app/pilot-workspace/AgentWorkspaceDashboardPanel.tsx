@@ -3,7 +3,11 @@
 import type { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
+  AgentWorkspaceGovernanceActionType,
+  AgentWorkspaceGovernanceLedgerDashboard,
+  AgentWorkspaceGovernanceLedgerRecord,
   AgentWorkspaceGovernanceStatus,
+  AgentWorkspaceIncidentSeverity,
   AgentWorkspaceWorkOrderDashboard,
   AgentWorkspaceWorkOrderEventType,
   AgentWorkspaceWorkOrderEventRecord,
@@ -30,6 +34,14 @@ type WorkOrderDetailResponse = {
 type WorkOrderMutationResponse = WorkOrderDetailResponse & {
   status?: string;
   eventId?: string;
+  error?: { code?: string; message?: string; fields?: string[] };
+};
+
+type GovernanceLedgerResponse = {
+  dashboard?: AgentWorkspaceGovernanceLedgerDashboard;
+  ledgerRecords?: AgentWorkspaceGovernanceLedgerRecord[];
+  ledgerId?: string;
+  ledgerRecord?: AgentWorkspaceGovernanceLedgerRecord | null;
   error?: { code?: string; message?: string; fields?: string[] };
 };
 
@@ -77,6 +89,15 @@ type TransitionFormState = {
   confidenceScore: string;
 };
 
+type GovernanceLedgerFormState = {
+  actionType: AgentWorkspaceGovernanceActionType;
+  reason: string;
+  workOrderId: string;
+  retentionUntil: string;
+  legalHoldUntil: string;
+  incidentSeverity: AgentWorkspaceIncidentSeverity;
+};
+
 const defaultFilters: FilterState = {
   state: "all",
   workOrderType: "all",
@@ -113,6 +134,21 @@ const agentWorkspaceGovernanceStatuses: AgentWorkspaceGovernanceStatus[] = [
   "blocked",
   "proof-ready",
   "closed"
+];
+
+const governanceActionOptions: Array<{ value: AgentWorkspaceGovernanceActionType; label: string }> = [
+  { value: "retention-policy-recorded", label: "Retention policy recorded" },
+  { value: "legal-hold-recorded", label: "Legal hold recorded" },
+  { value: "legal-hold-released", label: "Legal hold released" },
+  { value: "incident-export-requested", label: "Incident export requested" }
+];
+
+const incidentSeverityOptions: Array<{ value: AgentWorkspaceIncidentSeverity; label: string }> = [
+  { value: "not-applicable", label: "Not applicable" },
+  { value: "low", label: "Low" },
+  { value: "moderate", label: "Moderate" },
+  { value: "high", label: "High" },
+  { value: "critical", label: "Critical" }
 ];
 
 const workOrderOptions: WorkOrderOption[] = [
@@ -255,8 +291,9 @@ const readinessControls = [
   {
     area: "Auditing",
     status: "Active control",
-    control: "Create, transition, close, and packet actions write append-only work-order and pilot audit evidence.",
-    nextGate: "Server-audited retention/legal-hold and incident export ledger."
+    control:
+      "Create, transition, close, packet, retention, legal-hold, and incident-export actions write append-only evidence.",
+    nextGate: "Customer-specific retention schedule, legal hold procedure, and incident owner approval."
   },
   {
     area: "Processing",
@@ -347,6 +384,15 @@ function compactMetrics(metrics: Record<string, number | string | boolean | unde
   );
 }
 
+function isoTimestampFromInput(value: string) {
+  if (!value.trim()) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed.toISOString() : value;
+}
+
 function selectedOptionForType(workOrderType: AgentWorkOrderType) {
   return workOrderOptions.find((option) => option.type === workOrderType) ?? workOrderOptions[0];
 }
@@ -378,10 +424,24 @@ export default function AgentWorkspaceDashboardPanel({
     overrideRatePct: "",
     confidenceScore: ""
   });
+  const [governanceForm, setGovernanceForm] = useState<GovernanceLedgerFormState>({
+    actionType: "retention-policy-recorded",
+    reason:
+      "Record synthetic pilot governance evidence for enterprise diligence and human-reviewed controls.",
+    workOrderId: "",
+    retentionUntil: "",
+    legalHoldUntil: "",
+    incidentSeverity: "moderate"
+  });
   const [dashboard, setDashboard] = useState<AgentWorkspaceWorkOrderDashboard | null>(null);
   const [workOrders, setWorkOrders] = useState<AgentWorkspaceWorkOrderRecord[]>([]);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<AgentWorkspaceWorkOrderRecord | null>(null);
   const [selectedEvents, setSelectedEvents] = useState<AgentWorkspaceWorkOrderEventRecord[]>([]);
+  const [governanceLedgerDashboard, setGovernanceLedgerDashboard] =
+    useState<AgentWorkspaceGovernanceLedgerDashboard | null>(null);
+  const [governanceLedgerRecords, setGovernanceLedgerRecords] = useState<
+    AgentWorkspaceGovernanceLedgerRecord[]
+  >([]);
   const [status, setStatus] = useState<DashboardStatus>("loading");
   const [message, setMessage] = useState("");
   const query = useMemo(() => buildFilterQuery(filters), [filters]);
@@ -411,6 +471,27 @@ export default function AgentWorkspaceDashboardPanel({
 
     setSelectedWorkOrder(body.workOrder);
     setSelectedEvents(body.events ?? []);
+  }, [session.access_token, workspace.slug]);
+
+  const loadGovernanceLedger = useCallback(async (showErrors = false) => {
+    const response = await fetch(`/api/agent-workspaces/${workspace.slug}/governance-ledger`, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
+    const body = (await response.json()) as GovernanceLedgerResponse;
+
+    if (!response.ok) {
+      setGovernanceLedgerDashboard(null);
+      setGovernanceLedgerRecords([]);
+      if (showErrors) {
+        setMessage(body.error?.message ?? "The Agent Workspace governance ledger could not be loaded.");
+      }
+      return;
+    }
+
+    setGovernanceLedgerDashboard(body.dashboard ?? null);
+    setGovernanceLedgerRecords(body.ledgerRecords ?? []);
   }, [session.access_token, workspace.slug]);
 
   useEffect(() => {
@@ -463,6 +544,8 @@ export default function AgentWorkspaceDashboardPanel({
         setSelectedWorkOrder(null);
         setSelectedEvents([]);
       }
+
+      await loadGovernanceLedger();
     }
 
     void loadDashboard();
@@ -470,7 +553,7 @@ export default function AgentWorkspaceDashboardPanel({
     return () => {
       active = false;
     };
-  }, [loadWorkOrderDetail, query, selectedWorkOrder?.id, session.access_token, workspace.slug]);
+  }, [loadGovernanceLedger, loadWorkOrderDetail, query, selectedWorkOrder?.id, session.access_token, workspace.slug]);
 
   async function refreshDashboard(successMessage?: string, preferredWorkOrderId?: string) {
     setStatus("loading");
@@ -508,6 +591,7 @@ export default function AgentWorkspaceDashboardPanel({
 
     setStatus("ready");
     setMessage(successMessage ?? "");
+    await loadGovernanceLedger();
   }
 
   function applyQueueFilter(nextFilters: Partial<FilterState>) {
@@ -640,6 +724,102 @@ export default function AgentWorkspaceDashboardPanel({
     await onAuditChanged();
   }
 
+  function governanceLedgerPayload(actionType: AgentWorkspaceGovernanceActionType = governanceForm.actionType) {
+    return {
+      actionType,
+      reason: governanceForm.reason,
+      workOrderId: governanceForm.workOrderId || null,
+      retentionUntil:
+        actionType === "retention-policy-recorded"
+          ? isoTimestampFromInput(governanceForm.retentionUntil)
+          : null,
+      legalHoldUntil:
+        actionType === "legal-hold-recorded"
+          ? isoTimestampFromInput(governanceForm.legalHoldUntil)
+          : null,
+      incidentSeverity:
+        actionType === "incident-export-requested" ? governanceForm.incidentSeverity : "not-applicable",
+      eventMetadata: {
+        governancePurpose: "agent-workspace-control-evidence",
+        selectedWorkOrderId: governanceForm.workOrderId || null,
+        dashboardVisibleWorkOrders: dashboard?.visibleWorkOrders ?? workOrders.length,
+        activeLegalHolds: governanceLedgerDashboard?.activeLegalHolds ?? 0,
+        activeRetentionPolicies: governanceLedgerDashboard?.activeRetentionPolicies ?? 0,
+        legalBoundary: "Not legal advice, regulatory advice, compliance certification, or production authorization.",
+        processingBoundary: "Synthetic-only; no live PHI, payer submission, patient outreach, or record mutation.",
+        syntheticOnly: true,
+        recordedFrom: "pilot-workspace-agent-workspace-dashboard",
+        recordedAt: new Date().toISOString()
+      }
+    };
+  }
+
+  async function recordGovernanceLedgerAction() {
+    setStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/agent-workspaces/${workspace.slug}/governance-ledger`, {
+      body: JSON.stringify(governanceLedgerPayload()),
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+    const body = (await response.json()) as GovernanceLedgerResponse;
+
+    if (!response.ok) {
+      setStatus("error");
+      setMessage(
+        body.error?.fields?.join(", ") ??
+          body.error?.message ??
+          "The governance-ledger action could not be recorded."
+      );
+      return;
+    }
+
+    await loadGovernanceLedger(true);
+    setStatus("ready");
+    setMessage("Server-audited governance ledger action recorded.");
+    await onAuditChanged();
+  }
+
+  async function downloadIncidentExport() {
+    setStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/agent-workspaces/${workspace.slug}/governance-ledger/incident-export`,
+      {
+        body: JSON.stringify(governanceLedgerPayload("incident-export-requested")),
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        method: "POST"
+      }
+    );
+
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as GovernanceLedgerResponse;
+      setStatus("error");
+      setMessage(body.error?.message ?? "The server-audited incident export could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${workspace.slug}-agent-workspace-incident-export.md`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    await loadGovernanceLedger(true);
+    setStatus("ready");
+    setMessage("Server-audited incident export downloaded and governance ledger evidence committed.");
+    await onAuditChanged();
+  }
+
   function downloadGovernanceExport() {
     const generatedAt = new Date().toISOString();
     const selectedWorkOrderSection = selectedWorkOrder
@@ -667,6 +847,10 @@ export default function AgentWorkspaceDashboardPanel({
       `- Review held: ${dashboard?.reviewerQueue.reviewHeld ?? 0}`,
       `- Retry queue: ${dashboard?.retryQueue.workOrdersWithRetries ?? 0}`,
       `- Unassigned: ${dashboard?.reviewerQueue.unassigned ?? 0}`,
+      `- Governance ledger entries: ${governanceLedgerDashboard?.totalLedgerEntries ?? governanceLedgerRecords.length}`,
+      `- Active legal holds: ${governanceLedgerDashboard?.activeLegalHolds ?? 0}`,
+      `- Active retention policies: ${governanceLedgerDashboard?.activeRetentionPolicies ?? 0}`,
+      `- Incident exports: ${governanceLedgerDashboard?.incidentExports ?? 0}`,
       ``,
       selectedWorkOrderSection,
       ``,
@@ -678,7 +862,7 @@ export default function AgentWorkspaceDashboardPanel({
       ``,
       `## Limitations`,
       `- This export is local dashboard evidence, not a server-audited proof-packet event.`,
-      `- Use work-order proof packet downloads for audited packet evidence.`,
+      `- Use work-order proof packets and server incident exports for audited packet evidence.`,
       `- Live PHI, autonomous clinical execution, payer submission, patient outreach, and production connector use remain blocked.`
     ].join("\n");
     const blob = new Blob([exportText], { type: "text/markdown" });
@@ -690,7 +874,7 @@ export default function AgentWorkspaceDashboardPanel({
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-    setMessage("Governance export generated locally. Audited evidence remains tied to work-order packet downloads.");
+    setMessage("Governance export generated locally. Audited evidence remains tied to server packet downloads.");
   }
 
   async function downloadWorkOrderProofPacket(workOrder: AgentWorkspaceWorkOrderRecord) {
@@ -767,6 +951,164 @@ export default function AgentWorkspaceDashboardPanel({
             <small>{control.nextGate}</small>
           </article>
         ))}
+      </div>
+
+      <div className="evaluation-form decision-commit-form">
+        <div className="form-section">
+          <div>
+            <p className="eyebrow">Server-audited governance ledger</p>
+            <h3>Record retention, legal-hold, release, and incident-export evidence.</h3>
+          </div>
+          <div className="decision-ledger-summary">
+            <article>
+              <span>Ledger entries</span>
+              <strong>{governanceLedgerDashboard?.totalLedgerEntries ?? governanceLedgerRecords.length}</strong>
+            </article>
+            <article>
+              <span>Active holds</span>
+              <strong>{governanceLedgerDashboard?.activeLegalHolds ?? 0}</strong>
+            </article>
+            <article>
+              <span>Retention active</span>
+              <strong>{governanceLedgerDashboard?.activeRetentionPolicies ?? 0}</strong>
+            </article>
+            <article>
+              <span>Incident exports</span>
+              <strong>{governanceLedgerDashboard?.incidentExports ?? 0}</strong>
+            </article>
+          </div>
+          <div className="form-grid">
+            <label className="form-field">
+              <span>Ledger action</span>
+              <select
+                value={governanceForm.actionType}
+                onChange={(event) =>
+                  setGovernanceForm((current) => ({
+                    ...current,
+                    actionType: event.target.value as AgentWorkspaceGovernanceActionType
+                  }))
+                }
+              >
+                {governanceActionOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="form-field">
+              <span>Scope</span>
+              <select
+                value={governanceForm.workOrderId}
+                onChange={(event) =>
+                  setGovernanceForm((current) => ({ ...current, workOrderId: event.target.value }))
+                }
+              >
+                <option value="">Workspace-level</option>
+                {workOrders.map((workOrder) => (
+                  <option key={workOrder.id} value={workOrder.id}>
+                    {displayValue(workOrder.workOrderType)} - {displayValue(workOrder.state)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="form-field">
+              <span>Incident severity</span>
+              <select
+                disabled={governanceForm.actionType !== "incident-export-requested"}
+                value={
+                  governanceForm.actionType === "incident-export-requested"
+                    ? governanceForm.incidentSeverity
+                    : "not-applicable"
+                }
+                onChange={(event) =>
+                  setGovernanceForm((current) => ({
+                    ...current,
+                    incidentSeverity: event.target.value as AgentWorkspaceIncidentSeverity
+                  }))
+                }
+              >
+                {incidentSeverityOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="form-field">
+              <span>Retention until</span>
+              <input
+                disabled={governanceForm.actionType !== "retention-policy-recorded"}
+                onChange={(event) =>
+                  setGovernanceForm((current) => ({ ...current, retentionUntil: event.target.value }))
+                }
+                type="datetime-local"
+                value={governanceForm.retentionUntil}
+              />
+            </label>
+            <label className="form-field">
+              <span>Legal hold until</span>
+              <input
+                disabled={governanceForm.actionType !== "legal-hold-recorded"}
+                onChange={(event) =>
+                  setGovernanceForm((current) => ({ ...current, legalHoldUntil: event.target.value }))
+                }
+                type="datetime-local"
+                value={governanceForm.legalHoldUntil}
+              />
+            </label>
+            <label className="form-field form-field-wide">
+              <span>Reason</span>
+              <textarea
+                onChange={(event) =>
+                  setGovernanceForm((current) => ({ ...current, reason: event.target.value }))
+                }
+                value={governanceForm.reason}
+              />
+              <small>
+                Synthetic pilot control evidence only. Live incident response, legal advice, and regulated data
+                handling require authorized counsel, privacy, security, and customer owners.
+              </small>
+            </label>
+          </div>
+          <div className="form-actions">
+            <button
+              className="primary-action"
+              disabled={status === "saving"}
+              onClick={recordGovernanceLedgerAction}
+              type="button"
+            >
+              Record Governance Ledger
+            </button>
+            <button
+              className="secondary-action"
+              disabled={status === "saving"}
+              onClick={downloadIncidentExport}
+              type="button"
+            >
+              Download Audited Incident Export
+            </button>
+            <button className="secondary-action" onClick={() => loadGovernanceLedger(true)} type="button">
+              Refresh Ledger
+            </button>
+          </div>
+          <div className="review-event-list">
+            <h3>Recent governance ledger trail</h3>
+            {governanceLedgerRecords.length > 0 ? (
+              governanceLedgerRecords.slice(0, 5).map((record) => (
+                <article key={record.id}>
+                  <span>{displayValue(record.actionType)}</span>
+                  <strong>
+                    {record.incidentSeverity} · {record.workOrderId ?? "Workspace-level"}
+                  </strong>
+                  <small>{formatDate(record.createdAt)}</small>
+                </article>
+              ))
+            ) : (
+              <p>No governance ledger entries are visible for this workspace yet.</p>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="evaluation-form decision-commit-form">

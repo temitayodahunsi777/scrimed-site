@@ -16,6 +16,8 @@ import type {
 } from "./trustOSDecisionLedger";
 import type { TrustOSDecisionRecord } from "./trustOS";
 import type {
+  AgentWorkspaceGovernanceLedgerInput,
+  AgentWorkspaceGovernanceLedgerRecord,
   AgentWorkspaceWorkOrderEventRecord,
   AgentWorkspaceWorkOrderInput,
   AgentWorkspaceWorkOrderRecord,
@@ -138,6 +140,22 @@ type AgentWorkspaceWorkOrderEventRow = {
   prior_state: AgentWorkspaceWorkOrderEventRecord["priorState"];
   next_state: AgentWorkspaceWorkOrderEventRecord["nextState"];
   event_metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+type AgentWorkspaceGovernanceLedgerRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  work_order_id: string | null;
+  actor_user_id: string;
+  action_type: AgentWorkspaceGovernanceLedgerRecord["actionType"];
+  retention_until: string | null;
+  legal_hold_until: string | null;
+  incident_severity: AgentWorkspaceGovernanceLedgerRecord["incidentSeverity"];
+  reason: string;
+  event_metadata: Record<string, unknown>;
+  boundary: string;
   created_at: string;
 };
 
@@ -458,6 +476,26 @@ function mapAgentWorkspaceWorkOrderEvent(
   };
 }
 
+function mapAgentWorkspaceGovernanceLedger(
+  row: AgentWorkspaceGovernanceLedgerRow
+): AgentWorkspaceGovernanceLedgerRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    workOrderId: row.work_order_id,
+    actorUserId: row.actor_user_id,
+    actionType: row.action_type,
+    retentionUntil: row.retention_until,
+    legalHoldUntil: row.legal_hold_until,
+    incidentSeverity: row.incident_severity,
+    reason: row.reason,
+    eventMetadata: row.event_metadata,
+    boundary: row.boundary,
+    createdAt: row.created_at
+  };
+}
+
 const workspaceSelect = "id, tenant_id, slug, name, status, boundary, created_at, pilot_tenants(name)";
 const sessionSelect =
   "id, workspace_id, scenario_slug, status, boundary, evaluation, created_at, created_by";
@@ -471,6 +509,8 @@ const agentWorkspaceWorkOrderSelect =
   "id, tenant_id, workspace_id, pilot_session_id, trustos_decision_id, work_order_type, state, objective, agent_owner, model_router_policy, trust_card, memory_scopes, tool_scopes, reviewer_checkpoints, blocked_actions, result_summary, outcome_metrics, failure_reason, retry_count, assigned_reviewer_id, created_by, updated_by, reviewed_by, closed_by, created_at, updated_at, review_due_at, reviewed_at, closed_at, boundary";
 const agentWorkspaceWorkOrderEventSelect =
   "id, workspace_id, work_order_id, actor_user_id, event_type, prior_state, next_state, event_metadata, created_at";
+const agentWorkspaceGovernanceLedgerSelect =
+  "id, tenant_id, workspace_id, work_order_id, actor_user_id, action_type, retention_until, legal_hold_until, incident_severity, reason, event_metadata, boundary, created_at";
 
 export async function listAccessiblePilotWorkspaces(client: SupabaseClient) {
   const { data, error } = await client.from("pilot_workspaces").select(workspaceSelect).order("created_at");
@@ -799,6 +839,44 @@ export async function recordAgentWorkspaceWorkOrderProofPacketDownload(
 
   return {
     eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function listAgentWorkspaceGovernanceLedger(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("agent_workspace_governance_ledger")
+    .select(agentWorkspaceGovernanceLedgerSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(250);
+
+  return {
+    ledgerRecords: ((data ?? []) as unknown as AgentWorkspaceGovernanceLedgerRow[]).map(
+      mapAgentWorkspaceGovernanceLedger
+    ),
+    error
+  };
+}
+
+export async function recordAgentWorkspaceGovernanceLedger(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: AgentWorkspaceGovernanceLedgerInput
+) {
+  const { data, error } = await client.rpc("record_agent_workspace_governance_ledger", {
+    p_workspace_slug: workspaceSlug,
+    p_action_type: input.actionType,
+    p_reason: input.reason,
+    p_work_order_id: input.workOrderId,
+    p_retention_until: input.retentionUntil,
+    p_legal_hold_until: input.legalHoldUntil,
+    p_incident_severity: input.incidentSeverity,
+    p_event_metadata: input.eventMetadata
+  });
+
+  return {
+    ledgerId: typeof data === "string" ? data : null,
     error
   };
 }

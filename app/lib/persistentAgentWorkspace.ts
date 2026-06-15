@@ -181,6 +181,58 @@ export type AgentWorkspaceWorkOrderEventRecord = {
   createdAt: string;
 };
 
+export type AgentWorkspaceGovernanceActionType =
+  | "retention-policy-recorded"
+  | "legal-hold-recorded"
+  | "legal-hold-released"
+  | "incident-export-requested";
+
+export type AgentWorkspaceIncidentSeverity =
+  | "not-applicable"
+  | "low"
+  | "moderate"
+  | "high"
+  | "critical";
+
+export type AgentWorkspaceGovernanceLedgerInput = {
+  actionType: AgentWorkspaceGovernanceActionType;
+  reason: string;
+  workOrderId: string | null;
+  retentionUntil: string | null;
+  legalHoldUntil: string | null;
+  incidentSeverity: AgentWorkspaceIncidentSeverity;
+  eventMetadata: Record<string, unknown>;
+};
+
+export type AgentWorkspaceGovernanceLedgerRecord = {
+  id: string;
+  tenantId: string;
+  workspaceId: string;
+  workOrderId: string | null;
+  actorUserId: string;
+  actionType: AgentWorkspaceGovernanceActionType;
+  retentionUntil: string | null;
+  legalHoldUntil: string | null;
+  incidentSeverity: AgentWorkspaceIncidentSeverity;
+  reason: string;
+  eventMetadata: Record<string, unknown>;
+  boundary: string;
+  createdAt: string;
+};
+
+export type AgentWorkspaceGovernanceLedgerDashboard = {
+  totalLedgerEntries: number;
+  byActionType: Record<AgentWorkspaceGovernanceActionType, number>;
+  byIncidentSeverity: Record<AgentWorkspaceIncidentSeverity, number>;
+  retentionPolicies: number;
+  activeRetentionPolicies: number;
+  upcomingRetentionExpirations: number;
+  activeLegalHolds: number;
+  incidentExports: number;
+  latestLedgerAt: string | null;
+  boundaryControls: string[];
+};
+
 export type AgentWorkspaceGovernanceStatus =
   | "active"
   | "needs-review"
@@ -227,6 +279,16 @@ export type AgentWorkspaceWorkOrderProofPacketInput = {
   appBaseUrl: string;
 };
 
+export type AgentWorkspaceIncidentExportPacketInput = {
+  workspace: PilotWorkspaceRecord;
+  workOrders: AgentWorkspaceWorkOrderRecord[];
+  ledgerRecords: AgentWorkspaceGovernanceLedgerRecord[];
+  recordedLedgerEntry: AgentWorkspaceGovernanceLedgerRecord;
+  generatedAt: string;
+  actorUserId: string;
+  appBaseUrl: string;
+};
+
 type ValidationResult<T> =
   | { ok: true; value: T }
   | { ok: false; errors: string[] };
@@ -252,6 +314,21 @@ export const agentWorkOrderEventTypes: AgentWorkspaceWorkOrderEventType[] = [
   "work-order-blocked",
   "work-order-closed",
   "proof-packet-downloaded"
+];
+
+export const agentWorkspaceGovernanceActionTypes: AgentWorkspaceGovernanceActionType[] = [
+  "retention-policy-recorded",
+  "legal-hold-recorded",
+  "legal-hold-released",
+  "incident-export-requested"
+];
+
+export const agentWorkspaceIncidentSeverities: AgentWorkspaceIncidentSeverity[] = [
+  "not-applicable",
+  "low",
+  "moderate",
+  "high",
+  "critical"
 ];
 
 export const agentWorkspaceGovernanceStatuses: AgentWorkspaceGovernanceStatus[] = [
@@ -321,6 +398,15 @@ export const workspaceCapabilities: WorkspaceCapability[] = [
     proofRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
     productionGate:
       "Production packets need customer branding, legal disclaimers, evidence retention policy, confidentiality controls, and legal/privacy/security review."
+  },
+  {
+    capability: "Server-audited retention, legal hold, and incident export ledger",
+    status: "active-control",
+    implementation:
+      "Adds an append-only tenant governance ledger for retention policies, legal holds, legal releases, and write-before-release incident exports with RLS visibility and AAL2 mutations.",
+    proofRoute: "/api/agent-workspaces/{workspaceSlug}/governance-ledger",
+    productionGate:
+      "Customer counsel, privacy owner, incident commander, retention schedule, DPA/BAA path, and customer-specific legal hold workflow must be approved before live regulated data."
   }
 ];
 
@@ -618,6 +704,22 @@ export const workspaceApiContracts: WorkspaceApiContract[] = [
     access: "AAL2 bearer token + authorized tenant role + rate limit + append-only audit event before release.",
     purpose:
       "Download an audited Markdown proof packet for one persistent synthetic work order with Trust Card, event trail, reviewer checkpoints, blocked actions, and safety boundaries."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/agent-workspaces/{workspaceSlug}/governance-ledger",
+    status: "active-control",
+    access: "GET: bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + rate limit.",
+    purpose:
+      "List and record append-only retention, legal-hold, legal-release, and incident-export governance evidence for a protected pilot workspace."
+  },
+  {
+    method: "POST",
+    route: "/api/agent-workspaces/{workspaceSlug}/governance-ledger/incident-export",
+    status: "active-control",
+    access: "AAL2 bearer token + tenant-admin or pilot-lead role + rate limit + ledger write before Markdown release.",
+    purpose:
+      "Download a server-audited incident export packet only after the governance-ledger incident-export event is committed."
   }
 ];
 
@@ -656,7 +758,7 @@ export const limitationResolutionRegister: LimitationResolution[] = [
     replacementProcess:
       "Use dedicated agent workspace work-order tables, append-only work-order events, explicit authenticated grants, and RPC-only mutations with route-level AAL2 and rate-limit checks.",
     proofRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders",
-    remainingGate: "Apply migration, verify RLS with an authenticated tenant, run database advisors, and approve retention/legal-hold policy."
+    remainingGate: "Apply migration, verify RLS with an authenticated tenant, run database advisors, and approve customer-specific retention/legal-hold policy."
   },
   {
     limitation: "Production model routing across vendors is not active.",
@@ -712,6 +814,26 @@ function optionalUuid(value: unknown) {
   return typeof value === "string" && uuidPattern.test(value) ? value : "__invalid_uuid__";
 }
 
+function optionalIsoTimestamp(value: unknown, fieldName: string, errors: string[]) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    errors.push(`${fieldName} must be an ISO timestamp when provided`);
+    return null;
+  }
+
+  const parsed = Date.parse(value);
+
+  if (!Number.isFinite(parsed)) {
+    errors.push(`${fieldName} must be a valid ISO timestamp`);
+    return null;
+  }
+
+  return new Date(parsed).toISOString();
+}
+
 function stringArray(value: unknown, fallback: string[]) {
   if (value === undefined || value === null) {
     return fallback;
@@ -734,6 +856,22 @@ export function isAgentWorkOrderState(value: unknown): value is AgentWorkOrderSt
 
 export function isAgentWorkOrderEventType(value: unknown): value is AgentWorkspaceWorkOrderEventType {
   return typeof value === "string" && agentWorkOrderEventTypes.includes(value as AgentWorkspaceWorkOrderEventType);
+}
+
+export function isAgentWorkspaceGovernanceActionType(
+  value: unknown
+): value is AgentWorkspaceGovernanceActionType {
+  return (
+    typeof value === "string" &&
+    agentWorkspaceGovernanceActionTypes.includes(value as AgentWorkspaceGovernanceActionType)
+  );
+}
+
+export function isAgentWorkspaceIncidentSeverity(value: unknown): value is AgentWorkspaceIncidentSeverity {
+  return (
+    typeof value === "string" &&
+    agentWorkspaceIncidentSeverities.includes(value as AgentWorkspaceIncidentSeverity)
+  );
 }
 
 export function isAgentWorkspaceGovernanceStatus(value: unknown): value is AgentWorkspaceGovernanceStatus {
@@ -939,6 +1077,91 @@ export function summarizeAgentWorkspaceWorkOrderDashboard(
   };
 }
 
+function emptyGovernanceActionCounts() {
+  return Object.fromEntries(agentWorkspaceGovernanceActionTypes.map((actionType) => [actionType, 0])) as Record<
+    AgentWorkspaceGovernanceActionType,
+    number
+  >;
+}
+
+function emptyIncidentSeverityCounts() {
+  return Object.fromEntries(agentWorkspaceIncidentSeverities.map((severity) => [severity, 0])) as Record<
+    AgentWorkspaceIncidentSeverity,
+    number
+  >;
+}
+
+function legalHoldScope(record: AgentWorkspaceGovernanceLedgerRecord) {
+  return record.workOrderId ? `work-order:${record.workOrderId}` : `workspace:${record.workspaceId}`;
+}
+
+export function summarizeAgentWorkspaceGovernanceLedger(
+  ledgerRecords: AgentWorkspaceGovernanceLedgerRecord[]
+): AgentWorkspaceGovernanceLedgerDashboard {
+  const byActionType = emptyGovernanceActionCounts();
+  const byIncidentSeverity = emptyIncidentSeverityCounts();
+  const now = Date.now();
+  const upcomingRetentionWindowMs = 45 * 24 * 60 * 60 * 1000;
+  const legalHoldState = new Map<string, boolean>();
+
+  for (const record of [...ledgerRecords].sort((a, b) => a.createdAt.localeCompare(b.createdAt))) {
+    byActionType[record.actionType] += 1;
+
+    if (record.actionType === "incident-export-requested") {
+      byIncidentSeverity[record.incidentSeverity] += 1;
+    }
+
+    if (record.actionType === "legal-hold-recorded") {
+      const holdHasExpired = record.legalHoldUntil ? Date.parse(record.legalHoldUntil) <= now : false;
+      legalHoldState.set(legalHoldScope(record), !holdHasExpired);
+    }
+
+    if (record.actionType === "legal-hold-released") {
+      legalHoldState.set(legalHoldScope(record), false);
+    }
+  }
+
+  const retentionRecords = ledgerRecords.filter(
+    (record) => record.actionType === "retention-policy-recorded" && record.retentionUntil
+  );
+  const activeRetentionPolicies = retentionRecords.filter(
+    (record) => record.retentionUntil && Date.parse(record.retentionUntil) > now
+  ).length;
+  const upcomingRetentionExpirations = retentionRecords.filter((record) => {
+    if (!record.retentionUntil) {
+      return false;
+    }
+
+    const expiration = Date.parse(record.retentionUntil);
+    return expiration > now && expiration <= now + upcomingRetentionWindowMs;
+  }).length;
+  const latestLedgerAt =
+    ledgerRecords.reduce<string | null>(
+      (latest, record) => (!latest || record.createdAt > latest ? record.createdAt : latest),
+      null
+    );
+
+  return {
+    totalLedgerEntries: ledgerRecords.length,
+    byActionType,
+    byIncidentSeverity,
+    retentionPolicies: byActionType["retention-policy-recorded"],
+    activeRetentionPolicies,
+    upcomingRetentionExpirations,
+    activeLegalHolds: [...legalHoldState.values()].filter(Boolean).length,
+    incidentExports: byActionType["incident-export-requested"],
+    latestLedgerAt,
+    boundaryControls: [
+      "Append-only governance evidence",
+      "Tenant-scoped RLS visibility",
+      "AAL2 tenant-admin or pilot-lead mutations",
+      "Write-before-release incident export",
+      "Synthetic-pilot evidence only",
+      "No legal, clinical, HIPAA, SOC 2, or regulatory certification claim"
+    ]
+  };
+}
+
 function defaultTrustCard(template: WorkOrderTemplate) {
   return {
     requirement: template.trustCardRequirement,
@@ -1116,6 +1339,93 @@ export function validateAgentWorkspaceTransitionPayload(
   };
 }
 
+export function validateAgentWorkspaceGovernanceLedgerPayload(
+  payload: unknown
+): ValidationResult<AgentWorkspaceGovernanceLedgerInput> {
+  const errors: string[] = [];
+
+  if (!isRecord(payload)) {
+    return { ok: false, errors: ["payload must be a JSON object"] };
+  }
+
+  if (!isAgentWorkspaceGovernanceActionType(payload.actionType)) {
+    return {
+      ok: false,
+      errors: ["actionType must match retention-policy-recorded, legal-hold-recorded, legal-hold-released, or incident-export-requested"]
+    };
+  }
+
+  const reason = optionalString(payload.reason);
+  const workOrderId = optionalUuid(payload.workOrderId);
+  const retentionUntil = optionalIsoTimestamp(payload.retentionUntil, "retentionUntil", errors);
+  const legalHoldUntil = optionalIsoTimestamp(payload.legalHoldUntil, "legalHoldUntil", errors);
+  const incidentSeverity =
+    payload.incidentSeverity === undefined || payload.incidentSeverity === null || payload.incidentSeverity === ""
+      ? "not-applicable"
+      : isAgentWorkspaceIncidentSeverity(payload.incidentSeverity)
+        ? payload.incidentSeverity
+        : null;
+  const eventMetadata = isRecord(payload.eventMetadata) ? payload.eventMetadata : {};
+  const now = Date.now();
+
+  if (reason.length < 20 || reason.length > 2000) {
+    errors.push("reason must be between 20 and 2000 characters");
+  }
+
+  if (workOrderId === "__invalid_uuid__") {
+    errors.push("workOrderId must be a valid UUID when provided");
+  }
+
+  if (!incidentSeverity) {
+    errors.push("incidentSeverity must match not-applicable, low, moderate, high, or critical");
+  }
+
+  if (payload.eventMetadata !== undefined && !isRecord(payload.eventMetadata)) {
+    errors.push("eventMetadata must be a JSON object when provided");
+  }
+
+  if (payload.actionType === "retention-policy-recorded") {
+    if (!retentionUntil) {
+      errors.push("retentionUntil is required for retention-policy-recorded");
+    } else if (Date.parse(retentionUntil) <= now) {
+      errors.push("retentionUntil must be in the future");
+    }
+  }
+
+  if (payload.actionType === "legal-hold-recorded" && legalHoldUntil && Date.parse(legalHoldUntil) <= now) {
+    errors.push("legalHoldUntil must be in the future when provided");
+  }
+
+  if (payload.actionType === "legal-hold-released" && legalHoldUntil) {
+    errors.push("legal-hold-released cannot set legalHoldUntil");
+  }
+
+  if (payload.actionType === "incident-export-requested" && incidentSeverity === "not-applicable") {
+    errors.push("incidentSeverity is required for incident-export-requested");
+  }
+
+  if (payload.actionType !== "incident-export-requested" && incidentSeverity !== "not-applicable") {
+    errors.push("incidentSeverity must be not-applicable unless actionType is incident-export-requested");
+  }
+
+  if (errors.length > 0 || !incidentSeverity) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: {
+      actionType: payload.actionType,
+      reason,
+      workOrderId: workOrderId === "__invalid_uuid__" ? null : workOrderId,
+      retentionUntil,
+      legalHoldUntil,
+      incidentSeverity,
+      eventMetadata
+    }
+  };
+}
+
 export function getPersistentAgentWorkspaceSummary() {
   const protectedWorkspace = getProtectedPilotWorkspaceSummary();
   const agentOS = getAgentOSSummary();
@@ -1141,6 +1451,8 @@ export function getPersistentAgentWorkspaceSummary() {
     workOrderDetailRoute: "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}",
     workOrderProofPacketRoute:
       "/api/agent-workspaces/{workspaceSlug}/work-orders/{workOrderId}/proof-packet",
+    governanceLedgerRoute: "/api/agent-workspaces/{workspaceSlug}/governance-ledger",
+    incidentExportRoute: "/api/agent-workspaces/{workspaceSlug}/governance-ledger/incident-export",
     workOrderDashboardFilters: [
       "state",
       "workOrderType",
@@ -1168,6 +1480,8 @@ export function getPersistentAgentWorkspaceSummary() {
     workOrderCount: workOrderTemplates.length,
     workOrderStateCount: agentWorkOrderStates.length,
     workOrderEventTypeCount: agentWorkOrderEventTypes.length,
+    governanceActionTypeCount: agentWorkspaceGovernanceActionTypes.length,
+    incidentSeverityCount: agentWorkspaceIncidentSeverities.length,
     modelRouterDecisionCount: modelRouterWorkspaceDecisions.length,
     reviewerCheckpointCount: workspaceReviewerCheckpoints.length,
     auditTimelineEventCount: workspaceAuditTimeline.length,
@@ -1185,8 +1499,8 @@ export function getPersistentAgentWorkspaceSummary() {
     resolvedPosition:
       "No known limitation is left vague: each is either controlled by an active boundary, replaced with a safer synthetic quality process, or marked as an external approval gate that cannot be honestly resolved in code alone.",
     nextImplementationStep:
-      "Implement a server-audited retention/legal-hold and incident-export ledger, then run the authenticated Agent Workspace smoke script in CI with approved tenant secrets.",
-    updated: "2026-06-14"
+      "Run the authenticated Agent Workspace governance-ledger smoke script in CI with approved tenant secrets, then add customer-specific retention policy templates and legal-review workflow packs.",
+    updated: "2026-06-15"
   };
 }
 
@@ -1231,9 +1545,13 @@ export function buildPersistentAgentWorkspaceBrief() {
     `- Work-order mutation route: ${summary.workOrderMutationRoute}`,
     `- Work-order detail route: ${summary.workOrderDetailRoute}`,
     `- Work-order proof-packet route: ${summary.workOrderProofPacketRoute}`,
+    `- Governance ledger route: ${summary.governanceLedgerRoute}`,
+    `- Incident export route: ${summary.incidentExportRoute}`,
     `- Work-order dashboard filters: ${summary.workOrderDashboardFilters.join(", ")}`,
     `- Work-order states: ${summary.workOrderStateCount}`,
     `- Work-order event types: ${summary.workOrderEventTypeCount}`,
+    `- Governance action types: ${summary.governanceActionTypeCount}`,
+    `- Incident severity levels: ${summary.incidentSeverityCount}`,
     "",
     "## Workspace Capabilities",
     ...summary.capabilities.map(
@@ -1420,6 +1738,100 @@ export function buildAgentWorkspaceWorkOrderProofPacket({
     "## Product Boundary",
     workOrder.boundary,
     "",
+    persistentAgentWorkspaceBoundary
+  ].join("\n");
+}
+
+function governanceLedgerLines(records: AgentWorkspaceGovernanceLedgerRecord[]) {
+  const sortedRecords = [...records].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+  if (sortedRecords.length === 0) {
+    return "- No governance ledger entries are visible for this tenant member.";
+  }
+
+  return sortedRecords
+    .map(
+      (record) =>
+        `- ${record.createdAt}: ${record.actionType} by ${record.actorUserId}; severity ${record.incidentSeverity}; work order ${record.workOrderId ?? "workspace-level"}`
+    )
+    .join("\n");
+}
+
+function workOrderSnapshotLines(workOrders: AgentWorkspaceWorkOrderRecord[]) {
+  if (workOrders.length === 0) {
+    return "- No work orders are visible for this workspace.";
+  }
+
+  return workOrders
+    .slice(0, 25)
+    .map(
+      (workOrder) =>
+        `- ${workOrder.updatedAt}: ${workOrder.workOrderType} (${workOrder.state}) owned by ${workOrder.agentOwner}; reviewer ${workOrder.assignedReviewerId ?? "unassigned"}; synthetic-only boundary retained.`
+    )
+    .join("\n");
+}
+
+export function buildAgentWorkspaceIncidentExportPacket({
+  workspace,
+  workOrders,
+  ledgerRecords,
+  recordedLedgerEntry,
+  generatedAt,
+  actorUserId,
+  appBaseUrl
+}: AgentWorkspaceIncidentExportPacketInput) {
+  const dashboard = summarizeAgentWorkspaceGovernanceLedger(ledgerRecords);
+  const productRoute = `${appBaseUrl.replace(/\/$/, "")}/pilot-workspace`;
+
+  return [
+    "# SCRIMED Agent Workspace Incident Export",
+    "",
+    "## Export Control",
+    `- Generated: ${generatedAt}`,
+    `- Ledger ID: ${recordedLedgerEntry.id}`,
+    `- Requested by: ${actorUserId}`,
+    `- Incident severity: ${recordedLedgerEntry.incidentSeverity}`,
+    `- Product route: ${productRoute}`,
+    "- Export type: server-audited synthetic-pilot governance export",
+    "- Data boundary: synthetic-only and metadata-only",
+    "",
+    "## Tenant Workspace",
+    `- Tenant: ${workspace.tenantName}`,
+    `- Workspace: ${workspace.name}`,
+    `- Workspace slug: ${workspace.slug}`,
+    `- Workspace status: ${workspace.status}`,
+    "",
+    "## Incident Export Reason",
+    recordedLedgerEntry.reason,
+    "",
+    "## Recorded Ledger Entry",
+    markdownJson(recordedLedgerEntry),
+    "",
+    "## Governance Ledger Dashboard",
+    `- Total ledger entries: ${dashboard.totalLedgerEntries}`,
+    `- Incident exports: ${dashboard.incidentExports}`,
+    `- Active legal holds: ${dashboard.activeLegalHolds}`,
+    `- Active retention policies: ${dashboard.activeRetentionPolicies}`,
+    `- Upcoming retention expirations: ${dashboard.upcomingRetentionExpirations}`,
+    `- Latest ledger timestamp: ${dashboard.latestLedgerAt ?? "none"}`,
+    "",
+    "## Governance Boundary Controls",
+    markdownItems(dashboard.boundaryControls),
+    "",
+    "## Ledger Timeline",
+    governanceLedgerLines(ledgerRecords),
+    "",
+    "## Work-Order Snapshot",
+    workOrderSnapshotLines(workOrders),
+    "",
+    "## Legal, Privacy, Security, And Safety Boundary",
+    "- This export is governed synthetic-pilot evidence only.",
+    "- This export is not legal advice, regulatory advice, incident-response counsel, HIPAA compliance certification, SOC 2 certification, FDA clearance, payer approval, reimbursement assurance, or production authorization.",
+    "- Do not use this export to process PHI, live patient records, payer credentials, secrets, production connector credentials, or medical images.",
+    "- Live incident response, legal hold, retention, breach analysis, customer notification, regulatory reporting, and forensic review require authorized counsel, privacy, security, compliance, and customer incident owners.",
+    "- SCRIMED must escalate uncertainty, missing evidence, unsafe scope, or regulated-data requests to authorized human reviewers.",
+    "",
+    "## Product Boundary",
     persistentAgentWorkspaceBoundary
   ].join("\n");
 }

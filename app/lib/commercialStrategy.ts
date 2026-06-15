@@ -46,6 +46,13 @@ export type CommercialGuardrail = {
   detail: string;
 };
 
+export type PremiumPricingPrinciple = {
+  principle: string;
+  policy: string;
+  rationale: string;
+  guardrail: string;
+};
+
 export const commercialBoundary =
   "SCRIMED pricing and sales motions currently sell governed synthetic evaluations, readiness assessments, and protected enterprise pilots. Pricing does not imply live clinical execution, autonomous diagnosis, payer submission, reimbursement guarantees, or production medical-record processing.";
 
@@ -122,7 +129,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Workflow Intelligence Assessment",
     status: "sellable-now",
-    recommendedDisplayPrice: "Recommended range: $15k-$35k fixed fee",
+    recommendedDisplayPrice: "Starts at $50k; typical range $75k-$150k fixed fee",
     buyer: "Hospitals, clinics, payers, and transformation teams validating workflow opportunity before a pilot",
     entryCriteria: [
       "Executive or operational sponsor identified",
@@ -147,7 +154,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Synthetic Pilot Evaluation",
     status: "sellable-now",
-    recommendedDisplayPrice: "Recommended range: $35k-$95k for 30-90 days",
+    recommendedDisplayPrice: "Starts at $150k; typical range $200k-$500k for 45-90 days",
     buyer: "Enterprise buyers who want to evaluate SCRIMED against synthetic workflows before live integration",
     entryCriteria: [
       "Named sponsor and review team",
@@ -173,7 +180,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Protected Enterprise Pilot",
     status: "protected-pilot",
-    recommendedDisplayPrice: "Recommended range: $150k-$400k for 90-180 days",
+    recommendedDisplayPrice: "Starts at $750k; typical range $1M-$2.5M for 90-180 days",
     buyer: "Health systems, payers, public-sector programs, and enterprise operators preparing controlled deployment",
     entryCriteria: [
       "Security, privacy, compliance, and legal review underway",
@@ -200,7 +207,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Enterprise Operating License",
     status: "enterprise-license",
-    recommendedDisplayPrice: "Annual license: custom, recommended floor $300k+",
+    recommendedDisplayPrice: "Annual platform license starts at $2.5M; enterprise range $3M-$12M+",
     buyer: "Large hospitals, payers, government health agencies, and multi-site healthcare organizations",
     entryCriteria: [
       "Protected pilot validated",
@@ -226,7 +233,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Strategic Platform Partnership",
     status: "strategic",
-    recommendedDisplayPrice: "Custom multi-year partnership",
+    recommendedDisplayPrice: "Multi-year partnerships start at $10M; national or ecosystem programs $25M+",
     buyer: "Governments, national health systems, major payers, strategic hospital networks, and global partners",
     entryCriteria: [
       "Multi-organization mandate",
@@ -248,6 +255,40 @@ export const pricingTiers: PricingTier[] = [
       label: "Request Strategic Review",
       href: "/pilot?offer=ai-readiness-governance-audit"
     }
+  }
+];
+
+export const premiumPricingPrinciples: PremiumPricingPrinciple[] = [
+  {
+    principle: "Protect enterprise price integrity",
+    policy: "Use starts-at floors and scoped enterprise ranges; do not publish low monthly plans for the operating layer.",
+    rationale:
+      "SCRIMED sells governed healthcare intelligence infrastructure, workflow transformation, trust controls, and enterprise proof, not a commodity chatbot seat.",
+    guardrail: "Discount only by reducing scope, duration, services, integrations, or support commitments."
+  },
+  {
+    principle: "Price against workflow value and governance scope",
+    policy:
+      "Anchor fees to workflows under governance, departments served, integrations, support level, security review, and proof-stack depth.",
+    rationale:
+      "Healthcare buyers pay for measurable operational intelligence, trusted controls, and deployment readiness across high-friction workflows.",
+    guardrail: "Measured pilot outcomes are directional business evidence, not guaranteed clinical, payer, or reimbursement outcomes."
+  },
+  {
+    principle: "Separate platform license from implementation services",
+    policy:
+      "Keep annual platform licensing distinct from assessment, pilot, connector, migration, security, training, and advisory work.",
+    rationale:
+      "This preserves SCRIMED's long-term platform margin while making complex enterprise delivery transparent to buyers.",
+    guardrail: "Live connector, PHI, clinical, payer, or sovereign deployment work requires approved written scope and controls."
+  },
+  {
+    principle: "Move qualified buyers toward multi-year commitments",
+    policy:
+      "Use paid assessments and synthetic pilots to validate scope, then convert protected pilots into annual or multi-year platform agreements.",
+    rationale:
+      "Enterprise healthcare transformation compounds through trust, workflow ownership, integrations, and institutional memory.",
+    guardrail: "No customer should enter production use without legal, privacy, security, governance, and human-review approvals."
   }
 ];
 
@@ -372,9 +413,10 @@ export function getCommercialStrategySummary() {
     boundary: commercialBoundary,
     productAccessRoutes,
     pricingTiers,
+    premiumPricingPrinciples,
     salesMotion,
     valueMetrics,
     commercialGuardrails,
-    updated: "2026-06-02"
+    updated: "2026-06-15"
   };
 }

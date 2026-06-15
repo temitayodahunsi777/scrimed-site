@@ -58,6 +58,26 @@ export default function PricingPage() {
         </div>
       </section>
 
+      <section className="section-band" aria-label="Premium pricing posture">
+        <div className="section-heading">
+          <p className="eyebrow">Premium pricing posture</p>
+          <h2>Price SCRIMED like trusted healthcare intelligence infrastructure.</h2>
+        </div>
+        <div className="principle-grid">
+          {summary.premiumPricingPrinciples.map((principle) => (
+            <article key={principle.principle}>
+              <span>principle</span>
+              <h3>{principle.principle}</h3>
+              <p>{principle.policy}</p>
+              <ul className="compact-list">
+                <li>{principle.rationale}</li>
+                <li>{principle.guardrail}</li>
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="table-section" aria-label="SCRIMED pricing tiers">
         <div className="section-heading">
           <p className="eyebrow">Pricing tiers</p>

@@ -49,6 +49,15 @@ console.log(
   `pass unauthenticated fail-closed check: ${unauthenticated.response.status} ${unauthenticated.response.statusText}`
 );
 
+const unauthenticatedLedger = await request(
+  `/api/agent-workspaces/${workspaceSlug}/governance-ledger`
+);
+requireStatus("unauthenticated governance-ledger list", unauthenticatedLedger.response.status, [401, 503]);
+requireSyntheticBoundary("unauthenticated governance-ledger list", unauthenticatedLedger.response);
+console.log(
+  `pass unauthenticated governance-ledger fail-closed check: ${unauthenticatedLedger.response.status} ${unauthenticatedLedger.response.statusText}`
+);
+
 if (!bearerToken) {
   console.log(
     "skip authenticated happy path: set SCRIMED_BEARER_TOKEN to a tenant-admin or pilot-lead AAL2 bearer token."
@@ -168,4 +177,60 @@ if (!proofPacketResult.body.text.includes("SCRIMED Agent Workspace Work-Order Pr
 }
 
 console.log("pass authenticated proof packet download and audit event");
+
+const retentionUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+const governanceLedgerResult = await request(`/api/agent-workspaces/${workspaceSlug}/governance-ledger`, {
+  body: JSON.stringify({
+    actionType: "retention-policy-recorded",
+    reason:
+      "Authenticated smoke recorded synthetic pilot retention control evidence for enterprise governance verification.",
+    workOrderId: createdWorkOrderId,
+    retentionUntil,
+    legalHoldUntil: null,
+    incidentSeverity: "not-applicable",
+    eventMetadata: {
+      smokeTest: true,
+      syntheticOnly: true,
+      retentionUntil
+    }
+  }),
+  headers: authHeaders,
+  method: "POST"
+});
+requireStatus("authenticated governance-ledger retention record", governanceLedgerResult.response.status, 201);
+
+if (!governanceLedgerResult.body.json?.ledgerId) {
+  throw new Error("authenticated governance-ledger record did not return a ledgerId.");
+}
+
+console.log(`pass authenticated governance-ledger record: ${governanceLedgerResult.body.json.ledgerId}`);
+
+const incidentExportResult = await request(
+  `/api/agent-workspaces/${workspaceSlug}/governance-ledger/incident-export`,
+  {
+    body: JSON.stringify({
+      actionType: "incident-export-requested",
+      reason:
+        "Authenticated smoke requested a server-audited synthetic incident export to verify write-before-release governance behavior.",
+      workOrderId: createdWorkOrderId,
+      retentionUntil: null,
+      legalHoldUntil: null,
+      incidentSeverity: "moderate",
+      eventMetadata: {
+        smokeTest: true,
+        syntheticOnly: true,
+        exportPurpose: "ci-governance-ledger-smoke"
+      }
+    }),
+    headers: authHeaders,
+    method: "POST"
+  }
+);
+requireStatus("authenticated incident export", incidentExportResult.response.status, 200);
+
+if (!incidentExportResult.body.text.includes("SCRIMED Agent Workspace Incident Export")) {
+  throw new Error("authenticated incident export did not include the expected packet heading.");
+}
+
+console.log("pass authenticated incident export download and governance-ledger audit event");
 console.log("SCRIMED Agent Workspace authenticated smoke completed.");
