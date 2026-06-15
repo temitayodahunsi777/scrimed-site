@@ -73,6 +73,11 @@ const consoleViews = [
     summary: "Review CRM-safe source tracking, UTM/referrer capture, revenue routing, deployment profile mapping, and sales cadence."
   },
   {
+    name: "Attribution Analytics",
+    href: "/attribution-analytics",
+    summary: "Review source-to-pilot cohorts across campaign, buyer type, deployment profile, offer, cadence, proof packet, and sales outcome."
+  },
+  {
     name: "Source Intelligence",
     href: "/source-intelligence",
     summary: "Review public standards and platform signals converted into SCRIMED-specific implementation themes and governance boundaries."

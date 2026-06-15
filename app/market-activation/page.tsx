@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getAttributionAnalyticsSummary } from "../lib/attributionAnalytics";
 import { getMarketActivationSummary } from "../lib/marketActivation";
 import { getSalesAttributionSummary } from "../lib/salesAttribution";
 
@@ -11,6 +12,7 @@ export const metadata = {
 export default function MarketActivationPage() {
   const summary = getMarketActivationSummary();
   const attribution = getSalesAttributionSummary();
+  const analytics = getAttributionAnalyticsSummary();
 
   return (
     <main>
@@ -25,6 +27,7 @@ export default function MarketActivationPage() {
           <a className="primary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/pricing">Pricing</Link>
           <Link className="secondary-action" href="/sales-attribution">Attribution</Link>
+          <Link className="secondary-action" href={analytics.route}>Analytics</Link>
           <Link className="secondary-action" href="/faithcore">FaithCore</Link>
           <Link className="secondary-action" href="/claims">Claims Register</Link>
         </div>
@@ -52,6 +55,10 @@ export default function MarketActivationPage() {
           <strong>{summary.advertisingCampaignCount}</strong>
         </article>
         <article>
+          <span>Cohorts</span>
+          <strong>{analytics.cohorts.length}</strong>
+        </article>
+        <article>
           <span>FaithCore</span>
           <strong>{summary.faithCoreProgramCount}</strong>
         </article>
@@ -68,7 +75,8 @@ export default function MarketActivationPage() {
             `Captured fields: ${attribution.capturedFields.length}`,
             `Blocked fields: ${attribution.blockedFields.length}`,
             `Source signals: ${attribution.sourceSignalCount}`,
-            `Sample cadence: ${attribution.sampleAttribution.cadence.firstResponseSla}`
+            `Sample cadence: ${attribution.sampleAttribution.cadence.firstResponseSla}`,
+            `Cohort report: ${analytics.route}`
           ].map((item, index) => (
             <div className="layer-row" key={item}>
               <span>{String(index + 1).padStart(2, "0")}</span>
@@ -76,6 +84,26 @@ export default function MarketActivationPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Attribution analytics market linkage">
+        <div className="section-heading">
+          <p className="eyebrow">Cohort reporting</p>
+          <h2>Growth channels are evaluated by source-to-pilot movement before spending scales.</h2>
+          <p className="section-copy">{analytics.boundary}</p>
+        </div>
+        {analytics.proofRecommendations.slice(0, 4).map((recommendation) => (
+          <article className="module-row" key={recommendation.cohort}>
+            <div>
+              <span>analytics</span>
+              <h2>{recommendation.cohort}</h2>
+            </div>
+            <p>{recommendation.reason}</p>
+            <Link className="module-link" href={analytics.route}>
+              {recommendation.nextAction}
+            </Link>
+          </article>
+        ))}
       </section>
 
       <section className="section-band split-band">

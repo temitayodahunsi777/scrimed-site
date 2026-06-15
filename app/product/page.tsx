@@ -89,6 +89,14 @@ export default function ProductConsolePage() {
           <strong>{summary.attributionCapturedFieldCount}</strong>
         </article>
         <article>
+          <span>Attribution cohorts</span>
+          <strong>{summary.attributionCohortCount}</strong>
+        </article>
+        <article>
+          <span>Analytics records</span>
+          <strong>{summary.attributionAnalyticsRecordCount}</strong>
+        </article>
+        <article>
           <span>TrustOS controls</span>
           <strong>{summary.trustOSControlCount}</strong>
         </article>
@@ -100,6 +108,47 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED attribution analytics">
+        <div className="section-heading">
+          <p className="eyebrow">Attribution analytics</p>
+          <h2>Source-to-pilot cohorts connect campaign signal, buyer type, deployment profile, proof packet, and sales outcome.</h2>
+          <p className="section-copy">{summary.attributionAnalyticsSummary.boundary}</p>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.attributionAnalyticsSummary.status}</span>
+            <h2>{summary.attributionAnalyticsSummary.mode}</h2>
+          </div>
+          <p>
+            Public cohorts remain synthetic for investor and buyer review. Authenticated tenant-admin analytics derive from persisted no-PHI Sales Operations opportunities.
+          </p>
+          <div>
+            <Link className="module-link" href={summary.attributionAnalyticsRoute}>
+              Open attribution analytics
+            </Link>
+            <ul className="compact-list">
+              <li>Records: {summary.attributionAnalyticsRecordCount}</li>
+              <li>Cohorts: {summary.attributionCohortCount}</li>
+              <li>Source coverage: {summary.attributionAnalyticsSummary.totals.sourceCoveragePercent}%</li>
+              <li>Proof coverage: {summary.attributionAnalyticsSummary.totals.proofPacketCoveragePercent}%</li>
+              <li>Protected API: {summary.attributionAnalyticsAuthenticatedApiRoute}</li>
+            </ul>
+          </div>
+        </article>
+        {summary.attributionAnalyticsSummary.proofRecommendations.slice(0, 4).map((recommendation) => (
+          <article className="module-row" key={recommendation.cohort}>
+            <div>
+              <span>proof route</span>
+              <h2>{recommendation.cohort}</h2>
+            </div>
+            <p>{recommendation.nextAction}</p>
+            <Link className="module-link" href={recommendation.route}>
+              {recommendation.route}
+            </Link>
+          </article>
+        ))}
       </section>
 
       <section className="section-band split-band">

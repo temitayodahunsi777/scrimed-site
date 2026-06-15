@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getAttributionAnalyticsSummary } from "../lib/attributionAnalytics";
 import { getSalesAttributionSummary } from "../lib/salesAttribution";
 
 export const metadata = {
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default function SalesAttributionPage() {
   const summary = getSalesAttributionSummary();
+  const analytics = getAttributionAnalyticsSummary();
   const sample = summary.sampleAttribution;
 
   return (
@@ -22,6 +24,7 @@ export default function SalesAttributionPage() {
           <a className="primary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/pilot">Buyer Intake</Link>
           <Link className="secondary-action" href="/sales-operations">Sales Operations</Link>
+          <Link className="secondary-action" href={analytics.route}>Analytics</Link>
           <Link className="secondary-action" href="/source-intelligence">Source Intelligence</Link>
         </div>
       </section>
@@ -47,6 +50,36 @@ export default function SalesAttributionPage() {
           <span>Profiles</span>
           <strong>{summary.deploymentProfileCount}</strong>
         </article>
+        <article>
+          <span>Cohorts</span>
+          <strong>{analytics.cohorts.length}</strong>
+        </article>
+        <article>
+          <span>Analytics records</span>
+          <strong>{analytics.totals.recordCount}</strong>
+        </article>
+      </section>
+
+      <section className="section-band split-band">
+        <div>
+          <p className="eyebrow">Cohort analytics</p>
+          <h2>Attribution now rolls up into source-to-pilot cohort reporting.</h2>
+          <p className="section-copy">{analytics.boundary}</p>
+        </div>
+        <div className="layer-list">
+          {[
+            `Public route: ${analytics.route}`,
+            `Public API: ${analytics.apiRoute}`,
+            `Tenant API: ${analytics.authenticatedApiRoute}`,
+            `Source coverage: ${analytics.totals.sourceCoveragePercent}%`,
+            `Proof coverage: ${analytics.totals.proofPacketCoveragePercent}%`
+          ].map((item, index) => (
+            <div className="layer-row" key={item}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="section-band split-band">

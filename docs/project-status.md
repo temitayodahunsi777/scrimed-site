@@ -2,6 +2,14 @@
 
 Updated: 2026-06-15
 
+## Latest Attribution Analytics Release
+
+- Added `/attribution-analytics` and `/api/attribution-analytics` for public synthetic source-to-pilot cohort analytics across source category, campaign, buyer type, deployment profile, offer, cadence, proof packet, and sales outcome.
+- Added protected `/api/sales-operations/attribution-analytics` so authenticated tenant-admins can derive cohort analytics from persisted no-PHI Sales Operations opportunities.
+- Added Attribution Analytics to `/product`, `/hub`, `/sales-attribution`, `/market-activation`, and product readiness brief output.
+- Kept the durable source aligned to existing retained buyer-intake metadata at `private.pilot_intake_submissions.payload.attribution`, avoiding a new database migration or paid connector dependency.
+- Preserved the boundary: public analytics are synthetic fixtures and do not represent real customers, revenue, patient outcomes, clinical validation, or guaranteed ROI.
+
 ## Latest Sales Attribution And Source Intelligence Release
 
 - Added `/sales-attribution` and `/api/sales-attribution` for CRM-safe source tracking, UTM/referrer capture, target audience routing, revenue-stream mapping, deployment-profile selection, source-informed strategy signals, and human follow-up cadence.

@@ -23,6 +23,7 @@ import { getDeploymentProfileSummary } from "./deploymentProfiles";
 import { getMarketActivationSummary } from "./marketActivation";
 import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
+import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -506,6 +507,7 @@ export function getProductConsoleSummary() {
   const marketActivationSummary = getMarketActivationSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
   const sourceIntelligenceSummary = getSourceIntelligenceSummary();
+  const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -540,6 +542,9 @@ export function getProductConsoleSummary() {
     marketActivationApiRoute: marketActivationSummary.apiRoute,
     salesAttributionRoute: salesAttributionSummary.route,
     salesAttributionApiRoute: salesAttributionSummary.apiRoute,
+    attributionAnalyticsRoute: attributionAnalyticsSummary.route,
+    attributionAnalyticsApiRoute: attributionAnalyticsSummary.apiRoute,
+    attributionAnalyticsAuthenticatedApiRoute: attributionAnalyticsSummary.authenticatedApiRoute,
     sourceIntelligenceRoute: sourceIntelligenceSummary.route,
     sourceIntelligenceApiRoute: sourceIntelligenceSummary.apiRoute,
     pilotEvidenceRoute: "/pilot-evidence",
@@ -565,6 +570,8 @@ export function getProductConsoleSummary() {
     targetAudienceCount: marketActivationSummary.targetAudienceCount,
     sourceIntelligenceSourceCount: sourceIntelligenceSummary.sourceCount,
     attributionCapturedFieldCount: salesAttributionSummary.capturedFields.length,
+    attributionAnalyticsRecordCount: attributionAnalyticsSummary.totals.recordCount,
+    attributionCohortCount: attributionAnalyticsSummary.cohorts.length,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -594,10 +601,12 @@ export function getProductConsoleSummary() {
     deploymentProfileSummary,
     marketActivationSummary,
     salesAttributionSummary,
+    attributionAnalyticsSummary,
     sourceIntelligenceSummary,
     proofStack: {
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
+      attributionAnalytics: attributionAnalyticsSummary.status,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       deploymentProfiles: deploymentProfileSummary.status,
       marketActivation: marketActivationSummary.status,
@@ -627,7 +636,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
     updated: "2026-06-15"
   };
 }
@@ -717,6 +726,21 @@ export function getProductReadinessBrief() {
     `Sample revenue stream: ${summary.salesAttributionSummary.sampleAttribution.market.revenueStream}`,
     `Sample deployment profile: ${summary.salesAttributionSummary.sampleAttribution.deployment.profileName}`,
     `Sample cadence: ${summary.salesAttributionSummary.sampleAttribution.cadence.firstResponseSla}`,
+    "",
+    "## Attribution Analytics",
+    `Route: ${summary.attributionAnalyticsRoute}`,
+    `API: ${summary.attributionAnalyticsApiRoute}`,
+    `Authenticated API: ${summary.attributionAnalyticsAuthenticatedApiRoute}`,
+    `Status: ${summary.attributionAnalyticsSummary.status}`,
+    `Mode: ${summary.attributionAnalyticsSummary.mode}`,
+    `Records: ${summary.attributionAnalyticsRecordCount}`,
+    `Cohorts: ${summary.attributionCohortCount}`,
+    `Source coverage: ${summary.attributionAnalyticsSummary.totals.sourceCoveragePercent}%`,
+    `Proof packet coverage: ${summary.attributionAnalyticsSummary.totals.proofPacketCoveragePercent}%`,
+    ...summary.attributionAnalyticsSummary.proofRecommendations.map(
+      (recommendation) => `- ${recommendation.cohort} -> ${recommendation.route}: ${recommendation.nextAction}`
+    ),
+    ...summary.attributionAnalyticsSummary.limitations.map((limitation) => `- Limitation: ${limitation}`),
     "",
     "## Pricing and Sales",
     `Pricing route: ${summary.pricingRoute}`,

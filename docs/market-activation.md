@@ -10,6 +10,9 @@ Market activation is active as a governed product surface:
 - API: `/api/market-activation`
 - Attribution: `/sales-attribution`
 - Attribution API: `/api/sales-attribution`
+- Attribution analytics: `/attribution-analytics`
+- Attribution analytics API: `/api/attribution-analytics`
+- Protected tenant analytics API: `/api/sales-operations/attribution-analytics`
 - Product console: `/product`
 - FaithCore page: `/faithcore`
 
@@ -44,6 +47,8 @@ All public channels must use approved claims, no-PHI intake, explicit synthetic 
 ## Attribution Linkage
 
 Sales Attribution v1 now converts approved market activation signals into CRM-safe source routing, audience mapping, deployment profile selection, and human follow-up cadence.
+
+Attribution Analytics now compares source-to-pilot cohorts before campaigns scale. Public analytics remain synthetic. Tenant analytics require authenticated Sales Operations access and retained no-PHI opportunities.
 
 ## Boundary
 

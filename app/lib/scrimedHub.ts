@@ -55,6 +55,7 @@ import {
   getEnterpriseReadinessSummary,
   getReadinessDomains
 } from "./enterpriseReadiness";
+import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 
 export type HubModule = {
   name: string;
@@ -125,6 +126,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
+  { name: "Attribution analytics", value: "source-to-pilot cohorts active", tone: "good" },
   { name: "Source intelligence", value: "public platform signals encoded", tone: "good" },
   { name: "Persistent Agent Workspace", value: "work-order proof layer active", tone: "good" },
   { name: "Pilot evidence", value: "enterprise proof dashboard active", tone: "good" },
@@ -199,6 +201,7 @@ export const hubRoutes = [
   "/pricing",
   "/market-activation",
   "/sales-attribution",
+  "/attribution-analytics",
   "/source-intelligence",
   "/deployment-profiles",
   "/operations",
@@ -284,6 +287,8 @@ export const hubRoutes = [
   "/api/commercial/pricing",
   "/api/market-activation",
   "/api/sales-attribution",
+  "/api/attribution-analytics",
+  "/api/sales-operations/attribution-analytics",
   "/api/source-intelligence",
   "/api/deployment-profiles",
   "/api/operations/readiness",
@@ -378,6 +383,7 @@ export function getHubSummary() {
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
+  const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -401,6 +407,7 @@ export function getHubSummary() {
     commercialStrategySummary,
     companyOperationsSummary,
     enterpriseReadinessSummary,
+    attributionAnalyticsSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

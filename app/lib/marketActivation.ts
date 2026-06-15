@@ -372,7 +372,7 @@ export function getMarketActivationSummary() {
     advertisingCampaigns,
     faithCoreMarketPrograms,
     nextBuildStep:
-      "Use the Sales Attribution layer to convert approved campaigns into CRM-safe source tracking, then build cohort-level reporting across source, audience, deployment profile, and follow-up outcome.",
+      "Use Attribution Analytics to review source-to-pilot cohorts before scaling campaigns, then add tenant-admin export packets for board, investor, and enterprise pipeline reviews.",
     updated: "2026-06-15"
   };
 }

@@ -10,6 +10,9 @@ Routes:
 
 - `/sales-attribution`
 - `/api/sales-attribution`
+- `/attribution-analytics`
+- `/api/attribution-analytics`
+- `/api/sales-operations/attribution-analytics`
 - `/pilot`
 - `/api/pilot/intake`
 - `/sales-operations`
@@ -45,4 +48,10 @@ Sales Operations now carries attribution into:
 - Assessment invitation
 - Opportunity proposal
 
-The next build step is cohort reporting: source, audience, revenue stream, deployment profile, response SLA, follow-up completion, and qualified-pilot conversion.
+## Cohort Analytics
+
+Attribution Analytics now rolls safe source capture into cohort reporting by source, campaign, buyer type, deployment profile, offer, cadence, proof packet, and sales outcome.
+
+Public analytics use synthetic fixtures at `/attribution-analytics`. Authenticated tenant-admin analytics are available at `/api/sales-operations/attribution-analytics` and derive from persisted no-PHI Sales Operations opportunities.
+
+The next build step is audited packet export for board, investor, and enterprise sales reviews.

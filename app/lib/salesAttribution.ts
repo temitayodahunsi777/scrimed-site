@@ -500,7 +500,7 @@ export function getSalesAttributionSummary() {
       receivedAt: "2026-06-15T00:00:00.000Z"
     }),
     nextBuildStep:
-      "Persist attribution trends into dashboard-level cohort reporting and connect them to buyer-specific proof packet recommendations.",
+      "Use Attribution Analytics to compare source-to-pilot cohorts, then export audited board, investor, and enterprise sales packets from authenticated Sales Operations.",
     updated: "2026-06-15"
   };
 }
