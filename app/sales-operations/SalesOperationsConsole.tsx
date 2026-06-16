@@ -4,6 +4,7 @@ import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
+import type { AttributionAnalyticsReport } from "../lib/attributionAnalytics";
 import {
   salesOperationsBoundary,
   salesPipelineStages,
@@ -28,6 +29,7 @@ type ConsoleStatus =
   | "error";
 
 type DashboardResponse = {
+  attributionAnalytics?: AttributionAnalyticsReport;
   crmConfigured?: boolean;
   crmMode?: string;
   crmWebhookConfigured?: boolean;
@@ -119,6 +121,7 @@ export default function SalesOperationsConsole({
   );
   const [message, setMessage] = useState("");
   const [dashboard, setDashboard] = useState<SalesOperationsDashboard | null>(null);
+  const [attributionAnalytics, setAttributionAnalytics] = useState<AttributionAnalyticsReport | null>(null);
   const [crmMode, setCrmMode] = useState("native-export");
   const [crmWebhookConfigured, setCrmWebhookConfigured] = useState(false);
   const [selected, setSelected] = useState<SalesOpportunity | null>(null);
@@ -168,6 +171,7 @@ export default function SalesOperationsConsole({
       }
 
       setDashboard(body.dashboard);
+      setAttributionAnalytics(body.attributionAnalytics ?? null);
       setCrmMode(body.crmMode ?? "native-export");
       setCrmWebhookConfigured(Boolean(body.crmWebhookConfigured));
       const nextSelected = body.dashboard.opportunities[0] ?? null;
@@ -193,6 +197,7 @@ export default function SalesOperationsConsole({
       if (!nextSession) {
         setUser(null);
         setDashboard(null);
+        setAttributionAnalytics(null);
         setSelected(null);
         setDraft(null);
         setStatus("signed-out");
@@ -383,6 +388,7 @@ export default function SalesOperationsConsole({
     }
 
     setDashboard(body.dashboard);
+    setAttributionAnalytics(body.attributionAnalytics ?? null);
     setCrmMode(body.crmMode ?? "native-export");
     setCrmWebhookConfigured(Boolean(body.crmWebhookConfigured));
     const nextSelected =
@@ -483,6 +489,18 @@ export default function SalesOperationsConsole({
       `/api/sales-operations/opportunities/${selected.intakeId}/crm-export`,
       `scrimed-${selected.intakeId}-crm-import.csv`,
       "Vendor-neutral CRM import downloaded and its append-only audit event committed."
+    );
+  }
+
+  async function downloadAttributionAnalyticsPacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/attribution-analytics-packet`,
+      `scrimed-${selected.intakeId}-attribution-analytics-packet.md`,
+      "Attribution analytics packet downloaded and its append-only audit event committed."
     );
   }
 
@@ -737,7 +755,44 @@ export default function SalesOperationsConsole({
           <span>CRM mode</span>
           <strong>{displayValue(crmMode)}</strong>
         </article>
+        <article>
+          <span>Attribution cohorts</span>
+          <strong>{attributionAnalytics?.cohorts.length ?? 0}</strong>
+        </article>
+        <article>
+          <span>Source coverage</span>
+          <strong>{attributionAnalytics ? `${attributionAnalytics.totals.sourceCoveragePercent}%` : "0%"}</strong>
+        </article>
       </section>
+
+      {attributionAnalytics ? (
+        <section className="section-band split-band" aria-label="Tenant attribution analytics">
+          <div>
+            <p className="eyebrow">Tenant attribution analytics</p>
+            <h2>Source-to-pilot cohorts now live inside Sales Operations.</h2>
+            <p className="section-copy">{attributionAnalytics.boundary}</p>
+          </div>
+          <div className="layer-list">
+            {[
+              `Mode: ${attributionAnalytics.mode}`,
+              `Records: ${attributionAnalytics.totals.recordCount}`,
+              `Proof coverage: ${attributionAnalytics.totals.proofPacketCoveragePercent}%`,
+              `Open pipeline: ${attributionAnalytics.totals.openPipelineCount}`
+            ].map((item, index) => (
+              <div className="layer-row" key={item}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item}</strong>
+              </div>
+            ))}
+            {attributionAnalytics.proofRecommendations.slice(0, 4).map((recommendation, index) => (
+              <div className="layer-row" key={recommendation.cohort}>
+                <span>{String(index + 5).padStart(2, "0")}</span>
+                <strong>{recommendation.cohort}: {recommendation.nextAction}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="section-band sales-workspace" aria-label="Tenant-admin sales opportunity workspace">
         <div className="sales-toolbar">
@@ -972,6 +1027,9 @@ export default function SalesOperationsConsole({
                     </button>
                     <button className="secondary-action" onClick={downloadCrmExport} type="button">
                       Download CRM Import
+                    </button>
+                    <button className="secondary-action" onClick={downloadAttributionAnalyticsPacket} type="button">
+                      Download Attribution Packet
                     </button>
                     {crmWebhookConfigured ? (
                       <button

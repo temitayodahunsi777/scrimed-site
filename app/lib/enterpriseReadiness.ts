@@ -59,6 +59,8 @@ export const enterpriseReadinessBoundary =
   "This center is an operational readiness and claims-control register for SCRIMED's governed synthetic evaluation product. It is not legal advice, a compliance certification, a regulatory determination, or authorization for live clinical execution.";
 
 const sources = {
+  copyrightRegistration: "https://www.copyright.gov/registration/",
+  usptoTrademarkBasics: "https://www.uspto.gov/trademarks/basics",
   hipaaSecurity: "https://www.hhs.gov/hipaa/for-professionals/security/index.html",
   hipaaPrivacy: "https://www.hhs.gov/hipaa/for-professionals/privacy/index.html",
   hipaaBreach: "https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html",
@@ -93,8 +95,17 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
         state: "external-review-required",
         owner: "Founder and counsel",
         currentEvidence: "SCRIMED SOLUTIONS, founder identity, product names, slogan, repositories, and operating context are documented.",
-        requiredAction: "Verify entity records, invention assignment, contractor agreements, trademark strategy, domains, and repository ownership.",
+        requiredAction: "Verify entity records, invention assignment, contractor agreements, copyright registration candidates, trademark strategy, domains, and repository ownership.",
         launchGate: "Required before institutional financing, material partnerships, or enterprise contracting."
+      },
+      {
+        id: "legal-copyright-provenance",
+        name: "Copyright, license, and provenance control",
+        state: "external-review-required",
+        owner: "Founder, product, engineering, brand, and qualified IP counsel",
+        currentEvidence: "Trust Safety Ops defines a Copyright And IP Sentinel for source, generated asset, logo, dataset, code, and publication provenance.",
+        requiredAction: "Create an IP inventory, asset-source register, copyright registration queue, third-party license review, generated-content provenance process, and takedown/escalation workflow.",
+        launchGate: "Required before publishing external decks, training materials, datasets, customer artifacts, or broad marketing campaigns."
       },
       {
         id: "legal-contract-stack",
@@ -134,7 +145,13 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
       "Accepting PHI or confidential buyer data without an approved agreement and data-handling path.",
       "Changing intended use through marketing copy without regulatory and governance review."
     ],
-    sourceUrls: [sources.fdaCds, sources.hipaaPrivacy, sources.informationBlocking]
+    sourceUrls: [
+      sources.copyrightRegistration,
+      sources.usptoTrademarkBasics,
+      sources.fdaCds,
+      sources.hipaaPrivacy,
+      sources.informationBlocking
+    ]
   },
   {
     slug: "security",
@@ -162,8 +179,8 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
         name: "Incident response and breach operations",
         state: "decision-required",
         owner: "Security, privacy, legal, and communications",
-        currentEvidence: "Breach response is identified as a required control; no final response plan is asserted.",
-        requiredAction: "Approve incident taxonomy, response roles, evidence preservation, notification analysis, communications, exercises, and post-incident review.",
+        currentEvidence: "Trust Safety Ops defines incident detection, triage, containment, fixing, and improvement loops; no final managed 24/7 SOC/MDR coverage is asserted.",
+        requiredAction: "Approve incident taxonomy, response roles, 24/7 on-call coverage, evidence preservation, notification analysis, communications, exercises, and post-incident review.",
         launchGate: "Tabletop-tested plan required before processing protected or confidential data."
       },
       {
@@ -289,6 +306,15 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
         launchGate: "Review required before major campaigns, licensing, or geographic expansion."
       },
       {
+        id: "brand-copyright-assets",
+        name: "Copyrighted asset and generated-media provenance",
+        state: "decision-required",
+        owner: "Brand, product, engineering, and counsel",
+        currentEvidence: "Trust Safety Ops blocks unapproved third-party content, logos, screenshots, datasets, generated media, and public source excerpts.",
+        requiredAction: "Approve asset provenance metadata, license records, generated-media prompts/sources, approval owners, and removal workflow.",
+        launchGate: "Required before public campaign creative, decks, demo videos, and customer-facing proof packets."
+      },
+      {
         id: "brand-standards",
         name: "Visual and verbal standards",
         state: "decision-required",
@@ -317,7 +343,7 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
       "Blurring faith support with diagnosis, treatment, emergency care, or clinical consent.",
       "Launching new names without brand and legal review."
     ],
-    sourceUrls: []
+    sourceUrls: [sources.copyrightRegistration, sources.usptoTrademarkBasics]
   },
   {
     slug: "governance",
@@ -773,7 +799,7 @@ export function getEnterpriseReadinessSummary() {
       prohibited: publicClaimsRegister.filter((claim) => claim.state === "prohibited").length,
       total: publicClaimsRegister.length
     },
-    updated: "2026-06-10"
+    updated: "2026-06-15"
   };
 }
 

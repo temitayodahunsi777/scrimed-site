@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildAttributionAnalyticsFromOpportunities } from "../../lib/attributionAnalytics";
 import { getAuthenticatedSalesContext } from "../../lib/protectedPilotStore";
 import {
   getSalesOperationsSummary,
@@ -41,7 +42,8 @@ export async function GET(request: Request) {
     {
       ...summary,
       authenticatedUserId: context.user.id,
-      dashboard: result.dashboard
+      dashboard: result.dashboard,
+      attributionAnalytics: buildAttributionAnalyticsFromOpportunities(result.dashboard.opportunities)
     },
     { headers: salesOperationsNoStoreHeaders }
   );

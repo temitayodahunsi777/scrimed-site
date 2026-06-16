@@ -20,12 +20,15 @@ Attribution Analytics turns SCRIMED's CRM-safe source attribution into source-to
 - Public page: `/attribution-analytics`
 - Public API: `/api/attribution-analytics`
 - Authenticated tenant API: `/api/sales-operations/attribution-analytics`
+- Authenticated packet export: `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`
 
 ## Persistence Model
 
 Public analytics use synthetic fixtures for buyer and investor review.
 
 Tenant-admin analytics derive from persisted no-PHI Sales Operations opportunities stored through the durable pilot intake ledger. The durable source is `private.pilot_intake_submissions.payload.attribution`.
+
+Sales Operations now displays tenant cohort analytics inside the protected console and exports a Markdown attribution analytics packet for board, investor, sales, and enterprise pipeline review.
 
 ## Boundary
 
@@ -37,7 +40,8 @@ Attribution analytics must not contain PHI, patient identifiers, clinical record
 - Authenticated analytics require AAL2 tenant-admin access.
 - Ad spend, CAC, signed contract value, and customer ROI are not imported yet.
 - Small cohort counts are directional operating signals, not market claims.
+- Packet export is audited through the existing sales artifact event with explicit metadata until a dedicated attribution packet audit event is migrated.
 
 ## Next Build Step
 
-Add tenant-admin cohort visualization inside Sales Operations and export an audited attribution analytics packet for board, investor, and enterprise pipeline reviews.
+Add a dedicated attribution packet audit event and connect cohort packet outputs to the future Trust Safety incident and improvement ledger.

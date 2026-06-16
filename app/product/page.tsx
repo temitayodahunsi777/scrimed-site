@@ -97,6 +97,14 @@ export default function ProductConsolePage() {
           <strong>{summary.attributionAnalyticsRecordCount}</strong>
         </article>
         <article>
+          <span>Trust agents</span>
+          <strong>{summary.trustSafetyAgentCount}</strong>
+        </article>
+        <article>
+          <span>Safety controls</span>
+          <strong>{summary.trustSafetyControlCount}</strong>
+        </article>
+        <article>
           <span>TrustOS controls</span>
           <strong>{summary.trustOSControlCount}</strong>
         </article>
@@ -107,6 +115,35 @@ export default function ProductConsolePage() {
         <article>
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED trust and safety operations">
+        <div className="section-heading">
+          <p className="eyebrow">Trust safety operations</p>
+          <h2>Copyright, security, safety, legal, monitoring, auditing, fixing, and improvement are agent-operated controls.</h2>
+          <p className="section-copy">{summary.trustSafetyOperationsSummary.boundary}</p>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.trustSafetyOperationsSummary.status}</span>
+            <h2>{summary.trustSafetyOperationsSummary.operatingPosture}</h2>
+          </div>
+          <p>
+            SCRIMED defines a 24/7 trust-ops model while keeping production managed monitoring gated until staffing,
+            SOC/MDR, customer-specific runbooks, and external readiness are approved.
+          </p>
+          <div>
+            <Link className="module-link" href={summary.trustSafetyOperationsRoute}>
+              Open Trust Safety Ops
+            </Link>
+            <ul className="compact-list">
+              <li>Agents: {summary.trustSafetyAgentCount}</li>
+              <li>Controls: {summary.trustSafetyControlCount}</li>
+              <li>Channels: {summary.trustSafetyOperationsSummary.channelCount}</li>
+              <li>Next: {summary.trustSafetyOperationsSummary.nextBuildStep}</li>
+            </ul>
+          </div>
         </article>
       </section>
 

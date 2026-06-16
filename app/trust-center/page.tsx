@@ -19,6 +19,7 @@ export default function TrustCenterPage() {
         <p className="hero-text">{summary.boundary}</p>
         <div className="hero-actions">
           <Link className="primary-action" href="/claims">Review Claims Register</Link>
+          <Link className="secondary-action" href="/trust-safety-operations">Trust Safety Ops</Link>
           <Link className="secondary-action" href="/api/enterprise-readiness/diligence-brief">
             Download Diligence Brief
           </Link>
@@ -59,6 +60,31 @@ export default function TrustCenterPage() {
           <span>Controlled claims</span>
           <strong>{summary.claims.total}</strong>
         </article>
+      </section>
+
+      <section className="section-band split-band">
+        <div>
+          <p className="eyebrow">24/7 trust operations</p>
+          <h2>Trust readiness becomes stronger when agents continuously watch, audit, fix, and improve.</h2>
+          <p className="section-copy">
+            The Trust Safety Operations layer coordinates PHI shielding, agent firewalling, copyright and IP provenance,
+            claims control, clinical safety boundaries, security incident watch, and continuous improvement.
+          </p>
+        </div>
+        <div className="layer-list">
+          <Link className="layer-row" href="/trust-safety-operations">
+            <span>01</span>
+            <strong>Open the trust, safety, monitoring, and improvement operations layer</strong>
+          </Link>
+          <Link className="layer-row" href="/api/trust-safety-operations">
+            <span>02</span>
+            <strong>Inspect the Trust Safety Operations API</strong>
+          </Link>
+          <Link className="layer-row" href="/audit">
+            <span>03</span>
+            <strong>Review audit, governance, and AI asset controls</strong>
+          </Link>
+        </div>
       </section>
 
       <section className="table-section" aria-label="Enterprise readiness domains">

@@ -13,6 +13,7 @@ Routes:
 - `/attribution-analytics`
 - `/api/attribution-analytics`
 - `/api/sales-operations/attribution-analytics`
+- `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`
 - `/pilot`
 - `/api/pilot/intake`
 - `/sales-operations`
@@ -54,4 +55,6 @@ Attribution Analytics now rolls safe source capture into cohort reporting by sou
 
 Public analytics use synthetic fixtures at `/attribution-analytics`. Authenticated tenant-admin analytics are available at `/api/sales-operations/attribution-analytics` and derive from persisted no-PHI Sales Operations opportunities.
 
-The next build step is audited packet export for board, investor, and enterprise sales reviews.
+Sales Operations now displays the tenant cohort report in-console and can export an audited attribution analytics packet for board, investor, and enterprise sales reviews.
+
+The next build step is a dedicated attribution packet audit event and durable Trust Safety improvement ledger integration.

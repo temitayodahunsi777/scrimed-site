@@ -2,6 +2,15 @@
 
 Updated: 2026-06-15
 
+## Latest Trust Safety Operations Release
+
+- Added `/trust-safety-operations` and `/api/trust-safety-operations` for SCRIMED's 24/7 trust, safety, copyright, legal, security, monitoring, auditing, fixing, and continuous-improvement operating model.
+- Added named trust agents for PHI shielding, agent firewalling, copyright/IP provenance, claims/legal guardrails, clinical safety, security incident watch, and continuous improvement.
+- Strengthened Enterprise Readiness with copyright registration candidates, trademark strategy, third-party license/provenance controls, generated-media review, and 24/7 incident-response readiness gates.
+- Added tenant-admin attribution analytics into `/sales-operations` and added a protected audited attribution analytics packet export under `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`.
+- Used the existing audited sales artifact event as a free schema workaround for attribution packet release until a dedicated attribution packet audit event is migrated.
+- Preserved the boundary: this is not legal advice, compliance certification, managed SOC/MDR coverage, production clinical monitoring, or live clinical execution authorization.
+
 ## Latest Attribution Analytics Release
 
 - Added `/attribution-analytics` and `/api/attribution-analytics` for public synthetic source-to-pilot cohort analytics across source category, campaign, buyer type, deployment profile, offer, cadence, proof packet, and sales outcome.

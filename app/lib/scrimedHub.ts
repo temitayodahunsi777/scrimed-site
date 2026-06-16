@@ -56,6 +56,7 @@ import {
   getReadinessDomains
 } from "./enterpriseReadiness";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
+import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 
 export type HubModule = {
   name: string;
@@ -138,6 +139,7 @@ export const hubSignals: HubSignal[] = [
   { name: "AgentOS", value: "multi-agent control plane online", tone: "good" },
   { name: "Memory fabric", value: "session, operational, knowledge scoped", tone: "good" },
   { name: "Audit governance", value: "AI asset registry active", tone: "good" },
+  { name: "Trust and Safety Operations", value: "24/7 watchtower model defined", tone: "good" },
   { name: "Observability", value: "continuous validation ready", tone: "good" },
   { name: "Atlas Intelligence Core", value: "evidence and document intelligence staged", tone: "good" },
   { name: "Trust Cards", value: "provenance contracts active", tone: "good" },
@@ -206,6 +208,7 @@ export const hubRoutes = [
   "/deployment-profiles",
   "/operations",
   "/trust-center",
+  "/trust-safety-operations",
   "/claims",
   "/evaluation",
   "/platform",
@@ -282,6 +285,7 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/follow-up-draft",
   "/api/sales-operations/opportunities/{intakeId}/follow-up/complete",
   "/api/sales-operations/opportunities/{intakeId}/assessment-invitation",
+  "/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet",
   "/api/pilots",
   "/api/demos",
   "/api/commercial/pricing",
@@ -293,6 +297,7 @@ export const hubRoutes = [
   "/api/deployment-profiles",
   "/api/operations/readiness",
   "/api/enterprise-readiness",
+  "/api/trust-safety-operations",
   "/api/enterprise-readiness/claims",
   "/api/enterprise-readiness/diligence-brief",
   "/api/agent-os/evaluation",
@@ -384,6 +389,7 @@ export function getHubSummary() {
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
+  const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -408,6 +414,7 @@ export function getHubSummary() {
     companyOperationsSummary,
     enterpriseReadinessSummary,
     attributionAnalyticsSummary,
+    trustSafetyOperationsSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

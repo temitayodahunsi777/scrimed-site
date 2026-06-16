@@ -24,6 +24,7 @@ import { getMarketActivationSummary } from "./marketActivation";
 import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
+import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -409,6 +410,13 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Trust Center readiness is not legal advice, certification, or authorization for live clinical execution."
   },
   {
+    label: "Review Trust Safety Ops",
+    href: "/trust-safety-operations",
+    purpose: "Inspect 24/7 trust, safety, copyright, legal, security, monitoring, auditing, escalation, and continuous-improvement operations.",
+    boundary:
+      "Trust Safety Ops defines the operating model and current controls; managed 24/7 production coverage still requires approved staffing and external readiness."
+  },
+  {
     label: "Run AgentOS Evaluation",
     href: "/evaluation",
     purpose: "Generate a synthetic AgentOS plan, Atlas Trust Card, audit preview, and observability packet.",
@@ -508,6 +516,7 @@ export function getProductConsoleSummary() {
   const salesAttributionSummary = getSalesAttributionSummary();
   const sourceIntelligenceSummary = getSourceIntelligenceSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
+  const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -526,6 +535,8 @@ export function getProductConsoleSummary() {
     operationsApiRoute: companyOperationsSummary.apiRoute,
     trustCenterRoute: enterpriseReadinessSummary.route,
     trustCenterApiRoute: enterpriseReadinessSummary.apiRoute,
+    trustSafetyOperationsRoute: trustSafetyOperationsSummary.route,
+    trustSafetyOperationsApiRoute: trustSafetyOperationsSummary.apiRoute,
     demoRoute: demoPilotProgramSummary.demoRoute,
     demoApiRoute: demoPilotProgramSummary.demoApiRoute,
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
@@ -572,6 +583,8 @@ export function getProductConsoleSummary() {
     attributionCapturedFieldCount: salesAttributionSummary.capturedFields.length,
     attributionAnalyticsRecordCount: attributionAnalyticsSummary.totals.recordCount,
     attributionCohortCount: attributionAnalyticsSummary.cohorts.length,
+    trustSafetyAgentCount: trustSafetyOperationsSummary.agentCount,
+    trustSafetyControlCount: trustSafetyOperationsSummary.controlCount,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -602,11 +615,13 @@ export function getProductConsoleSummary() {
     marketActivationSummary,
     salesAttributionSummary,
     attributionAnalyticsSummary,
+    trustSafetyOperationsSummary,
     sourceIntelligenceSummary,
     proofStack: {
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
+      trustSafetyOperations: trustSafetyOperationsSummary.status,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       deploymentProfiles: deploymentProfileSummary.status,
       marketActivation: marketActivationSummary.status,
@@ -763,6 +778,11 @@ export function getProductReadinessBrief() {
     "## Trust and Enterprise Readiness",
     `Trust Center: ${summary.trustCenterRoute}`,
     `Trust Center API: ${summary.trustCenterApiRoute}`,
+    `Trust Safety Operations: ${summary.trustSafetyOperationsRoute}`,
+    `Trust Safety Operations API: ${summary.trustSafetyOperationsApiRoute}`,
+    `Trust Safety Agents: ${summary.trustSafetyAgentCount}`,
+    `Trust Safety Controls: ${summary.trustSafetyControlCount}`,
+    `Trust Safety Operating Posture: ${summary.trustSafetyOperationsSummary.operatingPosture}`,
     `Status: ${summary.enterpriseReadinessSummary.status}`,
     `Active controls: ${summary.enterpriseReadinessSummary.activeControls}`,
     `Decisions required: ${summary.enterpriseReadinessSummary.decisionsRequired}`,
