@@ -57,6 +57,8 @@ Passkey authentication does not remove this CI gate. WebAuthn passkey ceremonies
 
 No-secret public readiness is covered by `scripts/public-production-smoke.mjs`. That script verifies the branded app routes, product-console passkey posture, enterprise proof-packet proof-stack posture, protected-pilot readiness, and unauthenticated fail-closed boundaries without requiring production credentials.
 
+Human-run tenant verification is covered inside `/pilot-workspace/access`. An approved tenant member with a current AAL2 browser session can run protected workspace route checks, verify work-order, governance-ledger, TrustOps, audit, tenant-access, and enterprise proof-packet responses, and commit the aggregate proof-packet audit event without exporting the bearer token to source control or GitHub Actions.
+
 ## Code-Side Resolution
 
-The source-side gap is closed by public production smoke, fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, the protected activation-governance route, and the aggregate enterprise proof-packet route. The unresolved piece is only the out-of-band secret placement in GitHub Actions for authenticated mutation and packet happy paths.
+The source-side gap is closed by public production smoke, fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, the protected activation-governance route, the aggregate enterprise proof-packet route, and browser-session tenant verification in `/pilot-workspace/access`. The unresolved piece is only the out-of-band secret placement in GitHub Actions for unattended authenticated mutation and packet happy paths.

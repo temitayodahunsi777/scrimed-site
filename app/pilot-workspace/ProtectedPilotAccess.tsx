@@ -11,6 +11,7 @@ import type {
 } from "../lib/protectedPilotWorkspace";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
+import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
@@ -805,6 +806,13 @@ export default function ProtectedPilotAccess({
           />
 
           <TenantAccessAdministrationPanel session={session} workspace={selectedWorkspace} />
+
+          <PilotWorkspaceVerificationPanel
+            key={selectedWorkspace.id}
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
+          />
 
           <section className="table-section" aria-label="Enterprise proof packet">
             <div className="section-heading">

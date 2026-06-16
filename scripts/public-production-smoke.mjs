@@ -84,6 +84,10 @@ async function checkProductConsole() {
     throw new Error("product console missing enterprise proof packet proof-stack posture.");
   }
 
+  if (body.proofStack?.tenantSessionVerification !== "browser-aal2-no-secret-protected-route-checks") {
+    throw new Error("product console missing tenant-session verification proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }

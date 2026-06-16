@@ -635,6 +635,7 @@ export function getProductConsoleSummary() {
       passkeyTenantAuthentication: "passkey-or-magic-link-plus-aal2",
       passkeyManagement: "self-service-list-rename-register-revoke",
       enterpriseProofPackets: "tenant-admin-aggregate-write-before-release",
+      tenantSessionVerification: "browser-aal2-no-secret-protected-route-checks",
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,

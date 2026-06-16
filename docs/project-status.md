@@ -7,6 +7,7 @@ Updated: 2026-06-16
 - Added passkey-aware Supabase Auth clients for `/pilot-workspace/access` and `/sales-operations`, with enrolled-passkey sign-in, signed-in passkey registration, and continued TOTP/AAL2 gates for governed tenant actions.
 - Added authenticated passkey management panels for listing, renaming, registering, refreshing, and revoking passkeys inside protected pilot and Sales Operations.
 - Added a tenant-admin aggregate enterprise proof packet route at `/api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`, plus a protected workspace download action that combines synthetic sessions, TrustOS decisions, Agent Workspace work orders, Trust Safety incidents, tenant access posture, governance ledger records, and recent audit activity after a write-before-release audit event.
+- Added an authenticated tenant-session verification panel inside `/pilot-workspace/access` so an approved AAL2 browser session can validate protected workspace routes and the audited enterprise proof-packet artifact without storing bearer tokens in CI.
 - Added `passkey-or-magic-link` tenant identity readiness posture, API validation, and migration support so tenant administration can reflect the current phishing-resistant sign-in path without breaking legacy magic-link-only records.
 - Added `smoke:public` and `scripts/public-production-smoke.mjs` for no-secret production route, product posture, readiness, and fail-closed verification, including the aggregate enterprise proof packet protected route.
 - Added `smoke:trustops` as a package script for the TrustOps authenticated smoke path.
@@ -26,7 +27,7 @@ Updated: 2026-06-16
 - Strengthened Enterprise Readiness with copyright registration candidates, trademark strategy, third-party license/provenance controls, generated-media review, and 24/7 incident-response readiness gates.
 - Added tenant-admin attribution analytics into `/sales-operations` and added a protected audited attribution analytics packet export under `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`.
 - Preserved the boundary: this is not legal advice, compliance certification, managed SOC/MDR coverage, production clinical monitoring, breach determination, PHI storage, or live clinical execution authorization.
-- Remaining gate: place a CI-held AAL2 tenant smoke token before using authenticated TrustOps, Agent Workspace, and aggregate enterprise proof-packet happy paths in automated buyer-demo smoke. Public readiness smoke now runs without secrets. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
+- Remaining gate: place a CI-held short-lived AAL2 tenant smoke token before using unattended authenticated TrustOps, Agent Workspace, and aggregate enterprise proof-packet happy paths in automated buyer-demo smoke. Public readiness smoke now runs without secrets, and human-run protected verification can be executed from `/pilot-workspace/access` with the current browser session. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
 
 ## Latest Attribution Analytics Release
 

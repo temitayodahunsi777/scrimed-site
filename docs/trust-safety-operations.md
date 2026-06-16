@@ -80,6 +80,8 @@ The authenticated workspace panel lets approved tenant members inspect dashboard
 
 Tenant admins and pilot leads can also download an aggregate enterprise proof packet from `/pilot-workspace/access`. The packet combines synthetic pilot sessions, TrustOS decisions, Agent Workspace work orders, Trust Safety incidents, tenant access posture, governance ledger records, and recent audit activity only after a write-before-release audit event is committed.
 
+Approved tenant members can run tenant-session verification from `/pilot-workspace/access` using their current AAL2 browser session. The verification checks protected workspace routes, TrustOps, Agent Workspace, tenant access, audit, and the aggregate enterprise proof packet without storing the session bearer token in GitHub Actions or source control.
+
 ## Target Audience Appeal
 
 The TrustOps layer is especially relevant for:
@@ -105,6 +107,7 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Added passkey-aware tenant sign-in and enrollment controls while preserving AAL2/TOTP gates for governed TrustOps mutation paths.
 - Added authenticated passkey management for listing, renaming, registering, and revoking passkeys from protected product consoles.
 - Added a tenant-admin aggregate enterprise proof packet with write-before-release audit and no-secret fail-closed smoke coverage.
+- Added browser-session tenant verification for protected workspace routes and the audited enterprise proof packet without CI credential storage.
 - Added the `passkey-or-magic-link` tenant identity readiness posture so TrustOps and tenant administration can reflect the current phishing-resistant sign-in posture.
 - Added `scripts/trustops-authenticated-smoke.mjs` for fail-closed and authenticated TrustOps route verification.
 - Added `scripts/public-production-smoke.mjs` for no-secret public route, product posture, readiness, and fail-closed verification.
@@ -114,10 +117,10 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.
 - Tenant TrustOps storage is synthetic-pilot and enterprise-readiness only; regulated production incidents require customer-approved live-data boundaries, breach analysis, notification decisions, and forensic process.
 - Supabase Auth leaked-password protection remains a dashboard-level security setting for password-based auth. SCRIMED product flows remain passkey or passwordless magic-link based; enable leaked-password protection if password sign-in remains active anywhere in the project.
-- Authenticated TrustOps, Agent Workspace, and enterprise proof-packet happy-path smoke requires a CI-held AAL2 tenant-admin or pilot-lead bearer token; public readiness and unauthenticated fail-closed smoke can run without secrets.
+- Unattended authenticated TrustOps, Agent Workspace, and enterprise proof-packet happy-path smoke requires a CI-held short-lived AAL2 tenant-admin or pilot-lead bearer token; public readiness, unauthenticated fail-closed smoke, and human-run tenant-session verification can run without storing CI credentials.
 - Supabase passkeys are currently experimental per Supabase documentation and require stable relying-party domain/origin configuration; changing the relying-party ID invalidates enrolled passkeys.
 - Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers.
 
 ## Next Build Step
 
-Run `scripts/public-production-smoke.mjs` on every production deployment, place a CI-held AAL2 smoke token for authenticated mutation and proof-packet happy paths, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.
+Run `scripts/public-production-smoke.mjs` on every production deployment, use `/pilot-workspace/access` tenant-session verification before buyer demos, place a short-lived CI-held AAL2 smoke token only when unattended authenticated mutation smoke is required, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.
