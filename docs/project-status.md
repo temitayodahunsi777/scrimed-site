@@ -2,6 +2,17 @@
 
 Updated: 2026-06-16
 
+## Latest Buyer Tenant Lifecycle Release
+
+- Added guarded tenant-per-buyer lifecycle activation for provisioned Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/tenant-lifecycle`.
+- Added audited lifecycle packets through `/api/sales-operations/opportunities/{intakeId}/tenant-lifecycle/packet` so tenant-admins can retain SSO/domain policy, manual invitation delivery posture, access-review cadence, retention/archive controls, activation checklist, and competitive advantage signals.
+- Added a private `sales_buyer_tenant_lifecycles` table with deny-all RLS and tenant-admin AAL2 plus server-held authorization for lifecycle activation and packet release.
+- Updated `/sales-operations` with buyer tenant lifecycle status, access-review due date, lifecycle packet history, activation action, and packet download action.
+- Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with buyer tenant lifecycle proof-stack posture.
+- Strengthened the competitive edge: SCRIMED can now show buyers a governed path from intake to opportunity, buyer-specific workspace, lifecycle controls, proof packets, and paid synthetic pilot without accepting PHI or pretending production SSO/live connectors are already approved.
+- Preserved the boundary: lifecycle automation is for governed synthetic enterprise evaluations only. It does not authorize PHI, live clinical execution, payer submission, patient outreach, autonomous diagnosis, compliance certification, legal advice, or reimbursement guarantees.
+- Remaining gate: production customer SSO configuration, transactional invitation sending, customer-specific tenant architecture, BAA/DPA stack, retention deletion, and production connector authorization still require signed enterprise controls.
+
 ## Latest Opportunity Workspace Provisioning Release
 
 - Added guarded per-opportunity workspace provisioning for qualified Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/workspace-provisioning`.
@@ -11,7 +22,7 @@ Updated: 2026-06-16
 - Updated `/sales-operations` with buyer workspace status, provision action, workspace packet download, and Buyer Room link.
 - Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with the opportunity workspace proof-stack posture.
 - Preserved the boundary: opportunity workspaces are governed synthetic enterprise evaluation rooms only. They do not accept PHI, authorize live clinical execution, certify compliance, guarantee reimbursement, submit payer transactions, contact patients, or provide medical, legal, regulatory, or billing advice.
-- Remaining gate: full tenant-per-buyer provisioning, automated invitation delivery, customer SSO/domain policy, retention automation, and production connector authorization still require formal enterprise controls.
+- Remaining gate: production customer SSO configuration, automated invitation sending, signed customer tenant architecture, retention deletion, and production connector authorization still require formal enterprise controls.
 
 ## Latest Pilot Deal Room Release
 

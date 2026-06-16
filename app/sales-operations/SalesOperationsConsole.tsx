@@ -17,6 +17,10 @@ import {
   isProvisioningEligible,
   type SalesOpportunityWorkspaceProvisioningResult
 } from "../lib/opportunityWorkspaceProvisioning";
+import {
+  isTenantLifecycleEligible,
+  type SalesBuyerTenantLifecycleResult
+} from "../lib/buyerTenantLifecycle";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -31,6 +35,7 @@ type ConsoleStatus =
   | "syncing"
   | "scheduling"
   | "provisioning"
+  | "activating-lifecycle"
   | "completing"
   | "error";
 
@@ -52,6 +57,10 @@ type OpportunityResponse = {
 };
 
 type WorkspaceProvisioningResponse = SalesOpportunityWorkspaceProvisioningResult & {
+  error?: { message?: string };
+};
+
+type BuyerTenantLifecycleResponse = SalesBuyerTenantLifecycleResult & {
   error?: { message?: string };
 };
 
@@ -619,6 +628,49 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function activateBuyerTenantLifecycle() {
+    if (!session || !selected) {
+      return;
+    }
+
+    setStatus("activating-lifecycle");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/tenant-lifecycle`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as BuyerTenantLifecycleResponse;
+
+    if (!response.ok) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "The buyer tenant lifecycle could not be activated.");
+      return;
+    }
+
+    await refreshDashboard(
+      body.created
+        ? "Buyer tenant lifecycle controls activated and audit event committed."
+        : "Buyer tenant lifecycle controls already exist; dashboard refreshed."
+    );
+  }
+
+  async function downloadBuyerTenantLifecyclePacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/tenant-lifecycle/packet`,
+      `scrimed-${selected.intakeId}-buyer-tenant-lifecycle.md`,
+      "Buyer tenant lifecycle packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -866,7 +918,9 @@ export default function SalesOperationsConsole({
   const selectedGovernancePack = selected ? governancePackFor(selected) : null;
   const selectedAttribution = selected?.payload.attribution ?? null;
   const selectedWorkspaceProvisioning = selected?.workspaceProvisioning ?? null;
+  const selectedBuyerTenantLifecycle = selected?.buyerTenantLifecycle ?? null;
   const workspaceEligible = selected ? isProvisioningEligible(selected) : false;
+  const tenantLifecycleEligible = selected ? isTenantLifecycleEligible(selected) : false;
 
   return (
     <>
@@ -1150,6 +1204,34 @@ export default function SalesOperationsConsole({
                   </strong>
                 </article>
                 <article>
+                  <span>Buyer tenant lifecycle</span>
+                  <strong>
+                    {selectedBuyerTenantLifecycle
+                      ? `${selectedBuyerTenantLifecycle.lifecycleStatus} · ${selectedBuyerTenantLifecycle.tenantMode}`
+                      : tenantLifecycleEligible
+                        ? "Ready to activate"
+                        : "Provision workspace first"}
+                  </strong>
+                </article>
+                <article>
+                  <span>Access review due</span>
+                  <strong>
+                    {selectedBuyerTenantLifecycle
+                      ? formatDate(selectedBuyerTenantLifecycle.accessReviewPolicy.nextReviewDueAt)
+                      : "Lifecycle pending"}
+                  </strong>
+                </article>
+                <article>
+                  <span>Lifecycle packet</span>
+                  <strong>
+                    {selectedBuyerTenantLifecycle?.lastPacketGeneratedAt
+                      ? `Last released ${formatDate(selectedBuyerTenantLifecycle.lastPacketGeneratedAt)}`
+                      : selectedBuyerTenantLifecycle
+                        ? "Ready for audit"
+                        : "Activate first"}
+                  </strong>
+                </article>
+                <article>
                   <span>Source attribution</span>
                   <strong>
                     {selectedAttribution
@@ -1264,6 +1346,58 @@ export default function SalesOperationsConsole({
                         Open Buyer Room
                       </Link>
                     ) : null}
+                  </div>
+                </section>
+
+                <section>
+                  <p className="eyebrow">Tenant-per-buyer lifecycle</p>
+                  <h3>Control SSO, invitations, reviews, and archive gates before paid expansion.</h3>
+                  <p className="section-copy">
+                    {selectedBuyerTenantLifecycle
+                      ? `Lifecycle controls are active for ${selectedBuyerTenantLifecycle.workspaceSlug}; next access review is due ${formatDate(selectedBuyerTenantLifecycle.accessReviewPolicy.nextReviewDueAt)}.`
+                      : tenantLifecycleEligible
+                        ? "Activate a buyer lifecycle plan after workspace provisioning to package SSO policy, manual delivery, access review cadence, and retention controls."
+                        : "Provision a buyer-specific workspace before activating tenant lifecycle controls."}
+                  </p>
+                  {selectedBuyerTenantLifecycle ? (
+                    <div className="layer-list">
+                      <div className="layer-row">
+                        <span>01</span>
+                        <strong>SSO domains: {selectedBuyerTenantLifecycle.ssoPolicy.allowedDomains.join(", ")}</strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>02</span>
+                        <strong>Invitation delivery: {selectedBuyerTenantLifecycle.invitationDeliveryPolicy.mode}</strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>03</span>
+                        <strong>Archive eligible: {formatDate(selectedBuyerTenantLifecycle.retentionArchivePolicy.archiveEligibleAt)}</strong>
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={
+                        status === "activating-lifecycle" ||
+                        Boolean(selectedBuyerTenantLifecycle) ||
+                        !tenantLifecycleEligible
+                      }
+                      onClick={activateBuyerTenantLifecycle}
+                      type="button"
+                    >
+                      {status === "activating-lifecycle"
+                        ? "Activating Lifecycle"
+                        : "Activate Tenant Lifecycle"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!selectedBuyerTenantLifecycle}
+                      onClick={downloadBuyerTenantLifecyclePacket}
+                      type="button"
+                    >
+                      Download Lifecycle Packet
+                    </button>
                   </div>
                 </section>
 

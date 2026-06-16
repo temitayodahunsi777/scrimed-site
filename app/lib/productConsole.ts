@@ -43,6 +43,10 @@ import {
   opportunityWorkspaceProvisioningPacketProofStackStatus,
   opportunityWorkspaceProvisioningProofStackStatus
 } from "./opportunityWorkspaceProvisioning";
+import {
+  buyerTenantLifecyclePacketProofStackStatus,
+  buyerTenantLifecycleProofStackStatus
+} from "./buyerTenantLifecycle";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -376,7 +380,7 @@ export const buyerActions: BuyerAction[] = [
   {
     label: "Open Sales Operations Console",
     href: "/sales-operations",
-    purpose: "Manage retained buyer opportunities, ownership, pipeline stage, audited proposals, and controlled CRM synchronization.",
+    purpose: "Manage retained buyer opportunities, ownership, pipeline stage, audited proposals, buyer workspaces, tenant lifecycle packets, and controlled CRM synchronization.",
     boundary: "Approved SCRIMED tenant-admin identity is required. Business-contact and workflow-scope data only; no PHI or live clinical execution."
   },
   {
@@ -641,6 +645,8 @@ export function getProductConsoleSummary() {
     salesDealRoomProtectedPacketRoute: salesDealRoomSummary.protectedPacketRoute,
     opportunityWorkspaceProvisioningRoute: salesDealRoomSummary.workspaceProvisioningRoute,
     opportunityWorkspaceProvisioningPacketRoute: salesDealRoomSummary.workspaceProvisioningPacketRoute,
+    buyerTenantLifecycleRoute: salesDealRoomSummary.buyerTenantLifecycleRoute,
+    buyerTenantLifecyclePacketRoute: salesDealRoomSummary.buyerTenantLifecyclePacketRoute,
     competitiveEdgeRoute: "/competitive-edge",
     productOffers,
     enterpriseServiceOffers,
@@ -691,6 +697,8 @@ export function getProductConsoleSummary() {
       salesDealRoomPackets: salesDealRoomPacketProofStackStatus,
       opportunityWorkspaceProvisioning: opportunityWorkspaceProvisioningProofStackStatus,
       opportunityWorkspaceProvisioningPackets: opportunityWorkspaceProvisioningPacketProofStackStatus,
+      buyerTenantLifecycle: buyerTenantLifecycleProofStackStatus,
+      buyerTenantLifecyclePackets: buyerTenantLifecyclePacketProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -750,6 +758,8 @@ export function getProductReadinessBrief() {
     `Protected Deal Room Packet: ${summary.salesDealRoomProtectedPacketRoute}`,
     `Opportunity Workspace Provisioning: ${summary.opportunityWorkspaceProvisioningRoute}`,
     `Opportunity Workspace Packet: ${summary.opportunityWorkspaceProvisioningPacketRoute}`,
+    `Buyer Tenant Lifecycle: ${summary.buyerTenantLifecycleRoute}`,
+    `Buyer Tenant Lifecycle Packet: ${summary.buyerTenantLifecyclePacketRoute}`,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

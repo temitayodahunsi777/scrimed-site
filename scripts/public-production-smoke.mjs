@@ -128,6 +128,14 @@ async function checkProductConsole() {
     throw new Error("product console missing opportunity workspace packet proof-stack posture.");
   }
 
+  if (body.proofStack?.buyerTenantLifecycle !== "aal2-buyer-tenant-lifecycle-automation") {
+    throw new Error("product console missing buyer tenant lifecycle proof-stack posture.");
+  }
+
+  if (body.proofStack?.buyerTenantLifecyclePackets !== "aal2-audited-buyer-tenant-lifecycle-packets") {
+    throw new Error("product console missing buyer tenant lifecycle packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -229,6 +237,14 @@ await checkSalesProtectedFailClosed(
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/workspace-provisioning/packet",
   "Sales workspace provisioning packet protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/tenant-lifecycle",
+  "Sales buyer tenant lifecycle protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/tenant-lifecycle/packet",
+  "Sales buyer tenant lifecycle packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,

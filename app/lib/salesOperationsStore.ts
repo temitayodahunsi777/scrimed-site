@@ -6,6 +6,7 @@ import type {
   SalesOpportunityUpdate
 } from "./salesOperations";
 import type { SalesOpportunityWorkspaceProvisioningResult } from "./opportunityWorkspaceProvisioning";
+import type { SalesBuyerTenantLifecycleResult } from "./buyerTenantLifecycle";
 
 export async function getSalesOperationsDashboard(client: SupabaseClient) {
   const { data, error } = await client.rpc("sales_operations_dashboard");
@@ -95,6 +96,31 @@ export async function recordSalesOpportunityWorkspacePacketDownload(
 
   return {
     result: data ? (data as SalesOpportunityWorkspaceProvisioningResult) : null,
+    error
+  };
+}
+
+export async function activateSalesBuyerTenantLifecycle(client: SupabaseClient, intakeId: string) {
+  const { data, error } = await client.rpc("activate_sales_buyer_tenant_lifecycle", {
+    p_intake_id: intakeId
+  });
+
+  return {
+    result: data ? (data as SalesBuyerTenantLifecycleResult) : null,
+    error
+  };
+}
+
+export async function recordSalesBuyerTenantLifecyclePacketDownload(
+  client: SupabaseClient,
+  intakeId: string
+) {
+  const { data, error } = await client.rpc("record_sales_buyer_tenant_lifecycle_packet_download", {
+    p_intake_id: intakeId
+  });
+
+  return {
+    result: data ? (data as SalesBuyerTenantLifecycleResult) : null,
     error
   };
 }

@@ -21,6 +21,12 @@ import {
   workspaceMappingModeForOpportunity,
   workspaceSlugForOpportunity
 } from "./opportunityWorkspaceProvisioning";
+import {
+  buyerTenantLifecycleApiRoute,
+  buyerTenantLifecyclePacketApiRoute,
+  buyerTenantLifecyclePacketProofStackStatus,
+  buyerTenantLifecycleProofStackStatus
+} from "./buyerTenantLifecycle";
 
 export type SalesDealRoomStage = {
   stage: string;
@@ -53,6 +59,8 @@ export type SalesDealRoomSummary = {
   protectedPacketRoute: string;
   workspaceProvisioningRoute: string;
   workspaceProvisioningPacketRoute: string;
+  buyerTenantLifecycleRoute: string;
+  buyerTenantLifecyclePacketRoute: string;
   status: string;
   defaultWorkspaceSlug: string;
   proofStackStatus: string;
@@ -60,6 +68,8 @@ export type SalesDealRoomSummary = {
   buyerRoomPacketProofStackStatus: string;
   opportunityWorkspaceProvisioningProofStackStatus: string;
   opportunityWorkspaceProvisioningPacketProofStackStatus: string;
+  buyerTenantLifecycleProofStackStatus: string;
+  buyerTenantLifecyclePacketProofStackStatus: string;
   executiveThesis: string;
   stages: SalesDealRoomStage[];
   siteLanes: SalesDealRoomSiteLane[];
@@ -217,6 +227,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     protectedPacketRoute: "/api/sales-operations/opportunities/{intakeId}/deal-room-packet",
     workspaceProvisioningRoute: opportunityWorkspaceProvisioningApiRoute,
     workspaceProvisioningPacketRoute: opportunityWorkspaceProvisioningPacketApiRoute,
+    buyerTenantLifecycleRoute: buyerTenantLifecycleApiRoute,
+    buyerTenantLifecyclePacketRoute: buyerTenantLifecyclePacketApiRoute,
     status: "public-organization-and-protected-packet-ready",
     defaultWorkspaceSlug: defaultDealRoomWorkspaceSlug,
     proofStackStatus: salesDealRoomProofStackStatus,
@@ -224,6 +236,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     buyerRoomPacketProofStackStatus: buyerPilotRoomPacketProofStackStatus,
     opportunityWorkspaceProvisioningProofStackStatus,
     opportunityWorkspaceProvisioningPacketProofStackStatus,
+    buyerTenantLifecycleProofStackStatus,
+    buyerTenantLifecyclePacketProofStackStatus,
     executiveThesis:
       "SCRIMED converts public product proof, governed pilot intake, tenant-admin sales operations, buyer-room diligence, premium pricing, and protected workspace evidence into one enterprise-ready pilot acquisition path.",
     stages: publicStages,
@@ -231,10 +245,10 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     competitiveEdges: buyerPilotRoomCompetitiveEdges,
     limitations: [
       {
-        limitation: "Opportunities now support buyer-specific protected workspace provisioning after qualification.",
+        limitation: "Opportunities now support buyer-specific protected workspace provisioning and lifecycle activation after qualification.",
         resolution:
-          "Qualified opportunities can provision a protected workspace, invitation/onboarding policy, retention schedule, and audited provisioning packet. Unprovisioned opportunities still route to the default synthetic workspace with clear labeling.",
-        productionGate: "Full tenant-per-buyer provisioning, automated SSO/domain policy, and approved invitation delivery."
+          "Qualified opportunities can provision a protected workspace, activate buyer tenant lifecycle controls, package domain SSO policy, manual invitation delivery, access review cadence, retention/archive controls, and audited packets. Unprovisioned opportunities still route to the default synthetic workspace with clear labeling.",
+        productionGate: "Signed customer tenant architecture, production SSO configuration, transactional email approval, legal review, and live connector authorization."
       },
       {
         limitation: "Authenticated happy-path automation still requires a short-lived AAL2 bearer token.",
@@ -273,6 +287,7 @@ export function deriveSalesDealRoomForOpportunity({
   const hasAttribution = hasRecentEvent(auditEvents, "attribution-analytics-packet-downloaded");
   const hasDealRoom = hasRecentEvent(auditEvents, "buyer-deal-room-packet-downloaded");
   const hasWorkspaceProvisioned = hasRecentEvent(auditEvents, "opportunity-workspace-provisioned");
+  const hasTenantLifecycle = hasRecentEvent(auditEvents, "buyer-tenant-lifecycle-activated");
   const workflowTargetCount = opportunity.payload.scope.workflowTargets.length;
   const governanceCount = opportunity.payload.scope.governanceRequirements.length;
   const reviewStage = ["qualified", "discovery", "proposal", "pilot-planning", "won"].includes(
@@ -364,6 +379,19 @@ export function deriveSalesDealRoomForOpportunity({
       action: "Provision a buyer-specific protected workspace after qualification, then release the workspace packet."
     },
     {
+      id: "buyer-tenant-lifecycle",
+      label: "Buyer tenant lifecycle activated",
+      state: readinessState(Boolean(opportunity.buyerTenantLifecycle), Boolean(opportunity.workspaceProvisioning) || hasTenantLifecycle),
+      evidence: opportunity.buyerTenantLifecycle
+        ? `Lifecycle active for ${opportunity.buyerTenantLifecycle.workspaceSlug}; SSO policy ${opportunity.buyerTenantLifecycle.ssoPolicy.status}.`
+        : hasTenantLifecycle
+          ? "Buyer tenant lifecycle audit exists; refresh the opportunity dashboard."
+          : opportunity.workspaceProvisioning
+            ? "Workspace is provisioned; lifecycle controls are ready to activate."
+            : "No buyer-specific workspace is provisioned yet.",
+      action: "Activate tenant-per-buyer lifecycle controls before buyer expansion or paid pilot onboarding."
+    },
+    {
       id: "deal-room-audit",
       label: "Deal-room packet audit",
       state: readinessState(hasDealRoom, true),
@@ -397,6 +425,7 @@ export function deriveSalesDealRoomForOpportunity({
       "Confirm executive sponsor, workflow owner, buyer review team, and decision date.",
       "Send the non-binding opportunity proposal and deal-room packet after human review.",
       "Use the protected Buyer Pilot Room for readiness evidence, limitations, and packet audit.",
+      "Activate the buyer tenant lifecycle packet before paid pilot onboarding or SSO review.",
       "Convert to paid assessment or synthetic pilot only within the no-PHI governed evaluation boundary."
     ],
     boundary: salesDealRoomBoundary
@@ -470,6 +499,8 @@ export function buildSalesDealRoomPacket({
 - Buyer room packet API: ${packet.buyerRoomPacketRoute}
 - Workspace slug: ${packet.workspaceSlug}
 - Workspace mapping mode: ${packet.workspaceMappingMode}
+- Buyer tenant lifecycle: ${opportunity.buyerTenantLifecycle ? `${opportunity.buyerTenantLifecycle.lifecycleStatus} (${opportunity.buyerTenantLifecycle.tenantMode})` : "not activated"}
+- Buyer tenant SSO policy: ${opportunity.buyerTenantLifecycle?.ssoPolicy.status ?? "not activated"}
 
 ## Buyer Scope
 - Offer interest: ${opportunity.payload.scope.offerInterest}

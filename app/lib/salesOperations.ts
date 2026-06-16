@@ -12,6 +12,13 @@ import {
   opportunityWorkspaceProvisioningPacketProofStackStatus,
   opportunityWorkspaceProvisioningProofStackStatus
 } from "./opportunityWorkspaceProvisioning";
+import type { SalesBuyerTenantLifecycle } from "./buyerTenantLifecycle";
+import {
+  buyerTenantLifecycleApiRoute,
+  buyerTenantLifecyclePacketApiRoute,
+  buyerTenantLifecyclePacketProofStackStatus,
+  buyerTenantLifecycleProofStackStatus
+} from "./buyerTenantLifecycle";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -52,6 +59,7 @@ export type SalesOpportunity = {
   lastAttributionAnalyticsPacketAt?: string | null;
   lastBuyerDealRoomPacketAt?: string | null;
   workspaceProvisioning?: SalesOpportunityWorkspaceProvisioning | null;
+  buyerTenantLifecycle?: SalesBuyerTenantLifecycle | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -75,7 +83,9 @@ export type SalesAuditEvent = {
     | "attribution-analytics-packet-downloaded"
     | "buyer-deal-room-packet-downloaded"
     | "opportunity-workspace-provisioned"
-    | "opportunity-workspace-packet-downloaded";
+    | "opportunity-workspace-packet-downloaded"
+    | "buyer-tenant-lifecycle-activated"
+    | "buyer-tenant-lifecycle-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -318,6 +328,17 @@ export function getSalesOperationsSummary() {
       packetProofStackStatus: opportunityWorkspaceProvisioningPacketProofStackStatus,
       workspaceMode: "buyer-specific-protected-workspace",
       invitationMode: "manual-onboarding-packet-only",
+      noPhiBoundary: true
+    },
+    buyerTenantLifecycle: {
+      status: buyerTenantLifecycleProofStackStatus,
+      apiRoute: buyerTenantLifecycleApiRoute,
+      packetApiRoute: buyerTenantLifecyclePacketApiRoute,
+      packetProofStackStatus: buyerTenantLifecyclePacketProofStackStatus,
+      tenantMode: "buyer-dedicated-logical-tenant",
+      ssoPolicy: "buyer-domain-policy-ready",
+      invitationMode: "manual-packet-gated",
+      accessReviewCadenceDays: 30,
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,
