@@ -29,6 +29,11 @@ import type {
   TrustSafetyIncidentCreateInput,
   TrustSafetyIncidentUpdateInput
 } from "./trustSafetyOperations";
+import type {
+  PilotDemoReadinessSnapshotRecord,
+  PilotDemoReadinessSummary,
+  TenantSessionVerificationReadiness
+} from "./pilotDemoReadiness";
 
 type AuthenticatedPilotContext =
   | {
@@ -72,6 +77,28 @@ type AuditEventRow = {
   actor_user_id: string;
   event_type: string;
   event_metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+type PilotDemoReadinessSnapshotRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  readiness_state: PilotDemoReadinessSnapshotRecord["readinessState"];
+  readiness_score: number;
+  passed_count: number;
+  review_count: number;
+  blocked_count: number;
+  required_actions: string[];
+  buyer_brief: string[];
+  check_results: unknown;
+  runbook: unknown;
+  verification: unknown;
+  evidence_counts: unknown;
+  snapshot: unknown;
+  last_evidence_at: string | null;
+  boundary: string;
+  created_by: string;
   created_at: string;
 };
 
@@ -493,6 +520,45 @@ function mapAuditEvent(row: AuditEventRow): PilotAuditEventRecord {
   };
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+}
+
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function mapPilotDemoReadinessSnapshot(
+  row: PilotDemoReadinessSnapshotRow
+): PilotDemoReadinessSnapshotRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    readinessState: row.readiness_state,
+    readinessScore: row.readiness_score,
+    passedCount: row.passed_count,
+    reviewCount: row.review_count,
+    blockedCount: row.blocked_count,
+    requiredActions: asStringArray(row.required_actions),
+    buyerBrief: asStringArray(row.buyer_brief),
+    checkResults: asArray(row.check_results),
+    runbook: asArray(row.runbook),
+    verification: asRecord(row.verification) as unknown as TenantSessionVerificationReadiness,
+    evidenceCounts: {
+      sessions: Number(asRecord(row.evidence_counts).sessions ?? 0),
+      auditEvents: Number(asRecord(row.evidence_counts).auditEvents ?? 0),
+      requiredActions: Number(asRecord(row.evidence_counts).requiredActions ?? 0),
+      checks: Number(asRecord(row.evidence_counts).checks ?? 0)
+    },
+    snapshot: asRecord(row.snapshot) as unknown as PilotDemoReadinessSummary,
+    lastEvidenceAt: row.last_evidence_at,
+    boundary: row.boundary,
+    createdBy: row.created_by,
+    createdAt: row.created_at
+  };
+}
+
 function mapTrustOSDecision(row: TrustOSDecisionRow): TrustOSDecisionLedgerRecord {
   return {
     id: row.id,
@@ -684,6 +750,8 @@ const sessionSelect =
   "id, workspace_id, scenario_slug, status, boundary, evaluation, created_at, created_by";
 const auditEventSelect =
   "id, workspace_id, session_id, actor_user_id, event_type, event_metadata, created_at";
+const pilotDemoReadinessSnapshotSelect =
+  "id, tenant_id, workspace_id, readiness_state, readiness_score, passed_count, review_count, blocked_count, required_actions, buyer_brief, check_results, runbook, verification, evidence_counts, snapshot, last_evidence_at, boundary, created_by, created_at";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -754,6 +822,92 @@ export async function listPilotAuditEvents(client: SupabaseClient, workspaceId: 
 
   return {
     events: ((data ?? []) as unknown as AuditEventRow[]).map(mapAuditEvent),
+    error
+  };
+}
+
+export async function listPilotDemoReadinessSnapshots(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("pilot_demo_readiness_snapshots")
+    .select(pilotDemoReadinessSnapshotSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return {
+    snapshots: ((data ?? []) as unknown as PilotDemoReadinessSnapshotRow[]).map(
+      mapPilotDemoReadinessSnapshot
+    ),
+    error
+  };
+}
+
+export async function getPilotDemoReadinessSnapshot(
+  client: SupabaseClient,
+  workspaceId: string,
+  snapshotId: string
+) {
+  const { data, error } = await client
+    .from("pilot_demo_readiness_snapshots")
+    .select(pilotDemoReadinessSnapshotSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", snapshotId)
+    .maybeSingle();
+
+  return {
+    snapshot: data ? mapPilotDemoReadinessSnapshot(data as unknown as PilotDemoReadinessSnapshotRow) : null,
+    error
+  };
+}
+
+function persistedEvidenceTimestamp(value: string) {
+  const time = new Date(value).getTime();
+
+  return Number.isFinite(time) ? new Date(time).toISOString() : null;
+}
+
+export async function createPilotDemoReadinessSnapshot(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  summary: PilotDemoReadinessSummary,
+  verification: TenantSessionVerificationReadiness,
+  evidenceCounts: PilotDemoReadinessSnapshotRecord["evidenceCounts"]
+) {
+  const { data, error } = await client.rpc("create_pilot_demo_readiness_snapshot", {
+    p_workspace_slug: workspaceSlug,
+    p_readiness_state: summary.state,
+    p_readiness_score: summary.score,
+    p_passed_count: summary.passed,
+    p_review_count: summary.review,
+    p_blocked_count: summary.blocked,
+    p_required_actions: summary.requiredActions,
+    p_buyer_brief: summary.buyerBrief,
+    p_check_results: summary.checks,
+    p_runbook: summary.runbook,
+    p_verification: verification,
+    p_evidence_counts: evidenceCounts,
+    p_last_evidence_at: persistedEvidenceTimestamp(summary.lastEvidenceAt),
+    p_snapshot: summary
+  });
+
+  return {
+    snapshotId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordPilotDemoReadinessPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  snapshotId: string
+) {
+  const { data, error } = await client.rpc("record_pilot_demo_readiness_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_snapshot_id: snapshotId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
     error
   };
 }

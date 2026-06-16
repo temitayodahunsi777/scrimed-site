@@ -7,6 +7,7 @@ import type {
 } from "../lib/protectedPilotWorkspace";
 import {
   derivePilotDemoReadiness,
+  type PilotDemoReadinessSnapshotRecord,
   type PilotDemoReadinessState,
   type TenantSessionVerificationReadiness
 } from "../lib/pilotDemoReadiness";
@@ -25,8 +26,13 @@ function stateClass(state: PilotDemoReadinessState) {
 
 export default function PilotDemoReadinessCommandCenter({
   auditEvents,
+  demoPacketBusyId,
+  demoSnapshotBusy,
+  demoSnapshots,
   enterprisePacketBusy,
   onCreateSession,
+  onCreateDemoReadinessSnapshot,
+  onDownloadDemoReadinessPacket,
   onDownloadEnterprisePacket,
   sessions,
   status,
@@ -34,8 +40,13 @@ export default function PilotDemoReadinessCommandCenter({
   workspace
 }: {
   auditEvents: PilotAuditEventRecord[];
+  demoPacketBusyId: string | null;
+  demoSnapshotBusy: boolean;
+  demoSnapshots: PilotDemoReadinessSnapshotRecord[];
   enterprisePacketBusy: boolean;
   onCreateSession: () => Promise<void>;
+  onCreateDemoReadinessSnapshot: () => Promise<void>;
+  onDownloadDemoReadinessPacket: (snapshot: PilotDemoReadinessSnapshotRecord) => Promise<void>;
   onDownloadEnterprisePacket: () => Promise<void>;
   sessions: PilotSessionRecord[];
   status: "idle" | "creating-session";
@@ -44,6 +55,7 @@ export default function PilotDemoReadinessCommandCenter({
 }) {
   const readiness = derivePilotDemoReadiness({ auditEvents, sessions, verification, workspace });
   const hasDurableSession = sessions.length > 0;
+  const latestSnapshot = demoSnapshots[0] ?? null;
 
   return (
     <section className="table-section demo-readiness-command" aria-label="Pilot demo readiness command center">
@@ -58,6 +70,14 @@ export default function PilotDemoReadinessCommandCenter({
         <div className="form-actions">
           <button
             className="primary-action"
+            disabled={demoSnapshotBusy}
+            onClick={onCreateDemoReadinessSnapshot}
+            type="button"
+          >
+            {demoSnapshotBusy ? "Saving Snapshot" : "Save Demo Snapshot"}
+          </button>
+          <button
+            className="secondary-action"
             disabled={status === "creating-session"}
             onClick={onCreateSession}
             type="button"
@@ -67,6 +87,20 @@ export default function PilotDemoReadinessCommandCenter({
           <a className="secondary-action" href="#tenant-session-verification">
             Run Tenant Verification
           </a>
+          <button
+            className="secondary-action"
+            disabled={!latestSnapshot || demoPacketBusyId === latestSnapshot?.id}
+            onClick={() => {
+              if (latestSnapshot) {
+                void onDownloadDemoReadinessPacket(latestSnapshot);
+              }
+            }}
+            type="button"
+          >
+            {latestSnapshot && demoPacketBusyId === latestSnapshot.id
+              ? "Preparing Demo Packet"
+              : "Download Latest Demo Packet"}
+          </button>
           <button
             className="secondary-action"
             disabled={enterprisePacketBusy}
@@ -113,6 +147,53 @@ export default function PilotDemoReadinessCommandCenter({
             <p>Use this only as enterprise evaluation context, not as a clinical, legal, or compliance claim.</p>
           </article>
         ))}
+      </div>
+
+      <div className="demo-runbook demo-snapshot-history" aria-label="Demo readiness snapshot history">
+        <div className="section-heading">
+          <p className="eyebrow">Durable readiness snapshots</p>
+          <h2>Retain buyer-demo evidence before each enterprise call.</h2>
+          <p className="section-copy">
+            Snapshots persist the current readiness decision, buyer brief, required actions, verification result, and
+            evidence counts. Packet export is write-before-release audited.
+          </p>
+        </div>
+        {demoSnapshots.length > 0 ? (
+          demoSnapshots.slice(0, 5).map((snapshot) => (
+            <article className="module-row" key={snapshot.id}>
+              <div>
+                <span>{snapshot.createdAt}</span>
+                <h2>
+                  {stateLabel(snapshot.readinessState)} readiness at {snapshot.readinessScore}%
+                </h2>
+                <p>
+                  {snapshot.evidenceCounts.sessions} sessions, {snapshot.evidenceCounts.auditEvents} audit events,
+                  {snapshot.evidenceCounts.requiredActions} required actions.
+                </p>
+              </div>
+              <strong className={stateClass(snapshot.readinessState)}>
+                {stateLabel(snapshot.readinessState)}
+              </strong>
+              <button
+                className="module-link button-link"
+                disabled={demoPacketBusyId === snapshot.id}
+                onClick={() => void onDownloadDemoReadinessPacket(snapshot)}
+                type="button"
+              >
+                {demoPacketBusyId === snapshot.id ? "Preparing Packet" : "Download Demo Readiness Packet"}
+              </button>
+            </article>
+          ))
+        ) : (
+          <article className="module-row">
+            <div>
+              <span>snapshot gap</span>
+              <h2>No durable demo readiness snapshots yet.</h2>
+            </div>
+            <strong className="status-pill status-pill-warn">Review</strong>
+            <p>Save a snapshot after tenant verification to create repeatable buyer diligence evidence.</p>
+          </article>
+        )}
       </div>
 
       {readiness.requiredActions.length > 0 ? (

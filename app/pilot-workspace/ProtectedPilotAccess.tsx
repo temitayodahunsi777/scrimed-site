@@ -9,7 +9,10 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
-import type { TenantSessionVerificationReadiness } from "../lib/pilotDemoReadiness";
+import type {
+  PilotDemoReadinessSnapshotRecord,
+  TenantSessionVerificationReadiness
+} from "../lib/pilotDemoReadiness";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
@@ -49,6 +52,12 @@ type PilotAuditResponse = {
 };
 
 type ProofPacketResponse = {
+  error?: { message?: string };
+};
+
+type DemoReadinessSnapshotResponse = {
+  snapshots?: PilotDemoReadinessSnapshotRecord[];
+  snapshot?: PilotDemoReadinessSnapshotRecord | null;
   error?: { message?: string };
 };
 
@@ -94,6 +103,9 @@ export default function ProtectedPilotAccess({
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
   const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
+  const [demoReadinessSnapshots, setDemoReadinessSnapshots] = useState<PilotDemoReadinessSnapshotRecord[]>([]);
+  const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
+  const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [verificationReadiness, setVerificationReadiness] =
     useState<TenantSessionVerificationReadiness | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState("");
@@ -135,6 +147,9 @@ export default function ProtectedPilotAccess({
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
+        setDemoReadinessSnapshots([]);
+        setDemoPacketBusyId(null);
+        setDemoSnapshotStatus("idle");
         setVerificationReadiness(null);
         setEnterprisePacketStatus("idle");
         setStatus("signed-out");
@@ -171,6 +186,9 @@ export default function ProtectedPilotAccess({
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
+        setDemoReadinessSnapshots([]);
+        setDemoPacketBusyId(null);
+        setDemoSnapshotStatus("idle");
         setVerificationReadiness(null);
         setStatus("mfa-required");
         setMessage(
@@ -209,13 +227,17 @@ export default function ProtectedPilotAccess({
       const nextWorkspaces = body.workspaces ?? [];
       setWorkspaces(nextWorkspaces);
       setSelectedWorkspace(nextWorkspaces[0] ?? null);
+      setDemoReadinessSnapshots([]);
+      setDemoPacketBusyId(null);
+      setDemoSnapshotStatus("idle");
       setVerificationReadiness(null);
       setStatus("ready");
 
       if (nextWorkspaces[0]) {
         await Promise.all([
           loadSessions(activeSession, nextWorkspaces[0]),
-          loadAuditEvents(activeSession, nextWorkspaces[0])
+          loadAuditEvents(activeSession, nextWorkspaces[0]),
+          loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -258,6 +280,26 @@ export default function ProtectedPilotAccess({
       }
 
       setAuditEvents(body.events ?? []);
+    }
+
+    async function loadDemoReadinessSnapshots(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/demo-readiness`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as DemoReadinessSnapshotResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Demo readiness snapshots could not be loaded.");
+        return;
+      }
+
+      setDemoReadinessSnapshots(body.snapshots ?? []);
     }
 
     initializeAccess();
@@ -427,6 +469,9 @@ export default function ProtectedPilotAccess({
     }
 
     setSelectedWorkspace(workspace);
+    setDemoReadinessSnapshots([]);
+    setDemoPacketBusyId(null);
+    setDemoSnapshotStatus("idle");
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -444,7 +489,10 @@ export default function ProtectedPilotAccess({
     }
 
     setSessions(body.sessions ?? []);
-    await refreshAuditEvents(session, workspace);
+    await Promise.all([
+      refreshAuditEvents(session, workspace),
+      refreshDemoReadinessSnapshots(session, workspace)
+    ]);
     setStatus("ready");
   }
 
@@ -462,6 +510,22 @@ export default function ProtectedPilotAccess({
     }
 
     setAuditEvents(body.events ?? []);
+  }
+
+  async function refreshDemoReadinessSnapshots(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/demo-readiness`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as DemoReadinessSnapshotResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Demo readiness snapshots could not be loaded.");
+      return;
+    }
+
+    setDemoReadinessSnapshots(body.snapshots ?? []);
   }
 
   async function createSyntheticSession() {
@@ -560,6 +624,70 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Enterprise proof packet downloaded and its audit event was committed.");
+  }
+
+  async function createDemoReadinessSnapshot() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setDemoSnapshotStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/pilot-workspaces/${selectedWorkspace.slug}/demo-readiness`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ verification: verificationReadiness })
+    });
+    const body = (await response.json()) as DemoReadinessSnapshotResponse;
+
+    setDemoSnapshotStatus("idle");
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "The demo readiness snapshot could not be saved.");
+      return;
+    }
+
+    setDemoReadinessSnapshots(body.snapshots ?? (body.snapshot ? [body.snapshot] : []));
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Demo readiness snapshot saved with append-only audit evidence.");
+  }
+
+  async function downloadDemoReadinessPacket(snapshot: PilotDemoReadinessSnapshotRecord) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setDemoPacketBusyId(snapshot.id);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/demo-readiness/${snapshot.id}/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    setDemoPacketBusyId(null);
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+      setMessage(body.error?.message ?? "The demo readiness packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-${snapshot.id}-demo-readiness-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Demo readiness packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -797,8 +925,13 @@ export default function ProtectedPilotAccess({
         <>
           <PilotDemoReadinessCommandCenter
             auditEvents={auditEvents}
+            demoPacketBusyId={demoPacketBusyId}
+            demoSnapshotBusy={demoSnapshotStatus === "saving"}
+            demoSnapshots={demoReadinessSnapshots}
             enterprisePacketBusy={enterprisePacketStatus === "downloading"}
             onCreateSession={createSyntheticSession}
+            onCreateDemoReadinessSnapshot={createDemoReadinessSnapshot}
+            onDownloadDemoReadinessPacket={downloadDemoReadinessPacket}
             onDownloadEnterprisePacket={downloadEnterpriseProofPacket}
             sessions={sessions}
             status={status === "creating-session" ? "creating-session" : "idle"}

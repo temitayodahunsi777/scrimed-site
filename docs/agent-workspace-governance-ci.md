@@ -48,10 +48,11 @@ Scheduled runs use the defaults. If the secret is present, the authenticated pat
 - Authenticated TrustOps incident event trail is retained.
 - Authenticated TrustOps review packet downloads only after packet-release audit.
 - Authenticated aggregate enterprise proof packet downloads only after packet-release audit.
+- Authenticated demo readiness snapshots and Demo Readiness Packet downloads only after snapshot and packet-release audit.
 
 ## External Gate
 
-The remaining authenticated-mutation and packet happy-path gate is operational: GitHub Actions must receive an approved AAL2 tenant-admin or pilot-lead bearer token in the `SCRIMED_BEARER_TOKEN` secret before it can create or mutate protected work orders, TrustOps incidents, and audited enterprise proof-packet downloads. This cannot be resolved safely in code because source control must never store production identity credentials.
+The remaining authenticated-mutation and packet happy-path gate is operational: GitHub Actions must receive an approved AAL2 tenant-admin or pilot-lead bearer token in the `SCRIMED_BEARER_TOKEN` secret before it can create or mutate protected work orders, TrustOps incidents, demo readiness snapshots, audited Demo Readiness Packets, and audited enterprise proof-packet downloads. This cannot be resolved safely in code because source control must never store production identity credentials.
 
 Passkey authentication does not remove this CI gate. WebAuthn passkey ceremonies require a human/browser interaction and are appropriate for tenant-admin sign-in, not unattended GitHub Actions mutation smoke. CI should continue to use an explicitly issued, short-lived, AAL2-scoped operational token when authenticated mutation smoke is required.
 
@@ -59,8 +60,8 @@ No-secret public readiness is covered by `scripts/public-production-smoke.mjs`. 
 
 Human-run tenant verification is covered inside `/pilot-workspace/access`. An approved tenant member with a current AAL2 browser session can run protected workspace route checks, verify work-order, governance-ledger, TrustOps, audit, tenant-access, and enterprise proof-packet responses, and commit the aggregate proof-packet audit event without exporting the bearer token to source control or GitHub Actions.
 
-Human-run buyer-demo readiness is also covered inside `/pilot-workspace/access`. The Pilot Demo Readiness Command Center rolls durable synthetic sessions, audit events, proof-packet release evidence, and tenant-session verification into an operator readiness score, blockers, buyer brief, and repeatable runbook.
+Human-run buyer-demo readiness is also covered inside `/pilot-workspace/access`. The Pilot Demo Readiness Command Center rolls durable synthetic sessions, audit events, proof-packet release evidence, and tenant-session verification into an operator readiness score, blockers, buyer brief, and repeatable runbook. Operators can now persist that state as a durable snapshot and download an audited Demo Readiness Packet from the same AAL2 browser session.
 
 ## Code-Side Resolution
 
-The source-side gap is closed by public production smoke, fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, the protected activation-governance route, the aggregate enterprise proof-packet route, browser-session tenant verification, and protected demo readiness in `/pilot-workspace/access`. The unresolved piece is only the out-of-band secret placement in GitHub Actions for unattended authenticated mutation and packet happy paths.
+The source-side gap is closed by public production smoke, fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, the protected activation-governance route, the aggregate enterprise proof-packet route, browser-session tenant verification, durable demo readiness snapshots, audited Demo Readiness Packets, and protected demo readiness in `/pilot-workspace/access`. The unresolved piece is only the out-of-band secret placement in GitHub Actions for unattended authenticated mutation and packet happy paths.

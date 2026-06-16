@@ -335,6 +335,18 @@ export const protectedPilotApiContracts = [
     purpose: "Inspect the tenant-isolated append-only audit trail for workspace evidence activity."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/demo-readiness",
+    access: "GET: AAL2 bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",
+    purpose: "Inspect or persist buyer-demo readiness snapshots from durable synthetic sessions, audit events, proof-packet evidence, and tenant-session verification."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/demo-readiness/{snapshotId}/packet",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
+    purpose: "Download an audited Markdown Demo Readiness Packet for a retained synthetic buyer-demo readiness snapshot."
+  },
+  {
     method: "GET / PATCH",
     route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access",
     access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",

@@ -47,6 +47,10 @@ Operational boundaries:
 - `POST /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `GET /api/pilot-workspaces/{workspaceSlug}/audit`
 - `GET /api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness`
+- `POST /api/pilot-workspaces/{workspaceSlug}/demo-readiness`
+- `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness/{snapshotId}/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
 Protected routes fail closed with `503` until identity and durable storage are configured. They require a verified bearer token after activation.
 
@@ -63,6 +67,21 @@ Protected routes fail closed with `503` until identity and durable storage are c
 - A repeatable four-step demo runbook.
 
 This closes the human-run buyer-demo readiness gap without exporting bearer tokens to CI. The command center does not create a clinical validation claim, legal conclusion, compliance certification, production authorization, or live-care capability.
+
+## Demo Readiness Snapshots And Packets
+
+The protected command center can now save durable demo readiness snapshots. Each snapshot persists the current readiness score, buyer brief, required actions, check results, runbook, tenant-session verification metadata, and evidence counts into `public.pilot_demo_readiness_snapshots`.
+
+Snapshot creation requires:
+
+- Approved tenant membership.
+- Fresh AAL2 assurance.
+- Tenant-admin or pilot-lead role.
+- Server-held runtime authorization.
+- Synthetic-only evidence.
+- Append-only `demo-readiness-snapshot-created` audit event.
+
+Demo Readiness Packet export requires a selected snapshot and commits `demo-readiness-packet-downloaded` before releasing Markdown evidence. The packet remains buyer diligence support for synthetic pilots only; it is not a clinical validation, legal conclusion, compliance certification, production authorization, reimbursement claim, or live-care capability.
 
 ## Active Public Controls
 
