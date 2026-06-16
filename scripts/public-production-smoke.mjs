@@ -96,6 +96,14 @@ async function checkProductConsole() {
     throw new Error("product console missing pilot demo readiness packet proof-stack posture.");
   }
 
+  if (body.proofStack?.buyerPilotRoom !== "aal2-buyer-room-evidence-bundle") {
+    throw new Error("product console missing Buyer Pilot Room proof-stack posture.");
+  }
+
+  if (body.proofStack?.buyerPilotRoomPackets !== "aal2-audited-buyer-room-packets") {
+    throw new Error("product console missing audited Buyer Pilot Room packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -120,6 +128,27 @@ async function checkReadiness() {
   console.log("pass protected pilot readiness");
 }
 
+async function checkCompetitiveEdgeApi() {
+  const result = await request("/api/competitive-edge");
+  requireStatus("competitive edge", result.response.status, 200);
+  requireContentType("competitive edge", result.response, "application/json");
+  const body = requireJson("competitive edge", result.body);
+
+  if (body.service !== "scrimed-competitive-edge") {
+    throw new Error(`competitive edge expected service scrimed-competitive-edge but received ${body.service}.`);
+  }
+
+  if (body.status !== "public-positioning-ready") {
+    throw new Error(`competitive edge expected public-positioning-ready but received ${body.status}.`);
+  }
+
+  if (!Array.isArray(body.edges) || body.edges.length < 5) {
+    throw new Error("competitive edge expected at least five public proof pillars.");
+  }
+
+  console.log("pass competitive edge API");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -130,11 +159,21 @@ async function checkProtectedFailClosed(path, label) {
 
 await checkHtml("/pilot-workspace/access");
 await checkHtml("/sales-operations");
+await checkHtml("/competitive-edge");
 await checkProductConsole();
 await checkReadiness();
+await checkCompetitiveEdgeApi();
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,
   "Demo readiness snapshots protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-room`,
+  "Buyer Pilot Room protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,
+  "Buyer Pilot Room packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,

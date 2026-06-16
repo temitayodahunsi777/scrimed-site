@@ -50,6 +50,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness`
 - `POST /api/pilot-workspaces/{workspaceSlug}/demo-readiness`
 - `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness/{snapshotId}/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room`
+- `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
 Protected routes fail closed with `503` until identity and durable storage are configured. They require a verified bearer token after activation.
@@ -82,6 +84,22 @@ Snapshot creation requires:
 - Append-only `demo-readiness-snapshot-created` audit event.
 
 Demo Readiness Packet export requires a selected snapshot and commits `demo-readiness-packet-downloaded` before releasing Markdown evidence. The packet remains buyer diligence support for synthetic pilots only; it is not a clinical validation, legal conclusion, compliance certification, production authorization, reimbursement claim, or live-care capability.
+
+## Buyer Pilot Room
+
+`/pilot-workspace/access` now includes a protected Buyer Pilot Room. It packages the current workspace evidence into one enterprise diligence surface:
+
+- Readiness state and score.
+- Durable synthetic session and audit counts.
+- Latest demo readiness snapshot posture.
+- Competitive edge pillars with proof routes and blocked claims.
+- Premium enterprise sales path from assessment through protected pilot and annual operating license.
+- Known limitations with safe workarounds and production gates.
+- Audited Markdown Buyer Pilot Room Packet export.
+
+The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The packet route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact.
+
+This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, limitations, and competitive edge in one tenant-scoped room without weakening the synthetic-only boundary.
 
 ## Active Public Controls
 

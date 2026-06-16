@@ -15,6 +15,7 @@ import type {
 } from "../lib/pilotDemoReadiness";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
+import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
@@ -99,6 +100,7 @@ export default function ProtectedPilotAccess({
   const [message, setMessage] = useState("");
   const [passkeyStatus, setPasskeyStatus] = useState<PasskeyStatus>("idle");
   const [enterprisePacketStatus, setEnterprisePacketStatus] = useState<"idle" | "downloading">("idle");
+  const [buyerRoomPacketStatus, setBuyerRoomPacketStatus] = useState<"idle" | "downloading">("idle");
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
@@ -152,6 +154,7 @@ export default function ProtectedPilotAccess({
         setDemoSnapshotStatus("idle");
         setVerificationReadiness(null);
         setEnterprisePacketStatus("idle");
+        setBuyerRoomPacketStatus("idle");
         setStatus("signed-out");
         return;
       }
@@ -190,6 +193,7 @@ export default function ProtectedPilotAccess({
         setDemoPacketBusyId(null);
         setDemoSnapshotStatus("idle");
         setVerificationReadiness(null);
+        setBuyerRoomPacketStatus("idle");
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -230,6 +234,7 @@ export default function ProtectedPilotAccess({
       setDemoReadinessSnapshots([]);
       setDemoPacketBusyId(null);
       setDemoSnapshotStatus("idle");
+      setBuyerRoomPacketStatus("idle");
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -472,6 +477,7 @@ export default function ProtectedPilotAccess({
     setDemoReadinessSnapshots([]);
     setDemoPacketBusyId(null);
     setDemoSnapshotStatus("idle");
+    setBuyerRoomPacketStatus("idle");
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -688,6 +694,41 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Demo readiness packet downloaded and its audit event was committed.");
+  }
+
+  async function downloadBuyerPilotRoomPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setBuyerRoomPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/buyer-room/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    setBuyerRoomPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+      setMessage(body.error?.message ?? "The Buyer Pilot Room packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-buyer-pilot-room-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Buyer Pilot Room packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -936,6 +977,15 @@ export default function ProtectedPilotAccess({
             sessions={sessions}
             status={status === "creating-session" ? "creating-session" : "idle"}
             verification={verificationReadiness}
+            workspace={selectedWorkspace}
+          />
+
+          <BuyerPilotRoomPanel
+            auditEvents={auditEvents}
+            demoSnapshots={demoReadinessSnapshots}
+            onDownloadPacket={downloadBuyerPilotRoomPacket}
+            packetBusy={buyerRoomPacketStatus === "downloading"}
+            sessions={sessions}
             workspace={selectedWorkspace}
           />
 

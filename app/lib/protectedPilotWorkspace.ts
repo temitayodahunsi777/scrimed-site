@@ -347,6 +347,20 @@ export const protectedPilotApiContracts = [
     purpose: "Download an audited Markdown Demo Readiness Packet for a retained synthetic buyer-demo readiness snapshot."
   },
   {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/buyer-room",
+    access: "AAL2 bearer token + workspace membership",
+    purpose:
+      "Inspect a tenant-scoped Buyer Pilot Room that bundles synthetic evidence counts, readiness state, competitive edge, premium commercial path, known limitations, and workarounds."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited Markdown Buyer Pilot Room Packet for enterprise diligence, investor follow-up, and protected pilot sales engineering."
+  },
+  {
     method: "GET / PATCH",
     route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access",
     access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
@@ -561,6 +575,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Guided tenant-admin activation runbook with buyer-ready evidence status",
       "Audited tenant activation proof packet for buyer and investor diligence",
       "SMTP delivery readiness metadata with direct-send gate retained",
+      "Protected Buyer Pilot Room that packages competitive edge, readiness, pricing path, limitations, and write-before-release packet export",
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",
       "SSO-readiness metadata and identity lifecycle evidence",

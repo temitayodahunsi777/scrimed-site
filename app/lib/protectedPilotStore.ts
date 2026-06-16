@@ -969,6 +969,27 @@ export async function recordEnterpriseProofPacketDownload(
   };
 }
 
+export async function recordBuyerPilotRoomPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_buyer_pilot_room_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "buyer-pilot-room-packet",
+      format: "text/markdown",
+      syntheticOnly: true
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {
   const { data, error } = await client
     .from("trustos_decisions")

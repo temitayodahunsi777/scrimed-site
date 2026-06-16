@@ -29,6 +29,11 @@ import {
   pilotDemoReadinessPacketProofStackStatus,
   pilotDemoReadinessProofStackStatus
 } from "./pilotDemoReadiness";
+import {
+  buyerPilotRoomCompetitiveEdges,
+  buyerPilotRoomPacketProofStackStatus,
+  buyerPilotRoomProofStackStatus
+} from "./buyerPilotRoom";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -372,6 +377,22 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Protected synthetic-pilot mutations are active and verified; live clinical execution and PHI-enabled production workflows remain denied."
   },
   {
+    label: "Open Buyer Pilot Room",
+    href: "/pilot-workspace/access",
+    purpose:
+      "Package tenant-scoped readiness, pricing path, competitive edge, evidence counts, known limitations, and proof-packet audit into one protected buyer-diligence workspace.",
+    boundary:
+      "Buyer Pilot Room evidence is synthetic-only and tenant-scoped; packet export requires authenticated AAL2 workspace access."
+  },
+  {
+    label: "Broadcast Competitive Edge",
+    href: "/competitive-edge",
+    purpose:
+      "Review SCRIMED's public enterprise positioning across healthcare intelligence infrastructure, TrustOS, interoperability, premium sales motion, FaithCore, and global deployment optionality.",
+    boundary:
+      "Competitive positioning does not imply third-party partnership, certified compliance, live clinical execution, or production connector authorization."
+  },
+  {
     label: "Inspect Product Demos",
     href: "/demos",
     purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
@@ -577,6 +598,7 @@ export function getProductConsoleSummary() {
     pilotProgramCount: demoPilotProgramSummary.pilotCount,
     workflowCount: productWorkflows.length,
     workflowEngineCount: workflowEngineExamples.length,
+    buyerPilotRoomCompetitiveEdgeCount: buyerPilotRoomCompetitiveEdges.length,
     agentOSControlPlaneCount: agentOSSummary.controlPlane.length,
     atlasSubsystemCount: atlasIntelligenceCoreSummary.subsystems.length,
     trustCardCount: atlasIntelligenceCoreSummary.trustCards.length,
@@ -601,11 +623,16 @@ export function getProductConsoleSummary() {
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
+    buyerPilotRoomRoute: "/pilot-workspace/access",
+    buyerPilotRoomApiRoute: "/api/pilot-workspaces/{workspaceSlug}/buyer-room",
+    buyerPilotRoomPacketApiRoute: "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet",
+    competitiveEdgeRoute: "/competitive-edge",
     productOffers,
     enterpriseServiceOffers,
     productAgents,
     productWorkflows,
     workflowEngineExamples,
+    buyerPilotRoomCompetitiveEdges,
     governanceControls,
     evidenceMetrics,
     buyerActions,
@@ -642,6 +669,8 @@ export function getProductConsoleSummary() {
       tenantSessionVerification: "browser-aal2-no-secret-protected-route-checks",
       pilotDemoReadinessCommandCenter: pilotDemoReadinessProofStackStatus,
       pilotDemoReadinessPackets: pilotDemoReadinessPacketProofStackStatus,
+      buyerPilotRoom: buyerPilotRoomProofStackStatus,
+      buyerPilotRoomPackets: buyerPilotRoomPacketProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -673,7 +702,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited Buyer Pilot Room packet and non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
     updated: "2026-06-16"
   };
 }
@@ -696,6 +725,11 @@ export function getProductReadinessBrief() {
     `Pilot Evidence Dashboard: ${summary.pilotEvidenceRoute}`,
     `Demo Center: ${summary.demoRoute}`,
     `Pilot Programs: ${summary.pilotProgramRoute}`,
+    `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
+    `Competitive Edge: ${summary.competitiveEdgeRoute}`,
+    ...summary.buyerPilotRoomCompetitiveEdges.map(
+      (edge) => `- Competitive edge: ${edge.pillar} -> ${edge.route}: ${edge.claim}`
+    ),
     ...summary.demoPilotProgramSummary.productDemos.map(
       (demo) => `- Demo: ${demo.name} (${demo.status}) -> ${demo.route}`
     ),

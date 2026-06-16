@@ -138,6 +138,40 @@ export default function ProductConsolePage() {
         </article>
       </section>
 
+      <section className="table-section" aria-label="SCRIMED competitive edge">
+        <div className="section-heading">
+          <p className="eyebrow">Competitive edge</p>
+          <h2>SCRIMED presents as healthcare intelligence infrastructure, not another healthcare chatbot.</h2>
+          <p className="section-copy">
+            The product edge is the combination of governed agents, trust infrastructure, interoperability readiness,
+            premium enterprise sales motion, faith-aligned optionality, and protected buyer proof.
+          </p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.competitiveEdgeRoute}>
+              Broadcast Competitive Edge
+            </Link>
+            <Link className="secondary-action" href={summary.buyerPilotRoomRoute}>
+              Open Buyer Pilot Room
+            </Link>
+          </div>
+        </div>
+        {summary.buyerPilotRoomCompetitiveEdges.map((edge) => (
+          <article className="module-row" key={edge.pillar}>
+            <div>
+              <span>SCRIMED edge</span>
+              <h2>{edge.pillar}</h2>
+            </div>
+            <p>{edge.claim}</p>
+            <div>
+              <Link className="module-link" href={edge.route}>
+                Inspect proof
+              </Link>
+              <p>{edge.blockedClaim}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED trust and safety operations">
         <div className="section-heading">
           <p className="eyebrow">Trust safety operations</p>
