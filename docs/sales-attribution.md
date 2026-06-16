@@ -1,6 +1,6 @@
 # SCRIMED Sales Attribution
 
-Updated: 2026-06-15
+Updated: 2026-06-16
 
 ## Status
 
@@ -57,4 +57,6 @@ Public analytics use synthetic fixtures at `/attribution-analytics`. Authenticat
 
 Sales Operations now displays the tenant cohort report in-console and can export an audited attribution analytics packet for board, investor, and enterprise sales reviews.
 
-The next build step is a dedicated attribution packet audit event and durable Trust Safety improvement ledger integration.
+Attribution packet exports now attempt a dedicated `attribution-analytics-packet-downloaded` audit event, with a controlled rollout fallback while the Supabase migration is being verified.
+
+The next build step is anomalous packet-download review through Trust Safety incident operations and durable production trust-ops storage.

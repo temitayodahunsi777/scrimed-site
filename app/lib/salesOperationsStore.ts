@@ -59,7 +59,10 @@ export async function completeSalesFollowUp(client: SupabaseClient, intakeId: st
 export async function recordSalesArtifactDownload(
   client: SupabaseClient,
   intakeId: string,
-  eventType: "crm-export-downloaded" | "follow-up-draft-downloaded",
+  eventType:
+    | "crm-export-downloaded"
+    | "follow-up-draft-downloaded"
+    | "attribution-analytics-packet-downloaded",
   metadata: Record<string, unknown>
 ) {
   return client.rpc("record_sales_artifact_download", {

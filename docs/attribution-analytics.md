@@ -1,6 +1,6 @@
 # SCRIMED Attribution Analytics
 
-Updated: 2026-06-15
+Updated: 2026-06-16
 
 ## Purpose
 
@@ -40,8 +40,8 @@ Attribution analytics must not contain PHI, patient identifiers, clinical record
 - Authenticated analytics require AAL2 tenant-admin access.
 - Ad spend, CAC, signed contract value, and customer ROI are not imported yet.
 - Small cohort counts are directional operating signals, not market claims.
-- Packet export is audited through the existing sales artifact event with explicit metadata until a dedicated attribution packet audit event is migrated.
+- Packet export now attempts the dedicated `attribution-analytics-packet-downloaded` audit event and falls back to the prior sales artifact event only during migration rollout.
 
 ## Next Build Step
 
-Add a dedicated attribution packet audit event and connect cohort packet outputs to the future Trust Safety incident and improvement ledger.
+Verify the dedicated audit event in production, remove rollout fallback metadata once confirmed, and connect anomalous packet downloads to Trust Safety incident review.

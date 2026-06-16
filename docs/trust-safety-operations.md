@@ -1,13 +1,14 @@
 # SCRIMED Trust And Safety Operations
 
-Updated: 2026-06-15
+Updated: 2026-06-16
 
 ## Status
 
-Trust Safety Operations v1 is active as an inspectable operating model:
+Trust Safety Operations v2 is active as an inspectable operating model and synthetic incident operations layer:
 
 - UI: `/trust-safety-operations`
 - API: `/api/trust-safety-operations`
+- Incident report API: `/api/trust-safety-operations/incidents/{incidentId}/report`
 - Trust Center: `/trust-center`
 - Claims Register: `/claims`
 - Audit Layer: `/audit`
@@ -25,14 +26,48 @@ SCRIMED now defines a 24/7 trust, safety, monitoring, auditing, fixing, and cont
 - Security incident watch
 - Continuous improvement
 
+## Incident Queue
+
+Trust Safety Operations now tracks no-PHI product-control incidents with:
+
+- severity
+- status
+- owner
+- accountable agent
+- source channel
+- affected surface
+- containment action
+- remediation plan
+- legal-hold status
+- evidence routes
+- audit event names
+- improvement actions
+- downloadable incident report
+
+Seeded incident classes cover:
+
+- PHI-style intake content
+- unsupported claims and advertising substantiation
+- copyright, trademark, license, and provenance gaps
+- dedicated attribution packet audit event rollout
+- 24/7 managed coverage claim gating
+- runtime, dependency, and deployment anomaly watch
+
 ## Boundary
 
 This is an operating model and product control layer. It is not legal advice, a compliance certification, managed SOC/MDR coverage, production clinical monitoring, or authorization for live clinical execution.
 
-## Current Workaround
+## Addressed Limitations
 
-The protected attribution analytics packet uses the existing audited sales artifact event with explicit metadata until a dedicated `attribution-analytics-packet-downloaded` audit event is migrated. This keeps packet release protected and auditable without requiring a paid CRM or new infrastructure.
+- Added a synthetic trust-ops incident queue and audit-ready report route.
+- Added a dedicated `attribution-analytics-packet-downloaded` migration, with a compatibility fallback to the prior sales artifact event until production migration verification is complete.
+
+## Remaining Limitations
+
+- Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.
+- Regulated production incidents require customer-approved durable storage, legal hold, breach analysis, notification decisions, and forensic process.
+- Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers.
 
 ## Next Build Step
 
-Add a durable trust-ops incident and improvement ledger with severity, owner, containment action, legal-hold status, post-incident review, and agent-control update tracking.
+Promote trust-ops incidents from deterministic product-control records into tenant-scoped durable storage with authenticated mutation, legal-hold workflow, notification decisions, and post-incident review packets.

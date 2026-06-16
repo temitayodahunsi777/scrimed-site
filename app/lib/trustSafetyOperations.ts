@@ -41,6 +41,48 @@ export type TrustSafetyLoop = {
   boundary: string;
 };
 
+export type TrustSafetyIncidentSeverity = "low" | "moderate" | "high" | "critical";
+export type TrustSafetyIncidentStatus =
+  | "new"
+  | "triaged"
+  | "contained"
+  | "remediating"
+  | "monitoring"
+  | "closed"
+  | "production-gated";
+export type TrustSafetyLegalHoldStatus = "not-required" | "watch" | "recommended" | "active";
+
+export type TrustSafetyIncident = {
+  id: string;
+  title: string;
+  severity: TrustSafetyIncidentSeverity;
+  status: TrustSafetyIncidentStatus;
+  owner: string;
+  accountableAgent: string;
+  sourceChannel: string;
+  createdAt: string;
+  updatedAt: string;
+  affectedSurface: string[];
+  triggerSignal: string;
+  buyerImpact: string;
+  containmentAction: string;
+  remediationPlan: string;
+  legalHoldStatus: TrustSafetyLegalHoldStatus;
+  reportRoute: string;
+  evidenceRoutes: string[];
+  auditEvents: string[];
+  improvementActions: string[];
+  productionBoundary: string;
+};
+
+export type TrustSafetyIncidentSla = {
+  severity: TrustSafetyIncidentSeverity;
+  responseTarget: string;
+  containmentTarget: string;
+  executiveEscalation: string;
+  requiredReviewers: string[];
+};
+
 export const trustSafetyOperationsBoundary =
   "SCRIMED Trust and Safety Operations is an operating model and product control layer for synthetic evaluations, protected pilots, and enterprise readiness. It does not create legal advice, compliance certification, 24/7 managed SOC/MDR coverage, production clinical monitoring, or authorization for live clinical execution.";
 
@@ -252,16 +294,282 @@ export const continuousImprovementLoops: TrustSafetyLoop[] = [
   }
 ];
 
+export const trustSafetyIncidentSlas: TrustSafetyIncidentSla[] = [
+  {
+    severity: "critical",
+    responseTarget: "Immediate founder/security/privacy escalation in the target operating model.",
+    containmentTarget: "Fail closed, pause affected workflow, and preserve evidence before further release.",
+    executiveEscalation: "Founder, security owner, privacy owner, counsel, and customer incident owner when applicable.",
+    requiredReviewers: ["security", "privacy", "legal", "engineering", "executive owner"]
+  },
+  {
+    severity: "high",
+    responseTarget: "Same-business-day owner assignment in protected pilots; faster for production incidents once staffed.",
+    containmentTarget: "Block publication, export, connector action, or claim until reviewed.",
+    executiveEscalation: "Founder plus accountable domain owner.",
+    requiredReviewers: ["domain owner", "legal/privacy/security as applicable", "product owner"]
+  },
+  {
+    severity: "moderate",
+    responseTarget: "Next operational review cycle with assigned owner and evidence route.",
+    containmentTarget: "Document workaround, add review gate, and prevent unsupported external release.",
+    executiveEscalation: "Escalate if repeated, unowned, or buyer-facing.",
+    requiredReviewers: ["control owner", "engineering/product owner"]
+  },
+  {
+    severity: "low",
+    responseTarget: "Track in the continuous-improvement queue.",
+    containmentTarget: "Fix through normal release, documentation, or smoke-check improvement.",
+    executiveEscalation: "Escalate only if repeated or tied to buyer trust.",
+    requiredReviewers: ["control owner"]
+  }
+];
+
+export const trustSafetyIncidents: TrustSafetyIncident[] = [
+  {
+    id: "trustops-phi-style-intake-block",
+    title: "PHI-style intake content attempted in a public or sales workflow",
+    severity: "moderate",
+    status: "contained",
+    owner: "Privacy and product control owner",
+    accountableAgent: "PHI Shield Agent",
+    sourceChannel: "Supabase Identity And Audit Watch",
+    createdAt: "2026-06-16T09:00:00.000Z",
+    updatedAt: "2026-06-16T09:00:00.000Z",
+    affectedSurface: ["public pilot intake", "sales operations", "protected pilot boundary"],
+    triggerSignal: "PHI-style wording, patient identifier pattern, or clinical-record request appears in a no-PHI workflow.",
+    buyerImpact:
+      "Protects SCRIMED and buyers from routing patient data into public intake, sales analytics, or synthetic pilot workflows before approved production controls.",
+    containmentAction: "Reject prohibited content, return no-PHI guidance, and preserve safe metadata only.",
+    remediationPlan:
+      "Keep public and sales workflows business-contact only; add stricter phrase checks when repeated patterns appear.",
+    legalHoldStatus: "not-required",
+    reportRoute: "/api/trust-safety-operations/incidents/trustops-phi-style-intake-block/report",
+    evidenceRoutes: ["/pilot", "/sales-operations", "/trust-center/privacy", "/api/pilot/intake"],
+    auditEvents: ["intake-blocked", "no-phi-boundary-returned", "safe-metadata-retained"],
+    improvementActions: [
+      "Review rejected patterns after every campaign launch.",
+      "Add new prohibited terms to intake and sales operations validation.",
+      "Escalate suspected live PHI to privacy and counsel before any retention decision."
+    ],
+    productionBoundary:
+      "This incident pattern is synthetic/pilot boundary protection only; actual breach analysis requires authorized privacy, security, legal, and customer incident owners."
+  },
+  {
+    id: "trustops-claims-substantiation-gate",
+    title: "Unsupported public claim, sales claim, or advertising claim needs substantiation",
+    severity: "high",
+    status: "contained",
+    owner: "Claims, marketing, legal, and product owner",
+    accountableAgent: "Claims And Legal Guard",
+    sourceChannel: "Claims And Content Watch",
+    createdAt: "2026-06-16T09:10:00.000Z",
+    updatedAt: "2026-06-16T09:10:00.000Z",
+    affectedSurface: ["website copy", "sales packets", "pricing", "PR and advertising"],
+    triggerSignal:
+      "Language suggests certification, clinical outcome, guaranteed ROI, partnership, production readiness, or patient treatment capability without approved evidence.",
+    buyerImpact:
+      "Keeps SCRIMED credible with health systems, payers, investors, regulators, and enterprise counsel by forcing claims to match current capability.",
+    containmentAction: "Block publication and replace with current-boundary language until evidence and approvers are attached.",
+    remediationPlan:
+      "Route each quantified or regulated claim through the claims register with dated evidence, approved channel, limitation, and accountable approver.",
+    legalHoldStatus: "watch",
+    reportRoute: "/api/trust-safety-operations/incidents/trustops-claims-substantiation-gate/report",
+    evidenceRoutes: ["/claims", "/trust-center", "/market-activation", "/api/enterprise-readiness/claims"],
+    auditEvents: ["claim-blocked", "evidence-required", "approved-boundary-replacement-used"],
+    improvementActions: [
+      "Require claims-register entry before publishing new marketing copy.",
+      "Keep synthetic-pilot boundary visible in buyer and investor artifacts.",
+      "Escalate regulated health, compliance, and ROI claims to qualified external reviewers."
+    ],
+    productionBoundary:
+      "This gate is not legal advice or advertising clearance; final external claims require qualified counsel and appropriate domain reviewers."
+  },
+  {
+    id: "trustops-ip-provenance-register",
+    title: "Copyright, trademark, or third-party asset provenance missing before external use",
+    severity: "high",
+    status: "remediating",
+    owner: "Brand, product, founder, and qualified IP counsel",
+    accountableAgent: "Copyright And IP Sentinel",
+    sourceChannel: "Claims And Content Watch",
+    createdAt: "2026-06-16T09:20:00.000Z",
+    updatedAt: "2026-06-16T09:20:00.000Z",
+    affectedSurface: ["product names", "public pages", "generated media", "sales packets", "source-informed strategy"],
+    triggerSignal:
+      "Asset, name, screenshot, logo, source excerpt, dataset, code, or generated-media item lacks clear ownership, permission, license, or approval.",
+    buyerImpact:
+      "Reduces brand, IP, and partnership risk while preserving SCRIMED-owned product value and defensibility.",
+    containmentAction: "Hold external publication until provenance, ownership, license, or counsel review is attached.",
+    remediationPlan:
+      "Maintain an IP inventory, registration candidate list, trademark clearance plan, contributor assignments, and approved asset source log.",
+    legalHoldStatus: "watch",
+    reportRoute: "/api/trust-safety-operations/incidents/trustops-ip-provenance-register/report",
+    evidenceRoutes: ["/trust-safety-operations", "/trust-center/branding", "/claims", "/source-intelligence"],
+    auditEvents: ["asset-provenance-required", "registration-candidate-routed", "third-party-mark-blocked"],
+    improvementActions: [
+      "Add source URL, license, owner, approval status, and expiration to each external asset.",
+      "Separate source-informed strategy from copied third-party implementation details.",
+      "Escalate marks, slogans, and product names to trademark clearance before major launch."
+    ],
+    productionBoundary:
+      "This register supports IP readiness and evidence discipline; it does not create copyright registration, trademark registration, or legal clearance by itself."
+  },
+  {
+    id: "trustops-attribution-packet-audit-event",
+    title: "Attribution analytics packet needed a dedicated audit event instead of CRM-export workaround",
+    severity: "moderate",
+    status: "monitoring",
+    owner: "Sales operations and audit persistence owner",
+    accountableAgent: "Continuous Improvement Agent",
+    sourceChannel: "Supabase Identity And Audit Watch",
+    createdAt: "2026-06-16T09:30:00.000Z",
+    updatedAt: "2026-06-16T09:30:00.000Z",
+    affectedSurface: ["sales operations", "attribution analytics", "audit events", "enterprise proof packets"],
+    triggerSignal:
+      "Attribution packet release was audited under a generic sales artifact event while a dedicated event type was pending migration.",
+    buyerImpact:
+      "Improves evidence specificity for investor, board, and enterprise sales reviews without exposing PHI or buyer-sensitive health data.",
+    containmentAction:
+      "Add a dedicated attribution packet audit event and keep a compatibility fallback during database rollout.",
+    remediationPlan:
+      "Deploy the event migration, update the packet route header, and retain fallback metadata only until the database migration is confirmed.",
+    legalHoldStatus: "not-required",
+    reportRoute: "/api/trust-safety-operations/incidents/trustops-attribution-packet-audit-event/report",
+    evidenceRoutes: [
+      "/attribution-analytics",
+      "/sales-operations",
+      "/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet"
+    ],
+    auditEvents: [
+      "attribution-analytics-packet-downloaded",
+      "crm-export-downloaded-rollout-fallback",
+      "no-phi-boundary-confirmed"
+    ],
+    improvementActions: [
+      "Promote the dedicated audit event in Supabase.",
+      "Smoke authenticated packet release after migration.",
+      "Remove fallback metadata once the production migration is verified."
+    ],
+    productionBoundary:
+      "This audit event applies to business-contact and workflow-scope sales metadata only; no PHI, clinical records, diagnosis details, payer member identifiers, or autonomous care claims."
+  },
+  {
+    id: "trustops-coverage-claim-gate",
+    title: "24/7 managed monitoring coverage must not be claimed before staffing and external readiness",
+    severity: "high",
+    status: "production-gated",
+    owner: "Founder, security, operations, legal, and communications",
+    accountableAgent: "Security Incident Sentinel",
+    sourceChannel: "Vercel Runtime And Deployment Watch",
+    createdAt: "2026-06-16T09:40:00.000Z",
+    updatedAt: "2026-06-16T09:40:00.000Z",
+    affectedSurface: ["trust center", "sales proposals", "security review", "enterprise readiness"],
+    triggerSignal:
+      "Copy or sales material implies live 24/7 managed SOC, MDR, production clinical monitoring, or customer incident-response coverage.",
+    buyerImpact:
+      "Keeps SCRIMED trustworthy by separating current product controls from future managed operations commitments.",
+    containmentAction: "Use target-operating-model language and block live-coverage claims until staffing, contracts, runbooks, and tabletop evidence exist.",
+    remediationPlan:
+      "Approve on-call rota, severity taxonomy, notification tree, escalation owners, external security review, and tabletop cadence.",
+    legalHoldStatus: "watch",
+    reportRoute: "/api/trust-safety-operations/incidents/trustops-coverage-claim-gate/report",
+    evidenceRoutes: ["/trust-safety-operations", "/operations", "/observability", "/trust-center/security"],
+    auditEvents: ["coverage-claim-blocked", "staffing-gate-opened", "external-review-required"],
+    improvementActions: [
+      "Keep 24/7 language framed as an operating design until staffed.",
+      "Attach incident owner matrix before any production customer agreement.",
+      "Add post-tabletop evidence before upgrading the claim."
+    ],
+    productionBoundary:
+      "SCRIMED can show the operating architecture now, but live managed coverage requires approved staffing, vendor coverage, customer-specific runbooks, and legal/security review."
+  },
+  {
+    id: "trustops-runtime-security-watch",
+    title: "Runtime, dependency, and deployment anomaly watch needs owner-driven review",
+    severity: "low",
+    status: "monitoring",
+    owner: "Engineering and security owner",
+    accountableAgent: "Security Incident Sentinel",
+    sourceChannel: "Vercel Runtime And Deployment Watch",
+    createdAt: "2026-06-16T09:50:00.000Z",
+    updatedAt: "2026-06-16T09:50:00.000Z",
+    affectedSurface: ["Vercel deployment", "runtime logs", "quality gates", "dependency checks"],
+    triggerSignal: "Production smoke check, runtime log scan, dependency audit, or build gate reports an anomaly.",
+    buyerImpact:
+      "Maintains demo and pilot reliability while preventing small failures from becoming hidden sales or security risk.",
+    containmentAction: "Fail closed, investigate logs, patch, verify, and preserve release evidence.",
+    remediationPlan:
+      "Keep build, lint, typecheck, generated integrity, production smoke, and runtime-log review in every strategic release loop.",
+    legalHoldStatus: "not-required",
+    reportRoute: "/api/trust-safety-operations/incidents/trustops-runtime-security-watch/report",
+    evidenceRoutes: ["/quality", "/observability", "/operations", "/api/health"],
+    auditEvents: ["build-gate-reviewed", "runtime-log-scan-clean", "production-smoke-checked"],
+    improvementActions: [
+      "Increase smoke coverage when a route is added.",
+      "Escalate repeated 5xx or auth-boundary regressions.",
+      "Keep local npm limitation bypassed through direct Node quality commands until package manager access is restored."
+    ],
+    productionBoundary:
+      "Runtime watch supports current Vercel-hosted pilot and demo readiness; production customers still require customer-specific monitoring, alerting, incident ownership, and support agreements."
+  }
+];
+
+export const resolvedTrustSafetyLimitations = [
+  {
+    limitation: "Trust Safety Operations had no incident queue or audit-ready report surface.",
+    resolution:
+      "Added a synthetic trust-ops incident queue, severity/status/owner model, escalation SLA, and downloadable incident report route for each tracked incident."
+  },
+  {
+    limitation: "Attribution analytics packet release used a generic CRM export audit event.",
+    resolution:
+      "Added a dedicated attribution analytics packet event path with compatibility fallback until the Supabase migration is confirmed in production."
+  }
+];
+
+export const remainingTrustSafetyLimitations = [
+  "Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.",
+  "Trust-ops incidents are inspectable product-control records today; regulated production incidents require customer-approved durable storage, legal hold, breach analysis, notification decisions, and forensic process.",
+  "Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers."
+];
+
+function countIncidentsBySeverity(severity: TrustSafetyIncidentSeverity) {
+  return trustSafetyIncidents.filter((incident) => incident.severity === severity).length;
+}
+
+function countIncidentsByStatus(status: TrustSafetyIncidentStatus) {
+  return trustSafetyIncidents.filter((incident) => incident.status === status).length;
+}
+
+function cleanReportText(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+export function getTrustSafetyIncidentById(incidentId: string) {
+  return trustSafetyIncidents.find((incident) => incident.id === incidentId) ?? null;
+}
+
 export function getTrustSafetyOperationsSummary() {
   const activeControls = trustSafetyControls.filter((control) => control.status === "active-control").length;
   const watchRequired = trustSafetyControls.filter((control) => control.status === "watch-required").length;
   const productionGated = trustSafetyControls.filter((control) => control.status === "production-gated").length;
+  const openIncidentCount = trustSafetyIncidents.filter(
+    (incident) => incident.status !== "closed"
+  ).length;
+  const containedIncidentCount = trustSafetyIncidents.filter((incident) =>
+    ["contained", "monitoring", "closed"].includes(incident.status)
+  ).length;
+  const legalHoldWatchCount = trustSafetyIncidents.filter(
+    (incident) => incident.legalHoldStatus !== "not-required"
+  ).length;
 
   return {
     service: "scrimed-trust-safety-operations",
-    status: "trust-safety-watchtower-ready",
+    status: "trust-safety-incident-operations-ready",
     route: "/trust-safety-operations",
     apiRoute: "/api/trust-safety-operations",
+    incidentReportApiRoute: "/api/trust-safety-operations/incidents/{incidentId}/report",
     boundary: trustSafetyOperationsBoundary,
     operatingPosture:
       "24/7 trust, safety, monitoring, auditing, fixing, improving, and escalation model is defined. Production managed monitoring still requires approved staffing, on-call, SOC/MDR, and customer-specific runbooks before being claimed as live coverage.",
@@ -269,10 +577,22 @@ export function getTrustSafetyOperationsSummary() {
     controls: trustSafetyControls,
     channels: trustSafetyChannels,
     continuousImprovementLoops,
+    incidentSlas: trustSafetyIncidentSlas,
+    incidents: trustSafetyIncidents,
+    resolvedLimitations: resolvedTrustSafetyLimitations,
+    remainingLimitations: remainingTrustSafetyLimitations,
     agentCount: trustSafetyAgents.length,
     controlCount: trustSafetyControls.length,
     channelCount: trustSafetyChannels.length,
     loopStageCount: continuousImprovementLoops.length,
+    incidentCount: trustSafetyIncidents.length,
+    openIncidentCount,
+    containedIncidentCount,
+    legalHoldWatchCount,
+    highIncidentCount: countIncidentsBySeverity("high"),
+    criticalIncidentCount: countIncidentsBySeverity("critical"),
+    remediatingIncidentCount: countIncidentsByStatus("remediating"),
+    productionGatedIncidentCount: countIncidentsByStatus("production-gated"),
     activeControls,
     watchRequired,
     productionGated,
@@ -284,9 +604,72 @@ export function getTrustSafetyOperationsSummary() {
       "https://www.nist.gov/itl/ai-risk-management-framework"
     ],
     nextBuildStep:
-      "Add a durable trust-ops incident and improvement ledger with severity, owner, containment, legal-hold, post-incident review, and agent-control update tracking.",
-    updated: "2026-06-15"
+      "Promote trust-ops incidents from deterministic product-control records into tenant-scoped durable storage with authenticated mutation, legal-hold workflow, notification decisions, and post-incident review packets.",
+    updated: "2026-06-16"
   };
+}
+
+export function buildTrustSafetyIncidentReport(incident: TrustSafetyIncident, generatedAt = new Date().toISOString()) {
+  const sla = trustSafetyIncidentSlas.find((entry) => entry.severity === incident.severity);
+
+  return [
+    "# SCRIMED Trust Safety Incident Report",
+    "",
+    `Incident ID: ${incident.id}`,
+    `Title: ${incident.title}`,
+    `Generated: ${generatedAt}`,
+    `Severity: ${incident.severity}`,
+    `Status: ${incident.status}`,
+    `Owner: ${incident.owner}`,
+    `Accountable agent: ${incident.accountableAgent}`,
+    `Source channel: ${incident.sourceChannel}`,
+    `Created: ${incident.createdAt}`,
+    `Updated: ${incident.updatedAt}`,
+    `Legal-hold status: ${incident.legalHoldStatus}`,
+    "",
+    "## Boundary",
+    trustSafetyOperationsBoundary,
+    "",
+    "## Trigger Signal",
+    cleanReportText(incident.triggerSignal),
+    "",
+    "## Affected Surface",
+    ...incident.affectedSurface.map((surface) => `- ${cleanReportText(surface)}`),
+    "",
+    "## Buyer And Company Impact",
+    cleanReportText(incident.buyerImpact),
+    "",
+    "## Containment",
+    cleanReportText(incident.containmentAction),
+    "",
+    "## Remediation Plan",
+    cleanReportText(incident.remediationPlan),
+    "",
+    "## Evidence Routes",
+    ...incident.evidenceRoutes.map((route) => `- ${route}`),
+    "",
+    "## Audit Events",
+    ...incident.auditEvents.map((event) => `- ${event}`),
+    "",
+    "## Improvement Actions",
+    ...incident.improvementActions.map((action) => `- ${cleanReportText(action)}`),
+    "",
+    "## Severity SLA",
+    sla
+      ? [
+          `- Response target: ${sla.responseTarget}`,
+          `- Containment target: ${sla.containmentTarget}`,
+          `- Executive escalation: ${sla.executiveEscalation}`,
+          `- Required reviewers: ${sla.requiredReviewers.join(", ")}`
+        ].join("\n")
+      : "- No SLA found.",
+    "",
+    "## Production Boundary",
+    cleanReportText(incident.productionBoundary),
+    "",
+    "## Remaining Limitations",
+    ...remainingTrustSafetyLimitations.map((limitation) => `- ${limitation}`)
+  ].join("\n");
 }
 
 export function buildTrustSafetyOperationsBrief() {
@@ -315,6 +698,24 @@ export function buildTrustSafetyOperationsBrief() {
     ...summary.continuousImprovementLoops.map(
       (loop) => `- ${loop.stage}: ${loop.action} Evidence: ${loop.evidence}`
     ),
+    "",
+    "## Incident Queue",
+    `Incidents: ${summary.incidentCount}`,
+    `Open incidents: ${summary.openIncidentCount}`,
+    `Contained or monitoring: ${summary.containedIncidentCount}`,
+    `Legal-hold watch: ${summary.legalHoldWatchCount}`,
+    ...summary.incidents.map(
+      (incident) =>
+        `- ${incident.id} (${incident.severity}/${incident.status}): ${incident.title} Owner: ${incident.owner}. Report: ${incident.reportRoute}`
+    ),
+    "",
+    "## Resolved Limitations",
+    ...summary.resolvedLimitations.map(
+      (item) => `- ${item.limitation} Resolution: ${item.resolution}`
+    ),
+    "",
+    "## Remaining Limitations",
+    ...summary.remainingLimitations.map((limitation) => `- ${limitation}`),
     "",
     "## Next Build Step",
     summary.nextBuildStep

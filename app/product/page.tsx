@@ -105,6 +105,22 @@ export default function ProductConsolePage() {
           <strong>{summary.trustSafetyControlCount}</strong>
         </article>
         <article>
+          <span>Trust incidents</span>
+          <strong>{summary.trustSafetyIncidentCount}</strong>
+        </article>
+        <article>
+          <span>Open trust issues</span>
+          <strong>{summary.trustSafetyOpenIncidentCount}</strong>
+        </article>
+        <article>
+          <span>Contained issues</span>
+          <strong>{summary.trustSafetyContainedIncidentCount}</strong>
+        </article>
+        <article>
+          <span>Legal-hold watch</span>
+          <strong>{summary.trustSafetyLegalHoldWatchCount}</strong>
+        </article>
+        <article>
           <span>TrustOS controls</span>
           <strong>{summary.trustOSControlCount}</strong>
         </article>
@@ -140,11 +156,31 @@ export default function ProductConsolePage() {
             <ul className="compact-list">
               <li>Agents: {summary.trustSafetyAgentCount}</li>
               <li>Controls: {summary.trustSafetyControlCount}</li>
+              <li>Incident reports: {summary.trustSafetyIncidentCount}</li>
+              <li>Open issues: {summary.trustSafetyOpenIncidentCount}</li>
               <li>Channels: {summary.trustSafetyOperationsSummary.channelCount}</li>
               <li>Next: {summary.trustSafetyOperationsSummary.nextBuildStep}</li>
             </ul>
           </div>
         </article>
+        {summary.trustSafetyOperationsSummary.incidents.slice(0, 4).map((incident) => (
+          <article className="module-row" key={incident.id}>
+            <div>
+              <span>{incident.severity} / {incident.status}</span>
+              <h2>{incident.title}</h2>
+            </div>
+            <p>{incident.containmentAction}</p>
+            <div>
+              <a className="module-link" href={incident.reportRoute}>
+                Download incident report
+              </a>
+              <ul className="compact-list">
+                <li>Owner: {incident.owner}</li>
+                <li>Agent: {incident.accountableAgent}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED attribution analytics">

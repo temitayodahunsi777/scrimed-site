@@ -85,7 +85,7 @@ export type AttributionAnalyticsReport = {
   authenticatedPacketApiRoute: "/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet";
   mode: AttributionAnalyticsMode;
   generatedAt: string;
-  updated: "2026-06-15";
+  updated: "2026-06-16";
   boundary: string;
   persistence: {
     publicMode: string;
@@ -576,7 +576,7 @@ export function buildAttributionAnalyticsReport(
     authenticatedPacketApiRoute: "/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet",
     mode,
     generatedAt,
-    updated: "2026-06-15",
+    updated: "2026-06-16",
     boundary: attributionAnalyticsBoundary,
     persistence: {
       publicMode: "Synthetic cohort fixtures for public buyer and investor review.",
@@ -615,17 +615,18 @@ export function buildAttributionAnalyticsReport(
     limitations: [
       "Public analytics are synthetic fixtures and do not represent real customers, revenue, or clinical outcomes.",
       "Authenticated tenant analytics require tenant-admin AAL2 access and persisted no-PHI opportunities.",
+      "Attribution packet exports use a dedicated audit event when the Supabase migration is active, with an explicit rollout fallback to the prior sales artifact event.",
       "Ad spend, CAC, signed contract value, and customer ROI are not imported until approved finance and CRM connectors exist.",
       "Small cohort counts are directional operating signals, not statistically valid market claims.",
       "No PHI, clinical records, diagnosis details, payer member identifiers, or sensitive ad-platform health inferences are allowed."
     ],
     nextBuildStep:
-      "Add tenant-admin cohort visualization inside Sales Operations and export an audited attribution analytics packet for board, investor, and enterprise pipeline reviews."
+      "Verify the dedicated attribution packet audit migration in production, then remove rollout fallback metadata and connect packet downloads to trust-ops incident review when anomalies occur."
   };
 }
 
 export function getAttributionAnalyticsSummary() {
-  return buildAttributionAnalyticsReport(buildSyntheticRecords(), "synthetic-public-fixture", "2026-06-15T00:00:00.000Z");
+  return buildAttributionAnalyticsReport(buildSyntheticRecords(), "synthetic-public-fixture", "2026-06-16T00:00:00.000Z");
 }
 
 export function buildAttributionAnalyticsFromOpportunities(opportunities: SalesOpportunity[]) {
@@ -672,7 +673,7 @@ export function buildAttributionAnalyticsPacket({
   report: AttributionAnalyticsReport;
   generatedFor: string;
   generatedBy: string;
-  auditMode: "dedicated-event" | "existing-sales-artifact-event";
+  auditMode: "dedicated-attribution-analytics-packet-event" | "existing-sales-artifact-event-rollout-fallback";
 }) {
   const topCohorts = report.cohorts.slice(0, 12);
 

@@ -537,6 +537,7 @@ export function getProductConsoleSummary() {
     trustCenterApiRoute: enterpriseReadinessSummary.apiRoute,
     trustSafetyOperationsRoute: trustSafetyOperationsSummary.route,
     trustSafetyOperationsApiRoute: trustSafetyOperationsSummary.apiRoute,
+    trustSafetyIncidentReportApiRoute: trustSafetyOperationsSummary.incidentReportApiRoute,
     demoRoute: demoPilotProgramSummary.demoRoute,
     demoApiRoute: demoPilotProgramSummary.demoApiRoute,
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
@@ -585,6 +586,10 @@ export function getProductConsoleSummary() {
     attributionCohortCount: attributionAnalyticsSummary.cohorts.length,
     trustSafetyAgentCount: trustSafetyOperationsSummary.agentCount,
     trustSafetyControlCount: trustSafetyOperationsSummary.controlCount,
+    trustSafetyIncidentCount: trustSafetyOperationsSummary.incidentCount,
+    trustSafetyOpenIncidentCount: trustSafetyOperationsSummary.openIncidentCount,
+    trustSafetyContainedIncidentCount: trustSafetyOperationsSummary.containedIncidentCount,
+    trustSafetyLegalHoldWatchCount: trustSafetyOperationsSummary.legalHoldWatchCount,
     governanceControlCount: governanceControls.length,
     evidenceMetricCount: evidenceMetrics.length,
     buyerSegments: Array.from(new Set(productOffers.map((offer) => offer.buyer))),
@@ -622,6 +627,7 @@ export function getProductConsoleSummary() {
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
       trustSafetyOperations: trustSafetyOperationsSummary.status,
+      trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       deploymentProfiles: deploymentProfileSummary.status,
       marketActivation: marketActivationSummary.status,
@@ -651,8 +657,8 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
-    updated: "2026-06-15"
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Trust Safety incident operations to govern buyer-facing risk, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+    updated: "2026-06-16"
   };
 }
 
@@ -780,9 +786,24 @@ export function getProductReadinessBrief() {
     `Trust Center API: ${summary.trustCenterApiRoute}`,
     `Trust Safety Operations: ${summary.trustSafetyOperationsRoute}`,
     `Trust Safety Operations API: ${summary.trustSafetyOperationsApiRoute}`,
+    `Trust Safety Incident Report API: ${summary.trustSafetyIncidentReportApiRoute}`,
     `Trust Safety Agents: ${summary.trustSafetyAgentCount}`,
     `Trust Safety Controls: ${summary.trustSafetyControlCount}`,
+    `Trust Safety Incidents: ${summary.trustSafetyIncidentCount}`,
+    `Open Trust Safety Incidents: ${summary.trustSafetyOpenIncidentCount}`,
+    `Contained Trust Safety Incidents: ${summary.trustSafetyContainedIncidentCount}`,
+    `Legal Hold Watch: ${summary.trustSafetyLegalHoldWatchCount}`,
     `Trust Safety Operating Posture: ${summary.trustSafetyOperationsSummary.operatingPosture}`,
+    ...summary.trustSafetyOperationsSummary.incidents.map(
+      (incident) =>
+        `- Incident: ${incident.id} (${incident.severity}/${incident.status}) -> ${incident.reportRoute}: ${incident.title}`
+    ),
+    ...summary.trustSafetyOperationsSummary.resolvedLimitations.map(
+      (item) => `- Resolved limitation: ${item.limitation} Resolution: ${item.resolution}`
+    ),
+    ...summary.trustSafetyOperationsSummary.remainingLimitations.map(
+      (limitation) => `- Remaining limitation: ${limitation}`
+    ),
     `Status: ${summary.enterpriseReadinessSummary.status}`,
     `Active controls: ${summary.enterpriseReadinessSummary.activeControls}`,
     `Decisions required: ${summary.enterpriseReadinessSummary.decisionsRequired}`,

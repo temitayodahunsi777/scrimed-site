@@ -80,8 +80,12 @@ export default function TrustCenterPage() {
             <span>02</span>
             <strong>Inspect the Trust Safety Operations API</strong>
           </Link>
-          <Link className="layer-row" href="/audit">
+          <Link className="layer-row" href="/api/trust-safety-operations/incidents/trustops-claims-substantiation-gate/report">
             <span>03</span>
+            <strong>Download an audit-ready trust safety incident report</strong>
+          </Link>
+          <Link className="layer-row" href="/audit">
+            <span>04</span>
             <strong>Review audit, governance, and AI asset controls</strong>
           </Link>
         </div>

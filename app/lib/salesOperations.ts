@@ -41,6 +41,7 @@ export type SalesOpportunity = {
   lastCrmSyncStatus: SalesCrmSyncStatus;
   lastCrmSyncDetail: string;
   lastCrmExportAt: string | null;
+  lastAttributionAnalyticsPacketAt?: string | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -60,7 +61,8 @@ export type SalesAuditEvent = {
     | "crm-export-downloaded"
     | "follow-up-draft-downloaded"
     | "follow-up-completed"
-    | "assessment-invitation-downloaded";
+    | "assessment-invitation-downloaded"
+    | "attribution-analytics-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };

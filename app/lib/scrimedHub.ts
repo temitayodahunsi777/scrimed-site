@@ -140,6 +140,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Memory fabric", value: "session, operational, knowledge scoped", tone: "good" },
   { name: "Audit governance", value: "AI asset registry active", tone: "good" },
   { name: "Trust and Safety Operations", value: "24/7 watchtower model defined", tone: "good" },
+  { name: "Trust incidents", value: "owned queue and reports active", tone: "good" },
   { name: "Observability", value: "continuous validation ready", tone: "good" },
   { name: "Atlas Intelligence Core", value: "evidence and document intelligence staged", tone: "good" },
   { name: "Trust Cards", value: "provenance contracts active", tone: "good" },
@@ -298,6 +299,7 @@ export const hubRoutes = [
   "/api/operations/readiness",
   "/api/enterprise-readiness",
   "/api/trust-safety-operations",
+  "/api/trust-safety-operations/incidents/{incidentId}/report",
   "/api/enterprise-readiness/claims",
   "/api/enterprise-readiness/diligence-brief",
   "/api/agent-os/evaluation",
@@ -438,6 +440,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-14"
+    updated: "2026-06-16"
   };
 }

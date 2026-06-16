@@ -60,23 +60,51 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   const report = buildAttributionAnalyticsFromOpportunities(dashboardResult.dashboard.opportunities);
-  const audit = await recordSalesArtifactDownload(
+  let auditEventType: "attribution-analytics-packet-downloaded" | "crm-export-downloaded" =
+    "attribution-analytics-packet-downloaded";
+  let auditMode:
+    | "dedicated-attribution-analytics-packet-event"
+    | "existing-sales-artifact-event-rollout-fallback" = "dedicated-attribution-analytics-packet-event";
+  let audit = await recordSalesArtifactDownload(
     context.client,
     intakeId,
-    "crm-export-downloaded",
+    auditEventType,
     {
       artifactKind: "attribution-analytics-packet",
       format: "text/markdown",
       noPhiBoundary: true,
       tenantScoped: true,
+      dedicatedAuditEvent: true,
       reportStatus: report.status,
       reportMode: report.mode,
       recordCount: report.totals.recordCount,
-      cohortCount: report.cohorts.length,
-      auditSchemaWorkaround:
-        "Recorded under crm-export-downloaded until a dedicated attribution-analytics-packet-downloaded audit event is migrated."
+      cohortCount: report.cohorts.length
     }
   );
+
+  if (audit.error) {
+    auditEventType = "crm-export-downloaded";
+    auditMode = "existing-sales-artifact-event-rollout-fallback";
+    audit = await recordSalesArtifactDownload(
+      context.client,
+      intakeId,
+      auditEventType,
+      {
+        artifactKind: "attribution-analytics-packet",
+        format: "text/markdown",
+        noPhiBoundary: true,
+        tenantScoped: true,
+        dedicatedAuditEvent: false,
+        rolloutFallback: true,
+        fallbackReason:
+          "Dedicated attribution analytics packet audit event was unavailable during migration rollout.",
+        reportStatus: report.status,
+        reportMode: report.mode,
+        recordCount: report.totals.recordCount,
+        cohortCount: report.cohorts.length
+      }
+    );
+  }
 
   if (audit.error) {
     return NextResponse.json(
@@ -95,7 +123,7 @@ export async function GET(request: Request, { params }: RouteContext) {
     report,
     generatedFor: opportunityResult.opportunity.payload.organization.name,
     generatedBy: context.user.id,
-    auditMode: "existing-sales-artifact-event"
+    auditMode
   });
 
   return new NextResponse(packet, {
@@ -106,8 +134,8 @@ export async function GET(request: Request, { params }: RouteContext) {
       "Content-Type": "text/markdown; charset=utf-8",
       "X-SCRIMED-Data-Boundary": "business-contact-and-workflow-scope-only",
       "X-SCRIMED-Export-Audited": "true",
-      "X-SCRIMED-Audit-Event": "crm-export-downloaded",
-      "X-SCRIMED-Audit-Workaround": "attribution-analytics-packet"
+      "X-SCRIMED-Audit-Event": auditEventType,
+      "X-SCRIMED-Audit-Fallback": auditEventType === "crm-export-downloaded" ? "true" : "false"
     }
   });
 }

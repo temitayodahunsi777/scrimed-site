@@ -58,6 +58,22 @@ export default function TrustSafetyOperationsPage() {
           <span>Loop stages</span>
           <strong>{summary.loopStageCount}</strong>
         </article>
+        <article>
+          <span>Incidents</span>
+          <strong>{summary.incidentCount}</strong>
+        </article>
+        <article>
+          <span>Open incidents</span>
+          <strong>{summary.openIncidentCount}</strong>
+        </article>
+        <article>
+          <span>Contained</span>
+          <strong>{summary.containedIncidentCount}</strong>
+        </article>
+        <article>
+          <span>Legal-hold watch</span>
+          <strong>{summary.legalHoldWatchCount}</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
@@ -74,6 +90,59 @@ export default function TrustSafetyOperationsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Trust safety incident queue">
+        <div className="section-heading">
+          <p className="eyebrow">Incident queue</p>
+          <h2>Trust, safety, copyright, legal, security, and improvement signals become owned incidents.</h2>
+          <p className="section-copy">
+            These records are no-PHI product-control incidents for synthetic evaluations and enterprise readiness. Regulated
+            production incidents still require customer-approved storage, counsel, privacy, security, and notification workflow.
+          </p>
+        </div>
+        {summary.incidents.map((incident) => (
+          <article className="module-row" key={incident.id}>
+            <div>
+              <span>{incident.severity} / {incident.status}</span>
+              <h2>{incident.title}</h2>
+            </div>
+            <p>{incident.buyerImpact}</p>
+            <div>
+              <a className="module-link" href={incident.reportRoute}>
+                Download incident report
+              </a>
+              <ul className="compact-list">
+                <li>Owner: {incident.owner}</li>
+                <li>Agent: {incident.accountableAgent}</li>
+                <li>Containment: {incident.containmentAction}</li>
+                <li>Legal hold: {incident.legalHoldStatus}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Trust safety severity SLA">
+        <div className="section-heading">
+          <p className="eyebrow">Severity SLA</p>
+          <h2>Each severity level has a response target, containment target, and reviewer set.</h2>
+        </div>
+        {summary.incidentSlas.map((sla) => (
+          <article className="module-row" key={sla.severity}>
+            <div>
+              <span>{sla.severity}</span>
+              <h2>{sla.responseTarget}</h2>
+            </div>
+            <p>{sla.containmentTarget}</p>
+            <div>
+              <strong>{sla.executiveEscalation}</strong>
+              <ul className="compact-list">
+                <li>Reviewers: {sla.requiredReviewers.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Trust and safety agents">
@@ -143,6 +212,37 @@ export default function TrustSafetyOperationsPage() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="table-section" aria-label="Trust safety known limitations">
+        <div className="section-heading">
+          <p className="eyebrow">Limitations</p>
+          <h2>Known gaps stay visible until they are resolved, replaced, or governed by a better process.</h2>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>resolved</span>
+            <h2>Resolved limitations</h2>
+          </div>
+          <p>Recent trust-ops limitations that now have a product-control path.</p>
+          <ul className="compact-list">
+            {summary.resolvedLimitations.map((item) => (
+              <li key={item.limitation}>{item.limitation} {item.resolution}</li>
+            ))}
+          </ul>
+        </article>
+        <article className="module-row">
+          <div>
+            <span>remaining</span>
+            <h2>Remaining production gates</h2>
+          </div>
+          <p>These are intentionally not bypassed because they protect buyers, patients, SCRIMED, and future enterprise scale.</p>
+          <ul className="compact-list">
+            {summary.remainingLimitations.map((limitation) => (
+              <li key={limitation}>{limitation}</li>
+            ))}
+          </ul>
+        </article>
       </section>
     </main>
   );
