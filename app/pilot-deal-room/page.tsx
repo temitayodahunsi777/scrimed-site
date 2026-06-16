@@ -51,6 +51,10 @@ export default function PilotDealRoomPage() {
           <strong>{summary.buyerRoomPacketProofStackStatus}</strong>
         </article>
         <article>
+          <span>Workspace provisioning</span>
+          <strong>{summary.opportunityWorkspaceProvisioningProofStackStatus}</strong>
+        </article>
+        <article>
           <span>Workspace fallback</span>
           <strong>{summary.defaultWorkspaceSlug}</strong>
         </article>

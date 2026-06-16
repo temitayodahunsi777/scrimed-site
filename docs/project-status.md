@@ -2,6 +2,17 @@
 
 Updated: 2026-06-16
 
+## Latest Opportunity Workspace Provisioning Release
+
+- Added guarded per-opportunity workspace provisioning for qualified Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/workspace-provisioning`.
+- Added audited provisioning packets through `/api/sales-operations/opportunities/{intakeId}/workspace-provisioning/packet` so tenant-admins can retain buyer-specific workspace slug, invitation policy, onboarding plan, retention schedule, and packet history.
+- Added a private `sales_opportunity_workspaces` mapping table with deny-all RLS and tenant-admin AAL2 plus server-held authorization for all mutations.
+- Updated Deal Room packets so provisioned opportunities route to their buyer-specific protected workspace instead of the default synthetic fallback.
+- Updated `/sales-operations` with buyer workspace status, provision action, workspace packet download, and Buyer Room link.
+- Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with the opportunity workspace proof-stack posture.
+- Preserved the boundary: opportunity workspaces are governed synthetic enterprise evaluation rooms only. They do not accept PHI, authorize live clinical execution, certify compliance, guarantee reimbursement, submit payer transactions, contact patients, or provide medical, legal, regulatory, or billing advice.
+- Remaining gate: full tenant-per-buyer provisioning, automated invitation delivery, customer SSO/domain policy, retention automation, and production connector authorization still require formal enterprise controls.
+
 ## Latest Pilot Deal Room Release
 
 - Added `/pilot-deal-room` and `/api/pilot-deal-room` to organize the buyer path from official website discovery to product proof, pilot intake, Sales Operations, protected Buyer Pilot Room diligence, premium pricing, and paid synthetic pilot.
@@ -9,7 +20,7 @@ Updated: 2026-06-16
 - Added `buyer-deal-room-packet-downloaded` to the private sales audit event model and retained `last_buyer_deal_room_packet_at` on the no-PHI intake opportunity record.
 - Updated `/sales-operations` with a Deal Room Packet action and status tile for each opportunity.
 - Updated `/product`, `/hub`, `/`, `/api/product/console`, `/api/hub/summary`, and public smoke coverage so the deal-room layer is visible across the product surface.
-- Resolved the current opportunity-to-workspace gap with an explicit default synthetic workspace fallback (`atlas-synthetic-evaluation`) while preserving the production gate for per-opportunity workspace provisioning.
+- Preserved a default synthetic workspace fallback (`atlas-synthetic-evaluation`) for opportunities that have not yet been qualified and provisioned.
 - Preserved the boundary: the Pilot Deal Room is a non-binding enterprise diligence and sales artifact. It does not accept PHI, authorize live clinical execution, certify compliance, guarantee reimbursement, submit payer transactions, or provide medical, legal, or regulatory advice.
 
 ## Latest Trust Safety Operations Release

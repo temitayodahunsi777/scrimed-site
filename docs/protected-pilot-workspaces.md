@@ -108,9 +108,11 @@ This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now s
 
 `/pilot-deal-room` is the public organization layer that explains how buyers move from SCRIMED's official website and product app into governed intake, Sales Operations, protected Buyer Pilot Room diligence, audited packet release, and paid synthetic pilot.
 
-Sales Operations can generate a protected Pilot Deal Room packet through `GET /api/sales-operations/opportunities/{intakeId}/deal-room-packet`. The route requires tenant-admin AAL2 access, uses the existing private sales artifact RPC, commits `buyer-deal-room-packet-downloaded` before release, and returns a Markdown packet that links the buyer's opportunity scope to the default protected Buyer Pilot Room route.
+Sales Operations can generate a protected Pilot Deal Room packet through `GET /api/sales-operations/opportunities/{intakeId}/deal-room-packet`. The route requires tenant-admin AAL2 access, uses the existing private sales artifact RPC, commits `buyer-deal-room-packet-downloaded` before release, and returns a Markdown packet that links the buyer's opportunity scope to the protected Buyer Pilot Room route.
 
-Current workaround: opportunities do not yet auto-provision dedicated pilot workspaces, so packets use the configured/default synthetic workspace slug `atlas-synthetic-evaluation` and label the mapping mode as a default synthetic workspace. The production gate is per-opportunity workspace provisioning with tenant invitation policy, retention schedule, and buyer-specific workspace lifecycle controls.
+Qualified opportunities can now provision a buyer-specific protected workspace through `POST /api/sales-operations/opportunities/{intakeId}/workspace-provisioning`. The guarded RPC creates a protected workspace slug, private opportunity-to-workspace mapping, manual invitation/onboarding policy, retention schedule, Sales Operations audit event, and workspace audit event. `GET /api/sales-operations/opportunities/{intakeId}/workspace-provisioning/packet` commits `opportunity-workspace-packet-downloaded` before releasing the Markdown provisioning packet.
+
+Current workaround: buyer-specific workspaces are still created inside the activated SCRIMED pilot tenant rather than creating a separate tenant per external buyer. Unprovisioned opportunities continue to use the configured/default synthetic workspace slug `atlas-synthetic-evaluation` and label the mapping mode clearly. The production gate is full tenant-per-buyer provisioning with customer SSO/domain policy, approved invitation delivery, lifecycle automation, retention enforcement, and signed enterprise controls.
 
 ## Active Public Controls
 

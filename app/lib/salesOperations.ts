@@ -5,6 +5,13 @@ import {
 } from "./agentWorkspaceGovernancePacks";
 import type { PilotIntakeHandoffPayload } from "./pilotIntake";
 import { getSalesAttributionSummary } from "./salesAttribution";
+import type { SalesOpportunityWorkspaceProvisioning } from "./opportunityWorkspaceProvisioning";
+import {
+  opportunityWorkspaceProvisioningApiRoute,
+  opportunityWorkspaceProvisioningPacketApiRoute,
+  opportunityWorkspaceProvisioningPacketProofStackStatus,
+  opportunityWorkspaceProvisioningProofStackStatus
+} from "./opportunityWorkspaceProvisioning";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -44,6 +51,7 @@ export type SalesOpportunity = {
   lastCrmExportAt: string | null;
   lastAttributionAnalyticsPacketAt?: string | null;
   lastBuyerDealRoomPacketAt?: string | null;
+  workspaceProvisioning?: SalesOpportunityWorkspaceProvisioning | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -65,7 +73,9 @@ export type SalesAuditEvent = {
     | "follow-up-completed"
     | "assessment-invitation-downloaded"
     | "attribution-analytics-packet-downloaded"
-    | "buyer-deal-room-packet-downloaded";
+    | "buyer-deal-room-packet-downloaded"
+    | "opportunity-workspace-provisioned"
+    | "opportunity-workspace-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -299,6 +309,15 @@ export function getSalesOperationsSummary() {
       apiRoute: "/api/pilot-deal-room",
       protectedPacketRoute: "/api/sales-operations/opportunities/{intakeId}/deal-room-packet",
       defaultWorkspaceSlug: "atlas-synthetic-evaluation",
+      noPhiBoundary: true
+    },
+    opportunityWorkspaceProvisioning: {
+      status: opportunityWorkspaceProvisioningProofStackStatus,
+      apiRoute: opportunityWorkspaceProvisioningApiRoute,
+      packetApiRoute: opportunityWorkspaceProvisioningPacketApiRoute,
+      packetProofStackStatus: opportunityWorkspaceProvisioningPacketProofStackStatus,
+      workspaceMode: "buyer-specific-protected-workspace",
+      invitationMode: "manual-onboarding-packet-only",
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,

@@ -29,7 +29,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
-- Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, protected Buyer Pilot Room diligence, audited packet release, and paid synthetic pilot.
+- Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, protected Buyer Pilot Room diligence, audited packet release, and paid synthetic pilot.
 - The Trust and Enterprise Readiness Center governs company-level launch gates and public claims before marketing, PR, sales, advertising, protected pilots, or production use.
 
 Reasoning level:
@@ -51,6 +51,7 @@ Completed foundations:
 - Invite-only protected pilot access console with authenticated tenant workspace discovery, governed synthetic session creation, and audited proof downloads
 - Invite-only tenant-admin sales operations console with durable opportunity assignment, pipeline control, audited proposals, and controlled CRM synchronization
 - Pilot Deal Room public route, API, and tenant-admin audited deal-room packet for linking sales opportunities to Buyer Pilot Room proof
+- Opportunity-linked protected workspace provisioning with manual invitation policy, retention schedule, buyer-specific workspace slug, and audited provisioning packet
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -104,7 +105,7 @@ Completed foundations:
 
 Next build targets:
 
-- Add per-opportunity protected workspace provisioning so each qualified buyer can receive a dedicated workspace slug, invitation plan, retention schedule, and buyer-specific packet history.
+- Upgrade opportunity workspace provisioning into tenant-per-buyer lifecycle automation with approved invitation delivery, customer SSO/domain policy, retention enforcement, and workspace archival controls.
 - Operate the activated sales ownership, due-action cadence, vendor-neutral CRM export, proposal follow-up, and assessment invitation workflows through the protected Sales Operations console
 - Continue cross-tenant isolation verification and extend AAL2/session policy from Sales Operations to future tenant-administration surfaces
 - Continue monitoring verified Upstash Redis distributed intake and protected mutation limits across Vercel regions

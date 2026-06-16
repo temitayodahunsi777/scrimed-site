@@ -5,6 +5,7 @@ import type {
   SalesOpportunity,
   SalesOpportunityUpdate
 } from "./salesOperations";
+import type { SalesOpportunityWorkspaceProvisioningResult } from "./opportunityWorkspaceProvisioning";
 
 export async function getSalesOperationsDashboard(client: SupabaseClient) {
   const { data, error } = await client.rpc("sales_operations_dashboard");
@@ -71,6 +72,31 @@ export async function recordSalesArtifactDownload(
     p_event_type: eventType,
     p_event_metadata: metadata
   });
+}
+
+export async function provisionSalesOpportunityWorkspace(client: SupabaseClient, intakeId: string) {
+  const { data, error } = await client.rpc("provision_sales_opportunity_workspace", {
+    p_intake_id: intakeId
+  });
+
+  return {
+    result: data ? (data as SalesOpportunityWorkspaceProvisioningResult) : null,
+    error
+  };
+}
+
+export async function recordSalesOpportunityWorkspacePacketDownload(
+  client: SupabaseClient,
+  intakeId: string
+) {
+  const { data, error } = await client.rpc("record_sales_opportunity_workspace_packet_download", {
+    p_intake_id: intakeId
+  });
+
+  return {
+    result: data ? (data as SalesOpportunityWorkspaceProvisioningResult) : null,
+    error
+  };
 }
 
 export async function scheduleSalesAssessment(

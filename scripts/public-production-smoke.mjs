@@ -120,6 +120,14 @@ async function checkProductConsole() {
     throw new Error("product console missing audited Pilot Deal Room packet proof-stack posture.");
   }
 
+  if (body.proofStack?.opportunityWorkspaceProvisioning !== "aal2-opportunity-workspace-provisioning") {
+    throw new Error("product console missing opportunity workspace provisioning proof-stack posture.");
+  }
+
+  if (body.proofStack?.opportunityWorkspaceProvisioningPackets !== "aal2-audited-opportunity-workspace-packets") {
+    throw new Error("product console missing opportunity workspace packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -213,6 +221,14 @@ await checkPilotDealRoomApi();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/workspace-provisioning",
+  "Sales workspace provisioning protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/workspace-provisioning/packet",
+  "Sales workspace provisioning packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,

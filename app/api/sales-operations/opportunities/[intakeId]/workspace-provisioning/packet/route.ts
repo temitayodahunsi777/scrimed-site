@@ -1,20 +1,18 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
-  buildSalesDealRoomPacket,
-  defaultDealRoomWorkspaceSlug,
-  deriveSalesDealRoomForOpportunity,
-  salesDealRoomBoundary
-} from "../../../../../lib/salesDealRoom";
+  buildOpportunityWorkspaceProvisioningPacket,
+  opportunityWorkspaceProvisioningBoundary
+} from "../../../../../../lib/opportunityWorkspaceProvisioning";
+import { getAuthenticatedSalesContext } from "../../../../../../lib/protectedPilotStore";
 import {
   salesOperationsBoundary,
   salesOperationsNoStoreHeaders
-} from "../../../../../lib/salesOperations";
+} from "../../../../../../lib/salesOperations";
 import {
   getSalesOperationsDashboard,
   getSalesOpportunity,
-  recordSalesArtifactDownload
-} from "../../../../../lib/salesOperationsStore";
+  recordSalesOpportunityWorkspacePacketDownload
+} from "../../../../../../lib/salesOperationsStore";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +47,7 @@ export async function GET(request: Request, { params }: RouteContext) {
           code: "sales-opportunity-not-found",
           message: "No tenant-scoped opportunity is available for this ID."
         },
-        boundary: salesDealRoomBoundary
+        boundary: opportunityWorkspaceProvisioningBoundary
       },
       {
         status: opportunityResult.error?.message.includes("sales-operations-admin-required") ? 403 : 404,
@@ -58,14 +56,43 @@ export async function GET(request: Request, { params }: RouteContext) {
     );
   }
 
+  if (!opportunityResult.opportunity.workspaceProvisioning) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "sales-opportunity-workspace-not-provisioned",
+          message: "Provision a buyer-specific protected workspace before releasing the provisioning packet."
+        },
+        boundary: opportunityWorkspaceProvisioningBoundary
+      },
+      { status: 409, headers: salesOperationsNoStoreHeaders }
+    );
+  }
+
   if (dashboardResult.error || !dashboardResult.dashboard) {
     return NextResponse.json(
       {
         error: {
-          code: "sales-deal-room-dashboard-unavailable",
-          message: "The deal-room packet could not be generated because the tenant dashboard was unavailable."
+          code: "sales-opportunity-workspace-dashboard-unavailable",
+          message: "The provisioning packet could not be generated because the tenant dashboard was unavailable."
         },
-        boundary: salesDealRoomBoundary
+        boundary: opportunityWorkspaceProvisioningBoundary
+      },
+      { status: 502, headers: salesOperationsNoStoreHeaders }
+    );
+  }
+
+  const audit = await recordSalesOpportunityWorkspacePacketDownload(context.client, intakeId);
+
+  if (audit.error || !audit.result?.workspaceProvisioning) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "sales-opportunity-workspace-packet-audit-failed",
+          message:
+            "The provisioning packet was not released because its append-only audit event could not be committed."
+        },
+        boundary: opportunityWorkspaceProvisioningBoundary
       },
       { status: 502, headers: salesOperationsNoStoreHeaders }
     );
@@ -74,65 +101,27 @@ export async function GET(request: Request, { params }: RouteContext) {
   const opportunityAuditEvents = dashboardResult.dashboard.auditEvents.filter(
     (event) => event.intakeId === intakeId
   );
-  const fallbackWorkspaceSlug =
-    process.env.SCRIMED_DEFAULT_BUYER_ROOM_WORKSPACE_SLUG ?? defaultDealRoomWorkspaceSlug;
-  const packet = deriveSalesDealRoomForOpportunity({
-    opportunity: opportunityResult.opportunity,
-    auditEvents: opportunityAuditEvents,
-    appBaseUrl: appBaseUrl(request),
-    workspaceSlug: fallbackWorkspaceSlug
-  });
-  const audit = await recordSalesArtifactDownload(
-    context.client,
-    intakeId,
-    "buyer-deal-room-packet-downloaded",
-    {
-      artifactKind: "buyer-deal-room-packet",
-      format: "text/markdown",
-      noPhiBoundary: true,
-      tenantScoped: true,
-      buyerRoomRoute: packet.buyerRoomRoute,
-      buyerRoomPacketRoute: packet.buyerRoomPacketRoute,
-      readinessScore: packet.readinessScore,
-      workspaceSlug: packet.workspaceSlug,
-      workspaceMappingMode: packet.workspaceMappingMode
-    }
-  );
-
-  if (audit.error) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "sales-deal-room-packet-audit-failed",
-          message: "The deal-room packet was not released because its append-only audit event could not be committed."
-        },
-        boundary: salesDealRoomBoundary
-      },
-      { status: 502, headers: salesOperationsNoStoreHeaders }
-    );
-  }
-
-  const auditEventId = typeof audit.data === "string" ? audit.data : "committed";
+  const auditEventId = audit.result.auditEventId ?? "committed";
   const safeIntakeId = intakeId.replace(/[^a-z0-9-]/gi, "-");
 
   return new NextResponse(
-    buildSalesDealRoomPacket({
+    buildOpportunityWorkspaceProvisioningPacket({
       generatedAt: new Date().toISOString(),
       auditEventId,
       generatedBy: context.user.id,
       opportunity: opportunityResult.opportunity,
-      packet,
+      provisioning: audit.result.workspaceProvisioning,
+      appBaseUrl: appBaseUrl(request),
       auditEvents: opportunityAuditEvents
     }),
     {
       headers: {
         ...salesOperationsNoStoreHeaders,
         "Cache-Control": "private, no-store",
-        "Content-Disposition": `attachment; filename="scrimed-${safeIntakeId}-pilot-deal-room.md"`,
+        "Content-Disposition": `attachment; filename="scrimed-${safeIntakeId}-workspace-provisioning.md"`,
         "Content-Type": "text/markdown; charset=utf-8",
         "X-SCRIMED-Data-Boundary": "business-contact-and-workflow-scope-only",
-        "X-SCRIMED-Deal-Room-Packet-Audited": "true",
-        "X-SCRIMED-Workspace-Mapping": packet.workspaceMappingMode
+        "X-SCRIMED-Workspace-Provisioning-Packet-Audited": "true"
       }
     }
   );

@@ -39,6 +39,10 @@ import {
   salesDealRoomPacketProofStackStatus,
   salesDealRoomProofStackStatus
 } from "./salesDealRoom";
+import {
+  opportunityWorkspaceProvisioningPacketProofStackStatus,
+  opportunityWorkspaceProvisioningProofStackStatus
+} from "./opportunityWorkspaceProvisioning";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -635,6 +639,8 @@ export function getProductConsoleSummary() {
     salesDealRoomRoute: salesDealRoomSummary.route,
     salesDealRoomApiRoute: salesDealRoomSummary.apiRoute,
     salesDealRoomProtectedPacketRoute: salesDealRoomSummary.protectedPacketRoute,
+    opportunityWorkspaceProvisioningRoute: salesDealRoomSummary.workspaceProvisioningRoute,
+    opportunityWorkspaceProvisioningPacketRoute: salesDealRoomSummary.workspaceProvisioningPacketRoute,
     competitiveEdgeRoute: "/competitive-edge",
     productOffers,
     enterpriseServiceOffers,
@@ -683,6 +689,8 @@ export function getProductConsoleSummary() {
       buyerPilotRoomPackets: buyerPilotRoomPacketProofStackStatus,
       salesDealRoom: salesDealRoomProofStackStatus,
       salesDealRoomPackets: salesDealRoomPacketProofStackStatus,
+      opportunityWorkspaceProvisioning: opportunityWorkspaceProvisioningProofStackStatus,
+      opportunityWorkspaceProvisioningPackets: opportunityWorkspaceProvisioningPacketProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -740,6 +748,8 @@ export function getProductReadinessBrief() {
     `Pilot Deal Room: ${summary.salesDealRoomRoute}`,
     `Pilot Deal Room API: ${summary.salesDealRoomApiRoute}`,
     `Protected Deal Room Packet: ${summary.salesDealRoomProtectedPacketRoute}`,
+    `Opportunity Workspace Provisioning: ${summary.opportunityWorkspaceProvisioningRoute}`,
+    `Opportunity Workspace Packet: ${summary.opportunityWorkspaceProvisioningPacketRoute}`,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

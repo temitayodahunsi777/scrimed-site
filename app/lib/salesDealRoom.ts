@@ -11,6 +11,16 @@ import {
   salesMotion
 } from "./commercialStrategy";
 import { getPilotProgramForOpportunity, getGovernanceWorkflowPackForOpportunity, type SalesAuditEvent, type SalesOpportunity } from "./salesOperations";
+import {
+  buyerRoomPacketRouteForProvisioning,
+  buyerRoomRouteForProvisioning,
+  opportunityWorkspaceProvisioningApiRoute,
+  opportunityWorkspaceProvisioningPacketApiRoute,
+  opportunityWorkspaceProvisioningPacketProofStackStatus,
+  opportunityWorkspaceProvisioningProofStackStatus,
+  workspaceMappingModeForOpportunity,
+  workspaceSlugForOpportunity
+} from "./opportunityWorkspaceProvisioning";
 
 export type SalesDealRoomStage = {
   stage: string;
@@ -41,11 +51,15 @@ export type SalesDealRoomSummary = {
   route: string;
   apiRoute: string;
   protectedPacketRoute: string;
+  workspaceProvisioningRoute: string;
+  workspaceProvisioningPacketRoute: string;
   status: string;
   defaultWorkspaceSlug: string;
   proofStackStatus: string;
   buyerRoomProofStackStatus: string;
   buyerRoomPacketProofStackStatus: string;
+  opportunityWorkspaceProvisioningProofStackStatus: string;
+  opportunityWorkspaceProvisioningPacketProofStackStatus: string;
   executiveThesis: string;
   stages: SalesDealRoomStage[];
   siteLanes: SalesDealRoomSiteLane[];
@@ -67,7 +81,8 @@ export type SalesDealRoomOpportunityPacket = {
   recommendedPriceRange: string;
   buyerRoomRoute: string;
   buyerRoomPacketRoute: string;
-  workspaceMappingMode: "default-synthetic-workspace" | "buyer-specific-workspace-planned";
+  workspaceSlug: string;
+  workspaceMappingMode: "default-synthetic-workspace" | "buyer-specific-workspace";
   readinessScore: number;
   readinessChecks: SalesDealRoomReadinessCheck[];
   nextSteps: string[];
@@ -200,11 +215,15 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     route: salesDealRoomRoute,
     apiRoute: salesDealRoomApiRoute,
     protectedPacketRoute: "/api/sales-operations/opportunities/{intakeId}/deal-room-packet",
+    workspaceProvisioningRoute: opportunityWorkspaceProvisioningApiRoute,
+    workspaceProvisioningPacketRoute: opportunityWorkspaceProvisioningPacketApiRoute,
     status: "public-organization-and-protected-packet-ready",
     defaultWorkspaceSlug: defaultDealRoomWorkspaceSlug,
     proofStackStatus: salesDealRoomProofStackStatus,
     buyerRoomProofStackStatus: buyerPilotRoomProofStackStatus,
     buyerRoomPacketProofStackStatus: buyerPilotRoomPacketProofStackStatus,
+    opportunityWorkspaceProvisioningProofStackStatus,
+    opportunityWorkspaceProvisioningPacketProofStackStatus,
     executiveThesis:
       "SCRIMED converts public product proof, governed pilot intake, tenant-admin sales operations, buyer-room diligence, premium pricing, and protected workspace evidence into one enterprise-ready pilot acquisition path.",
     stages: publicStages,
@@ -212,10 +231,10 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     competitiveEdges: buyerPilotRoomCompetitiveEdges,
     limitations: [
       {
-        limitation: "Opportunities do not yet auto-provision a unique pilot workspace.",
+        limitation: "Opportunities now support buyer-specific protected workspace provisioning after qualification.",
         resolution:
-          "Deal-room packets route to the configured/default synthetic evaluation workspace and label the mapping mode clearly.",
-        productionGate: "Per-opportunity workspace provisioning with invitation policy and retention schedule."
+          "Qualified opportunities can provision a protected workspace, invitation/onboarding policy, retention schedule, and audited provisioning packet. Unprovisioned opportunities still route to the default synthetic workspace with clear labeling.",
+        productionGate: "Full tenant-per-buyer provisioning, automated SSO/domain policy, and approved invitation delivery."
       },
       {
         limitation: "Authenticated happy-path automation still requires a short-lived AAL2 bearer token.",
@@ -253,11 +272,14 @@ export function deriveSalesDealRoomForOpportunity({
   const hasProposal = hasRecentEvent(auditEvents, "proposal-downloaded");
   const hasAttribution = hasRecentEvent(auditEvents, "attribution-analytics-packet-downloaded");
   const hasDealRoom = hasRecentEvent(auditEvents, "buyer-deal-room-packet-downloaded");
+  const hasWorkspaceProvisioned = hasRecentEvent(auditEvents, "opportunity-workspace-provisioned");
   const workflowTargetCount = opportunity.payload.scope.workflowTargets.length;
   const governanceCount = opportunity.payload.scope.governanceRequirements.length;
   const reviewStage = ["qualified", "discovery", "proposal", "pilot-planning", "won"].includes(
     opportunity.pipelineStage
   );
+  const resolvedWorkspaceSlug = workspaceSlugForOpportunity(opportunity, workspaceSlug);
+  const workspaceMappingMode = workspaceMappingModeForOpportunity(opportunity);
   const checks: SalesDealRoomReadinessCheck[] = [
     {
       id: "commercial-fit",
@@ -327,8 +349,19 @@ export function deriveSalesDealRoomForOpportunity({
       id: "buyer-room-link",
       label: "Buyer Pilot Room route attached",
       state: "ready",
-      evidence: `Protected Buyer Pilot Room route uses workspace slug ${workspaceSlug}.`,
+      evidence: `Protected Buyer Pilot Room route uses workspace slug ${resolvedWorkspaceSlug}.`,
       action: "Use the protected room for tenant-scoped readiness, evidence, limitations, and buyer packet downloads."
+    },
+    {
+      id: "workspace-provisioning",
+      label: "Buyer-specific workspace provisioning",
+      state: readinessState(Boolean(opportunity.workspaceProvisioning), reviewStage || hasWorkspaceProvisioned),
+      evidence: opportunity.workspaceProvisioning
+        ? `Provisioned workspace ${opportunity.workspaceProvisioning.workspaceSlug}.`
+        : hasWorkspaceProvisioned
+          ? "Workspace provisioning audit exists; refresh the opportunity dashboard."
+          : "No buyer-specific workspace has been provisioned yet.",
+      action: "Provision a buyer-specific protected workspace after qualification, then release the workspace packet."
     },
     {
       id: "deal-room-audit",
@@ -347,9 +380,17 @@ export function deriveSalesDealRoomForOpportunity({
     buyerName: opportunity.payload.contact.fullName,
     recommendedOffer: pilot?.name ?? tier.name,
     recommendedPriceRange: tier.recommendedDisplayPrice,
-    buyerRoomRoute: `${baseUrl}/pilot-workspace/access?workspace=${encodeURIComponent(workspaceSlug)}&opportunity=${encodeURIComponent(opportunity.intakeId)}`,
-    buyerRoomPacketRoute: `${baseUrl}/api/pilot-workspaces/${encodeURIComponent(workspaceSlug)}/buyer-room/packet`,
-    workspaceMappingMode: "default-synthetic-workspace",
+    buyerRoomRoute: buyerRoomRouteForProvisioning({
+      appBaseUrl: baseUrl,
+      intakeId: opportunity.intakeId,
+      workspaceSlug: resolvedWorkspaceSlug
+    }),
+    buyerRoomPacketRoute: buyerRoomPacketRouteForProvisioning({
+      appBaseUrl: baseUrl,
+      workspaceSlug: resolvedWorkspaceSlug
+    }),
+    workspaceSlug: resolvedWorkspaceSlug,
+    workspaceMappingMode,
     readinessScore: scoreChecks(checks),
     readinessChecks: checks,
     nextSteps: [
@@ -427,6 +468,7 @@ export function buildSalesDealRoomPacket({
 - Governance pack route: ${governancePack.route}
 - Buyer room route: ${packet.buyerRoomRoute}
 - Buyer room packet API: ${packet.buyerRoomPacketRoute}
+- Workspace slug: ${packet.workspaceSlug}
 - Workspace mapping mode: ${packet.workspaceMappingMode}
 
 ## Buyer Scope

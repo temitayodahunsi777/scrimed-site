@@ -64,7 +64,7 @@ SCRIMED now routes new no-PHI buyer intakes through deterministic governance wor
 
 This improves diligence readiness, but it does not replace qualified legal, privacy, security, or regulatory review.
 
-SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room` and protected opportunity packet route at `/api/sales-operations/opportunities/{intakeId}/deal-room-packet`. These artifacts organize public proof, protected Buyer Pilot Room routing, premium pricing posture, governance pack context, and next-step diligence. They remain non-binding business artifacts and do not create production authorization, legal conclusions, compliance certification, clinical validation, payer approval, or reimbursement guarantees.
+SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportunity packet route at `/api/sales-operations/opportunities/{intakeId}/deal-room-packet`, guarded buyer workspace provisioning at `/api/sales-operations/opportunities/{intakeId}/workspace-provisioning`, and audited provisioning packets at `/api/sales-operations/opportunities/{intakeId}/workspace-provisioning/packet`. These artifacts organize public proof, protected Buyer Pilot Room routing, premium pricing posture, governance pack context, buyer-specific workspace readiness, manual invitation policy, and next-step diligence. They remain non-binding business artifacts and do not create production authorization, legal conclusions, compliance certification, clinical validation, payer approval, or reimbursement guarantees.
 
 ## Routes
 

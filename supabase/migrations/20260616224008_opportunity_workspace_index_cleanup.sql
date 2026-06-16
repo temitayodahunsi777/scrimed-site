@@ -1,0 +1,5 @@
+drop index if exists private.sales_opportunity_workspaces_tenant_created_idx;
+drop index if exists private.sales_opportunity_workspaces_intake_idx;
+drop index if exists private.sales_opportunity_workspaces_workspace_slug_idx;
+drop index if exists private.sales_opportunity_workspaces_created_by_idx;
+drop index if exists private.sales_opportunity_workspaces_updated_by_idx;

@@ -13,6 +13,10 @@ import {
   type SalesOpportunity,
   type SalesOpportunityUpdate
 } from "../lib/salesOperations";
+import {
+  isProvisioningEligible,
+  type SalesOpportunityWorkspaceProvisioningResult
+} from "../lib/opportunityWorkspaceProvisioning";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -26,6 +30,7 @@ type ConsoleStatus =
   | "saving"
   | "syncing"
   | "scheduling"
+  | "provisioning"
   | "completing"
   | "error";
 
@@ -42,6 +47,11 @@ type DashboardResponse = {
 
 type OpportunityResponse = {
   opportunity?: SalesOpportunity;
+  workspaceProvisioning?: SalesOpportunityWorkspaceProvisioningResult["workspaceProvisioning"];
+  error?: { message?: string };
+};
+
+type WorkspaceProvisioningResponse = SalesOpportunityWorkspaceProvisioningResult & {
   error?: { message?: string };
 };
 
@@ -566,6 +576,49 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function provisionWorkspace() {
+    if (!session || !selected) {
+      return;
+    }
+
+    setStatus("provisioning");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/workspace-provisioning`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as WorkspaceProvisioningResponse;
+
+    if (!response.ok) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "The buyer-specific workspace could not be provisioned.");
+      return;
+    }
+
+    await refreshDashboard(
+      body.created
+        ? "Buyer-specific protected workspace provisioned and audit event committed."
+        : "Buyer-specific protected workspace already exists; dashboard refreshed."
+    );
+  }
+
+  async function downloadWorkspaceProvisioningPacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/workspace-provisioning/packet`,
+      `scrimed-${selected.intakeId}-workspace-provisioning.md`,
+      "Opportunity workspace provisioning packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -812,6 +865,8 @@ export default function SalesOperationsConsole({
 
   const selectedGovernancePack = selected ? governancePackFor(selected) : null;
   const selectedAttribution = selected?.payload.attribution ?? null;
+  const selectedWorkspaceProvisioning = selected?.workspaceProvisioning ?? null;
+  const workspaceEligible = selected ? isProvisioningEligible(selected) : false;
 
   return (
     <>
@@ -1075,6 +1130,26 @@ export default function SalesOperationsConsole({
                   </strong>
                 </article>
                 <article>
+                  <span>Buyer workspace</span>
+                  <strong>
+                    {selectedWorkspaceProvisioning
+                      ? `${selectedWorkspaceProvisioning.workspaceSlug} · ${selectedWorkspaceProvisioning.provisioningStatus}`
+                      : workspaceEligible
+                        ? "Ready to provision"
+                        : "Advance to Qualified first"}
+                  </strong>
+                </article>
+                <article>
+                  <span>Workspace packet</span>
+                  <strong>
+                    {selectedWorkspaceProvisioning?.lastPacketGeneratedAt
+                      ? `Last released ${formatDate(selectedWorkspaceProvisioning.lastPacketGeneratedAt)}`
+                      : selectedWorkspaceProvisioning
+                        ? "Ready for audit"
+                        : "Provision first"}
+                  </strong>
+                </article>
+                <article>
                   <span>Source attribution</span>
                   <strong>
                     {selectedAttribution
@@ -1144,6 +1219,50 @@ export default function SalesOperationsConsole({
                       >
                         {status === "syncing" ? "Syncing CRM" : "Sync CRM Webhook"}
                       </button>
+                    ) : null}
+                  </div>
+                </section>
+
+                <section>
+                  <p className="eyebrow">Protected buyer workspace</p>
+                  <h3>Provision the buyer-specific room before deeper diligence.</h3>
+                  <p className="section-copy">
+                    {selectedWorkspaceProvisioning
+                      ? `Workspace ${selectedWorkspaceProvisioning.workspaceSlug} is linked to this opportunity with manual invitation policy and retention controls.`
+                      : workspaceEligible
+                        ? "This opportunity is qualified for a protected synthetic workspace with manual onboarding policy."
+                        : "Move the pipeline stage to Qualified or later before provisioning a buyer-specific workspace."}
+                  </p>
+                  <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={
+                        status === "provisioning" ||
+                        Boolean(selectedWorkspaceProvisioning) ||
+                        !workspaceEligible
+                      }
+                      onClick={provisionWorkspace}
+                      type="button"
+                    >
+                      {status === "provisioning" ? "Provisioning Workspace" : "Provision Buyer Workspace"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!selectedWorkspaceProvisioning}
+                      onClick={downloadWorkspaceProvisioningPacket}
+                      type="button"
+                    >
+                      Download Workspace Packet
+                    </button>
+                    {selectedWorkspaceProvisioning ? (
+                      <Link
+                        className="secondary-action"
+                        href={`/pilot-workspace/access?workspace=${encodeURIComponent(
+                          selectedWorkspaceProvisioning.workspaceSlug
+                        )}&opportunity=${encodeURIComponent(selected.intakeId)}`}
+                      >
+                        Open Buyer Room
+                      </Link>
                     ) : null}
                   </div>
                 </section>
