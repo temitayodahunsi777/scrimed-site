@@ -4,6 +4,10 @@ Updated: 2026-06-16
 
 ## Latest Trust Safety Operations Release
 
+- Added passkey-aware Supabase Auth clients for `/pilot-workspace/access` and `/sales-operations`, with enrolled-passkey sign-in, signed-in passkey registration, and continued TOTP/AAL2 gates for governed tenant actions.
+- Added `passkey-or-magic-link` tenant identity readiness posture, API validation, and migration support so tenant administration can reflect the current phishing-resistant sign-in path without breaking legacy magic-link-only records.
+- Added `smoke:trustops` as a package script for the TrustOps authenticated smoke path.
+- Reclassified the remaining auth limitation: leaked-password protection is a Supabase dashboard control for password-based auth, while SCRIMED product flows continue to avoid password sign-in and require passkey or magic-link sign-in plus AAL2 where protected mutations are involved.
 - Added a trust-ops incident queue with severity, owner, accountable agent, source channel, containment action, remediation plan, legal-hold status, SLA tier, improvement actions, and audit-ready report exports.
 - Added `/api/trust-safety-operations/incidents/{incidentId}/report` for downloadable no-PHI trust safety incident reports.
 - Added tenant-scoped durable TrustOps incident storage contract with private Supabase tables, deny-all RLS, guarded RPCs, AAL2 tenant mutation gates, append-only events, legal-hold fields, notification decisions, and review-packet exports.
@@ -19,7 +23,7 @@ Updated: 2026-06-16
 - Strengthened Enterprise Readiness with copyright registration candidates, trademark strategy, third-party license/provenance controls, generated-media review, and 24/7 incident-response readiness gates.
 - Added tenant-admin attribution analytics into `/sales-operations` and added a protected audited attribution analytics packet export under `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`.
 - Preserved the boundary: this is not legal advice, compliance certification, managed SOC/MDR coverage, production clinical monitoring, breach determination, PHI storage, or live clinical execution authorization.
-- Remaining gate: enable Supabase Auth leaked-password protection in the dashboard and add a CI-held AAL2 tenant smoke token before using TrustOps mutation routes in buyer-facing demos.
+- Remaining gate: place a CI-held AAL2 tenant smoke token before using authenticated TrustOps mutation routes in automated buyer-demo smoke. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
 
 ## Latest Attribution Analytics Release
 
@@ -68,7 +72,7 @@ Updated: 2026-06-16
 
 ## Latest Sales Operations Release
 
-- Enforced passwordless magic-link plus free TOTP authentication for `/sales-operations`, with AAL2 verification, a twelve-hour maximum session, a two-hour inactivity boundary, and global session termination.
+- Enforced passkey or passwordless magic-link sign-in plus free TOTP authentication for `/sales-operations`, with AAL2 verification, a twelve-hour maximum session, a two-hour inactivity boundary, and global session termination.
 - Added native vendor-neutral CRM CSV exports so SCRIMED sales operations does not depend on a paid CRM; approved webhook synchronization remains optional.
 - Added durable next-action due dates, automatic due and overdue triage, audited human-reviewed email drafts, and audited follow-up completion.
 - Added audited enterprise assessment calendar invitations with durable schedule state and optional HTTPS meeting links.

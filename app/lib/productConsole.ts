@@ -632,6 +632,7 @@ export function getProductConsoleSummary() {
       attributionAnalytics: attributionAnalyticsSummary.status,
       trustSafetyOperations: trustSafetyOperationsSummary.status,
       tenantTrustOpsIncidents: "private-schema-rpc-guarded",
+      passkeyTenantAuthentication: "passkey-or-magic-link-plus-aal2",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       deploymentProfiles: deploymentProfileSummary.status,

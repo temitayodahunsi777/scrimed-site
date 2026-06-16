@@ -6,7 +6,7 @@ Protected pilot workspaces retain governed synthetic evaluation evidence only. T
 
 ## Selected Architecture
 
-- Identity: Supabase Auth, verified server-side from bearer tokens.
+- Identity: Supabase Auth with passkey or passwordless magic-link sign-in, verified server-side from bearer tokens.
 - Tenant isolation: PostgreSQL row-level security backed by tenant memberships.
 - Durable evidence: Supabase Postgres synthetic session records.
 - Durable audit: append-only audit events created through hardened transactional functions.
@@ -15,6 +15,18 @@ Protected pilot workspaces retain governed synthetic evaluation evidence only. T
 
 Runtime APIs do not use a Supabase service-role key. Authorization is based on provider identity and database membership, never user-editable profile metadata.
 
+## Passkey Authentication
+
+Protected pilot access now supports enrolled-passkey sign-in and signed-in passkey registration through Supabase Auth. The product client explicitly opts into Supabase's passkey API, and tenant identity readiness can be marked as `passkey-or-magic-link`.
+
+Passkeys improve sign-in resistance to phishing, but they do not remove SCRIMED's governed action controls. Protected workspace mutations, TrustOps actions, and tenant-admin operations still require fresh authenticated membership and AAL2/TOTP assurance where enforced.
+
+Operational boundaries:
+
+- Supabase passkey support is currently experimental, so the client opt-in and dependency version must be monitored during upgrades.
+- Passkeys are bound to the configured relying-party ID and allowed origins. Keep `app.scrimedsolutions.com` and any approved preview/loopback origins stable before broad enrollment.
+- Existing signed-in, confirmed, non-anonymous users can register passkeys. CI smoke cannot use passkeys directly because WebAuthn requires a human/browser ceremony.
+
 ## Activation
 
 1. Provision the approved Supabase project. Completed on 2026-06-10 in `us-east-1`.
@@ -22,9 +34,9 @@ Runtime APIs do not use a Supabase service-role key. Authorization is based on p
 3. Create tenant, membership, and workspace bootstrap records through an approved administrative process. Completed for the first SCRIMED tenant-admin and Atlas governed synthetic workspace on 2026-06-10.
 4. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel. Completed for Production and Preview on 2026-06-10.
 5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL. Completed on 2026-06-10.
-6. Configure invite-only production sign-in, MFA, session lifetime, and enterprise SSO policy. Public signups are disabled; MFA, session lifetime, and enterprise SSO decisions remain pending.
+6. Configure invite-only production sign-in, passkeys, MFA, session lifetime, and enterprise SSO policy. Public signups are disabled; passkey-aware clients are active; enterprise SSO decisions remain pending.
 7. Provision Upstash Redis and configure its REST environment variables. Completed through the Vercel Marketplace free plan in `iad1` on 2026-06-10.
-8. Run Supabase security and performance advisors. Database security findings are clear; leaked-password protection is unavailable on the current free plan and the protected-pilot console uses passwordless magic-link access.
+8. Run Supabase security and performance advisors. Database security findings are clear; passkeys are enabled for phishing-resistant sign-in, and leaked-password protection is only required if password sign-in remains enabled for any project-level flow.
 9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events. Completed transactionally and through the authenticated production workspace on 2026-06-10.
 
 ## Protected Routes

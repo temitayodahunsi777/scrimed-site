@@ -28,6 +28,8 @@ type ConsoleStatus =
   | "completing"
   | "error";
 
+type PasskeyStatus = "idle" | "signing-in" | "registering";
+
 type DashboardResponse = {
   attributionAnalytics?: AttributionAnalyticsReport;
   crmConfigured?: boolean;
@@ -107,7 +109,8 @@ export default function SalesOperationsConsole({
         ? createClient(supabaseUrl, supabasePublishableKey, {
             auth: {
               detectSessionInUrl: true,
-              persistSession: true
+              persistSession: true,
+              experimental: { passkey: true }
             }
           })
         : null,
@@ -120,6 +123,7 @@ export default function SalesOperationsConsole({
     configured ? "loading" : "infrastructure-required"
   );
   const [message, setMessage] = useState("");
+  const [passkeyStatus, setPasskeyStatus] = useState<PasskeyStatus>("idle");
   const [dashboard, setDashboard] = useState<SalesOperationsDashboard | null>(null);
   const [attributionAnalytics, setAttributionAnalytics] = useState<AttributionAnalyticsReport | null>(null);
   const [crmMode, setCrmMode] = useState("native-export");
@@ -196,6 +200,7 @@ export default function SalesOperationsConsole({
 
       if (!nextSession) {
         setUser(null);
+        setPasskeyStatus("idle");
         setDashboard(null);
         setAttributionAnalytics(null);
         setSelected(null);
@@ -290,6 +295,50 @@ export default function SalesOperationsConsole({
 
     setStatus("signed-out");
     setMessage("If this identity is an approved tenant-admin, check its enterprise email for the secure access link.");
+  }
+
+  async function signInWithPasskey() {
+    if (!supabase) {
+      return;
+    }
+
+    setPasskeyStatus("signing-in");
+    setStatus("loading");
+    setMessage("");
+
+    const { error } = await supabase.auth.signInWithPasskey();
+
+    if (error) {
+      setPasskeyStatus("idle");
+      setStatus("signed-out");
+      setMessage(error.message);
+      return;
+    }
+
+    setPasskeyStatus("idle");
+    setMessage("Passkey verified. Opening tenant-admin operations.");
+  }
+
+  async function registerPasskey() {
+    if (!supabase || !session) {
+      return;
+    }
+
+    setPasskeyStatus("registering");
+    setMessage("");
+
+    const { data, error } = await supabase.auth.registerPasskey();
+
+    setPasskeyStatus("idle");
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    setMessage(
+      `Passkey registered${data.friendly_name ? `: ${data.friendly_name}` : ""}. Future sign-in can use the passkey button; tenant-admin changes still require fresh assurance.`
+    );
   }
 
   async function beginMfaEnrollment() {
@@ -632,13 +681,28 @@ export default function SalesOperationsConsole({
                 type="email"
                 value={email}
               />
-              <small>Secure magic link plus authenticator verification is required. Password authentication is not used.</small>
+              <small>
+                Use an enrolled passkey or a secure email link. Authenticator verification is required for
+                tenant-admin operations; password authentication is not used.
+              </small>
             </label>
           </div>
           {message ? <div className="intake-alert">{message}</div> : null}
           <div className="form-actions">
-            <button className="primary-action" disabled={status === "sending-link"} type="submit">
+            <button
+              className="primary-action"
+              disabled={status === "sending-link" || passkeyStatus === "signing-in"}
+              type="submit"
+            >
               {status === "sending-link" ? "Sending Secure Link" : "Send Secure Access Link"}
+            </button>
+            <button
+              className="secondary-action"
+              disabled={passkeyStatus === "signing-in" || status === "sending-link"}
+              onClick={signInWithPasskey}
+              type="button"
+            >
+              {passkeyStatus === "signing-in" ? "Checking Passkey" : "Use Passkey"}
             </button>
             <Link className="secondary-action" href="/pilot">
               Open Buyer Intake
@@ -657,8 +721,8 @@ export default function SalesOperationsConsole({
             <p className="eyebrow">Tenant-admin assurance gate</p>
             <h2>Verify an authenticator before entering Sales Operations.</h2>
             <p className="section-copy">
-              SCRIMED uses passwordless magic-link access plus free TOTP verification. Sales sessions expire after
-              twelve hours and require activity within two hours.
+              SCRIMED uses passkey or passwordless magic-link sign-in plus free TOTP verification. Sales sessions
+              expire after twelve hours and require activity within two hours.
             </p>
             {mfaQrCode ? (
               <div className="mfa-enrollment">
@@ -716,6 +780,14 @@ export default function SalesOperationsConsole({
                 Restart Authenticator Setup
               </button>
             ) : null}
+            <button
+              className="secondary-action"
+              disabled={passkeyStatus === "registering"}
+              onClick={registerPasskey}
+              type="button"
+            >
+              {passkeyStatus === "registering" ? "Registering Passkey" : "Register Passkey"}
+            </button>
             <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
             </button>
@@ -734,6 +806,10 @@ export default function SalesOperationsConsole({
         <article>
           <span>Access assurance</span>
           <strong>AAL2 tenant-admin</strong>
+        </article>
+        <article>
+          <span>Passkey posture</span>
+          <strong>Enabled</strong>
         </article>
         <article>
           <span>Open opportunities</span>
@@ -802,6 +878,14 @@ export default function SalesOperationsConsole({
             <p className="section-copy">{dashboard?.boundary ?? salesOperationsBoundary}</p>
           </div>
           <div className="form-actions">
+            <button
+              className="secondary-action"
+              disabled={passkeyStatus === "registering"}
+              onClick={registerPasskey}
+              type="button"
+            >
+              {passkeyStatus === "registering" ? "Registering Passkey" : "Register Passkey"}
+            </button>
             <Link className="secondary-action" href="/pilot">Create Buyer Intake</Link>
             <button className="secondary-action" onClick={() => refreshDashboard()} type="button">
               Refresh

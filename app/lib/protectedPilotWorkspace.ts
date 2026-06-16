@@ -123,6 +123,7 @@ export type TenantAccessLifecycleEvent = {
 
 export type TenantIdentityProviderStatus =
   | "passwordless-magic-link"
+  | "passkey-or-magic-link"
   | "sso-readiness"
   | "sso-configured";
 
@@ -390,7 +391,7 @@ export const protectedPilotApiContracts = [
 
 export const protectedPilotActivationGates = [
   "Keep direct invitation send disabled until custom SMTP, legal copy, abuse controls, and delivery monitoring are approved.",
-  "Extend the active magic-link, TOTP MFA, and session-lifetime policy into enforced enterprise SSO and multi-tenant identity operations.",
+  "Extend the active passkey or magic-link sign-in, TOTP MFA, and session-lifetime policy into enforced enterprise SSO and multi-tenant identity operations.",
   "Complete legal, privacy, security, retention, incident response, and BAA review before any PHI-enabled scope.",
   "Keep live clinical execution denied until separate production promotion approval."
 ];
@@ -625,7 +626,7 @@ export function buildTenantInvitationOnboardingPacket(
 - Access route: ${portalUrl}
 
 ## Onboarding Steps
-1. Sign in at the protected pilot access route using the invited email address.
+1. Sign in at the protected pilot access route using an enrolled passkey or the invited email address.
 2. Complete fresh MFA/TOTP verification when prompted by SCRIMED identity controls.
 3. Use the workspace only for governed synthetic pilot evaluation.
 4. Wait for a tenant-admin to activate the invitation after authentication enrollment is complete.

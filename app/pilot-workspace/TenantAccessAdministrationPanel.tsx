@@ -50,6 +50,7 @@ type ActivationRunbookStep = {
 
 const roles: PilotWorkspaceRole[] = ["tenant-admin", "pilot-lead", "reviewer", "observer"];
 const identityStatuses: TenantIdentityProviderStatus[] = [
+  "passkey-or-magic-link",
   "passwordless-magic-link",
   "sso-readiness",
   "sso-configured"
@@ -68,6 +69,7 @@ function displayRole(role: PilotWorkspaceRole) {
 }
 
 function displayIdentityStatus(status: TenantIdentityProviderStatus) {
+  if (status === "passkey-or-magic-link") return "Passkey or Magic Link + MFA";
   if (status === "passwordless-magic-link") return "Passwordless + MFA";
   if (status === "sso-readiness") return "SSO readiness";
   return "SSO configured";

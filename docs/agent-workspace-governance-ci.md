@@ -52,6 +52,8 @@ Scheduled runs use the defaults. If the secret is present, the authenticated pat
 
 The only remaining gate is operational: GitHub Actions must receive an approved AAL2 tenant-admin or pilot-lead bearer token in the `SCRIMED_BEARER_TOKEN` secret. This cannot be resolved safely in code because source control must never store production identity credentials.
 
+Passkey authentication does not remove this CI gate. WebAuthn passkey ceremonies require a human/browser interaction and are appropriate for tenant-admin sign-in, not unattended GitHub Actions mutation smoke. CI should continue to use an explicitly issued, short-lived, AAL2-scoped operational token when authenticated mutation smoke is required.
+
 ## Code-Side Resolution
 
 The source-side gap is closed by fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, and the protected activation-governance route. The unresolved piece is only the out-of-band secret placement in GitHub Actions.

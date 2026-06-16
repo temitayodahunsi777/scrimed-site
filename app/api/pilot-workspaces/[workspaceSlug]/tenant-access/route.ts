@@ -43,6 +43,7 @@ type TenantAccessAction =
 
 const allowedRoles = new Set<PilotWorkspaceRole>(pilotWorkspaceRoles.map((entry) => entry.role));
 const allowedIdentityStatuses = new Set<TenantIdentityProviderStatus>([
+  "passkey-or-magic-link",
   "passwordless-magic-link",
   "sso-readiness",
   "sso-configured"

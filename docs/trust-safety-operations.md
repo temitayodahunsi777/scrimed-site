@@ -99,16 +99,19 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Applied the tenant TrustOps incident migration to Supabase production.
 - Applied foreign-key index hardening for TrustOps and Agent Workspace tables after Supabase advisor review.
 - Added the authenticated `/pilot-workspace/access` TrustOps incident panel.
+- Added passkey-aware tenant sign-in and enrollment controls while preserving AAL2/TOTP gates for governed TrustOps mutation paths.
+- Added the `passkey-or-magic-link` tenant identity readiness posture so TrustOps and tenant administration can reflect the current phishing-resistant sign-in posture.
 - Added `scripts/trustops-authenticated-smoke.mjs` for fail-closed and authenticated TrustOps route verification.
 
 ## Remaining Limitations
 
 - Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.
 - Tenant TrustOps storage is synthetic-pilot and enterprise-readiness only; regulated production incidents require customer-approved live-data boundaries, breach analysis, notification decisions, and forensic process.
-- Supabase Auth leaked-password protection remains a dashboard-level security setting to enable under Auth password security.
+- Supabase Auth leaked-password protection remains a dashboard-level security setting for password-based auth. SCRIMED product flows remain passkey or passwordless magic-link based; enable leaked-password protection if password sign-in remains active anywhere in the project.
 - Authenticated TrustOps happy-path smoke requires a CI-held AAL2 tenant-admin or pilot-lead bearer token; unauthenticated fail-closed smoke can run without secrets.
+- Supabase passkeys are currently experimental per Supabase documentation and require stable relying-party domain/origin configuration; changing the relying-party ID invalidates enrolled passkeys.
 - Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers.
 
 ## Next Build Step
 
-Enable Supabase Auth leaked-password protection, add a CI-held AAL2 smoke token, and run `scripts/trustops-authenticated-smoke.mjs` alongside the Agent Workspace authenticated smoke before buyer demos.
+Place a CI-held AAL2 smoke token, run `scripts/trustops-authenticated-smoke.mjs` alongside the Agent Workspace authenticated smoke before buyer demos, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.

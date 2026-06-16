@@ -272,7 +272,7 @@ export function getSalesOperationsSummary() {
     crmConfigured: true,
     crmMode: process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL ? "native-export-plus-webhook" : "native-export",
     crmWebhookConfigured: Boolean(process.env.SCRIMED_PILOT_INTAKE_WEBHOOK_URL),
-    authentication: "magic-link-plus-totp",
+    authentication: "passkey-or-magic-link-plus-totp",
     sessionPolicy: "12-hour maximum; 2-hour inactivity boundary",
     pipelineStages: salesPipelineStages,
     governancePackRouting: {

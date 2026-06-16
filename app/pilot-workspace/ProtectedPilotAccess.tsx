@@ -26,6 +26,8 @@ type AccessStatus =
   | "creating-session"
   | "error";
 
+type PasskeyStatus = "idle" | "signing-in" | "registering";
+
 type PilotWorkspaceResponse = {
   workspaces?: PilotWorkspaceRecord[];
   error?: { message?: string };
@@ -64,7 +66,8 @@ export default function ProtectedPilotAccess({
         ? createClient(supabaseUrl, supabasePublishableKey, {
             auth: {
               detectSessionInUrl: true,
-              persistSession: true
+              persistSession: true,
+              experimental: { passkey: true }
             }
           })
         : null,
@@ -77,6 +80,7 @@ export default function ProtectedPilotAccess({
     configured ? "loading" : "infrastructure-required"
   );
   const [message, setMessage] = useState("");
+  const [passkeyStatus, setPasskeyStatus] = useState<PasskeyStatus>("idle");
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
@@ -115,6 +119,7 @@ export default function ProtectedPilotAccess({
 
       if (!nextSession) {
         setUser(null);
+        setPasskeyStatus("idle");
         setWorkspaces([]);
         setSelectedWorkspace(null);
         setSessions([]);
@@ -278,6 +283,50 @@ export default function ProtectedPilotAccess({
 
     setStatus("signed-out");
     setMessage("If this identity is approved, check its enterprise email for the protected pilot access link.");
+  }
+
+  async function signInWithPasskey() {
+    if (!supabase) {
+      return;
+    }
+
+    setPasskeyStatus("signing-in");
+    setStatus("loading");
+    setMessage("");
+
+    const { error } = await supabase.auth.signInWithPasskey();
+
+    if (error) {
+      setPasskeyStatus("idle");
+      setStatus("signed-out");
+      setMessage(error.message);
+      return;
+    }
+
+    setPasskeyStatus("idle");
+    setMessage("Passkey verified. Opening the governed workspace session.");
+  }
+
+  async function registerPasskey() {
+    if (!supabase || !session) {
+      return;
+    }
+
+    setPasskeyStatus("registering");
+    setMessage("");
+
+    const { data, error } = await supabase.auth.registerPasskey();
+
+    setPasskeyStatus("idle");
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    setMessage(
+      `Passkey registered${data.friendly_name ? `: ${data.friendly_name}` : ""}. Future sign-in can use the passkey button; governed workspace actions still require fresh assurance.`
+    );
   }
 
   async function beginMfaEnrollment() {
@@ -507,13 +556,28 @@ export default function ProtectedPilotAccess({
                 type="email"
                 value={email}
               />
-              <small>Access requires an approved tenant membership. Synthetic pilot evidence only.</small>
+              <small>
+                Access requires approved tenant membership. Use an enrolled passkey or a secure email link.
+                Synthetic pilot evidence only.
+              </small>
             </label>
           </div>
           {message ? <div className="intake-alert">{message}</div> : null}
           <div className="form-actions">
-            <button className="primary-action" disabled={status === "sending-link"} type="submit">
+            <button
+              className="primary-action"
+              disabled={status === "sending-link" || passkeyStatus === "signing-in"}
+              type="submit"
+            >
               {status === "sending-link" ? "Sending Secure Link" : "Send Secure Access Link"}
+            </button>
+            <button
+              className="secondary-action"
+              disabled={passkeyStatus === "signing-in" || status === "sending-link"}
+              onClick={signInWithPasskey}
+              type="button"
+            >
+              {passkeyStatus === "signing-in" ? "Checking Passkey" : "Use Passkey"}
             </button>
             <Link className="secondary-action" href="/pilot-workspace">
               Review Workspace Controls
@@ -532,8 +596,8 @@ export default function ProtectedPilotAccess({
             <p className="eyebrow">Protected pilot assurance gate</p>
             <h2>Verify an authenticator before opening the workspace.</h2>
             <p className="section-copy">
-              SCRIMED uses passwordless magic-link access plus free TOTP verification. Protected sessions expire
-              after twelve hours and require activity within two hours.
+              SCRIMED uses passkey or passwordless magic-link sign-in plus free TOTP verification. Protected sessions
+              expire after twelve hours and require activity within two hours.
             </p>
             {mfaQrCode ? (
               <div className="mfa-enrollment">
@@ -591,6 +655,14 @@ export default function ProtectedPilotAccess({
                 Restart Authenticator Setup
               </button>
             ) : null}
+            <button
+              className="secondary-action"
+              disabled={passkeyStatus === "registering"}
+              onClick={registerPasskey}
+              type="button"
+            >
+              {passkeyStatus === "registering" ? "Registering Passkey" : "Register Passkey"}
+            </button>
             <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
             </button>
@@ -606,6 +678,10 @@ export default function ProtectedPilotAccess({
         <article>
           <span>Access assurance</span>
           <strong>AAL2 protected pilot</strong>
+        </article>
+        <article>
+          <span>Passkey posture</span>
+          <strong>Enabled</strong>
         </article>
         <article>
           <span>Tenant workspaces</span>
@@ -630,6 +706,14 @@ export default function ProtectedPilotAccess({
             fresh AAL2 assurance, and PostgreSQL row-level security.
           </p>
           <div className="form-actions">
+            <button
+              className="secondary-action"
+              disabled={passkeyStatus === "registering"}
+              onClick={registerPasskey}
+              type="button"
+            >
+              {passkeyStatus === "registering" ? "Registering Passkey" : "Register Passkey"}
+            </button>
             <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
             </button>
