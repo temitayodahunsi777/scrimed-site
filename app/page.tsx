@@ -49,6 +49,7 @@ const systemLayers = [
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
+  { label: "Deal Room", value: "/pilot-deal-room" },
   { label: "Demos", value: "/demos" },
   { label: "Programs", value: "/pilots" },
   { label: "Pricing", value: "/api/commercial/pricing" },
@@ -96,6 +97,7 @@ export default function Home() {
           </a>
           <div className="nav-links">
             <Link href="/product">Product</Link>
+            <Link href="/pilot-deal-room">Deal Room</Link>
             <Link href="/demos">Demos</Link>
             <Link href="/pilots">Programs</Link>
             <Link href="/pricing">Pricing</Link>
@@ -117,6 +119,7 @@ export default function Home() {
               <Link className="secondary-action" href="/demos">Inspect Demos</Link>
               <Link className="secondary-action" href="/pilots">Compare Pilot Programs</Link>
               <Link className="secondary-action" href="/product">Open Product Console</Link>
+              <Link className="secondary-action" href="/pilot-deal-room">Open Deal Room</Link>
               <Link className="secondary-action" href="/pricing">Review Pricing</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
               <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
@@ -148,6 +151,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Pricing and sales motion ready
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Pilot Deal Room links sales proof to buyer-room diligence
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Operations blocker register active

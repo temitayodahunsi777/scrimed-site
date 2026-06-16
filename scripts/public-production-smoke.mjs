@@ -55,6 +55,14 @@ function requireSyntheticBoundary(label, response) {
   }
 }
 
+function requireSalesBoundary(label, response) {
+  const boundary = response.headers.get("x-scrimed-data-boundary");
+
+  if (boundary !== "business-contact-and-workflow-scope-only") {
+    throw new Error(`${label} expected x-scrimed-data-boundary business-contact-and-workflow-scope-only but received ${boundary}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -104,6 +112,14 @@ async function checkProductConsole() {
     throw new Error("product console missing audited Buyer Pilot Room packet proof-stack posture.");
   }
 
+  if (body.proofStack?.salesDealRoom !== "sales-to-buyer-room-linkage-ready") {
+    throw new Error("product console missing Pilot Deal Room proof-stack posture.");
+  }
+
+  if (body.proofStack?.salesDealRoomPackets !== "aal2-audited-sales-deal-room-packets") {
+    throw new Error("product console missing audited Pilot Deal Room packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -149,6 +165,27 @@ async function checkCompetitiveEdgeApi() {
   console.log("pass competitive edge API");
 }
 
+async function checkPilotDealRoomApi() {
+  const result = await request("/api/pilot-deal-room");
+  requireStatus("pilot deal room", result.response.status, 200);
+  requireContentType("pilot deal room", result.response, "application/json");
+  const body = requireJson("pilot deal room", result.body);
+
+  if (body.service !== "scrimed-sales-deal-room") {
+    throw new Error(`pilot deal room expected service scrimed-sales-deal-room but received ${body.service}.`);
+  }
+
+  if (body.status !== "public-organization-and-protected-packet-ready") {
+    throw new Error(`pilot deal room expected public-organization-and-protected-packet-ready but received ${body.status}.`);
+  }
+
+  if (!Array.isArray(body.stages) || body.stages.length < 6) {
+    throw new Error("pilot deal room expected at least six buyer journey stages.");
+  }
+
+  console.log("pass pilot deal room API");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -157,12 +194,26 @@ async function checkProtectedFailClosed(path, label) {
   console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
 }
 
+async function checkSalesProtectedFailClosed(path, label) {
+  const result = await request(path);
+  requireStatus(label, result.response.status, [401, 503]);
+  requireContentType(label, result.response, "application/json");
+  requireSalesBoundary(label, result.response);
+  console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
+}
+
 await checkHtml("/pilot-workspace/access");
 await checkHtml("/sales-operations");
 await checkHtml("/competitive-edge");
+await checkHtml("/pilot-deal-room");
 await checkProductConsole();
 await checkReadiness();
 await checkCompetitiveEdgeApi();
+await checkPilotDealRoomApi();
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
+  "Sales deal-room packet protected API"
+);
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,
   "Demo readiness snapshots protected API"

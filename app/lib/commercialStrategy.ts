@@ -88,6 +88,12 @@ export const productAccessRoutes: ProductAccessRoute[] = [
     owner: "Enterprise sales and delivery"
   },
   {
+    surface: "Pilot Deal Room",
+    route: "/pilot-deal-room",
+    buyerIntent: "Understand how SCRIMED moves from public product proof to sales opportunity, Buyer Pilot Room, audited packet, and paid pilot.",
+    owner: "Enterprise sales and product"
+  },
+  {
     surface: "AgentOS Evaluation Workspace",
     route: "/evaluation",
     buyerIntent: "Run a synthetic workflow packet through AgentOS and Atlas Trust Cards before a sales call.",
@@ -314,9 +320,9 @@ export const salesMotion: SalesMotionStep[] = [
   {
     phase: "pilot",
     name: "Paid Evaluation or Synthetic Pilot",
-    route: "/pilot",
-    buyerAction: "Buyer requests scoped assessment or pilot and acknowledges no-PHI boundary.",
-    scrimedAction: "Qualify buyer, define scope, metrics, governance gates, and decision criteria.",
+    route: "/pilot-deal-room",
+    buyerAction: "Buyer reviews the Pilot Deal Room, requests scoped assessment or pilot, and acknowledges no-PHI boundary.",
+    scrimedAction: "Qualify buyer, define scope, metrics, governance gates, decision criteria, and deal-room packet.",
     qualificationGate: "Sponsor, budget range, workflow owner, review team, and pilot success metrics exist.",
     nextCommitment: "Protected pilot or annual license proposal."
   },

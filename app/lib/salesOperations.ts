@@ -11,7 +11,8 @@ export const salesOperationsBoundary =
 
 export const salesOperationsNoStoreHeaders = {
   "Cache-Control": "private, no-store",
-  Vary: "Authorization"
+  Vary: "Authorization",
+  "X-SCRIMED-Data-Boundary": "business-contact-and-workflow-scope-only"
 } as const;
 
 export const salesPipelineStages = [
@@ -42,6 +43,7 @@ export type SalesOpportunity = {
   lastCrmSyncDetail: string;
   lastCrmExportAt: string | null;
   lastAttributionAnalyticsPacketAt?: string | null;
+  lastBuyerDealRoomPacketAt?: string | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -62,7 +64,8 @@ export type SalesAuditEvent = {
     | "follow-up-draft-downloaded"
     | "follow-up-completed"
     | "assessment-invitation-downloaded"
-    | "attribution-analytics-packet-downloaded";
+    | "attribution-analytics-packet-downloaded"
+    | "buyer-deal-room-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -290,8 +293,16 @@ export function getSalesOperationsSummary() {
       crmPayloadField: "attribution",
       noPhiBoundary: true
     },
+    dealRoom: {
+      status: "sales-to-buyer-room-linkage-ready",
+      route: "/pilot-deal-room",
+      apiRoute: "/api/pilot-deal-room",
+      protectedPacketRoute: "/api/sales-operations/opportunities/{intakeId}/deal-room-packet",
+      defaultWorkspaceSlug: "atlas-synthetic-evaluation",
+      noPhiBoundary: true
+    },
     boundary: salesOperationsBoundary,
-    updated: "2026-06-15"
+    updated: "2026-06-16"
   };
 }
 

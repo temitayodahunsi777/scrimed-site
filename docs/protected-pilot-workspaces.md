@@ -43,6 +43,9 @@ Operational boundaries:
 
 - `GET /api/pilot-workspaces`
 - `/pilot-workspace/access`
+- `/pilot-deal-room`
+- `GET /api/pilot-deal-room`
+- `GET /api/sales-operations/opportunities/{intakeId}/deal-room-packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `POST /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `GET /api/pilot-workspaces/{workspaceSlug}/audit`
@@ -100,6 +103,14 @@ Demo Readiness Packet export requires a selected snapshot and commits `demo-read
 The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The packet route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact.
 
 This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, limitations, and competitive edge in one tenant-scoped room without weakening the synthetic-only boundary.
+
+## Pilot Deal Room Linkage
+
+`/pilot-deal-room` is the public organization layer that explains how buyers move from SCRIMED's official website and product app into governed intake, Sales Operations, protected Buyer Pilot Room diligence, audited packet release, and paid synthetic pilot.
+
+Sales Operations can generate a protected Pilot Deal Room packet through `GET /api/sales-operations/opportunities/{intakeId}/deal-room-packet`. The route requires tenant-admin AAL2 access, uses the existing private sales artifact RPC, commits `buyer-deal-room-packet-downloaded` before release, and returns a Markdown packet that links the buyer's opportunity scope to the default protected Buyer Pilot Room route.
+
+Current workaround: opportunities do not yet auto-provision dedicated pilot workspaces, so packets use the configured/default synthetic workspace slug `atlas-synthetic-evaluation` and label the mapping mode as a default synthetic workspace. The production gate is per-opportunity workspace provisioning with tenant invitation policy, retention schedule, and buyer-specific workspace lifecycle controls.
 
 ## Active Public Controls
 

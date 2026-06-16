@@ -554,6 +554,18 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function downloadDealRoomPacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/deal-room-packet`,
+      `scrimed-${selected.intakeId}-pilot-deal-room.md`,
+      "Pilot deal-room packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -1055,6 +1067,14 @@ export default function SalesOperationsConsole({
                   <strong>{selected.lastCrmExportAt ? `Last exported ${formatDate(selected.lastCrmExportAt)}` : "Ready"}</strong>
                 </article>
                 <article>
+                  <span>Deal room packet</span>
+                  <strong>
+                    {selected.lastBuyerDealRoomPacketAt
+                      ? `Last released ${formatDate(selected.lastBuyerDealRoomPacketAt)}`
+                      : "Ready for audit"}
+                  </strong>
+                </article>
+                <article>
                   <span>Source attribution</span>
                   <strong>
                     {selectedAttribution
@@ -1105,6 +1125,9 @@ export default function SalesOperationsConsole({
                   <div className="form-actions">
                     <button className="secondary-action" onClick={downloadProposal} type="button">
                       Download Audited Proposal
+                    </button>
+                    <button className="secondary-action" onClick={downloadDealRoomPacket} type="button">
+                      Download Deal Room Packet
                     </button>
                     <button className="secondary-action" onClick={downloadCrmExport} type="button">
                       Download CRM Import

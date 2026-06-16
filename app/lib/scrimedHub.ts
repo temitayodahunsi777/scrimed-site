@@ -57,6 +57,7 @@ import {
 } from "./enterpriseReadiness";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
+import { getSalesDealRoomSummary } from "./salesDealRoom";
 
 export type HubModule = {
   name: string;
@@ -194,6 +195,7 @@ export const hubRoutes = [
   "/hub/readiness",
   "/hub/events",
   "/pilot",
+  "/pilot-deal-room",
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",
@@ -270,6 +272,7 @@ export const hubRoutes = [
   "/api/readiness",
   "/api/events",
   "/api/pilot/intake",
+  "/api/pilot-deal-room",
   "/api/healthcare-intelligence-os",
   "/api/healthcare-intelligence-os/brief",
   "/api/agent-workspace",
@@ -289,6 +292,7 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/follow-up/complete",
   "/api/sales-operations/opportunities/{intakeId}/assessment-invitation",
   "/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet",
+  "/api/sales-operations/opportunities/{intakeId}/deal-room-packet",
   "/api/pilots",
   "/api/demos",
   "/api/commercial/pricing",
@@ -388,6 +392,7 @@ export function getHubSummary() {
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
   const pilotIntakeSummary = getPilotIntakeSummary();
   const salesOperationsSummary = getSalesOperationsSummary();
+  const salesDealRoomSummary = getSalesDealRoomSummary();
   const commercialStrategySummary = getCommercialStrategySummary();
   const companyOperationsSummary = getCompanyOperationsSummary();
   const agentEvaluationWorkspaceSummary = getAgentEvaluationWorkspaceSummary();
@@ -420,6 +425,7 @@ export function getHubSummary() {
     },
     pilotIntakeSummary,
     salesOperationsSummary,
+    salesDealRoomSummary,
     commercialStrategySummary,
     companyOperationsSummary,
     enterpriseReadinessSummary,

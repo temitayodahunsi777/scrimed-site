@@ -1,6 +1,6 @@
 # SCRIMED Enterprise Readiness and Claims Control
 
-Updated: 2026-06-15
+Updated: 2026-06-16
 
 SCRIMED maintains a public Trust and Enterprise Readiness Center at `/trust-center`, a controlled claims register at `/claims`, and machine-readable readiness APIs under `/api/enterprise-readiness`.
 
@@ -64,6 +64,8 @@ SCRIMED now routes new no-PHI buyer intakes through deterministic governance wor
 
 This improves diligence readiness, but it does not replace qualified legal, privacy, security, or regulatory review.
 
+SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room` and protected opportunity packet route at `/api/sales-operations/opportunities/{intakeId}/deal-room-packet`. These artifacts organize public proof, protected Buyer Pilot Room routing, premium pricing posture, governance pack context, and next-step diligence. They remain non-binding business artifacts and do not create production authorization, legal conclusions, compliance certification, clinical validation, payer approval, or reimbursement guarantees.
+
 ## Routes
 
 - `/trust-center`
@@ -73,3 +75,5 @@ This improves diligence readiness, but it does not replace qualified legal, priv
 - `/api/enterprise-readiness/[slug]`
 - `/api/enterprise-readiness/claims`
 - `/api/enterprise-readiness/diligence-brief`
+- `/pilot-deal-room`
+- `/api/pilot-deal-room`

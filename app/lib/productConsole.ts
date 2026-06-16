@@ -34,6 +34,11 @@ import {
   buyerPilotRoomPacketProofStackStatus,
   buyerPilotRoomProofStackStatus
 } from "./buyerPilotRoom";
+import {
+  getSalesDealRoomSummary,
+  salesDealRoomPacketProofStackStatus,
+  salesDealRoomProofStackStatus
+} from "./salesDealRoom";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -542,6 +547,7 @@ export function getProductConsoleSummary() {
   const sourceIntelligenceSummary = getSourceIntelligenceSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
+  const salesDealRoomSummary = getSalesDealRoomSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -626,6 +632,9 @@ export function getProductConsoleSummary() {
     buyerPilotRoomRoute: "/pilot-workspace/access",
     buyerPilotRoomApiRoute: "/api/pilot-workspaces/{workspaceSlug}/buyer-room",
     buyerPilotRoomPacketApiRoute: "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet",
+    salesDealRoomRoute: salesDealRoomSummary.route,
+    salesDealRoomApiRoute: salesDealRoomSummary.apiRoute,
+    salesDealRoomProtectedPacketRoute: salesDealRoomSummary.protectedPacketRoute,
     competitiveEdgeRoute: "/competitive-edge",
     productOffers,
     enterpriseServiceOffers,
@@ -649,6 +658,7 @@ export function getProductConsoleSummary() {
     interoperabilityConformanceSummary,
     protectedPilotWorkspaceSummary,
     salesOperationsSummary,
+    salesDealRoomSummary,
     persistentAgentWorkspaceSummary,
     strategicPlatformIntelligenceSummary,
     deploymentProfileSummary,
@@ -671,6 +681,8 @@ export function getProductConsoleSummary() {
       pilotDemoReadinessPackets: pilotDemoReadinessPacketProofStackStatus,
       buyerPilotRoom: buyerPilotRoomProofStackStatus,
       buyerPilotRoomPackets: buyerPilotRoomPacketProofStackStatus,
+      salesDealRoom: salesDealRoomProofStackStatus,
+      salesDealRoomPackets: salesDealRoomPacketProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -702,7 +714,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited Buyer Pilot Room packet and non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited Pilot Deal Room packet, Buyer Pilot Room packet, and non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
     updated: "2026-06-16"
   };
 }
@@ -725,6 +737,9 @@ export function getProductReadinessBrief() {
     `Pilot Evidence Dashboard: ${summary.pilotEvidenceRoute}`,
     `Demo Center: ${summary.demoRoute}`,
     `Pilot Programs: ${summary.pilotProgramRoute}`,
+    `Pilot Deal Room: ${summary.salesDealRoomRoute}`,
+    `Pilot Deal Room API: ${summary.salesDealRoomApiRoute}`,
+    `Protected Deal Room Packet: ${summary.salesDealRoomProtectedPacketRoute}`,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

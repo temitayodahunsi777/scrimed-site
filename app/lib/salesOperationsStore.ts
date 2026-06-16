@@ -62,7 +62,8 @@ export async function recordSalesArtifactDownload(
   eventType:
     | "crm-export-downloaded"
     | "follow-up-draft-downloaded"
-    | "attribution-analytics-packet-downloaded",
+    | "attribution-analytics-packet-downloaded"
+    | "buyer-deal-room-packet-downloaded",
   metadata: Record<string, unknown>
 ) {
   return client.rpc("record_sales_artifact_download", {

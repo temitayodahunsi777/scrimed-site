@@ -18,6 +18,11 @@ const consoleViews = [
     summary: "Review SCRIMED Atlas Pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
   },
   {
+    name: "Pilot Deal Room",
+    href: "/pilot-deal-room",
+    summary: "Review the organized buyer path from public product proof to sales opportunity, protected Buyer Pilot Room, audited packet, and paid synthetic pilot."
+  },
+  {
     name: "Healthcare Intelligence OS",
     href: "/healthcare-intelligence-os",
     summary: "Review SCRIMED's Agent Runtime, Clinical Knowledge Graph, Validation Trust Lab, model router, sovereign deployment, and production gates."

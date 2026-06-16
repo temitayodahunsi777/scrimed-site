@@ -172,6 +172,37 @@ export default function ProductConsolePage() {
         ))}
       </section>
 
+      <section className="table-section" aria-label="SCRIMED pilot deal room">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot deal room</p>
+          <h2>Sales, proof, pricing, and protected buyer-room evidence now move through one organized path.</h2>
+          <p className="section-copy">{summary.salesDealRoomSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.salesDealRoomRoute}>
+              Open Pilot Deal Room
+            </Link>
+            <Link className="secondary-action" href={summary.salesOperationsRoute}>
+              Open Sales Operations
+            </Link>
+          </div>
+        </div>
+        {summary.salesDealRoomSummary.stages.map((stage) => (
+          <article className="module-row" key={stage.stage}>
+            <div>
+              <span>{stage.stage}</span>
+              <h2>{stage.buyerQuestion}</h2>
+            </div>
+            <p>{stage.scrimedProof}</p>
+            <div>
+              <Link className="module-link" href={stage.primaryRoute}>
+                {stage.primaryRoute}
+              </Link>
+              <p>{stage.gatedBoundary}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED trust and safety operations">
         <div className="section-heading">
           <p className="eyebrow">Trust safety operations</p>

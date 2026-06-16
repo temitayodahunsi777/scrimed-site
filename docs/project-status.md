@@ -2,6 +2,16 @@
 
 Updated: 2026-06-16
 
+## Latest Pilot Deal Room Release
+
+- Added `/pilot-deal-room` and `/api/pilot-deal-room` to organize the buyer path from official website discovery to product proof, pilot intake, Sales Operations, protected Buyer Pilot Room diligence, premium pricing, and paid synthetic pilot.
+- Added protected `/api/sales-operations/opportunities/{intakeId}/deal-room-packet` so tenant-admins can generate an audited Markdown Pilot Deal Room packet for a retained no-PHI opportunity.
+- Added `buyer-deal-room-packet-downloaded` to the private sales audit event model and retained `last_buyer_deal_room_packet_at` on the no-PHI intake opportunity record.
+- Updated `/sales-operations` with a Deal Room Packet action and status tile for each opportunity.
+- Updated `/product`, `/hub`, `/`, `/api/product/console`, `/api/hub/summary`, and public smoke coverage so the deal-room layer is visible across the product surface.
+- Resolved the current opportunity-to-workspace gap with an explicit default synthetic workspace fallback (`atlas-synthetic-evaluation`) while preserving the production gate for per-opportunity workspace provisioning.
+- Preserved the boundary: the Pilot Deal Room is a non-binding enterprise diligence and sales artifact. It does not accept PHI, authorize live clinical execution, certify compliance, guarantee reimbursement, submit payer transactions, or provide medical, legal, or regulatory advice.
+
 ## Latest Trust Safety Operations Release
 
 - Added passkey-aware Supabase Auth clients for `/pilot-workspace/access` and `/sales-operations`, with enrolled-passkey sign-in, signed-in passkey registration, and continued TOTP/AAL2 gates for governed tenant actions.
