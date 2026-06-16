@@ -293,7 +293,8 @@ export function getDeploymentProfileSummary() {
     knownLimitationResolution: [
       "npm unavailable in the local shell is handled through direct Node entrypoints for lint, typecheck, integrity, and build.",
       "Local Turbopack is blocked by macOS SWC code-signature validation, so production verification uses Next's Webpack fallback while Vercel builds continue to report READY.",
-      "GitHub authenticated smoke remains gated by the out-of-band SCRIMED_BEARER_TOKEN secret and cannot be safely resolved in source code."
+      "No-secret public production readiness is handled by scripts/public-production-smoke.mjs.",
+      "Authenticated mutation smoke remains gated by the out-of-band SCRIMED_BEARER_TOKEN secret and cannot be safely resolved in source code."
     ],
     nextBuildStep:
       "Create synthetic device, imaging, and deployment-profile scenarios, then connect selected profile IDs to buyer intake and protected workspace activation metadata.",

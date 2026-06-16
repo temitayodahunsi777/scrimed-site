@@ -46,4 +46,6 @@ Governance packs remain synthetic pilot and enterprise evaluation operating temp
 
 ## Remaining External Gate
 
-Authenticated CI still requires the `SCRIMED_BEARER_TOKEN` GitHub Actions secret. The token must belong to an approved tenant-admin or pilot-lead identity with AAL2 assurance. This secret cannot be safely stored in source code.
+Authenticated mutation CI still requires the `SCRIMED_BEARER_TOKEN` GitHub Actions secret. The token must belong to an approved tenant-admin or pilot-lead identity with AAL2 assurance. This secret cannot be safely stored in source code.
+
+No-secret deployment readiness is covered by `scripts/public-production-smoke.mjs`, which verifies public route health, product-console passkey posture, protected-pilot readiness, and unauthenticated fail-closed behavior without touching protected mutations.

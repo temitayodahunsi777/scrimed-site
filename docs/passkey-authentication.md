@@ -11,10 +11,12 @@ Passkey authentication is product-enabled for the governed SCRIMED pilot surface
 
 Both clients explicitly opt into Supabase Auth passkeys and preserve the existing tenant membership, TOTP/AAL2, session-lifetime, and row-level-security controls.
 
+Authenticated users can now list, rename, register, and revoke their own passkeys from the protected pilot workspace and Sales Operations consoles.
+
 ## Supported Flow
 
 1. Approved user signs in with magic link or existing passkey.
-2. Signed-in user can register a passkey from the protected pilot or sales operations console.
+2. Signed-in user can register, rename, refresh, and revoke passkeys from the passkey management panel.
 3. Future sign-in can use the passkey button without entering an email.
 4. Governed workspace actions still require the applicable tenant role and AAL2/TOTP assurance.
 
@@ -30,4 +32,4 @@ Both clients explicitly opt into Supabase Auth passkeys and preserve the existin
 
 - Add `SCRIMED_BEARER_TOKEN` as a GitHub Actions secret for authenticated Agent Workspace and TrustOps mutation smoke.
 - Keep password sign-in disabled for SCRIMED product flows. If password sign-in remains enabled elsewhere at the Supabase project level, enable leaked-password protection in Supabase Auth password security.
-- Add passkey management UX next: list, rename, and revoke registered passkeys from a tenant-admin security panel.
+- Use `scripts/public-production-smoke.mjs` for no-secret deployment readiness checks; authenticated mutation smoke still needs the AAL2 bearer token because WebAuthn ceremonies cannot run unattended in CI.

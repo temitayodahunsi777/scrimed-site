@@ -4,6 +4,7 @@ import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
+import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import type { AttributionAnalyticsReport } from "../lib/attributionAnalytics";
 import {
   salesOperationsBoundary,
@@ -870,6 +871,10 @@ export default function SalesOperationsConsole({
         </section>
       ) : null}
 
+      {supabase ? (
+        <PasskeyManagementPanel supabase={supabase} surface="Sales Operations" />
+      ) : null}
+
       <section className="section-band sales-workspace" aria-label="Tenant-admin sales opportunity workspace">
         <div className="sales-toolbar">
           <div>
@@ -878,14 +883,6 @@ export default function SalesOperationsConsole({
             <p className="section-copy">{dashboard?.boundary ?? salesOperationsBoundary}</p>
           </div>
           <div className="form-actions">
-            <button
-              className="secondary-action"
-              disabled={passkeyStatus === "registering"}
-              onClick={registerPasskey}
-              type="button"
-            >
-              {passkeyStatus === "registering" ? "Registering Passkey" : "Register Passkey"}
-            </button>
             <Link className="secondary-action" href="/pilot">Create Buyer Intake</Link>
             <button className="secondary-action" onClick={() => refreshDashboard()} type="button">
               Refresh

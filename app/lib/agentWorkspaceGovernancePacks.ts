@@ -504,6 +504,7 @@ export function getAgentWorkspaceGovernancePacksSummary() {
       bearerTokenSecret: "SCRIMED_BEARER_TOKEN",
       optionalBaseUrlVariable: "SCRIMED_BASE_URL",
       optionalWorkspaceSlugVariable: "SCRIMED_WORKSPACE_SLUG",
+      publicReadinessSmoke: "scripts/public-production-smoke.mjs",
       requiredSmokeFlag: "SCRIMED_REQUIRE_AUTHENTICATED_SMOKE=1"
     },
     nextImplementationStep:

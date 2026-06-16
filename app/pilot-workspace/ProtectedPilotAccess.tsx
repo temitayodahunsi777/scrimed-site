@@ -9,6 +9,7 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
+import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
@@ -706,14 +707,6 @@ export default function ProtectedPilotAccess({
             fresh AAL2 assurance, and PostgreSQL row-level security.
           </p>
           <div className="form-actions">
-            <button
-              className="secondary-action"
-              disabled={passkeyStatus === "registering"}
-              onClick={registerPasskey}
-              type="button"
-            >
-              {passkeyStatus === "registering" ? "Registering Passkey" : "Register Passkey"}
-            </button>
             <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
             </button>
@@ -745,6 +738,10 @@ export default function ProtectedPilotAccess({
           )}
         </div>
       </section>
+
+      {supabase ? (
+        <PasskeyManagementPanel supabase={supabase} surface="protected pilot workspace" />
+      ) : null}
 
       {selectedWorkspace ? (
         <>
