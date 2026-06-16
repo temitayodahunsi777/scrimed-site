@@ -2,6 +2,7 @@
 
 import type { Session } from "@supabase/supabase-js";
 import { useMemo, useState } from "react";
+import type { TenantSessionVerificationReadiness } from "../lib/pilotDemoReadiness";
 import type { PilotWorkspaceRecord } from "../lib/protectedPilotWorkspace";
 
 type VerificationStatus = "idle" | "running" | "complete" | "error";
@@ -116,10 +117,12 @@ async function readErrorMessage(response: Response) {
 }
 
 export default function PilotWorkspaceVerificationPanel({
+  onVerificationChanged,
   session,
   workspace,
   onAuditChanged
 }: {
+  onVerificationChanged?: (verification: TenantSessionVerificationReadiness) => void;
   session: Session;
   workspace: PilotWorkspaceRecord;
   onAuditChanged: () => Promise<void>;
@@ -141,6 +144,14 @@ export default function PilotWorkspaceVerificationPanel({
     setChecks(nextChecks);
     setStatus("running");
     setMessage("Running tenant-session verification with the current AAL2 browser session.");
+    onVerificationChanged?.({
+      failed: 0,
+      passed: 0,
+      status: "running",
+      total: nextChecks.length,
+      updatedAt: new Date().toISOString(),
+      warnings: 0
+    });
 
     const completedChecks: VerificationCheck[] = [];
 
@@ -199,7 +210,16 @@ export default function PilotWorkspaceVerificationPanel({
     await onAuditChanged();
     const failed = completedChecks.filter((check) => check.status === "fail").length;
     const warnings = completedChecks.filter((check) => check.status === "warn").length;
+    const passed = completedChecks.filter((check) => check.status === "pass").length;
     setStatus(failed > 0 ? "error" : "complete");
+    onVerificationChanged?.({
+      failed,
+      passed,
+      status: failed > 0 ? "error" : "complete",
+      total: completedChecks.length,
+      updatedAt: new Date().toISOString(),
+      warnings
+    });
     setMessage(
       failed > 0
         ? "Verification completed with failures. Review failed routes before buyer demo use."
@@ -210,7 +230,7 @@ export default function PilotWorkspaceVerificationPanel({
   }
 
   return (
-    <section className="table-section" aria-label="Tenant-session verification">
+    <section className="table-section" id="tenant-session-verification" aria-label="Tenant-session verification">
       <div className="section-heading">
         <p className="eyebrow">Tenant-session verification</p>
         <h2>Run protected workspace checks without storing CI bearer tokens.</h2>

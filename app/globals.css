@@ -683,6 +683,38 @@ h3 {
   margin: 0;
 }
 
+.demo-readiness-command .section-heading {
+  max-width: 920px;
+}
+
+.demo-readiness-summary {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 28px 0 12px;
+}
+
+.demo-readiness-summary article {
+  min-height: 150px;
+}
+
+.demo-readiness-summary strong,
+.demo-readiness-brief strong {
+  overflow-wrap: anywhere;
+}
+
+.demo-readiness-brief {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.demo-readiness-brief article {
+  min-height: 190px;
+}
+
+.demo-runbook {
+  border-top: 1px solid var(--line);
+  margin-top: 34px;
+  padding-top: 34px;
+}
+
 .decision-ledger-summary article {
   border: 1px solid var(--line);
   min-height: 130px;
@@ -1558,6 +1590,11 @@ h3 {
   .command-surface {
     min-height: 420px;
   }
+
+  .demo-readiness-summary,
+  .demo-readiness-brief {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -1591,5 +1628,10 @@ h3 {
 
   .back-link {
     margin-bottom: 44px;
+  }
+
+  .demo-readiness-summary,
+  .demo-readiness-brief {
+    grid-template-columns: 1fr;
   }
 }

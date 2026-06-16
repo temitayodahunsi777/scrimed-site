@@ -52,6 +52,18 @@ Protected routes fail closed with `503` until identity and durable storage are c
 
 `GET /api/pilot-workspaces/readiness` verifies the deployed runtime against the migrated Supabase schema and Upstash Redis. Environment-variable presence alone does not mark production activation as verified.
 
+## Pilot Demo Readiness Command Center
+
+`/pilot-workspace/access` now includes a protected Pilot Demo Readiness Command Center. It turns the current workspace, durable synthetic sessions, append-only audit events, proof-packet release events, and tenant-session verification results into:
+
+- A ready/review/blocked status.
+- A numeric readiness score.
+- Required operator actions before a buyer call.
+- Buyer brief lines for enterprise demo preparation.
+- A repeatable four-step demo runbook.
+
+This closes the human-run buyer-demo readiness gap without exporting bearer tokens to CI. The command center does not create a clinical validation claim, legal conclusion, compliance certification, production authorization, or live-care capability.
+
 ## Active Public Controls
 
 - `POST /api/pilot/intake` is rate limited to five requests per ten-minute request fingerprint.

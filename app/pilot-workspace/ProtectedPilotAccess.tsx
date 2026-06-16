@@ -9,8 +9,10 @@ import type {
   PilotSessionRecord,
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
+import type { TenantSessionVerificationReadiness } from "../lib/pilotDemoReadiness";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
+import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
@@ -92,6 +94,8 @@ export default function ProtectedPilotAccess({
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
   const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
+  const [verificationReadiness, setVerificationReadiness] =
+    useState<TenantSessionVerificationReadiness | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState("");
   const [mfaFactorStatus, setMfaFactorStatus] = useState<"verified" | "unverified" | "">("");
   const [mfaQrCode, setMfaQrCode] = useState("");
@@ -131,6 +135,7 @@ export default function ProtectedPilotAccess({
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
+        setVerificationReadiness(null);
         setEnterprisePacketStatus("idle");
         setStatus("signed-out");
         return;
@@ -166,6 +171,7 @@ export default function ProtectedPilotAccess({
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
+        setVerificationReadiness(null);
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -203,6 +209,7 @@ export default function ProtectedPilotAccess({
       const nextWorkspaces = body.workspaces ?? [];
       setWorkspaces(nextWorkspaces);
       setSelectedWorkspace(nextWorkspaces[0] ?? null);
+      setVerificationReadiness(null);
       setStatus("ready");
 
       if (nextWorkspaces[0]) {
@@ -420,6 +427,7 @@ export default function ProtectedPilotAccess({
     }
 
     setSelectedWorkspace(workspace);
+    setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
     const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/sessions`, {
@@ -787,6 +795,17 @@ export default function ProtectedPilotAccess({
 
       {selectedWorkspace ? (
         <>
+          <PilotDemoReadinessCommandCenter
+            auditEvents={auditEvents}
+            enterprisePacketBusy={enterprisePacketStatus === "downloading"}
+            onCreateSession={createSyntheticSession}
+            onDownloadEnterprisePacket={downloadEnterpriseProofPacket}
+            sessions={sessions}
+            status={status === "creating-session" ? "creating-session" : "idle"}
+            verification={verificationReadiness}
+            workspace={selectedWorkspace}
+          />
+
           <TrustOSDecisionLedgerPanel
             onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
             session={session}
@@ -810,6 +829,7 @@ export default function ProtectedPilotAccess({
           <PilotWorkspaceVerificationPanel
             key={selectedWorkspace.id}
             onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            onVerificationChanged={setVerificationReadiness}
             session={session}
             workspace={selectedWorkspace}
           />

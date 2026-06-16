@@ -88,6 +88,10 @@ async function checkProductConsole() {
     throw new Error("product console missing tenant-session verification proof-stack posture.");
   }
 
+  if (body.proofStack?.pilotDemoReadinessCommandCenter !== "protected-workspace-demo-readiness-command-center") {
+    throw new Error("product console missing pilot demo readiness command-center proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }

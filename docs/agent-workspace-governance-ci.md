@@ -59,6 +59,8 @@ No-secret public readiness is covered by `scripts/public-production-smoke.mjs`. 
 
 Human-run tenant verification is covered inside `/pilot-workspace/access`. An approved tenant member with a current AAL2 browser session can run protected workspace route checks, verify work-order, governance-ledger, TrustOps, audit, tenant-access, and enterprise proof-packet responses, and commit the aggregate proof-packet audit event without exporting the bearer token to source control or GitHub Actions.
 
+Human-run buyer-demo readiness is also covered inside `/pilot-workspace/access`. The Pilot Demo Readiness Command Center rolls durable synthetic sessions, audit events, proof-packet release evidence, and tenant-session verification into an operator readiness score, blockers, buyer brief, and repeatable runbook.
+
 ## Code-Side Resolution
 
-The source-side gap is closed by public production smoke, fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, the protected activation-governance route, the aggregate enterprise proof-packet route, and browser-session tenant verification in `/pilot-workspace/access`. The unresolved piece is only the out-of-band secret placement in GitHub Actions for unattended authenticated mutation and packet happy paths.
+The source-side gap is closed by public production smoke, fail-closed unauthenticated checks, optional scheduled authenticated-path skipping when the secret is absent, manual dispatch with `require_authenticated_path=true`, the protected activation-governance route, the aggregate enterprise proof-packet route, browser-session tenant verification, and protected demo readiness in `/pilot-workspace/access`. The unresolved piece is only the out-of-band secret placement in GitHub Actions for unattended authenticated mutation and packet happy paths.

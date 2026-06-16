@@ -25,6 +25,7 @@ import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
+import { pilotDemoReadinessProofStackStatus } from "./pilotDemoReadiness";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -636,6 +637,7 @@ export function getProductConsoleSummary() {
       passkeyManagement: "self-service-list-rename-register-revoke",
       enterpriseProofPackets: "tenant-admin-aggregate-write-before-release",
       tenantSessionVerification: "browser-aal2-no-secret-protected-route-checks",
+      pilotDemoReadinessCommandCenter: pilotDemoReadinessProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
