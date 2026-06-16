@@ -21,6 +21,10 @@ import {
   isTenantLifecycleEligible,
   type SalesBuyerTenantLifecycleResult
 } from "../lib/buyerTenantLifecycle";
+import {
+  isProductionReadinessEligible,
+  type SalesProductionActivationReadinessResult
+} from "../lib/productionActivationReadiness";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -36,6 +40,7 @@ type ConsoleStatus =
   | "scheduling"
   | "provisioning"
   | "activating-lifecycle"
+  | "preparing-production-readiness"
   | "completing"
   | "error";
 
@@ -61,6 +66,10 @@ type WorkspaceProvisioningResponse = SalesOpportunityWorkspaceProvisioningResult
 };
 
 type BuyerTenantLifecycleResponse = SalesBuyerTenantLifecycleResult & {
+  error?: { message?: string };
+};
+
+type ProductionActivationReadinessResponse = SalesProductionActivationReadinessResult & {
   error?: { message?: string };
 };
 
@@ -671,6 +680,49 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function prepareProductionActivationReadiness() {
+    if (!session || !selected) {
+      return;
+    }
+
+    setStatus("preparing-production-readiness");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/production-readiness`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProductionActivationReadinessResponse;
+
+    if (!response.ok) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "Production SSO and invitation readiness could not be prepared.");
+      return;
+    }
+
+    await refreshDashboard(
+      body.created
+        ? "Production SSO and invitation readiness prepared and audit event committed."
+        : "Production SSO and invitation readiness already exists; dashboard refreshed."
+    );
+  }
+
+  async function downloadProductionReadinessPacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/production-readiness/packet`,
+      `scrimed-${selected.intakeId}-production-readiness.md`,
+      "Production readiness packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -919,8 +971,10 @@ export default function SalesOperationsConsole({
   const selectedAttribution = selected?.payload.attribution ?? null;
   const selectedWorkspaceProvisioning = selected?.workspaceProvisioning ?? null;
   const selectedBuyerTenantLifecycle = selected?.buyerTenantLifecycle ?? null;
+  const selectedProductionReadiness = selected?.productionActivationReadiness ?? null;
   const workspaceEligible = selected ? isProvisioningEligible(selected) : false;
   const tenantLifecycleEligible = selected ? isTenantLifecycleEligible(selected) : false;
+  const productionReadinessEligible = selected ? isProductionReadinessEligible(selected) : false;
 
   return (
     <>
@@ -1232,6 +1286,36 @@ export default function SalesOperationsConsole({
                   </strong>
                 </article>
                 <article>
+                  <span>Production readiness</span>
+                  <strong>
+                    {selectedProductionReadiness
+                      ? displayValue(selectedProductionReadiness.readinessStatus)
+                      : productionReadinessEligible
+                        ? "Ready to prepare"
+                        : "Lifecycle first"}
+                  </strong>
+                </article>
+                <article>
+                  <span>Transactional send</span>
+                  <strong>
+                    {selectedProductionReadiness
+                      ? selectedProductionReadiness.transactionalDeliveryPolicy.directSendEnabled
+                        ? "Enabled"
+                        : "Disabled until approved"
+                      : "Not prepared"}
+                  </strong>
+                </article>
+                <article>
+                  <span>Readiness packet</span>
+                  <strong>
+                    {selectedProductionReadiness?.lastPacketGeneratedAt
+                      ? `Last released ${formatDate(selectedProductionReadiness.lastPacketGeneratedAt)}`
+                      : selectedProductionReadiness
+                        ? "Ready for audit"
+                        : "Prepare first"}
+                  </strong>
+                </article>
+                <article>
                   <span>Source attribution</span>
                   <strong>
                     {selectedAttribution
@@ -1397,6 +1481,74 @@ export default function SalesOperationsConsole({
                       type="button"
                     >
                       Download Lifecycle Packet
+                    </button>
+                  </div>
+                </section>
+
+                <section>
+                  <p className="eyebrow">Production SSO and invitation readiness</p>
+                  <h3>Prepare domain, origin, messaging, delivery, review, and archive controls.</h3>
+                  <p className="section-copy">
+                    {selectedProductionReadiness
+                      ? `Readiness controls are prepared for ${selectedProductionReadiness.workspaceSlug}; automated invitation send remains ${
+                          selectedProductionReadiness.transactionalDeliveryPolicy.directSendEnabled
+                            ? "enabled"
+                            : "disabled"
+                        } until explicit provider, legal, security, and tenant-admin approval.`
+                      : productionReadinessEligible
+                        ? "Prepare the production-readiness packet after lifecycle activation to package buyer-domain verification, redirect origins, approved invitation copy, delivery guardrails, access-review attestation, and archive execution."
+                        : "Activate the buyer tenant lifecycle before preparing production SSO and invitation readiness."}
+                  </p>
+                  {selectedProductionReadiness ? (
+                    <div className="layer-list">
+                      <div className="layer-row">
+                        <span>01</span>
+                        <strong>
+                          Domain verification: {selectedProductionReadiness.domainVerificationPolicy.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>02</span>
+                        <strong>
+                          Redirect origins: {selectedProductionReadiness.ssoRedirectPolicy.allowedRedirectOrigins.join(", ")}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>03</span>
+                        <strong>
+                          Template approval: {selectedProductionReadiness.invitationTemplatePolicy.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>04</span>
+                        <strong>
+                          Access attestation due: {formatDate(selectedProductionReadiness.accessReviewAutomation.nextAttestationDueAt)}
+                        </strong>
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={
+                        status === "preparing-production-readiness" ||
+                        Boolean(selectedProductionReadiness) ||
+                        !productionReadinessEligible
+                      }
+                      onClick={prepareProductionActivationReadiness}
+                      type="button"
+                    >
+                      {status === "preparing-production-readiness"
+                        ? "Preparing Readiness"
+                        : "Prepare Production Readiness"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!selectedProductionReadiness}
+                      onClick={downloadProductionReadinessPacket}
+                      type="button"
+                    >
+                      Download Readiness Packet
                     </button>
                   </div>
                 </section>

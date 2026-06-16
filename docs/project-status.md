@@ -2,6 +2,17 @@
 
 Updated: 2026-06-16
 
+## Latest Production SSO And Invitation Readiness Release
+
+- Added guarded production SSO and invitation delivery readiness preparation for lifecycle-activated Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/production-readiness`.
+- Added audited readiness packets through `/api/sales-operations/opportunities/{intakeId}/production-readiness/packet` so tenant-admins can retain buyer-domain verification policy, SSO redirect/origin registry, invitation template approval requirements, transactional delivery controls, access-review attestation automation, archive runbook, launch blockers, and competitive advantage signals.
+- Added a private `sales_production_activation_readiness` table with deny-all RLS and tenant-admin AAL2 plus server-held authorization for readiness preparation and packet release.
+- Updated `/sales-operations` with production readiness status, transactional-send posture, readiness packet history, preparation action, and packet download action.
+- Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with production readiness proof-stack posture.
+- Strengthened the competitive edge: SCRIMED now shows enterprise buyers that customer SSO, automated invitations, access attestations, and archive execution are handled through auditable readiness gates instead of ad hoc setup.
+- Preserved the boundary: readiness preparation does not enable automated email sending, approve customer SSO, create a BAA/DPA, authorize PHI, execute live clinical workflows, submit payer transactions, contact patients, certify compliance, or provide legal/security/regulatory determinations.
+- Remaining gate: verified buyer domain, approved IdP metadata, approved transactional provider and sender domain, approved templates, legal/privacy/security sign-off, retention deletion controls, and production connector authorization still require written enterprise approval.
+
 ## Latest Buyer Tenant Lifecycle Release
 
 - Added guarded tenant-per-buyer lifecycle activation for provisioned Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/tenant-lifecycle`.

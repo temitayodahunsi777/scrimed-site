@@ -19,6 +19,13 @@ import {
   buyerTenantLifecyclePacketProofStackStatus,
   buyerTenantLifecycleProofStackStatus
 } from "./buyerTenantLifecycle";
+import type { SalesProductionActivationReadiness } from "./productionActivationReadiness";
+import {
+  productionActivationReadinessApiRoute,
+  productionActivationReadinessPacketApiRoute,
+  productionActivationReadinessPacketProofStackStatus,
+  productionActivationReadinessProofStackStatus
+} from "./productionActivationReadiness";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -60,6 +67,7 @@ export type SalesOpportunity = {
   lastBuyerDealRoomPacketAt?: string | null;
   workspaceProvisioning?: SalesOpportunityWorkspaceProvisioning | null;
   buyerTenantLifecycle?: SalesBuyerTenantLifecycle | null;
+  productionActivationReadiness?: SalesProductionActivationReadiness | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -85,7 +93,9 @@ export type SalesAuditEvent = {
     | "opportunity-workspace-provisioned"
     | "opportunity-workspace-packet-downloaded"
     | "buyer-tenant-lifecycle-activated"
-    | "buyer-tenant-lifecycle-packet-downloaded";
+    | "buyer-tenant-lifecycle-packet-downloaded"
+    | "production-readiness-prepared"
+    | "production-readiness-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -339,6 +349,19 @@ export function getSalesOperationsSummary() {
       ssoPolicy: "buyer-domain-policy-ready",
       invitationMode: "manual-packet-gated",
       accessReviewCadenceDays: 30,
+      noPhiBoundary: true
+    },
+    productionActivationReadiness: {
+      status: productionActivationReadinessProofStackStatus,
+      apiRoute: productionActivationReadinessApiRoute,
+      packetApiRoute: productionActivationReadinessPacketApiRoute,
+      packetProofStackStatus: productionActivationReadinessPacketProofStackStatus,
+      ssoDomainVerification: "buyer-domain-review-required",
+      redirectOriginRegistry: "origin-registry-ready",
+      invitationTemplateApproval: "legal-security-review-required",
+      transactionalDelivery: "provider-approval-required-direct-send-disabled",
+      accessReviewAutomation: "attestation-reminder-ready",
+      archiveExecution: "manual-archive-ready",
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,
