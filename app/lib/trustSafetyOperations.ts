@@ -83,8 +83,156 @@ export type TrustSafetyIncidentSla = {
   requiredReviewers: string[];
 };
 
+export type TrustSafetyNotificationDecision =
+  | "pending"
+  | "not-required"
+  | "internal-only"
+  | "customer-review"
+  | "regulatory-review"
+  | "counsel-escalation";
+export type TrustSafetyPostIncidentReviewStatus =
+  | "not-started"
+  | "in-review"
+  | "actions-assigned"
+  | "complete";
+export type TrustSafetyIncidentEventType =
+  | "incident-created"
+  | "status-updated"
+  | "containment-recorded"
+  | "remediation-updated"
+  | "legal-hold-recorded"
+  | "legal-hold-released"
+  | "notification-decision-recorded"
+  | "post-incident-review-recorded"
+  | "review-packet-downloaded"
+  | "incident-closed";
+
+export type DurableTrustSafetyIncidentRecord = {
+  id: string;
+  tenantId: string;
+  workspaceId: string;
+  incidentKey: string;
+  title: string;
+  severity: TrustSafetyIncidentSeverity;
+  status: TrustSafetyIncidentStatus;
+  owner: string;
+  accountableAgent: string;
+  sourceChannel: string;
+  affectedSurface: string[];
+  triggerSignal: string;
+  buyerImpact: string;
+  containmentAction: string;
+  remediationPlan: string;
+  legalHoldStatus: TrustSafetyLegalHoldStatus;
+  notificationDecision: TrustSafetyNotificationDecision;
+  notificationReason: string;
+  postIncidentReviewStatus: TrustSafetyPostIncidentReviewStatus;
+  retentionUntil: string | null;
+  legalHoldUntil: string | null;
+  eventMetadata: Record<string, unknown>;
+  boundary: string;
+  createdBy: string;
+  updatedBy: string;
+  createdAt: string;
+  updatedAt: string;
+  closedAt: string | null;
+};
+
+export type DurableTrustSafetyIncidentEventRecord = {
+  id: string;
+  tenantId: string;
+  workspaceId: string;
+  incidentId: string;
+  actorUserId: string;
+  eventType: TrustSafetyIncidentEventType;
+  priorStatus: TrustSafetyIncidentStatus | null;
+  nextStatus: TrustSafetyIncidentStatus;
+  priorLegalHoldStatus: TrustSafetyLegalHoldStatus | null;
+  nextLegalHoldStatus: TrustSafetyLegalHoldStatus;
+  priorNotificationDecision: TrustSafetyNotificationDecision | null;
+  nextNotificationDecision: TrustSafetyNotificationDecision;
+  eventSummary: string;
+  eventMetadata: Record<string, unknown>;
+  boundary: string;
+  createdAt: string;
+};
+
+export type TrustSafetyIncidentCreateInput = {
+  incidentKey: string;
+  title: string;
+  severity: TrustSafetyIncidentSeverity;
+  owner: string;
+  accountableAgent: string;
+  sourceChannel: string;
+  affectedSurface: string[];
+  triggerSignal: string;
+  buyerImpact: string;
+  containmentAction: string;
+  remediationPlan: string;
+  legalHoldStatus: TrustSafetyLegalHoldStatus;
+  notificationDecision: TrustSafetyNotificationDecision;
+  notificationReason: string;
+  retentionUntil: string | null;
+  legalHoldUntil: string | null;
+  eventMetadata: Record<string, unknown>;
+};
+
+export type TrustSafetyIncidentUpdateInput = {
+  status: TrustSafetyIncidentStatus | null;
+  severity: TrustSafetyIncidentSeverity | null;
+  legalHoldStatus: TrustSafetyLegalHoldStatus | null;
+  notificationDecision: TrustSafetyNotificationDecision | null;
+  notificationReason: string | null;
+  containmentAction: string | null;
+  remediationPlan: string | null;
+  postIncidentReviewStatus: TrustSafetyPostIncidentReviewStatus | null;
+  retentionUntil: string | null;
+  legalHoldUntil: string | null;
+  eventType: TrustSafetyIncidentEventType;
+  eventSummary: string;
+  eventMetadata: Record<string, unknown>;
+};
+
+export type DurableTrustSafetyIncidentDashboard = {
+  totalIncidents: number;
+  openIncidents: number;
+  highOrCriticalOpen: number;
+  legalHoldActive: number;
+  notificationReviews: number;
+  postIncidentReviewsOpen: number;
+  packetDownloads: number;
+  latestUpdatedAt: string | null;
+  bySeverity: Record<TrustSafetyIncidentSeverity, number>;
+  byStatus: Record<TrustSafetyIncidentStatus, number>;
+  byLegalHoldStatus: Record<TrustSafetyLegalHoldStatus, number>;
+  byNotificationDecision: Record<TrustSafetyNotificationDecision, number>;
+  boundaryControls: string[];
+};
+
+export type TenantTrustSafetyIncidentPacketInput = {
+  workspace: {
+    slug: string;
+    name: string;
+    tenantName: string;
+    boundary: string;
+  };
+  incident: DurableTrustSafetyIncidentRecord;
+  events: DurableTrustSafetyIncidentEventRecord[];
+  auditEventId: string;
+  generatedAt: string;
+  actorUserId: string;
+  appBaseUrl: string;
+};
+
+type ValidationResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; errors: string[] };
+
 export const trustSafetyOperationsBoundary =
   "SCRIMED Trust and Safety Operations is an operating model and product control layer for synthetic evaluations, protected pilots, and enterprise readiness. It does not create legal advice, compliance certification, 24/7 managed SOC/MDR coverage, production clinical monitoring, or authorization for live clinical execution.";
+
+export const tenantTrustSafetyIncidentBoundary =
+  "Tenant TrustOps Incident Workspace stores synthetic-pilot and enterprise-readiness incident evidence only. It does not store PHI, patient identifiers, live clinical records, secrets, payer member identifiers, production breach determinations, legal advice, compliance certification, or managed 24/7 SOC/MDR coverage.";
 
 export const trustSafetyAgents: TrustSafetyAgent[] = [
   {
@@ -325,6 +473,87 @@ export const trustSafetyIncidentSlas: TrustSafetyIncidentSla[] = [
   }
 ];
 
+export const trustSafetyIncidentSeverities: TrustSafetyIncidentSeverity[] = [
+  "low",
+  "moderate",
+  "high",
+  "critical"
+];
+
+export const trustSafetyIncidentStatuses: TrustSafetyIncidentStatus[] = [
+  "new",
+  "triaged",
+  "contained",
+  "remediating",
+  "monitoring",
+  "closed",
+  "production-gated"
+];
+
+export const trustSafetyLegalHoldStatuses: TrustSafetyLegalHoldStatus[] = [
+  "not-required",
+  "watch",
+  "recommended",
+  "active"
+];
+
+export const trustSafetyNotificationDecisions: TrustSafetyNotificationDecision[] = [
+  "pending",
+  "not-required",
+  "internal-only",
+  "customer-review",
+  "regulatory-review",
+  "counsel-escalation"
+];
+
+export const trustSafetyPostIncidentReviewStatuses: TrustSafetyPostIncidentReviewStatus[] = [
+  "not-started",
+  "in-review",
+  "actions-assigned",
+  "complete"
+];
+
+export const trustSafetyIncidentEventTypes: TrustSafetyIncidentEventType[] = [
+  "incident-created",
+  "status-updated",
+  "containment-recorded",
+  "remediation-updated",
+  "legal-hold-recorded",
+  "legal-hold-released",
+  "notification-decision-recorded",
+  "post-incident-review-recorded",
+  "review-packet-downloaded",
+  "incident-closed"
+];
+
+export const targetAudienceTrustOpsSignals = [
+  {
+    audience: "CIOs and digital transformation leaders",
+    appeal:
+      "Shows SCRIMED can operate as a tenant-isolated healthcare intelligence layer with durable evidence, route-level controls, and rollout discipline."
+  },
+  {
+    audience: "CISOs, security reviewers, and privacy officers",
+    appeal:
+      "Surfaces authentication, AAL2 mutation gates, no-PHI boundaries, legal-hold posture, notification decisions, and audit packet evidence."
+  },
+  {
+    audience: "Compliance, legal, and governance teams",
+    appeal:
+      "Keeps claims, incident ownership, reviewer status, limitation registers, and escalation boundaries visible before production commitments."
+  },
+  {
+    audience: "Clinical operations, RCM, research, and payer teams",
+    appeal:
+      "Connects incident controls to workflow reliability, human review, revenue-risk review, trial operations, documentation review, and interoperability readiness."
+  },
+  {
+    audience: "Enterprise buyers, investors, and strategic partners",
+    appeal:
+      "Turns trust into inspectable operating evidence rather than unsupported marketing language."
+  }
+];
+
 export const trustSafetyIncidents: TrustSafetyIncident[] = [
   {
     id: "trustops-phi-style-intake-block",
@@ -522,6 +751,11 @@ export const resolvedTrustSafetyLimitations = [
       "Added a synthetic trust-ops incident queue, severity/status/owner model, escalation SLA, and downloadable incident report route for each tracked incident."
   },
   {
+    limitation: "Trust-ops incidents were inspectable product-control records without a tenant-scoped durable incident workspace contract.",
+    resolution:
+      "Added a private-schema Supabase migration, guarded RPC contract, authenticated incident dashboard, mutation path, event trail, legal-hold fields, notification decisions, and review-packet release pattern."
+  },
+  {
     limitation: "Attribution analytics packet release used a generic CRM export audit event.",
     resolution:
       "Added a dedicated attribution analytics packet event path with compatibility fallback until the Supabase migration is confirmed in production."
@@ -530,9 +764,528 @@ export const resolvedTrustSafetyLimitations = [
 
 export const remainingTrustSafetyLimitations = [
   "Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.",
-  "Trust-ops incidents are inspectable product-control records today; regulated production incidents require customer-approved durable storage, legal hold, breach analysis, notification decisions, and forensic process.",
+  "Tenant TrustOps storage is designed for synthetic pilots and enterprise readiness; regulated production incidents still require customer-approved live-data boundaries, breach analysis, notification decisions, and forensic process.",
+  "The TrustOps Supabase migration must be applied and authenticated-smoke-tested in each environment before tenant mutation routes are used with buyers.",
   "Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers."
 ];
+
+const incidentKeyPattern = /^trustops-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const prohibitedIncidentContentPatterns = [
+  /\bmrn\b/i,
+  /\bmedical record number\b/i,
+  /\bmember id\b/i,
+  /\bpolicy number\b/i,
+  /\bssn\b/i,
+  /\bsocial security\b/i,
+  /\bdate of birth\b/i,
+  /\bdob\b/i,
+  /\bpatient identifier\b/i,
+  /\bdiagnosis code for patient\b/i,
+  /\blive chart\b/i,
+  /\bclinical record\b/i,
+  /\bprogress note\b/i,
+  /\blab result\b/i
+];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function optionalString(value: unknown, fallback = "") {
+  return typeof value === "string" ? value.trim() : fallback;
+}
+
+function optionalIsoTimestamp(value: unknown, fieldName: string, errors: string[]) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    errors.push(`${fieldName} must be an ISO timestamp when provided`);
+    return null;
+  }
+
+  const parsed = Date.parse(value);
+
+  if (!Number.isFinite(parsed)) {
+    errors.push(`${fieldName} must be a valid ISO timestamp`);
+    return null;
+  }
+
+  return new Date(parsed).toISOString();
+}
+
+function metadataObject(value: unknown, fieldName: string, errors: string[]) {
+  if (value === undefined || value === null) {
+    return {};
+  }
+
+  if (!isRecord(value)) {
+    errors.push(`${fieldName} must be a JSON object`);
+    return {};
+  }
+
+  if (JSON.stringify(value).length > 16000) {
+    errors.push(`${fieldName} must stay below 16000 serialized characters`);
+  }
+
+  return value;
+}
+
+function affectedSurfaceArray(value: unknown, errors: string[]) {
+  if (!Array.isArray(value)) {
+    errors.push("affectedSurface must be an array of one to twelve non-empty strings");
+    return [];
+  }
+
+  const surface = value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 12);
+
+  if (surface.length === 0 || surface.length !== value.length) {
+    errors.push("affectedSurface must contain one to twelve non-empty strings");
+  }
+
+  if (surface.some((item) => item.length > 160)) {
+    errors.push("affectedSurface entries must be 160 characters or fewer");
+  }
+
+  return surface;
+}
+
+function slugifyIncidentKey(title: string) {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+
+  return `trustops-${slug || "tenant-incident"}`;
+}
+
+function hasProhibitedIncidentContent(...values: string[]) {
+  const joined = values.join(" ");
+  return prohibitedIncidentContentPatterns.some((pattern) => pattern.test(joined));
+}
+
+function validateLength(
+  value: string,
+  fieldName: string,
+  min: number,
+  max: number,
+  errors: string[]
+) {
+  if (value.length < min || value.length > max) {
+    errors.push(`${fieldName} must be between ${min} and ${max} characters`);
+  }
+}
+
+export function isTrustSafetyIncidentSeverity(value: unknown): value is TrustSafetyIncidentSeverity {
+  return typeof value === "string" && trustSafetyIncidentSeverities.includes(value as TrustSafetyIncidentSeverity);
+}
+
+export function isTrustSafetyIncidentStatus(value: unknown): value is TrustSafetyIncidentStatus {
+  return typeof value === "string" && trustSafetyIncidentStatuses.includes(value as TrustSafetyIncidentStatus);
+}
+
+export function isTrustSafetyLegalHoldStatus(value: unknown): value is TrustSafetyLegalHoldStatus {
+  return typeof value === "string" && trustSafetyLegalHoldStatuses.includes(value as TrustSafetyLegalHoldStatus);
+}
+
+export function isTrustSafetyNotificationDecision(value: unknown): value is TrustSafetyNotificationDecision {
+  return (
+    typeof value === "string" &&
+    trustSafetyNotificationDecisions.includes(value as TrustSafetyNotificationDecision)
+  );
+}
+
+export function isTrustSafetyPostIncidentReviewStatus(
+  value: unknown
+): value is TrustSafetyPostIncidentReviewStatus {
+  return (
+    typeof value === "string" &&
+    trustSafetyPostIncidentReviewStatuses.includes(value as TrustSafetyPostIncidentReviewStatus)
+  );
+}
+
+export function isTrustSafetyIncidentEventType(value: unknown): value is TrustSafetyIncidentEventType {
+  return typeof value === "string" && trustSafetyIncidentEventTypes.includes(value as TrustSafetyIncidentEventType);
+}
+
+export function validateTrustSafetyIncidentCreatePayload(
+  payload: unknown
+): ValidationResult<TrustSafetyIncidentCreateInput> {
+  const errors: string[] = [];
+
+  if (!isRecord(payload)) {
+    return { ok: false, errors: ["payload must be a JSON object"] };
+  }
+
+  const title = optionalString(payload.title);
+  const incidentKey = optionalString(payload.incidentKey, slugifyIncidentKey(title));
+  const severity = isTrustSafetyIncidentSeverity(payload.severity) ? payload.severity : null;
+  const owner = optionalString(payload.owner);
+  const accountableAgent = optionalString(payload.accountableAgent);
+  const sourceChannel = optionalString(payload.sourceChannel);
+  const affectedSurface = affectedSurfaceArray(payload.affectedSurface, errors);
+  const triggerSignal = optionalString(payload.triggerSignal);
+  const buyerImpact = optionalString(payload.buyerImpact);
+  const containmentAction = optionalString(payload.containmentAction);
+  const remediationPlan = optionalString(payload.remediationPlan);
+  const legalHoldStatus = isTrustSafetyLegalHoldStatus(payload.legalHoldStatus)
+    ? payload.legalHoldStatus
+    : "not-required";
+  const notificationDecision = isTrustSafetyNotificationDecision(payload.notificationDecision)
+    ? payload.notificationDecision
+    : "pending";
+  const notificationReason = optionalString(payload.notificationReason);
+  const retentionUntil = optionalIsoTimestamp(payload.retentionUntil, "retentionUntil", errors);
+  const legalHoldUntil = optionalIsoTimestamp(payload.legalHoldUntil, "legalHoldUntil", errors);
+  const eventMetadata = metadataObject(payload.eventMetadata, "eventMetadata", errors);
+
+  if (!incidentKeyPattern.test(incidentKey) || incidentKey.length > 120) {
+    errors.push("incidentKey must match trustops-slug-format and be 120 characters or fewer");
+  }
+
+  if (!severity) {
+    errors.push("severity must be low, moderate, high, or critical");
+  }
+
+  validateLength(title, "title", 10, 240, errors);
+  validateLength(owner, "owner", 3, 180, errors);
+  validateLength(accountableAgent, "accountableAgent", 3, 180, errors);
+  validateLength(sourceChannel, "sourceChannel", 3, 180, errors);
+  validateLength(triggerSignal, "triggerSignal", 20, 2000, errors);
+  validateLength(buyerImpact, "buyerImpact", 20, 2000, errors);
+  validateLength(containmentAction, "containmentAction", 20, 2000, errors);
+  validateLength(remediationPlan, "remediationPlan", 20, 2000, errors);
+
+  if (notificationReason.length > 1200) {
+    errors.push("notificationReason must be 1200 characters or fewer");
+  }
+
+  if (legalHoldStatus === "active" && legalHoldUntil && Date.parse(legalHoldUntil) <= Date.now()) {
+    errors.push("legalHoldUntil must be in the future for an active legal hold");
+  }
+
+  if (retentionUntil && Date.parse(retentionUntil) <= Date.now()) {
+    errors.push("retentionUntil must be in the future when provided");
+  }
+
+  if (
+    hasProhibitedIncidentContent(
+      title,
+      owner,
+      accountableAgent,
+      sourceChannel,
+      triggerSignal,
+      buyerImpact,
+      containmentAction,
+      remediationPlan,
+      notificationReason,
+      ...affectedSurface
+    )
+  ) {
+    errors.push("incident fields must not include PHI, patient identifiers, payer member identifiers, or live clinical record details");
+  }
+
+  if (errors.length > 0 || !severity) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: {
+      incidentKey,
+      title,
+      severity,
+      owner,
+      accountableAgent,
+      sourceChannel,
+      affectedSurface,
+      triggerSignal,
+      buyerImpact,
+      containmentAction,
+      remediationPlan,
+      legalHoldStatus,
+      notificationDecision,
+      notificationReason,
+      retentionUntil,
+      legalHoldUntil,
+      eventMetadata
+    }
+  };
+}
+
+function defaultTrustSafetyEventType(
+  status: TrustSafetyIncidentStatus | null,
+  legalHoldStatus: TrustSafetyLegalHoldStatus | null,
+  notificationDecision: TrustSafetyNotificationDecision | null,
+  postIncidentReviewStatus: TrustSafetyPostIncidentReviewStatus | null
+): TrustSafetyIncidentEventType {
+  if (status === "closed") {
+    return "incident-closed";
+  }
+
+  if (legalHoldStatus === "active") {
+    return "legal-hold-recorded";
+  }
+
+  if (legalHoldStatus === "not-required") {
+    return "legal-hold-released";
+  }
+
+  if (notificationDecision && notificationDecision !== "pending") {
+    return "notification-decision-recorded";
+  }
+
+  if (postIncidentReviewStatus) {
+    return "post-incident-review-recorded";
+  }
+
+  return "status-updated";
+}
+
+export function validateTrustSafetyIncidentUpdatePayload(
+  payload: unknown
+): ValidationResult<TrustSafetyIncidentUpdateInput> {
+  const errors: string[] = [];
+
+  if (!isRecord(payload)) {
+    return { ok: false, errors: ["payload must be a JSON object"] };
+  }
+
+  const status =
+    payload.status === undefined || payload.status === null
+      ? null
+      : isTrustSafetyIncidentStatus(payload.status)
+        ? payload.status
+        : "__invalid_status__";
+  const severity =
+    payload.severity === undefined || payload.severity === null
+      ? null
+      : isTrustSafetyIncidentSeverity(payload.severity)
+        ? payload.severity
+        : "__invalid_severity__";
+  const legalHoldStatus =
+    payload.legalHoldStatus === undefined || payload.legalHoldStatus === null
+      ? null
+      : isTrustSafetyLegalHoldStatus(payload.legalHoldStatus)
+        ? payload.legalHoldStatus
+        : "__invalid_legal_hold__";
+  const notificationDecision =
+    payload.notificationDecision === undefined || payload.notificationDecision === null
+      ? null
+      : isTrustSafetyNotificationDecision(payload.notificationDecision)
+        ? payload.notificationDecision
+        : "__invalid_notification__";
+  const postIncidentReviewStatus =
+    payload.postIncidentReviewStatus === undefined || payload.postIncidentReviewStatus === null
+      ? null
+      : isTrustSafetyPostIncidentReviewStatus(payload.postIncidentReviewStatus)
+        ? payload.postIncidentReviewStatus
+        : "__invalid_review_status__";
+  const eventType =
+    payload.eventType === undefined || payload.eventType === null
+      ? defaultTrustSafetyEventType(
+          status === "__invalid_status__" ? null : status,
+          legalHoldStatus === "__invalid_legal_hold__" ? null : legalHoldStatus,
+          notificationDecision === "__invalid_notification__" ? null : notificationDecision,
+          postIncidentReviewStatus === "__invalid_review_status__" ? null : postIncidentReviewStatus
+        )
+      : isTrustSafetyIncidentEventType(payload.eventType)
+        ? payload.eventType
+        : null;
+  const notificationReason =
+    payload.notificationReason === undefined || payload.notificationReason === null
+      ? null
+      : optionalString(payload.notificationReason);
+  const containmentAction =
+    payload.containmentAction === undefined || payload.containmentAction === null
+      ? null
+      : optionalString(payload.containmentAction);
+  const remediationPlan =
+    payload.remediationPlan === undefined || payload.remediationPlan === null
+      ? null
+      : optionalString(payload.remediationPlan);
+  const eventSummary = optionalString(payload.eventSummary);
+  const retentionUntil = optionalIsoTimestamp(payload.retentionUntil, "retentionUntil", errors);
+  const legalHoldUntil = optionalIsoTimestamp(payload.legalHoldUntil, "legalHoldUntil", errors);
+  const eventMetadata = metadataObject(payload.eventMetadata, "eventMetadata", errors);
+
+  if (status === "__invalid_status__") {
+    errors.push("status must match a supported TrustOps status");
+  }
+
+  if (severity === "__invalid_severity__") {
+    errors.push("severity must be low, moderate, high, or critical");
+  }
+
+  if (legalHoldStatus === "__invalid_legal_hold__") {
+    errors.push("legalHoldStatus must be not-required, watch, recommended, or active");
+  }
+
+  if (notificationDecision === "__invalid_notification__") {
+    errors.push("notificationDecision must match a supported TrustOps notification decision");
+  }
+
+  if (postIncidentReviewStatus === "__invalid_review_status__") {
+    errors.push("postIncidentReviewStatus must match a supported review status");
+  }
+
+  if (!eventType) {
+    errors.push("eventType must match a supported TrustOps incident event type");
+  }
+
+  if (notificationReason && notificationReason.length > 1200) {
+    errors.push("notificationReason must be 1200 characters or fewer");
+  }
+
+  if (containmentAction !== null) {
+    validateLength(containmentAction, "containmentAction", 20, 2000, errors);
+  }
+
+  if (remediationPlan !== null) {
+    validateLength(remediationPlan, "remediationPlan", 20, 2000, errors);
+  }
+
+  if (eventSummary.length < 12 || eventSummary.length > 2000) {
+    errors.push("eventSummary must be between 12 and 2000 characters");
+  }
+
+  if (legalHoldStatus === "active" && legalHoldUntil && Date.parse(legalHoldUntil) <= Date.now()) {
+    errors.push("legalHoldUntil must be in the future for an active legal hold");
+  }
+
+  if (retentionUntil && Date.parse(retentionUntil) <= Date.now()) {
+    errors.push("retentionUntil must be in the future when provided");
+  }
+
+  if (status === "closed" && postIncidentReviewStatus !== "complete") {
+    errors.push("closing a TrustOps incident requires postIncidentReviewStatus complete");
+  }
+
+  if (
+    hasProhibitedIncidentContent(
+      notificationReason ?? "",
+      containmentAction ?? "",
+      remediationPlan ?? "",
+      eventSummary
+    )
+  ) {
+    errors.push("incident update fields must not include PHI, patient identifiers, payer member identifiers, or live clinical record details");
+  }
+
+  if (errors.length > 0 || !eventType) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: {
+      status: status === "__invalid_status__" ? null : status,
+      severity: severity === "__invalid_severity__" ? null : severity,
+      legalHoldStatus: legalHoldStatus === "__invalid_legal_hold__" ? null : legalHoldStatus,
+      notificationDecision:
+        notificationDecision === "__invalid_notification__" ? null : notificationDecision,
+      notificationReason,
+      containmentAction,
+      remediationPlan,
+      postIncidentReviewStatus:
+        postIncidentReviewStatus === "__invalid_review_status__" ? null : postIncidentReviewStatus,
+      retentionUntil,
+      legalHoldUntil,
+      eventType,
+      eventSummary,
+      eventMetadata
+    }
+  };
+}
+
+function emptySeverityCounts() {
+  return Object.fromEntries(trustSafetyIncidentSeverities.map((severity) => [severity, 0])) as Record<
+    TrustSafetyIncidentSeverity,
+    number
+  >;
+}
+
+function emptyStatusCounts() {
+  return Object.fromEntries(trustSafetyIncidentStatuses.map((status) => [status, 0])) as Record<
+    TrustSafetyIncidentStatus,
+    number
+  >;
+}
+
+function emptyLegalHoldCounts() {
+  return Object.fromEntries(trustSafetyLegalHoldStatuses.map((status) => [status, 0])) as Record<
+    TrustSafetyLegalHoldStatus,
+    number
+  >;
+}
+
+function emptyNotificationCounts() {
+  return Object.fromEntries(trustSafetyNotificationDecisions.map((decision) => [decision, 0])) as Record<
+    TrustSafetyNotificationDecision,
+    number
+  >;
+}
+
+export function summarizeDurableTrustSafetyIncidents(
+  incidents: DurableTrustSafetyIncidentRecord[],
+  events: DurableTrustSafetyIncidentEventRecord[] = []
+): DurableTrustSafetyIncidentDashboard {
+  const bySeverity = emptySeverityCounts();
+  const byStatus = emptyStatusCounts();
+  const byLegalHoldStatus = emptyLegalHoldCounts();
+  const byNotificationDecision = emptyNotificationCounts();
+
+  for (const incident of incidents) {
+    bySeverity[incident.severity] += 1;
+    byStatus[incident.status] += 1;
+    byLegalHoldStatus[incident.legalHoldStatus] += 1;
+    byNotificationDecision[incident.notificationDecision] += 1;
+  }
+
+  const openIncidents = incidents.filter((incident) => incident.status !== "closed").length;
+  const latestUpdatedAt = incidents.reduce<string | null>(
+    (latest, incident) => (!latest || incident.updatedAt > latest ? incident.updatedAt : latest),
+    null
+  );
+
+  return {
+    totalIncidents: incidents.length,
+    openIncidents,
+    highOrCriticalOpen: incidents.filter(
+      (incident) =>
+        incident.status !== "closed" && ["high", "critical"].includes(incident.severity)
+    ).length,
+    legalHoldActive: incidents.filter((incident) => incident.legalHoldStatus === "active").length,
+    notificationReviews: incidents.filter((incident) =>
+      ["customer-review", "regulatory-review", "counsel-escalation"].includes(incident.notificationDecision)
+    ).length,
+    postIncidentReviewsOpen: incidents.filter(
+      (incident) =>
+        incident.status === "closed" && incident.postIncidentReviewStatus !== "complete"
+    ).length,
+    packetDownloads: events.filter((event) => event.eventType === "review-packet-downloaded").length,
+    latestUpdatedAt,
+    bySeverity,
+    byStatus,
+    byLegalHoldStatus,
+    byNotificationDecision,
+    boundaryControls: [
+      "Private-schema incident tables",
+      "RLS deny-all defense in depth",
+      "AAL2 tenant-admin or pilot-lead mutation gates",
+      "Tenant reviewer packet release with write-before-release audit",
+      "Legal-hold and notification-decision fields",
+      "Synthetic-pilot and enterprise-readiness data only",
+      "No PHI, breach determination, legal advice, compliance certification, or managed SOC/MDR claim"
+    ]
+  };
+}
 
 function countIncidentsBySeverity(severity: TrustSafetyIncidentSeverity) {
   return trustSafetyIncidents.filter((incident) => incident.severity === severity).length;
@@ -570,12 +1323,20 @@ export function getTrustSafetyOperationsSummary() {
     route: "/trust-safety-operations",
     apiRoute: "/api/trust-safety-operations",
     incidentReportApiRoute: "/api/trust-safety-operations/incidents/{incidentId}/report",
+    tenantIncidentDashboardApiRoute: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents",
+    tenantIncidentMutationApiRoute: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}",
+    tenantIncidentReviewPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet",
     boundary: trustSafetyOperationsBoundary,
+    tenantIncidentBoundary: tenantTrustSafetyIncidentBoundary,
     operatingPosture:
       "24/7 trust, safety, monitoring, auditing, fixing, improving, and escalation model is defined. Production managed monitoring still requires approved staffing, on-call, SOC/MDR, and customer-specific runbooks before being claimed as live coverage.",
+    durableTenantStorage:
+      "Tenant-scoped TrustOps incident storage is implemented as a private-schema Supabase migration with guarded RPCs, AAL2 mutation gates, append-only event trails, legal-hold fields, notification decisions, and audited review-packet downloads.",
     agents: trustSafetyAgents,
     controls: trustSafetyControls,
     channels: trustSafetyChannels,
+    targetAudienceSignals: targetAudienceTrustOpsSignals,
     continuousImprovementLoops,
     incidentSlas: trustSafetyIncidentSlas,
     incidents: trustSafetyIncidents,
@@ -584,6 +1345,7 @@ export function getTrustSafetyOperationsSummary() {
     agentCount: trustSafetyAgents.length,
     controlCount: trustSafetyControls.length,
     channelCount: trustSafetyChannels.length,
+    targetAudienceCount: targetAudienceTrustOpsSignals.length,
     loopStageCount: continuousImprovementLoops.length,
     incidentCount: trustSafetyIncidents.length,
     openIncidentCount,
@@ -596,6 +1358,7 @@ export function getTrustSafetyOperationsSummary() {
     activeControls,
     watchRequired,
     productionGated,
+    durableTrustOpsControls: summarizeDurableTrustSafetyIncidents([], []).boundaryControls,
     sourceUrls: [
       "https://www.copyright.gov/registration/",
       "https://www.uspto.gov/trademarks/basics",
@@ -604,7 +1367,7 @@ export function getTrustSafetyOperationsSummary() {
       "https://www.nist.gov/itl/ai-risk-management-framework"
     ],
     nextBuildStep:
-      "Promote trust-ops incidents from deterministic product-control records into tenant-scoped durable storage with authenticated mutation, legal-hold workflow, notification decisions, and post-incident review packets.",
+      "Apply and verify the tenant TrustOps Supabase migration in production, then add an authenticated workspace UI panel for incident creation, update, legal-hold review, notification decision, and packet download.",
     updated: "2026-06-16"
   };
 }
@@ -684,6 +1447,16 @@ export function buildTrustSafetyOperationsBrief() {
     "## Operating Posture",
     summary.operatingPosture,
     "",
+    "## Tenant Durable TrustOps",
+    summary.durableTenantStorage,
+    `Dashboard API: ${summary.tenantIncidentDashboardApiRoute}`,
+    `Mutation API: ${summary.tenantIncidentMutationApiRoute}`,
+    `Review packet API: ${summary.tenantIncidentReviewPacketApiRoute}`,
+    `Boundary: ${summary.tenantIncidentBoundary}`,
+    "",
+    "## Target Audience Fit",
+    ...summary.targetAudienceSignals.map((signal) => `- ${signal.audience}: ${signal.appeal}`),
+    "",
     "## Agents",
     ...summary.agents.map(
       (agent) => `- ${agent.name} (${agent.status}): ${agent.mission} Escalates: ${agent.escalationTriggers.join(", ")}.`
@@ -719,5 +1492,91 @@ export function buildTrustSafetyOperationsBrief() {
     "",
     "## Next Build Step",
     summary.nextBuildStep
+  ].join("\n");
+}
+
+export function buildTenantTrustSafetyIncidentReviewPacket({
+  workspace,
+  incident,
+  events,
+  auditEventId,
+  generatedAt,
+  actorUserId,
+  appBaseUrl
+}: TenantTrustSafetyIncidentPacketInput) {
+  const eventTimeline = events
+    .filter((event) => event.incidentId === incident.id)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+  return [
+    "# SCRIMED Tenant TrustOps Incident Review Packet",
+    "",
+    `Generated: ${generatedAt}`,
+    `Workspace: ${workspace.name} (${workspace.slug})`,
+    `Tenant: ${workspace.tenantName}`,
+    `Incident ID: ${incident.id}`,
+    `Incident key: ${incident.incidentKey}`,
+    `Audit event ID: ${auditEventId}`,
+    `Actor user ID: ${actorUserId}`,
+    "",
+    "## Boundary",
+    tenantTrustSafetyIncidentBoundary,
+    "",
+    "## Incident Summary",
+    `Title: ${incident.title}`,
+    `Severity: ${incident.severity}`,
+    `Status: ${incident.status}`,
+    `Owner: ${incident.owner}`,
+    `Accountable agent: ${incident.accountableAgent}`,
+    `Source channel: ${incident.sourceChannel}`,
+    `Legal-hold status: ${incident.legalHoldStatus}`,
+    `Notification decision: ${incident.notificationDecision}`,
+    `Post-incident review: ${incident.postIncidentReviewStatus}`,
+    `Created: ${incident.createdAt}`,
+    `Updated: ${incident.updatedAt}`,
+    `Closed: ${incident.closedAt ?? "not closed"}`,
+    "",
+    "## Buyer Impact",
+    cleanReportText(incident.buyerImpact),
+    "",
+    "## Trigger Signal",
+    cleanReportText(incident.triggerSignal),
+    "",
+    "## Affected Surface",
+    ...incident.affectedSurface.map((surface) => `- ${cleanReportText(surface)}`),
+    "",
+    "## Containment And Remediation",
+    `Containment: ${cleanReportText(incident.containmentAction)}`,
+    `Remediation: ${cleanReportText(incident.remediationPlan)}`,
+    "",
+    "## Legal Hold And Notification",
+    `Retention until: ${incident.retentionUntil ?? "not set"}`,
+    `Legal hold until: ${incident.legalHoldUntil ?? "not set or indefinite"}`,
+    `Notification reason: ${incident.notificationReason || "not recorded"}`,
+    "",
+    "## Event Timeline",
+    ...(eventTimeline.length > 0
+      ? eventTimeline.map(
+          (event) =>
+            `- ${event.createdAt}: ${event.eventType} by ${event.actorUserId}; status ${event.priorStatus ?? "none"} -> ${event.nextStatus}; legal hold ${event.priorLegalHoldStatus ?? "none"} -> ${event.nextLegalHoldStatus}; notification ${event.priorNotificationDecision ?? "none"} -> ${event.nextNotificationDecision}; ${cleanReportText(event.eventSummary)}`
+        )
+      : ["- No incident events were visible through the tenant-scoped dashboard."]),
+    "",
+    "## Durable Controls",
+    ...summarizeDurableTrustSafetyIncidents([incident], eventTimeline).boundaryControls.map(
+      (control) => `- ${control}`
+    ),
+    "",
+    "## Workspace Boundary",
+    cleanReportText(workspace.boundary),
+    "",
+    "## Evidence Routes",
+    `- ${appBaseUrl}/trust-safety-operations`,
+    `- ${appBaseUrl}/trust-center`,
+    `- ${appBaseUrl}/audit`,
+    `- ${appBaseUrl}/observability`,
+    "",
+    "## Remaining Limitations",
+    ...remainingTrustSafetyLimitations.map((limitation) => `- ${limitation}`)
   ].join("\n");
 }

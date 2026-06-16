@@ -43,6 +43,10 @@ export default function TrustSafetyOperationsPage() {
           <strong>{summary.channelCount}</strong>
         </article>
         <article>
+          <span>Target audiences</span>
+          <strong>{summary.targetAudienceCount}</strong>
+        </article>
+        <article>
           <span>Active controls</span>
           <strong>{summary.activeControls}</strong>
         </article>
@@ -90,6 +94,45 @@ export default function TrustSafetyOperationsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Tenant TrustOps durable workspace">
+        <div className="section-heading">
+          <p className="eyebrow">Tenant TrustOps</p>
+          <h2>Durable tenant incident workspaces create evidence buyers can inspect before production launch.</h2>
+          <p className="section-copy">{summary.tenantIncidentBoundary}</p>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>private schema</span>
+            <h2>{summary.durableTenantStorage}</h2>
+          </div>
+          <p>
+            Enterprise pilots can keep TrustOps incidents tenant-bound, review-gated, audit-backed, and packet-ready while
+            live clinical execution and managed SOC/MDR coverage stay gated.
+          </p>
+          <div>
+            <strong>Tenant incident dashboard contract</strong>
+            <ul className="compact-list">
+              <li>Dashboard API: {summary.tenantIncidentDashboardApiRoute}</li>
+              <li>Create/update API: {summary.tenantIncidentMutationApiRoute}</li>
+              <li>Review packet API: {summary.tenantIncidentReviewPacketApiRoute}</li>
+              {summary.durableTrustOpsControls.slice(0, 4).map((control) => (
+                <li key={control}>{control}</li>
+              ))}
+            </ul>
+          </div>
+        </article>
+        {summary.targetAudienceSignals.map((signal) => (
+          <article className="module-row" key={signal.audience}>
+            <div>
+              <span>buyer signal</span>
+              <h2>{signal.audience}</h2>
+            </div>
+            <p>{signal.appeal}</p>
+            <strong>Appeal: trust, evidence, tenant isolation, and current-boundary discipline.</strong>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Trust safety incident queue">

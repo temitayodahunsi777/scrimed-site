@@ -105,6 +105,10 @@ export default function ProductConsolePage() {
           <strong>{summary.trustSafetyControlCount}</strong>
         </article>
         <article>
+          <span>Trust audiences</span>
+          <strong>{summary.trustSafetyTargetAudienceCount}</strong>
+        </article>
+        <article>
           <span>Trust incidents</span>
           <strong>{summary.trustSafetyIncidentCount}</strong>
         </article>
@@ -153,9 +157,11 @@ export default function ProductConsolePage() {
             <Link className="module-link" href={summary.trustSafetyOperationsRoute}>
               Open Trust Safety Ops
             </Link>
-            <ul className="compact-list">
+          <ul className="compact-list">
               <li>Agents: {summary.trustSafetyAgentCount}</li>
               <li>Controls: {summary.trustSafetyControlCount}</li>
+              <li>Tenant dashboard: {summary.trustSafetyTenantIncidentDashboardApiRoute}</li>
+              <li>Tenant packet: {summary.trustSafetyTenantIncidentReviewPacketApiRoute}</li>
               <li>Incident reports: {summary.trustSafetyIncidentCount}</li>
               <li>Open issues: {summary.trustSafetyOpenIncidentCount}</li>
               <li>Channels: {summary.trustSafetyOperationsSummary.channelCount}</li>
@@ -179,6 +185,35 @@ export default function ProductConsolePage() {
                 <li>Agent: {incident.accountableAgent}</li>
               </ul>
             </div>
+          </article>
+        ))}
+        <article className="module-row">
+          <div>
+            <span>tenant durable</span>
+            <h2>Tenant TrustOps incident workspaces turn trust into buyer-inspectable evidence.</h2>
+          </div>
+          <p>{summary.trustSafetyOperationsSummary.durableTenantStorage}</p>
+          <div>
+            <Link className="module-link" href={summary.trustSafetyOperationsRoute}>
+              Review TrustOps controls
+            </Link>
+            <ul className="compact-list">
+              {summary.trustSafetyOperationsSummary.durableTrustOpsControls.slice(0, 5).map((control) => (
+                <li key={control}>{control}</li>
+              ))}
+            </ul>
+          </div>
+        </article>
+        {summary.trustSafetyOperationsSummary.targetAudienceSignals.slice(0, 3).map((signal) => (
+          <article className="module-row" key={signal.audience}>
+            <div>
+              <span>buyer fit</span>
+              <h2>{signal.audience}</h2>
+            </div>
+            <p>{signal.appeal}</p>
+            <Link className="module-link" href={summary.trustSafetyOperationsRoute}>
+              Inspect TrustOps proof
+            </Link>
           </article>
         ))}
       </section>

@@ -538,6 +538,9 @@ export function getProductConsoleSummary() {
     trustSafetyOperationsRoute: trustSafetyOperationsSummary.route,
     trustSafetyOperationsApiRoute: trustSafetyOperationsSummary.apiRoute,
     trustSafetyIncidentReportApiRoute: trustSafetyOperationsSummary.incidentReportApiRoute,
+    trustSafetyTenantIncidentDashboardApiRoute: trustSafetyOperationsSummary.tenantIncidentDashboardApiRoute,
+    trustSafetyTenantIncidentMutationApiRoute: trustSafetyOperationsSummary.tenantIncidentMutationApiRoute,
+    trustSafetyTenantIncidentReviewPacketApiRoute: trustSafetyOperationsSummary.tenantIncidentReviewPacketApiRoute,
     demoRoute: demoPilotProgramSummary.demoRoute,
     demoApiRoute: demoPilotProgramSummary.demoApiRoute,
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
@@ -586,6 +589,7 @@ export function getProductConsoleSummary() {
     attributionCohortCount: attributionAnalyticsSummary.cohorts.length,
     trustSafetyAgentCount: trustSafetyOperationsSummary.agentCount,
     trustSafetyControlCount: trustSafetyOperationsSummary.controlCount,
+    trustSafetyTargetAudienceCount: trustSafetyOperationsSummary.targetAudienceCount,
     trustSafetyIncidentCount: trustSafetyOperationsSummary.incidentCount,
     trustSafetyOpenIncidentCount: trustSafetyOperationsSummary.openIncidentCount,
     trustSafetyContainedIncidentCount: trustSafetyOperationsSummary.containedIncidentCount,
@@ -627,6 +631,7 @@ export function getProductConsoleSummary() {
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
       trustSafetyOperations: trustSafetyOperationsSummary.status,
+      tenantTrustOpsIncidents: "private-schema-rpc-guarded",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       deploymentProfiles: deploymentProfileSummary.status,
@@ -657,7 +662,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Trust Safety incident operations to govern buyer-facing risk, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release an audited non-binding Pilot Program proposal with buyer-approved metrics and governance gates.",
     updated: "2026-06-16"
   };
 }
@@ -787,13 +792,22 @@ export function getProductReadinessBrief() {
     `Trust Safety Operations: ${summary.trustSafetyOperationsRoute}`,
     `Trust Safety Operations API: ${summary.trustSafetyOperationsApiRoute}`,
     `Trust Safety Incident Report API: ${summary.trustSafetyIncidentReportApiRoute}`,
+    `Tenant TrustOps Incident Dashboard API: ${summary.trustSafetyTenantIncidentDashboardApiRoute}`,
+    `Tenant TrustOps Incident Mutation API: ${summary.trustSafetyTenantIncidentMutationApiRoute}`,
+    `Tenant TrustOps Review Packet API: ${summary.trustSafetyTenantIncidentReviewPacketApiRoute}`,
     `Trust Safety Agents: ${summary.trustSafetyAgentCount}`,
     `Trust Safety Controls: ${summary.trustSafetyControlCount}`,
+    `Trust Safety Target Audiences: ${summary.trustSafetyTargetAudienceCount}`,
     `Trust Safety Incidents: ${summary.trustSafetyIncidentCount}`,
     `Open Trust Safety Incidents: ${summary.trustSafetyOpenIncidentCount}`,
     `Contained Trust Safety Incidents: ${summary.trustSafetyContainedIncidentCount}`,
     `Legal Hold Watch: ${summary.trustSafetyLegalHoldWatchCount}`,
     `Trust Safety Operating Posture: ${summary.trustSafetyOperationsSummary.operatingPosture}`,
+    `Tenant TrustOps Durable Storage: ${summary.trustSafetyOperationsSummary.durableTenantStorage}`,
+    `Tenant TrustOps Boundary: ${summary.trustSafetyOperationsSummary.tenantIncidentBoundary}`,
+    ...summary.trustSafetyOperationsSummary.targetAudienceSignals.map(
+      (signal) => `- Target audience: ${signal.audience}. Appeal: ${signal.appeal}`
+    ),
     ...summary.trustSafetyOperationsSummary.incidents.map(
       (incident) =>
         `- Incident: ${incident.id} (${incident.severity}/${incident.status}) -> ${incident.reportRoute}: ${incident.title}`

@@ -23,6 +23,12 @@ import type {
   AgentWorkspaceWorkOrderRecord,
   AgentWorkspaceWorkOrderTransitionInput
 } from "./persistentAgentWorkspace";
+import type {
+  DurableTrustSafetyIncidentEventRecord,
+  DurableTrustSafetyIncidentRecord,
+  TrustSafetyIncidentCreateInput,
+  TrustSafetyIncidentUpdateInput
+} from "./trustSafetyOperations";
 
 type AuthenticatedPilotContext =
   | {
@@ -157,6 +163,105 @@ type AgentWorkspaceGovernanceLedgerRow = {
   event_metadata: Record<string, unknown>;
   boundary: string;
   created_at: string;
+};
+
+type TrustSafetyIncidentRow = {
+  id: string;
+  tenantId?: string;
+  tenant_id?: string;
+  workspaceId?: string;
+  workspace_id?: string;
+  incidentKey?: string;
+  incident_key?: string;
+  title: string;
+  severity: DurableTrustSafetyIncidentRecord["severity"];
+  status: DurableTrustSafetyIncidentRecord["status"];
+  owner: string;
+  accountableAgent?: string;
+  accountable_agent?: string;
+  sourceChannel?: string;
+  source_channel?: string;
+  affectedSurface?: string[];
+  affected_surface?: string[];
+  triggerSignal?: string;
+  trigger_signal?: string;
+  buyerImpact?: string;
+  buyer_impact?: string;
+  containmentAction?: string;
+  containment_action?: string;
+  remediationPlan?: string;
+  remediation_plan?: string;
+  legalHoldStatus?: DurableTrustSafetyIncidentRecord["legalHoldStatus"];
+  legal_hold_status?: DurableTrustSafetyIncidentRecord["legalHoldStatus"];
+  notificationDecision?: DurableTrustSafetyIncidentRecord["notificationDecision"];
+  notification_decision?: DurableTrustSafetyIncidentRecord["notificationDecision"];
+  notificationReason?: string;
+  notification_reason?: string;
+  postIncidentReviewStatus?: DurableTrustSafetyIncidentRecord["postIncidentReviewStatus"];
+  post_incident_review_status?: DurableTrustSafetyIncidentRecord["postIncidentReviewStatus"];
+  retentionUntil?: string | null;
+  retention_until?: string | null;
+  legalHoldUntil?: string | null;
+  legal_hold_until?: string | null;
+  eventMetadata?: Record<string, unknown>;
+  event_metadata?: Record<string, unknown>;
+  boundary: string;
+  createdBy?: string;
+  created_by?: string;
+  updatedBy?: string;
+  updated_by?: string;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+  closedAt?: string | null;
+  closed_at?: string | null;
+};
+
+type TrustSafetyIncidentEventRow = {
+  id: string;
+  tenantId?: string;
+  tenant_id?: string;
+  workspaceId?: string;
+  workspace_id?: string;
+  incidentId?: string;
+  incident_id?: string;
+  actorUserId?: string;
+  actor_user_id?: string;
+  eventType?: DurableTrustSafetyIncidentEventRecord["eventType"];
+  event_type?: DurableTrustSafetyIncidentEventRecord["eventType"];
+  priorStatus?: DurableTrustSafetyIncidentEventRecord["priorStatus"];
+  prior_status?: DurableTrustSafetyIncidentEventRecord["priorStatus"];
+  nextStatus?: DurableTrustSafetyIncidentEventRecord["nextStatus"];
+  next_status?: DurableTrustSafetyIncidentEventRecord["nextStatus"];
+  priorLegalHoldStatus?: DurableTrustSafetyIncidentEventRecord["priorLegalHoldStatus"];
+  prior_legal_hold_status?: DurableTrustSafetyIncidentEventRecord["priorLegalHoldStatus"];
+  nextLegalHoldStatus?: DurableTrustSafetyIncidentEventRecord["nextLegalHoldStatus"];
+  next_legal_hold_status?: DurableTrustSafetyIncidentEventRecord["nextLegalHoldStatus"];
+  priorNotificationDecision?: DurableTrustSafetyIncidentEventRecord["priorNotificationDecision"];
+  prior_notification_decision?: DurableTrustSafetyIncidentEventRecord["priorNotificationDecision"];
+  nextNotificationDecision?: DurableTrustSafetyIncidentEventRecord["nextNotificationDecision"];
+  next_notification_decision?: DurableTrustSafetyIncidentEventRecord["nextNotificationDecision"];
+  eventSummary?: string;
+  event_summary?: string;
+  eventMetadata?: Record<string, unknown>;
+  event_metadata?: Record<string, unknown>;
+  boundary: string;
+  createdAt?: string;
+  created_at?: string;
+};
+
+type TrustSafetyIncidentDashboardPayload = {
+  tenantId: string;
+  tenantName: string;
+  workspaceId: string;
+  workspaceSlug: string;
+  workspaceName: string;
+  actorUserId: string;
+  incidents: TrustSafetyIncidentRow[];
+  events: TrustSafetyIncidentEventRow[];
+  security: Record<string, unknown>;
+  boundary: string;
 };
 
 function getSupabaseConfiguration() {
@@ -493,6 +598,84 @@ function mapAgentWorkspaceGovernanceLedger(
     eventMetadata: row.event_metadata,
     boundary: row.boundary,
     createdAt: row.created_at
+  };
+}
+
+function mapTrustSafetyIncident(row: TrustSafetyIncidentRow): DurableTrustSafetyIncidentRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenantId ?? row.tenant_id ?? "",
+    workspaceId: row.workspaceId ?? row.workspace_id ?? "",
+    incidentKey: row.incidentKey ?? row.incident_key ?? "",
+    title: row.title,
+    severity: row.severity,
+    status: row.status,
+    owner: row.owner,
+    accountableAgent: row.accountableAgent ?? row.accountable_agent ?? "",
+    sourceChannel: row.sourceChannel ?? row.source_channel ?? "",
+    affectedSurface: asStringArray(row.affectedSurface ?? row.affected_surface),
+    triggerSignal: row.triggerSignal ?? row.trigger_signal ?? "",
+    buyerImpact: row.buyerImpact ?? row.buyer_impact ?? "",
+    containmentAction: row.containmentAction ?? row.containment_action ?? "",
+    remediationPlan: row.remediationPlan ?? row.remediation_plan ?? "",
+    legalHoldStatus: row.legalHoldStatus ?? row.legal_hold_status ?? "not-required",
+    notificationDecision: row.notificationDecision ?? row.notification_decision ?? "pending",
+    notificationReason: row.notificationReason ?? row.notification_reason ?? "",
+    postIncidentReviewStatus: row.postIncidentReviewStatus ?? row.post_incident_review_status ?? "not-started",
+    retentionUntil: row.retentionUntil ?? row.retention_until ?? null,
+    legalHoldUntil: row.legalHoldUntil ?? row.legal_hold_until ?? null,
+    eventMetadata: row.eventMetadata ?? row.event_metadata ?? {},
+    boundary: row.boundary,
+    createdBy: row.createdBy ?? row.created_by ?? "",
+    updatedBy: row.updatedBy ?? row.updated_by ?? "",
+    createdAt: row.createdAt ?? row.created_at ?? "",
+    updatedAt: row.updatedAt ?? row.updated_at ?? "",
+    closedAt: row.closedAt ?? row.closed_at ?? null
+  };
+}
+
+function mapTrustSafetyIncidentEvent(
+  row: TrustSafetyIncidentEventRow
+): DurableTrustSafetyIncidentEventRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenantId ?? row.tenant_id ?? "",
+    workspaceId: row.workspaceId ?? row.workspace_id ?? "",
+    incidentId: row.incidentId ?? row.incident_id ?? "",
+    actorUserId: row.actorUserId ?? row.actor_user_id ?? "",
+    eventType: row.eventType ?? row.event_type ?? "status-updated",
+    priorStatus: row.priorStatus ?? row.prior_status ?? null,
+    nextStatus: row.nextStatus ?? row.next_status ?? "new",
+    priorLegalHoldStatus: row.priorLegalHoldStatus ?? row.prior_legal_hold_status ?? null,
+    nextLegalHoldStatus: row.nextLegalHoldStatus ?? row.next_legal_hold_status ?? "not-required",
+    priorNotificationDecision:
+      row.priorNotificationDecision ?? row.prior_notification_decision ?? null,
+    nextNotificationDecision: row.nextNotificationDecision ?? row.next_notification_decision ?? "pending",
+    eventSummary: row.eventSummary ?? row.event_summary ?? "",
+    eventMetadata: row.eventMetadata ?? row.event_metadata ?? {},
+    boundary: row.boundary,
+    createdAt: row.createdAt ?? row.created_at ?? ""
+  };
+}
+
+function mapTrustSafetyIncidentDashboard(
+  payload: TrustSafetyIncidentDashboardPayload | null
+) {
+  if (!payload) {
+    return null;
+  }
+
+  return {
+    tenantId: payload.tenantId,
+    tenantName: payload.tenantName,
+    workspaceId: payload.workspaceId,
+    workspaceSlug: payload.workspaceSlug,
+    workspaceName: payload.workspaceName,
+    actorUserId: payload.actorUserId,
+    incidents: (payload.incidents ?? []).map(mapTrustSafetyIncident),
+    events: (payload.events ?? []).map(mapTrustSafetyIncidentEvent),
+    security: payload.security ?? {},
+    boundary: payload.boundary
   };
 }
 
@@ -877,6 +1060,97 @@ export async function recordAgentWorkspaceGovernanceLedger(
 
   return {
     ledgerId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function getTrustSafetyIncidentDashboard(client: SupabaseClient, workspaceSlug: string) {
+  const { data, error } = await client.rpc("trust_safety_incident_dashboard", {
+    p_workspace_slug: workspaceSlug
+  });
+
+  return {
+    dashboard: mapTrustSafetyIncidentDashboard(
+      data && typeof data === "object" ? (data as TrustSafetyIncidentDashboardPayload) : null
+    ),
+    error
+  };
+}
+
+export async function createTrustSafetyIncident(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: TrustSafetyIncidentCreateInput
+) {
+  const { data, error } = await client.rpc("create_trust_safety_incident", {
+    p_workspace_slug: workspaceSlug,
+    p_incident_key: input.incidentKey,
+    p_title: input.title,
+    p_severity: input.severity,
+    p_owner: input.owner,
+    p_accountable_agent: input.accountableAgent,
+    p_source_channel: input.sourceChannel,
+    p_affected_surface: input.affectedSurface,
+    p_trigger_signal: input.triggerSignal,
+    p_buyer_impact: input.buyerImpact,
+    p_containment_action: input.containmentAction,
+    p_remediation_plan: input.remediationPlan,
+    p_legal_hold_status: input.legalHoldStatus,
+    p_notification_decision: input.notificationDecision,
+    p_notification_reason: input.notificationReason,
+    p_retention_until: input.retentionUntil,
+    p_legal_hold_until: input.legalHoldUntil,
+    p_event_metadata: input.eventMetadata
+  });
+
+  return {
+    incidentId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function updateTrustSafetyIncident(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  incidentId: string,
+  input: TrustSafetyIncidentUpdateInput
+) {
+  const { data, error } = await client.rpc("update_trust_safety_incident", {
+    p_workspace_slug: workspaceSlug,
+    p_incident_id: incidentId,
+    p_status: input.status,
+    p_severity: input.severity,
+    p_legal_hold_status: input.legalHoldStatus,
+    p_notification_decision: input.notificationDecision,
+    p_notification_reason: input.notificationReason,
+    p_containment_action: input.containmentAction,
+    p_remediation_plan: input.remediationPlan,
+    p_post_incident_review_status: input.postIncidentReviewStatus,
+    p_retention_until: input.retentionUntil,
+    p_legal_hold_until: input.legalHoldUntil,
+    p_event_type: input.eventType,
+    p_event_summary: input.eventSummary,
+    p_event_metadata: input.eventMetadata
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordTrustSafetyIncidentPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  incidentId: string
+) {
+  const { data, error } = await client.rpc("record_trust_safety_incident_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_incident_id: incidentId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
     error
   };
 }

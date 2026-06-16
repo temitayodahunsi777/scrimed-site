@@ -30,12 +30,12 @@ export default function ProtectedPilotWorkspacePage() {
           <Link className="secondary-action" href="/agent-workspace">
             Open Agent Workspace
           </Link>
-          <a className="primary-action" href="/api/pilot-workspaces/preview-proof-packet">
+          <Link className="primary-action" href="/api/pilot-workspaces/preview-proof-packet">
             Download Synthetic Proof Packet
-          </a>
-          <a className="secondary-action" href="/api/pilot-workspaces/readiness">
+          </Link>
+          <Link className="secondary-action" href="/api/pilot-workspaces/readiness">
             Inspect Readiness API
-          </a>
+          </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             View Pilot Evidence
           </Link>
