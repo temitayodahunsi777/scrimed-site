@@ -1,4 +1,4 @@
-# SCRIMED Agent Workspace Governance Smoke CI
+# SCRIMED Agent Workspace And TrustOps Governance Smoke CI
 
 Status: active CI workflow foundation.
 
@@ -10,7 +10,10 @@ GitHub Actions workflow:
 
 - `.github/workflows/agent-workspace-governance-smoke.yml`
 
-The workflow runs `scripts/agent-workspace-authenticated-smoke.mjs` against the production app.
+The workflow runs authenticated governance smoke scripts against the production app:
+
+- `scripts/agent-workspace-authenticated-smoke.mjs`
+- `scripts/trustops-authenticated-smoke.mjs`
 
 ## Required Secret
 
@@ -32,8 +35,7 @@ Scheduled runs use the defaults. If the secret is present, the authenticated pat
 
 ## What The Smoke Validates
 
-- Unauthenticated work-order access fails closed.
-- Unauthenticated governance-ledger access fails closed.
+- Unauthenticated work-order, governance-ledger, and TrustOps incident access fails closed.
 - Protected workspace activation governance can commit a metadata-only governance pack seed through the same ledger foundation.
 - Authenticated work-order creation succeeds.
 - Authenticated work-order transition succeeds.
@@ -41,6 +43,10 @@ Scheduled runs use the defaults. If the secret is present, the authenticated pat
 - Authenticated work-order proof packet downloads after audit.
 - Authenticated retention ledger entry commits.
 - Authenticated incident export downloads only after governance-ledger write.
+- Authenticated TrustOps incident creation succeeds.
+- Authenticated TrustOps incident update succeeds.
+- Authenticated TrustOps incident event trail is retained.
+- Authenticated TrustOps review packet downloads only after packet-release audit.
 
 ## External Gate
 

@@ -12,6 +12,7 @@ import type {
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
+import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -670,6 +671,12 @@ export default function ProtectedPilotAccess({
           />
 
           <AgentWorkspaceDashboardPanel
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
+          />
+
+          <TrustSafetyIncidentWorkspacePanel
             onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
             session={session}
             workspace={selectedWorkspace}

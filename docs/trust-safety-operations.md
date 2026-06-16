@@ -4,11 +4,12 @@ Updated: 2026-06-16
 
 ## Status
 
-Trust Safety Operations v3 is active as an inspectable operating model, synthetic incident operations layer, and tenant-scoped durable TrustOps workspace contract:
+Trust Safety Operations v4 is active as an inspectable operating model, synthetic incident operations layer, and tenant-scoped durable TrustOps workspace:
 
 - UI: `/trust-safety-operations`
 - API: `/api/trust-safety-operations`
 - Incident report API: `/api/trust-safety-operations/incidents/{incidentId}/report`
+- Authenticated workspace UI: `/pilot-workspace/access`
 - Tenant incident dashboard API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents`
 - Tenant incident update API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}`
 - Tenant incident review packet API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet`
@@ -58,7 +59,7 @@ Seeded incident classes cover:
 
 ## Tenant TrustOps Durable Workspace
 
-SCRIMED now has a Supabase migration contract for tenant-scoped TrustOps incidents:
+SCRIMED now has applied Supabase migrations for tenant-scoped TrustOps incidents:
 
 - private schema incident table
 - private schema append-only incident event table
@@ -70,8 +71,11 @@ SCRIMED now has a Supabase migration contract for tenant-scoped TrustOps inciden
 - post-incident review status
 - write-before-release incident review packet audit
 - pilot audit event integration
+- covering indexes for TrustOps and Agent Workspace foreign keys surfaced by Supabase performance advisors
 
 This is designed for protected synthetic pilots and enterprise readiness. It does not store PHI, live clinical records, patient identifiers, secrets, payer member identifiers, production breach determinations, legal advice, compliance certification, or managed 24/7 SOC/MDR coverage.
+
+The authenticated workspace panel lets approved tenant members inspect dashboard metrics, create no-PHI incident records, commit status and legal-hold/notification review updates, inspect the event trail, and download audited review packets.
 
 ## Target Audience Appeal
 
@@ -92,14 +96,19 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Added a synthetic trust-ops incident queue and audit-ready report route.
 - Added a tenant-scoped durable TrustOps migration contract with authenticated dashboard, mutation RPCs, event trail, legal-hold fields, notification decisions, and review-packet audit.
 - Added a dedicated `attribution-analytics-packet-downloaded` migration, with a compatibility fallback to the prior sales artifact event until production migration verification is complete.
+- Applied the tenant TrustOps incident migration to Supabase production.
+- Applied foreign-key index hardening for TrustOps and Agent Workspace tables after Supabase advisor review.
+- Added the authenticated `/pilot-workspace/access` TrustOps incident panel.
+- Added `scripts/trustops-authenticated-smoke.mjs` for fail-closed and authenticated TrustOps route verification.
 
 ## Remaining Limitations
 
 - Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.
 - Tenant TrustOps storage is synthetic-pilot and enterprise-readiness only; regulated production incidents require customer-approved live-data boundaries, breach analysis, notification decisions, and forensic process.
-- The TrustOps Supabase migration must be applied and authenticated-smoke-tested in each environment before tenant mutation routes are used with buyers.
+- Supabase Auth leaked-password protection remains a dashboard-level security setting to enable under Auth password security.
+- Authenticated TrustOps happy-path smoke requires a CI-held AAL2 tenant-admin or pilot-lead bearer token; unauthenticated fail-closed smoke can run without secrets.
 - Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers.
 
 ## Next Build Step
 
-Apply and verify the tenant TrustOps Supabase migration in production, then add an authenticated workspace UI panel for incident creation, update, legal-hold review, notification decision, and packet download.
+Enable Supabase Auth leaked-password protection, add a CI-held AAL2 smoke token, and run `scripts/trustops-authenticated-smoke.mjs` alongside the Agent Workspace authenticated smoke before buyer demos.

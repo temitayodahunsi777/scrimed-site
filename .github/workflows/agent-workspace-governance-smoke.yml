@@ -1,4 +1,4 @@
-name: Agent Workspace Governance Smoke
+name: Agent Workspace And TrustOps Governance Smoke
 
 on:
   workflow_dispatch:
@@ -23,12 +23,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: agent-workspace-governance-smoke
+  group: agent-workspace-trustops-governance-smoke
   cancel-in-progress: false
 
 jobs:
   governance-smoke:
-    name: Production governance-ledger smoke
+    name: Production governance smoke
     runs-on: ubuntu-latest
 
     steps:
@@ -47,3 +47,11 @@ jobs:
           SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}
           SCRIMED_REQUIRE_AUTHENTICATED_SMOKE: ${{ github.event_name == 'workflow_dispatch' && inputs.require_authenticated_path && '1' || '' }}
         run: node scripts/agent-workspace-authenticated-smoke.mjs
+
+      - name: Run Tenant TrustOps governance smoke
+        env:
+          SCRIMED_BASE_URL: ${{ inputs.base_url || 'https://app.scrimedsolutions.com' }}
+          SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug || 'atlas-synthetic-evaluation' }}
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}
+          SCRIMED_REQUIRE_AUTHENTICATED_SMOKE: ${{ github.event_name == 'workflow_dispatch' && inputs.require_authenticated_path && '1' || '' }}
+        run: node scripts/trustops-authenticated-smoke.mjs

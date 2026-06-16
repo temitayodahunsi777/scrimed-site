@@ -257,18 +257,18 @@ export const pilotWorkspaceRoles: Array<{
 }> = [
   {
     role: "tenant-admin",
-    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Download proof and governance packets"],
-    restrictions: ["Cannot enable live clinical execution", "Cannot alter append-only audit events"]
+    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Download proof and governance packets"],
+    restrictions: ["Cannot enable live clinical execution", "Cannot alter append-only audit events", "Cannot create legal, breach, or compliance certification determinations"]
   },
   {
     role: "pilot-lead",
-    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Commit TrustOS decisions", "Record governed reviewer dispositions", "View workspace sessions", "Download proof and governance packets"],
-    restrictions: ["Cannot manage tenant identity", "Cannot alter append-only audit events"]
+    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "View workspace sessions", "Download proof and governance packets"],
+    restrictions: ["Cannot manage tenant identity", "Cannot alter append-only audit events", "Cannot create legal, breach, or compliance certification determinations"]
   },
   {
     role: "reviewer",
-    permissions: ["View workspace sessions", "Review Trust Cards and work orders", "Record governed reviewer dispositions and outcome signals", "Download proof and governance packets"],
-    restrictions: ["Cannot create sessions or new work orders", "Cannot manage tenant identity"]
+    permissions: ["View workspace sessions", "Review Trust Cards, work orders, and TrustOps incidents", "Record governed reviewer dispositions and outcome signals", "Download proof and governance packets"],
+    restrictions: ["Cannot create sessions or new work orders", "Cannot manage tenant identity", "Cannot mutate TrustOps incident records"]
   },
   {
     role: "observer",
@@ -331,6 +331,24 @@ export const protectedPilotApiContracts = [
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
     purpose: "Download a buyer-ready Markdown proof packet generated from tenant-isolated session evidence."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents",
+    access: "GET: AAL2 bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",
+    purpose: "Inspect or create tenant-scoped TrustOps incident evidence for synthetic-pilot and enterprise-readiness review."
+  },
+  {
+    method: "GET / PATCH",
+    route: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}",
+    access: "GET: AAL2 bearer token + workspace membership. PATCH: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",
+    purpose: "Inspect or update TrustOps incident status, legal-hold posture, notification review posture, containment, remediation, and post-incident review evidence."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + append-only packet-download audit",
+    purpose: "Download an audited TrustOps review packet after recording the packet release event."
   },
   {
     method: "GET / POST",

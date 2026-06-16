@@ -8,6 +8,10 @@ Updated: 2026-06-16
 - Added `/api/trust-safety-operations/incidents/{incidentId}/report` for downloadable no-PHI trust safety incident reports.
 - Added tenant-scoped durable TrustOps incident storage contract with private Supabase tables, deny-all RLS, guarded RPCs, AAL2 tenant mutation gates, append-only events, legal-hold fields, notification decisions, and review-packet exports.
 - Added protected tenant TrustOps APIs at `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents`, `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}`, and `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet`.
+- Applied the tenant TrustOps incident migration to the `scrimed-protected-pilot` Supabase project.
+- Added FK index hardening for TrustOps and Agent Workspace tables after Supabase performance advisor review.
+- Added the authenticated `/pilot-workspace/access` Tenant TrustOps incident workspace panel for dashboard metrics, no-PHI incident creation, status/legal-hold/notification review updates, event inspection, and audited review-packet download.
+- Added `scripts/trustops-authenticated-smoke.mjs` for TrustOps fail-closed and authenticated happy-path verification.
 - Added target-audience positioning for CIO, CISO, privacy, compliance, clinical operations, RCM, payer, government, investor, and strategic partner review.
 - Added a dedicated Supabase migration for `attribution-analytics-packet-downloaded`, plus a rollout fallback to the existing sales artifact event until the production migration is verified.
 - Added `/trust-safety-operations` and `/api/trust-safety-operations` for SCRIMED's 24/7 trust, safety, copyright, legal, security, monitoring, auditing, fixing, and continuous-improvement operating model.
@@ -15,7 +19,7 @@ Updated: 2026-06-16
 - Strengthened Enterprise Readiness with copyright registration candidates, trademark strategy, third-party license/provenance controls, generated-media review, and 24/7 incident-response readiness gates.
 - Added tenant-admin attribution analytics into `/sales-operations` and added a protected audited attribution analytics packet export under `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`.
 - Preserved the boundary: this is not legal advice, compliance certification, managed SOC/MDR coverage, production clinical monitoring, breach determination, PHI storage, or live clinical execution authorization.
-- Remaining gate: apply and authenticated-smoke-test the TrustOps Supabase migration in every environment before using tenant mutation routes with buyers.
+- Remaining gate: enable Supabase Auth leaked-password protection in the dashboard and add a CI-held AAL2 tenant smoke token before using TrustOps mutation routes in buyer-facing demos.
 
 ## Latest Attribution Analytics Release
 
