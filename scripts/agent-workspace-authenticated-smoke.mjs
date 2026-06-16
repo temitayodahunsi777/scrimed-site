@@ -61,6 +61,19 @@ console.log(
   `pass unauthenticated governance-ledger fail-closed check: ${unauthenticatedLedger.response.status} ${unauthenticatedLedger.response.statusText}`
 );
 
+const unauthenticatedEnterpriseProofPacket = await request(
+  `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`
+);
+requireStatus(
+  "unauthenticated enterprise proof packet",
+  unauthenticatedEnterpriseProofPacket.response.status,
+  [401, 503]
+);
+requireSyntheticBoundary("unauthenticated enterprise proof packet", unauthenticatedEnterpriseProofPacket.response);
+console.log(
+  `pass unauthenticated enterprise proof-packet fail-closed check: ${unauthenticatedEnterpriseProofPacket.response.status} ${unauthenticatedEnterpriseProofPacket.response.statusText}`
+);
+
 if (!bearerToken) {
   const missingTokenMessage =
     "set SCRIMED_BEARER_TOKEN to a tenant-admin or pilot-lead AAL2 bearer token";
@@ -245,4 +258,18 @@ if (!incidentExportResult.body.text.includes("SCRIMED Agent Workspace Incident E
 }
 
 console.log("pass authenticated incident export download and governance-ledger audit event");
+
+const enterpriseProofPacketResult = await request(
+  `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,
+  {
+    headers: { Authorization: `Bearer ${bearerToken}` }
+  }
+);
+requireStatus("authenticated enterprise proof packet", enterpriseProofPacketResult.response.status, 200);
+
+if (!enterpriseProofPacketResult.body.text.includes("SCRIMED Enterprise Proof Packet")) {
+  throw new Error("authenticated enterprise proof packet did not include the expected packet heading.");
+}
+
+console.log("pass authenticated enterprise proof packet download and audit event");
 console.log("SCRIMED Agent Workspace authenticated smoke completed.");

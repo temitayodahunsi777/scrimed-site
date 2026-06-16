@@ -1,6 +1,14 @@
 import type { AgentEvaluationRecord } from "./agentEvaluationWorkspace";
 import { deploymentMetricLines, getDeploymentProfileSummary } from "./deploymentProfiles";
-import type { AgentWorkspaceGovernanceLedgerRecord } from "./persistentAgentWorkspace";
+import type {
+  AgentWorkspaceGovernanceLedgerRecord,
+  AgentWorkspaceWorkOrderRecord
+} from "./persistentAgentWorkspace";
+import type {
+  DurableTrustSafetyIncidentEventRecord,
+  DurableTrustSafetyIncidentRecord
+} from "./trustSafetyOperations";
+import type { TrustOSDecisionLedgerRecord } from "./trustOSDecisionLedger";
 import { isUpstashRedisConfigured } from "./upstashRuntime";
 
 export type PilotWorkspaceRole = "tenant-admin" | "pilot-lead" | "reviewer" | "observer";
@@ -218,6 +226,29 @@ export type TenantActivationProofPacket = {
   boundary: string;
 };
 
+export type EnterpriseProofPacketTrustSafetyDashboard = {
+  incidents: DurableTrustSafetyIncidentRecord[];
+  events: DurableTrustSafetyIncidentEventRecord[];
+  security: Record<string, unknown>;
+  boundary: string;
+} | null;
+
+export type EnterpriseProofPacketInput = {
+  generatedAt: string;
+  auditEventId: string;
+  actorUserId: string;
+  appBaseUrl: string;
+  workspace: PilotWorkspaceRecord;
+  sessions: PilotSessionRecord[];
+  auditEvents: PilotAuditEventRecord[];
+  trustOSDecisions: TrustOSDecisionLedgerRecord[];
+  agentWorkOrders: AgentWorkspaceWorkOrderRecord[];
+  governanceLedgerRecords: AgentWorkspaceGovernanceLedgerRecord[];
+  trustSafetyDashboard: EnterpriseProofPacketTrustSafetyDashboard;
+  tenantAccessDashboard: TenantAccessDashboard | null;
+  unavailableSections: string[];
+};
+
 export type ProtectedPilotInfrastructure = {
   identity: {
     provider: "Supabase Auth";
@@ -332,6 +363,12 @@ export const protectedPilotApiContracts = [
     route: "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit",
     purpose: "Download a buyer-ready Markdown proof packet generated from tenant-isolated session evidence."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet",
+    access: "AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit + append-only packet-download audit",
+    purpose: "Download an aggregate Markdown enterprise proof packet spanning sessions, audit events, TrustOS decisions, Agent Workspace work orders, TrustOps incidents, tenant access posture, and governance ledger evidence."
   },
   {
     method: "GET / POST",
@@ -500,7 +537,8 @@ export function getProtectedPilotWorkspaceSummary() {
       "Tenant-isolated durable synthetic evaluation sessions",
       "Append-only audit events",
       "Human-review and Trust Card evidence",
-      "Downloadable enterprise proof packets",
+      "Downloadable single-session enterprise proof packets",
+      "Tenant-admin aggregate enterprise proof packet spanning sessions, work orders, incidents, access controls, and audit evidence",
       "AAL2-protected append-only TrustOS Decision Ledger",
       "Governed reviewer dispositions, overrides, and outcome-learning signals",
       "Downloadable audited TrustOS governance packets",
@@ -518,7 +556,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Authenticated Agent Workspace dashboard for work-order creation, governed transitions, outcome metrics, reviewer queues, retry queues, packet export, governance export, and event-trail review",
       "Persistent Agent Workspace work-order creation, state transitions, retry tracking, reviewer assignment, closure, dashboard filters, proof-packet export, and append-only event trails"
     ],
-    updated: "2026-06-14"
+    updated: "2026-06-16"
   };
 }
 
@@ -600,6 +638,196 @@ ${evaluation.observabilityRecord.measurementBoundary}
 ${session.boundary}
 
 This proof packet documents a governed synthetic pilot evaluation. It is not clinical advice, a production authorization, a reimbursement guarantee, or evidence of autonomous clinical execution.
+`;
+}
+
+function enterpriseSessionLines(sessions: PilotSessionRecord[]) {
+  if (sessions.length === 0) {
+    return "- No durable synthetic pilot sessions are visible to this tenant-admin session.";
+  }
+
+  return sessions
+    .slice(0, 25)
+    .map(
+      (session) =>
+        `- ${session.createdAt}: ${session.evaluation.scenario.name} (${session.status}), session ${session.id}, scenario ${session.scenarioSlug}`
+    )
+    .join("\n");
+}
+
+function enterpriseTrustOSDecisionLines(decisions: TrustOSDecisionLedgerRecord[]) {
+  if (decisions.length === 0) {
+    return "- No TrustOS decisions are visible for this workspace.";
+  }
+
+  return decisions
+    .slice(0, 25)
+    .map(
+      (decision) =>
+        `- ${decision.createdAt}: ${decision.workflow}, ${decision.decision}, confidence ${decision.confidence}, uncertainty ${decision.uncertainty}, policy ${decision.policyVersion}`
+    )
+    .join("\n");
+}
+
+function enterpriseWorkOrderLines(workOrders: AgentWorkspaceWorkOrderRecord[]) {
+  if (workOrders.length === 0) {
+    return "- No persistent Agent Workspace work orders are visible for this workspace.";
+  }
+
+  return workOrders
+    .slice(0, 25)
+    .map(
+      (workOrder) =>
+        `- ${workOrder.updatedAt}: ${workOrder.workOrderType}, state ${workOrder.state}, owner ${workOrder.agentOwner}, reviewer ${workOrder.assignedReviewerId ?? "unassigned"}, work order ${workOrder.id}`
+    )
+    .join("\n");
+}
+
+function enterpriseGovernanceLedgerLines(records: AgentWorkspaceGovernanceLedgerRecord[]) {
+  if (records.length === 0) {
+    return "- No Agent Workspace governance ledger records are visible for this workspace.";
+  }
+
+  return records
+    .slice(0, 25)
+    .map(
+      (record) =>
+        `- ${record.createdAt}: ${record.actionType}, severity ${record.incidentSeverity}, work order ${record.workOrderId ?? "workspace-level"}, ledger ${record.id}`
+    )
+    .join("\n");
+}
+
+function enterpriseIncidentLines(dashboard: EnterpriseProofPacketTrustSafetyDashboard) {
+  if (!dashboard) {
+    return "- Trust Safety incident dashboard is unavailable for this packet.";
+  }
+
+  if (dashboard.incidents.length === 0) {
+    return "- No Trust Safety incidents are visible for this workspace.";
+  }
+
+  return dashboard.incidents
+    .slice(0, 20)
+    .map(
+      (incident) =>
+        `- ${incident.updatedAt}: ${incident.title}, severity ${incident.severity}, status ${incident.status}, legal hold ${incident.legalHoldStatus}, notification ${incident.notificationDecision}`
+    )
+    .join("\n");
+}
+
+function enterpriseAccessLines(dashboard: TenantAccessDashboard | null) {
+  if (!dashboard) {
+    return "- Tenant access dashboard is unavailable for this packet.";
+  }
+
+  return [
+    `- Active members: ${dashboard.summary.activeMembers}`,
+    `- Inactive members: ${dashboard.summary.inactiveMembers}`,
+    `- Pending invitations: ${dashboard.summary.pendingInvitations}`,
+    `- Access reviews due: ${dashboard.summary.accessReviewsDue}`,
+    `- Identity provider posture: ${dashboard.identityReadiness.providerStatus}`,
+    `- Invitation delivery posture: ${dashboard.deliveryReadiness.status}`,
+    `- Direct invitation email: ${dashboard.security.directInvitationEmail ? "enabled" : "disabled"}`
+  ].join("\n");
+}
+
+function enterpriseAuditLines(events: PilotAuditEventRecord[]) {
+  if (events.length === 0) {
+    return "- No pilot audit events are visible for this workspace.";
+  }
+
+  return events
+    .slice(0, 30)
+    .map(
+      (event) =>
+        `- ${event.createdAt}: ${event.eventType} by ${event.actorUserId}; session ${event.sessionId ?? "workspace-level"}`
+    )
+    .join("\n");
+}
+
+function unavailableSectionLines(sections: string[]) {
+  if (sections.length === 0) {
+    return "- All aggregate packet evidence sections returned data or empty-state evidence.";
+  }
+
+  return markdownItems(sections);
+}
+
+function markdownJson(value: unknown) {
+  return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
+}
+
+export function buildEnterpriseAggregateProofPacket(input: EnterpriseProofPacketInput) {
+  const appBaseUrl = input.appBaseUrl.replace(/\/$/, "");
+  const accessRoute = `${appBaseUrl}/pilot-workspace/access`;
+  const trustSafetyEventCount = input.trustSafetyDashboard?.events.length ?? 0;
+
+  return `# SCRIMED Enterprise Proof Packet
+
+## Packet Control
+- Generated: ${input.generatedAt}
+- Audit event ID: ${input.auditEventId}
+- Generated by: ${input.actorUserId}
+- Packet type: tenant-admin aggregate enterprise proof packet
+- Product route: ${accessRoute}
+- Data boundary: synthetic-only, metadata-only, tenant-scoped
+
+## Tenant Workspace
+- Tenant: ${input.workspace.tenantName}
+- Workspace: ${input.workspace.name}
+- Workspace slug: ${input.workspace.slug}
+- Workspace status: ${input.workspace.status}
+- Workspace created: ${input.workspace.createdAt}
+
+## Evidence Counts
+- Durable synthetic sessions: ${input.sessions.length}
+- Pilot audit events: ${input.auditEvents.length}
+- TrustOS decisions: ${input.trustOSDecisions.length}
+- Agent Workspace work orders: ${input.agentWorkOrders.length}
+- Agent Workspace governance ledger records: ${input.governanceLedgerRecords.length}
+- Trust Safety incidents: ${input.trustSafetyDashboard?.incidents.length ?? 0}
+- Trust Safety incident events: ${trustSafetyEventCount}
+- Tenant access members: ${input.tenantAccessDashboard?.summary.activeMembers ?? 0} active, ${input.tenantAccessDashboard?.summary.inactiveMembers ?? 0} inactive
+
+## Durable Synthetic Sessions
+${enterpriseSessionLines(input.sessions)}
+
+## TrustOS Decision Ledger
+${enterpriseTrustOSDecisionLines(input.trustOSDecisions)}
+
+## Persistent Agent Workspace
+${enterpriseWorkOrderLines(input.agentWorkOrders)}
+
+## Governance Ledger
+${enterpriseGovernanceLedgerLines(input.governanceLedgerRecords)}
+
+## Trust Safety And Incident Evidence
+${enterpriseIncidentLines(input.trustSafetyDashboard)}
+
+## Tenant Access And Identity Controls
+${enterpriseAccessLines(input.tenantAccessDashboard)}
+
+## Recent Append-Only Audit Events
+${enterpriseAuditLines(input.auditEvents)}
+
+## Unavailable Or Degraded Sections
+${unavailableSectionLines(input.unavailableSections)}
+
+## Trust Safety Security Metadata
+${markdownJson(input.trustSafetyDashboard?.security ?? {})}
+
+## Legal, Privacy, Security, And Safety Boundary
+- This packet documents governed synthetic pilot evidence only.
+- It is not medical advice, clinical decision support authorization, diagnosis, treatment guidance, patient instruction, payer submission, reimbursement guarantee, legal advice, regulatory advice, or security certification.
+- It is not evidence of HIPAA compliance, SOC 2 certification, FDA clearance, payer approval, reimbursement eligibility, or production readiness.
+- SCRIMED does not accept PHI, live patient records, payer credentials, production EHR credentials, imaging files, device streams, or secrets in this protected synthetic pilot workspace.
+- Live clinical, payer, imaging, device, EHR, or patient-facing use requires signed customer authorization, BAA/DPA path where applicable, privacy review, security review, clinical governance, legal review, retention policy, incident response, and deployment approval.
+- Human review remains required before any buyer-facing interpretation is treated as operational evidence.
+
+## Workspace Boundary
+${input.workspace.boundary}
+
+${protectedPilotBoundary}
 `;
 }
 

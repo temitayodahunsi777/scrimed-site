@@ -72,7 +72,7 @@ Current boundary:
 
 Current foundation:
 
-- Protected Pilot Workspaces provide tenant-authenticated synthetic sessions, durable proof packets, TrustOS governance packets, an authenticated Agent Workspace execution dashboard, and append-only audit events.
+- Protected Pilot Workspaces provide tenant-authenticated synthetic sessions, durable session proof packets, aggregate tenant-admin enterprise proof packets, TrustOS governance packets, an authenticated Agent Workspace execution dashboard, and append-only audit events.
 - Persistent Agent Workspace v1 composes protected pilot sessions into resumable synthetic work-order templates for RCM denial appeals, trial matching, pre-visit review, post-visit drafting, investor outreach, security scans, and interoperability data transformation.
 - Persistent Agent Workspace v1 exposes model-router policy decisions, memory scopes, sandbox/tool scopes, reviewer checkpoints, audit timelines, blocked actions, dedicated RLS-backed work-order/event tables, authenticated dashboard filters, governed create and transition controls, outcome metric capture, reviewer and retry queue visibility, RPC-only protected mutations, local governance export, and audited downloadable proof packets while keeping live PHI and clinical execution blocked.
 - TrustOS model-route profiles define the policy frame for vendor-neutral model routing across cost, latency, safety, context, availability, fallback, PHI sensitivity, and regional constraints.
@@ -213,7 +213,7 @@ Deferred production gates:
 Replacement process:
 
 - Vercel deployment, GitHub Actions, and local package-manager verification provide independent build evidence.
-- Persistent Agent Workspace v1 replaces vague long-running agent promises with inspectable synthetic work orders, model-router policies, reviewer checkpoints, audit timelines, blocked actions, and downloadable proof packets.
+- Persistent Agent Workspace v1 replaces vague long-running agent promises with inspectable synthetic work orders, model-router policies, reviewer checkpoints, audit timelines, blocked actions, downloadable work-order proof packets, and tenant-admin aggregate enterprise proof packets.
 - Agent Workspace work-order APIs and protected cockpit UI replace static work-order proof with RLS-backed list filters, dashboard summaries, selected event trails, governed create, inspect, transition, retry, review, block, close, outcome metric capture, local governance export, and audited proof-packet contracts that fail closed when migration verification is missing.
 - Integration fixture validation replaces live connector assumptions with synthetic request and expected-response evidence.
 - Synthetic interoperability conformance evaluations replace untested standards claims with deterministic checks, linked evidence, and explicit production blockers.

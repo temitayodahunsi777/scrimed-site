@@ -45,6 +45,10 @@ type PilotAuditResponse = {
   error?: { message?: string };
 };
 
+type ProofPacketResponse = {
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -82,6 +86,7 @@ export default function ProtectedPilotAccess({
   );
   const [message, setMessage] = useState("");
   const [passkeyStatus, setPasskeyStatus] = useState<PasskeyStatus>("idle");
+  const [enterprisePacketStatus, setEnterprisePacketStatus] = useState<"idle" | "downloading">("idle");
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
@@ -125,6 +130,7 @@ export default function ProtectedPilotAccess({
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
+        setEnterprisePacketStatus("idle");
         setStatus("signed-out");
         return;
       }
@@ -512,6 +518,41 @@ export default function ProtectedPilotAccess({
     setMessage("Proof packet downloaded and its audit event was committed.");
   }
 
+  async function downloadEnterpriseProofPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setEnterprisePacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/enterprise-proof-packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    setEnterprisePacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+      setMessage(body.error?.message ?? "The enterprise proof packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-enterprise-proof-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Enterprise proof packet downloaded and its audit event was committed.");
+  }
+
   if (!configured) {
     return (
       <section className="section-band split-band">
@@ -764,6 +805,41 @@ export default function ProtectedPilotAccess({
           />
 
           <TenantAccessAdministrationPanel session={session} workspace={selectedWorkspace} />
+
+          <section className="table-section" aria-label="Enterprise proof packet">
+            <div className="section-heading">
+              <p className="eyebrow">Enterprise proof packet</p>
+              <h2>Download tenant-admin diligence evidence for this protected pilot workspace.</h2>
+              <p className="section-copy">
+                The aggregate packet combines synthetic sessions, TrustOS decisions, Agent Workspace work orders,
+                Trust Safety incidents, tenant access posture, governance ledger evidence, and recent audit activity.
+                Release requires tenant-admin or pilot-lead authorization, fresh AAL2 assurance, and an append-only
+                audit event before download.
+              </p>
+              <div className="form-actions">
+                <button
+                  className="primary-action"
+                  disabled={enterprisePacketStatus === "downloading"}
+                  onClick={downloadEnterpriseProofPacket}
+                  type="button"
+                >
+                  {enterprisePacketStatus === "downloading"
+                    ? "Preparing Enterprise Packet"
+                    : "Download Enterprise Proof Packet"}
+                </button>
+              </div>
+            </div>
+            <article className="module-row">
+              <div>
+                <span>synthetic-only diligence</span>
+                <h2>{selectedWorkspace.tenantName} aggregate proof export</h2>
+              </div>
+              <p>
+                {sessions.length} sessions, {auditEvents.length} audit events, governed workspace boundary retained.
+              </p>
+              <strong>No PHI, autonomous clinical execution, payer submission, or production authorization.</strong>
+            </article>
+          </section>
 
           <section className="table-section" aria-label="Durable synthetic pilot sessions">
             <div className="section-heading">

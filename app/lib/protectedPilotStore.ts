@@ -794,6 +794,27 @@ export async function recordProofPacketDownload(
   });
 }
 
+export async function recordEnterpriseProofPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "enterprise-proof-packet",
+      format: "text/markdown",
+      syntheticOnly: true
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {
   const { data, error } = await client
     .from("trustos_decisions")

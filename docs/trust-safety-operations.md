@@ -13,6 +13,7 @@ Trust Safety Operations v4 is active as an inspectable operating model, syntheti
 - Tenant incident dashboard API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents`
 - Tenant incident update API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}`
 - Tenant incident review packet API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet`
+- Aggregate enterprise proof packet API: `/api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 - Trust Center: `/trust-center`
 - Claims Register: `/claims`
 - Audit Layer: `/audit`
@@ -77,6 +78,8 @@ This is designed for protected synthetic pilots and enterprise readiness. It doe
 
 The authenticated workspace panel lets approved tenant members inspect dashboard metrics, create no-PHI incident records, commit status and legal-hold/notification review updates, inspect the event trail, and download audited review packets.
 
+Tenant admins and pilot leads can also download an aggregate enterprise proof packet from `/pilot-workspace/access`. The packet combines synthetic pilot sessions, TrustOS decisions, Agent Workspace work orders, Trust Safety incidents, tenant access posture, governance ledger records, and recent audit activity only after a write-before-release audit event is committed.
+
 ## Target Audience Appeal
 
 The TrustOps layer is especially relevant for:
@@ -101,6 +104,7 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Added the authenticated `/pilot-workspace/access` TrustOps incident panel.
 - Added passkey-aware tenant sign-in and enrollment controls while preserving AAL2/TOTP gates for governed TrustOps mutation paths.
 - Added authenticated passkey management for listing, renaming, registering, and revoking passkeys from protected product consoles.
+- Added a tenant-admin aggregate enterprise proof packet with write-before-release audit and no-secret fail-closed smoke coverage.
 - Added the `passkey-or-magic-link` tenant identity readiness posture so TrustOps and tenant administration can reflect the current phishing-resistant sign-in posture.
 - Added `scripts/trustops-authenticated-smoke.mjs` for fail-closed and authenticated TrustOps route verification.
 - Added `scripts/public-production-smoke.mjs` for no-secret public route, product posture, readiness, and fail-closed verification.
@@ -110,10 +114,10 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.
 - Tenant TrustOps storage is synthetic-pilot and enterprise-readiness only; regulated production incidents require customer-approved live-data boundaries, breach analysis, notification decisions, and forensic process.
 - Supabase Auth leaked-password protection remains a dashboard-level security setting for password-based auth. SCRIMED product flows remain passkey or passwordless magic-link based; enable leaked-password protection if password sign-in remains active anywhere in the project.
-- Authenticated TrustOps happy-path mutation smoke requires a CI-held AAL2 tenant-admin or pilot-lead bearer token; public readiness and unauthenticated fail-closed smoke can run without secrets.
+- Authenticated TrustOps, Agent Workspace, and enterprise proof-packet happy-path smoke requires a CI-held AAL2 tenant-admin or pilot-lead bearer token; public readiness and unauthenticated fail-closed smoke can run without secrets.
 - Supabase passkeys are currently experimental per Supabase documentation and require stable relying-party domain/origin configuration; changing the relying-party ID invalidates enrolled passkeys.
 - Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers.
 
 ## Next Build Step
 
-Run `scripts/public-production-smoke.mjs` on every production deployment, place a CI-held AAL2 smoke token for authenticated mutation happy paths, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.
+Run `scripts/public-production-smoke.mjs` on every production deployment, place a CI-held AAL2 smoke token for authenticated mutation and proof-packet happy paths, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.

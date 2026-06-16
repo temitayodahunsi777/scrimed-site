@@ -80,6 +80,10 @@ async function checkProductConsole() {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
 
+  if (body.proofStack?.enterpriseProofPackets !== "tenant-admin-aggregate-write-before-release") {
+    throw new Error("product console missing enterprise proof packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -116,6 +120,10 @@ await checkHtml("/pilot-workspace/access");
 await checkHtml("/sales-operations");
 await checkProductConsole();
 await checkReadiness();
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,
+  "Enterprise proof packet protected API"
+);
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/trust-safety-incidents`,
   "TrustOps protected API"

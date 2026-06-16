@@ -634,6 +634,7 @@ export function getProductConsoleSummary() {
       tenantTrustOpsIncidents: "private-schema-rpc-guarded",
       passkeyTenantAuthentication: "passkey-or-magic-link-plus-aal2",
       passkeyManagement: "self-service-list-rename-register-revoke",
+      enterpriseProofPackets: "tenant-admin-aggregate-write-before-release",
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
