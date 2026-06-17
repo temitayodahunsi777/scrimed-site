@@ -62,6 +62,10 @@ import {
   buyerDemoExecutionBriefApiRoute,
   buyerDemoExecutionPathApiRoute
 } from "./buyerDemoExecutionPath";
+import {
+  buyerDemoSessionPacketApiRoute,
+  buyerDemoSessionsApiRoute
+} from "./buyerDemoSessions";
 
 export type HubModule = {
   name: string;
@@ -194,6 +198,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Integration fixtures", value: "contract coverage active", tone: "good" },
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "local, CI, and Vercel active", tone: "good" },
+  { name: "Buyer demo sessions", value: "persisted no-PHI proof history active", tone: "good" },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },
@@ -241,6 +246,8 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness/packet",
   buyerDemoExecutionPathApiRoute,
   buyerDemoExecutionBriefApiRoute,
+  buyerDemoSessionsApiRoute,
+  buyerDemoSessionPacketApiRoute,
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",
@@ -507,6 +514,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-16"
+    updated: "2026-06-17"
   };
 }

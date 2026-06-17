@@ -11,6 +11,10 @@ import type { SalesProductionActivationReadinessResult } from "./productionActiv
 import type { SalesCustomerActivationApprovalsResult } from "./customerActivationApprovals";
 import type { SalesBuyerDiligenceRoomResult } from "./buyerDiligenceRoom";
 import type { SalesSecureEvidenceVaultReadinessResult } from "./secureEvidenceVaultReadiness";
+import type {
+  SalesBuyerDemoSession,
+  SalesBuyerDemoSessionResult
+} from "./buyerDemoSessions";
 
 export async function getSalesOperationsDashboard(client: SupabaseClient) {
   const { data, error } = await client.rpc("sales_operations_dashboard");
@@ -240,6 +244,49 @@ export async function recordSalesSecureEvidenceVaultReadinessPacketDownload(
 
   return {
     result: data ? (data as SalesSecureEvidenceVaultReadinessResult) : null,
+    error
+  };
+}
+
+export async function listSalesBuyerDemoSessions(client: SupabaseClient, intakeId: string) {
+  const { data, error } = await client.rpc("list_sales_buyer_demo_sessions", {
+    p_intake_id: intakeId
+  });
+
+  return {
+    buyerDemoSessions: data ? (data as SalesBuyerDemoSession[]) : null,
+    error
+  };
+}
+
+export async function recordSalesBuyerDemoSession(
+  client: SupabaseClient,
+  intakeId: string,
+  sessionInput: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_sales_buyer_demo_session", {
+    p_intake_id: intakeId,
+    p_session_input: sessionInput
+  });
+
+  return {
+    result: data ? (data as SalesBuyerDemoSessionResult) : null,
+    error
+  };
+}
+
+export async function recordSalesBuyerDemoSessionPacketDownload(
+  client: SupabaseClient,
+  intakeId: string,
+  sessionId: string
+) {
+  const { data, error } = await client.rpc("record_sales_buyer_demo_session_packet_download", {
+    p_intake_id: intakeId,
+    p_session_id: sessionId
+  });
+
+  return {
+    result: data ? (data as SalesBuyerDemoSessionResult) : null,
     error
   };
 }

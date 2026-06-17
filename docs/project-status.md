@@ -2,6 +2,17 @@
 
 Updated: 2026-06-17
 
+## Latest Persisted Buyer Demo Sessions Release
+
+- Added guarded persisted buyer demo sessions through `GET` and `POST /api/sales-operations/opportunities/{intakeId}/demo-sessions`.
+- Added audited buyer demo session packets through `GET /api/sales-operations/opportunities/{intakeId}/demo-sessions/{sessionId}/packet` so tenant-admins can retain no-PHI operator notes, buyer questions, blockers, workarounds, next actions, follow-up plan, current demo path snapshot, and selected proof-packet routes.
+- Added a private `sales_buyer_demo_sessions` table with deny-all direct RLS and tenant-admin AAL2 plus server-held authorization for session recording and packet release.
+- Updated `/sales-operations` with no-PHI demo-session capture, persisted session history, latest-session packet export, and current path score visibility inside the existing Authenticated Buyer Demo Execution panel.
+- Updated `/product`, `/hub`, `/api/product/console`, public smoke coverage, and product readiness brief with buyer demo session proof-stack posture.
+- Resolved the previous demo-persistence limitation with a free workaround: SCRIMED can now record buyer demo outcomes and release audited follow-up packets without a paid CRM, object storage, or PHI-bearing evidence vault.
+- Preserved the hard boundary: buyer demo sessions do not accept PHI, patient identifiers, live clinical records, payer member data, diagnosis details, source contracts, credentials, legal advice, compliance certification, reimbursement determinations, patient outreach approval, autonomous care approval, or live healthcare execution authorization.
+- Remaining gate: automated authenticated happy-path CI still requires approved short-lived AAL2 token handling. Until then, public smoke verifies fail-closed behavior and human tenant-admins exercise the authenticated path through browser sessions.
+
 ## Latest Authenticated Buyer Demo Execution Release
 
 - Added protected `GET /api/sales-operations/opportunities/{intakeId}/demo-execution` to build a tenant-admin, no-PHI buyer demo execution path from existing opportunities, audit events, deal-room readiness, protected workspace routing, and packet availability.

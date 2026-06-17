@@ -37,6 +37,10 @@ import {
   isSecureEvidenceVaultReadinessEligible,
   type SalesSecureEvidenceVaultReadinessResult
 } from "../lib/secureEvidenceVaultReadiness";
+import type {
+  SalesBuyerDemoSession,
+  SalesBuyerDemoSessionResult
+} from "../lib/buyerDemoSessions";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -56,6 +60,7 @@ type ConsoleStatus =
   | "recording-activation-approvals"
   | "preparing-buyer-diligence"
   | "preparing-evidence-vault-readiness"
+  | "recording-demo-session"
   | "completing"
   | "error";
 
@@ -100,6 +105,14 @@ type SecureEvidenceVaultReadinessResponse = SalesSecureEvidenceVaultReadinessRes
   error?: { message?: string };
 };
 
+type BuyerDemoSessionsResponse = {
+  buyerDemoSessions?: SalesBuyerDemoSession[];
+  buyerDemoSession?: SalesBuyerDemoSessionResult["buyerDemoSession"];
+  created?: boolean;
+  auditEventId?: string | null;
+  error?: { message?: string };
+};
+
 function displayValue(value: string) {
   return value
     .split("-")
@@ -136,6 +149,14 @@ function defaultAssessmentStart() {
   const date = new Date(Date.now() + 24 * 60 * 60_000);
   date.setMinutes(0, 0, 0);
   return toDateTimeLocal(date.toISOString());
+}
+
+function linesFromText(value: string) {
+  return value
+    .split(/\n|;/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 8);
 }
 
 function draftFor(opportunity: SalesOpportunity): SalesOpportunityUpdate {
@@ -186,6 +207,12 @@ export default function SalesOperationsConsole({
   const [crmWebhookConfigured, setCrmWebhookConfigured] = useState(false);
   const [selected, setSelected] = useState<SalesOpportunity | null>(null);
   const [draft, setDraft] = useState<SalesOpportunityUpdate | null>(null);
+  const [buyerDemoSessionsByIntake, setBuyerDemoSessionsByIntake] = useState<
+    Record<string, SalesBuyerDemoSession[]>
+  >({});
+  const [demoOperatorNotes, setDemoOperatorNotes] = useState("");
+  const [demoBuyerQuestions, setDemoBuyerQuestions] = useState("");
+  const [demoNextActions, setDemoNextActions] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState("");
   const [mfaFactorStatus, setMfaFactorStatus] = useState<"verified" | "unverified" | "">("");
   const [mfaQrCode, setMfaQrCode] = useState("");
@@ -237,6 +264,9 @@ export default function SalesOperationsConsole({
       const nextSelected = body.dashboard.opportunities[0] ?? null;
       setSelected(nextSelected);
       setDraft(nextSelected ? draftFor(nextSelected) : null);
+      setDemoOperatorNotes("");
+      setDemoBuyerQuestions("");
+      setDemoNextActions("");
       setAssessmentStart(
         nextSelected?.assessmentStartAt
           ? toDateTimeLocal(nextSelected.assessmentStartAt)
@@ -261,6 +291,10 @@ export default function SalesOperationsConsole({
         setAttributionAnalytics(null);
         setSelected(null);
         setDraft(null);
+        setBuyerDemoSessionsByIntake({});
+        setDemoOperatorNotes("");
+        setDemoBuyerQuestions("");
+        setDemoNextActions("");
         setStatus("signed-out");
         return;
       }
@@ -325,6 +359,43 @@ export default function SalesOperationsConsole({
       subscription.unsubscribe();
     };
   }, [supabase]);
+
+  useEffect(() => {
+    if (!session || !selected || status !== "ready") {
+      return;
+    }
+
+    const activeSession = session;
+    const activeOpportunity = selected;
+    let active = true;
+
+    async function loadSelectedBuyerDemoSessions() {
+      const response = await fetch(
+        `/api/sales-operations/opportunities/${activeOpportunity.intakeId}/demo-sessions`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as BuyerDemoSessionsResponse;
+
+      if (!active || !response.ok || !body.buyerDemoSessions) {
+        return;
+      }
+
+      setBuyerDemoSessionsByIntake((current) => ({
+        ...current,
+        [activeOpportunity.intakeId]: body.buyerDemoSessions ?? []
+      }));
+    }
+
+    void loadSelectedBuyerDemoSessions();
+
+    return () => {
+      active = false;
+    };
+  }, [selected, session, status]);
 
   async function sendMagicLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -509,6 +580,9 @@ export default function SalesOperationsConsole({
   function selectOpportunity(opportunity: SalesOpportunity) {
     setSelected(opportunity);
     setDraft(draftFor(opportunity));
+    setDemoOperatorNotes("");
+    setDemoBuyerQuestions("");
+    setDemoNextActions("");
     setAssessmentStart(
       opportunity.assessmentStartAt
         ? toDateTimeLocal(opportunity.assessmentStartAt)
@@ -631,6 +705,88 @@ export default function SalesOperationsConsole({
       `scrimed-${selected.intakeId}-buyer-demo-execution-brief.md`,
       "Buyer demo execution operator brief downloaded. Existing audited packet routes remain the source of truth."
     );
+  }
+
+  async function loadBuyerDemoSessions(opportunity: SalesOpportunity | null = selected) {
+    if (!session || !opportunity) {
+      return;
+    }
+
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${opportunity.intakeId}/demo-sessions`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as BuyerDemoSessionsResponse;
+
+    if (!response.ok || !body.buyerDemoSessions) {
+      return;
+    }
+
+    setBuyerDemoSessionsByIntake((current) => ({
+      ...current,
+      [opportunity.intakeId]: body.buyerDemoSessions ?? []
+    }));
+  }
+
+  async function recordBuyerDemoSession() {
+    if (!session || !selected) {
+      return;
+    }
+
+    const nextActions = linesFromText(demoNextActions);
+    setStatus("recording-demo-session");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/demo-sessions`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          operatorNotes: demoOperatorNotes,
+          buyerQuestions: linesFromText(demoBuyerQuestions),
+          nextActions,
+          followUpPlan: {
+            owner: user?.email ?? "SCRIMED sales operator",
+            nextStep: nextActions[0] ?? selected.nextAction ?? "Confirm buyer decision path",
+            dueAt: selected.nextActionDueAt ?? "",
+            commercialMotion: selected.payload.scope.offerInterest || "Synthetic Pilot Evaluation"
+          }
+        })
+      }
+    );
+    const body = (await response.json()) as BuyerDemoSessionsResponse;
+
+    if (!response.ok || !body.buyerDemoSession) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "The buyer demo session could not be recorded.");
+      return;
+    }
+
+    setDemoOperatorNotes("");
+    setDemoBuyerQuestions("");
+    setDemoNextActions("");
+    await refreshDashboard("Buyer demo session recorded with no-PHI history and append-only audit.");
+    await loadBuyerDemoSessions(selected);
+  }
+
+  async function downloadBuyerDemoSessionPacket(sessionId: string) {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/demo-sessions/${sessionId}/packet`,
+      `scrimed-${selected.intakeId}-${sessionId}-buyer-demo-session.md`,
+      "Buyer demo session packet downloaded and its append-only audit event committed."
+    );
+    await loadBuyerDemoSessions(selected);
   }
 
   async function provisionWorkspace() {
@@ -1160,6 +1316,10 @@ export default function SalesOperationsConsole({
   const buyerDemoWorkspaceMode = selectedWorkspaceProvisioning
     ? "buyer-specific protected workspace"
     : "default synthetic workspace";
+  const selectedBuyerDemoSessions = selected
+    ? buyerDemoSessionsByIntake[selected.intakeId] ?? []
+    : [];
+  const latestBuyerDemoSession = selectedBuyerDemoSessions[0] ?? null;
   const buyerDemoSteps = selected
     ? [
         {
@@ -1675,6 +1835,15 @@ export default function SalesOperationsConsole({
                       <span>04</span>
                       <strong>Boundary: synthetic, business-contact, and workflow-scope metadata only</strong>
                     </div>
+                    <div className="layer-row">
+                      <span>05</span>
+                      <strong>
+                        Persisted sessions: {selectedBuyerDemoSessions.length} ·{" "}
+                        {latestBuyerDemoSession
+                          ? `Latest ${formatDate(latestBuyerDemoSession.createdAt)}`
+                          : "Record after the buyer demo"}
+                      </strong>
+                    </div>
                   </div>
                   <div className="layer-list">
                     {buyerDemoSteps.map((step, index) => (
@@ -1686,9 +1855,83 @@ export default function SalesOperationsConsole({
                       </div>
                     ))}
                   </div>
+                  <div className="form-grid">
+                    <label className="form-field form-field-wide">
+                      <span>Operator notes</span>
+                      <textarea
+                        maxLength={3000}
+                        onChange={(event) => setDemoOperatorNotes(event.target.value)}
+                        placeholder="No PHI. Capture buyer objections, value signals, approved workarounds, and demo outcome."
+                        value={demoOperatorNotes}
+                      />
+                      <small>
+                        No PHI, patient identifiers, live clinical records, payer member data, diagnosis details, or
+                        source contract excerpts.
+                      </small>
+                    </label>
+                    <label className="form-field">
+                      <span>Buyer questions</span>
+                      <textarea
+                        maxLength={1200}
+                        onChange={(event) => setDemoBuyerQuestions(event.target.value)}
+                        placeholder="One no-PHI question per line."
+                        value={demoBuyerQuestions}
+                      />
+                    </label>
+                    <label className="form-field">
+                      <span>Next actions</span>
+                      <textarea
+                        maxLength={1200}
+                        onChange={(event) => setDemoNextActions(event.target.value)}
+                        placeholder="One action per line."
+                        value={demoNextActions}
+                      />
+                    </label>
+                  </div>
+                  <div className="layer-list">
+                    {selectedBuyerDemoSessions.length > 0 ? (
+                      selectedBuyerDemoSessions.slice(0, 3).map((demoSession, index) => (
+                        <div className="layer-row" key={demoSession.id}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <strong>
+                            {displayValue(demoSession.demoStatus)} · {demoSession.readinessScore}% path ·{" "}
+                            {demoSession.selectedPacketRoutes.length} packet routes ·{" "}
+                            {demoSession.lastPacketGeneratedAt
+                              ? `Packet ${formatDate(demoSession.lastPacketGeneratedAt)}`
+                              : "Packet ready"}
+                          </strong>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="layer-row">
+                        <span>01</span>
+                        <strong>No persisted buyer demo sessions recorded for this opportunity yet.</strong>
+                      </div>
+                    )}
+                  </div>
                   <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={status === "recording-demo-session"}
+                      onClick={recordBuyerDemoSession}
+                      type="button"
+                    >
+                      {status === "recording-demo-session" ? "Recording Session" : "Record Demo Session"}
+                    </button>
                     <button className="primary-action" onClick={downloadBuyerDemoExecutionBrief} type="button">
                       Download Demo Brief
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!latestBuyerDemoSession}
+                      onClick={() =>
+                        latestBuyerDemoSession
+                          ? downloadBuyerDemoSessionPacket(latestBuyerDemoSession.id)
+                          : undefined
+                      }
+                      type="button"
+                    >
+                      Download Latest Session Packet
                     </button>
                     <Link className="secondary-action" href="/product">
                       View Product Console

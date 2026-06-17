@@ -59,6 +59,7 @@ Completed foundations:
 - Buyer evidence and signed controls diligence rooms with metadata-only domain proof, IdP metadata readiness, legal/privacy/security controls, BAA/DPA posture, transactional provider decisions, production connector readiness, signed-control tracking, retained blockers, and audited diligence packets
 - Secure evidence vault readiness with disabled-by-default storage-provider decisioning, encryption/key management, DLP, malware scanning, retention/legal hold, access reviews, evidence classification, upload approval, incident response, regional residency, target audience, revenue-path controls, and audited readiness packets
 - Authenticated buyer demo execution path with protected JSON runbook, non-audited operator brief, sequenced packet readiness, known-limit workarounds, and buyer-room/product-console/deal-room routing
+- Persisted buyer demo sessions with no-PHI operator notes, buyer questions, blockers, workarounds, next actions, follow-up plan, current path snapshot, selected packet routes, private deny-all RLS storage, and audited session packets
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -112,7 +113,7 @@ Completed foundations:
 
 Next build targets:
 
-- Convert the authenticated buyer demo execution path into saved demo sessions only after approved AAL2 token handling, operator identity policy, and audited session persistence are defined.
+- Add authenticated happy-path CI for buyer demo sessions after approved short-lived AAL2 test-token handling and operator identity policy are defined.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.
 - Operate the activated sales ownership, due-action cadence, vendor-neutral CRM export, proposal follow-up, and assessment invitation workflows through the protected Sales Operations console

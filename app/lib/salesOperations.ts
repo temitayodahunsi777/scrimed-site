@@ -47,6 +47,12 @@ import {
   secureEvidenceVaultReadinessPacketProofStackStatus,
   secureEvidenceVaultReadinessProofStackStatus
 } from "./secureEvidenceVaultReadiness";
+import {
+  buyerDemoSessionPacketApiRoute,
+  buyerDemoSessionPacketProofStackStatus,
+  buyerDemoSessionProofStackStatus,
+  buyerDemoSessionsApiRoute
+} from "./buyerDemoSessions";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -125,7 +131,9 @@ export type SalesAuditEvent = {
     | "buyer-diligence-room-prepared"
     | "buyer-diligence-packet-downloaded"
     | "secure-evidence-vault-readiness-prepared"
-    | "secure-evidence-vault-readiness-packet-downloaded";
+    | "secure-evidence-vault-readiness-packet-downloaded"
+    | "sales-demo-session-recorded"
+    | "sales-demo-session-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -485,6 +493,26 @@ export function getSalesOperationsSummary() {
       sourceOfTruth: "existing audited packet routes and protected workspaces",
       purpose:
         "Sequence no-PHI buyer demos, operator workarounds, audited packet release, and paid implementation gates from one authenticated runbook.",
+      noPhiBoundary: true
+    },
+    buyerDemoSessions: {
+      status: buyerDemoSessionProofStackStatus,
+      apiRoute: buyerDemoSessionsApiRoute,
+      packetApiRoute: buyerDemoSessionPacketApiRoute,
+      packetProofStackStatus: buyerDemoSessionPacketProofStackStatus,
+      persistedFields: [
+        "operator notes",
+        "buyer questions",
+        "blockers",
+        "workarounds",
+        "next actions",
+        "follow-up plan",
+        "demo path snapshot",
+        "selected proof packet routes"
+      ],
+      sourceOfTruth: "private Supabase table with deny-all direct RLS and tenant-admin RPC guards",
+      purpose:
+        "Persist no-PHI buyer demo run history and release audited Markdown session packets for enterprise proof-of-value follow-up.",
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,
