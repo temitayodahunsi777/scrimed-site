@@ -2,6 +2,17 @@
 
 Updated: 2026-06-16
 
+## Latest Customer Activation Approval Workflow Release
+
+- Added guarded customer activation approvals for production-readiness-prepared Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/activation-approvals`.
+- Added audited activation approval packets through `/api/sales-operations/opportunities/{intakeId}/activation-approvals/packet` so tenant-admins can retain the paid-pilot setup approval scope, allowed setup actions, domain evidence status, IdP metadata review status, invitation template signoff, transactional provider gate, legal/privacy/security approval state, retained blockers, and competitive advantage signals.
+- Added a private `sales_customer_activation_approvals` table with deny-all RLS and tenant-admin AAL2 plus server-held authorization for approval recording and packet release.
+- Updated `/sales-operations` with customer activation approval status, paid-pilot setup approval action, approval packet download action, and visible retained blockers.
+- Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with customer activation approval proof-stack posture.
+- Addressed the written-approval hard gate: SCRIMED founder/operator approval can now unblock paid pilot setup and diligence work inside the governed synthetic evaluation boundary.
+- Preserved the hard boundary: activation approvals do not authorize PHI, live clinical records, customer SSO cutover, automated bulk invitations, production connectors, payer submission, patient outreach, autonomous diagnosis, treatment decisions, compliance certification, reimbursement determinations, or legal/security/privacy conclusions.
+- Remaining gate: separate buyer and SCRIMED written approval, signed legal/privacy/security controls, BAA/DPA path if applicable, clinical governance, connector validation, transactional provider approval, and production operating procedures are still required before live healthcare operations.
+
 ## Latest Production SSO And Invitation Readiness Release
 
 - Added guarded production SSO and invitation delivery readiness preparation for lifecycle-activated Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/production-readiness`.

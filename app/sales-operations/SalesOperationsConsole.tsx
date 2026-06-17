@@ -25,6 +25,10 @@ import {
   isProductionReadinessEligible,
   type SalesProductionActivationReadinessResult
 } from "../lib/productionActivationReadiness";
+import {
+  isCustomerActivationApprovalEligible,
+  type SalesCustomerActivationApprovalsResult
+} from "../lib/customerActivationApprovals";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -41,6 +45,7 @@ type ConsoleStatus =
   | "provisioning"
   | "activating-lifecycle"
   | "preparing-production-readiness"
+  | "recording-activation-approvals"
   | "completing"
   | "error";
 
@@ -70,6 +75,10 @@ type BuyerTenantLifecycleResponse = SalesBuyerTenantLifecycleResult & {
 };
 
 type ProductionActivationReadinessResponse = SalesProductionActivationReadinessResult & {
+  error?: { message?: string };
+};
+
+type CustomerActivationApprovalsResponse = SalesCustomerActivationApprovalsResult & {
   error?: { message?: string };
 };
 
@@ -723,6 +732,49 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function recordCustomerActivationApprovals() {
+    if (!session || !selected) {
+      return;
+    }
+
+    setStatus("recording-activation-approvals");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/activation-approvals`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as CustomerActivationApprovalsResponse;
+
+    if (!response.ok) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "Customer activation approvals could not be recorded.");
+      return;
+    }
+
+    await refreshDashboard(
+      body.created
+        ? "Customer activation approvals recorded for paid pilot setup and audit event committed."
+        : "Customer activation approvals already exist; dashboard refreshed."
+    );
+  }
+
+  async function downloadCustomerActivationApprovalsPacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/activation-approvals/packet`,
+      `scrimed-${selected.intakeId}-activation-approvals.md`,
+      "Customer activation approval packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -972,9 +1024,11 @@ export default function SalesOperationsConsole({
   const selectedWorkspaceProvisioning = selected?.workspaceProvisioning ?? null;
   const selectedBuyerTenantLifecycle = selected?.buyerTenantLifecycle ?? null;
   const selectedProductionReadiness = selected?.productionActivationReadiness ?? null;
+  const selectedCustomerActivationApprovals = selected?.customerActivationApprovals ?? null;
   const workspaceEligible = selected ? isProvisioningEligible(selected) : false;
   const tenantLifecycleEligible = selected ? isTenantLifecycleEligible(selected) : false;
   const productionReadinessEligible = selected ? isProductionReadinessEligible(selected) : false;
+  const activationApprovalEligible = selected ? isCustomerActivationApprovalEligible(selected) : false;
 
   return (
     <>
@@ -1549,6 +1603,71 @@ export default function SalesOperationsConsole({
                       type="button"
                     >
                       Download Readiness Packet
+                    </button>
+                  </div>
+                </section>
+
+                <section>
+                  <p className="eyebrow">Customer activation approvals</p>
+                  <h3>Record paid-pilot setup approval while retaining clinical and privacy hard gates.</h3>
+                  <p className="section-copy">
+                    {selectedCustomerActivationApprovals
+                      ? `Approval is recorded for ${selectedCustomerActivationApprovals.workspaceSlug} with scope ${selectedCustomerActivationApprovals.approvalScope}; live clinical, PHI, payer, patient-facing, customer SSO cutover, and autonomous care actions remain blocked.`
+                      : activationApprovalEligible
+                        ? "Record the written SCRIMED approval that unblocks paid pilot setup after production readiness, while preserving live clinical, PHI, payer, patient-facing, and autonomous-care hard gates."
+                        : "Prepare production readiness before recording paid-pilot setup approval."}
+                  </p>
+                  {selectedCustomerActivationApprovals ? (
+                    <div className="layer-list">
+                      <div className="layer-row">
+                        <span>01</span>
+                        <strong>
+                          Final gate: {selectedCustomerActivationApprovals.finalSetupGate.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>02</span>
+                        <strong>
+                          Domain evidence: {selectedCustomerActivationApprovals.domainEvidenceApproval.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>03</span>
+                        <strong>
+                          Legal, privacy, security:{" "}
+                          {selectedCustomerActivationApprovals.legalPrivacySecurityApproval.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>04</span>
+                        <strong>
+                          Retained blockers: {selectedCustomerActivationApprovals.retainedBlockers.length}
+                        </strong>
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={
+                        status === "recording-activation-approvals" ||
+                        Boolean(selectedCustomerActivationApprovals) ||
+                        !activationApprovalEligible
+                      }
+                      onClick={recordCustomerActivationApprovals}
+                      type="button"
+                    >
+                      {status === "recording-activation-approvals"
+                        ? "Recording Approvals"
+                        : "Record Setup Approval"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!selectedCustomerActivationApprovals}
+                      onClick={downloadCustomerActivationApprovalsPacket}
+                      type="button"
+                    >
+                      Download Approval Packet
                     </button>
                   </div>
                 </section>

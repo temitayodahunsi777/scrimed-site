@@ -26,6 +26,13 @@ import {
   productionActivationReadinessPacketProofStackStatus,
   productionActivationReadinessProofStackStatus
 } from "./productionActivationReadiness";
+import type { SalesCustomerActivationApprovals } from "./customerActivationApprovals";
+import {
+  customerActivationApprovalsApiRoute,
+  customerActivationApprovalsPacketApiRoute,
+  customerActivationApprovalsPacketProofStackStatus,
+  customerActivationApprovalsProofStackStatus
+} from "./customerActivationApprovals";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -68,6 +75,7 @@ export type SalesOpportunity = {
   workspaceProvisioning?: SalesOpportunityWorkspaceProvisioning | null;
   buyerTenantLifecycle?: SalesBuyerTenantLifecycle | null;
   productionActivationReadiness?: SalesProductionActivationReadiness | null;
+  customerActivationApprovals?: SalesCustomerActivationApprovals | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -95,7 +103,9 @@ export type SalesAuditEvent = {
     | "buyer-tenant-lifecycle-activated"
     | "buyer-tenant-lifecycle-packet-downloaded"
     | "production-readiness-prepared"
-    | "production-readiness-packet-downloaded";
+    | "production-readiness-packet-downloaded"
+    | "customer-activation-approvals-recorded"
+    | "customer-activation-approvals-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -362,6 +372,30 @@ export function getSalesOperationsSummary() {
       transactionalDelivery: "provider-approval-required-direct-send-disabled",
       accessReviewAutomation: "attestation-reminder-ready",
       archiveExecution: "manual-archive-ready",
+      noPhiBoundary: true
+    },
+    customerActivationApprovals: {
+      status: customerActivationApprovalsProofStackStatus,
+      apiRoute: customerActivationApprovalsApiRoute,
+      packetApiRoute: customerActivationApprovalsPacketApiRoute,
+      packetProofStackStatus: customerActivationApprovalsPacketProofStackStatus,
+      approvalScope: "paid-pilot-setup-only",
+      allowedActions: [
+        "buyer workspace configuration",
+        "manual onboarding packet preparation",
+        "assessment scheduling",
+        "synthetic proof-packet release",
+        "legal/privacy/security diligence routing"
+      ],
+      retainedHardGates: [
+        "PHI and live clinical records",
+        "production connectors",
+        "customer SSO cutover",
+        "automated bulk invitations",
+        "payer submission",
+        "patient outreach",
+        "autonomous diagnosis or treatment decisions"
+      ],
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,

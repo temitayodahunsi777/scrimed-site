@@ -144,6 +144,14 @@ async function checkProductConsole() {
     throw new Error("product console missing production readiness packet proof-stack posture.");
   }
 
+  if (body.proofStack?.customerActivationApprovals !== "aal2-paid-pilot-activation-approvals") {
+    throw new Error("product console missing customer activation approvals proof-stack posture.");
+  }
+
+  if (body.proofStack?.customerActivationApprovalPackets !== "aal2-audited-activation-approval-packets") {
+    throw new Error("product console missing customer activation approval packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -261,6 +269,14 @@ await checkSalesProtectedFailClosed(
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/production-readiness/packet",
   "Sales production readiness packet protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/activation-approvals",
+  "Sales customer activation approvals protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/activation-approvals/packet",
+  "Sales customer activation approval packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,

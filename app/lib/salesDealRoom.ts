@@ -33,6 +33,12 @@ import {
   productionActivationReadinessPacketProofStackStatus,
   productionActivationReadinessProofStackStatus
 } from "./productionActivationReadiness";
+import {
+  customerActivationApprovalsApiRoute,
+  customerActivationApprovalsPacketApiRoute,
+  customerActivationApprovalsPacketProofStackStatus,
+  customerActivationApprovalsProofStackStatus
+} from "./customerActivationApprovals";
 
 export type SalesDealRoomStage = {
   stage: string;
@@ -69,6 +75,8 @@ export type SalesDealRoomSummary = {
   buyerTenantLifecyclePacketRoute: string;
   productionActivationReadinessRoute: string;
   productionActivationReadinessPacketRoute: string;
+  customerActivationApprovalsRoute: string;
+  customerActivationApprovalsPacketRoute: string;
   status: string;
   defaultWorkspaceSlug: string;
   proofStackStatus: string;
@@ -80,6 +88,8 @@ export type SalesDealRoomSummary = {
   buyerTenantLifecyclePacketProofStackStatus: string;
   productionActivationReadinessProofStackStatus: string;
   productionActivationReadinessPacketProofStackStatus: string;
+  customerActivationApprovalsProofStackStatus: string;
+  customerActivationApprovalsPacketProofStackStatus: string;
   executiveThesis: string;
   stages: SalesDealRoomStage[];
   siteLanes: SalesDealRoomSiteLane[];
@@ -241,6 +251,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     buyerTenantLifecyclePacketRoute: buyerTenantLifecyclePacketApiRoute,
     productionActivationReadinessRoute: productionActivationReadinessApiRoute,
     productionActivationReadinessPacketRoute: productionActivationReadinessPacketApiRoute,
+    customerActivationApprovalsRoute: customerActivationApprovalsApiRoute,
+    customerActivationApprovalsPacketRoute: customerActivationApprovalsPacketApiRoute,
     status: "public-organization-and-protected-packet-ready",
     defaultWorkspaceSlug: defaultDealRoomWorkspaceSlug,
     proofStackStatus: salesDealRoomProofStackStatus,
@@ -252,6 +264,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     buyerTenantLifecyclePacketProofStackStatus,
     productionActivationReadinessProofStackStatus,
     productionActivationReadinessPacketProofStackStatus,
+    customerActivationApprovalsProofStackStatus,
+    customerActivationApprovalsPacketProofStackStatus,
     executiveThesis:
       "SCRIMED converts public product proof, governed pilot intake, tenant-admin sales operations, buyer-room diligence, premium pricing, and protected workspace evidence into one enterprise-ready pilot acquisition path.",
     stages: publicStages,
@@ -269,6 +283,12 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
         resolution:
           "Production readiness packets now package buyer-domain verification, redirect/origin registry, invitation template approval, transactional delivery guardrails, access-review attestation, and archive runbook before any automated send or SSO cutover.",
         productionGate: "Verified buyer domain, approved IdP configuration, approved sending provider, legal/privacy/security sign-off, incident response path, and written enterprise authorization."
+      },
+      {
+        limitation: "Written SCRIMED approval can unblock paid pilot setup, but not live healthcare operations.",
+        resolution:
+          "Customer activation approval packets now record paid-pilot setup authorization, allowed setup actions, retained blockers, owner approvals, and evidence requirements after production readiness exists.",
+        productionGate: "Separate buyer and SCRIMED written approval for PHI, production connectors, customer SSO cutover, automated bulk invitations, payer submission, patient outreach, clinical validation, and live workflow execution."
       },
       {
         limitation: "Authenticated happy-path automation still requires a short-lived AAL2 bearer token.",
@@ -309,6 +329,7 @@ export function deriveSalesDealRoomForOpportunity({
   const hasWorkspaceProvisioned = hasRecentEvent(auditEvents, "opportunity-workspace-provisioned");
   const hasTenantLifecycle = hasRecentEvent(auditEvents, "buyer-tenant-lifecycle-activated");
   const hasProductionReadiness = hasRecentEvent(auditEvents, "production-readiness-prepared");
+  const hasCustomerActivationApprovals = hasRecentEvent(auditEvents, "customer-activation-approvals-recorded");
   const workflowTargetCount = opportunity.payload.scope.workflowTargets.length;
   const governanceCount = opportunity.payload.scope.governanceRequirements.length;
   const reviewStage = ["qualified", "discovery", "proposal", "pilot-planning", "won"].includes(
@@ -430,6 +451,23 @@ export function deriveSalesDealRoomForOpportunity({
         "Prepare domain verification, redirect origins, approved invitation templates, delivery guardrails, access attestations, and archive runbook before customer SSO or automated invitation delivery."
     },
     {
+      id: "customer-activation-approvals",
+      label: "Paid pilot setup approval recorded",
+      state: readinessState(
+        Boolean(opportunity.customerActivationApprovals),
+        Boolean(opportunity.productionActivationReadiness) || hasCustomerActivationApprovals
+      ),
+      evidence: opportunity.customerActivationApprovals
+        ? `Approval scope ${opportunity.customerActivationApprovals.approvalScope}; retained blockers ${opportunity.customerActivationApprovals.retainedBlockers.length}.`
+        : hasCustomerActivationApprovals
+          ? "Customer activation approval audit exists; refresh the opportunity dashboard."
+          : opportunity.productionActivationReadiness
+            ? "Production readiness is prepared; paid pilot setup approval is ready to record."
+            : "Production readiness is not prepared yet.",
+      action:
+        "Record paid-pilot setup approval only for synthetic evaluation setup, then keep PHI, live clinical execution, payer submission, patient outreach, customer SSO cutover, and autonomous care blocked."
+    },
+    {
       id: "deal-room-audit",
       label: "Deal-room packet audit",
       state: readinessState(hasDealRoom, true),
@@ -465,6 +503,7 @@ export function deriveSalesDealRoomForOpportunity({
       "Use the protected Buyer Pilot Room for readiness evidence, limitations, and packet audit.",
       "Activate the buyer tenant lifecycle packet before paid pilot onboarding or SSO review.",
       "Prepare the production readiness packet before customer-domain SSO, automated invitation delivery, access attestation, or archive execution.",
+      "Record customer activation approvals before paid-pilot setup, while retaining live clinical, PHI, payer, patient-facing, SSO cutover, and autonomous-care hard gates.",
       "Convert to paid assessment or synthetic pilot only within the no-PHI governed evaluation boundary."
     ],
     boundary: salesDealRoomBoundary
@@ -542,6 +581,8 @@ export function buildSalesDealRoomPacket({
 - Buyer tenant SSO policy: ${opportunity.buyerTenantLifecycle?.ssoPolicy.status ?? "not activated"}
 - Production readiness: ${opportunity.productionActivationReadiness ? opportunity.productionActivationReadiness.readinessStatus : "not prepared"}
 - Transactional invitation send: ${opportunity.productionActivationReadiness?.transactionalDeliveryPolicy.directSendEnabled ? "enabled" : "disabled or not prepared"}
+- Customer activation approval: ${opportunity.customerActivationApprovals ? opportunity.customerActivationApprovals.approvalStatus : "not recorded"}
+- Paid pilot setup scope: ${opportunity.customerActivationApprovals?.approvalScope ?? "not approved"}
 
 ## Buyer Scope
 - Offer interest: ${opportunity.payload.scope.offerInterest}

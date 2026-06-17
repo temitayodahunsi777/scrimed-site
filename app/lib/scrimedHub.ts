@@ -132,6 +132,11 @@ export const hubSignals: HubSignal[] = [
     value: "domain, origin, invitation, access, archive gates packaged",
     tone: "good"
   },
+  {
+    name: "Customer activation approvals",
+    value: "paid-pilot setup approval with retained hard gates active",
+    tone: "good"
+  },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
@@ -209,6 +214,8 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/tenant-lifecycle/packet",
   "/api/sales-operations/opportunities/{intakeId}/production-readiness",
   "/api/sales-operations/opportunities/{intakeId}/production-readiness/packet",
+  "/api/sales-operations/opportunities/{intakeId}/activation-approvals",
+  "/api/sales-operations/opportunities/{intakeId}/activation-approvals/packet",
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",
@@ -308,6 +315,8 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/deal-room-packet",
   "/api/sales-operations/opportunities/{intakeId}/production-readiness",
   "/api/sales-operations/opportunities/{intakeId}/production-readiness/packet",
+  "/api/sales-operations/opportunities/{intakeId}/activation-approvals",
+  "/api/sales-operations/opportunities/{intakeId}/activation-approvals/packet",
   "/api/pilots",
   "/api/demos",
   "/api/commercial/pricing",
