@@ -55,6 +55,10 @@ import {
   customerActivationApprovalsPacketProofStackStatus,
   customerActivationApprovalsProofStackStatus
 } from "./customerActivationApprovals";
+import {
+  buyerDiligenceRoomPacketProofStackStatus,
+  buyerDiligenceRoomProofStackStatus
+} from "./buyerDiligenceRoom";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -661,6 +665,8 @@ export function getProductConsoleSummary() {
     customerActivationApprovalsRoute: salesDealRoomSummary.customerActivationApprovalsRoute,
     customerActivationApprovalsPacketRoute:
       salesDealRoomSummary.customerActivationApprovalsPacketRoute,
+    buyerDiligenceRoomRoute: salesDealRoomSummary.buyerDiligenceRoomRoute,
+    buyerDiligenceRoomPacketRoute: salesDealRoomSummary.buyerDiligenceRoomPacketRoute,
     competitiveEdgeRoute: "/competitive-edge",
     productOffers,
     enterpriseServiceOffers,
@@ -717,6 +723,8 @@ export function getProductConsoleSummary() {
       productionActivationReadinessPackets: productionActivationReadinessPacketProofStackStatus,
       customerActivationApprovals: customerActivationApprovalsProofStackStatus,
       customerActivationApprovalPackets: customerActivationApprovalsPacketProofStackStatus,
+      buyerDiligenceRoom: buyerDiligenceRoomProofStackStatus,
+      buyerDiligenceRoomPackets: buyerDiligenceRoomPacketProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -748,8 +756,8 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, and paid-pilot activation approval packets before any customer SSO, automated invitation, or production connector step.",
-    updated: "2026-06-16"
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, and buyer diligence packets before any customer SSO, automated invitation, signed document storage, or production connector step.",
+    updated: "2026-06-17"
   };
 }
 
@@ -782,6 +790,8 @@ export function getProductReadinessBrief() {
     `Production Readiness Packet: ${summary.productionActivationReadinessPacketRoute}`,
     `Customer Activation Approvals: ${summary.customerActivationApprovalsRoute}`,
     `Customer Activation Approval Packet: ${summary.customerActivationApprovalsPacketRoute}`,
+    `Buyer Evidence Diligence Room: ${summary.buyerDiligenceRoomRoute}`,
+    `Buyer Evidence Diligence Packet: ${summary.buyerDiligenceRoomPacketRoute}`,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

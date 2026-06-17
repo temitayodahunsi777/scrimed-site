@@ -39,6 +39,12 @@ import {
   customerActivationApprovalsPacketProofStackStatus,
   customerActivationApprovalsProofStackStatus
 } from "./customerActivationApprovals";
+import {
+  buyerDiligenceRoomApiRoute,
+  buyerDiligenceRoomPacketApiRoute,
+  buyerDiligenceRoomPacketProofStackStatus,
+  buyerDiligenceRoomProofStackStatus
+} from "./buyerDiligenceRoom";
 
 export type SalesDealRoomStage = {
   stage: string;
@@ -77,6 +83,8 @@ export type SalesDealRoomSummary = {
   productionActivationReadinessPacketRoute: string;
   customerActivationApprovalsRoute: string;
   customerActivationApprovalsPacketRoute: string;
+  buyerDiligenceRoomRoute: string;
+  buyerDiligenceRoomPacketRoute: string;
   status: string;
   defaultWorkspaceSlug: string;
   proofStackStatus: string;
@@ -90,6 +98,8 @@ export type SalesDealRoomSummary = {
   productionActivationReadinessPacketProofStackStatus: string;
   customerActivationApprovalsProofStackStatus: string;
   customerActivationApprovalsPacketProofStackStatus: string;
+  buyerDiligenceRoomProofStackStatus: string;
+  buyerDiligenceRoomPacketProofStackStatus: string;
   executiveThesis: string;
   stages: SalesDealRoomStage[];
   siteLanes: SalesDealRoomSiteLane[];
@@ -253,6 +263,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     productionActivationReadinessPacketRoute: productionActivationReadinessPacketApiRoute,
     customerActivationApprovalsRoute: customerActivationApprovalsApiRoute,
     customerActivationApprovalsPacketRoute: customerActivationApprovalsPacketApiRoute,
+    buyerDiligenceRoomRoute: buyerDiligenceRoomApiRoute,
+    buyerDiligenceRoomPacketRoute: buyerDiligenceRoomPacketApiRoute,
     status: "public-organization-and-protected-packet-ready",
     defaultWorkspaceSlug: defaultDealRoomWorkspaceSlug,
     proofStackStatus: salesDealRoomProofStackStatus,
@@ -266,6 +278,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     productionActivationReadinessPacketProofStackStatus,
     customerActivationApprovalsProofStackStatus,
     customerActivationApprovalsPacketProofStackStatus,
+    buyerDiligenceRoomProofStackStatus,
+    buyerDiligenceRoomPacketProofStackStatus,
     executiveThesis:
       "SCRIMED converts public product proof, governed pilot intake, tenant-admin sales operations, buyer-room diligence, premium pricing, and protected workspace evidence into one enterprise-ready pilot acquisition path.",
     stages: publicStages,
@@ -289,6 +303,12 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
         resolution:
           "Customer activation approval packets now record paid-pilot setup authorization, allowed setup actions, retained blockers, owner approvals, and evidence requirements after production readiness exists.",
         productionGate: "Separate buyer and SCRIMED written approval for PHI, production connectors, customer SSO cutover, automated bulk invitations, payer submission, patient outreach, clinical validation, and live workflow execution."
+      },
+      {
+        limitation: "Sensitive buyer diligence documents should not be uploaded until storage, DLP, retention, and legal hold controls are approved.",
+        resolution:
+          "Buyer diligence rooms now track metadata-only evidence requirements, signed-control status, BAA/DPA posture, IdP/domain proof needs, transactional provider decisions, production connector readiness, and packet history without collecting sensitive files.",
+        productionGate: "Approved document storage, malware scanning, DLP, retention/legal hold, access reviews, buyer-approved secure exchange path, and counsel-reviewed signed controls."
       },
       {
         limitation: "Authenticated happy-path automation still requires a short-lived AAL2 bearer token.",
@@ -330,6 +350,7 @@ export function deriveSalesDealRoomForOpportunity({
   const hasTenantLifecycle = hasRecentEvent(auditEvents, "buyer-tenant-lifecycle-activated");
   const hasProductionReadiness = hasRecentEvent(auditEvents, "production-readiness-prepared");
   const hasCustomerActivationApprovals = hasRecentEvent(auditEvents, "customer-activation-approvals-recorded");
+  const hasBuyerDiligenceRoom = hasRecentEvent(auditEvents, "buyer-diligence-room-prepared");
   const workflowTargetCount = opportunity.payload.scope.workflowTargets.length;
   const governanceCount = opportunity.payload.scope.governanceRequirements.length;
   const reviewStage = ["qualified", "discovery", "proposal", "pilot-planning", "won"].includes(
@@ -468,6 +489,23 @@ export function deriveSalesDealRoomForOpportunity({
         "Record paid-pilot setup approval only for synthetic evaluation setup, then keep PHI, live clinical execution, payer submission, patient outreach, customer SSO cutover, and autonomous care blocked."
     },
     {
+      id: "buyer-diligence-room",
+      label: "Buyer evidence diligence room prepared",
+      state: readinessState(
+        Boolean(opportunity.buyerDiligenceRoom),
+        Boolean(opportunity.customerActivationApprovals) || hasBuyerDiligenceRoom
+      ),
+      evidence: opportunity.buyerDiligenceRoom
+        ? `Evidence scope ${opportunity.buyerDiligenceRoom.evidenceScope}; next approvals ${opportunity.buyerDiligenceRoom.nextRequiredApprovals.length}.`
+        : hasBuyerDiligenceRoom
+          ? "Buyer diligence room audit exists; refresh the opportunity dashboard."
+          : opportunity.customerActivationApprovals
+            ? "Customer activation approval is recorded; buyer diligence room is ready to prepare."
+            : "Customer activation approval is not recorded yet.",
+      action:
+        "Prepare metadata-only diligence before collecting signed controls, IdP evidence, legal/privacy/security approvals, or production connector decisions."
+    },
+    {
       id: "deal-room-audit",
       label: "Deal-room packet audit",
       state: readinessState(hasDealRoom, true),
@@ -504,6 +542,7 @@ export function deriveSalesDealRoomForOpportunity({
       "Activate the buyer tenant lifecycle packet before paid pilot onboarding or SSO review.",
       "Prepare the production readiness packet before customer-domain SSO, automated invitation delivery, access attestation, or archive execution.",
       "Record customer activation approvals before paid-pilot setup, while retaining live clinical, PHI, payer, patient-facing, SSO cutover, and autonomous-care hard gates.",
+      "Prepare the buyer diligence room to track signed controls, BAA/DPA posture, domain proof, IdP readiness, transactional provider decisions, and connector readiness without storing sensitive documents.",
       "Convert to paid assessment or synthetic pilot only within the no-PHI governed evaluation boundary."
     ],
     boundary: salesDealRoomBoundary
@@ -583,6 +622,8 @@ export function buildSalesDealRoomPacket({
 - Transactional invitation send: ${opportunity.productionActivationReadiness?.transactionalDeliveryPolicy.directSendEnabled ? "enabled" : "disabled or not prepared"}
 - Customer activation approval: ${opportunity.customerActivationApprovals ? opportunity.customerActivationApprovals.approvalStatus : "not recorded"}
 - Paid pilot setup scope: ${opportunity.customerActivationApprovals?.approvalScope ?? "not approved"}
+- Buyer diligence room: ${opportunity.buyerDiligenceRoom ? opportunity.buyerDiligenceRoom.diligenceStatus : "not prepared"}
+- Buyer diligence evidence scope: ${opportunity.buyerDiligenceRoom?.evidenceScope ?? "not prepared"}
 
 ## Buyer Scope
 - Offer interest: ${opportunity.payload.scope.offerInterest}

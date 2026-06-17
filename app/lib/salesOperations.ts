@@ -33,6 +33,13 @@ import {
   customerActivationApprovalsPacketProofStackStatus,
   customerActivationApprovalsProofStackStatus
 } from "./customerActivationApprovals";
+import type { SalesBuyerDiligenceRoom } from "./buyerDiligenceRoom";
+import {
+  buyerDiligenceRoomApiRoute,
+  buyerDiligenceRoomPacketApiRoute,
+  buyerDiligenceRoomPacketProofStackStatus,
+  buyerDiligenceRoomProofStackStatus
+} from "./buyerDiligenceRoom";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -76,6 +83,7 @@ export type SalesOpportunity = {
   buyerTenantLifecycle?: SalesBuyerTenantLifecycle | null;
   productionActivationReadiness?: SalesProductionActivationReadiness | null;
   customerActivationApprovals?: SalesCustomerActivationApprovals | null;
+  buyerDiligenceRoom?: SalesBuyerDiligenceRoom | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -105,7 +113,9 @@ export type SalesAuditEvent = {
     | "production-readiness-prepared"
     | "production-readiness-packet-downloaded"
     | "customer-activation-approvals-recorded"
-    | "customer-activation-approvals-packet-downloaded";
+    | "customer-activation-approvals-packet-downloaded"
+    | "buyer-diligence-room-prepared"
+    | "buyer-diligence-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -398,8 +408,34 @@ export function getSalesOperationsSummary() {
       ],
       noPhiBoundary: true
     },
+    buyerDiligenceRoom: {
+      status: buyerDiligenceRoomProofStackStatus,
+      apiRoute: buyerDiligenceRoomApiRoute,
+      packetApiRoute: buyerDiligenceRoomPacketApiRoute,
+      packetProofStackStatus: buyerDiligenceRoomPacketProofStackStatus,
+      evidenceScope: "metadata-only",
+      collects: [
+        "buyer domain proof status",
+        "IdP metadata request status",
+        "legal/privacy/security control status",
+        "BAA/DPA posture",
+        "transactional provider decision",
+        "production connector readiness",
+        "signed controls register"
+      ],
+      prohibitedUploads: [
+        "PHI",
+        "patient identifiers",
+        "live clinical records",
+        "IdP certificates",
+        "production credentials",
+        "private keys",
+        "payer member data"
+      ],
+      noPhiBoundary: true
+    },
     boundary: salesOperationsBoundary,
-    updated: "2026-06-16"
+    updated: "2026-06-17"
   };
 }
 

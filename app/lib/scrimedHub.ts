@@ -137,6 +137,11 @@ export const hubSignals: HubSignal[] = [
     value: "paid-pilot setup approval with retained hard gates active",
     tone: "good"
   },
+  {
+    name: "Buyer diligence room",
+    value: "metadata-only signed controls and evidence path active",
+    tone: "good"
+  },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
@@ -216,6 +221,8 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/production-readiness/packet",
   "/api/sales-operations/opportunities/{intakeId}/activation-approvals",
   "/api/sales-operations/opportunities/{intakeId}/activation-approvals/packet",
+  "/api/sales-operations/opportunities/{intakeId}/buyer-diligence",
+  "/api/sales-operations/opportunities/{intakeId}/buyer-diligence/packet",
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",
@@ -317,6 +324,8 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/production-readiness/packet",
   "/api/sales-operations/opportunities/{intakeId}/activation-approvals",
   "/api/sales-operations/opportunities/{intakeId}/activation-approvals/packet",
+  "/api/sales-operations/opportunities/{intakeId}/buyer-diligence",
+  "/api/sales-operations/opportunities/{intakeId}/buyer-diligence/packet",
   "/api/pilots",
   "/api/demos",
   "/api/commercial/pricing",

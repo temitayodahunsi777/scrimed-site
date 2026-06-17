@@ -29,6 +29,10 @@ import {
   isCustomerActivationApprovalEligible,
   type SalesCustomerActivationApprovalsResult
 } from "../lib/customerActivationApprovals";
+import {
+  isBuyerDiligenceRoomEligible,
+  type SalesBuyerDiligenceRoomResult
+} from "../lib/buyerDiligenceRoom";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -46,6 +50,7 @@ type ConsoleStatus =
   | "activating-lifecycle"
   | "preparing-production-readiness"
   | "recording-activation-approvals"
+  | "preparing-buyer-diligence"
   | "completing"
   | "error";
 
@@ -79,6 +84,10 @@ type ProductionActivationReadinessResponse = SalesProductionActivationReadinessR
 };
 
 type CustomerActivationApprovalsResponse = SalesCustomerActivationApprovalsResult & {
+  error?: { message?: string };
+};
+
+type BuyerDiligenceRoomResponse = SalesBuyerDiligenceRoomResult & {
   error?: { message?: string };
 };
 
@@ -775,6 +784,49 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function prepareBuyerDiligenceRoom() {
+    if (!session || !selected) {
+      return;
+    }
+
+    setStatus("preparing-buyer-diligence");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/buyer-diligence`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as BuyerDiligenceRoomResponse;
+
+    if (!response.ok) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "Buyer evidence diligence room could not be prepared.");
+      return;
+    }
+
+    await refreshDashboard(
+      body.created
+        ? "Buyer evidence diligence room prepared and audit event committed."
+        : "Buyer evidence diligence room already exists; dashboard refreshed."
+    );
+  }
+
+  async function downloadBuyerDiligencePacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/buyer-diligence/packet`,
+      `scrimed-${selected.intakeId}-buyer-diligence.md`,
+      "Buyer diligence packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -1025,10 +1077,12 @@ export default function SalesOperationsConsole({
   const selectedBuyerTenantLifecycle = selected?.buyerTenantLifecycle ?? null;
   const selectedProductionReadiness = selected?.productionActivationReadiness ?? null;
   const selectedCustomerActivationApprovals = selected?.customerActivationApprovals ?? null;
+  const selectedBuyerDiligenceRoom = selected?.buyerDiligenceRoom ?? null;
   const workspaceEligible = selected ? isProvisioningEligible(selected) : false;
   const tenantLifecycleEligible = selected ? isTenantLifecycleEligible(selected) : false;
   const productionReadinessEligible = selected ? isProductionReadinessEligible(selected) : false;
   const activationApprovalEligible = selected ? isCustomerActivationApprovalEligible(selected) : false;
+  const buyerDiligenceEligible = selected ? isBuyerDiligenceRoomEligible(selected) : false;
 
   return (
     <>
@@ -1668,6 +1722,64 @@ export default function SalesOperationsConsole({
                       type="button"
                     >
                       Download Approval Packet
+                    </button>
+                  </div>
+                </section>
+
+                <section>
+                  <p className="eyebrow">Buyer evidence and signed controls diligence</p>
+                  <h3>Prepare metadata-only diligence before SSO, documents, or live-data decisions.</h3>
+                  <p className="section-copy">
+                    {selectedBuyerDiligenceRoom
+                      ? `Diligence room is prepared for ${selectedBuyerDiligenceRoom.workspaceSlug} with ${selectedBuyerDiligenceRoom.evidenceScope} evidence scope; sensitive files, PHI, IdP certificates, private keys, and production credentials remain outside SCRIMED until storage and legal controls are approved.`
+                      : buyerDiligenceEligible
+                        ? "Prepare the buyer diligence room to track domain proof, IdP metadata status, signed controls, BAA/DPA posture, transactional provider decisions, and production connector readiness without collecting sensitive documents."
+                        : "Record customer activation approvals before preparing the buyer evidence diligence room."}
+                  </p>
+                  {selectedBuyerDiligenceRoom ? (
+                    <div className="layer-list">
+                      <div className="layer-row">
+                        <span>01</span>
+                        <strong>Diligence status: {selectedBuyerDiligenceRoom.diligenceStatus}</strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>02</span>
+                        <strong>BAA/DPA: {selectedBuyerDiligenceRoom.baaDpaStatus.status}</strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>03</span>
+                        <strong>
+                          Connector readiness: {selectedBuyerDiligenceRoom.productionConnectorReadiness.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>04</span>
+                        <strong>Next approvals: {selectedBuyerDiligenceRoom.nextRequiredApprovals.length}</strong>
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={
+                        status === "preparing-buyer-diligence" ||
+                        Boolean(selectedBuyerDiligenceRoom) ||
+                        !buyerDiligenceEligible
+                      }
+                      onClick={prepareBuyerDiligenceRoom}
+                      type="button"
+                    >
+                      {status === "preparing-buyer-diligence"
+                        ? "Preparing Diligence"
+                        : "Prepare Diligence Room"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!selectedBuyerDiligenceRoom}
+                      onClick={downloadBuyerDiligencePacket}
+                      type="button"
+                    >
+                      Download Diligence Packet
                     </button>
                   </div>
                 </section>

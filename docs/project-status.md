@@ -1,6 +1,17 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-16
+Updated: 2026-06-17
+
+## Latest Buyer Evidence And Signed Controls Diligence Release
+
+- Added guarded buyer evidence and signed controls diligence rooms for activation-approved Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/buyer-diligence`.
+- Added audited buyer diligence packets through `/api/sales-operations/opportunities/{intakeId}/buyer-diligence/packet` so tenant-admins can retain domain proof status, IdP metadata readiness, legal/privacy/security controls, BAA/DPA posture, transactional provider decisions, production connector readiness, signed controls, retained blockers, and next approvals.
+- Added a private `sales_buyer_diligence_rooms` table with deny-all RLS and tenant-admin AAL2 plus server-held authorization for room preparation and packet release.
+- Updated `/sales-operations` with buyer diligence status, metadata-only evidence scope, BAA/DPA status, production connector readiness, preparation action, and diligence packet download action.
+- Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with buyer diligence proof-stack posture.
+- Addressed the current sensitive-document limitation with a safe workaround: SCRIMED now tracks only diligence metadata, owners, status, dates, approvals, blockers, and external secure-channel references until storage, DLP, malware scanning, retention, legal hold, and access controls are approved.
+- Preserved the hard boundary: buyer diligence rooms do not accept PHI, patient identifiers, live clinical records, payer member data, IdP certificates, private keys, production credentials, legal advice, compliance certification, reimbursement determinations, customer SSO cutover approval, automated invitation delivery, production connector authorization, payer submission, patient outreach, autonomous diagnosis, treatment decisions, or live healthcare execution.
+- Remaining gate: secure evidence vaulting, customer SSO cutover, automated invitations, live connectors, BAA/DPA execution, and production healthcare operations still require separate signed enterprise controls and qualified review.
 
 ## Latest Customer Activation Approval Workflow Release
 
