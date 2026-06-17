@@ -59,6 +59,10 @@ import {
   buyerDiligenceRoomPacketProofStackStatus,
   buyerDiligenceRoomProofStackStatus
 } from "./buyerDiligenceRoom";
+import {
+  secureEvidenceVaultReadinessPacketProofStackStatus,
+  secureEvidenceVaultReadinessProofStackStatus
+} from "./secureEvidenceVaultReadiness";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -667,6 +671,9 @@ export function getProductConsoleSummary() {
       salesDealRoomSummary.customerActivationApprovalsPacketRoute,
     buyerDiligenceRoomRoute: salesDealRoomSummary.buyerDiligenceRoomRoute,
     buyerDiligenceRoomPacketRoute: salesDealRoomSummary.buyerDiligenceRoomPacketRoute,
+    secureEvidenceVaultReadinessRoute: salesDealRoomSummary.secureEvidenceVaultReadinessRoute,
+    secureEvidenceVaultReadinessPacketRoute:
+      salesDealRoomSummary.secureEvidenceVaultReadinessPacketRoute,
     competitiveEdgeRoute: "/competitive-edge",
     productOffers,
     enterpriseServiceOffers,
@@ -725,6 +732,8 @@ export function getProductConsoleSummary() {
       customerActivationApprovalPackets: customerActivationApprovalsPacketProofStackStatus,
       buyerDiligenceRoom: buyerDiligenceRoomProofStackStatus,
       buyerDiligenceRoomPackets: buyerDiligenceRoomPacketProofStackStatus,
+      secureEvidenceVaultReadiness: secureEvidenceVaultReadinessProofStackStatus,
+      secureEvidenceVaultReadinessPackets: secureEvidenceVaultReadinessPacketProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -756,7 +765,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, and buyer diligence packets before any customer SSO, automated invitation, signed document storage, or production connector step.",
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, or production connector step.",
     updated: "2026-06-17"
   };
 }
@@ -792,6 +801,8 @@ export function getProductReadinessBrief() {
     `Customer Activation Approval Packet: ${summary.customerActivationApprovalsPacketRoute}`,
     `Buyer Evidence Diligence Room: ${summary.buyerDiligenceRoomRoute}`,
     `Buyer Evidence Diligence Packet: ${summary.buyerDiligenceRoomPacketRoute}`,
+    `Secure Evidence Vault Readiness: ${summary.secureEvidenceVaultReadinessRoute}`,
+    `Secure Evidence Vault Packet: ${summary.secureEvidenceVaultReadinessPacketRoute}`,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

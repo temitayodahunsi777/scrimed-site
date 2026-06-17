@@ -33,6 +33,10 @@ import {
   isBuyerDiligenceRoomEligible,
   type SalesBuyerDiligenceRoomResult
 } from "../lib/buyerDiligenceRoom";
+import {
+  isSecureEvidenceVaultReadinessEligible,
+  type SalesSecureEvidenceVaultReadinessResult
+} from "../lib/secureEvidenceVaultReadiness";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -51,6 +55,7 @@ type ConsoleStatus =
   | "preparing-production-readiness"
   | "recording-activation-approvals"
   | "preparing-buyer-diligence"
+  | "preparing-evidence-vault-readiness"
   | "completing"
   | "error";
 
@@ -88,6 +93,10 @@ type CustomerActivationApprovalsResponse = SalesCustomerActivationApprovalsResul
 };
 
 type BuyerDiligenceRoomResponse = SalesBuyerDiligenceRoomResult & {
+  error?: { message?: string };
+};
+
+type SecureEvidenceVaultReadinessResponse = SalesSecureEvidenceVaultReadinessResult & {
   error?: { message?: string };
 };
 
@@ -827,6 +836,49 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function prepareSecureEvidenceVaultReadiness() {
+    if (!session || !selected) {
+      return;
+    }
+
+    setStatus("preparing-evidence-vault-readiness");
+    setMessage("");
+    const response = await fetch(
+      `/api/sales-operations/opportunities/${selected.intakeId}/evidence-vault-readiness`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as SecureEvidenceVaultReadinessResponse;
+
+    if (!response.ok) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "Secure evidence vault readiness could not be prepared.");
+      return;
+    }
+
+    await refreshDashboard(
+      body.created
+        ? "Secure evidence vault readiness prepared with storage disabled and audit event committed."
+        : "Secure evidence vault readiness already exists; dashboard refreshed."
+    );
+  }
+
+  async function downloadSecureEvidenceVaultReadinessPacket() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/evidence-vault-readiness/packet`,
+      `scrimed-${selected.intakeId}-evidence-vault-readiness.md`,
+      "Secure evidence vault readiness packet downloaded and its append-only audit event committed."
+    );
+  }
+
   async function downloadFollowUpDraft() {
     if (!selected) {
       return;
@@ -1078,11 +1130,15 @@ export default function SalesOperationsConsole({
   const selectedProductionReadiness = selected?.productionActivationReadiness ?? null;
   const selectedCustomerActivationApprovals = selected?.customerActivationApprovals ?? null;
   const selectedBuyerDiligenceRoom = selected?.buyerDiligenceRoom ?? null;
+  const selectedSecureEvidenceVaultReadiness = selected?.secureEvidenceVaultReadiness ?? null;
   const workspaceEligible = selected ? isProvisioningEligible(selected) : false;
   const tenantLifecycleEligible = selected ? isTenantLifecycleEligible(selected) : false;
   const productionReadinessEligible = selected ? isProductionReadinessEligible(selected) : false;
   const activationApprovalEligible = selected ? isCustomerActivationApprovalEligible(selected) : false;
   const buyerDiligenceEligible = selected ? isBuyerDiligenceRoomEligible(selected) : false;
+  const secureEvidenceVaultEligible = selected
+    ? isSecureEvidenceVaultReadinessEligible(selected)
+    : false;
 
   return (
     <>
@@ -1780,6 +1836,72 @@ export default function SalesOperationsConsole({
                       type="button"
                     >
                       Download Diligence Packet
+                    </button>
+                  </div>
+                </section>
+
+                <section>
+                  <p className="eyebrow">Secure evidence vault readiness</p>
+                  <h3>Prepare storage controls before sensitive evidence is accepted.</h3>
+                  <p className="section-copy">
+                    {selectedSecureEvidenceVaultReadiness
+                      ? `Vault readiness is prepared for ${selectedSecureEvidenceVaultReadiness.workspaceSlug} in ${selectedSecureEvidenceVaultReadiness.vaultMode} mode; storage remains disabled until DLP, malware scanning, retention, legal hold, access review, regional residency, and legal/privacy/security controls are approved.`
+                      : secureEvidenceVaultEligible
+                        ? "Prepare the disabled-by-default evidence vault plan to align CIO, CISO, privacy, legal, compliance, procurement, clinical operations, payer, government, and investor diligence without storing sensitive files."
+                        : "Prepare the buyer evidence diligence room before preparing secure evidence vault readiness."}
+                  </p>
+                  {selectedSecureEvidenceVaultReadiness ? (
+                    <div className="layer-list">
+                      <div className="layer-row">
+                        <span>01</span>
+                        <strong>
+                          Readiness status: {selectedSecureEvidenceVaultReadiness.readinessStatus}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>02</span>
+                        <strong>
+                          Storage provider:{" "}
+                          {selectedSecureEvidenceVaultReadiness.storageProviderDecision.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>03</span>
+                        <strong>
+                          DLP and malware: {selectedSecureEvidenceVaultReadiness.dlpMalwareScanning.status}
+                        </strong>
+                      </div>
+                      <div className="layer-row">
+                        <span>04</span>
+                        <strong>
+                          Target audiences:{" "}
+                          {selectedSecureEvidenceVaultReadiness.targetAudienceSignals.length}
+                        </strong>
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="form-actions">
+                    <button
+                      className="primary-action"
+                      disabled={
+                        status === "preparing-evidence-vault-readiness" ||
+                        Boolean(selectedSecureEvidenceVaultReadiness) ||
+                        !secureEvidenceVaultEligible
+                      }
+                      onClick={prepareSecureEvidenceVaultReadiness}
+                      type="button"
+                    >
+                      {status === "preparing-evidence-vault-readiness"
+                        ? "Preparing Vault"
+                        : "Prepare Vault Readiness"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={!selectedSecureEvidenceVaultReadiness}
+                      onClick={downloadSecureEvidenceVaultReadinessPacket}
+                      type="button"
+                    >
+                      Download Vault Packet
                     </button>
                   </div>
                 </section>

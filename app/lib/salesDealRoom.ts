@@ -45,6 +45,12 @@ import {
   buyerDiligenceRoomPacketProofStackStatus,
   buyerDiligenceRoomProofStackStatus
 } from "./buyerDiligenceRoom";
+import {
+  secureEvidenceVaultReadinessApiRoute,
+  secureEvidenceVaultReadinessPacketApiRoute,
+  secureEvidenceVaultReadinessPacketProofStackStatus,
+  secureEvidenceVaultReadinessProofStackStatus
+} from "./secureEvidenceVaultReadiness";
 
 export type SalesDealRoomStage = {
   stage: string;
@@ -85,6 +91,8 @@ export type SalesDealRoomSummary = {
   customerActivationApprovalsPacketRoute: string;
   buyerDiligenceRoomRoute: string;
   buyerDiligenceRoomPacketRoute: string;
+  secureEvidenceVaultReadinessRoute: string;
+  secureEvidenceVaultReadinessPacketRoute: string;
   status: string;
   defaultWorkspaceSlug: string;
   proofStackStatus: string;
@@ -100,6 +108,8 @@ export type SalesDealRoomSummary = {
   customerActivationApprovalsPacketProofStackStatus: string;
   buyerDiligenceRoomProofStackStatus: string;
   buyerDiligenceRoomPacketProofStackStatus: string;
+  secureEvidenceVaultReadinessProofStackStatus: string;
+  secureEvidenceVaultReadinessPacketProofStackStatus: string;
   executiveThesis: string;
   stages: SalesDealRoomStage[];
   siteLanes: SalesDealRoomSiteLane[];
@@ -265,6 +275,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     customerActivationApprovalsPacketRoute: customerActivationApprovalsPacketApiRoute,
     buyerDiligenceRoomRoute: buyerDiligenceRoomApiRoute,
     buyerDiligenceRoomPacketRoute: buyerDiligenceRoomPacketApiRoute,
+    secureEvidenceVaultReadinessRoute: secureEvidenceVaultReadinessApiRoute,
+    secureEvidenceVaultReadinessPacketRoute: secureEvidenceVaultReadinessPacketApiRoute,
     status: "public-organization-and-protected-packet-ready",
     defaultWorkspaceSlug: defaultDealRoomWorkspaceSlug,
     proofStackStatus: salesDealRoomProofStackStatus,
@@ -280,6 +292,8 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
     customerActivationApprovalsPacketProofStackStatus,
     buyerDiligenceRoomProofStackStatus,
     buyerDiligenceRoomPacketProofStackStatus,
+    secureEvidenceVaultReadinessProofStackStatus,
+    secureEvidenceVaultReadinessPacketProofStackStatus,
     executiveThesis:
       "SCRIMED converts public product proof, governed pilot intake, tenant-admin sales operations, buyer-room diligence, premium pricing, and protected workspace evidence into one enterprise-ready pilot acquisition path.",
     stages: publicStages,
@@ -311,6 +325,12 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
         productionGate: "Approved document storage, malware scanning, DLP, retention/legal hold, access reviews, buyer-approved secure exchange path, and counsel-reviewed signed controls."
       },
       {
+        limitation: "Sensitive evidence vaulting is not enabled until security, privacy, legal, residency, and incident controls are approved.",
+        resolution:
+          "Secure evidence vault readiness now packages disabled-by-default storage-provider decisioning, encryption/key management, DLP, malware scanning, retention/legal hold, access reviews, evidence classification, upload approval, incident response, regional residency, target audience, and revenue-path controls.",
+        productionGate: "Approved vault provider, BAA/DPA path, encryption key ownership, DLP/malware controls, legal hold, deletion workflow, access review cadence, incident response, region policy, counsel review, and buyer authorization."
+      },
+      {
         limitation: "Authenticated happy-path automation still requires a short-lived AAL2 bearer token.",
         resolution:
           "Keep fail-closed public smoke checks and use human AAL2 browser sessions for buyer packet generation.",
@@ -324,7 +344,7 @@ export function getSalesDealRoomSummary(): SalesDealRoomSummary {
       }
     ],
     boundary: salesDealRoomBoundary,
-    updated: "2026-06-16"
+    updated: "2026-06-17"
   };
 }
 
@@ -351,6 +371,10 @@ export function deriveSalesDealRoomForOpportunity({
   const hasProductionReadiness = hasRecentEvent(auditEvents, "production-readiness-prepared");
   const hasCustomerActivationApprovals = hasRecentEvent(auditEvents, "customer-activation-approvals-recorded");
   const hasBuyerDiligenceRoom = hasRecentEvent(auditEvents, "buyer-diligence-room-prepared");
+  const hasSecureEvidenceVaultReadiness = hasRecentEvent(
+    auditEvents,
+    "secure-evidence-vault-readiness-prepared"
+  );
   const workflowTargetCount = opportunity.payload.scope.workflowTargets.length;
   const governanceCount = opportunity.payload.scope.governanceRequirements.length;
   const reviewStage = ["qualified", "discovery", "proposal", "pilot-planning", "won"].includes(
@@ -506,6 +530,23 @@ export function deriveSalesDealRoomForOpportunity({
         "Prepare metadata-only diligence before collecting signed controls, IdP evidence, legal/privacy/security approvals, or production connector decisions."
     },
     {
+      id: "secure-evidence-vault-readiness",
+      label: "Secure evidence vault readiness prepared",
+      state: readinessState(
+        Boolean(opportunity.secureEvidenceVaultReadiness),
+        Boolean(opportunity.buyerDiligenceRoom) || hasSecureEvidenceVaultReadiness
+      ),
+      evidence: opportunity.secureEvidenceVaultReadiness
+        ? `Vault mode ${opportunity.secureEvidenceVaultReadiness.vaultMode}; status ${opportunity.secureEvidenceVaultReadiness.readinessStatus}.`
+        : hasSecureEvidenceVaultReadiness
+          ? "Secure evidence vault readiness audit exists; refresh the opportunity dashboard."
+          : opportunity.buyerDiligenceRoom
+            ? "Buyer diligence room is prepared; secure evidence vault readiness is ready to prepare."
+            : "Buyer diligence room is not prepared yet.",
+      action:
+        "Prepare disabled-by-default vault controls before any sensitive document storage, PHI handling, legal hold, DLP, malware scanning, or regional storage decision."
+    },
+    {
       id: "deal-room-audit",
       label: "Deal-room packet audit",
       state: readinessState(hasDealRoom, true),
@@ -543,6 +584,7 @@ export function deriveSalesDealRoomForOpportunity({
       "Prepare the production readiness packet before customer-domain SSO, automated invitation delivery, access attestation, or archive execution.",
       "Record customer activation approvals before paid-pilot setup, while retaining live clinical, PHI, payer, patient-facing, SSO cutover, and autonomous-care hard gates.",
       "Prepare the buyer diligence room to track signed controls, BAA/DPA posture, domain proof, IdP readiness, transactional provider decisions, and connector readiness without storing sensitive documents.",
+      "Prepare secure evidence vault readiness to turn sensitive-document handling into a controlled paid implementation workstream while storage remains disabled.",
       "Convert to paid assessment or synthetic pilot only within the no-PHI governed evaluation boundary."
     ],
     boundary: salesDealRoomBoundary
@@ -624,6 +666,8 @@ export function buildSalesDealRoomPacket({
 - Paid pilot setup scope: ${opportunity.customerActivationApprovals?.approvalScope ?? "not approved"}
 - Buyer diligence room: ${opportunity.buyerDiligenceRoom ? opportunity.buyerDiligenceRoom.diligenceStatus : "not prepared"}
 - Buyer diligence evidence scope: ${opportunity.buyerDiligenceRoom?.evidenceScope ?? "not prepared"}
+- Secure evidence vault readiness: ${opportunity.secureEvidenceVaultReadiness ? opportunity.secureEvidenceVaultReadiness.readinessStatus : "not prepared"}
+- Secure evidence vault mode: ${opportunity.secureEvidenceVaultReadiness?.vaultMode ?? "disabled"}
 
 ## Buyer Scope
 - Offer interest: ${opportunity.payload.scope.offerInterest}

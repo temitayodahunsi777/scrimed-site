@@ -29,7 +29,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
-- Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, tenant-per-buyer lifecycle activation, production readiness, activation approvals, buyer evidence and signed controls diligence, protected Buyer Pilot Room proof, audited packet release, and paid synthetic pilot.
+- Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, tenant-per-buyer lifecycle activation, production readiness, activation approvals, buyer evidence and signed controls diligence, secure evidence vault readiness, protected Buyer Pilot Room proof, audited packet release, and paid synthetic pilot.
 - The Trust and Enterprise Readiness Center governs company-level launch gates and public claims before marketing, PR, sales, advertising, protected pilots, or production use.
 
 Reasoning level:
@@ -56,6 +56,7 @@ Completed foundations:
 - Production SSO and invitation delivery readiness with buyer-domain verification, redirect/origin registry, invitation template approval, transactional delivery guardrails, access-review attestation, archive runbook, launch blockers, and audited readiness packet
 - Customer activation approval workflow with paid-pilot setup approval, allowed setup actions, retained hard blockers, approval-domain status, private audit storage, and audited approval packet
 - Buyer evidence and signed controls diligence rooms with metadata-only domain proof, IdP metadata readiness, legal/privacy/security controls, BAA/DPA posture, transactional provider decisions, production connector readiness, signed-control tracking, retained blockers, and audited diligence packets
+- Secure evidence vault readiness with disabled-by-default storage-provider decisioning, encryption/key management, DLP, malware scanning, retention/legal hold, access reviews, evidence classification, upload approval, incident response, regional residency, target audience, revenue-path controls, and audited readiness packets
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -109,8 +110,8 @@ Completed foundations:
 
 Next build targets:
 
-- Convert buyer diligence metadata into a secure evidence vault only after storage, DLP, malware scanning, retention, legal hold, access-control, and signed legal/privacy/security controls are approved.
-- Convert activation approval and buyer diligence packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.
+- Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
+- Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.
 - Operate the activated sales ownership, due-action cadence, vendor-neutral CRM export, proposal follow-up, and assessment invitation workflows through the protected Sales Operations console
 - Continue cross-tenant isolation verification and extend AAL2/session policy from Sales Operations to future tenant-administration surfaces
 - Continue monitoring verified Upstash Redis distributed intake and protected mutation limits across Vercel regions

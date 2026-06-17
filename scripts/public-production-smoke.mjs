@@ -160,6 +160,20 @@ async function checkProductConsole() {
     throw new Error("product console missing buyer diligence packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.secureEvidenceVaultReadiness !==
+    "aal2-secure-evidence-vault-readiness-disabled-by-default"
+  ) {
+    throw new Error("product console missing secure evidence vault readiness proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.secureEvidenceVaultReadinessPackets !==
+    "aal2-audited-secure-evidence-vault-readiness-packets"
+  ) {
+    throw new Error("product console missing secure evidence vault readiness packet proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -293,6 +307,14 @@ await checkSalesProtectedFailClosed(
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/buyer-diligence/packet",
   "Sales buyer diligence packet protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/evidence-vault-readiness",
+  "Sales secure evidence vault readiness protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/evidence-vault-readiness/packet",
+  "Sales secure evidence vault readiness packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,

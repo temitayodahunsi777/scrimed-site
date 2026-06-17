@@ -2,6 +2,20 @@
 
 Updated: 2026-06-17
 
+## Latest Secure Evidence Vault Readiness Release
+
+- Added guarded secure evidence vault readiness for buyer-diligence-prepared Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness`.
+- Added audited secure evidence vault readiness packets through `/api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness/packet` so tenant-admins can retain storage-provider decisioning, encryption/key management, DLP, malware scanning, retention, legal hold, access review, evidence classification, upload approval, incident response, regional data residency, target audience, and revenue-path controls.
+- Added a private `sales_secure_evidence_vault_readiness` table with deny-all RLS and tenant-admin AAL2 plus server-held authorization for readiness preparation and packet release.
+- Updated `/sales-operations` with vault mode, readiness status, storage provider decision, DLP/malware posture, target audience count, preparation action, and vault packet download action.
+- Updated `/pilot-deal-room`, `/product`, `/hub`, `/api/product/console`, and public smoke coverage with secure evidence vault readiness proof-stack posture.
+- Resolved the local run-failure pattern: duplicate-suffixed generated `.next` artifacts can appear when rebuilding while `next start` is still serving the build output. Stop the local server, quarantine or remove `.next`, rebuild cleanly, then run `scripts/check-generated-integrity.mjs` before TypeScript or smoke checks.
+- Addressed the sensitive-document storage limitation with a stronger workaround: SCRIMED can now sell and run enterprise evidence-vault implementation planning while storage remains disabled and only metadata, owners, approval status, secure-channel labels, dates, blockers, and production gates are retained.
+- Expanded target-audience reach for CIO, CISO, privacy, legal, compliance, procurement, clinical operations, payer operations, government health buyers, investors, and strategic partners.
+- Preserved the hard boundary: vault readiness does not create upload URLs, buckets, object storage, PHI/ePHI processing, source-document storage, legal advice, compliance certification, breach determination, reimbursement guarantees, customer SSO approval, production connector authorization, payer submission, patient outreach, autonomous diagnosis, treatment decisions, or live healthcare execution.
+- Applied the production Supabase migration and verified the private table, RLS, public RPC wrappers, runtime schema `2026-06-17.2`, and secure evidence vault readiness status. Supabase advisors show the existing leaked-password protection warning for password-based Auth; SCRIMED protected product flows remain passkey or passwordless magic-link based, so password sign-in should remain disabled unless that dashboard setting is enabled.
+- Remaining gate: actual evidence storage requires approved provider, BAA/DPA path, encryption/key management, DLP, malware scanning, retention/deletion/legal hold, access reviews, incident response, regional residency, support ownership, buyer authorization, and qualified legal/privacy/security review.
+
 ## Latest Buyer Evidence And Signed Controls Diligence Release
 
 - Added guarded buyer evidence and signed controls diligence rooms for activation-approved Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/buyer-diligence`.

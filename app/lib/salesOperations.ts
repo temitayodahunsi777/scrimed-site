@@ -40,6 +40,13 @@ import {
   buyerDiligenceRoomPacketProofStackStatus,
   buyerDiligenceRoomProofStackStatus
 } from "./buyerDiligenceRoom";
+import type { SalesSecureEvidenceVaultReadiness } from "./secureEvidenceVaultReadiness";
+import {
+  secureEvidenceVaultReadinessApiRoute,
+  secureEvidenceVaultReadinessPacketApiRoute,
+  secureEvidenceVaultReadinessPacketProofStackStatus,
+  secureEvidenceVaultReadinessProofStackStatus
+} from "./secureEvidenceVaultReadiness";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -84,6 +91,7 @@ export type SalesOpportunity = {
   productionActivationReadiness?: SalesProductionActivationReadiness | null;
   customerActivationApprovals?: SalesCustomerActivationApprovals | null;
   buyerDiligenceRoom?: SalesBuyerDiligenceRoom | null;
+  secureEvidenceVaultReadiness?: SalesSecureEvidenceVaultReadiness | null;
   assessmentStartAt: string | null;
   assessmentDurationMinutes: number;
   assessmentMeetingUrl: string;
@@ -115,7 +123,9 @@ export type SalesAuditEvent = {
     | "customer-activation-approvals-recorded"
     | "customer-activation-approvals-packet-downloaded"
     | "buyer-diligence-room-prepared"
-    | "buyer-diligence-packet-downloaded";
+    | "buyer-diligence-packet-downloaded"
+    | "secure-evidence-vault-readiness-prepared"
+    | "secure-evidence-vault-readiness-packet-downloaded";
   eventMetadata: Record<string, unknown>;
   createdAt: string;
 };
@@ -432,6 +442,38 @@ export function getSalesOperationsSummary() {
         "private keys",
         "payer member data"
       ],
+      noPhiBoundary: true
+    },
+    secureEvidenceVaultReadiness: {
+      status: secureEvidenceVaultReadinessProofStackStatus,
+      apiRoute: secureEvidenceVaultReadinessApiRoute,
+      packetApiRoute: secureEvidenceVaultReadinessPacketApiRoute,
+      packetProofStackStatus: secureEvidenceVaultReadinessPacketProofStackStatus,
+      vaultMode: "disabled-metadata-only",
+      targetAudiences: [
+        "CIO",
+        "CISO",
+        "privacy officer",
+        "legal counsel",
+        "compliance leader",
+        "clinical operations executive",
+        "payer operations leader",
+        "government health buyer",
+        "investor diligence reviewer"
+      ],
+      readinessControls: [
+        "storage provider decision",
+        "encryption and key management",
+        "DLP and malware scanning",
+        "retention and legal hold",
+        "access reviews",
+        "evidence classification",
+        "upload approval workflow",
+        "incident response",
+        "regional data residency"
+      ],
+      revenuePath:
+        "Turns sensitive-document handling from a blocker into a paid enterprise implementation workstream without prematurely accepting regulated files.",
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,

@@ -10,6 +10,7 @@ import type { SalesBuyerTenantLifecycleResult } from "./buyerTenantLifecycle";
 import type { SalesProductionActivationReadinessResult } from "./productionActivationReadiness";
 import type { SalesCustomerActivationApprovalsResult } from "./customerActivationApprovals";
 import type { SalesBuyerDiligenceRoomResult } from "./buyerDiligenceRoom";
+import type { SalesSecureEvidenceVaultReadinessResult } from "./secureEvidenceVaultReadiness";
 
 export async function getSalesOperationsDashboard(client: SupabaseClient) {
   const { data, error } = await client.rpc("sales_operations_dashboard");
@@ -208,6 +209,37 @@ export async function recordSalesBuyerDiligenceRoomPacketDownload(
 
   return {
     result: data ? (data as SalesBuyerDiligenceRoomResult) : null,
+    error
+  };
+}
+
+export async function prepareSalesSecureEvidenceVaultReadiness(
+  client: SupabaseClient,
+  intakeId: string
+) {
+  const { data, error } = await client.rpc("prepare_sales_secure_evidence_vault_readiness", {
+    p_intake_id: intakeId
+  });
+
+  return {
+    result: data ? (data as SalesSecureEvidenceVaultReadinessResult) : null,
+    error
+  };
+}
+
+export async function recordSalesSecureEvidenceVaultReadinessPacketDownload(
+  client: SupabaseClient,
+  intakeId: string
+) {
+  const { data, error } = await client.rpc(
+    "record_sales_secure_evidence_vault_readiness_packet_download",
+    {
+      p_intake_id: intakeId
+    }
+  );
+
+  return {
+    result: data ? (data as SalesSecureEvidenceVaultReadinessResult) : null,
     error
   };
 }
