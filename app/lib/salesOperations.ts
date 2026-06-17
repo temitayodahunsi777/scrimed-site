@@ -476,6 +476,17 @@ export function getSalesOperationsSummary() {
         "Turns sensitive-document handling from a blocker into a paid enterprise implementation workstream without prematurely accepting regulated files.",
       noPhiBoundary: true
     },
+    buyerDemoExecutionPath: {
+      status: "aal2-authenticated-buyer-demo-execution-path",
+      apiRoute: "/api/sales-operations/opportunities/{intakeId}/demo-execution",
+      briefApiRoute: "/api/sales-operations/opportunities/{intakeId}/demo-execution/brief",
+      briefProofStackStatus:
+        "operator-brief-non-audited-existing-packets-remain-source-of-truth",
+      sourceOfTruth: "existing audited packet routes and protected workspaces",
+      purpose:
+        "Sequence no-PHI buyer demos, operator workarounds, audited packet release, and paid implementation gates from one authenticated runbook.",
+      noPhiBoundary: true
+    },
     boundary: salesOperationsBoundary,
     updated: "2026-06-17"
   };

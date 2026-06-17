@@ -58,6 +58,10 @@ import {
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
+import {
+  buyerDemoExecutionBriefApiRoute,
+  buyerDemoExecutionPathApiRoute
+} from "./buyerDemoExecutionPath";
 
 export type HubModule = {
   name: string;
@@ -147,6 +151,11 @@ export const hubSignals: HubSignal[] = [
     value: "disabled-by-default storage control path active",
     tone: "good"
   },
+  {
+    name: "Buyer demo execution path",
+    value: "authenticated no-PHI operator runbook active",
+    tone: "good"
+  },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
@@ -230,6 +239,8 @@ export const hubRoutes = [
   "/api/sales-operations/opportunities/{intakeId}/buyer-diligence/packet",
   "/api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness",
   "/api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness/packet",
+  buyerDemoExecutionPathApiRoute,
+  buyerDemoExecutionBriefApiRoute,
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",

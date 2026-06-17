@@ -2,6 +2,16 @@
 
 Updated: 2026-06-17
 
+## Latest Authenticated Buyer Demo Execution Release
+
+- Added protected `GET /api/sales-operations/opportunities/{intakeId}/demo-execution` to build a tenant-admin, no-PHI buyer demo execution path from existing opportunities, audit events, deal-room readiness, protected workspace routing, and packet availability.
+- Added protected `GET /api/sales-operations/opportunities/{intakeId}/demo-execution/brief` for a downloadable Markdown operator runbook. The brief is explicitly non-audited and keeps existing audited packet routes as the source of truth.
+- Updated `/sales-operations` with an Authenticated Buyer Demo Execution panel that shows path score, next action, workspace mapping mode, sequenced gates, current blocker, and quick links to Product Console, Pilot Deal Room, Buyer Room, and the demo brief.
+- Updated `/product`, `/hub`, `/api/product/console`, and public smoke coverage with buyer demo execution proof-stack posture.
+- Resolved the current demo-orchestration limitation with a free workaround: SCRIMED can run enterprise buyer demos from one protected checklist without adding a new database table, paid CRM dependency, or sensitive evidence store.
+- Preserved the hard boundary: the execution path does not create new audit evidence, accept PHI, authorize live clinical workflows, approve customer SSO cutover, certify compliance, submit payer transactions, contact patients, or provide medical, legal, security, regulatory, or reimbursement determinations.
+- Remaining gate: automated authenticated happy-path CI still requires approved short-lived AAL2 token handling. Until then, public smoke verifies fail-closed behavior and human operators generate authenticated demo packets through browser sessions.
+
 ## Latest Secure Evidence Vault Readiness Release
 
 - Added guarded secure evidence vault readiness for buyer-diligence-prepared Sales Operations opportunities through `/api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness`.

@@ -621,6 +621,18 @@ export default function SalesOperationsConsole({
     );
   }
 
+  async function downloadBuyerDemoExecutionBrief() {
+    if (!selected) {
+      return;
+    }
+
+    await downloadProtectedFile(
+      `/api/sales-operations/opportunities/${selected.intakeId}/demo-execution/brief`,
+      `scrimed-${selected.intakeId}-buyer-demo-execution-brief.md`,
+      "Buyer demo execution operator brief downloaded. Existing audited packet routes remain the source of truth."
+    );
+  }
+
   async function provisionWorkspace() {
     if (!session || !selected) {
       return;
@@ -1139,6 +1151,120 @@ export default function SalesOperationsConsole({
   const secureEvidenceVaultEligible = selected
     ? isSecureEvidenceVaultReadinessEligible(selected)
     : false;
+  const selectedAuditEvents =
+    dashboard?.auditEvents.filter((event) => event.intakeId === selected?.intakeId) ?? [];
+  const hasSelectedAuditEvent = (eventType: string) =>
+    selectedAuditEvents.some((event) => event.eventType === eventType);
+  const buyerDemoWorkspaceSlug =
+    selectedWorkspaceProvisioning?.workspaceSlug ?? "atlas-synthetic-evaluation";
+  const buyerDemoWorkspaceMode = selectedWorkspaceProvisioning
+    ? "buyer-specific protected workspace"
+    : "default synthetic workspace";
+  const buyerDemoSteps = selected
+    ? [
+        {
+          label: "Proposal",
+          status: hasSelectedAuditEvent("proposal-downloaded") ? "complete" : "available",
+          evidence: hasSelectedAuditEvent("proposal-downloaded")
+            ? "Audited proposal exists"
+            : "Ready for human review"
+        },
+        {
+          label: "Attribution packet",
+          status:
+            hasSelectedAuditEvent("attribution-analytics-packet-downloaded") ||
+            Boolean(selected.lastAttributionAnalyticsPacketAt)
+              ? "complete"
+              : selectedAttribution
+                ? "available"
+                : "blocked",
+          evidence: selectedAttribution ? selectedAttribution.market.revenueStream : "Source signal missing"
+        },
+        {
+          label: "Deal-room packet",
+          status:
+            hasSelectedAuditEvent("buyer-deal-room-packet-downloaded") ||
+            Boolean(selected.lastBuyerDealRoomPacketAt)
+              ? "complete"
+              : "available",
+          evidence: selected.lastBuyerDealRoomPacketAt
+            ? `Last released ${formatDate(selected.lastBuyerDealRoomPacketAt)}`
+            : "Ready for audit"
+        },
+        {
+          label: "Buyer workspace",
+          status: selectedWorkspaceProvisioning ? "complete" : workspaceEligible ? "available" : "blocked",
+          evidence: selectedWorkspaceProvisioning
+            ? selectedWorkspaceProvisioning.workspaceSlug
+            : workspaceEligible
+              ? "Qualified for provisioning"
+              : "Advance to Qualified"
+        },
+        {
+          label: "Tenant lifecycle",
+          status: selectedBuyerTenantLifecycle ? "complete" : tenantLifecycleEligible ? "available" : "blocked",
+          evidence: selectedBuyerTenantLifecycle?.lifecycleStatus ?? "Workspace required"
+        },
+        {
+          label: "Production readiness",
+          status: selectedProductionReadiness
+            ? "complete"
+            : productionReadinessEligible
+              ? "available"
+              : "blocked",
+          evidence: selectedProductionReadiness?.readinessStatus ?? "Lifecycle required"
+        },
+        {
+          label: "Setup approvals",
+          status: selectedCustomerActivationApprovals
+            ? "complete"
+            : activationApprovalEligible
+              ? "available"
+              : "blocked",
+          evidence: selectedCustomerActivationApprovals?.approvalStatus ?? "Production readiness required"
+        },
+        {
+          label: "Buyer diligence",
+          status: selectedBuyerDiligenceRoom ? "complete" : buyerDiligenceEligible ? "available" : "blocked",
+          evidence: selectedBuyerDiligenceRoom?.diligenceStatus ?? "Setup approval required"
+        },
+        {
+          label: "Vault readiness",
+          status: selectedSecureEvidenceVaultReadiness
+            ? "complete"
+            : secureEvidenceVaultEligible
+              ? "available"
+              : "blocked",
+          evidence: selectedSecureEvidenceVaultReadiness?.readinessStatus ?? "Diligence room required"
+        },
+        {
+          label: "Buyer room",
+          status: "available",
+          evidence: buyerDemoWorkspaceMode
+        },
+        {
+          label: "Enterprise proof packet",
+          status: "manual-review-required",
+          evidence: "Release after workspace proof review"
+        }
+      ]
+    : [];
+  const buyerDemoCompletedSteps = buyerDemoSteps.filter((step) => step.status === "complete").length;
+  const buyerDemoWeightedScore = buyerDemoSteps.length
+    ? Math.round(
+        (buyerDemoSteps.reduce((total, step) => {
+          if (step.status === "complete") return total + 1;
+          if (step.status === "available") return total + 0.5;
+          return total;
+        }, 0) /
+          buyerDemoSteps.length) *
+          100
+      )
+    : 0;
+  const buyerDemoNextStep =
+    buyerDemoSteps.find((step) => step.status === "available") ??
+    buyerDemoSteps.find((step) => step.status === "blocked") ??
+    buyerDemoSteps.find((step) => step.status === "manual-review-required");
 
   return (
     <>
@@ -1524,6 +1650,63 @@ export default function SalesOperationsConsole({
               ) : null}
 
               <div className="sales-activation-grid">
+                <section>
+                  <p className="eyebrow">Authenticated buyer demo execution</p>
+                  <h3>Run the no-PHI buyer demo path from one protected checklist.</h3>
+                  <p className="section-copy">
+                    This path sequences the existing audited packets, protected buyer room, and paid
+                    implementation gates. The operator brief is a runbook only; audited packet routes remain the
+                    source of truth.
+                  </p>
+                  <div className="layer-list">
+                    <div className="layer-row">
+                      <span>01</span>
+                      <strong>Path score: {buyerDemoWeightedScore}% · {buyerDemoCompletedSteps}/{buyerDemoSteps.length} complete</strong>
+                    </div>
+                    <div className="layer-row">
+                      <span>02</span>
+                      <strong>Next action: {buyerDemoNextStep ? `${buyerDemoNextStep.label} (${displayValue(buyerDemoNextStep.status)})` : "Review opportunity"}</strong>
+                    </div>
+                    <div className="layer-row">
+                      <span>03</span>
+                      <strong>Workspace: {buyerDemoWorkspaceSlug} · {buyerDemoWorkspaceMode}</strong>
+                    </div>
+                    <div className="layer-row">
+                      <span>04</span>
+                      <strong>Boundary: synthetic, business-contact, and workflow-scope metadata only</strong>
+                    </div>
+                  </div>
+                  <div className="layer-list">
+                    {buyerDemoSteps.map((step, index) => (
+                      <div className="layer-row" key={`${step.label}-${step.status}`}>
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        <strong>
+                          {step.label}: {displayValue(step.status)} · {step.evidence}
+                        </strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="form-actions">
+                    <button className="primary-action" onClick={downloadBuyerDemoExecutionBrief} type="button">
+                      Download Demo Brief
+                    </button>
+                    <Link className="secondary-action" href="/product">
+                      View Product Console
+                    </Link>
+                    <Link className="secondary-action" href="/pilot-deal-room">
+                      Open Deal Room
+                    </Link>
+                    <Link
+                      className="secondary-action"
+                      href={`/pilot-workspace/access?workspace=${encodeURIComponent(
+                        buyerDemoWorkspaceSlug
+                      )}&opportunity=${encodeURIComponent(selected.intakeId)}`}
+                    >
+                      Open Buyer Room
+                    </Link>
+                  </div>
+                </section>
+
                 <section>
                   <p className="eyebrow">Commercial artifacts</p>
                   <h3>Move the opportunity without a paid CRM dependency.</h3>

@@ -46,6 +46,8 @@ Operational boundaries:
 - `/pilot-deal-room`
 - `GET /api/pilot-deal-room`
 - `GET /api/sales-operations/opportunities/{intakeId}/deal-room-packet`
+- `GET /api/sales-operations/opportunities/{intakeId}/demo-execution`
+- `GET /api/sales-operations/opportunities/{intakeId}/demo-execution/brief`
 - `GET /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `POST /api/pilot-workspaces/{workspaceSlug}/sessions`
 - `GET /api/pilot-workspaces/{workspaceSlug}/audit`
@@ -121,6 +123,8 @@ Production-readiness-prepared opportunities can now record customer activation a
 Activation-approved opportunities can now prepare a buyer evidence and signed controls diligence room through `POST /api/sales-operations/opportunities/{intakeId}/buyer-diligence`. The guarded RPC stores metadata-only evidence requirements, buyer domain proof status, IdP metadata readiness, legal/privacy/security controls, BAA/DPA posture, transactional provider decisions, production connector readiness, signed controls, retained blockers, Sales Operations audit evidence, and workspace audit evidence. `GET /api/sales-operations/opportunities/{intakeId}/buyer-diligence/packet` commits `buyer-diligence-packet-downloaded` before releasing the Markdown diligence packet.
 
 Buyer-diligence-prepared opportunities can now prepare secure evidence vault readiness through `POST /api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness`. The guarded RPC stores disabled-by-default storage-provider decisioning, encryption/key management, DLP, malware scanning, retention/legal hold, access reviews, evidence classification, upload approval, incident response, regional residency, target audience, revenue-path controls, Sales Operations audit evidence, and workspace audit evidence. `GET /api/sales-operations/opportunities/{intakeId}/evidence-vault-readiness/packet` commits `secure-evidence-vault-readiness-packet-downloaded` before releasing the Markdown readiness packet.
+
+Sales Operations now exposes an authenticated buyer demo execution path through `GET /api/sales-operations/opportunities/{intakeId}/demo-execution` and a downloadable operator runbook through `GET /api/sales-operations/opportunities/{intakeId}/demo-execution/brief`. These routes coordinate the existing audited packet sequence, buyer room routing, known limits, workarounds, and retained hard gates without adding a new persistence surface. The operator brief is not an audited evidence packet; proposal, deal-room, workspace, lifecycle, production readiness, activation approval, diligence, vault readiness, buyer-room, and enterprise proof packets remain the evidence source of truth.
 
 Current boundary: buyer-specific workspaces, lifecycle controls, production readiness packets, activation approval packets, buyer diligence rooms, and secure evidence vault readiness records are logical tenant-per-buyer evaluation controls inside the activated SCRIMED pilot tenant. This resolves the paid-pilot setup, enterprise diligence, and sensitive-document storage planning gap without creating live customer infrastructure, upload URLs, object buckets, or a sensitive-document repository prematurely. The production gate is signed customer tenant architecture, production SSO configuration, approved transactional email delivery, retention deletion policy, legal/privacy/security review, clinical governance review, BAA/DPA path where applicable, secure evidence storage controls, and live connector authorization.
 

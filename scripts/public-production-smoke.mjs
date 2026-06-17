@@ -174,6 +174,17 @@ async function checkProductConsole() {
     throw new Error("product console missing secure evidence vault readiness packet proof-stack posture.");
   }
 
+  if (body.proofStack?.buyerDemoExecutionPath !== "aal2-authenticated-buyer-demo-execution-path") {
+    throw new Error("product console missing buyer demo execution path proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.buyerDemoExecutionBrief !==
+    "operator-brief-non-audited-existing-packets-remain-source-of-truth"
+  ) {
+    throw new Error("product console missing buyer demo execution brief proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -315,6 +326,14 @@ await checkSalesProtectedFailClosed(
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/evidence-vault-readiness/packet",
   "Sales secure evidence vault readiness packet protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/demo-execution",
+  "Sales buyer demo execution protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/demo-execution/brief",
+  "Sales buyer demo execution brief protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/demo-readiness`,
