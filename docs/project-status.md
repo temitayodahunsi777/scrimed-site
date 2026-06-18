@@ -2,6 +2,14 @@
 
 Updated: 2026-06-18
 
+## Latest Command Intelligence Hub Release
+
+- Added the protected SCRIMED Command Intelligence Hub inside `/pilot-workspace/access` so operators can review Agent Commander posture, Buyer Pilot Room readiness, Trust Engine outputs, continuous evaluation gates, MCP/tool-access plans, observability, safe-mode controls, limitations, workarounds, and next actions before external buyer diligence.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence` with AAL2 governance context, workspace membership, no-store response headers, synthetic-only data boundary, rate limiting, degraded-section disclosure, and no new storage requirement.
+- Added `app/lib/commandIntelligenceHub.ts` as the typed intelligence layer connecting agents, tenant evidence, protected workspace data, buyer-room posture, QA evidence, MCP/tool plans, safe-mode controls, and operator decisions.
+- Updated Product Console proof stack, protected workspace API contract, protected workspace capability list, docs, and public smoke expectations with `aal2-command-intelligence-hub`.
+- Preserved the boundary: the hub remains protected, synthetic-only, metadata-only, tenant-scoped, and does not accept PHI, store credentials, certify compliance/security, guarantee reimbursement, approve production connectors, or authorize live clinical, payer, imaging, device, or patient-facing execution.
+
 ## Latest Buyer Diligence Export Release
 
 - Upgraded the protected Buyer Pilot Room export into a one-click Buyer Diligence Export at `/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`.

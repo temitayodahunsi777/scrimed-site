@@ -34,6 +34,7 @@ import {
   buyerPilotRoomPacketProofStackStatus,
   buyerPilotRoomProofStackStatus
 } from "./buyerPilotRoom";
+import { commandIntelligenceHubProofStackStatus } from "./commandIntelligenceHub";
 import {
   getSalesDealRoomSummary,
   salesDealRoomPacketProofStackStatus,
@@ -685,6 +686,8 @@ export function getProductConsoleSummary() {
     buyerPilotRoomRoute: "/pilot-workspace/access",
     buyerPilotRoomApiRoute: "/api/pilot-workspaces/{workspaceSlug}/buyer-room",
     buyerPilotRoomPacketApiRoute: "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet",
+    commandIntelligenceHubRoute: "/pilot-workspace/access",
+    commandIntelligenceHubApiRoute: "/api/pilot-workspaces/{workspaceSlug}/command-intelligence",
     salesDealRoomRoute: salesDealRoomSummary.route,
     salesDealRoomApiRoute: salesDealRoomSummary.apiRoute,
     salesDealRoomProtectedPacketRoute: salesDealRoomSummary.protectedPacketRoute,
@@ -755,6 +758,7 @@ export function getProductConsoleSummary() {
       pilotDemoReadinessPackets: pilotDemoReadinessPacketProofStackStatus,
       buyerPilotRoom: buyerPilotRoomProofStackStatus,
       buyerPilotRoomPackets: buyerPilotRoomPacketProofStackStatus,
+      commandIntelligenceHub: commandIntelligenceHubProofStackStatus,
       salesDealRoom: salesDealRoomProofStackStatus,
       salesDealRoomPackets: salesDealRoomPacketProofStackStatus,
       opportunityWorkspaceProvisioning: opportunityWorkspaceProvisioningProofStackStatus,

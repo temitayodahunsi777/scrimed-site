@@ -16,6 +16,7 @@ import type {
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
+import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
@@ -1030,6 +1031,16 @@ export default function ProtectedPilotAccess({
             sessions={sessions}
             status={status === "creating-session" ? "creating-session" : "idle"}
             verification={verificationReadiness}
+            workspace={selectedWorkspace}
+          />
+
+          <CommandIntelligenceHubPanel
+            auditEvents={auditEvents}
+            demoSnapshots={demoReadinessSnapshots}
+            manualQaEvidencePackets={manualQaEvidencePackets}
+            onDownloadBuyerDiligenceExport={downloadBuyerPilotRoomPacket}
+            packetBusy={buyerRoomPacketStatus === "downloading"}
+            sessions={sessions}
             workspace={selectedWorkspace}
           />
 

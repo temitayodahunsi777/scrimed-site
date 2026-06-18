@@ -59,6 +59,7 @@ Operational boundaries:
 - `POST /api/pilot-workspaces/{workspaceSlug}/demo-readiness`
 - `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness/{snapshotId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room`
+- `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -108,6 +109,22 @@ Demo Readiness Packet export requires a selected snapshot and commits `demo-read
 The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The export route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact and preserves the legacy packet route for compatibility.
 
 This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, QA evidence, legal/privacy/security/safety posture, limitations, workarounds, and competitive edge in one tenant-scoped export without weakening the synthetic-only boundary.
+
+## Command Intelligence Hub
+
+`/pilot-workspace/access` now includes the protected SCRIMED Command Intelligence Hub between Demo Readiness and Buyer Pilot Room. It unifies the workspace's current command posture:
+
+- Agent Commander orchestration with planner, router, specialist services, shared memory, approvals, MCP/tool contracts, and observability signals.
+- Buyer Room readiness, export route, latest demo snapshot, and buyer diligence posture.
+- Trust Engine outputs with recommendation, confidence, evidence source, risk score, human review trigger, validation status, and audit log.
+- Continuous evaluation gates for groundedness, hallucination/safety, workflow success, latency/cost, drift, and human feedback.
+- MCP/tool-access plans for EHR/FHIR/HL7, claims/prior auth, imaging/DICOM, research/trials, scheduling/referrals, and wearables/devices.
+- Operator Safe Mode controls for no PHI, no production credentials, no autonomous clinical authority, no payer submission, and no unsupported certification claims.
+- Observability signals including audit traces, packet exports, manual QA packet hashes, degraded sections, and next recommended actions.
+
+The JSON route at `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence` requires AAL2 governance context, tenant workspace membership, no-store response headers, synthetic-only data-boundary headers, and rate limiting. It does not create new records, store secrets, enable connectors, or grant live execution authority.
+
+Current boundary: the hub is a command posture for governed synthetic pilots and enterprise evaluation only. Production use still requires signed customer scope, BAA/DPA path where applicable, legal/privacy/security/clinical review, approved connectors, live monitoring, and human operating controls.
 
 ## Pilot Deal Room Linkage
 
