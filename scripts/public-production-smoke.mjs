@@ -23,6 +23,18 @@ async function request(path) {
   return { body, response };
 }
 
+async function postJson(path, payload) {
+  const response = await fetch(endpoint(path), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  const body = await readResponse(response);
+  return { body, response };
+}
+
 function requireStatus(label, actual, expected) {
   const expectedValues = Array.isArray(expected) ? expected : [expected];
 
@@ -214,6 +226,10 @@ async function checkProductConsole() {
     throw new Error("product console missing QA evidence ledger proof-stack posture.");
   }
 
+  if (body.proofStack?.qaManualRunEvidencePacket !== "manual-aal2-run-evidence-packet-ready") {
+    throw new Error("product console missing manual QA run evidence packet posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -307,10 +323,59 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA evidence ledger expected a visible manual AAL2 gate.");
   }
 
+  if (body.manualRunEvidenceCapture?.status !== "manual-aal2-run-evidence-packet-ready") {
+    throw new Error("QA evidence ledger expected manual run evidence packet capture status.");
+  }
+
   const brief = await request("/api/qa-evidence/brief");
   requireStatus("QA evidence brief", brief.response.status, 200);
   requireContentType("QA evidence brief", brief.response, "text/markdown");
   requireSyntheticBoundary("QA evidence brief", brief.response);
+
+  const contract = await request("/api/qa-evidence/manual-run-packet");
+  requireStatus("QA manual run evidence packet contract", contract.response.status, 200);
+  requireContentType("QA manual run evidence packet contract", contract.response, "application/json");
+  requireSyntheticBoundary("QA manual run evidence packet contract", contract.response);
+  const contractBody = requireJson("QA manual run evidence packet contract", contract.body);
+
+  if (contractBody.status !== "manual-aal2-run-evidence-packet-ready") {
+    throw new Error("QA manual run evidence packet contract expected ready status.");
+  }
+
+  const rejectedSecret = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowRunId: "123456789",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "intake-test-123",
+    createdSessionId: "11111111-1111-4111-8111-111111111111",
+    packetAuditEventId: "22222222-2222-4222-8222-222222222222",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only",
+    bearerToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkby1ub3Qtc3RvcmUifQ.signature"
+  });
+  requireStatus("QA manual run evidence packet secret rejection", rejectedSecret.response.status, 400);
+  requireContentType("QA manual run evidence packet secret rejection", rejectedSecret.response, "application/json");
+  requireSyntheticBoundary("QA manual run evidence packet secret rejection", rejectedSecret.response);
+
+  const acceptedPacket = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowRunId: "123456789",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "intake-test-123",
+    createdSessionId: "11111111-1111-4111-8111-111111111111",
+    packetAuditEventId: "22222222-2222-4222-8222-222222222222",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA manual run evidence packet", acceptedPacket.response.status, 200);
+  requireContentType("QA manual run evidence packet", acceptedPacket.response, "text/markdown");
+  requireSyntheticBoundary("QA manual run evidence packet", acceptedPacket.response);
 
   console.log("pass QA evidence ledger");
 }

@@ -31,6 +31,9 @@ export default function QaEvidencePage() {
           <a className="secondary-action" href={ledger.apiRoute}>
             Inspect QA API
           </a>
+          <a className="secondary-action" href={ledger.manualRunEvidenceCapture.route}>
+            Capture Run Packet
+          </a>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
           </Link>
@@ -57,6 +60,10 @@ export default function QaEvidencePage() {
         <article>
           <span>Manual gates</span>
           <strong>{ledger.manualGates}</strong>
+        </article>
+        <article>
+          <span>Capture path</span>
+          <strong>{ledger.manualRunEvidenceCapture.status}</strong>
         </article>
         <article>
           <span>Data boundary</span>
@@ -155,6 +162,32 @@ export default function QaEvidencePage() {
             <span>boundary</span>
             <h3>No long-lived secret</h3>
             <p>{ledger.salesDemoSessionQaBoundary}</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-band" aria-label="SCRIMED manual QA evidence capture">
+        <div className="section-heading">
+          <p className="eyebrow">Manual run packet</p>
+          <h2>After the AAL2 workflow passes, SCRIMED can generate a no-secret evidence packet without storing credentials.</h2>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>status</span>
+            <h3>{ledger.manualRunEvidenceCapture.status}</h3>
+            <p>{ledger.manualRunEvidenceCapture.persistenceBoundary}</p>
+          </article>
+          <article>
+            <span>route</span>
+            <h3>{ledger.manualRunEvidenceCapture.route}</h3>
+            <p>{ledger.manualRunEvidenceCapture.forbiddenContent}</p>
+          </article>
+          <article>
+            <span>required</span>
+            <h3>{ledger.manualRunEvidenceCapture.requiredFields.length} fields</h3>
+            <p>
+              Required attestations: {Object.values(ledger.manualRunEvidenceCapture.acceptedAttestations).join(", ")}.
+            </p>
           </article>
         </div>
       </section>

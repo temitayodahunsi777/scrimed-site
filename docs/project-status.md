@@ -2,6 +2,15 @@
 
 Updated: 2026-06-18
 
+## Latest Manual QA Evidence Packet Release
+
+- Added `POST /api/qa-evidence/manual-run-packet` to validate non-secret manual Sales Demo Session QA run metadata and return a Markdown evidence packet after the AAL2 workflow completes.
+- Added `GET /api/qa-evidence/manual-run-packet` so operators can inspect required fields, accepted attestations, forbidden content, and the no-persistence boundary before submitting evidence.
+- Extended `app/lib/qaEvidenceLedger.ts` with a manual-run capture contract, secret-like content rejection, UUID/run URL/intake/timestamp validation, token-disposal attestation, and packet generation.
+- Updated `/qa-evidence`, `/pilot-evidence`, `/hub`, `/product`, and public smoke coverage so the manual AAL2 run no longer has an undefined evidence-capture process.
+- Public smoke now verifies the packet contract, rejects token-like payloads, and accepts a sanitized synthetic packet payload.
+- Preserved the boundary: the packet generator does not mint tokens, execute authenticated QA, store evidence, accept PHI, accept credentials, certify compliance, or authorize live healthcare execution.
+
 ## Latest QA Evidence Ledger Release
 
 - Added `/qa-evidence`, `/api/qa-evidence`, and `/api/qa-evidence/brief` as a buyer-safe ledger for release QA, fail-closed controls, token-policy readiness, known limitations, and the remaining manual AAL2 gate.

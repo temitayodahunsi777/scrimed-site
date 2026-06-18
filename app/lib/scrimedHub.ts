@@ -71,7 +71,8 @@ import {
   getQaEvidenceLedger,
   qaEvidenceLedgerApiRoute,
   qaEvidenceLedgerBriefRoute,
-  qaEvidenceLedgerRoute
+  qaEvidenceLedgerRoute,
+  qaManualRunEvidencePacketApiRoute
 } from "./qaEvidenceLedger";
 
 export type HubModule = {
@@ -221,6 +222,11 @@ export const hubSignals: HubSignal[] = [
     value: "release proof and manual AAL2 gate visible",
     tone: "good"
   },
+  {
+    name: "Manual QA evidence packet",
+    value: "no-secret capture contract active",
+    tone: "good"
+  },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },
@@ -361,6 +367,7 @@ export const hubRoutes = [
   "/api/pilot-evidence/brief",
   qaEvidenceLedgerApiRoute,
   qaEvidenceLedgerBriefRoute,
+  qaManualRunEvidencePacketApiRoute,
   "/api/sales-operations",
   "/api/sales-operations/opportunities/{intakeId}",
   "/api/sales-operations/opportunities/{intakeId}/proposal",

@@ -28,6 +28,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Executable synthetic conformance evaluations are the active evidence gate for FHIR R4 and US Core, SMART App Launch, and DICOMweb before partner testing or live connector work.
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - QA Evidence Ledger is the active dated proof surface for release smoke, fail-closed routes, token-policy readiness, contained limitations, and manual AAL2 operator gates.
+- Manual QA Evidence Packet generation is the active no-secret capture process after the human-run AAL2 Sales Demo Session QA workflow completes.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
 - Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, tenant-per-buyer lifecycle activation, production readiness, activation approvals, buyer evidence and signed controls diligence, secure evidence vault readiness, protected Buyer Pilot Room proof, audited packet release, and paid synthetic pilot.
@@ -64,6 +65,7 @@ Completed foundations:
 - AAL2 buyer-demo session QA harness with selected-opportunity targeting, synthetic session creation, packet-audit verification, UI trigger, public fail-closed smoke, and optional short-lived-token authenticated smoke
 - Operator-token rotation runbook and CI secret policy for Sales Demo Session QA with local token preflight, manual GitHub Actions dispatch, explicit intake targeting, and no long-lived credential storage
 - QA Evidence Ledger with page, API, downloadable brief, proof-stack wiring, public smoke verification, explicit known limitations, and remaining manual AAL2 gate visibility
+- Manual QA Evidence Packet route with required-field contract, secret-like content rejection, token-disposal attestation, no-PHI boundary, and Markdown packet generation
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -117,7 +119,7 @@ Completed foundations:
 
 Next build targets:
 
-- Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
+- Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, generate the sanitized packet through `/api/qa-evidence/manual-run-packet`, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.
 - Operate the activated sales ownership, due-action cadence, vendor-neutral CRM export, proposal follow-up, and assessment invitation workflows through the protected Sales Operations console

@@ -30,13 +30,30 @@ export type QaKnownLimitation = {
   status: "contained" | "manual-action-required" | "external-review-required";
 };
 
+export type QaManualRunEvidenceInput = {
+  workflowRunId: string;
+  workflowRunUrl: string;
+  executedAt: string;
+  baseUrl: string;
+  intakeId: string;
+  createdSessionId: string;
+  packetAuditEventId: string;
+  qaOutcome: "pass";
+  operatorAttestation: "no-secrets-no-phi-aal2-human-run";
+  tokenDisposalAttestation: "temporary-token-deleted-or-rotated";
+  dataBoundary: "synthetic-business-workflow-only";
+};
+
 export const qaEvidenceLedgerRoute = "/qa-evidence";
 export const qaEvidenceLedgerApiRoute = "/api/qa-evidence";
 export const qaEvidenceLedgerBriefRoute = "/api/qa-evidence/brief";
+export const qaManualRunEvidencePacketApiRoute = "/api/qa-evidence/manual-run-packet";
 
 export const qaEvidenceLedgerStatus = "qa-evidence-ledger-active";
 export const qaEvidenceLedgerProofStackStatus =
   "dated-qa-evidence-ledger-with-manual-aal2-gate";
+export const qaManualRunEvidencePacketStatus =
+  "manual-aal2-run-evidence-packet-ready";
 
 export const qaEvidenceLedgerBoundary =
   "SCRIMED QA Evidence Ledger records synthetic-only release, smoke, token-policy, fail-closed, and operator-gate evidence. It is not a clinical validation report, security certification, legal opinion, SOC report, HIPAA attestation, or authorization for live healthcare execution.";
@@ -116,6 +133,23 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
     nextAction: "Run the manual workflow once a fresh AAL2 token and safe synthetic intake target are available."
   },
   {
+    id: "manual-run-evidence-capture",
+    name: "Manual AAL2 run evidence capture",
+    status: "workaround-active",
+    owner: "Release engineering",
+    recordedAt: "2026-06-18",
+    artifact: qaManualRunEvidencePacketApiRoute,
+    routes: [qaManualRunEvidencePacketApiRoute, qaEvidenceLedgerRoute, salesDemoSessionQaApiRoute],
+    evidence:
+      "A stateless evidence packet generator validates non-secret workflow run metadata, created synthetic session ID, packet audit event ID, operator attestation, and token-disposal attestation after the manual QA workflow completes.",
+    limitation:
+      "The packet generator does not execute the authenticated QA run or persist evidence to durable storage by itself.",
+    workaround:
+      "Use it immediately after the manual workflow run to produce a sanitized packet, then archive the packet with the release record and update the ledger entry when durable evidence is approved.",
+    nextAction:
+      "After the first manual workflow pass, POST the non-secret run metadata to the packet route and attach the packet to the release evidence record."
+  },
+  {
     id: "protected-routes-fail-closed",
     name: "Protected route fail-closed coverage",
     status: "fail-closed",
@@ -185,6 +219,34 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
   }
 ];
 
+export const qaManualRunEvidenceContract = {
+  route: qaManualRunEvidencePacketApiRoute,
+  status: qaManualRunEvidencePacketStatus,
+  requiredFields: [
+    "workflowRunId",
+    "workflowRunUrl",
+    "executedAt",
+    "baseUrl",
+    "intakeId",
+    "createdSessionId",
+    "packetAuditEventId",
+    "qaOutcome",
+    "operatorAttestation",
+    "tokenDisposalAttestation",
+    "dataBoundary"
+  ],
+  acceptedAttestations: {
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  },
+  forbiddenContent:
+    "Do not submit bearer tokens, refresh tokens, passwords, API keys, PHI, patient identifiers, payer member identifiers, source contracts, credentials, or legal/security conclusions.",
+  persistenceBoundary:
+    "This route validates and returns a Markdown evidence packet. It does not persist evidence; durable evidence storage remains gated by approved controls."
+};
+
 function getCurrentDeploymentEvidence() {
   return {
     environment: process.env.VERCEL_ENV ?? "local-or-unset",
@@ -219,14 +281,201 @@ export function getQaEvidenceLedger() {
     salesDemoSessionQaBoundary,
     salesDemoSessionQaControls,
     tokenPolicy: salesDemoSessionQaTokenPolicy,
+    manualRunEvidenceCapture: qaManualRunEvidenceContract,
     entries: qaEvidenceEntries,
     knownLimitations: qaKnownLimitations,
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, and token-policy readiness today; the only remaining authenticated QA evidence step is a deliberate short-lived AAL2 operator run against a synthetic buyer opportunity.",
     nextRecommendedBuildStep:
-      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, then add the resulting run ID, timestamp, intake target, created session ID, and packet audit event ID to this ledger.",
+      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, generate the manual-run evidence packet, then add the run ID, timestamp, intake target, created session ID, and packet audit event ID to this ledger.",
     updated: "2026-06-18"
   };
+}
+
+function cleanText(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function hasForbiddenKey(value: unknown) {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const forbiddenKeys = new Set([
+    "accessToken",
+    "access_token",
+    "bearerToken",
+    "bearer_token",
+    "refreshToken",
+    "refresh_token",
+    "jwt",
+    "secret",
+    "password",
+    "credential",
+    "credentials"
+  ]);
+
+  return Object.keys(value).some((key) => forbiddenKeys.has(key));
+}
+
+function hasForbiddenContent(value: unknown) {
+  const text = JSON.stringify(value ?? "");
+
+  return [
+    /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/,
+    /sk-[A-Za-z0-9_-]{12,}/,
+    /sbp_[A-Za-z0-9_-]{12,}/,
+    /Bearer\s+[A-Za-z0-9._-]+/i,
+    /patient\s*(id|identifier|mrn)/i,
+    /member\s*(id|identifier)/i
+  ].some((pattern) => pattern.test(text));
+}
+
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function isSafeIntakeId(value: string) {
+  return /^[A-Za-z0-9][A-Za-z0-9_-]{5,127}$/.test(value);
+}
+
+function isValidWorkflowUrl(value: string) {
+  return /^https:\/\/github\.com\/temitayodahunsi777\/scrimed-site\/actions\/runs\/[0-9]+$/.test(value);
+}
+
+function isValidBaseUrl(value: string) {
+  return value === "https://app.scrimedsolutions.com" || /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(value);
+}
+
+function isValidIsoTimestamp(value: string) {
+  const timestamp = Date.parse(value);
+
+  if (!Number.isFinite(timestamp)) {
+    return false;
+  }
+
+  return Math.abs(Date.now() - timestamp) <= 1000 * 60 * 60 * 24 * 14;
+}
+
+function normalizeQaManualRunEvidenceInput(value: unknown): QaManualRunEvidenceInput {
+  const record = value && typeof value === "object" ? value as Record<string, unknown> : {};
+
+  return {
+    workflowRunId: cleanText(record.workflowRunId),
+    workflowRunUrl: cleanText(record.workflowRunUrl),
+    executedAt: cleanText(record.executedAt),
+    baseUrl: cleanText(record.baseUrl),
+    intakeId: cleanText(record.intakeId),
+    createdSessionId: cleanText(record.createdSessionId),
+    packetAuditEventId: cleanText(record.packetAuditEventId),
+    qaOutcome: cleanText(record.qaOutcome) as QaManualRunEvidenceInput["qaOutcome"],
+    operatorAttestation: cleanText(record.operatorAttestation) as QaManualRunEvidenceInput["operatorAttestation"],
+    tokenDisposalAttestation:
+      cleanText(record.tokenDisposalAttestation) as QaManualRunEvidenceInput["tokenDisposalAttestation"],
+    dataBoundary: cleanText(record.dataBoundary) as QaManualRunEvidenceInput["dataBoundary"]
+  };
+}
+
+export function validateQaManualRunEvidenceInput(value: unknown) {
+  const input = normalizeQaManualRunEvidenceInput(value);
+  const errors: string[] = [];
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    errors.push("Body must be a JSON object.");
+  }
+
+  if (hasForbiddenKey(value)) {
+    errors.push("Body must not include token, secret, password, credential, bearer, or refresh fields.");
+  }
+
+  if (hasForbiddenContent(value)) {
+    errors.push("Body appears to contain secret-like, bearer-token-like, or regulated identifier content.");
+  }
+
+  if (!/^[0-9]{6,32}$/.test(input.workflowRunId)) {
+    errors.push("workflowRunId must be the numeric GitHub Actions run ID.");
+  }
+
+  if (!isValidWorkflowUrl(input.workflowRunUrl)) {
+    errors.push("workflowRunUrl must point to the SCRIMED GitHub Actions run URL.");
+  }
+
+  if (!isValidIsoTimestamp(input.executedAt)) {
+    errors.push("executedAt must be an ISO timestamp within 14 days of packet generation.");
+  }
+
+  if (!isValidBaseUrl(input.baseUrl)) {
+    errors.push("baseUrl must be https://app.scrimedsolutions.com or a Vercel deployment URL.");
+  }
+
+  if (!isSafeIntakeId(input.intakeId)) {
+    errors.push("intakeId must be an explicit alphanumeric, underscore, or hyphen target between 6 and 128 characters.");
+  }
+
+  if (!isUuid(input.createdSessionId)) {
+    errors.push("createdSessionId must be a UUID returned by the QA route.");
+  }
+
+  if (!isUuid(input.packetAuditEventId)) {
+    errors.push("packetAuditEventId must be a UUID returned by the audited packet route.");
+  }
+
+  if (input.qaOutcome !== qaManualRunEvidenceContract.acceptedAttestations.qaOutcome) {
+    errors.push("qaOutcome must equal pass.");
+  }
+
+  if (input.operatorAttestation !== qaManualRunEvidenceContract.acceptedAttestations.operatorAttestation) {
+    errors.push("operatorAttestation must equal no-secrets-no-phi-aal2-human-run.");
+  }
+
+  if (
+    input.tokenDisposalAttestation !==
+    qaManualRunEvidenceContract.acceptedAttestations.tokenDisposalAttestation
+  ) {
+    errors.push("tokenDisposalAttestation must equal temporary-token-deleted-or-rotated.");
+  }
+
+  if (input.dataBoundary !== qaManualRunEvidenceContract.acceptedAttestations.dataBoundary) {
+    errors.push("dataBoundary must equal synthetic-business-workflow-only.");
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    input
+  };
+}
+
+export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) {
+  return [
+    "# SCRIMED Manual Sales Demo Session QA Evidence Packet",
+    "",
+    `Status: ${qaManualRunEvidencePacketStatus}`,
+    `Boundary: ${qaEvidenceLedgerBoundary}`,
+    "",
+    "## Run Evidence",
+    `- Workflow run ID: ${input.workflowRunId}`,
+    `- Workflow run URL: ${input.workflowRunUrl}`,
+    `- Executed at: ${input.executedAt}`,
+    `- Base URL: ${input.baseUrl}`,
+    `- Intake target: ${input.intakeId}`,
+    `- Created session ID: ${input.createdSessionId}`,
+    `- Packet audit event ID: ${input.packetAuditEventId}`,
+    `- QA outcome: ${input.qaOutcome}`,
+    "",
+    "## Attestations",
+    `- Operator attestation: ${input.operatorAttestation}`,
+    `- Token disposal attestation: ${input.tokenDisposalAttestation}`,
+    `- Data boundary: ${input.dataBoundary}`,
+    "",
+    "## Controls",
+    ...salesDemoSessionQaControls.map((control) => `- ${control}`),
+    "",
+    "## Remaining Boundaries",
+    "- This packet does not contain bearer tokens, refresh tokens, passwords, credentials, PHI, patient identifiers, payer member identifiers, source contracts, or regulated healthcare records.",
+    "- This packet documents a synthetic buyer-demo QA run only. It does not authorize live clinical execution, autonomous diagnosis, payer submission, patient outreach, compliance certification, or production connector activation.",
+    "- Durable evidence storage remains gated until approved storage, retention, access review, legal hold, incident response, regional residency, and buyer authorization controls are complete."
+  ].join("\n");
 }
 
 export function buildQaEvidenceBrief() {

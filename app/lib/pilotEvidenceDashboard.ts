@@ -331,6 +331,7 @@ export function buildPilotEvidenceBrief() {
     `- Status: ${dashboard.qaEvidenceLedger.status}`,
     `- Recorded evidence entries: ${dashboard.qaEvidenceLedger.recordedEvidenceCount}`,
     `- Manual AAL2 gates remaining: ${dashboard.qaEvidenceLedger.manualGates}`,
+    `- Manual run packet route: ${dashboard.qaEvidenceLedger.manualRunEvidenceCapture.route}`,
     `- Buyer-safe summary: ${dashboard.qaEvidenceLedger.buyerSafeSummary}`,
     "",
     "## Key Routes",

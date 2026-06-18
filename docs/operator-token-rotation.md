@@ -15,6 +15,7 @@ Applies to:
 - `/qa-evidence`
 - `/api/qa-evidence`
 - `/api/qa-evidence/brief`
+- `/api/qa-evidence/manual-run-packet`
 - `scripts/sales-demo-session-qa-token-policy-selftest.mjs`
 - `scripts/sales-demo-session-qa-token-preflight.mjs`
 - `scripts/sales-demo-session-qa-smoke.mjs`
@@ -79,7 +80,28 @@ SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQ
 10. Unset local shell variables immediately after the run.
 11. Sign out of the tenant-admin session if the token was copied outside the browser context.
 12. Review the Sales Operations audit trail and latest buyer demo session packet proof.
-13. Add the successful run ID, timestamp, target intake ID, created session ID, and packet audit event ID to the QA Evidence Ledger after the run is captured.
+13. POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet.
+14. Add the successful run ID, timestamp, target intake ID, created session ID, and packet audit event ID to the QA Evidence Ledger after the run is captured.
+
+Manual evidence packet payload:
+
+```json
+{
+  "workflowRunId": "123456789",
+  "workflowRunUrl": "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
+  "executedAt": "2026-06-18T19:00:00.000Z",
+  "baseUrl": "https://app.scrimedsolutions.com",
+  "intakeId": "synthetic-intake-target",
+  "createdSessionId": "11111111-1111-4111-8111-111111111111",
+  "packetAuditEventId": "22222222-2222-4222-8222-222222222222",
+  "qaOutcome": "pass",
+  "operatorAttestation": "no-secrets-no-phi-aal2-human-run",
+  "tokenDisposalAttestation": "temporary-token-deleted-or-rotated",
+  "dataBoundary": "synthetic-business-workflow-only"
+}
+```
+
+The packet route rejects token, secret, password, credential, bearer, refresh, JWT-like, API-key-like, patient identifier, or payer member identifier content.
 
 ## GitHub Actions Policy
 
@@ -122,3 +144,5 @@ Status: `short-lived-aal2-token-preflight-and-manual-ci-policy`
 Boundary: governed synthetic pilot and enterprise evaluation only.
 
 Evidence ledger: `/qa-evidence`
+
+Manual evidence packet route: `/api/qa-evidence/manual-run-packet`
