@@ -2,6 +2,15 @@
 
 Updated: 2026-06-18
 
+## Latest QA Evidence Ledger Release
+
+- Added `/qa-evidence`, `/api/qa-evidence`, and `/api/qa-evidence/brief` as a buyer-safe ledger for release QA, fail-closed controls, token-policy readiness, known limitations, and the remaining manual AAL2 gate.
+- Added `app/lib/qaEvidenceLedger.ts` as the typed source of truth for QA entries, contained limitations, token policy references, current deployment evidence, and the next authenticated QA action.
+- Updated `/quality`, `/pilot-evidence`, `/hub`, `/api/hub/summary`, `/product`, and `/api/product/console` so QA evidence appears in the main proof stack rather than only in docs.
+- Updated `scripts/public-production-smoke.mjs` to verify the QA evidence page, JSON API, Markdown brief, synthetic-only data boundary, and manual AAL2 gate visibility.
+- Addressed the remaining Sales Demo Session QA limitation with a clearer, safer workaround: SCRIMED now proves every surrounding control automatically and shows that the only unactioned item is a deliberate short-lived AAL2 operator-token run against an explicit synthetic opportunity.
+- Preserved the boundary: the ledger is not a clinical validation report, legal opinion, compliance certification, SOC report, HIPAA attestation, or authorization for live healthcare execution.
+
 ## Latest Operator Token Rotation Release
 
 - Added `docs/operator-token-rotation.md` for Sales Demo Session QA token handling, human operator flow, GitHub Actions policy, incident response, and retained production boundaries.

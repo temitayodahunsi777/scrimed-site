@@ -6,6 +6,7 @@ import { getProductConsoleSummary } from "./productConsole";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
 import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
+import { getQaEvidenceLedger } from "./qaEvidenceLedger";
 
 export type PilotEvidenceCard = {
   name: string;
@@ -50,6 +51,7 @@ export function getPilotEvidenceDashboard() {
   const enterpriseReadiness = getEnterpriseReadinessSummary();
   const commercial = getCommercialStrategySummary();
   const salesOperations = getSalesOperationsSummary();
+  const qaEvidenceLedger = getQaEvidenceLedger();
 
   const evidenceCards: PilotEvidenceCard[] = [
     {
@@ -142,6 +144,16 @@ export function getPilotEvidenceDashboard() {
       currentEvidence:
         `${product.serviceOfferCount} enterprise offers, ${product.pilotProgramCount} pilot programs, and Sales Operations status ${salesOperations.status} support retained buyer intake and proposal workflows.`,
       boundary: commercial.boundary
+    },
+    {
+      name: "QA evidence and operator-token readiness",
+      status: qaEvidenceLedger.status,
+      route: qaEvidenceLedger.route,
+      apiRoute: qaEvidenceLedger.apiRoute,
+      buyerQuestion: "Can SCRIMED show release proof, fail-closed controls, and remaining manual gates clearly?",
+      currentEvidence:
+        `${qaEvidenceLedger.recordedEvidenceCount} QA evidence entries show ${qaEvidenceLedger.passed} passed checks, ${qaEvidenceLedger.failClosed} fail-closed controls, and ${qaEvidenceLedger.manualGates} manual AAL2 gate.`,
+      boundary: qaEvidenceLedger.boundary
     }
   ];
 
@@ -189,6 +201,13 @@ export function getPilotEvidenceDashboard() {
       evidence:
         `${healthcareOS.sovereignDeployment.profiles.length} deployment profiles cover managed cloud, private cloud, hospital-controlled, government, and edge/on-prem needs.`,
       nextGate: "Validate private-network, regional, identity, local audit, and model route controls for each customer environment."
+    },
+    {
+      track: "Sales Demo Session QA evidence",
+      status: qaEvidenceLedger.manualGates > 0 ? "manual-aal2-gate" : "verified",
+      owner: "SCRIMED operator",
+      evidence: qaEvidenceLedger.buyerSafeSummary,
+      nextGate: qaEvidenceLedger.nextRecommendedBuildStep
     }
   ];
 
@@ -222,6 +241,11 @@ export function getPilotEvidenceDashboard() {
       label: "Download Evidence Brief",
       href: "/api/pilot-evidence/brief",
       purpose: "Export a concise enterprise proof brief for buyer, investor, or internal diligence."
+    },
+    {
+      label: "Open QA Evidence Ledger",
+      href: qaEvidenceLedger.route,
+      purpose: "Review release QA evidence, fail-closed controls, token-policy readiness, and remaining manual gates."
     }
   ];
 
@@ -260,9 +284,10 @@ export function getPilotEvidenceDashboard() {
     evidenceMetrics,
     proofStack,
     buyerActions,
+    qaEvidenceLedger,
     dataPosture: healthcareOS.currentStack.dataPosture,
     externalReviewGates: healthcareOS.todoGates,
-    updated: "2026-06-14"
+    updated: "2026-06-18"
   };
 }
 
@@ -302,9 +327,16 @@ export function buildPilotEvidenceBrief() {
     "## Required External Review and Production Gates",
     ...dashboard.externalReviewGates.map((gate) => `- ${gate}`),
     "",
+    "## QA Evidence Ledger",
+    `- Status: ${dashboard.qaEvidenceLedger.status}`,
+    `- Recorded evidence entries: ${dashboard.qaEvidenceLedger.recordedEvidenceCount}`,
+    `- Manual AAL2 gates remaining: ${dashboard.qaEvidenceLedger.manualGates}`,
+    `- Buyer-safe summary: ${dashboard.qaEvidenceLedger.buyerSafeSummary}`,
+    "",
     "## Key Routes",
     `- Pilot evidence dashboard: ${dashboard.route}`,
     `- Pilot evidence API: ${dashboard.apiRoute}`,
+    `- QA evidence ledger: ${dashboard.qaEvidenceLedger.route}`,
     `- Healthcare Intelligence OS: ${dashboard.operatingSystemRoute}`,
     `- Product Console: /product`,
     `- Protected Pilot Workspace: /pilot-workspace`

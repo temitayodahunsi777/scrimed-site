@@ -116,6 +116,14 @@ export default function QualityPage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadiness.externalReviewsRequired}</strong>
         </article>
+        <article>
+          <span>QA evidence</span>
+          <strong>{summary.qaEvidenceLedger.recordedEvidenceCount}</strong>
+        </article>
+        <article>
+          <span>Manual gates</span>
+          <strong>{summary.qaEvidenceLedger.manualGates}</strong>
+        </article>
       </section>
 
       <section className="table-section" aria-label="SCRIMED quality gates">

@@ -19,6 +19,7 @@ import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
 import { getTrustOSSummary } from "./trustOS";
+import { getQaEvidenceLedger } from "./qaEvidenceLedger";
 
 export type QualityGate = {
   name: string;
@@ -196,6 +197,12 @@ export const qualityGates: QualityGate[] = [
     role: "Independent CI gate for deterministic install, dependency audit, lint, typecheck, and production build."
   },
   {
+    name: "QA evidence ledger",
+    route: "/qa-evidence",
+    state: "active",
+    role: "Dated release, smoke, token-policy, fail-closed, limitation, and manual AAL2 gate evidence surface for buyer-safe proof review."
+  },
+  {
     name: "Live clinical integrations",
     route: "/integrations",
     state: "planned",
@@ -226,6 +233,7 @@ export function getQualityGateSummary() {
   const protectedPilotWorkspaces = getProtectedPilotWorkspaceSummary();
   const salesOperations = getSalesOperationsSummary();
   const trustOS = getTrustOSSummary();
+  const qaEvidenceLedger = getQaEvidenceLedger();
 
   return {
     service: "scrimed-quality-gates",
@@ -243,7 +251,8 @@ export function getQualityGateSummary() {
       interoperability.status === "standards-control-plane-defined" &&
       interoperabilityEvaluations.status === "synthetic-conformance-evaluations-ready" &&
       demoPilotPrograms.status === "buyer-ready-synthetic-evaluations" &&
-      trustOS.status === "executable-synthetic-governance-ready"
+      trustOS.status === "executable-synthetic-governance-ready" &&
+      qaEvidenceLedger.status === "qa-evidence-ledger-active"
         ? "active"
         : "attention-required",
     gates: qualityGates,
@@ -271,6 +280,7 @@ export function getQualityGateSummary() {
     protectedPilotWorkspaces,
     salesOperations,
     trustOS,
-    updated: "2026-06-11"
+    qaEvidenceLedger,
+    updated: "2026-06-18"
   };
 }

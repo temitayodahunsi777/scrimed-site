@@ -207,6 +207,13 @@ async function checkProductConsole() {
     throw new Error("product console missing buyer demo session QA token-policy posture.");
   }
 
+  if (
+    body.proofStack?.qaEvidenceLedger !==
+    "dated-qa-evidence-ledger-with-manual-aal2-gate"
+  ) {
+    throw new Error("product console missing QA evidence ledger proof-stack posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -273,6 +280,41 @@ async function checkPilotDealRoomApi() {
   console.log("pass pilot deal room API");
 }
 
+async function checkQaEvidenceLedger() {
+  const result = await request("/api/qa-evidence");
+  requireStatus("QA evidence ledger", result.response.status, 200);
+  requireContentType("QA evidence ledger", result.response, "application/json");
+  requireSyntheticBoundary("QA evidence ledger", result.response);
+  const body = requireJson("QA evidence ledger", result.body);
+
+  if (body.service !== "scrimed-qa-evidence-ledger") {
+    throw new Error(`QA evidence ledger expected service scrimed-qa-evidence-ledger but received ${body.service}.`);
+  }
+
+  if (body.status !== "qa-evidence-ledger-active") {
+    throw new Error(`QA evidence ledger expected qa-evidence-ledger-active but received ${body.status}.`);
+  }
+
+  if (body.proofStackStatus !== "dated-qa-evidence-ledger-with-manual-aal2-gate") {
+    throw new Error("QA evidence ledger missing proof-stack status.");
+  }
+
+  if (!Array.isArray(body.entries) || body.entries.length < 5) {
+    throw new Error("QA evidence ledger expected at least five evidence entries.");
+  }
+
+  if (!body.entries.some((entry) => entry.status === "manual-gate")) {
+    throw new Error("QA evidence ledger expected a visible manual AAL2 gate.");
+  }
+
+  const brief = await request("/api/qa-evidence/brief");
+  requireStatus("QA evidence brief", brief.response.status, 200);
+  requireContentType("QA evidence brief", brief.response, "text/markdown");
+  requireSyntheticBoundary("QA evidence brief", brief.response);
+
+  console.log("pass QA evidence ledger");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -293,10 +335,12 @@ await checkHtml("/pilot-workspace/access");
 await checkHtml("/sales-operations");
 await checkHtml("/competitive-edge");
 await checkHtml("/pilot-deal-room");
+await checkHtml("/qa-evidence");
 await checkProductConsole();
 await checkReadiness();
 await checkCompetitiveEdgeApi();
 await checkPilotDealRoomApi();
+await checkQaEvidenceLedger();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"

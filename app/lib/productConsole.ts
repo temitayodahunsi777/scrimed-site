@@ -80,6 +80,10 @@ import {
   salesDemoSessionQaProofStackStatus,
   salesDemoSessionQaTokenPolicyStatus
 } from "./salesDemoSessionQa";
+import {
+  getQaEvidenceLedger,
+  qaEvidenceLedgerProofStackStatus
+} from "./qaEvidenceLedger";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -589,6 +593,7 @@ export function getProductConsoleSummary() {
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const salesDealRoomSummary = getSalesDealRoomSummary();
+  const qaEvidenceLedger = getQaEvidenceLedger();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -635,6 +640,9 @@ export function getProductConsoleSummary() {
     sourceIntelligenceRoute: sourceIntelligenceSummary.route,
     sourceIntelligenceApiRoute: sourceIntelligenceSummary.apiRoute,
     pilotEvidenceRoute: "/pilot-evidence",
+    qaEvidenceRoute: qaEvidenceLedger.route,
+    qaEvidenceApiRoute: qaEvidenceLedger.apiRoute,
+    qaEvidenceBriefRoute: qaEvidenceLedger.briefRoute,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -728,6 +736,7 @@ export function getProductConsoleSummary() {
     attributionAnalyticsSummary,
     trustSafetyOperationsSummary,
     sourceIntelligenceSummary,
+    qaEvidenceLedger,
     proofStack: {
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
@@ -762,6 +771,7 @@ export function getProductConsoleSummary() {
       buyerDemoSessionPackets: buyerDemoSessionPacketProofStackStatus,
       buyerDemoSessionQa: salesDemoSessionQaProofStackStatus,
       buyerDemoSessionQaTokenPolicy: salesDemoSessionQaTokenPolicyStatus,
+      qaEvidenceLedger: qaEvidenceLedgerProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,

@@ -67,6 +67,12 @@ import {
   buyerDemoSessionsApiRoute
 } from "./buyerDemoSessions";
 import { salesDemoSessionQaApiRoute } from "./salesDemoSessionQa";
+import {
+  getQaEvidenceLedger,
+  qaEvidenceLedgerApiRoute,
+  qaEvidenceLedgerBriefRoute,
+  qaEvidenceLedgerRoute
+} from "./qaEvidenceLedger";
 
 export type HubModule = {
   name: string;
@@ -210,6 +216,11 @@ export const hubSignals: HubSignal[] = [
     value: "short-lived AAL2 preflight active",
     tone: "good"
   },
+  {
+    name: "QA evidence ledger",
+    value: "release proof and manual AAL2 gate visible",
+    tone: "good"
+  },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },
@@ -266,6 +277,7 @@ export const hubRoutes = [
   "/healthcare-intelligence-os",
   "/agent-workspace",
   "/pilot-evidence",
+  qaEvidenceLedgerRoute,
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -347,6 +359,8 @@ export const hubRoutes = [
   "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet",
   "/api/pilot-evidence",
   "/api/pilot-evidence/brief",
+  qaEvidenceLedgerApiRoute,
+  qaEvidenceLedgerBriefRoute,
   "/api/sales-operations",
   "/api/sales-operations/opportunities/{intakeId}",
   "/api/sales-operations/opportunities/{intakeId}/proposal",
@@ -477,6 +491,7 @@ export function getHubSummary() {
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
+  const qaEvidenceLedger = getQaEvidenceLedger();
 
   return {
     service: "scrimed-os-hub",
@@ -503,6 +518,7 @@ export function getHubSummary() {
     enterpriseReadinessSummary,
     attributionAnalyticsSummary,
     trustSafetyOperationsSummary,
+    qaEvidenceLedger,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
@@ -526,6 +542,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-17"
+    updated: "2026-06-18"
   };
 }

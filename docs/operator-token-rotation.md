@@ -12,6 +12,9 @@ This runbook exists to prevent long-lived CI credentials, wrong-opportunity QA w
 
 Applies to:
 
+- `/qa-evidence`
+- `/api/qa-evidence`
+- `/api/qa-evidence/brief`
 - `scripts/sales-demo-session-qa-token-policy-selftest.mjs`
 - `scripts/sales-demo-session-qa-token-preflight.mjs`
 - `scripts/sales-demo-session-qa-smoke.mjs`
@@ -76,6 +79,7 @@ SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQ
 10. Unset local shell variables immediately after the run.
 11. Sign out of the tenant-admin session if the token was copied outside the browser context.
 12. Review the Sales Operations audit trail and latest buyer demo session packet proof.
+13. Add the successful run ID, timestamp, target intake ID, created session ID, and packet audit event ID to the QA Evidence Ledger after the run is captured.
 
 ## GitHub Actions Policy
 
@@ -116,3 +120,5 @@ If a token is pasted into chat, logs, docs, tickets, screenshots, or source cont
 Status: `short-lived-aal2-token-preflight-and-manual-ci-policy`
 
 Boundary: governed synthetic pilot and enterprise evaluation only.
+
+Evidence ledger: `/qa-evidence`
