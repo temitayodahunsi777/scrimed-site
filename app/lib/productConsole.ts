@@ -77,7 +77,8 @@ import {
 } from "./buyerDemoSessions";
 import {
   salesDemoSessionQaApiRoute,
-  salesDemoSessionQaProofStackStatus
+  salesDemoSessionQaProofStackStatus,
+  salesDemoSessionQaTokenPolicyStatus
 } from "./salesDemoSessionQa";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
@@ -760,6 +761,7 @@ export function getProductConsoleSummary() {
       buyerDemoSessions: buyerDemoSessionProofStackStatus,
       buyerDemoSessionPackets: buyerDemoSessionPacketProofStackStatus,
       buyerDemoSessionQa: salesDemoSessionQaProofStackStatus,
+      buyerDemoSessionQaTokenPolicy: salesDemoSessionQaTokenPolicyStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,

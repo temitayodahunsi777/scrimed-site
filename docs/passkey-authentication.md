@@ -1,6 +1,6 @@
 # SCRIMED Passkey Authentication
 
-Updated: 2026-06-17
+Updated: 2026-06-18
 
 ## Status
 
@@ -30,6 +30,6 @@ Authenticated users can now list, rename, register, and revoke their own passkey
 
 ## Remaining Operational Gates
 
-- Add `SCRIMED_BEARER_TOKEN` as a GitHub Actions secret for authenticated Agent Workspace and TrustOps mutation smoke.
+- Use short-lived AAL2 bearer secrets only for deliberate authenticated mutation smoke. Sales Demo Session QA now has a dedicated preflight, explicit `SCRIMED_SALES_QA_INTAKE_ID` target, and manual-only workflow in `.github/workflows/sales-demo-session-qa-smoke.yml`.
 - Keep password sign-in disabled for SCRIMED product flows. Supabase advisors currently flag leaked-password protection as disabled; this is acceptable only while SCRIMED protected product access remains passkey or passwordless magic-link based. If password sign-in remains enabled anywhere at the Supabase project level, enable leaked-password protection in Supabase Auth password security before buyer expansion.
-- Use `scripts/public-production-smoke.mjs` for no-secret deployment readiness checks; authenticated mutation smoke still needs the AAL2 bearer token because WebAuthn ceremonies cannot run unattended in CI.
+- Use `scripts/public-production-smoke.mjs` for no-secret deployment readiness checks; authenticated mutation smoke still needs a human-minted AAL2 bearer token because WebAuthn ceremonies cannot run unattended in CI.

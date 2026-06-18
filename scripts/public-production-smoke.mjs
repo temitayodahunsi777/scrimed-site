@@ -200,6 +200,13 @@ async function checkProductConsole() {
     throw new Error("product console missing buyer demo session QA proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.buyerDemoSessionQaTokenPolicy !==
+    "short-lived-aal2-token-preflight-and-manual-ci-policy"
+  ) {
+    throw new Error("product console missing buyer demo session QA token-policy posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }

@@ -22,6 +22,11 @@ export const salesDemoSessionQaApiRoute = "/api/sales-operations/qa/buyer-demo-s
 export const salesDemoSessionQaProofStackStatus =
   "aal2-operator-buyer-demo-session-qa-short-lived-token-compatible";
 
+export const salesDemoSessionQaTokenPolicyStatus =
+  "short-lived-aal2-token-preflight-and-manual-ci-policy";
+
+export const salesDemoSessionQaRunbookPath = "docs/operator-token-rotation.md";
+
 export const salesDemoSessionQaBoundary =
   "The Sales Demo Session QA harness is an AAL2 tenant-admin control that writes synthetic buyer-demo verification records only. It verifies session persistence and packet audit creation without storing PHI, patient identifiers, live clinical records, payer member identifiers, credentials, secrets, source contracts, autonomous clinical decisions, or production healthcare execution authorization.";
 
@@ -34,6 +39,26 @@ export const salesDemoSessionQaControls = [
   "Existing guarded packet RPC commits the packet audit event",
   "No secrets, credentials, source contracts, or regulated healthcare files are accepted"
 ];
+
+export const salesDemoSessionQaTokenPolicy = {
+  status: salesDemoSessionQaTokenPolicyStatus,
+  runbookPath: salesDemoSessionQaRunbookPath,
+  workflowPath: ".github/workflows/sales-demo-session-qa-smoke.yml",
+  selfTestScript: "scripts/sales-demo-session-qa-token-policy-selftest.mjs",
+  preflightScript: "scripts/sales-demo-session-qa-token-preflight.mjs",
+  smokeScript: "scripts/sales-demo-session-qa-smoke.mjs",
+  requiredEnvironment: [
+    "SCRIMED_SALES_QA_BEARER_TOKEN",
+    "SCRIMED_SALES_QA_INTAKE_ID",
+    "SCRIMED_REQUIRE_SALES_QA"
+  ],
+  requiredClaims: ["aal=aal2", "session_id", "exp", "iat"],
+  maxTokenLifetimeSeconds: 3900,
+  minRemainingSeconds: 60,
+  ciMode:
+    "manual workflow_dispatch only; token must be minted immediately before the run, masked as an Actions secret, and removed after the run",
+  noLongLivedSecretBoundary: true
+};
 
 export function buildSalesDemoSessionQaInput({
   operator,

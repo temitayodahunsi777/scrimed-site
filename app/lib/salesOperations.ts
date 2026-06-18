@@ -57,7 +57,8 @@ import {
   salesDemoSessionQaApiRoute,
   salesDemoSessionQaBoundary,
   salesDemoSessionQaControls,
-  salesDemoSessionQaProofStackStatus
+  salesDemoSessionQaProofStackStatus,
+  salesDemoSessionQaTokenPolicy
 } from "./salesDemoSessionQa";
 
 export const salesOperationsBoundary =
@@ -526,6 +527,7 @@ export function getSalesOperationsSummary() {
       apiRoute: salesDemoSessionQaApiRoute,
       mode: "AAL2 browser session or externally supplied short-lived bearer token",
       controls: salesDemoSessionQaControls,
+      tokenPolicy: salesDemoSessionQaTokenPolicy,
       purpose:
         "Verify the buyer demo session write path and packet-audit path through the same protected tenant-admin controls used by real operator demos.",
       boundary: salesDemoSessionQaBoundary,

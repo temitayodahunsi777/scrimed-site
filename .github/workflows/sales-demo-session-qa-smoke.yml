@@ -1,0 +1,53 @@
+name: Sales Demo Session QA Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Production app URL to smoke-test.
+        required: true
+        default: https://app.scrimedsolutions.com
+      intake_id:
+        description: Explicit Sales Operations intake ID to verify.
+        required: true
+      require_authenticated_path:
+        description: Fail if SCRIMED_SALES_QA_BEARER_TOKEN is missing.
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sales-demo-session-qa-smoke
+  cancel-in-progress: false
+
+jobs:
+  sales-demo-session-qa:
+    name: Sales demo session QA smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Preflight short-lived AAL2 token
+        env:
+          SCRIMED_SALES_QA_BEARER_TOKEN: ${{ secrets.SCRIMED_SALES_QA_BEARER_TOKEN }}
+          SCRIMED_SALES_QA_INTAKE_ID: ${{ inputs.intake_id }}
+          SCRIMED_REQUIRE_SALES_QA: ${{ inputs.require_authenticated_path && '1' || '' }}
+        run: node scripts/sales-demo-session-qa-token-preflight.mjs
+
+      - name: Run Sales Demo Session QA smoke
+        env:
+          SCRIMED_BASE_URL: ${{ inputs.base_url }}
+          SCRIMED_SALES_QA_BEARER_TOKEN: ${{ secrets.SCRIMED_SALES_QA_BEARER_TOKEN }}
+          SCRIMED_SALES_QA_INTAKE_ID: ${{ inputs.intake_id }}
+          SCRIMED_REQUIRE_SALES_QA: ${{ inputs.require_authenticated_path && '1' || '' }}
+        run: node scripts/sales-demo-session-qa-smoke.mjs

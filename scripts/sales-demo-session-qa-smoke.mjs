@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+import {
+  analyzeSalesDemoSessionQaTokenFromEnv,
+  formatSalesDemoSessionQaTokenReport
+} from "./lib/sales-demo-session-qa-token-policy.mjs";
+
 const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.com").replace(/\/$/, "");
 const bearerToken = process.env.SCRIMED_SALES_QA_BEARER_TOKEN?.trim();
 const intakeId = process.env.SCRIMED_SALES_QA_INTAKE_ID?.trim();
@@ -54,6 +59,18 @@ if (!intakeId) {
     "sales demo session QA smoke requires SCRIMED_SALES_QA_INTAKE_ID when SCRIMED_SALES_QA_BEARER_TOKEN is supplied."
   );
 }
+
+const tokenPolicyResult = analyzeSalesDemoSessionQaTokenFromEnv(process.env);
+
+if (!tokenPolicyResult.ok) {
+  throw new Error(`sales demo session QA token preflight failed: ${tokenPolicyResult.errors.join(" ")}`);
+}
+
+for (const warning of tokenPolicyResult.warnings) {
+  console.warn(`warn sales demo session QA token preflight: ${warning}`);
+}
+
+console.log(`pass sales demo session QA token preflight: ${formatSalesDemoSessionQaTokenReport(tokenPolicyResult)}`);
 
 const response = await fetch(endpoint("/api/sales-operations/qa/buyer-demo-sessions"), {
   body: JSON.stringify({ intakeId }),

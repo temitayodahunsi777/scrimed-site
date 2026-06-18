@@ -2,6 +2,17 @@
 
 Updated: 2026-06-18
 
+## Latest Operator Token Rotation Release
+
+- Added `docs/operator-token-rotation.md` for Sales Demo Session QA token handling, human operator flow, GitHub Actions policy, incident response, and retained production boundaries.
+- Added `scripts/lib/sales-demo-session-qa-token-policy.mjs` as the reusable short-lived AAL2 token policy for buyer-demo QA.
+- Added `scripts/sales-demo-session-qa-token-preflight.mjs` and `npm run smoke:sales-demo-session-qa:preflight` so operators can validate token claims and explicit opportunity targeting before any authenticated request is sent.
+- Added `scripts/sales-demo-session-qa-token-policy-selftest.mjs` and `npm run smoke:sales-demo-session-qa:policy-test` so the AAL2, expiry, minted-lifetime, `iat`, and explicit-target guards can be tested without secrets.
+- Updated `scripts/sales-demo-session-qa-smoke.mjs` to refuse tokens that are expired, not AAL2, missing `session_id`, missing `iat`/`exp`, too long-lived, too close to expiry, or missing an explicit `SCRIMED_SALES_QA_INTAKE_ID`.
+- Added manual-only GitHub Actions workflow `.github/workflows/sales-demo-session-qa-smoke.yml` for governed CI execution without scheduled mutation smoke or committed credentials.
+- Updated `/product`, `/api/product/console`, Sales Operations summary, and public smoke checks with `short-lived-aal2-token-preflight-and-manual-ci-policy`.
+- Preserved the hard boundary: the token policy does not create long-lived credentials, bypass WebAuthn/passkey ceremony requirements, store tokens in source control, authorize production healthcare execution, or replace protected API verification through Supabase Auth.
+
 ## Latest Sales Demo Session QA Harness Release
 
 - Added protected `GET` and `POST /api/sales-operations/qa/buyer-demo-sessions` for AAL2 tenant-admin buyer-demo QA.

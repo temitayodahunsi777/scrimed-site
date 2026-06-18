@@ -205,6 +205,11 @@ export const hubSignals: HubSignal[] = [
     value: "AAL2 write-and-audit harness active",
     tone: "good"
   },
+  {
+    name: "Buyer demo token policy",
+    value: "short-lived AAL2 preflight active",
+    tone: "good"
+  },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },

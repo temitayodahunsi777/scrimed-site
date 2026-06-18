@@ -11,6 +11,8 @@
     "lint": "eslint .",
     "smoke:agent-workspace": "node scripts/agent-workspace-authenticated-smoke.mjs",
     "smoke:public": "node scripts/public-production-smoke.mjs",
+    "smoke:sales-demo-session-qa:preflight": "node scripts/sales-demo-session-qa-token-preflight.mjs",
+    "smoke:sales-demo-session-qa:policy-test": "node scripts/sales-demo-session-qa-token-policy-selftest.mjs",
     "smoke:sales-demo-session-qa": "node scripts/sales-demo-session-qa-smoke.mjs",
     "smoke:trustops": "node scripts/trustops-authenticated-smoke.mjs",
     "pretypecheck": "node scripts/clean-generated-cache.mjs",
