@@ -212,7 +212,7 @@ const siteLanes: SalesDealRoomSiteLane[] = [
     lane: "Protected Workspace",
     audience: "Approved tenant admins, pilot leads, reviewers, and SCRIMED operators",
     route: "/pilot-workspace/access",
-    purpose: "Package tenant-scoped synthetic sessions, audit evidence, demo readiness, TrustOps, and buyer-room packets.",
+    purpose: "Package tenant-scoped synthetic sessions, audit evidence, demo readiness, TrustOps, and Buyer Diligence Exports.",
     handoff: "Use audited packets for diligence follow-up and protected-pilot planning."
   },
   {

@@ -179,7 +179,7 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
     workaround:
       "Keep the public packet generator stateless for no-secret packet creation; use the protected persistence route only after human AAL2 QA has completed.",
     nextAction:
-      "Run the first AAL2 Sales Demo Session QA workflow, persist the evidence packet, then export a Buyer Pilot Room packet with the manual QA evidence signal included."
+      "Run the first AAL2 Sales Demo Session QA workflow, persist the evidence packet, then export a Buyer Diligence Export with the manual QA evidence signal included."
   },
   {
     id: "protected-routes-fail-closed",
@@ -327,7 +327,7 @@ export function getQaEvidenceLedger() {
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, and token-policy readiness today; the only remaining authenticated QA evidence step is a deliberate short-lived AAL2 operator run against a synthetic buyer opportunity.",
     nextRecommendedBuildStep:
-      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, generate the manual-run evidence packet, persist it through the protected workspace evidence route, then export the Buyer Pilot Room packet with the manual QA evidence signal included.",
+      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, generate the manual-run evidence packet, persist it through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
     updated: "2026-06-18"
   };
 }

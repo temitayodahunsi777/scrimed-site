@@ -2,6 +2,14 @@
 
 Updated: 2026-06-18
 
+## Latest Buyer Diligence Export Release
+
+- Upgraded the protected Buyer Pilot Room export into a one-click Buyer Diligence Export at `/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`.
+- The export now bundles readiness, QA evidence, pricing posture, competitive edge, demo and pilot proof, legal/privacy/security/safety controls, degraded-section disclosure, known limitations, safe workarounds, and production hard gates.
+- Added a typed diligence control matrix to the Buyer Pilot Room model so buyer questions, evidence, boundaries, workarounds, and production gates stay consistent across UI and Markdown export.
+- Updated the protected UI copy, download filename, product proof-stack status, API contract, operator runbook, and smoke expectations.
+- Preserved the boundary: the export remains synthetic-only, metadata-only, tenant-scoped, audited before release, and does not certify compliance, authorize live clinical execution, guarantee reimbursement, provide legal advice, or approve production connectors.
+
 ## Latest Browser-Session Manual QA Capture Release
 
 - Added a protected Manual QA Evidence panel inside `/pilot-workspace/access` so operators can persist manual Sales Demo Session QA evidence from the existing AAL2 browser session instead of copying bearer tokens into local scripts.
@@ -189,7 +197,7 @@ Updated: 2026-06-18
 - Strengthened Enterprise Readiness with copyright registration candidates, trademark strategy, third-party license/provenance controls, generated-media review, and 24/7 incident-response readiness gates.
 - Added tenant-admin attribution analytics into `/sales-operations` and added a protected audited attribution analytics packet export under `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`.
 - Preserved the boundary: this is not legal advice, compliance certification, managed SOC/MDR coverage, production clinical monitoring, breach determination, PHI storage, or live clinical execution authorization.
-- Remaining gate: place CI-held short-lived AAL2 tenant smoke tokens before using unattended authenticated TrustOps, Agent Workspace, Demo Readiness Packet, Buyer Pilot Room Packet, and aggregate enterprise proof-packet happy paths. Buyer-demo session write-and-packet QA now has its own short-lived-token-compatible harness. Public readiness smoke runs without secrets, while human-run buyer-room packets, demo readiness snapshots, packet exports, and protected verification can be executed from `/pilot-workspace/access` or `/sales-operations` with the current browser session. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
+- Remaining gate: place CI-held short-lived AAL2 tenant smoke tokens before using unattended authenticated TrustOps, Agent Workspace, Demo Readiness Packet, Buyer Diligence Export, and aggregate enterprise proof-packet happy paths. Buyer-demo session write-and-packet QA now has its own short-lived-token-compatible harness. Public readiness smoke runs without secrets, while human-run buyer diligence exports, demo readiness snapshots, packet exports, and protected verification can be executed from `/pilot-workspace/access` or `/sales-operations` with the current browser session. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
 
 ## Latest Attribution Analytics Release
 

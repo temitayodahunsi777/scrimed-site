@@ -44,6 +44,16 @@ export type BuyerPilotRoomLimitation = {
   productionGate: string;
 };
 
+export type BuyerPilotRoomDiligenceControl = {
+  domain: string;
+  status: BuyerPilotRoomState;
+  buyerQuestion: string;
+  evidence: string;
+  boundary: string;
+  workaround: string;
+  productionGate: string;
+};
+
 export type BuyerPilotRoomSummary = {
   state: BuyerPilotRoomState;
   score: number;
@@ -78,6 +88,16 @@ export type BuyerPilotRoomSummary = {
     href: string;
     purpose: string;
   }>;
+  diligenceExport: {
+    label: string;
+    route: string;
+    status: BuyerPilotRoomState;
+    oneClickAction: string;
+    includedArtifacts: string[];
+    requiredHumanActions: string[];
+    withheldItems: string[];
+  };
+  diligenceControls: BuyerPilotRoomDiligenceControl[];
   limitations: BuyerPilotRoomLimitation[];
   unavailableSections: string[];
   boundary: string;
@@ -85,7 +105,7 @@ export type BuyerPilotRoomSummary = {
 };
 
 export const buyerPilotRoomProofStackStatus = "aal2-buyer-room-evidence-bundle";
-export const buyerPilotRoomPacketProofStackStatus = "aal2-audited-buyer-room-packets";
+export const buyerPilotRoomPacketProofStackStatus = "aal2-audited-buyer-diligence-export";
 
 export const buyerPilotRoomBoundary =
   "Buyer Pilot Rooms package tenant-scoped synthetic evaluation evidence, pricing posture, competitive positioning, readiness snapshots, and audit history for enterprise diligence only. They do not accept PHI, authorize live clinical execution, submit payer transactions, contact patients, certify compliance, guarantee reimbursement, or provide medical, legal, or regulatory advice.";
@@ -123,7 +143,7 @@ export const buyerPilotRoomCompetitiveEdges: BuyerPilotRoomCompetitiveEdge[] = [
     claim:
       "SCRIMED sells high-value enterprise evaluation, protected pilots, and operating licenses anchored to workflow value, governance scope, and measurable proof.",
     proof:
-      "Pricing tiers, pilot intake, Sales Operations, attribution analytics, enterprise proof packets, and buyer-room packets connect product evidence to commercial execution.",
+      "Pricing tiers, pilot intake, Sales Operations, attribution analytics, enterprise proof packets, and the Buyer Diligence Export connect product evidence to commercial execution.",
     route: "/pricing",
     blockedClaim: "Does not guarantee savings, reimbursement, denial reduction, or clinical outcomes."
   },
@@ -186,7 +206,7 @@ function buildCommercialPath(state: BuyerPilotRoomState): BuyerPilotRoomCommerci
       offer: syntheticPilot.name,
       priceRange: syntheticPilot.recommendedDisplayPrice,
       buyerCommitment: "Approve synthetic scenarios, success metrics, review roles, and no-PHI boundary.",
-      proofRequired: "Durable sessions, demo readiness snapshot, enterprise packet, and buyer room packet."
+      proofRequired: "Durable sessions, demo readiness snapshot, enterprise packet, and Buyer Diligence Export."
     },
     {
       step: "3. Govern",
@@ -204,6 +224,139 @@ function buildCommercialPath(state: BuyerPilotRoomState): BuyerPilotRoomCommerci
       priceRange: license.recommendedDisplayPrice,
       buyerCommitment: "Approve annual platform license, connector scope, human-review operating model, and value reviews.",
       proofRequired: "Production gates, signed controls, approved connectors, monitoring, and governance runbooks."
+    }
+  ];
+}
+
+function buildDiligenceControls({
+  auditEvents,
+  demoSnapshots,
+  hasAgentWorkspace,
+  hasManualQaEvidence,
+  hasSession,
+  hasTrustOps,
+  manualQaEvidencePackets,
+  sessions,
+  state,
+  unavailableSections
+}: {
+  auditEvents: PilotAuditEventRecord[];
+  demoSnapshots: PilotDemoReadinessSnapshotRecord[];
+  hasAgentWorkspace: boolean;
+  hasManualQaEvidence: boolean;
+  hasSession: boolean;
+  hasTrustOps: boolean;
+  manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
+  sessions: PilotSessionRecord[];
+  state: BuyerPilotRoomState;
+  unavailableSections: string[];
+}): BuyerPilotRoomDiligenceControl[] {
+  return [
+    {
+      domain: "Identity And Access",
+      status: "ready",
+      buyerQuestion: "Can SCRIMED prove that protected buyer evidence requires authenticated tenant access?",
+      evidence: "Buyer room APIs require workspace membership and fresh AAL2 governance context before data is returned.",
+      boundary: "This does not replace customer SSO approval, production IdP configuration, or access-review signoff.",
+      workaround: "Use the current browser-session verification panel for buyer demos instead of exporting bearer tokens.",
+      productionGate: "Signed tenant access model, SSO/domain configuration, access reviews, and support process approval."
+    },
+    {
+      domain: "Synthetic Product Proof",
+      status: hasSession ? "ready" : "blocked",
+      buyerQuestion: "Is there retained product evidence for a no-PHI workflow evaluation?",
+      evidence: `${sessions.length} durable synthetic session${sessions.length === 1 ? "" : "s"} visible in the workspace.`,
+      boundary: "Synthetic sessions are not live clinical care, payer transactions, or production workflow execution.",
+      workaround: "Create a synthetic session in the protected workspace before a formal buyer review.",
+      productionGate: "Customer-approved workflow scope, production connector authorization, and human-review operating model."
+    },
+    {
+      domain: "Demo And Pilot Readiness",
+      status: demoSnapshots.length > 0 ? "ready" : "review",
+      buyerQuestion: "Can SCRIMED show a prepared pilot path rather than a one-off demo?",
+      evidence: `${demoSnapshots.length} demo readiness snapshot${demoSnapshots.length === 1 ? "" : "s"} retained.`,
+      boundary: "Demo readiness does not approve production launch, live data access, or customer-facing automation.",
+      workaround: "Persist a fresh readiness snapshot from the browser session before executive buyer follow-up.",
+      productionGate: "Signed pilot scope, reviewer assignments, success metrics, and customer data boundary approval."
+    },
+    {
+      domain: "Manual QA Evidence",
+      status: hasManualQaEvidence ? "ready" : "review",
+      buyerQuestion: "Can SCRIMED show human-run QA evidence without storing secrets in CI?",
+      evidence: `${manualQaEvidencePackets.length} tenant-scoped manual QA evidence packet${manualQaEvidencePackets.length === 1 ? "" : "s"} retained or audited.`,
+      boundary: "Manual QA evidence contains no bearer tokens, credentials, PHI, payer member identifiers, or source contracts.",
+      workaround: "Use the Manual QA Evidence panel after a human AAL2 run; do not paste secrets into packet fields.",
+      productionGate: "Approved short-lived token policy, identity operations, and optional CI-held token process."
+    },
+    {
+      domain: "Auditability",
+      status: auditEvents.length > 0 ? "ready" : "review",
+      buyerQuestion: "Can diligence evidence be tied to an append-only event trail?",
+      evidence: `${auditEvents.length} append-only audit event${auditEvents.length === 1 ? "" : "s"} visible to this tenant session.`,
+      boundary: "Audit logs document synthetic pilot activity; they are not a SOC 2 report or compliance certification.",
+      workaround: "Use write-before-release packet downloads and retain packet audit IDs in buyer follow-up.",
+      productionGate: "Formal retention, legal hold, monitoring, incident response, and compliance-review operating controls."
+    },
+    {
+      domain: "Trust And Safety Operations",
+      status: hasTrustOps ? "ready" : "review",
+      buyerQuestion: "Can SCRIMED show a process for monitoring, escalation, and improvement?",
+      evidence: hasTrustOps
+        ? "TrustOps incident or packet activity is visible in the audit trail."
+        : "No TrustOps incident activity is visible in this workspace yet.",
+      boundary: "TrustOps pilot evidence is not a staffed 24/7 managed production service commitment.",
+      workaround: "Create or review a synthetic TrustOps incident when security, safety, or legal reviewers attend.",
+      productionGate: "Approved staffing, customer escalation matrix, MDR/SOC process, and incident response review."
+    },
+    {
+      domain: "Agent Workspace Governance",
+      status: hasAgentWorkspace ? "ready" : "review",
+      buyerQuestion: "Can SCRIMED govern long-running agent work rather than only answer prompts?",
+      evidence: hasAgentWorkspace
+        ? "Agent Workspace work-order activity is visible in the audit trail."
+        : "No Agent Workspace work-order activity is visible in this workspace yet.",
+      boundary: "Agent work orders are synthetic, human-reviewed, and do not autonomously execute clinical care.",
+      workaround: "Create a synthetic work order for buyers evaluating long-running agent task operations.",
+      productionGate: "Approved tools, scoped credentials, customer environment boundary, and reviewer approval workflow."
+    },
+    {
+      domain: "Pricing And Commercial Posture",
+      status: "ready",
+      buyerQuestion: "Is the commercial path premium, clear, and tied to evidence?",
+      evidence: "Assessment, synthetic pilot, protected enterprise pilot, and operating license steps are packaged in the room.",
+      boundary: "Pricing posture is not a savings guarantee, reimbursement guarantee, or binding contract.",
+      workaround: "Use measured pilot value, scoped deliverables, and buyer-specific governance before final contracting.",
+      productionGate: "Signed order form, MSA/BAA/DPA path where applicable, and approved statement of work."
+    },
+    {
+      domain: "Legal, Privacy, And Security Boundary",
+      status: "ready",
+      buyerQuestion: "Does the export clearly separate diligence support from legal or compliance certification?",
+      evidence: "The export states no medical, legal, regulatory, compliance, security, or production authorization claims.",
+      boundary: "SCRIMED does not accept PHI or production credentials in this protected synthetic pilot workspace.",
+      workaround: "Use metadata-only evidence, blocked claims, review gates, and signed controls before production promotion.",
+      productionGate: "Customer legal, privacy, security, clinical governance, retention, and incident response approval."
+    },
+    {
+      domain: "Unavailable Evidence Handling",
+      status: unavailableSections.length === 0 ? "ready" : "review",
+      buyerQuestion: "What happens if part of the evidence stack is unavailable during diligence?",
+      evidence:
+        unavailableSections.length === 0
+          ? "No degraded evidence section is currently reported."
+          : `${unavailableSections.length} evidence section${unavailableSections.length === 1 ? "" : "s"} degraded.`,
+      boundary: "Degraded evidence must be disclosed rather than hidden in buyer-facing exports.",
+      workaround: "Export visible evidence with explicit degraded-section disclosure and follow-up owners.",
+      productionGate: "Operational monitoring, alerting, retry policy, and customer communication process."
+    },
+    {
+      domain: "Production Activation",
+      status: state === "ready" ? "review" : "blocked",
+      buyerQuestion: "Can the diligence export be used to start live clinical, payer, or patient-facing operations?",
+      evidence: "The export intentionally preserves production hard gates and live-use exclusions.",
+      boundary: "No autonomous diagnosis, treatment, patient outreach, payer submission, EHR writeback, or live data processing.",
+      workaround: "Use the export to progress evaluation and contracting while production controls are reviewed separately.",
+      productionGate: "Signed authorization, BAA/DPA path, live connector approval, clinical safety review, and launch approval."
     }
   ];
 }
@@ -335,7 +488,7 @@ export function deriveBuyerPilotRoom({
         : "No buyer-room packet download audit event exists yet.",
       action: hasBuyerPacket
         ? "Use the most recent packet as buyer-diligence follow-up."
-        : "Download the Buyer Room Packet after this room is reviewed."
+        : "Download the Buyer Diligence Export after this room is reviewed."
     },
     {
       id: "degraded-sections",
@@ -356,6 +509,18 @@ export function deriveBuyerPilotRoom({
   const blocked = checks.filter((check) => check.state === "blocked").length;
   const state = rollupState(checks);
   const score = Math.round((passed / checks.length) * 100);
+  const diligenceControls = buildDiligenceControls({
+    auditEvents,
+    demoSnapshots,
+    hasAgentWorkspace,
+    hasManualQaEvidence,
+    hasSession,
+    hasTrustOps,
+    manualQaEvidencePackets,
+    sessions,
+    state,
+    unavailableSections
+  });
 
   return {
     state,
@@ -404,6 +569,36 @@ export function deriveBuyerPilotRoom({
         purpose: "Return to the SCRIMED public brand and communications surface."
       }
     ],
+    diligenceExport: {
+      label: "Buyer Diligence Export",
+      route: `/api/pilot-workspaces/${workspace.slug}/buyer-room/packet`,
+      status: state === "blocked" ? "review" : state,
+      oneClickAction:
+        "Download one audited Markdown export from the protected Buyer Pilot Room after AAL2 tenant authorization.",
+      includedArtifacts: [
+        "Executive thesis and tenant workspace posture",
+        "Readiness score, checks, blockers, and workaround owners",
+        "Manual QA evidence counts, workflow run IDs, and packet hashes when retained",
+        "Demo readiness, durable synthetic session, and append-only audit evidence",
+        "Pricing path from assessment through protected pilot and operating license",
+        "Competitive edge pillars with proof routes and blocked claims",
+        "Legal, privacy, security, safety, and production activation boundaries",
+        "Recent audit trail and degraded-section disclosure"
+      ],
+      requiredHumanActions: [
+        "Keep the tenant browser session at AAL2 before download",
+        "Review the export for buyer-specific context before sending externally",
+        "Use manual QA evidence capture for human-run proof instead of storing bearer tokens",
+        "Escalate any live-data, PHI, payer, EHR, imaging, device, legal, or clinical request"
+      ],
+      withheldItems: [
+        "Bearer tokens, credentials, secrets, and source contracts",
+        "PHI, patient identifiers, payer member data, and production customer records",
+        "Legal advice, compliance certification, security certification, or reimbursement guarantees",
+        "Production launch approval, autonomous clinical action, or live connector authorization"
+      ]
+    },
+    diligenceControls,
     limitations: [
       {
         limitation: "Authenticated CI happy-path checks cannot safely run without a short-lived AAL2 tenant token.",
@@ -443,7 +638,7 @@ export function deriveBuyerPilotRoom({
     ],
     unavailableSections,
     boundary: buyerPilotRoomBoundary,
-    updatedAt: "2026-06-16"
+    updatedAt: "2026-06-18"
   };
 }
 
@@ -486,6 +681,15 @@ function limitationLines(limitations: BuyerPilotRoomLimitation[]) {
     .join("\n");
 }
 
+function diligenceControlLines(controls: BuyerPilotRoomDiligenceControl[]) {
+  return controls
+    .map(
+      (control) =>
+        `- ${control.domain}: ${control.status}. Buyer question: ${control.buyerQuestion} Evidence: ${control.evidence} Boundary: ${control.boundary} Workaround: ${control.workaround} Gate: ${control.productionGate}`
+    )
+    .join("\n");
+}
+
 function recentAuditLines(events: PilotAuditEventRecord[]) {
   if (events.length === 0) {
     return "- No recent audit events are visible to this tenant session.";
@@ -521,7 +725,9 @@ export function buildBuyerPilotRoomPacket({
 }) {
   const baseUrl = appBaseUrl.replace(/\/$/, "");
 
-  return `# SCRIMED Buyer Pilot Room Packet
+  return `# SCRIMED Buyer Diligence Export
+
+This audited export is generated from the protected Buyer Pilot Room. It packages the current synthetic pilot evidence, commercial posture, governance boundaries, known limitations, and safe workarounds into one buyer-ready diligence artifact.
 
 ## Packet Control
 - Generated: ${generatedAt}
@@ -529,6 +735,8 @@ export function buildBuyerPilotRoomPacket({
 - Generated by: ${actorUserId}
 - Product route: ${baseUrl}/pilot-workspace/access
 - Buyer room API: ${baseUrl}/api/pilot-workspaces/${workspace.slug}/buyer-room
+- Diligence export API: ${baseUrl}${room.diligenceExport.route}
+- Export status: ${room.diligenceExport.status}
 - Data boundary: synthetic-only, metadata-only, tenant-scoped
 
 ## Executive Thesis
@@ -540,6 +748,18 @@ ${room.executiveThesis}
 - Workspace slug: ${workspace.slug}
 - Workspace status: ${workspace.status}
 - Workspace created: ${workspace.createdAt}
+
+## One-Click Diligence Export Index
+- Label: ${room.diligenceExport.label}
+- Action: ${room.diligenceExport.oneClickAction}
+- Included artifacts:
+${markdownItems(room.diligenceExport.includedArtifacts)}
+
+Required human actions:
+${markdownItems(room.diligenceExport.requiredHumanActions)}
+
+Withheld by design:
+${markdownItems(room.diligenceExport.withheldItems)}
 
 ## Buyer Room Readiness
 - State: ${room.state}
@@ -561,8 +781,28 @@ ${room.executiveThesis}
 ## Readiness Checks
 ${checkLines(room.checks)}
 
+## Readiness And QA Evidence Bundle
+- Durable synthetic sessions: ${room.evidenceCounts.sessions}
+- Append-only audit events: ${room.evidenceCounts.auditEvents}
+- Demo readiness snapshots: ${room.evidenceCounts.demoSnapshots}
+- Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
+- Degraded evidence sections: ${room.evidenceCounts.unavailableSections}
+- Latest demo snapshot: ${
+    room.latestSnapshot
+      ? `${room.latestSnapshot.id}, ${room.latestSnapshot.state}, ${room.latestSnapshot.score}%, ${room.latestSnapshot.createdAt}`
+      : "not available"
+  }
+
+## Legal, Privacy, Security, Safety, And Production Control Matrix
+${diligenceControlLines(room.diligenceControls)}
+
 ## Competitive Edge
 ${edgeLines(room.competitiveEdges)}
+
+## Pricing And Commercial Posture
+- SCRIMED pricing is positioned as premium enterprise workflow intelligence, governed synthetic evaluation, protected pilot activation, and operating-system licensing.
+- Pricing must remain tied to buyer-specific workflow scope, governance obligations, deployment mode, support expectations, integration complexity, and measurable pilot outcomes.
+- No savings, reimbursement, denial-reduction, revenue, clinical outcome, or regulatory guarantee is made by this export.
 
 ## Commercial Path
 ${commercialLines(room.commercialPath)}
@@ -572,6 +812,15 @@ ${room.buyerActions.map((action) => `- ${action.label}: ${action.purpose} Route:
 
 ## Known Limitations And Workarounds
 ${limitationLines(room.limitations)}
+
+## Production Hard Gates
+- Signed customer authorization and scope.
+- BAA/DPA path where applicable.
+- Legal, privacy, security, and clinical governance review.
+- Human-review workflow approval and reviewer accountability.
+- Live connector authorization for EHR, payer, imaging, device, or warehouse integrations.
+- Retention, deletion, legal-hold, incident-response, and access-review controls.
+- Region, sovereignty, and deployment-mode approval where applicable.
 
 ## Unavailable Or Degraded Sections
 ${markdownItems(room.unavailableSections)}

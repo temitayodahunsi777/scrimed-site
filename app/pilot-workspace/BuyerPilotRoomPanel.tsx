@@ -51,8 +51,8 @@ export default function BuyerPilotRoomPanel({
   return (
     <section className="table-section buyer-pilot-room" aria-label="Buyer Pilot Room">
       <div className="section-heading">
-        <p className="eyebrow">Buyer Pilot Room</p>
-        <h2>Package SCRIMED&apos;s competitive edge into one enterprise diligence room.</h2>
+        <p className="eyebrow">Buyer Diligence Export</p>
+        <h2>Package SCRIMED&apos;s competitive edge, proof stack, and guarded boundaries into one audited export.</h2>
         <p className="section-copy">{room.executiveThesis}</p>
         <div className="form-actions">
           <button
@@ -61,7 +61,7 @@ export default function BuyerPilotRoomPanel({
             onClick={() => void onDownloadPacket()}
             type="button"
           >
-            {packetBusy ? "Preparing Buyer Packet" : "Download Buyer Room Packet"}
+            {packetBusy ? "Preparing Diligence Export" : "Download Diligence Export"}
           </button>
           <Link className="secondary-action" href="/competitive-edge">
             Public Competitive Edge
@@ -104,6 +104,29 @@ export default function BuyerPilotRoomPanel({
           <span>Manual QA</span>
           <strong>{room.evidenceCounts.manualQaEvidencePackets}</strong>
         </article>
+        <article>
+          <span>Controls</span>
+          <strong>{room.diligenceControls.length}</strong>
+        </article>
+      </div>
+
+      <div className="demo-runbook" aria-label="Buyer diligence export contents">
+        <div className="section-heading">
+          <p className="eyebrow">One-click export contents</p>
+          <h2>{room.diligenceExport.oneClickAction}</h2>
+        </div>
+        {room.diligenceExport.includedArtifacts.slice(0, 8).map((artifact) => (
+          <article className="module-row" key={artifact}>
+            <div>
+              <span>included</span>
+              <h2>{artifact}</h2>
+            </div>
+            <p>
+              The export keeps this artifact tenant-scoped, synthetic-only, and tied to the protected workspace
+              evidence boundary.
+            </p>
+          </article>
+        ))}
       </div>
 
       <div className="agent-readiness-grid demo-readiness-brief" aria-label="Competitive edge proof">
@@ -151,6 +174,24 @@ export default function BuyerPilotRoomPanel({
           </p>
         </article>
       ))}
+
+      <div className="demo-runbook" aria-label="Diligence control matrix">
+        <div className="section-heading">
+          <p className="eyebrow">Legal, privacy, security, safety</p>
+          <h2>Expose the control answer, boundary, workaround, and production gate in the buyer export.</h2>
+        </div>
+        {room.diligenceControls.slice(0, 6).map((control) => (
+          <article className="module-row" key={control.domain}>
+            <div>
+              <span>{control.domain}</span>
+              <h2>{control.buyerQuestion}</h2>
+            </div>
+            <strong className={stateClass(control.status)}>{stateLabel(control.status)}</strong>
+            <p>{control.evidence}</p>
+            <p>{control.workaround}</p>
+          </article>
+        ))}
+      </div>
 
       <div className="demo-runbook" aria-label="Known limitations and workarounds">
         <div className="section-heading">

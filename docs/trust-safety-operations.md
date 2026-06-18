@@ -14,7 +14,7 @@ Trust Safety Operations v4 is active as an inspectable operating model, syntheti
 - Tenant incident update API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}`
 - Tenant incident review packet API: `/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet`
 - Aggregate enterprise proof packet API: `/api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
-- Buyer Pilot Room packet API: `/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
+- Buyer Diligence Export API: `/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - Trust Center: `/trust-center`
 - Claims Register: `/claims`
 - Audit Layer: `/audit`
@@ -83,7 +83,7 @@ Tenant admins and pilot leads can also download an aggregate enterprise proof pa
 
 Approved tenant members can run tenant-session verification from `/pilot-workspace/access` using their current AAL2 browser session. The verification checks protected workspace routes, TrustOps, Agent Workspace, tenant access, audit, and the aggregate enterprise proof packet without storing the session bearer token in GitHub Actions or source control.
 
-Approved tenant members can now use the Buyer Pilot Room from `/pilot-workspace/access` to bundle readiness, premium sales path, competitive edge, evidence counts, limitations, workarounds, and packet-release audit into one buyer-diligence artifact. The packet does not certify compliance, authorize live clinical execution, guarantee reimbursement, or create legal conclusions.
+Approved tenant members can now use the Buyer Pilot Room from `/pilot-workspace/access` to bundle readiness, QA evidence, premium sales path, competitive edge, evidence counts, legal/privacy/security/safety boundaries, limitations, workarounds, production hard gates, and packet-release audit into one Buyer Diligence Export. The export does not certify compliance, authorize live clinical execution, guarantee reimbursement, or create legal conclusions.
 
 ## Target Audience Appeal
 
@@ -113,7 +113,7 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Added browser-session tenant verification for protected workspace routes and the audited enterprise proof packet without CI credential storage.
 - Added a protected Pilot Demo Readiness Command Center that turns tenant-session verification, durable synthetic sessions, proof-packet audit events, and append-only audit visibility into demo readiness scoring, blockers, buyer brief lines, and a repeatable runbook.
 - Added durable Pilot Demo Readiness snapshots and audited Demo Readiness Packet exports so buyer-demo readiness can be retained and released through write-before-release audit without CI credential storage.
-- Added the protected Buyer Pilot Room and audited Buyer Pilot Room Packet so sales engineering can broadcast competitive edge and package diligence evidence without storing CI bearer tokens.
+- Added the protected Buyer Pilot Room and audited Buyer Diligence Export so sales engineering can broadcast competitive edge, package diligence evidence, and preserve hard boundaries without storing CI bearer tokens.
 - Added the `passkey-or-magic-link` tenant identity readiness posture so TrustOps and tenant administration can reflect the current phishing-resistant sign-in posture.
 - Added `scripts/trustops-authenticated-smoke.mjs` for fail-closed and authenticated TrustOps route verification.
 - Added `scripts/public-production-smoke.mjs` for no-secret public route, product posture, readiness, and fail-closed verification.
@@ -123,10 +123,10 @@ This is an operating model and product control layer. It is not legal advice, a 
 - Production managed 24/7 coverage still requires staffed on-call/SOC/MDR coverage, contracts, tabletop exercises, customer-specific runbooks, and external security review.
 - Tenant TrustOps storage is synthetic-pilot and enterprise-readiness only; regulated production incidents require customer-approved live-data boundaries, breach analysis, notification decisions, and forensic process.
 - Supabase Auth leaked-password protection remains a dashboard-level security setting for password-based auth. SCRIMED product flows remain passkey or passwordless magic-link based; enable leaked-password protection if password sign-in remains active anywhere in the project.
-- Unattended authenticated TrustOps, Agent Workspace, Demo Readiness Packet, Buyer Pilot Room Packet, and enterprise proof-packet happy-path smoke requires a CI-held short-lived AAL2 tenant-admin or pilot-lead bearer token. Sales Demo Session QA now has a stricter dedicated preflight and manual-only workflow requiring `aal2`, `session_id`, bounded expiry, and explicit `SCRIMED_SALES_QA_INTAKE_ID`. Public readiness, unauthenticated fail-closed smoke, human-run buyer-room packets, human-run demo readiness snapshots, human-run packet export, and human-run tenant-session verification can run without storing CI credentials.
+- Unattended authenticated TrustOps, Agent Workspace, Demo Readiness Packet, Buyer Diligence Export, and enterprise proof-packet happy-path smoke requires a CI-held short-lived AAL2 tenant-admin or pilot-lead bearer token. Sales Demo Session QA now has a stricter dedicated preflight and manual-only workflow requiring `aal2`, `session_id`, bounded expiry, and explicit `SCRIMED_SALES_QA_INTAKE_ID`. Public readiness, unauthenticated fail-closed smoke, human-run buyer diligence exports, human-run demo readiness snapshots, human-run packet export, and human-run tenant-session verification can run without storing CI credentials.
 - Supabase passkeys are currently experimental per Supabase documentation and require stable relying-party domain/origin configuration; changing the relying-party ID invalidates enrolled passkeys.
 - Clinical, legal, privacy, security, copyright, trademark, reimbursement, and advertising determinations still require qualified human reviewers.
 
 ## Next Build Step
 
-Run `scripts/public-production-smoke.mjs` on every production deployment, use `/pilot-workspace/access` Buyer Pilot Room packets, demo readiness snapshots, packet export, and tenant-session verification before buyer demos, run `scripts/sales-demo-session-qa-token-preflight.mjs` before any tokenized Sales Demo Session QA smoke, place a short-lived CI-held AAL2 smoke token only when unattended authenticated mutation smoke is required, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.
+Run `scripts/public-production-smoke.mjs` on every production deployment, use `/pilot-workspace/access` Buyer Diligence Export, demo readiness snapshots, packet export, and tenant-session verification before buyer demos, run `scripts/sales-demo-session-qa-token-preflight.mjs` before any tokenized Sales Demo Session QA smoke, place a short-lived CI-held AAL2 smoke token only when unattended authenticated mutation smoke is required, and enable leaked-password protection in Supabase only if password auth remains enabled for any non-SCRIMED product flow.

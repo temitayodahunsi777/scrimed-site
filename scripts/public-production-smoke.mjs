@@ -120,8 +120,8 @@ async function checkProductConsole() {
     throw new Error("product console missing Buyer Pilot Room proof-stack posture.");
   }
 
-  if (body.proofStack?.buyerPilotRoomPackets !== "aal2-audited-buyer-room-packets") {
-    throw new Error("product console missing audited Buyer Pilot Room packet proof-stack posture.");
+  if (body.proofStack?.buyerPilotRoomPackets !== "aal2-audited-buyer-diligence-export") {
+    throw new Error("product console missing audited Buyer Diligence Export proof-stack posture.");
   }
 
   if (body.proofStack?.salesDealRoom !== "sales-to-buyer-room-linkage-ready") {
@@ -502,7 +502,7 @@ await checkProtectedFailClosed(
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,
-  "Buyer Pilot Room packet protected API"
+  "Buyer Diligence Export protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-run-packets`,

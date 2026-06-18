@@ -103,11 +103,11 @@ Demo Readiness Packet export requires a selected snapshot and commits `demo-read
 - Competitive edge pillars with proof routes and blocked claims.
 - Premium enterprise sales path from assessment through protected pilot and annual operating license.
 - Known limitations with safe workarounds and production gates.
-- Audited Markdown Buyer Pilot Room Packet export.
+- Audited Markdown Buyer Diligence Export with readiness, QA evidence, pricing posture, legal/privacy/security/safety controls, demo and pilot proof, degraded-section disclosure, and production hard gates.
 
-The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The packet route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact.
+The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The export route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact and preserves the legacy packet route for compatibility.
 
-This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, limitations, and competitive edge in one tenant-scoped room without weakening the synthetic-only boundary.
+This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, QA evidence, legal/privacy/security/safety posture, limitations, workarounds, and competitive edge in one tenant-scoped export without weakening the synthetic-only boundary.
 
 ## Pilot Deal Room Linkage
 

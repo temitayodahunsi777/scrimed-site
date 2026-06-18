@@ -769,7 +769,7 @@ export default function ProtectedPilotAccess({
 
     if (!response.ok) {
       const body = (await response.json()) as ProofPacketResponse;
-      setMessage(body.error?.message ?? "The Buyer Pilot Room packet could not be downloaded.");
+      setMessage(body.error?.message ?? "The Buyer Diligence Export could not be downloaded.");
       return;
     }
 
@@ -777,11 +777,11 @@ export default function ProtectedPilotAccess({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `scrimed-${selectedWorkspace.slug}-buyer-pilot-room-packet.md`;
+    link.download = `scrimed-${selectedWorkspace.slug}-buyer-diligence-export.md`;
     link.click();
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
-    setMessage("Buyer Pilot Room packet downloaded and its audit event was committed.");
+    setMessage("Buyer Diligence Export downloaded and its audit event was committed.");
   }
 
   if (!configured) {

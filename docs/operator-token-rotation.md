@@ -83,7 +83,7 @@ SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQ
 12. Review the Sales Operations audit trail and latest buyer demo session packet proof.
 13. Preferred path: open `/pilot-workspace/access` with the same AAL2 browser session and use the Manual QA Evidence panel to persist the non-secret run metadata.
 14. Fallback path: POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet, then POST the same payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session.
-15. Export the Buyer Pilot Room packet after persistence so the manual QA evidence count, workflow run ID, and packet hash appear in enterprise diligence.
+15. Export the Buyer Diligence Export after persistence so the manual QA evidence count, workflow run ID, packet hash, legal/privacy/security/safety boundaries, and production hard gates appear in enterprise diligence.
 
 Manual evidence packet payload:
 

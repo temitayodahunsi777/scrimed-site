@@ -57,7 +57,7 @@ export async function GET(request: Request, { params }: RouteContext) {
       {
         error: {
           code: "rate-limit-exceeded",
-          message: "Buyer Pilot Room packet downloads are temporarily rate limited."
+          message: "Buyer Diligence Export downloads are temporarily rate limited."
         },
         boundary: protectedPilotBoundary
       },
@@ -133,7 +133,7 @@ export async function GET(request: Request, { params }: RouteContext) {
         error: {
           code: "buyer-room-packet-audit-failed",
           message:
-            "The Buyer Pilot Room packet was not released because its append-only download audit event could not be committed."
+            "The Buyer Diligence Export was not released because its append-only download audit event could not be committed."
         },
         boundary: protectedPilotBoundary
       },
@@ -157,9 +157,10 @@ export async function GET(request: Request, { params }: RouteContext) {
   return new NextResponse(packet, {
     headers: {
       ...headers,
-      "Content-Disposition": `attachment; filename="scrimed-${safeWorkspaceSlug}-buyer-pilot-room-packet.md"`,
+      "Content-Disposition": `attachment; filename="scrimed-${safeWorkspaceSlug}-buyer-diligence-export.md"`,
       "Content-Type": "text/markdown; charset=utf-8",
       "X-SCRIMED-Data-Boundary": "synthetic-only",
+      "X-SCRIMED-Buyer-Diligence-Export-Audited": "true",
       "X-SCRIMED-Buyer-Room-Packet-Audited": "true"
     }
   });

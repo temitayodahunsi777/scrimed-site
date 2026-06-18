@@ -70,6 +70,7 @@ Completed foundations:
 - Manual QA Evidence Packet route with required-field contract, secret-like content rejection, token-disposal attestation, no-PHI boundary, and Markdown packet generation
 - Tenant-scoped Manual QA Evidence Packet persistence with RLS, AAL2 guarded RPC write path, packet hashing, append-only audit events, protected packet listing, and Buyer Pilot Room proof visibility
 - Browser-session Manual QA Evidence Capture panel with fixed attestations, retained packet list, packet download, buyer-room count wiring, and tenant-session verification coverage
+- One-click Buyer Diligence Export with readiness, QA evidence, pricing posture, competitive edge, legal/privacy/security/safety controls, demo and pilot proof, degraded-section disclosure, workarounds, and production hard gates
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline

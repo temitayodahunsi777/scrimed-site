@@ -272,4 +272,18 @@ if (!enterpriseProofPacketResult.body.text.includes("SCRIMED Enterprise Proof Pa
 }
 
 console.log("pass authenticated enterprise proof packet download and audit event");
+
+const buyerDiligenceExportResult = await request(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,
+  {
+    headers: { Authorization: `Bearer ${bearerToken}` }
+  }
+);
+requireStatus("authenticated Buyer Diligence Export", buyerDiligenceExportResult.response.status, 200);
+
+if (!buyerDiligenceExportResult.body.text.includes("SCRIMED Buyer Diligence Export")) {
+  throw new Error("authenticated Buyer Diligence Export did not include the expected export heading.");
+}
+
+console.log("pass authenticated Buyer Diligence Export download and audit event");
 console.log("SCRIMED Agent Workspace authenticated smoke completed.");
