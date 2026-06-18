@@ -73,6 +73,15 @@ function initialChecks(workspaceSlug: string): VerificationCheck[] {
       audited: false
     },
     {
+      id: "manual-qa-evidence",
+      label: "Manual QA Evidence",
+      route: `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-run-packets`,
+      expected: [200],
+      status: "pending",
+      detail: "Not run",
+      audited: false
+    },
+    {
       id: "tenant-access",
       label: "Tenant Access",
       route: `/api/pilot-workspaces/${workspaceSlug}/tenant-access`,

@@ -7,6 +7,7 @@ import type {
   PilotWorkspaceRecord
 } from "../lib/protectedPilotWorkspace";
 import type { PilotDemoReadinessSnapshotRecord } from "../lib/pilotDemoReadiness";
+import type { QaManualRunEvidencePacketRecord } from "../lib/qaEvidenceLedger";
 import { deriveBuyerPilotRoom, type BuyerPilotRoomState } from "../lib/buyerPilotRoom";
 
 function stateLabel(state: BuyerPilotRoomState) {
@@ -24,6 +25,7 @@ function stateClass(state: BuyerPilotRoomState) {
 export default function BuyerPilotRoomPanel({
   auditEvents,
   demoSnapshots,
+  manualQaEvidencePackets,
   onDownloadPacket,
   packetBusy,
   sessions,
@@ -31,6 +33,7 @@ export default function BuyerPilotRoomPanel({
 }: {
   auditEvents: PilotAuditEventRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
+  manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
   onDownloadPacket: () => Promise<void>;
   packetBusy: boolean;
   sessions: PilotSessionRecord[];
@@ -41,7 +44,7 @@ export default function BuyerPilotRoomPanel({
     sessions,
     auditEvents,
     demoSnapshots,
-    manualQaEvidencePackets: [],
+    manualQaEvidencePackets,
     unavailableSections: []
   });
 

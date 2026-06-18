@@ -81,8 +81,8 @@ SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQ
 10. Unset local shell variables immediately after the run.
 11. Sign out of the tenant-admin session if the token was copied outside the browser context.
 12. Review the Sales Operations audit trail and latest buyer demo session packet proof.
-13. POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet.
-14. POST the same non-secret payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session to persist the packet in tenant-scoped audit storage.
+13. Preferred path: open `/pilot-workspace/access` with the same AAL2 browser session and use the Manual QA Evidence panel to persist the non-secret run metadata.
+14. Fallback path: POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet, then POST the same payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session.
 15. Export the Buyer Pilot Room packet after persistence so the manual QA evidence count, workflow run ID, and packet hash appear in enterprise diligence.
 
 Manual evidence packet payload:
@@ -109,6 +109,12 @@ Protected persistence route:
 
 ```text
 POST /api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets
+```
+
+Preferred browser-session path:
+
+```text
+/pilot-workspace/access -> Manual QA Evidence
 ```
 
 Persistence controls:

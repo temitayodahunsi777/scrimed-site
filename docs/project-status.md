@@ -2,6 +2,15 @@
 
 Updated: 2026-06-18
 
+## Latest Browser-Session Manual QA Capture Release
+
+- Added a protected Manual QA Evidence panel inside `/pilot-workspace/access` so operators can persist manual Sales Demo Session QA evidence from the existing AAL2 browser session instead of copying bearer tokens into local scripts.
+- The panel captures only non-secret workflow metadata, fixed operator attestations, token-disposal attestation, synthetic-only boundary, generated packet download, retained packet hashes, and existing packet downloads.
+- Updated Buyer Pilot Room UI wiring so retained manual QA evidence counts are visible before exporting buyer diligence packets.
+- Added the protected manual QA evidence route to tenant-session verification so workspace operators can verify the capability without storing CI credentials.
+- Updated the protected pilot API contract and capability list with browser-session manual QA evidence capture.
+- Preserved the boundary: the panel does not accept bearer tokens, credentials, PHI, patient identifiers, payer member data, source contracts, legal advice, compliance certification, production authorization, or live healthcare execution approval.
+
 ## Latest Manual QA Evidence Persistence Release
 
 - Added tenant-scoped durable manual QA evidence packet storage through `POST /api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`.

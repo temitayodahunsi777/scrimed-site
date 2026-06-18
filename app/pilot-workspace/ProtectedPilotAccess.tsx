@@ -16,11 +16,13 @@ import type {
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
+import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
+import type { QaManualRunEvidencePacketRecord } from "../lib/qaEvidenceLedger";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -59,6 +61,11 @@ type ProofPacketResponse = {
 type DemoReadinessSnapshotResponse = {
   snapshots?: PilotDemoReadinessSnapshotRecord[];
   snapshot?: PilotDemoReadinessSnapshotRecord | null;
+  error?: { message?: string };
+};
+
+type ManualQaEvidenceResponse = {
+  packets?: QaManualRunEvidencePacketRecord[];
   error?: { message?: string };
 };
 
@@ -106,6 +113,7 @@ export default function ProtectedPilotAccess({
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
   const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
   const [demoReadinessSnapshots, setDemoReadinessSnapshots] = useState<PilotDemoReadinessSnapshotRecord[]>([]);
+  const [manualQaEvidencePackets, setManualQaEvidencePackets] = useState<QaManualRunEvidencePacketRecord[]>([]);
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [verificationReadiness, setVerificationReadiness] =
@@ -150,6 +158,7 @@ export default function ProtectedPilotAccess({
         setSessions([]);
         setAuditEvents([]);
         setDemoReadinessSnapshots([]);
+        setManualQaEvidencePackets([]);
         setDemoPacketBusyId(null);
         setDemoSnapshotStatus("idle");
         setVerificationReadiness(null);
@@ -190,6 +199,7 @@ export default function ProtectedPilotAccess({
         setSessions([]);
         setAuditEvents([]);
         setDemoReadinessSnapshots([]);
+        setManualQaEvidencePackets([]);
         setDemoPacketBusyId(null);
         setDemoSnapshotStatus("idle");
         setVerificationReadiness(null);
@@ -232,6 +242,7 @@ export default function ProtectedPilotAccess({
       setWorkspaces(nextWorkspaces);
       setSelectedWorkspace(nextWorkspaces[0] ?? null);
       setDemoReadinessSnapshots([]);
+      setManualQaEvidencePackets([]);
       setDemoPacketBusyId(null);
       setDemoSnapshotStatus("idle");
       setBuyerRoomPacketStatus("idle");
@@ -242,7 +253,8 @@ export default function ProtectedPilotAccess({
         await Promise.all([
           loadSessions(activeSession, nextWorkspaces[0]),
           loadAuditEvents(activeSession, nextWorkspaces[0]),
-          loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0])
+          loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0]),
+          loadManualQaEvidencePackets(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -305,6 +317,29 @@ export default function ProtectedPilotAccess({
       }
 
       setDemoReadinessSnapshots(body.snapshots ?? []);
+    }
+
+    async function loadManualQaEvidencePackets(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/qa-evidence/manual-run-packets`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ManualQaEvidenceResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Manual QA evidence packets could not be loaded.");
+        return;
+      }
+
+      setManualQaEvidencePackets(body.packets ?? []);
     }
 
     initializeAccess();
@@ -475,6 +510,7 @@ export default function ProtectedPilotAccess({
 
     setSelectedWorkspace(workspace);
     setDemoReadinessSnapshots([]);
+    setManualQaEvidencePackets([]);
     setDemoPacketBusyId(null);
     setDemoSnapshotStatus("idle");
     setBuyerRoomPacketStatus("idle");
@@ -497,7 +533,8 @@ export default function ProtectedPilotAccess({
     setSessions(body.sessions ?? []);
     await Promise.all([
       refreshAuditEvents(session, workspace),
-      refreshDemoReadinessSnapshots(session, workspace)
+      refreshDemoReadinessSnapshots(session, workspace),
+      refreshManualQaEvidencePackets(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -532,6 +569,22 @@ export default function ProtectedPilotAccess({
     }
 
     setDemoReadinessSnapshots(body.snapshots ?? []);
+  }
+
+  async function refreshManualQaEvidencePackets(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/qa-evidence/manual-run-packets`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ManualQaEvidenceResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Manual QA evidence packets could not be loaded.");
+      return;
+    }
+
+    setManualQaEvidencePackets(body.packets ?? []);
   }
 
   async function createSyntheticSession() {
@@ -983,9 +1036,18 @@ export default function ProtectedPilotAccess({
           <BuyerPilotRoomPanel
             auditEvents={auditEvents}
             demoSnapshots={demoReadinessSnapshots}
+            manualQaEvidencePackets={manualQaEvidencePackets}
             onDownloadPacket={downloadBuyerPilotRoomPacket}
             packetBusy={buyerRoomPacketStatus === "downloading"}
             sessions={sessions}
+            workspace={selectedWorkspace}
+          />
+
+          <ManualQaEvidencePanel
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            onEvidenceChanged={setManualQaEvidencePackets}
+            packets={manualQaEvidencePackets}
+            session={session}
             workspace={selectedWorkspace}
           />
 

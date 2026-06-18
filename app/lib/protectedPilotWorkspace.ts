@@ -361,6 +361,13 @@ export const protectedPilotApiContracts = [
       "Download an audited Markdown Buyer Pilot Room Packet for enterprise diligence, investor follow-up, and protected pilot sales engineering."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets",
+    access: "GET: AAL2 bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",
+    purpose:
+      "Inspect or persist no-secret manual Sales Demo Session QA evidence packets so human-run AAL2 proof appears in tenant-scoped Buyer Pilot Room diligence."
+  },
+  {
     method: "GET / PATCH",
     route: "/api/pilot-workspaces/{workspaceSlug}/tenant-access",
     access: "AAL2 bearer token + tenant-admin role + server-held runtime authorization + rate limit",
@@ -576,6 +583,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Audited tenant activation proof packet for buyer and investor diligence",
       "SMTP delivery readiness metadata with direct-send gate retained",
       "Protected Buyer Pilot Room that packages competitive edge, readiness, pricing path, limitations, and write-before-release packet export",
+      "Browser-session manual QA evidence capture without copying bearer tokens into scripts",
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",
       "SSO-readiness metadata and identity lifecycle evidence",
@@ -583,7 +591,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Authenticated Agent Workspace dashboard for work-order creation, governed transitions, outcome metrics, reviewer queues, retry queues, packet export, governance export, and event-trail review",
       "Persistent Agent Workspace work-order creation, state transitions, retry tracking, reviewer assignment, closure, dashboard filters, proof-packet export, and append-only event trails"
     ],
-    updated: "2026-06-16"
+    updated: "2026-06-18"
   };
 }
 
