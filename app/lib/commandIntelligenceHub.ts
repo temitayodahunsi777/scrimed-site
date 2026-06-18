@@ -157,7 +157,46 @@ export type CommandIntelligenceHubSummary = {
   updatedAt: string;
 };
 
+export type CommandIntelligenceSnapshotRecord = {
+  id: string;
+  tenantId: string;
+  workspaceId: string;
+  commandState: CommandIntelligenceState;
+  commandScore: number;
+  buyerRoomState: CommandIntelligenceState;
+  buyerRoomScore: number;
+  agentCommanderStatus: CommandIntelligenceState;
+  workstreamCount: number;
+  trustOutputCount: number;
+  evaluationGateCount: number;
+  toolAccessPlanCount: number;
+  safeModeControlCount: number;
+  nextActionCount: number;
+  evidenceCounts: CommandIntelligenceHubSummary["evidenceCounts"];
+  metrics: CommandIntelligenceMetric[];
+  workstreams: CommandIntelligenceWorkstream[];
+  trustEngineOutputs: CommandTrustEngineOutput[];
+  evaluationPipeline: CommandEvaluationGate[];
+  toolAccessPlans: CommandToolAccessPlan[];
+  safeModeControls: CommandSafeModeControl[];
+  nextActions: CommandNextAction[];
+  limitations: CommandIntelligenceHubSummary["limitations"];
+  observability: CommandIntelligenceHubSummary["observability"];
+  snapshot: CommandIntelligenceHubSummary;
+  lastEvidenceAt: string | null;
+  operatorAttestation: typeof commandIntelligenceSnapshotOperatorAttestation;
+  boundary: string;
+  createdBy: string;
+  createdAt: string;
+};
+
 export const commandIntelligenceHubProofStackStatus = "aal2-command-intelligence-hub";
+export const commandIntelligenceSnapshotProofStackStatus =
+  "aal2-audited-command-intelligence-snapshots";
+export const commandIntelligencePacketProofStackStatus =
+  "aal2-audited-command-intelligence-packets";
+export const commandIntelligenceSnapshotOperatorAttestation =
+  "aal2-human-reviewed-synthetic-command-posture";
 
 export const commandIntelligenceHubBoundary =
   "SCRIMED Command Intelligence Hub is a protected synthetic-pilot command posture. It unifies tenant-scoped evidence, agents, Trust Engine outputs, QA posture, buyer diligence, MCP/tool-access plans, observability, and safe-mode boundaries. It does not accept PHI, store credentials, certify security or compliance, guarantee reimbursement, approve production connectors, or authorize live clinical, payer, imaging, device, or patient-facing execution.";
@@ -679,6 +718,177 @@ function buildNextActions({
       expectedOutcome: "Customer-ready connector plan with standards, blocked claims, controls, and production gates."
     }
   ];
+}
+
+function listLines(items: string[], empty = "- No retained items.") {
+  return items.length > 0 ? items.map((item) => `- ${item}`).join("\n") : empty;
+}
+
+function snapshotEvidenceTimestamp(snapshot: CommandIntelligenceSnapshotRecord) {
+  return snapshot.lastEvidenceAt ?? snapshot.createdAt;
+}
+
+export function buildCommandIntelligenceSnapshotPacket({
+  actorUserId,
+  appBaseUrl,
+  auditEventId,
+  generatedAt,
+  recentAuditEvents,
+  snapshot,
+  workspace
+}: {
+  generatedAt: string;
+  auditEventId: string;
+  actorUserId: string;
+  appBaseUrl: string;
+  workspace: PilotWorkspaceRecord;
+  snapshot: CommandIntelligenceSnapshotRecord;
+  recentAuditEvents: PilotAuditEventRecord[];
+}) {
+  const safeAppBaseUrl = appBaseUrl.replace(/\/$/, "");
+  const recentAuditLines = recentAuditEvents.slice(0, 12).map(
+    (event) =>
+      `- ${event.createdAt} | ${event.eventType} | actor ${event.actorUserId} | event ${event.id}`
+  );
+  const metricLines = snapshot.metrics.map(
+    (metric) => `- ${metric.label}: ${metric.value}. ${metric.detail}`
+  );
+  const workstreamLines = snapshot.workstreams.map(
+    (workstream) =>
+      `- ${workstream.name}: ${workstream.state}, confidence ${workstream.confidenceLevel}, risk ${workstream.riskScore}. Evidence: ${workstream.evidence} Review trigger: ${workstream.humanReviewTrigger}`
+  );
+  const trustLines = snapshot.trustEngineOutputs.map(
+    (output) =>
+      `- ${output.recommendation}: ${output.confidenceLevel} confidence, risk ${output.riskScore}, validation ${output.validationStatus}. Evidence: ${output.evidenceSource}`
+  );
+  const evaluationLines = snapshot.evaluationPipeline.map(
+    (gate) =>
+      `- ${gate.name}: ${gate.state}. Metric: ${gate.metric} Current control: ${gate.currentControl}`
+  );
+  const toolLines = snapshot.toolAccessPlans.map(
+    (plan) =>
+      `- ${plan.domain}: ${plan.status}. Standards: ${plan.standards.join(", ")}. Safe mode: ${plan.safeMode}`
+  );
+  const safeModeLines = snapshot.safeModeControls.map(
+    (control) =>
+      `- ${control.control}: ${control.status}. Blocked action: ${control.blockedAction} Workaround: ${control.workaround}`
+  );
+  const nextActionLines = snapshot.nextActions.map(
+    (action) =>
+      `- ${action.priority} | ${action.owner}: ${action.action}. Expected outcome: ${action.expectedOutcome}. Route: ${action.route}`
+  );
+  const limitationLines = snapshot.limitations.map(
+    (item) =>
+      `- Limitation: ${item.limitation} Workaround: ${item.workaround} Production gate: ${item.productionGate}`
+  );
+  const packetHashLines = snapshot.observability.manualQaPacketHashes.map(
+    (hash) => `- ${hash}`
+  );
+
+  return `# SCRIMED Command Intelligence Snapshot Packet
+
+Generated: ${generatedAt}
+Packet audit event: ${auditEventId}
+Generated by: ${actorUserId}
+Workspace: ${workspace.name}
+Tenant: ${workspace.tenantName}
+Workspace slug: ${workspace.slug}
+Workspace route: ${safeAppBaseUrl}/pilot-workspace/access
+
+## Command Decision
+
+- Command state: ${snapshot.commandState}
+- Command score: ${snapshot.commandScore}%
+- Buyer room state: ${snapshot.buyerRoomState}
+- Buyer room score: ${snapshot.buyerRoomScore}%
+- Agent Commander status: ${snapshot.agentCommanderStatus}
+- Operator attestation: ${snapshot.operatorAttestation}
+- Last evidence timestamp: ${snapshotEvidenceTimestamp(snapshot)}
+- Snapshot ID: ${snapshot.id}
+- Snapshot created: ${snapshot.createdAt}
+
+## Evidence Counts
+
+- Durable synthetic sessions: ${snapshot.evidenceCounts.sessions}
+- Audit events: ${snapshot.evidenceCounts.auditEvents}
+- Demo readiness snapshots: ${snapshot.evidenceCounts.demoSnapshots}
+- Manual QA evidence packets: ${snapshot.evidenceCounts.manualQaEvidencePackets}
+- Packet exports: ${snapshot.evidenceCounts.packetExports}
+- Degraded evidence sections: ${snapshot.evidenceCounts.unavailableSections}
+
+## Metrics
+
+${listLines(metricLines)}
+
+## Agent Commander
+
+- Planner: ${snapshot.snapshot.agentCommander.planner}
+- Router: ${snapshot.snapshot.agentCommander.router}
+- Control-plane agents: ${snapshot.snapshot.agentCommander.controlPlaneAgents}
+- Specialist services: ${snapshot.snapshot.agentCommander.specialistServices}
+- Memory layers: ${snapshot.snapshot.agentCommander.memoryLayers}
+- MCP/tool connector plans: ${snapshot.snapshot.agentCommander.mcpConnectors}
+- Approval checkpoints: ${snapshot.snapshot.agentCommander.approvalCheckpoints}
+- Observability signals: ${snapshot.snapshot.agentCommander.observabilitySignals}
+- Coordination model: ${snapshot.snapshot.agentCommander.coordinationModel}
+
+## Command Workstreams
+
+${listLines(workstreamLines)}
+
+## Trust Engine Outputs
+
+${listLines(trustLines)}
+
+## Continuous Evaluation Pipeline
+
+${listLines(evaluationLines)}
+
+## MCP And Tool Access Plans
+
+${listLines(toolLines)}
+
+## Operator Safe Mode
+
+${listLines(safeModeLines)}
+
+## Buyer Diligence Export Posture
+
+- Label: ${snapshot.snapshot.buyerDiligenceExport.label}
+- Route: ${snapshot.snapshot.buyerDiligenceExport.route}
+- Status: ${snapshot.snapshot.buyerDiligenceExport.status}
+- Included artifacts:
+${listLines(snapshot.snapshot.buyerDiligenceExport.includedArtifacts.map((item) => `  - ${item}`), "  - No included artifacts recorded.")}
+- Withheld items:
+${listLines(snapshot.snapshot.buyerDiligenceExport.withheldItems.map((item) => `  - ${item}`), "  - No withheld items recorded.")}
+
+## Observability
+
+- Runtime trace source: ${snapshot.observability.runtimeTraceSource}
+- Audit trace count: ${snapshot.observability.auditTraceCount}
+- Manual QA packet hashes:
+${listLines(packetHashLines)}
+- Degraded sections:
+${listLines(snapshot.observability.degradedSections.map((section) => `- ${section}`))}
+
+## Next Recommended Actions
+
+${listLines(nextActionLines)}
+
+## Known Boundaries And Workarounds
+
+${listLines(limitationLines)}
+
+## Recent Audit Events
+
+${listLines(recentAuditLines)}
+
+## Legal, Privacy, Security, And Safety Boundary
+
+${snapshot.boundary}
+
+This packet is synthetic-pilot diligence evidence only. It does not contain PHI, payer member data, patient identifiers, medical records, imaging, production credentials, source contracts, legal advice, compliance certification, security certification, reimbursement determination, production connector approval, patient outreach authorization, autonomous diagnosis, autonomous treatment, or live healthcare execution approval.
+`;
 }
 
 export function deriveCommandIntelligenceHub({

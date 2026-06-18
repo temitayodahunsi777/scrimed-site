@@ -60,6 +60,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness/{snapshotId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room`
 - `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
+- `POST /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
+- `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -123,6 +125,10 @@ This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now s
 - Observability signals including audit traces, packet exports, manual QA packet hashes, degraded sections, and next recommended actions.
 
 The JSON route at `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence` requires AAL2 governance context, tenant workspace membership, no-store response headers, synthetic-only data-boundary headers, and rate limiting. It does not create new records, store secrets, enable connectors, or grant live execution authority.
+
+Operators can now persist AAL2 human-reviewed command posture snapshots with `POST /api/pilot-workspaces/{workspaceSlug}/command-intelligence`. Snapshot creation recomputes evidence server-side, requires the fixed `aal2-human-reviewed-synthetic-command-posture` attestation, persists to `public.command_intelligence_snapshots`, and commits `command-intelligence-snapshot-created` into the workspace audit trail.
+
+Command Intelligence packet export at `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet` requires an existing snapshot and commits `command-intelligence-packet-downloaded` before releasing Markdown evidence. This gives enterprise buyers and investors a retained command-history packet without screenshots, PHI, secrets, or unsupported production claims.
 
 Current boundary: the hub is a command posture for governed synthetic pilots and enterprise evaluation only. Production use still requires signed customer scope, BAA/DPA path where applicable, legal/privacy/security/clinical review, approved connectors, live monitoring, and human operating controls.
 

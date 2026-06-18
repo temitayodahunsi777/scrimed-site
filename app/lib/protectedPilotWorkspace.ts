@@ -354,11 +354,18 @@ export const protectedPilotApiContracts = [
       "Inspect a tenant-scoped Buyer Pilot Room that bundles synthetic evidence counts, readiness state, competitive edge, premium commercial path, known limitations, and workarounds."
   },
   {
-    method: "GET",
+    method: "GET / POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/command-intelligence",
-    access: "AAL2 bearer token + workspace membership + rate limit",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin or pilot-lead role + fixed human-review attestation + server-held runtime authorization + rate limit",
     purpose:
-      "Inspect the protected SCRIMED Command Intelligence Hub that unifies Agent Commander posture, buyer-room readiness, Trust Engine outputs, continuous evaluation gates, MCP/tool-access plans, observability, safe-mode boundaries, limitations, and next actions."
+      "Inspect the protected SCRIMED Command Intelligence Hub or persist an AAL2 human-reviewed command snapshot that unifies Agent Commander posture, buyer-room readiness, Trust Engine outputs, continuous evaluation gates, MCP/tool-access plans, observability, safe-mode boundaries, limitations, and next actions."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited Markdown Command Intelligence Packet for a retained synthetic command-posture snapshot."
   },
   {
     method: "GET",
@@ -590,7 +597,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "Audited tenant activation proof packet for buyer and investor diligence",
       "SMTP delivery readiness metadata with direct-send gate retained",
       "Protected Buyer Pilot Room with one-click Buyer Diligence Export for competitive edge, readiness, QA evidence, pricing path, limitations, legal/privacy/security/safety boundaries, workarounds, and write-before-release audit",
-      "Protected SCRIMED Command Intelligence Hub for Agent Commander posture, Trust Engine outputs, continuous evaluation, MCP/tool access architecture, observability, buyer diligence readiness, safe-mode controls, limitations, workarounds, and next actions",
+      "Protected SCRIMED Command Intelligence Hub for Agent Commander posture, Trust Engine outputs, continuous evaluation, MCP/tool access architecture, observability, buyer diligence readiness, safe-mode controls, limitations, workarounds, next actions, durable AAL2-reviewed snapshots, and audited command packets",
       "Browser-session manual QA evidence capture without copying bearer tokens into scripts",
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",

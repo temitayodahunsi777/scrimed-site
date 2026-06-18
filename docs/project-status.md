@@ -2,6 +2,15 @@
 
 Updated: 2026-06-18
 
+## Latest Durable Command Intelligence Snapshot Release
+
+- Added tenant-scoped durable Command Intelligence snapshots so protected workspace operators can retain AAL2 human-reviewed command posture across sessions.
+- Added `POST /api/pilot-workspaces/{workspaceSlug}/command-intelligence` with fixed operator attestation, AAL2 governance context, evidence recomputation, rate limiting, Supabase RPC persistence, and append-only `command-intelligence-snapshot-created` audit events.
+- Added audited `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet` so Command Intelligence packets commit `command-intelligence-packet-downloaded` before releasing Markdown evidence.
+- Added `public.command_intelligence_snapshots` with RLS select, explicit authenticated grants, guarded private RPC writes, JSON size/type checks, no direct write grants, and runtime schema `2026-06-18.2`.
+- Updated `/pilot-workspace/access`, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with durable command snapshots and audited command packets.
+- Preserved the boundary: this stores synthetic command posture only. It does not store PHI, payer member data, medical records, imaging, source contracts, production credentials, secrets, legal/security/compliance certification, reimbursement determinations, production connector approval, patient outreach authorization, autonomous clinical authority, or live healthcare execution approval.
+
 ## Latest Command Intelligence Hub Release
 
 - Added the protected SCRIMED Command Intelligence Hub inside `/pilot-workspace/access` so operators can review Agent Commander posture, Buyer Pilot Room readiness, Trust Engine outputs, continuous evaluation gates, MCP/tool-access plans, observability, safe-mode controls, limitations, workarounds, and next actions before external buyer diligence.

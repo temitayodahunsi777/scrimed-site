@@ -13,6 +13,10 @@ import type {
   PilotDemoReadinessSnapshotRecord,
   TenantSessionVerificationReadiness
 } from "../lib/pilotDemoReadiness";
+import {
+  commandIntelligenceSnapshotOperatorAttestation,
+  type CommandIntelligenceSnapshotRecord
+} from "../lib/commandIntelligenceHub";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
@@ -70,6 +74,12 @@ type ManualQaEvidenceResponse = {
   error?: { message?: string };
 };
 
+type CommandIntelligenceResponse = {
+  snapshots?: CommandIntelligenceSnapshotRecord[];
+  snapshot?: CommandIntelligenceSnapshotRecord | null;
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -115,8 +125,11 @@ export default function ProtectedPilotAccess({
   const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
   const [demoReadinessSnapshots, setDemoReadinessSnapshots] = useState<PilotDemoReadinessSnapshotRecord[]>([]);
   const [manualQaEvidencePackets, setManualQaEvidencePackets] = useState<QaManualRunEvidencePacketRecord[]>([]);
+  const [commandIntelligenceSnapshots, setCommandIntelligenceSnapshots] = useState<CommandIntelligenceSnapshotRecord[]>([]);
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
+  const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
+  const [commandPacketBusyId, setCommandPacketBusyId] = useState<string | null>(null);
   const [verificationReadiness, setVerificationReadiness] =
     useState<TenantSessionVerificationReadiness | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState("");
@@ -160,8 +173,11 @@ export default function ProtectedPilotAccess({
         setAuditEvents([]);
         setDemoReadinessSnapshots([]);
         setManualQaEvidencePackets([]);
+        setCommandIntelligenceSnapshots([]);
         setDemoPacketBusyId(null);
         setDemoSnapshotStatus("idle");
+        setCommandPacketBusyId(null);
+        setCommandSnapshotStatus("idle");
         setVerificationReadiness(null);
         setEnterprisePacketStatus("idle");
         setBuyerRoomPacketStatus("idle");
@@ -201,8 +217,11 @@ export default function ProtectedPilotAccess({
         setAuditEvents([]);
         setDemoReadinessSnapshots([]);
         setManualQaEvidencePackets([]);
+        setCommandIntelligenceSnapshots([]);
         setDemoPacketBusyId(null);
         setDemoSnapshotStatus("idle");
+        setCommandPacketBusyId(null);
+        setCommandSnapshotStatus("idle");
         setVerificationReadiness(null);
         setBuyerRoomPacketStatus("idle");
         setStatus("mfa-required");
@@ -244,8 +263,11 @@ export default function ProtectedPilotAccess({
       setSelectedWorkspace(nextWorkspaces[0] ?? null);
       setDemoReadinessSnapshots([]);
       setManualQaEvidencePackets([]);
+      setCommandIntelligenceSnapshots([]);
       setDemoPacketBusyId(null);
       setDemoSnapshotStatus("idle");
+      setCommandPacketBusyId(null);
+      setCommandSnapshotStatus("idle");
       setBuyerRoomPacketStatus("idle");
       setVerificationReadiness(null);
       setStatus("ready");
@@ -255,7 +277,8 @@ export default function ProtectedPilotAccess({
           loadSessions(activeSession, nextWorkspaces[0]),
           loadAuditEvents(activeSession, nextWorkspaces[0]),
           loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0]),
-          loadManualQaEvidencePackets(activeSession, nextWorkspaces[0])
+          loadManualQaEvidencePackets(activeSession, nextWorkspaces[0]),
+          loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -341,6 +364,26 @@ export default function ProtectedPilotAccess({
       }
 
       setManualQaEvidencePackets(body.packets ?? []);
+    }
+
+    async function loadCommandIntelligenceSnapshots(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/command-intelligence`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as CommandIntelligenceResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Command Intelligence snapshots could not be loaded.");
+        return;
+      }
+
+      setCommandIntelligenceSnapshots(body.snapshots ?? []);
     }
 
     initializeAccess();
@@ -512,8 +555,11 @@ export default function ProtectedPilotAccess({
     setSelectedWorkspace(workspace);
     setDemoReadinessSnapshots([]);
     setManualQaEvidencePackets([]);
+    setCommandIntelligenceSnapshots([]);
     setDemoPacketBusyId(null);
     setDemoSnapshotStatus("idle");
+    setCommandPacketBusyId(null);
+    setCommandSnapshotStatus("idle");
     setBuyerRoomPacketStatus("idle");
     setVerificationReadiness(null);
     setStatus("loading");
@@ -535,7 +581,8 @@ export default function ProtectedPilotAccess({
     await Promise.all([
       refreshAuditEvents(session, workspace),
       refreshDemoReadinessSnapshots(session, workspace),
-      refreshManualQaEvidencePackets(session, workspace)
+      refreshManualQaEvidencePackets(session, workspace),
+      refreshCommandIntelligenceSnapshots(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -586,6 +633,22 @@ export default function ProtectedPilotAccess({
     }
 
     setManualQaEvidencePackets(body.packets ?? []);
+  }
+
+  async function refreshCommandIntelligenceSnapshots(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/command-intelligence`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as CommandIntelligenceResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Command Intelligence snapshots could not be loaded.");
+      return;
+    }
+
+    setCommandIntelligenceSnapshots(body.snapshots ?? []);
   }
 
   async function createSyntheticSession() {
@@ -748,6 +811,75 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Demo readiness packet downloaded and its audit event was committed.");
+  }
+
+  async function createCommandIntelligenceSnapshot() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setCommandSnapshotStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/command-intelligence`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          operatorAttestation: commandIntelligenceSnapshotOperatorAttestation
+        })
+      }
+    );
+    const body = (await response.json()) as CommandIntelligenceResponse;
+
+    setCommandSnapshotStatus("idle");
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "The Command Intelligence snapshot could not be saved.");
+      return;
+    }
+
+    setCommandIntelligenceSnapshots(body.snapshots ?? (body.snapshot ? [body.snapshot] : []));
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Command Intelligence snapshot saved with append-only audit evidence.");
+  }
+
+  async function downloadCommandIntelligencePacket(snapshot: CommandIntelligenceSnapshotRecord) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setCommandPacketBusyId(snapshot.id);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/command-intelligence/${snapshot.id}/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    setCommandPacketBusyId(null);
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+      setMessage(body.error?.message ?? "The Command Intelligence packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-${snapshot.id}-command-intelligence-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Command Intelligence packet downloaded and its audit event was committed.");
   }
 
   async function downloadBuyerPilotRoomPacket() {
@@ -1036,8 +1168,13 @@ export default function ProtectedPilotAccess({
 
           <CommandIntelligenceHubPanel
             auditEvents={auditEvents}
+            commandPacketBusyId={commandPacketBusyId}
+            commandSnapshotBusy={commandSnapshotStatus === "saving"}
+            commandSnapshots={commandIntelligenceSnapshots}
             demoSnapshots={demoReadinessSnapshots}
             manualQaEvidencePackets={manualQaEvidencePackets}
+            onCreateCommandSnapshot={createCommandIntelligenceSnapshot}
+            onDownloadCommandSnapshotPacket={downloadCommandIntelligencePacket}
             onDownloadBuyerDiligenceExport={downloadBuyerPilotRoomPacket}
             packetBusy={buyerRoomPacketStatus === "downloading"}
             sessions={sessions}

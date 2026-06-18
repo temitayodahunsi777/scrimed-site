@@ -38,6 +38,18 @@ import type {
   QaManualRunEvidenceInput,
   QaManualRunEvidencePacketRecord
 } from "./qaEvidenceLedger";
+import type {
+  CommandIntelligenceHubSummary,
+  CommandIntelligenceMetric,
+  CommandIntelligenceSnapshotRecord,
+  CommandIntelligenceState,
+  CommandIntelligenceWorkstream,
+  CommandEvaluationGate,
+  CommandNextAction,
+  CommandSafeModeControl,
+  CommandToolAccessPlan,
+  CommandTrustEngineOutput
+} from "./commandIntelligenceHub";
 
 type AuthenticatedPilotContext =
   | {
@@ -123,6 +135,39 @@ type PilotDemoReadinessSnapshotRow = {
   evidence_counts: unknown;
   snapshot: unknown;
   last_evidence_at: string | null;
+  boundary: string;
+  created_by: string;
+  created_at: string;
+};
+
+type CommandIntelligenceSnapshotRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  command_state: CommandIntelligenceState;
+  command_score: number;
+  buyer_room_state: CommandIntelligenceState;
+  buyer_room_score: number;
+  agent_commander_status: CommandIntelligenceState;
+  workstream_count: number;
+  trust_output_count: number;
+  evaluation_gate_count: number;
+  tool_access_plan_count: number;
+  safe_mode_control_count: number;
+  next_action_count: number;
+  evidence_counts: unknown;
+  metrics: unknown;
+  workstreams: unknown;
+  trust_engine_outputs: unknown;
+  evaluation_pipeline: unknown;
+  tool_access_plans: unknown;
+  safe_mode_controls: unknown;
+  next_actions: unknown;
+  limitations: unknown;
+  observability: unknown;
+  snapshot: unknown;
+  last_evidence_at: string | null;
+  operator_attestation: CommandIntelligenceSnapshotRecord["operatorAttestation"];
   boundary: string;
   created_by: string;
   created_at: string;
@@ -611,6 +656,54 @@ function mapPilotDemoReadinessSnapshot(
   };
 }
 
+function mapCommandIntelligenceSnapshot(
+  row: CommandIntelligenceSnapshotRow
+): CommandIntelligenceSnapshotRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    commandState: row.command_state,
+    commandScore: row.command_score,
+    buyerRoomState: row.buyer_room_state,
+    buyerRoomScore: row.buyer_room_score,
+    agentCommanderStatus: row.agent_commander_status,
+    workstreamCount: row.workstream_count,
+    trustOutputCount: row.trust_output_count,
+    evaluationGateCount: row.evaluation_gate_count,
+    toolAccessPlanCount: row.tool_access_plan_count,
+    safeModeControlCount: row.safe_mode_control_count,
+    nextActionCount: row.next_action_count,
+    evidenceCounts: {
+      sessions: Number(asRecord(row.evidence_counts).sessions ?? 0),
+      auditEvents: Number(asRecord(row.evidence_counts).auditEvents ?? 0),
+      demoSnapshots: Number(asRecord(row.evidence_counts).demoSnapshots ?? 0),
+      manualQaEvidencePackets: Number(
+        asRecord(row.evidence_counts).manualQaEvidencePackets ?? 0
+      ),
+      packetExports: Number(asRecord(row.evidence_counts).packetExports ?? 0),
+      unavailableSections: Number(asRecord(row.evidence_counts).unavailableSections ?? 0)
+    },
+    metrics: asArray<CommandIntelligenceMetric>(row.metrics),
+    workstreams: asArray<CommandIntelligenceWorkstream>(row.workstreams),
+    trustEngineOutputs: asArray<CommandTrustEngineOutput>(row.trust_engine_outputs),
+    evaluationPipeline: asArray<CommandEvaluationGate>(row.evaluation_pipeline),
+    toolAccessPlans: asArray<CommandToolAccessPlan>(row.tool_access_plans),
+    safeModeControls: asArray<CommandSafeModeControl>(row.safe_mode_controls),
+    nextActions: asArray<CommandNextAction>(row.next_actions),
+    limitations: asArray<CommandIntelligenceSnapshotRecord["limitations"][number]>(
+      row.limitations
+    ),
+    observability: asRecord(row.observability) as CommandIntelligenceHubSummary["observability"],
+    snapshot: asRecord(row.snapshot) as unknown as CommandIntelligenceHubSummary,
+    lastEvidenceAt: row.last_evidence_at,
+    operatorAttestation: row.operator_attestation,
+    boundary: row.boundary,
+    createdBy: row.created_by,
+    createdAt: row.created_at
+  };
+}
+
 function mapTrustOSDecision(row: TrustOSDecisionRow): TrustOSDecisionLedgerRecord {
   return {
     id: row.id,
@@ -806,6 +899,8 @@ const qaManualRunEvidencePacketSelect =
   "id, tenant_id, workspace_id, workflow_run_id, workflow_run_url, executed_at, base_url, intake_id, created_session_id, packet_audit_event_id, qa_outcome, operator_attestation, token_disposal_attestation, data_boundary, packet_markdown, packet_sha256, created_by, created_at, boundary";
 const pilotDemoReadinessSnapshotSelect =
   "id, tenant_id, workspace_id, readiness_state, readiness_score, passed_count, review_count, blocked_count, required_actions, buyer_brief, check_results, runbook, verification, evidence_counts, snapshot, last_evidence_at, boundary, created_by, created_at";
+const commandIntelligenceSnapshotSelect =
+  "id, tenant_id, workspace_id, command_state, command_score, buyer_room_state, buyer_room_score, agent_commander_status, workstream_count, trust_output_count, evaluation_gate_count, tool_access_plan_count, safe_mode_control_count, next_action_count, evidence_counts, metrics, workstreams, trust_engine_outputs, evaluation_pipeline, tool_access_plans, safe_mode_controls, next_actions, limitations, observability, snapshot, last_evidence_at, operator_attestation, boundary, created_by, created_at";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -930,10 +1025,53 @@ export async function getPilotDemoReadinessSnapshot(
   };
 }
 
+export async function listCommandIntelligenceSnapshots(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("command_intelligence_snapshots")
+    .select(commandIntelligenceSnapshotSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return {
+    snapshots: ((data ?? []) as unknown as CommandIntelligenceSnapshotRow[]).map(
+      mapCommandIntelligenceSnapshot
+    ),
+    error
+  };
+}
+
+export async function getCommandIntelligenceSnapshot(
+  client: SupabaseClient,
+  workspaceId: string,
+  snapshotId: string
+) {
+  const { data, error } = await client
+    .from("command_intelligence_snapshots")
+    .select(commandIntelligenceSnapshotSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", snapshotId)
+    .maybeSingle();
+
+  return {
+    snapshot: data
+      ? mapCommandIntelligenceSnapshot(data as unknown as CommandIntelligenceSnapshotRow)
+      : null,
+    error
+  };
+}
+
 function persistedEvidenceTimestamp(value: string) {
   const time = new Date(value).getTime();
 
   return Number.isFinite(time) ? new Date(time).toISOString() : null;
+}
+
+function persistedOptionalEvidenceTimestamp(value: string | null) {
+  return value ? persistedEvidenceTimestamp(value) : null;
 }
 
 export async function createPilotDemoReadinessSnapshot(
@@ -972,6 +1110,63 @@ export async function recordPilotDemoReadinessPacketDownload(
   snapshotId: string
 ) {
   const { data, error } = await client.rpc("record_pilot_demo_readiness_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_snapshot_id: snapshotId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function createCommandIntelligenceSnapshot(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  hub: CommandIntelligenceHubSummary,
+  operatorAttestation: CommandIntelligenceSnapshotRecord["operatorAttestation"],
+  lastEvidenceAt: string | null
+) {
+  const { data, error } = await client.rpc("create_command_intelligence_snapshot", {
+    p_workspace_slug: workspaceSlug,
+    p_command_state: hub.state,
+    p_command_score: hub.score,
+    p_buyer_room_state: hub.buyerRoomReadiness.state,
+    p_buyer_room_score: hub.buyerRoomReadiness.score,
+    p_agent_commander_status: hub.agentCommander.status,
+    p_workstream_count: hub.workstreams.length,
+    p_trust_output_count: hub.trustEngineOutputs.length,
+    p_evaluation_gate_count: hub.evaluationPipeline.length,
+    p_tool_access_plan_count: hub.toolAccessPlans.length,
+    p_safe_mode_control_count: hub.safeModeControls.length,
+    p_next_action_count: hub.nextActions.length,
+    p_evidence_counts: hub.evidenceCounts,
+    p_metrics: hub.metrics,
+    p_workstreams: hub.workstreams,
+    p_trust_engine_outputs: hub.trustEngineOutputs,
+    p_evaluation_pipeline: hub.evaluationPipeline,
+    p_tool_access_plans: hub.toolAccessPlans,
+    p_safe_mode_controls: hub.safeModeControls,
+    p_next_actions: hub.nextActions,
+    p_limitations: hub.limitations,
+    p_observability: hub.observability,
+    p_snapshot: hub,
+    p_last_evidence_at: persistedOptionalEvidenceTimestamp(lastEvidenceAt),
+    p_operator_attestation: operatorAttestation
+  });
+
+  return {
+    snapshotId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordCommandIntelligencePacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  snapshotId: string
+) {
+  const { data, error } = await client.rpc("record_command_intelligence_packet_download", {
     p_workspace_slug: workspaceSlug,
     p_snapshot_id: snapshotId
   });

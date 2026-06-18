@@ -128,6 +128,20 @@ async function checkProductConsole() {
     throw new Error("product console missing Command Intelligence Hub proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.commandIntelligenceSnapshots !==
+    "aal2-audited-command-intelligence-snapshots"
+  ) {
+    throw new Error("product console missing Command Intelligence snapshot proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.commandIntelligencePackets !==
+    "aal2-audited-command-intelligence-packets"
+  ) {
+    throw new Error("product console missing Command Intelligence packet proof-stack posture.");
+  }
+
   if (body.proofStack?.salesDealRoom !== "sales-to-buyer-room-linkage-ready") {
     throw new Error("product console missing Pilot Deal Room proof-stack posture.");
   }
@@ -507,6 +521,10 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/command-intelligence`,
   "Command Intelligence Hub protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/command-intelligence/00000000-0000-0000-0000-000000000000/packet`,
+  "Command Intelligence packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { deriveCommandIntelligenceHub, type CommandIntelligenceState } from "../lib/commandIntelligenceHub";
+import {
+  commandIntelligenceSnapshotOperatorAttestation,
+  deriveCommandIntelligenceHub,
+  type CommandIntelligenceSnapshotRecord,
+  type CommandIntelligenceState
+} from "../lib/commandIntelligenceHub";
 import type { PilotDemoReadinessSnapshotRecord } from "../lib/pilotDemoReadiness";
 import type {
   PilotAuditEventRecord,
@@ -25,16 +30,26 @@ function stateClass(state: CommandIntelligenceState) {
 
 export default function CommandIntelligenceHubPanel({
   auditEvents,
+  commandPacketBusyId,
+  commandSnapshotBusy,
+  commandSnapshots,
   demoSnapshots,
   manualQaEvidencePackets,
+  onCreateCommandSnapshot,
+  onDownloadCommandSnapshotPacket,
   onDownloadBuyerDiligenceExport,
   packetBusy,
   sessions,
   workspace
 }: {
   auditEvents: PilotAuditEventRecord[];
+  commandPacketBusyId: string | null;
+  commandSnapshotBusy: boolean;
+  commandSnapshots: CommandIntelligenceSnapshotRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
   manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
+  onCreateCommandSnapshot: () => Promise<void>;
+  onDownloadCommandSnapshotPacket: (snapshot: CommandIntelligenceSnapshotRecord) => Promise<void>;
   onDownloadBuyerDiligenceExport: () => Promise<void>;
   packetBusy: boolean;
   sessions: PilotSessionRecord[];
@@ -52,6 +67,7 @@ export default function CommandIntelligenceHubPanel({
       }),
     [auditEvents, demoSnapshots, manualQaEvidencePackets, sessions, workspace]
   );
+  const latestCommandSnapshot = commandSnapshots[0] ?? null;
 
   return (
     <section className="table-section" aria-label="SCRIMED Command Intelligence Hub">
@@ -59,9 +75,30 @@ export default function CommandIntelligenceHubPanel({
         <p className="eyebrow">SCRIMED Command Intelligence Hub</p>
         <h2>Unify agents, trust evidence, buyer diligence, evaluation, tool readiness, and safe-mode controls.</h2>
         <p className="section-copy">{hub.mission}</p>
+        <p className="section-copy">
+          Snapshot attestation: {commandIntelligenceSnapshotOperatorAttestation}.
+        </p>
         <div className="form-actions">
           <button
             className="primary-action"
+            disabled={commandSnapshotBusy}
+            onClick={() => void onCreateCommandSnapshot()}
+            type="button"
+          >
+            {commandSnapshotBusy ? "Saving Command Snapshot" : "Save Command Snapshot"}
+          </button>
+          <button
+            className="secondary-action"
+            disabled={!latestCommandSnapshot || commandPacketBusyId === latestCommandSnapshot?.id}
+            onClick={() => latestCommandSnapshot ? void onDownloadCommandSnapshotPacket(latestCommandSnapshot) : undefined}
+            type="button"
+          >
+            {latestCommandSnapshot && commandPacketBusyId === latestCommandSnapshot.id
+              ? "Preparing Command Packet"
+              : "Download Latest Command Packet"}
+          </button>
+          <button
+            className="secondary-action"
             disabled={packetBusy}
             onClick={() => void onDownloadBuyerDiligenceExport()}
             type="button"
@@ -112,6 +149,10 @@ export default function CommandIntelligenceHubPanel({
           <strong>{hub.evidenceCounts.packetExports}</strong>
         </article>
         <article>
+          <span>Command snapshots</span>
+          <strong>{commandSnapshots.length}</strong>
+        </article>
+        <article>
           <span>Safe mode</span>
           <strong>Enforced</strong>
         </article>
@@ -142,6 +183,60 @@ export default function CommandIntelligenceHubPanel({
           {hub.agentCommander.observabilitySignals} observability signals are represented.
         </p>
       </article>
+
+      <div className="demo-runbook" aria-label="Durable Command Intelligence snapshots">
+        <div className="section-heading">
+          <p className="eyebrow">Durable command snapshots</p>
+          <h2>Retain AAL2 human-reviewed command posture before releasing buyer or investor evidence.</h2>
+          <p className="section-copy">
+            Snapshots are tenant-scoped, synthetic-only, and packet exports commit audit evidence before download.
+          </p>
+        </div>
+        {commandSnapshots.length > 0 ? (
+          commandSnapshots.slice(0, 5).map((snapshot) => (
+            <article className="module-row" key={snapshot.id}>
+              <div>
+                <span>{snapshot.createdAt}</span>
+                <h2>
+                  Command {snapshot.commandScore}% / Buyer Room {snapshot.buyerRoomScore}%
+                </h2>
+              </div>
+              <strong className={stateClass(snapshot.commandState)}>
+                {stateLabel(snapshot.commandState)}
+              </strong>
+              <p>
+                Evidence: {snapshot.evidenceCounts.sessions} sessions,{" "}
+                {snapshot.evidenceCounts.auditEvents} audit events,{" "}
+                {snapshot.evidenceCounts.demoSnapshots} demo snapshots,{" "}
+                {snapshot.evidenceCounts.manualQaEvidencePackets} manual QA packets,{" "}
+                {snapshot.evidenceCounts.packetExports} exports.
+              </p>
+              <button
+                className="module-link button-link"
+                disabled={commandPacketBusyId === snapshot.id}
+                onClick={() => void onDownloadCommandSnapshotPacket(snapshot)}
+                type="button"
+              >
+                {commandPacketBusyId === snapshot.id
+                  ? "Preparing Packet"
+                  : "Download Audited Command Packet"}
+              </button>
+            </article>
+          ))
+        ) : (
+          <article className="module-row">
+            <div>
+              <span>snapshot gap</span>
+              <h2>No retained Command Intelligence snapshots yet.</h2>
+            </div>
+            <p>
+              Save the first snapshot after reviewing the current command posture, evidence counts, Trust Engine outputs,
+              evaluation gates, tool plans, and safe-mode controls.
+            </p>
+            <strong>Live clinical execution remains denied.</strong>
+          </article>
+        )}
+      </div>
 
       <div className="demo-runbook" aria-label="Command workstreams">
         <div className="section-heading">
