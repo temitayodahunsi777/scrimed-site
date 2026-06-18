@@ -142,6 +142,10 @@ async function checkProductConsole() {
     throw new Error("product console missing Command Intelligence packet proof-stack posture.");
   }
 
+  if (body.proofStack?.salesCommandCenter !== "aal2-sales-command-intelligence-timeline") {
+    throw new Error("product console missing Sales Command Center proof-stack posture.");
+  }
+
   if (body.proofStack?.salesDealRoom !== "sales-to-buyer-room-linkage-ready") {
     throw new Error("product console missing Pilot Deal Room proof-stack posture.");
   }
@@ -441,6 +445,10 @@ await checkQaEvidenceLedger();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"
+);
+await checkSalesProtectedFailClosed(
+  "/api/sales-operations/opportunities/smoke-test/command-center",
+  "Sales Command Center protected API"
 );
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/workspace-provisioning",

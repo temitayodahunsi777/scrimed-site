@@ -3,7 +3,7 @@
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import type { AttributionAnalyticsReport } from "../lib/attributionAnalytics";
 import {
@@ -42,6 +42,7 @@ import type {
   SalesBuyerDemoSessionResult
 } from "../lib/buyerDemoSessions";
 import type { SalesDemoSessionQaRun } from "../lib/salesDemoSessionQa";
+import type { SalesCommandCenterSummary } from "../lib/salesCommandCenter";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -118,6 +119,11 @@ type BuyerDemoSessionsResponse = {
 type BuyerDemoSessionQaResponse = {
   status?: string;
   qaRun?: SalesDemoSessionQaRun;
+  error?: { message?: string };
+};
+
+type SalesCommandCenterResponse = {
+  commandCenter?: SalesCommandCenterSummary;
   error?: { message?: string };
 };
 
@@ -221,6 +227,9 @@ export default function SalesOperationsConsole({
   const [buyerDemoQaRunsByIntake, setBuyerDemoQaRunsByIntake] = useState<
     Record<string, SalesDemoSessionQaRun>
   >({});
+  const [salesCommandCentersByIntake, setSalesCommandCentersByIntake] = useState<
+    Record<string, SalesCommandCenterSummary>
+  >({});
   const [demoOperatorNotes, setDemoOperatorNotes] = useState("");
   const [demoBuyerQuestions, setDemoBuyerQuestions] = useState("");
   const [demoNextActions, setDemoNextActions] = useState("");
@@ -231,6 +240,37 @@ export default function SalesOperationsConsole({
   const [assessmentStart, setAssessmentStart] = useState(defaultAssessmentStart);
   const [assessmentDuration, setAssessmentDuration] = useState(45);
   const [assessmentMeetingUrl, setAssessmentMeetingUrl] = useState("");
+
+  const loadSelectedSalesCommandCenter = useCallback(
+    async (
+      opportunity: SalesOpportunity | null = selected,
+      activeSession: Session | null = session
+    ) => {
+      if (!activeSession || !opportunity) {
+        return;
+      }
+
+      const response = await fetch(
+        `/api/sales-operations/opportunities/${opportunity.intakeId}/command-center`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as SalesCommandCenterResponse;
+
+      if (!response.ok || !body.commandCenter) {
+        return;
+      }
+
+      setSalesCommandCentersByIntake((current) => ({
+        ...current,
+        [opportunity.intakeId]: body.commandCenter as SalesCommandCenterSummary
+      }));
+    },
+    [selected, session]
+  );
 
   useEffect(() => {
     const client = supabase;
@@ -304,6 +344,7 @@ export default function SalesOperationsConsole({
         setDraft(null);
         setBuyerDemoSessionsByIntake({});
         setBuyerDemoQaRunsByIntake({});
+        setSalesCommandCentersByIntake({});
         setDemoOperatorNotes("");
         setDemoBuyerQuestions("");
         setDemoNextActions("");
@@ -402,7 +443,29 @@ export default function SalesOperationsConsole({
       }));
     }
 
+    async function loadSelectedCommandCenter() {
+      const response = await fetch(
+        `/api/sales-operations/opportunities/${activeOpportunity.intakeId}/command-center`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as SalesCommandCenterResponse;
+
+      if (!active || !response.ok || !body.commandCenter) {
+        return;
+      }
+
+      setSalesCommandCentersByIntake((current) => ({
+        ...current,
+        [activeOpportunity.intakeId]: body.commandCenter as SalesCommandCenterSummary
+      }));
+    }
+
     void loadSelectedBuyerDemoSessions();
+    void loadSelectedCommandCenter();
 
     return () => {
       active = false;
@@ -1371,6 +1434,9 @@ export default function SalesOperationsConsole({
     : [];
   const latestBuyerDemoSession = selectedBuyerDemoSessions[0] ?? null;
   const latestBuyerDemoQaRun = selected ? buyerDemoQaRunsByIntake[selected.intakeId] ?? null : null;
+  const selectedSalesCommandCenter = selected
+    ? salesCommandCentersByIntake[selected.intakeId] ?? null
+    : null;
   const buyerDemoSteps = selected
     ? [
         {
@@ -1857,6 +1923,93 @@ export default function SalesOperationsConsole({
                       </div>
                     ))}
                   </div>
+                </div>
+              ) : null}
+
+              <section className="section-band split-band" aria-label="Sales Command Center">
+                <div>
+                  <p className="eyebrow">Sales Command Center</p>
+                  <h3>Connect buyer opportunity, command posture, and diligence proof into one timeline.</h3>
+                  <p className="section-copy">
+                    {selectedSalesCommandCenter
+                      ? selectedSalesCommandCenter.boundary
+                      : "Command timeline loads from the tenant-scoped opportunity and protected workspace. If no buyer workspace exists yet, the route returns a safe workspace-required posture."}
+                  </p>
+                  <div className="form-actions">
+                    <button
+                      className="secondary-action"
+                      onClick={() => loadSelectedSalesCommandCenter()}
+                      type="button"
+                    >
+                      Refresh Command Timeline
+                    </button>
+                    <Link
+                      className="secondary-action"
+                      href={`/pilot-workspace/access?workspace=${encodeURIComponent(
+                        buyerDemoWorkspaceSlug
+                      )}&opportunity=${encodeURIComponent(selected.intakeId)}`}
+                    >
+                      Open Command Hub
+                    </Link>
+                  </div>
+                </div>
+                <div className="layer-list">
+                  {selectedSalesCommandCenter ? (
+                    [
+                      `Commercial readiness: ${selectedSalesCommandCenter.commercialReadiness.score}%`,
+                      `Command snapshots: ${selectedSalesCommandCenter.commandPosture.snapshotCount}`,
+                      `Latest command score: ${
+                        selectedSalesCommandCenter.commandPosture.latestScore === null
+                          ? "not available"
+                          : `${selectedSalesCommandCenter.commandPosture.latestScore}%`
+                      }`,
+                      `Trend: ${selectedSalesCommandCenter.commandPosture.trend}`,
+                      `Command packets: ${selectedSalesCommandCenter.commandPosture.packetExports}`,
+                      `Next action: ${selectedSalesCommandCenter.commercialReadiness.nextAction}`
+                    ].map((item, index) => (
+                      <div className="layer-row" key={item}>
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        <strong>{item}</strong>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="layer-row">
+                      <span>01</span>
+                      <strong>Loading command posture, buyer-room maturity, and commercial next action.</strong>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {selectedSalesCommandCenter ? (
+                <div className="demo-runbook" aria-label="Opportunity command posture timeline">
+                  <div className="section-heading">
+                    <p className="eyebrow">Posture timeline</p>
+                    <h3>Show what improved, when it was recorded, and what buyer action comes next.</h3>
+                  </div>
+                  {selectedSalesCommandCenter.timeline.slice(0, 7).map((item, index) => (
+                    <article className="module-row" key={item.id}>
+                      <div>
+                        <span>{String(index + 1).padStart(2, "0")} · {displayValue(item.kind)}</span>
+                        <h2>{item.label}</h2>
+                      </div>
+                      <strong>{displayValue(item.state)}</strong>
+                      <p>
+                        {formatDate(item.occurredAt)} · {item.evidence} {item.buyerImpact}
+                      </p>
+                      <p>{item.nextAction}</p>
+                    </article>
+                  ))}
+                  {selectedSalesCommandCenter.degradedSections.length > 0 ? (
+                    <article className="module-row">
+                      <div>
+                        <span>Boundary</span>
+                        <h2>Degraded sections disclosed</h2>
+                      </div>
+                      <p>{selectedSalesCommandCenter.degradedSections.join(" ")}</p>
+                      <strong>No hidden readiness assumptions.</strong>
+                    </article>
+                  ) : null}
                 </div>
               ) : null}
 

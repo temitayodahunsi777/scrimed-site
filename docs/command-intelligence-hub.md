@@ -28,6 +28,8 @@ The hub is a protected synthetic-pilot command posture. It does not accept PHI, 
 - `/api/pilot-workspaces/{workspaceSlug}/command-intelligence` requires AAL2 governance context, workspace membership, no-store response headers, synthetic-only data boundary headers, and read rate limiting. `POST` requires the fixed `aal2-human-reviewed-synthetic-command-posture` attestation and persists through a guarded database RPC.
 - `/api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet` commits `command-intelligence-packet-downloaded` before releasing Markdown evidence.
 - `/pilot-workspace/access` renders the hub after Pilot Demo Readiness and before Buyer Pilot Room export so operators review and save command posture before sending buyer diligence.
+- Sales Operations now consumes retained snapshots through `GET /api/sales-operations/opportunities/{intakeId}/command-center` when an opportunity has a buyer-specific protected workspace, creating a buyer/investor-visible command posture timeline without duplicating PHI-sensitive storage.
+- Buyer Pilot Room exports now include Command Intelligence snapshot count, latest score, score delta, trend, packet exports, and next action.
 - `/api/product/console` exposes `proofStack.commandIntelligenceHub = aal2-command-intelligence-hub`, `proofStack.commandIntelligenceSnapshots = aal2-audited-command-intelligence-snapshots`, and `proofStack.commandIntelligencePackets = aal2-audited-command-intelligence-packets`.
 - `scripts/public-production-smoke.mjs` verifies the product proof-stack statuses and protected fail-closed behavior for both the hub and packet route.
 
@@ -71,4 +73,4 @@ These patterns are implemented as SCRIMED-safe scaffolding only. The current hub
 
 ## Next Build Step
 
-Tie retained Command Intelligence snapshots to Sales Operations opportunities when a buyer-specific workspace exists, then surface snapshot deltas so operators can show command-posture improvement over time without storing PHI or secrets.
+Add opportunity-level buyer follow-up packets that include Sales Command Center deltas, latest Command Intelligence packet status, Buyer Diligence Export status, pricing posture, unresolved gates, and the next paid-pilot recommendation.

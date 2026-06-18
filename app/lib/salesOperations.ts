@@ -60,6 +60,11 @@ import {
   salesDemoSessionQaProofStackStatus,
   salesDemoSessionQaTokenPolicy
 } from "./salesDemoSessionQa";
+import {
+  salesCommandCenterApiRoute,
+  salesCommandCenterBoundary,
+  salesCommandCenterProofStackStatus
+} from "./salesCommandCenter";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -531,6 +536,16 @@ export function getSalesOperationsSummary() {
       purpose:
         "Verify the buyer demo session write path and packet-audit path through the same protected tenant-admin controls used by real operator demos.",
       boundary: salesDemoSessionQaBoundary,
+      noPhiBoundary: true
+    },
+    salesCommandCenter: {
+      status: salesCommandCenterProofStackStatus,
+      apiRoute: salesCommandCenterApiRoute,
+      sourceOfTruth:
+        "Sales Operations opportunity records linked to protected workspace Command Intelligence snapshots and packet audit events",
+      purpose:
+        "Shows command-posture deltas, buyer-room maturity, commercial readiness, and next actions for each opportunity.",
+      boundary: salesCommandCenterBoundary,
       noPhiBoundary: true
     },
     boundary: salesOperationsBoundary,

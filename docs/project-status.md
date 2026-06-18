@@ -2,6 +2,15 @@
 
 Updated: 2026-06-18
 
+## Latest Sales Command Center Release
+
+- Added a protected Sales Command Center route at `GET /api/sales-operations/opportunities/{intakeId}/command-center`.
+- The route ties Sales Operations opportunities to buyer-specific protected workspaces, retained Command Intelligence snapshots, command packet exports, Buyer Diligence Export posture, sales audit events, protected workspace audit events, commercial readiness, and next buyer actions.
+- Added a Sales Operations console section showing commercial readiness score, command snapshot count, latest command score, score trend, packet export count, degraded sections, and posture timeline.
+- Extended Buyer Pilot Room JSON and Markdown exports with Command Intelligence snapshot counts, latest score, score delta, trend, packet exports, and next action.
+- Updated Product Console proof stack and public smoke coverage with `aal2-sales-command-intelligence-timeline`.
+- Preserved the boundary: this is business-contact, workflow-scope, and synthetic command-posture intelligence only. It does not store PHI, payer member data, medical records, imaging, production credentials, source contracts, legal/security/compliance certification, reimbursement determinations, production connector approval, patient outreach authorization, autonomous clinical authority, or live healthcare execution approval.
+
 ## Latest Durable Command Intelligence Snapshot Release
 
 - Added tenant-scoped durable Command Intelligence snapshots so protected workspace operators can retain AAL2 human-reviewed command posture across sessions.

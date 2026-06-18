@@ -46,6 +46,7 @@ Operational boundaries:
 - `/pilot-deal-room`
 - `GET /api/pilot-deal-room`
 - `GET /api/sales-operations/opportunities/{intakeId}/deal-room-packet`
+- `GET /api/sales-operations/opportunities/{intakeId}/command-center`
 - `GET /api/sales-operations/opportunities/{intakeId}/demo-execution`
 - `GET /api/sales-operations/opportunities/{intakeId}/demo-execution/brief`
 - `GET /api/sales-operations/opportunities/{intakeId}/demo-sessions`
@@ -131,6 +132,20 @@ Operators can now persist AAL2 human-reviewed command posture snapshots with `PO
 Command Intelligence packet export at `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet` requires an existing snapshot and commits `command-intelligence-packet-downloaded` before releasing Markdown evidence. This gives enterprise buyers and investors a retained command-history packet without screenshots, PHI, secrets, or unsupported production claims.
 
 Current boundary: the hub is a command posture for governed synthetic pilots and enterprise evaluation only. Production use still requires signed customer scope, BAA/DPA path where applicable, legal/privacy/security/clinical review, approved connectors, live monitoring, and human operating controls.
+
+## Sales Command Center Linkage
+
+Sales Operations now exposes `GET /api/sales-operations/opportunities/{intakeId}/command-center` for tenant-admin AAL2 users. The route links the selected Sales Operations opportunity to its buyer-specific protected workspace when one exists, then derives:
+
+- Commercial readiness score and next buyer action.
+- Retained Command Intelligence snapshot count.
+- Latest command state, score, timestamp, and score delta.
+- Command Intelligence packet export count.
+- Buyer-room packet and diligence posture from protected workspace audit events.
+- A chronological timeline of opportunity, workspace, command, buyer, governance, and commercial evidence.
+- Degraded-section disclosure when the workspace or command evidence is not yet available.
+
+The route is read-only and uses existing opportunity records, protected workspace audit events, and Command Intelligence snapshot records. It does not create storage, accept uploads, expose secrets, or authorize production workflow execution. When a buyer workspace is not provisioned yet, it returns a safe workspace-required posture instead of pretending command evidence exists.
 
 ## Pilot Deal Room Linkage
 

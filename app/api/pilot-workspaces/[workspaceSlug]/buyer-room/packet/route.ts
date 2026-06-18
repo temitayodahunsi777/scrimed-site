@@ -3,6 +3,7 @@ import { buildBuyerPilotRoomPacket, deriveBuyerPilotRoom } from "../../../../../
 import {
   getAccessiblePilotWorkspace,
   getAuthenticatedGovernanceContext,
+  listCommandIntelligenceSnapshots,
   listQaManualRunEvidencePackets,
   listPilotAuditEvents,
   listPilotDemoReadinessSnapshots,
@@ -91,17 +92,25 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   const workspace = workspaceResult.workspace;
-  const [sessionsResult, auditResult, snapshotsResult, manualQaEvidenceResult] = await Promise.all([
+  const [
+    sessionsResult,
+    auditResult,
+    snapshotsResult,
+    manualQaEvidenceResult,
+    commandSnapshotsResult
+  ] = await Promise.all([
     listPilotSessions(context.client, workspace.id),
     listPilotAuditEvents(context.client, workspace.id),
     listPilotDemoReadinessSnapshots(context.client, workspace.id),
-    listQaManualRunEvidencePackets(context.client, workspace.id)
+    listQaManualRunEvidencePackets(context.client, workspace.id),
+    listCommandIntelligenceSnapshots(context.client, workspace.id)
   ]);
   const unavailableSections = [
     sessionsResult.error ? "Durable synthetic sessions could not be retrieved." : "",
     auditResult.error ? "Append-only pilot audit events could not be retrieved." : "",
     snapshotsResult.error ? "Demo readiness snapshots could not be retrieved." : "",
-    manualQaEvidenceResult.error ? "Manual QA evidence packets could not be retrieved." : ""
+    manualQaEvidenceResult.error ? "Manual QA evidence packets could not be retrieved." : "",
+    commandSnapshotsResult.error ? "Command Intelligence snapshots could not be retrieved." : ""
   ].filter(Boolean);
   const sessions = sessionsResult.error ? [] : sessionsResult.sessions;
   const auditEvents = auditResult.error ? [] : auditResult.events;
@@ -109,11 +118,13 @@ export async function GET(request: Request, { params }: RouteContext) {
   const manualQaEvidencePackets = manualQaEvidenceResult.error
     ? []
     : manualQaEvidenceResult.packets;
+  const commandSnapshots = commandSnapshotsResult.error ? [] : commandSnapshotsResult.snapshots;
   const room = deriveBuyerPilotRoom({
     workspace,
     sessions,
     auditEvents,
     demoSnapshots,
+    commandSnapshots,
     manualQaEvidencePackets,
     unavailableSections
   });

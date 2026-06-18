@@ -1183,6 +1183,7 @@ export default function ProtectedPilotAccess({
 
           <BuyerPilotRoomPanel
             auditEvents={auditEvents}
+            commandSnapshots={commandIntelligenceSnapshots}
             demoSnapshots={demoReadinessSnapshots}
             manualQaEvidencePackets={manualQaEvidencePackets}
             onDownloadPacket={downloadBuyerPilotRoomPacket}

@@ -8,6 +8,7 @@ import type {
 } from "../lib/protectedPilotWorkspace";
 import type { PilotDemoReadinessSnapshotRecord } from "../lib/pilotDemoReadiness";
 import type { QaManualRunEvidencePacketRecord } from "../lib/qaEvidenceLedger";
+import type { CommandIntelligenceSnapshotRecord } from "../lib/commandIntelligenceHub";
 import { deriveBuyerPilotRoom, type BuyerPilotRoomState } from "../lib/buyerPilotRoom";
 
 function stateLabel(state: BuyerPilotRoomState) {
@@ -24,6 +25,7 @@ function stateClass(state: BuyerPilotRoomState) {
 
 export default function BuyerPilotRoomPanel({
   auditEvents,
+  commandSnapshots,
   demoSnapshots,
   manualQaEvidencePackets,
   onDownloadPacket,
@@ -32,6 +34,7 @@ export default function BuyerPilotRoomPanel({
   workspace
 }: {
   auditEvents: PilotAuditEventRecord[];
+  commandSnapshots: CommandIntelligenceSnapshotRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
   manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
   onDownloadPacket: () => Promise<void>;
@@ -43,6 +46,7 @@ export default function BuyerPilotRoomPanel({
     workspace,
     sessions,
     auditEvents,
+    commandSnapshots,
     demoSnapshots,
     manualQaEvidencePackets,
     unavailableSections: []
@@ -101,6 +105,10 @@ export default function BuyerPilotRoomPanel({
           <strong>{room.evidenceCounts.demoSnapshots}</strong>
         </article>
         <article>
+          <span>Command</span>
+          <strong>{room.evidenceCounts.commandSnapshots}</strong>
+        </article>
+        <article>
           <span>Manual QA</span>
           <strong>{room.evidenceCounts.manualQaEvidencePackets}</strong>
         </article>
@@ -108,6 +116,35 @@ export default function BuyerPilotRoomPanel({
           <span>Controls</span>
           <strong>{room.diligenceControls.length}</strong>
         </article>
+      </div>
+
+      <div className="demo-runbook" aria-label="Command Intelligence buyer timeline">
+        <div className="section-heading">
+          <p className="eyebrow">Command Intelligence timeline</p>
+          <h2>Show command-posture maturity before buyer follow-up.</h2>
+        </div>
+        {[
+          `Snapshots: ${room.commandIntelligence.snapshotCount}`,
+          `Latest score: ${
+            room.commandIntelligence.latestScore === null
+              ? "not available"
+              : `${room.commandIntelligence.latestScore}%`
+          }`,
+          `Trend: ${room.commandIntelligence.trend}`,
+          `Packet exports: ${room.commandIntelligence.packetExports}`,
+          `Next action: ${room.commandIntelligence.nextAction}`
+        ].map((item, index) => (
+          <article className="module-row" key={item}>
+            <div>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h2>{item}</h2>
+            </div>
+            <p>
+              Command Intelligence remains synthetic-only, human-reviewed, and non-clinical. It supports buyer
+              diligence but does not approve live workflow execution.
+            </p>
+          </article>
+        ))}
       </div>
 
       <div className="demo-runbook" aria-label="Buyer diligence export contents">

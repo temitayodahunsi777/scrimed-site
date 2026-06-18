@@ -13,6 +13,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Healthcare Intelligence OS foundation: `/healthcare-intelligence-os`, `/api/healthcare-intelligence-os`, and `/api/healthcare-intelligence-os/brief`
 - Persistent Agent Workspace v1: `/agent-workspace`, `/api/agent-workspace`, `/api/agent-workspace/brief`, `/api/agent-workspace/proof-packet`, `/api/agent-workspaces/[workspaceSlug]/work-orders`, `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]`, and `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet`
 - Protected Command Intelligence Hub: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/command-intelligence`, and `/api/pilot-workspaces/[workspaceSlug]/command-intelligence/[snapshotId]/packet`
+- Sales Command Center: `/sales-operations` and `/api/sales-operations/opportunities/[intakeId]/command-center` for opportunity-linked command posture, buyer-room maturity, commercial readiness, and synthetic proof timeline
 - Enterprise pilot evidence dashboard: `/pilot-evidence`, `/api/pilot-evidence`, and `/api/pilot-evidence/brief`
 - Executable TrustOS governance surface: `/trust-os`, `/api/trust-os`, and `/api/trust-os/evaluate`
 - Trust and enterprise readiness control plane: `/trust-center`, `/trust-center/[slug]`, `/claims`, `/api/enterprise-readiness`, `/api/enterprise-readiness/[slug]`, `/api/enterprise-readiness/claims`, and `/api/enterprise-readiness/diligence-brief`
@@ -75,6 +76,7 @@ Current foundation:
 
 - Protected Pilot Workspaces provide tenant-authenticated synthetic sessions, durable session proof packets, aggregate tenant-admin enterprise proof packets, TrustOS governance packets, an authenticated Agent Workspace execution dashboard, and append-only audit events.
 - The protected Command Intelligence Hub composes AgentOS, protected workspace evidence, Buyer Pilot Room readiness, Trust Engine outputs, continuous evaluation gates, MCP/tool-access plans, observability, safe-mode controls, limitations, workarounds, next actions, durable AAL2-reviewed snapshots, and audited command packets into one operator posture.
+- The Sales Command Center links retained Command Intelligence snapshots back to Sales Operations opportunities when a buyer-specific protected workspace exists, exposing posture deltas, packet exports, buyer-room maturity, commercial readiness, degraded-section disclosure, and next buyer actions without storing PHI or secrets.
 - Persistent Agent Workspace v1 composes protected pilot sessions into resumable synthetic work-order templates for RCM denial appeals, trial matching, pre-visit review, post-visit drafting, investor outreach, security scans, and interoperability data transformation.
 - Persistent Agent Workspace v1 exposes model-router policy decisions, memory scopes, sandbox/tool scopes, reviewer checkpoints, audit timelines, blocked actions, dedicated RLS-backed work-order/event tables, authenticated dashboard filters, governed create and transition controls, outcome metric capture, reviewer and retry queue visibility, RPC-only protected mutations, local governance export, and audited downloadable proof packets while keeping live PHI and clinical execution blocked.
 - TrustOS model-route profiles define the policy frame for vendor-neutral model routing across cost, latency, safety, context, availability, fallback, PHI sensitivity, and regional constraints.
@@ -206,6 +208,7 @@ Active gates:
 - Agent Workspace work-order migration verification before protected create, transition, retry, review, close, and audited proof-packet routes are enabled for a tenant pilot
 - Agent workflow registry for specialized agent boundaries before execution
 - Command Intelligence Hub for protected operator visibility across agents, buyer diligence, Trust Engine, continuous evaluation, MCP/tool readiness, observability, and safe-mode controls before external proof release
+- Sales Command Center for tying opportunity records to protected workspace command snapshots, buyer diligence packet posture, commercial readiness, and next actions before enterprise follow-up
 - Hub readiness checks for operational visibility
 
 Deferred production gates:

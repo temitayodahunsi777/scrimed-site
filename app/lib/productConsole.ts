@@ -45,6 +45,10 @@ import {
   salesDealRoomProofStackStatus
 } from "./salesDealRoom";
 import {
+  salesCommandCenterApiRoute,
+  salesCommandCenterProofStackStatus
+} from "./salesCommandCenter";
+import {
   opportunityWorkspaceProvisioningPacketProofStackStatus,
   opportunityWorkspaceProvisioningProofStackStatus
 } from "./opportunityWorkspaceProvisioning";
@@ -694,6 +698,7 @@ export function getProductConsoleSummary() {
     commandIntelligenceHubApiRoute: "/api/pilot-workspaces/{workspaceSlug}/command-intelligence",
     commandIntelligenceSnapshotPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet",
+    salesCommandCenterApiRoute,
     salesDealRoomRoute: salesDealRoomSummary.route,
     salesDealRoomApiRoute: salesDealRoomSummary.apiRoute,
     salesDealRoomProtectedPacketRoute: salesDealRoomSummary.protectedPacketRoute,
@@ -767,6 +772,7 @@ export function getProductConsoleSummary() {
       commandIntelligenceHub: commandIntelligenceHubProofStackStatus,
       commandIntelligenceSnapshots: commandIntelligenceSnapshotProofStackStatus,
       commandIntelligencePackets: commandIntelligencePacketProofStackStatus,
+      salesCommandCenter: salesCommandCenterProofStackStatus,
       salesDealRoom: salesDealRoomProofStackStatus,
       salesDealRoomPackets: salesDealRoomPacketProofStackStatus,
       opportunityWorkspaceProvisioning: opportunityWorkspaceProvisioningProofStackStatus,

@@ -10,6 +10,7 @@ import type {
 } from "./protectedPilotWorkspace";
 import type { PilotDemoReadinessSnapshotRecord } from "./pilotDemoReadiness";
 import type { QaManualRunEvidencePacketRecord } from "./qaEvidenceLedger";
+import type { CommandIntelligenceSnapshotRecord } from "./commandIntelligenceHub";
 
 export type BuyerPilotRoomState = "ready" | "review" | "blocked";
 
@@ -71,6 +72,8 @@ export type BuyerPilotRoomSummary = {
     sessions: number;
     auditEvents: number;
     demoSnapshots: number;
+    commandSnapshots: number;
+    commandPacketExports: number;
     manualQaEvidencePackets: number;
     unavailableSections: number;
   };
@@ -98,6 +101,17 @@ export type BuyerPilotRoomSummary = {
     withheldItems: string[];
   };
   diligenceControls: BuyerPilotRoomDiligenceControl[];
+  commandIntelligence: {
+    snapshotCount: number;
+    latestSnapshotId: string | null;
+    latestState: BuyerPilotRoomState | null;
+    latestScore: number | null;
+    latestCreatedAt: string | null;
+    scoreDelta: number | null;
+    trend: "improving" | "stable" | "declining" | "insufficient-history";
+    packetExports: number;
+    nextAction: string;
+  };
   limitations: BuyerPilotRoomLimitation[];
   unavailableSections: string[];
   boundary: string;
@@ -171,6 +185,43 @@ function hasAuditEvent(events: PilotAuditEventRecord[], eventType: string) {
   return events.some((event) => event.eventType === eventType);
 }
 
+function commandSnapshotPosture(
+  commandSnapshots: CommandIntelligenceSnapshotRecord[],
+  auditEvents: PilotAuditEventRecord[]
+): BuyerPilotRoomSummary["commandIntelligence"] {
+  const latest = commandSnapshots[0] ?? null;
+  const previous = commandSnapshots[1] ?? null;
+  const scoreDelta =
+    latest && previous ? latest.commandScore - previous.commandScore : null;
+  const packetExports = auditEvents.filter(
+    (event) => event.eventType === "command-intelligence-packet-downloaded"
+  ).length;
+
+  return {
+    snapshotCount: commandSnapshots.length,
+    latestSnapshotId: latest?.id ?? null,
+    latestState: latest?.commandState ?? null,
+    latestScore: latest?.commandScore ?? null,
+    latestCreatedAt: latest?.createdAt ?? null,
+    scoreDelta,
+    trend:
+      scoreDelta === null
+        ? "insufficient-history"
+        : scoreDelta > 0
+          ? "improving"
+          : scoreDelta < 0
+            ? "declining"
+            : "stable",
+    packetExports,
+    nextAction:
+      commandSnapshots.length === 0
+        ? "Save a human-reviewed Command Intelligence snapshot before buyer diligence."
+        : packetExports === 0
+          ? "Download the latest Command Intelligence packet after operator review."
+          : "Use the latest command packet and buyer export together in diligence follow-up."
+  };
+}
+
 function rollupState(checks: BuyerPilotRoomCheck[]): BuyerPilotRoomState {
   if (checks.some((check) => check.state === "blocked")) return "blocked";
   if (checks.some((check) => check.state === "review")) return "review";
@@ -230,6 +281,7 @@ function buildCommercialPath(state: BuyerPilotRoomState): BuyerPilotRoomCommerci
 
 function buildDiligenceControls({
   auditEvents,
+  commandSnapshots,
   demoSnapshots,
   hasAgentWorkspace,
   hasManualQaEvidence,
@@ -241,6 +293,7 @@ function buildDiligenceControls({
   unavailableSections
 }: {
   auditEvents: PilotAuditEventRecord[];
+  commandSnapshots: CommandIntelligenceSnapshotRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
   hasAgentWorkspace: boolean;
   hasManualQaEvidence: boolean;
@@ -251,6 +304,8 @@ function buildDiligenceControls({
   state: BuyerPilotRoomState;
   unavailableSections: string[];
 }): BuyerPilotRoomDiligenceControl[] {
+  const commandPosture = commandSnapshotPosture(commandSnapshots, auditEvents);
+
   return [
     {
       domain: "Identity And Access",
@@ -296,6 +351,23 @@ function buildDiligenceControls({
       boundary: "Audit logs document synthetic pilot activity; they are not a SOC 2 report or compliance certification.",
       workaround: "Use write-before-release packet downloads and retain packet audit IDs in buyer follow-up.",
       productionGate: "Formal retention, legal hold, monitoring, incident response, and compliance-review operating controls."
+    },
+    {
+      domain: "Command Intelligence Posture",
+      status: commandPosture.snapshotCount > 0 ? "ready" : "review",
+      buyerQuestion: "Can SCRIMED show command-posture improvement over time, not only point-in-time demos?",
+      evidence:
+        commandPosture.snapshotCount > 0
+          ? `${commandPosture.snapshotCount} retained Command Intelligence snapshot${commandPosture.snapshotCount === 1 ? "" : "s"}; latest score ${commandPosture.latestScore}% with ${commandPosture.trend} trend.`
+          : "No retained Command Intelligence snapshot is visible yet.",
+      boundary:
+        "Command posture is synthetic-pilot operating evidence and does not certify clinical, security, compliance, or reimbursement outcomes.",
+      workaround:
+        commandPosture.snapshotCount > 0
+          ? "Pair the latest snapshot with the Buyer Diligence Export and explicit production gates."
+          : "Save a command snapshot from the protected workspace before formal buyer diligence.",
+      productionGate:
+        "Production operating metrics require signed scope, live connector approval, monitoring ownership, and customer validation."
     },
     {
       domain: "Trust And Safety Operations",
@@ -381,6 +453,7 @@ export function deriveBuyerPilotRoom({
   sessions,
   auditEvents,
   demoSnapshots,
+  commandSnapshots = [],
   manualQaEvidencePackets,
   unavailableSections
 }: {
@@ -388,6 +461,7 @@ export function deriveBuyerPilotRoom({
   sessions: PilotSessionRecord[];
   auditEvents: PilotAuditEventRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
+  commandSnapshots?: CommandIntelligenceSnapshotRecord[];
   manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
   unavailableSections: string[];
 }): BuyerPilotRoomSummary {
@@ -408,6 +482,7 @@ export function deriveBuyerPilotRoom({
     hasAuditEvent(auditEvents, "agent-work-order-created") ||
     hasAuditEvent(auditEvents, "agent-work-order-transitioned") ||
     hasAuditEvent(auditEvents, "agent-work-order-proof-packet-downloaded");
+  const commandPosture = commandSnapshotPosture(commandSnapshots, auditEvents);
 
   const checks: BuyerPilotRoomCheck[] = [
     {
@@ -491,6 +566,16 @@ export function deriveBuyerPilotRoom({
         : "Download the Buyer Diligence Export after this room is reviewed."
     },
     {
+      id: "command-intelligence-timeline",
+      label: "Command Intelligence posture timeline",
+      state: commandPosture.snapshotCount > 0 ? "ready" : "review",
+      evidence:
+        commandPosture.snapshotCount > 0
+          ? `${commandPosture.snapshotCount} command snapshot${commandPosture.snapshotCount === 1 ? "" : "s"} retained; latest score ${commandPosture.latestScore}% and trend ${commandPosture.trend}.`
+          : "No Command Intelligence snapshot is retained for this workspace yet.",
+      action: commandPosture.nextAction
+    },
+    {
       id: "degraded-sections",
       label: "Unavailable evidence sections",
       state: unavailableSections.length === 0 ? "ready" : "review",
@@ -511,6 +596,7 @@ export function deriveBuyerPilotRoom({
   const score = Math.round((passed / checks.length) * 100);
   const diligenceControls = buildDiligenceControls({
     auditEvents,
+    commandSnapshots,
     demoSnapshots,
     hasAgentWorkspace,
     hasManualQaEvidence,
@@ -540,6 +626,8 @@ export function deriveBuyerPilotRoom({
       sessions: sessions.length,
       auditEvents: auditEvents.length,
       demoSnapshots: demoSnapshots.length,
+      commandSnapshots: commandSnapshots.length,
+      commandPacketExports: commandPosture.packetExports,
       manualQaEvidencePackets: manualQaEvidencePackets.length,
       unavailableSections: unavailableSections.length
     },
@@ -580,6 +668,7 @@ export function deriveBuyerPilotRoom({
         "Readiness score, checks, blockers, and workaround owners",
         "Manual QA evidence counts, workflow run IDs, and packet hashes when retained",
         "Demo readiness, durable synthetic session, and append-only audit evidence",
+        "Command Intelligence snapshot timeline, score trend, and packet export posture",
         "Pricing path from assessment through protected pilot and operating license",
         "Competitive edge pillars with proof routes and blocked claims",
         "Legal, privacy, security, safety, and production activation boundaries",
@@ -599,6 +688,7 @@ export function deriveBuyerPilotRoom({
       ]
     },
     diligenceControls,
+    commandIntelligence: commandPosture,
     limitations: [
       {
         limitation: "Authenticated CI happy-path checks cannot safely run without a short-lived AAL2 tenant token.",
@@ -770,6 +860,8 @@ ${markdownItems(room.diligenceExport.withheldItems)}
 - Durable synthetic sessions: ${room.evidenceCounts.sessions}
 - Append-only audit events: ${room.evidenceCounts.auditEvents}
 - Demo readiness snapshots: ${room.evidenceCounts.demoSnapshots}
+- Command Intelligence snapshots: ${room.evidenceCounts.commandSnapshots}
+- Command Intelligence packet exports: ${room.evidenceCounts.commandPacketExports}
 - Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
 - Degraded evidence sections: ${room.evidenceCounts.unavailableSections}
 - Latest demo snapshot: ${
@@ -785,6 +877,8 @@ ${checkLines(room.checks)}
 - Durable synthetic sessions: ${room.evidenceCounts.sessions}
 - Append-only audit events: ${room.evidenceCounts.auditEvents}
 - Demo readiness snapshots: ${room.evidenceCounts.demoSnapshots}
+- Command Intelligence snapshots: ${room.evidenceCounts.commandSnapshots}
+- Command Intelligence packet exports: ${room.evidenceCounts.commandPacketExports}
 - Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
 - Degraded evidence sections: ${room.evidenceCounts.unavailableSections}
 - Latest demo snapshot: ${
@@ -792,6 +886,17 @@ ${checkLines(room.checks)}
       ? `${room.latestSnapshot.id}, ${room.latestSnapshot.state}, ${room.latestSnapshot.score}%, ${room.latestSnapshot.createdAt}`
       : "not available"
   }
+
+## Command Intelligence Timeline
+- Snapshot count: ${room.commandIntelligence.snapshotCount}
+- Latest snapshot: ${room.commandIntelligence.latestSnapshotId ?? "not available"}
+- Latest state: ${room.commandIntelligence.latestState ?? "not available"}
+- Latest score: ${room.commandIntelligence.latestScore === null ? "not available" : `${room.commandIntelligence.latestScore}%`}
+- Latest created: ${room.commandIntelligence.latestCreatedAt ?? "not available"}
+- Score delta: ${room.commandIntelligence.scoreDelta === null ? "insufficient history" : `${room.commandIntelligence.scoreDelta > 0 ? "+" : ""}${room.commandIntelligence.scoreDelta} points`}
+- Trend: ${room.commandIntelligence.trend}
+- Packet exports: ${room.commandIntelligence.packetExports}
+- Next action: ${room.commandIntelligence.nextAction}
 
 ## Legal, Privacy, Security, Safety, And Production Control Matrix
 ${diligenceControlLines(room.diligenceControls)}
