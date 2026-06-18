@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "prebuild": "node scripts/clean-generated-cache.mjs",
-    "build": "node scripts/check-generated-integrity.mjs && next build",
+    "build": "node scripts/check-generated-integrity.mjs && next build --webpack",
     "start": "next start",
     "integrity": "node scripts/check-generated-integrity.mjs",
     "lint": "eslint .",
     "smoke:agent-workspace": "node scripts/agent-workspace-authenticated-smoke.mjs",
     "smoke:public": "node scripts/public-production-smoke.mjs",
+    "smoke:sales-demo-session-qa": "node scripts/sales-demo-session-qa-smoke.mjs",
     "smoke:trustops": "node scripts/trustops-authenticated-smoke.mjs",
     "pretypecheck": "node scripts/clean-generated-cache.mjs",
     "typecheck": "node scripts/check-generated-integrity.mjs && tsc --noEmit"

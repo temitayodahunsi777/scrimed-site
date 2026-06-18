@@ -53,6 +53,12 @@ import {
   buyerDemoSessionProofStackStatus,
   buyerDemoSessionsApiRoute
 } from "./buyerDemoSessions";
+import {
+  salesDemoSessionQaApiRoute,
+  salesDemoSessionQaBoundary,
+  salesDemoSessionQaControls,
+  salesDemoSessionQaProofStackStatus
+} from "./salesDemoSessionQa";
 
 export const salesOperationsBoundary =
   "SCRIMED Sales Operations manages business-contact and workflow-scope opportunities only. Do not enter PHI, patient identifiers, live clinical records, diagnosis details, payer member identifiers, or production healthcare data. Every offer remains a governed synthetic pilot or enterprise evaluation until production controls are separately approved.";
@@ -515,8 +521,18 @@ export function getSalesOperationsSummary() {
         "Persist no-PHI buyer demo run history and release audited Markdown session packets for enterprise proof-of-value follow-up.",
       noPhiBoundary: true
     },
+    buyerDemoSessionQa: {
+      status: salesDemoSessionQaProofStackStatus,
+      apiRoute: salesDemoSessionQaApiRoute,
+      mode: "AAL2 browser session or externally supplied short-lived bearer token",
+      controls: salesDemoSessionQaControls,
+      purpose:
+        "Verify the buyer demo session write path and packet-audit path through the same protected tenant-admin controls used by real operator demos.",
+      boundary: salesDemoSessionQaBoundary,
+      noPhiBoundary: true
+    },
     boundary: salesOperationsBoundary,
-    updated: "2026-06-17"
+    updated: "2026-06-18"
   };
 }
 

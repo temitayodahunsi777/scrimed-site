@@ -66,6 +66,7 @@ import {
   buyerDemoSessionPacketApiRoute,
   buyerDemoSessionsApiRoute
 } from "./buyerDemoSessions";
+import { salesDemoSessionQaApiRoute } from "./salesDemoSessionQa";
 
 export type HubModule = {
   name: string;
@@ -199,6 +200,11 @@ export const hubSignals: HubSignal[] = [
   { name: "Synthetic validation", value: "assertions passing", tone: "good" },
   { name: "Build verification", value: "local, CI, and Vercel active", tone: "good" },
   { name: "Buyer demo sessions", value: "persisted no-PHI proof history active", tone: "good" },
+  {
+    name: "Buyer demo QA",
+    value: "AAL2 write-and-audit harness active",
+    tone: "good"
+  },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },
@@ -248,6 +254,7 @@ export const hubRoutes = [
   buyerDemoExecutionBriefApiRoute,
   buyerDemoSessionsApiRoute,
   buyerDemoSessionPacketApiRoute,
+  salesDemoSessionQaApiRoute,
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",

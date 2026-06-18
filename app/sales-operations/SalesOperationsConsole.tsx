@@ -41,6 +41,7 @@ import type {
   SalesBuyerDemoSession,
   SalesBuyerDemoSessionResult
 } from "../lib/buyerDemoSessions";
+import type { SalesDemoSessionQaRun } from "../lib/salesDemoSessionQa";
 
 type ConsoleStatus =
   | "infrastructure-required"
@@ -61,6 +62,7 @@ type ConsoleStatus =
   | "preparing-buyer-diligence"
   | "preparing-evidence-vault-readiness"
   | "recording-demo-session"
+  | "running-demo-session-qa"
   | "completing"
   | "error";
 
@@ -110,6 +112,12 @@ type BuyerDemoSessionsResponse = {
   buyerDemoSession?: SalesBuyerDemoSessionResult["buyerDemoSession"];
   created?: boolean;
   auditEventId?: string | null;
+  error?: { message?: string };
+};
+
+type BuyerDemoSessionQaResponse = {
+  status?: string;
+  qaRun?: SalesDemoSessionQaRun;
   error?: { message?: string };
 };
 
@@ -210,6 +218,9 @@ export default function SalesOperationsConsole({
   const [buyerDemoSessionsByIntake, setBuyerDemoSessionsByIntake] = useState<
     Record<string, SalesBuyerDemoSession[]>
   >({});
+  const [buyerDemoQaRunsByIntake, setBuyerDemoQaRunsByIntake] = useState<
+    Record<string, SalesDemoSessionQaRun>
+  >({});
   const [demoOperatorNotes, setDemoOperatorNotes] = useState("");
   const [demoBuyerQuestions, setDemoBuyerQuestions] = useState("");
   const [demoNextActions, setDemoNextActions] = useState("");
@@ -292,6 +303,7 @@ export default function SalesOperationsConsole({
         setSelected(null);
         setDraft(null);
         setBuyerDemoSessionsByIntake({});
+        setBuyerDemoQaRunsByIntake({});
         setDemoOperatorNotes("");
         setDemoBuyerQuestions("");
         setDemoNextActions("");
@@ -787,6 +799,44 @@ export default function SalesOperationsConsole({
       "Buyer demo session packet downloaded and its append-only audit event committed."
     );
     await loadBuyerDemoSessions(selected);
+  }
+
+  async function runBuyerDemoSessionQa() {
+    if (!session || !selected) {
+      return;
+    }
+
+    const qaTarget = selected;
+    setStatus("running-demo-session-qa");
+    setMessage("");
+    const response = await fetch("/api/sales-operations/qa/buyer-demo-sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        intakeId: qaTarget.intakeId
+      })
+    });
+    const body = (await response.json()) as BuyerDemoSessionQaResponse;
+
+    if (!response.ok || !body.qaRun) {
+      setStatus("ready");
+      setMessage(body.error?.message ?? "The buyer demo session QA harness did not complete.");
+      return;
+    }
+
+    setBuyerDemoQaRunsByIntake((current) => ({
+      ...current,
+      [qaTarget.intakeId]: body.qaRun as SalesDemoSessionQaRun
+    }));
+    await refreshDashboard(
+      `Buyer demo QA passed: session ${body.qaRun.createdSessionId.slice(0, 8)} and packet audit ${
+        body.qaRun.packetAuditEventId?.slice(0, 8) ?? "committed"
+      } verified.`
+    );
+    await loadBuyerDemoSessions(qaTarget);
   }
 
   async function provisionWorkspace() {
@@ -1320,6 +1370,7 @@ export default function SalesOperationsConsole({
     ? buyerDemoSessionsByIntake[selected.intakeId] ?? []
     : [];
   const latestBuyerDemoSession = selectedBuyerDemoSessions[0] ?? null;
+  const latestBuyerDemoQaRun = selected ? buyerDemoQaRunsByIntake[selected.intakeId] ?? null : null;
   const buyerDemoSteps = selected
     ? [
         {
@@ -1909,14 +1960,34 @@ export default function SalesOperationsConsole({
                       </div>
                     )}
                   </div>
+                  {latestBuyerDemoQaRun ? (
+                    <div className="layer-list">
+                      <div className="layer-row">
+                        <span>QA</span>
+                        <strong>
+                          Harness passed {formatDate(latestBuyerDemoQaRun.executedAt)} · session{" "}
+                          {latestBuyerDemoQaRun.createdSessionId.slice(0, 8)} · packet audit{" "}
+                          {latestBuyerDemoQaRun.packetAuditEventId?.slice(0, 8) ?? "committed"}
+                        </strong>
+                      </div>
+                    </div>
+                  ) : null}
                   <div className="form-actions">
                     <button
                       className="primary-action"
-                      disabled={status === "recording-demo-session"}
+                      disabled={status === "recording-demo-session" || status === "running-demo-session-qa"}
                       onClick={recordBuyerDemoSession}
                       type="button"
                     >
                       {status === "recording-demo-session" ? "Recording Session" : "Record Demo Session"}
+                    </button>
+                    <button
+                      className="secondary-action"
+                      disabled={status === "running-demo-session-qa"}
+                      onClick={runBuyerDemoSessionQa}
+                      type="button"
+                    >
+                      {status === "running-demo-session-qa" ? "Running QA Harness" : "Run QA Harness"}
                     </button>
                     <button className="primary-action" onClick={downloadBuyerDemoExecutionBrief} type="button">
                       Download Demo Brief

@@ -1,6 +1,17 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-17
+Updated: 2026-06-18
+
+## Latest Sales Demo Session QA Harness Release
+
+- Added protected `GET` and `POST /api/sales-operations/qa/buyer-demo-sessions` for AAL2 tenant-admin buyer-demo QA.
+- The QA harness targets the selected opportunity from `/sales-operations` or an explicit `SCRIMED_SALES_QA_INTAKE_ID`, creates a synthetic buyer-demo session through the existing guarded session RPC, and immediately verifies packet audit creation through the existing guarded packet RPC.
+- Added `/sales-operations` operator UI support with a Run QA Harness action and proof line showing the created session and packet audit event.
+- Added `scripts/sales-demo-session-qa-smoke.mjs` and `npm run smoke:sales-demo-session-qa`. The smoke skips by default, or runs the authenticated happy path when `SCRIMED_SALES_QA_BEARER_TOKEN` is supplied as a short-lived AAL2 tenant-admin token and `SCRIMED_SALES_QA_INTAKE_ID` names the explicit QA target.
+- Updated `/product`, `/hub`, `/api/product/console`, product readiness brief, and public production smoke coverage with the buyer-demo QA proof-stack posture.
+- Resolved the prior authenticated happy-path limitation with a free, safer workaround: browser AAL2 operator QA is available now, and CI can exercise the same route only when a short-lived external token and explicit opportunity target are intentionally provided.
+- Resolved the local Turbopack native-binding build failure by making `dev` and `build` use Next.js Webpack mode by default while the macOS SWC binding remains unavailable in this environment.
+- Preserved the hard boundary: the QA harness stores synthetic business workflow metadata only and does not accept PHI, patient identifiers, live clinical records, payer member data, diagnosis details, source contracts, secrets, credentials, legal advice, compliance certification, reimbursement determinations, patient outreach approval, autonomous care approval, or live healthcare execution authorization.
 
 ## Latest Persisted Buyer Demo Sessions Release
 
@@ -11,7 +22,7 @@ Updated: 2026-06-17
 - Updated `/product`, `/hub`, `/api/product/console`, public smoke coverage, and product readiness brief with buyer demo session proof-stack posture.
 - Resolved the previous demo-persistence limitation with a free workaround: SCRIMED can now record buyer demo outcomes and release audited follow-up packets without a paid CRM, object storage, or PHI-bearing evidence vault.
 - Preserved the hard boundary: buyer demo sessions do not accept PHI, patient identifiers, live clinical records, payer member data, diagnosis details, source contracts, credentials, legal advice, compliance certification, reimbursement determinations, patient outreach approval, autonomous care approval, or live healthcare execution authorization.
-- Remaining gate: automated authenticated happy-path CI still requires approved short-lived AAL2 token handling. Until then, public smoke verifies fail-closed behavior and human tenant-admins exercise the authenticated path through browser sessions.
+- Authenticated happy-path coverage is now handled by the AAL2 buyer-demo QA harness. Public smoke continues to verify fail-closed behavior, and tokenized happy-path smoke runs only when a short-lived external bearer token and explicit opportunity target are supplied.
 
 ## Latest Authenticated Buyer Demo Execution Release
 
@@ -21,7 +32,7 @@ Updated: 2026-06-17
 - Updated `/product`, `/hub`, `/api/product/console`, and public smoke coverage with buyer demo execution proof-stack posture.
 - Resolved the current demo-orchestration limitation with a free workaround: SCRIMED can run enterprise buyer demos from one protected checklist without adding a new database table, paid CRM dependency, or sensitive evidence store.
 - Preserved the hard boundary: the execution path does not create new audit evidence, accept PHI, authorize live clinical workflows, approve customer SSO cutover, certify compliance, submit payer transactions, contact patients, or provide medical, legal, security, regulatory, or reimbursement determinations.
-- Remaining gate: automated authenticated happy-path CI still requires approved short-lived AAL2 token handling. Until then, public smoke verifies fail-closed behavior and human operators generate authenticated demo packets through browser sessions.
+- Authenticated write-path QA is now covered by the dedicated buyer-demo QA harness; the demo execution brief remains non-audited and existing packet routes remain the evidence source of truth.
 
 ## Latest Secure Evidence Vault Readiness Release
 
@@ -131,7 +142,7 @@ Updated: 2026-06-17
 - Strengthened Enterprise Readiness with copyright registration candidates, trademark strategy, third-party license/provenance controls, generated-media review, and 24/7 incident-response readiness gates.
 - Added tenant-admin attribution analytics into `/sales-operations` and added a protected audited attribution analytics packet export under `/api/sales-operations/opportunities/{intakeId}/attribution-analytics-packet`.
 - Preserved the boundary: this is not legal advice, compliance certification, managed SOC/MDR coverage, production clinical monitoring, breach determination, PHI storage, or live clinical execution authorization.
-- Remaining gate: place a CI-held short-lived AAL2 tenant smoke token before using unattended authenticated TrustOps, Agent Workspace, Demo Readiness Packet, Buyer Pilot Room Packet, and aggregate enterprise proof-packet happy paths in automated buyer-demo smoke. Public readiness smoke now runs without secrets, while human-run buyer-room packets, demo readiness snapshots, packet exports, and protected verification can be executed from `/pilot-workspace/access` with the current browser session. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
+- Remaining gate: place CI-held short-lived AAL2 tenant smoke tokens before using unattended authenticated TrustOps, Agent Workspace, Demo Readiness Packet, Buyer Pilot Room Packet, and aggregate enterprise proof-packet happy paths. Buyer-demo session write-and-packet QA now has its own short-lived-token-compatible harness. Public readiness smoke runs without secrets, while human-run buyer-room packets, demo readiness snapshots, packet exports, and protected verification can be executed from `/pilot-workspace/access` or `/sales-operations` with the current browser session. If password sign-in remains enabled anywhere in the Supabase project, enable leaked-password protection in the dashboard; SCRIMED product flows remain passwordless/passkey-first.
 
 ## Latest Attribution Analytics Release
 
