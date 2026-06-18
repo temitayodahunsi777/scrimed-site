@@ -152,7 +152,7 @@ export function getPilotEvidenceDashboard() {
       apiRoute: qaEvidenceLedger.apiRoute,
       buyerQuestion: "Can SCRIMED show release proof, fail-closed controls, and remaining manual gates clearly?",
       currentEvidence:
-        `${qaEvidenceLedger.recordedEvidenceCount} QA evidence entries show ${qaEvidenceLedger.passed} passed checks, ${qaEvidenceLedger.failClosed} fail-closed controls, and ${qaEvidenceLedger.manualGates} manual AAL2 gate.`,
+        `${qaEvidenceLedger.recordedEvidenceCount} QA evidence entries show ${qaEvidenceLedger.passed} passed checks, ${qaEvidenceLedger.failClosed} fail-closed controls, ${qaEvidenceLedger.manualGates} manual AAL2 gate, and protected manual QA evidence persistence status ${qaEvidenceLedger.manualRunEvidencePersistence.status}.`,
       boundary: qaEvidenceLedger.boundary
     }
   ];
@@ -332,6 +332,7 @@ export function buildPilotEvidenceBrief() {
     `- Recorded evidence entries: ${dashboard.qaEvidenceLedger.recordedEvidenceCount}`,
     `- Manual AAL2 gates remaining: ${dashboard.qaEvidenceLedger.manualGates}`,
     `- Manual run packet route: ${dashboard.qaEvidenceLedger.manualRunEvidenceCapture.route}`,
+    `- Protected manual run persistence route: ${dashboard.qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute}`,
     `- Buyer-safe summary: ${dashboard.qaEvidenceLedger.buyerSafeSummary}`,
     "",
     "## Key Routes",

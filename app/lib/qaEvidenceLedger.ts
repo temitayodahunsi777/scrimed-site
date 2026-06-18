@@ -44,16 +44,31 @@ export type QaManualRunEvidenceInput = {
   dataBoundary: "synthetic-business-workflow-only";
 };
 
+export type QaManualRunEvidencePacketRecord = QaManualRunEvidenceInput & {
+  id: string;
+  tenantId: string;
+  workspaceId: string;
+  packetMarkdown: string;
+  packetSha256: string;
+  createdBy: string;
+  createdAt: string;
+  boundary: string;
+};
+
 export const qaEvidenceLedgerRoute = "/qa-evidence";
 export const qaEvidenceLedgerApiRoute = "/api/qa-evidence";
 export const qaEvidenceLedgerBriefRoute = "/api/qa-evidence/brief";
 export const qaManualRunEvidencePacketApiRoute = "/api/qa-evidence/manual-run-packet";
+export const qaManualRunEvidencePersistenceApiRoute =
+  "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets";
 
 export const qaEvidenceLedgerStatus = "qa-evidence-ledger-active";
 export const qaEvidenceLedgerProofStackStatus =
   "dated-qa-evidence-ledger-with-manual-aal2-gate";
 export const qaManualRunEvidencePacketStatus =
   "manual-aal2-run-evidence-packet-ready";
+export const qaManualRunEvidencePersistenceStatus =
+  "tenant-scoped-aal2-manual-qa-evidence-ledger";
 
 export const qaEvidenceLedgerBoundary =
   "SCRIMED QA Evidence Ledger records synthetic-only release, smoke, token-policy, fail-closed, and operator-gate evidence. It is not a clinical validation report, security certification, legal opinion, SOC report, HIPAA attestation, or authorization for live healthcare execution.";
@@ -143,11 +158,28 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
     evidence:
       "A stateless evidence packet generator validates non-secret workflow run metadata, created synthetic session ID, packet audit event ID, operator attestation, and token-disposal attestation after the manual QA workflow completes.",
     limitation:
-      "The packet generator does not execute the authenticated QA run or persist evidence to durable storage by itself.",
+      "The packet generator does not execute the authenticated QA run by itself.",
     workaround:
-      "Use it immediately after the manual workflow run to produce a sanitized packet, then archive the packet with the release record and update the ledger entry when durable evidence is approved.",
+      "Use it immediately after the manual workflow run to produce a sanitized packet, then persist the same non-secret run metadata through the protected tenant-scoped evidence route.",
     nextAction:
-      "After the first manual workflow pass, POST the non-secret run metadata to the packet route and attach the packet to the release evidence record."
+      "After the first manual workflow pass, POST the non-secret run metadata to the packet route, then persist it through the workspace evidence route for buyer-room visibility."
+  },
+  {
+    id: "manual-run-evidence-persistence",
+    name: "Tenant-scoped manual QA evidence persistence",
+    status: "workaround-active",
+    owner: "Trust engineering",
+    recordedAt: "2026-06-18",
+    artifact: qaManualRunEvidencePersistenceApiRoute,
+    routes: [qaManualRunEvidencePersistenceApiRoute, "/api/pilot-workspaces/{workspaceSlug}/buyer-room"],
+    evidence:
+      "A protected AAL2 workspace route can persist sanitized manual QA evidence packets into tenant-scoped audit storage and surface the resulting packet/audit signal inside Buyer Pilot Rooms.",
+    limitation:
+      "Persistence is intentionally unavailable without a verified AAL2 tenant governance session and server-held runtime authorization.",
+    workaround:
+      "Keep the public packet generator stateless for no-secret packet creation; use the protected persistence route only after human AAL2 QA has completed.",
+    nextAction:
+      "Run the first AAL2 Sales Demo Session QA workflow, persist the evidence packet, then export a Buyer Pilot Room packet with the manual QA evidence signal included."
   },
   {
     id: "protected-routes-fail-closed",
@@ -221,7 +253,9 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
 
 export const qaManualRunEvidenceContract = {
   route: qaManualRunEvidencePacketApiRoute,
+  protectedPersistenceRoute: qaManualRunEvidencePersistenceApiRoute,
   status: qaManualRunEvidencePacketStatus,
+  persistenceStatus: qaManualRunEvidencePersistenceStatus,
   requiredFields: [
     "workflowRunId",
     "workflowRunUrl",
@@ -244,7 +278,7 @@ export const qaManualRunEvidenceContract = {
   forbiddenContent:
     "Do not submit bearer tokens, refresh tokens, passwords, API keys, PHI, patient identifiers, payer member identifiers, source contracts, credentials, or legal/security conclusions.",
   persistenceBoundary:
-    "This route validates and returns a Markdown evidence packet. It does not persist evidence; durable evidence storage remains gated by approved controls."
+    "The public route validates and returns a Markdown evidence packet without storing data. The protected workspace route persists the same sanitized metadata only after AAL2 tenant governance authorization and server-side storage controls."
 };
 
 function getCurrentDeploymentEvidence() {
@@ -282,12 +316,18 @@ export function getQaEvidenceLedger() {
     salesDemoSessionQaControls,
     tokenPolicy: salesDemoSessionQaTokenPolicy,
     manualRunEvidenceCapture: qaManualRunEvidenceContract,
+    manualRunEvidencePersistence: {
+      route: qaManualRunEvidencePersistenceApiRoute,
+      status: qaManualRunEvidencePersistenceStatus,
+      boundary:
+        "Tenant-scoped durable storage requires AAL2 governance authorization, server-held runtime authorization, RLS membership checks, append-only audit events, no-secret validation, and synthetic-only metadata."
+    },
     entries: qaEvidenceEntries,
     knownLimitations: qaKnownLimitations,
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, and token-policy readiness today; the only remaining authenticated QA evidence step is a deliberate short-lived AAL2 operator run against a synthetic buyer opportunity.",
     nextRecommendedBuildStep:
-      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, generate the manual-run evidence packet, then add the run ID, timestamp, intake target, created session ID, and packet audit event ID to this ledger.",
+      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, generate the manual-run evidence packet, persist it through the protected workspace evidence route, then export the Buyer Pilot Room packet with the manual QA evidence signal included.",
     updated: "2026-06-18"
   };
 }

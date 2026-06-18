@@ -41,6 +41,7 @@ export default function BuyerPilotRoomPanel({
     sessions,
     auditEvents,
     demoSnapshots,
+    manualQaEvidencePackets: [],
     unavailableSections: []
   });
 
@@ -95,6 +96,10 @@ export default function BuyerPilotRoomPanel({
         <article>
           <span>Snapshots</span>
           <strong>{room.evidenceCounts.demoSnapshots}</strong>
+        </article>
+        <article>
+          <span>Manual QA</span>
+          <strong>{room.evidenceCounts.manualQaEvidencePackets}</strong>
         </article>
       </div>
 

@@ -2,6 +2,15 @@
 
 Updated: 2026-06-18
 
+## Latest Manual QA Evidence Persistence Release
+
+- Added tenant-scoped durable manual QA evidence packet storage through `POST /api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`.
+- Added protected packet listing through `GET /api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` so AAL2 governance users can inspect retained manual QA packets.
+- Added `public.qa_manual_run_evidence_packets` with RLS select, guarded AAL2 RPC writes, packet SHA-256 hashing, duplicate workflow-run protection, append-only audit events, and no-secret/no-PHI validation.
+- Updated Buyer Pilot Room JSON and Markdown packets so manual QA evidence packet counts, workflow run IDs, and packet hashes appear in enterprise diligence when captured.
+- Updated `/qa-evidence`, `/pilot-evidence`, `/hub`, `/product`, and public smoke coverage with `tenant-scoped-aal2-manual-qa-evidence-ledger`.
+- Preserved the boundary: persistence requires AAL2 tenant governance authorization and server-held runtime authorization. It does not store tokens, PHI, patient identifiers, payer member identifiers, source contracts, legal advice, compliance certification, security certification, production authorization, or live healthcare execution approval.
+
 ## Latest Manual QA Evidence Packet Release
 
 - Added `POST /api/qa-evidence/manual-run-packet` to validate non-secret manual Sales Demo Session QA run metadata and return a Markdown evidence packet after the AAL2 workflow completes.
@@ -9,7 +18,7 @@ Updated: 2026-06-18
 - Extended `app/lib/qaEvidenceLedger.ts` with a manual-run capture contract, secret-like content rejection, UUID/run URL/intake/timestamp validation, token-disposal attestation, and packet generation.
 - Updated `/qa-evidence`, `/pilot-evidence`, `/hub`, `/product`, and public smoke coverage so the manual AAL2 run no longer has an undefined evidence-capture process.
 - Public smoke now verifies the packet contract, rejects token-like payloads, and accepts a sanitized synthetic packet payload.
-- Preserved the boundary: the packet generator does not mint tokens, execute authenticated QA, store evidence, accept PHI, accept credentials, certify compliance, or authorize live healthcare execution.
+- Preserved the boundary: the packet generator does not mint tokens, execute authenticated QA, accept PHI, accept credentials, certify compliance, or authorize live healthcare execution. Durable storage is handled only by the protected workspace evidence route.
 
 ## Latest QA Evidence Ledger Release
 

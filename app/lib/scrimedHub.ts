@@ -72,7 +72,8 @@ import {
   qaEvidenceLedgerApiRoute,
   qaEvidenceLedgerBriefRoute,
   qaEvidenceLedgerRoute,
-  qaManualRunEvidencePacketApiRoute
+  qaManualRunEvidencePacketApiRoute,
+  qaManualRunEvidencePersistenceApiRoute
 } from "./qaEvidenceLedger";
 
 export type HubModule = {
@@ -227,6 +228,11 @@ export const hubSignals: HubSignal[] = [
     value: "no-secret capture contract active",
     tone: "good"
   },
+  {
+    name: "Manual QA evidence persistence",
+    value: "tenant-scoped AAL2 packet ledger active",
+    tone: "good"
+  },
   { name: "Integration contracts", value: "foundation defined", tone: "good" },
   { name: "Interoperability control plane", value: "standards registry defined", tone: "good" },
   { name: "Interoperability conformance", value: "synthetic test kits passing; live blocked", tone: "good" },
@@ -368,6 +374,7 @@ export const hubRoutes = [
   qaEvidenceLedgerApiRoute,
   qaEvidenceLedgerBriefRoute,
   qaManualRunEvidencePacketApiRoute,
+  qaManualRunEvidencePersistenceApiRoute,
   "/api/sales-operations",
   "/api/sales-operations/opportunities/{intakeId}",
   "/api/sales-operations/opportunities/{intakeId}/proposal",

@@ -9,6 +9,7 @@ import type {
   PilotWorkspaceRecord
 } from "./protectedPilotWorkspace";
 import type { PilotDemoReadinessSnapshotRecord } from "./pilotDemoReadiness";
+import type { QaManualRunEvidencePacketRecord } from "./qaEvidenceLedger";
 
 export type BuyerPilotRoomState = "ready" | "review" | "blocked";
 
@@ -60,6 +61,7 @@ export type BuyerPilotRoomSummary = {
     sessions: number;
     auditEvents: number;
     demoSnapshots: number;
+    manualQaEvidencePackets: number;
     unavailableSections: number;
   };
   latestSnapshot: {
@@ -226,12 +228,14 @@ export function deriveBuyerPilotRoom({
   sessions,
   auditEvents,
   demoSnapshots,
+  manualQaEvidencePackets,
   unavailableSections
 }: {
   workspace: PilotWorkspaceRecord;
   sessions: PilotSessionRecord[];
   auditEvents: PilotAuditEventRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
+  manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
   unavailableSections: string[];
 }): BuyerPilotRoomSummary {
   const hasSession = sessions.length > 0;
@@ -240,6 +244,9 @@ export function deriveBuyerPilotRoom({
   const hasDemoSnapshot = demoSnapshots.length > 0;
   const hasDemoPacket = hasAuditEvent(auditEvents, "demo-readiness-packet-downloaded");
   const hasBuyerPacket = hasAuditEvent(auditEvents, "buyer-pilot-room-packet-downloaded");
+  const hasManualQaEvidence =
+    manualQaEvidencePackets.length > 0 ||
+    hasAuditEvent(auditEvents, "manual-qa-evidence-packet-recorded");
   const hasTrustOps =
     hasAuditEvent(auditEvents, "trust-safety-incident-created") ||
     hasAuditEvent(auditEvents, "trust-safety-incident-updated") ||
@@ -285,6 +292,17 @@ export function deriveBuyerPilotRoom({
       action: hasEnterprisePacket && hasDemoPacket
         ? "Attach packet IDs to the buyer follow-up."
         : "Download the missing packet type before a formal enterprise follow-up."
+    },
+    {
+      id: "manual-qa-evidence",
+      label: "Manual QA evidence persistence",
+      state: hasManualQaEvidence ? "ready" : "review",
+      evidence: hasManualQaEvidence
+        ? `${manualQaEvidencePackets.length} tenant-scoped manual QA evidence packet${manualQaEvidencePackets.length === 1 ? "" : "s"} retained or audited.`
+        : "No tenant-scoped manual QA evidence packet is visible yet.",
+      action: hasManualQaEvidence
+        ? "Attach the latest workflow run ID and packet hash to the buyer diligence follow-up."
+        : "After the human AAL2 QA workflow passes, persist the no-secret packet through the protected workspace evidence route."
     },
     {
       id: "agent-workspace",
@@ -357,6 +375,7 @@ export function deriveBuyerPilotRoom({
       sessions: sessions.length,
       auditEvents: auditEvents.length,
       demoSnapshots: demoSnapshots.length,
+      manualQaEvidencePackets: manualQaEvidencePackets.length,
       unavailableSections: unavailableSections.length
     },
     latestSnapshot: latestSnapshot(demoSnapshots),
@@ -389,7 +408,7 @@ export function deriveBuyerPilotRoom({
       {
         limitation: "Authenticated CI happy-path checks cannot safely run without a short-lived AAL2 tenant token.",
         workaround:
-          "Use human browser-session tenant verification, public fail-closed smoke checks, and audited packet downloads instead of storing reusable bearer tokens.",
+          "Use human browser-session tenant verification, public fail-closed smoke checks, audited packet downloads, and the protected no-secret manual QA evidence packet route instead of storing reusable bearer tokens.",
         owner: "SCRIMED operator",
         productionGate: "Enterprise CI token handling requires approved secret rotation, session policy, and identity operations."
       },
@@ -488,7 +507,8 @@ export function buildBuyerPilotRoomPacket({
   appBaseUrl,
   workspace,
   room,
-  recentAuditEvents
+  recentAuditEvents,
+  manualQaEvidencePackets
 }: {
   generatedAt: string;
   auditEventId: string;
@@ -497,6 +517,7 @@ export function buildBuyerPilotRoomPacket({
   workspace: PilotWorkspaceRecord;
   room: BuyerPilotRoomSummary;
   recentAuditEvents: PilotAuditEventRecord[];
+  manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
 }) {
   const baseUrl = appBaseUrl.replace(/\/$/, "");
 
@@ -529,6 +550,7 @@ ${room.executiveThesis}
 - Durable synthetic sessions: ${room.evidenceCounts.sessions}
 - Append-only audit events: ${room.evidenceCounts.auditEvents}
 - Demo readiness snapshots: ${room.evidenceCounts.demoSnapshots}
+- Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
 - Degraded evidence sections: ${room.evidenceCounts.unavailableSections}
 - Latest demo snapshot: ${
     room.latestSnapshot
@@ -556,6 +578,17 @@ ${markdownItems(room.unavailableSections)}
 
 ## Recent Append-Only Audit Events
 ${recentAuditLines(recentAuditEvents)}
+
+## Manual QA Evidence Packets
+${manualQaEvidencePackets.length === 0
+    ? "- No tenant-scoped manual QA evidence packets are visible yet."
+    : manualQaEvidencePackets
+        .slice(0, 10)
+        .map(
+          (packet) =>
+            `- ${packet.createdAt}: workflow ${packet.workflowRunId}, intake ${packet.intakeId}, packet hash ${packet.packetSha256}, created by ${packet.createdBy}`
+        )
+        .join("\n")}
 
 ## Legal, Privacy, Security, And Safety Boundary
 - This packet documents governed synthetic pilot evidence and SCRIMED commercial positioning only.

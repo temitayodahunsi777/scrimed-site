@@ -29,6 +29,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - QA Evidence Ledger is the active dated proof surface for release smoke, fail-closed routes, token-policy readiness, contained limitations, and manual AAL2 operator gates.
 - Manual QA Evidence Packet generation is the active no-secret capture process after the human-run AAL2 Sales Demo Session QA workflow completes.
+- Tenant-scoped Manual QA Evidence Packet persistence is the active AAL2 durable evidence gate before manual QA evidence appears in Buyer Pilot Room diligence.
 - GitHub Actions, local package-manager verification, and Vercel deployment are active independent build-quality paths.
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
 - Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, tenant-per-buyer lifecycle activation, production readiness, activation approvals, buyer evidence and signed controls diligence, secure evidence vault readiness, protected Buyer Pilot Room proof, audited packet release, and paid synthetic pilot.
@@ -66,6 +67,7 @@ Completed foundations:
 - Operator-token rotation runbook and CI secret policy for Sales Demo Session QA with local token preflight, manual GitHub Actions dispatch, explicit intake targeting, and no long-lived credential storage
 - QA Evidence Ledger with page, API, downloadable brief, proof-stack wiring, public smoke verification, explicit known limitations, and remaining manual AAL2 gate visibility
 - Manual QA Evidence Packet route with required-field contract, secret-like content rejection, token-disposal attestation, no-PHI boundary, and Markdown packet generation
+- Tenant-scoped Manual QA Evidence Packet persistence with RLS, AAL2 guarded RPC write path, packet hashing, append-only audit events, protected packet listing, and Buyer Pilot Room proof visibility
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline

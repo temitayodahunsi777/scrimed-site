@@ -34,6 +34,10 @@ import type {
   PilotDemoReadinessSummary,
   TenantSessionVerificationReadiness
 } from "./pilotDemoReadiness";
+import type {
+  QaManualRunEvidenceInput,
+  QaManualRunEvidencePacketRecord
+} from "./qaEvidenceLedger";
 
 type AuthenticatedPilotContext =
   | {
@@ -78,6 +82,28 @@ type AuditEventRow = {
   event_type: string;
   event_metadata: Record<string, unknown>;
   created_at: string;
+};
+
+type QaManualRunEvidencePacketRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  workflow_run_id: string;
+  workflow_run_url: string;
+  executed_at: string;
+  base_url: string;
+  intake_id: string;
+  created_session_id: string;
+  packet_audit_event_id: string;
+  qa_outcome: QaManualRunEvidenceInput["qaOutcome"];
+  operator_attestation: QaManualRunEvidenceInput["operatorAttestation"];
+  token_disposal_attestation: QaManualRunEvidenceInput["tokenDisposalAttestation"];
+  data_boundary: QaManualRunEvidenceInput["dataBoundary"];
+  packet_markdown: string;
+  packet_sha256: string;
+  created_by: string;
+  created_at: string;
+  boundary: string;
 };
 
 type PilotDemoReadinessSnapshotRow = {
@@ -520,6 +546,32 @@ function mapAuditEvent(row: AuditEventRow): PilotAuditEventRecord {
   };
 }
 
+function mapQaManualRunEvidencePacket(
+  row: QaManualRunEvidencePacketRow
+): QaManualRunEvidencePacketRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    workflowRunId: row.workflow_run_id,
+    workflowRunUrl: row.workflow_run_url,
+    executedAt: row.executed_at,
+    baseUrl: row.base_url,
+    intakeId: row.intake_id,
+    createdSessionId: row.created_session_id,
+    packetAuditEventId: row.packet_audit_event_id,
+    qaOutcome: row.qa_outcome,
+    operatorAttestation: row.operator_attestation,
+    tokenDisposalAttestation: row.token_disposal_attestation,
+    dataBoundary: row.data_boundary,
+    packetMarkdown: row.packet_markdown,
+    packetSha256: row.packet_sha256,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -750,6 +802,8 @@ const sessionSelect =
   "id, workspace_id, scenario_slug, status, boundary, evaluation, created_at, created_by";
 const auditEventSelect =
   "id, workspace_id, session_id, actor_user_id, event_type, event_metadata, created_at";
+const qaManualRunEvidencePacketSelect =
+  "id, tenant_id, workspace_id, workflow_run_id, workflow_run_url, executed_at, base_url, intake_id, created_session_id, packet_audit_event_id, qa_outcome, operator_attestation, token_disposal_attestation, data_boundary, packet_markdown, packet_sha256, created_by, created_at, boundary";
 const pilotDemoReadinessSnapshotSelect =
   "id, tenant_id, workspace_id, readiness_state, readiness_score, passed_count, review_count, blocked_count, required_actions, buyer_brief, check_results, runbook, verification, evidence_counts, snapshot, last_evidence_at, boundary, created_by, created_at";
 const trustOSDecisionSelect =
@@ -822,6 +876,22 @@ export async function listPilotAuditEvents(client: SupabaseClient, workspaceId: 
 
   return {
     events: ((data ?? []) as unknown as AuditEventRow[]).map(mapAuditEvent),
+    error
+  };
+}
+
+export async function listQaManualRunEvidencePackets(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("qa_manual_run_evidence_packets")
+    .select(qaManualRunEvidencePacketSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return {
+    packets: ((data ?? []) as unknown as QaManualRunEvidencePacketRow[]).map(
+      mapQaManualRunEvidencePacket
+    ),
     error
   };
 }
@@ -986,6 +1056,32 @@ export async function recordBuyerPilotRoomPacketDownload(
 
   return {
     eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordQaManualRunEvidencePacket(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: QaManualRunEvidenceInput,
+  packetMarkdown: string
+) {
+  const { data, error } = await client.rpc("record_qa_manual_run_evidence_packet", {
+    p_workspace_slug: workspaceSlug,
+    p_packet_input: input,
+    p_packet_markdown: packetMarkdown
+  });
+
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const packet =
+    payload.packet && typeof payload.packet === "object"
+      ? (payload.packet as unknown as QaManualRunEvidencePacketRecord)
+      : null;
+
+  return {
+    packet,
+    auditEventId: typeof payload.auditEventId === "string" ? payload.auditEventId : null,
+    boundary: typeof payload.boundary === "string" ? payload.boundary : null,
     error
   };
 }

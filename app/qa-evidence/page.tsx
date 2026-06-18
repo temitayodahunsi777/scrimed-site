@@ -66,6 +66,10 @@ export default function QaEvidencePage() {
           <strong>{ledger.manualRunEvidenceCapture.status}</strong>
         </article>
         <article>
+          <span>Persistence</span>
+          <strong>{ledger.manualRunEvidencePersistence.status}</strong>
+        </article>
+        <article>
           <span>Data boundary</span>
           <strong>synthetic only</strong>
         </article>
@@ -181,6 +185,11 @@ export default function QaEvidencePage() {
             <span>route</span>
             <h3>{ledger.manualRunEvidenceCapture.route}</h3>
             <p>{ledger.manualRunEvidenceCapture.forbiddenContent}</p>
+          </article>
+          <article>
+            <span>protected</span>
+            <h3>{ledger.manualRunEvidenceCapture.protectedPersistenceRoute}</h3>
+            <p>{ledger.manualRunEvidencePersistence.boundary}</p>
           </article>
           <article>
             <span>required</span>

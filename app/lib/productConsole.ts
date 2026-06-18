@@ -82,7 +82,8 @@ import {
 } from "./salesDemoSessionQa";
 import {
   getQaEvidenceLedger,
-  qaEvidenceLedgerProofStackStatus
+  qaEvidenceLedgerProofStackStatus,
+  qaManualRunEvidencePersistenceStatus
 } from "./qaEvidenceLedger";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
@@ -644,6 +645,8 @@ export function getProductConsoleSummary() {
     qaEvidenceApiRoute: qaEvidenceLedger.apiRoute,
     qaEvidenceBriefRoute: qaEvidenceLedger.briefRoute,
     qaManualRunEvidencePacketRoute: qaEvidenceLedger.manualRunEvidenceCapture.route,
+    qaManualRunEvidencePersistenceRoute:
+      qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -774,6 +777,7 @@ export function getProductConsoleSummary() {
       buyerDemoSessionQaTokenPolicy: salesDemoSessionQaTokenPolicyStatus,
       qaEvidenceLedger: qaEvidenceLedgerProofStackStatus,
       qaManualRunEvidencePacket: qaEvidenceLedger.manualRunEvidenceCapture.status,
+      qaManualRunEvidencePersistence: qaManualRunEvidencePersistenceStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,

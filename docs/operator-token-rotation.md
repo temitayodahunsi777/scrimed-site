@@ -16,6 +16,7 @@ Applies to:
 - `/api/qa-evidence`
 - `/api/qa-evidence/brief`
 - `/api/qa-evidence/manual-run-packet`
+- `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`
 - `scripts/sales-demo-session-qa-token-policy-selftest.mjs`
 - `scripts/sales-demo-session-qa-token-preflight.mjs`
 - `scripts/sales-demo-session-qa-smoke.mjs`
@@ -81,7 +82,8 @@ SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQ
 11. Sign out of the tenant-admin session if the token was copied outside the browser context.
 12. Review the Sales Operations audit trail and latest buyer demo session packet proof.
 13. POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet.
-14. Add the successful run ID, timestamp, target intake ID, created session ID, and packet audit event ID to the QA Evidence Ledger after the run is captured.
+14. POST the same non-secret payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session to persist the packet in tenant-scoped audit storage.
+15. Export the Buyer Pilot Room packet after persistence so the manual QA evidence count, workflow run ID, and packet hash appear in enterprise diligence.
 
 Manual evidence packet payload:
 
@@ -102,6 +104,20 @@ Manual evidence packet payload:
 ```
 
 The packet route rejects token, secret, password, credential, bearer, refresh, JWT-like, API-key-like, patient identifier, or payer member identifier content.
+
+Protected persistence route:
+
+```text
+POST /api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets
+```
+
+Persistence controls:
+
+- Requires a verified tenant governance bearer session with AAL2.
+- Requires server-held runtime authorization before the database RPC can write.
+- Stores the generated Markdown packet, packet hash, workflow run metadata, operator attestations, and append-only audit event only.
+- Rejects token-like, secret-like, PHI-like, patient-identifier-like, and payer-member-identifier-like payloads.
+- Does not store the bearer token, source contracts, clinical data, production credentials, legal conclusions, compliance certification, or live healthcare authorization.
 
 ## GitHub Actions Policy
 
@@ -146,3 +162,5 @@ Boundary: governed synthetic pilot and enterprise evaluation only.
 Evidence ledger: `/qa-evidence`
 
 Manual evidence packet route: `/api/qa-evidence/manual-run-packet`
+
+Protected manual evidence persistence route: `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`

@@ -230,6 +230,13 @@ async function checkProductConsole() {
     throw new Error("product console missing manual QA run evidence packet posture.");
   }
 
+  if (
+    body.proofStack?.qaManualRunEvidencePersistence !==
+    "tenant-scoped-aal2-manual-qa-evidence-ledger"
+  ) {
+    throw new Error("product console missing manual QA run evidence persistence posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -325,6 +332,13 @@ async function checkQaEvidenceLedger() {
 
   if (body.manualRunEvidenceCapture?.status !== "manual-aal2-run-evidence-packet-ready") {
     throw new Error("QA evidence ledger expected manual run evidence packet capture status.");
+  }
+
+  if (
+    body.manualRunEvidencePersistence?.status !==
+    "tenant-scoped-aal2-manual-qa-evidence-ledger"
+  ) {
+    throw new Error("QA evidence ledger expected manual run evidence persistence status.");
   }
 
   const brief = await request("/api/qa-evidence/brief");
@@ -489,6 +503,10 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,
   "Buyer Pilot Room packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-run-packets`,
+  "Manual QA evidence persistence protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,
