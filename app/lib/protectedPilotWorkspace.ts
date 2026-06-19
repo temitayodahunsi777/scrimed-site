@@ -289,17 +289,17 @@ export const pilotWorkspaceRoles: Array<{
 }> = [
   {
     role: "tenant-admin",
-    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Record no-PHI clinical activation readiness attestations", "Download proof and governance packets"],
+    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Record no-PHI clinical activation readiness attestations", "Record no-PHI Public Market Readiness operator metrics", "Download proof and governance packets"],
     restrictions: ["Cannot enable live clinical execution", "Cannot alter append-only audit events", "Cannot create legal, breach, or compliance certification determinations"]
   },
   {
     role: "pilot-lead",
-    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Record no-PHI clinical activation readiness attestations", "View workspace sessions", "Download proof and governance packets"],
+    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Record no-PHI clinical activation readiness attestations", "Record no-PHI Public Market Readiness operator metrics", "View workspace sessions", "Download proof and governance packets"],
     restrictions: ["Cannot manage tenant identity", "Cannot alter append-only audit events", "Cannot create legal, breach, or compliance certification determinations"]
   },
   {
     role: "reviewer",
-    permissions: ["View workspace sessions", "Review Trust Cards, work orders, and TrustOps incidents", "Record governed reviewer dispositions and outcome signals", "Record no-PHI clinical activation readiness attestations", "Download proof and governance packets"],
+    permissions: ["View workspace sessions", "Review Trust Cards, work orders, and TrustOps incidents", "Record governed reviewer dispositions and outcome signals", "Record no-PHI clinical activation readiness attestations", "Record no-PHI Public Market Readiness operator metrics", "Download proof and governance packets"],
     restrictions: ["Cannot create sessions or new work orders", "Cannot manage tenant identity", "Cannot mutate TrustOps incident records"]
   },
   {
@@ -423,6 +423,13 @@ export const protectedPilotApiContracts = [
     access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI attestation + server-held runtime authorization + rate limit",
     purpose:
       "Inspect or append no-PHI clinical activation readiness attestations for regulatory, clinical governance, privacy/security, interoperability, legal/commercial, and go-live domains while live care remains blocked."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/operator-metrics",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI finance-readiness attestation + rate limit",
+    purpose:
+      "Inspect or append tenant-scoped no-PHI Public Market Readiness operator metrics for model cost, review time, delivery hours, proof-packet count, workflow volume, and unit-economics discipline without storing audited financials, securities material, PHI, patient identifiers, payer member data, source contracts, secrets, or clinical validation."
   },
   {
     method: "GET",
@@ -612,6 +619,7 @@ export function getProtectedPilotWorkspaceSummary() {
       "SMTP delivery readiness metadata with direct-send gate retained",
       "Protected Buyer Pilot Room with one-click Buyer Diligence Export for competitive edge, readiness, QA evidence, pricing path, limitations, legal/privacy/security/safety boundaries, workarounds, and write-before-release audit",
       "Protected SCRIMED Command Intelligence Hub for Agent Commander posture, Trust Engine outputs, continuous evaluation, MCP/tool access architecture, observability, buyer diligence readiness, safe-mode controls, limitations, workarounds, next actions, durable AAL2-reviewed snapshots, and audited command packets",
+      "AAL2-protected no-PHI operator metric capture for Public Market Readiness, workflow cost discipline, proof-packet coverage, and finance-review preparation",
       "Browser-session manual QA evidence capture without copying bearer tokens into scripts",
       "Tenant offboarding, reactivation, and final-admin protection",
       "Periodic access review attestation",

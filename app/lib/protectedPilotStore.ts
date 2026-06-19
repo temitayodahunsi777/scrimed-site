@@ -54,6 +54,12 @@ import type {
   ClinicalActivationApprovalRecord,
   ClinicalActivationApprovalStatus
 } from "./clinicalActivationApprovals";
+import type {
+  ProtectedOperatorMetricInput,
+  ProtectedOperatorMetricKey,
+  ProtectedOperatorMetricRecord,
+  ProtectedOperatorMetricUnit
+} from "./protectedOperatorMetrics";
 
 type AuthenticatedPilotContext =
   | {
@@ -193,6 +199,29 @@ type ClinicalActivationApprovalRow = {
   clinical_go_live_authority: ClinicalActivationApprovalRecord["clinicalGoLiveAuthority"];
   signed_by: string;
   signed_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedOperatorMetricRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  metric_key: ProtectedOperatorMetricKey;
+  metric_label: string;
+  metric_unit: ProtectedOperatorMetricUnit;
+  metric_value: number | string;
+  public_market_kpi_id: string;
+  workflow_key: string;
+  measurement_window_start: string;
+  measurement_window_end: string;
+  source_route: string;
+  evidence_reference: string;
+  operator_attestation: ProtectedOperatorMetricInput["operatorAttestation"];
+  data_boundary: ProtectedOperatorMetricInput["dataBoundary"];
+  financial_reporting_authority: ProtectedOperatorMetricRecord["financialReportingAuthority"];
+  securities_authority: ProtectedOperatorMetricRecord["securitiesAuthority"];
+  created_by: string;
   created_at: string;
   boundary: string;
 };
@@ -665,6 +694,31 @@ function mapClinicalActivationApproval(
   };
 }
 
+function mapProtectedOperatorMetric(row: ProtectedOperatorMetricRow): ProtectedOperatorMetricRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    metricKey: row.metric_key,
+    metricValue: Number(row.metric_value),
+    metricLabel: row.metric_label,
+    metricUnit: row.metric_unit,
+    publicMarketKpiId: row.public_market_kpi_id,
+    workflowKey: row.workflow_key,
+    measurementWindowStart: row.measurement_window_start,
+    measurementWindowEnd: row.measurement_window_end,
+    sourceRoute: row.source_route,
+    evidenceReference: row.evidence_reference,
+    operatorAttestation: row.operator_attestation,
+    dataBoundary: row.data_boundary,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -951,6 +1005,8 @@ const commandIntelligenceSnapshotSelect =
   "id, tenant_id, workspace_id, command_state, command_score, buyer_room_state, buyer_room_score, agent_commander_status, workstream_count, trust_output_count, evaluation_gate_count, tool_access_plan_count, safe_mode_control_count, next_action_count, evidence_counts, metrics, workstreams, trust_engine_outputs, evaluation_pipeline, tool_access_plans, safe_mode_controls, next_actions, limitations, observability, snapshot, last_evidence_at, operator_attestation, boundary, created_by, created_at";
 const clinicalActivationApprovalSelect =
   "id, tenant_id, workspace_id, domain_id, domain_label, approval_status, approval_scope, reviewer_role, attestation, evidence_snapshot, retained_blockers, no_phi_attestation, clinical_go_live_authority, signed_by, signed_at, created_at, boundary";
+const protectedOperatorMetricSelect =
+  "id, tenant_id, workspace_id, metric_key, metric_label, metric_unit, metric_value, public_market_kpi_id, workflow_key, measurement_window_start, measurement_window_end, source_route, evidence_reference, operator_attestation, data_boundary, financial_reporting_authority, securities_authority, created_by, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1128,6 +1184,25 @@ export async function listClinicalActivationApprovals(
   return {
     approvals: ((data ?? []) as unknown as ClinicalActivationApprovalRow[]).map(
       mapClinicalActivationApproval
+    ),
+    error
+  };
+}
+
+export async function listProtectedOperatorMetrics(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_operator_metrics")
+    .select(protectedOperatorMetricSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  return {
+    metrics: ((data ?? []) as unknown as ProtectedOperatorMetricRow[]).map(
+      mapProtectedOperatorMetric
     ),
     error
   };
@@ -1372,6 +1447,22 @@ export async function createClinicalActivationApproval(
 
   return {
     approvalId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedOperatorMetric(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedOperatorMetricInput
+) {
+  const { data, error } = await client.rpc("record_protected_operator_metric", {
+    p_workspace_slug: workspaceSlug,
+    p_metric_input: input
+  });
+
+  return {
+    metricId: typeof data === "string" ? data : null,
     error
   };
 }

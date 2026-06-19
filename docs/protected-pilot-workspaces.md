@@ -68,6 +68,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals`
 - `POST /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/operator-metrics`
+- `POST /api/pilot-workspaces/{workspaceSlug}/operator-metrics`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -137,6 +139,24 @@ Operators can now persist AAL2 human-reviewed command posture snapshots with `PO
 Command Intelligence packet export at `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet` requires an existing snapshot and commits `command-intelligence-packet-downloaded` before releasing Markdown evidence. This gives enterprise buyers and investors a retained command-history packet without screenshots, PHI, secrets, or unsupported production claims.
 
 Current boundary: the hub is a command posture for governed synthetic pilots and enterprise evaluation only. Production use still requires signed customer scope, BAA/DPA path where applicable, legal/privacy/security/clinical review, approved connectors, live monitoring, and human operating controls.
+
+## Protected Operator Metrics
+
+`/pilot-workspace/access` now includes protected Public Market Operator Metrics immediately after the Command Intelligence Hub. This gives tenant operators a no-PHI way to capture aggregate operating signals for:
+
+- Model cost.
+- Human review time.
+- Delivery hours.
+- Proof-packet count.
+- Workflow volume.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/operator-metrics` requires AAL2 governance context, tenant workspace membership, no-store headers, synthetic-only boundary headers, and rate limiting. It returns retained records plus a dashboard that summarizes metric coverage, latest capture, totals by KPI, remaining metric types, and safe workarounds.
+
+`POST /api/pilot-workspaces/{workspaceSlug}/operator-metrics` accepts only bounded metric metadata and fixed `no-phi-finance-readiness-operator-metric` plus `synthetic-business-workflow-only` attestations. The guarded Supabase RPC recomputes metric labels, units, KPI ids, actor role, audit metadata, financial authority, and securities authority before inserting the record and committing `operator-metric-recorded` to the append-only workspace audit trail.
+
+Safe workaround: if the protected ledger is unavailable, use `/public-market-readiness` KPI definitions and external finance-reviewed spreadsheets for board or investor materials. Do not treat raw captures as audited financial statements, securities offering material, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live-care authorization.
+
+Current boundary: operator metrics must not store PHI, patient identifiers, payer member data, live clinical records, source contracts, credentials, secrets, medical facts, audited financials, investment advice, accounting advice, tax advice, legal advice, or production clinical approval.
 
 ## Clinical Activation Dossier
 

@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-06-18
+Updated: 2026-06-19
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -35,6 +35,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
 - Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, tenant-per-buyer lifecycle activation, production readiness, activation approvals, buyer evidence and signed controls diligence, secure evidence vault readiness, protected Buyer Pilot Room proof, audited packet release, and paid synthetic pilot.
 - Public Market Readiness is the active capital-efficiency gate for KPI definitions, unit economics, model-cost controls, compliance logs, customer proof, margin discipline, investor narrative, and financial/securities claim boundaries before external fundraising or board-scale reporting.
+- Protected Operator Metrics are the active AAL2 no-PHI capture gate for model cost, review time, delivery hours, proof-packet count, workflow volume, unit-economics discipline, and future finance-reviewed rollups.
 - Authenticated Buyer Demo Execution Path is the active operator gate for sequencing no-PHI buyer demos, audited packet release, known workarounds, retained hard gates, and paid implementation next steps.
 - The Trust and Enterprise Readiness Center governs company-level launch gates and public claims before marketing, PR, sales, advertising, protected pilots, or production use.
 
@@ -73,6 +74,7 @@ Completed foundations:
 - Browser-session Manual QA Evidence Capture panel with fixed attestations, retained packet list, packet download, buyer-room count wiring, and tenant-session verification coverage
 - One-click Buyer Diligence Export with readiness, QA evidence, pricing posture, competitive edge, legal/privacy/security/safety controls, demo and pilot proof, degraded-section disclosure, workarounds, and production hard gates
 - Public Market Readiness with KPI definitions, unit economics, model-efficiency controls, compliance logs, customer proof ladder, board cadence, investor narrative, known limitations, and financial/securities boundaries
+- Protected Operator Metrics with AAL2 tenant-scoped no-PHI capture for model cost, review time, delivery hours, proof-packet count, workflow volume, dashboard coverage, safe workarounds, append-only audit events, and fixed financial/securities boundaries
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -126,7 +128,7 @@ Completed foundations:
 
 Next build targets:
 
-- Add protected operator metric capture for model cost, review time, delivery hours, and proof-packet count so SCRIMED can graduate Public Market Readiness from definitions to finance-reviewed dashboards.
+- Add finance-reviewed protected metric rollups and packet export so SCRIMED can graduate raw no-PHI operator captures into board-review operating dashboards.
 - Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, generate the sanitized packet through `/api/qa-evidence/manual-run-packet`, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.

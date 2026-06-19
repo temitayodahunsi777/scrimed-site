@@ -1,3 +1,8 @@
+import {
+  protectedOperatorMetricCaptureStatus,
+  protectedOperatorMetricCatalog
+} from "./protectedOperatorMetrics";
+
 export type PublicMarketMetricCategory =
   | "unit-economics"
   | "workflow-value"
@@ -363,6 +368,16 @@ export const publicMarketComplianceLogs: PublicMarketComplianceLog[] = [
     boundary: "Sensitive buyer document storage remains disabled until approved controls exist."
   },
   {
+    log: "Protected operator metric ledger",
+    owner: "Founder, finance advisor, product, and trust operations",
+    currentSource:
+      "AAL2 tenant-scoped no-PHI captures for model cost, review time, delivery hours, proof-packet count, and workflow volume.",
+    proofRoute: "/pilot-workspace/access",
+    metricUse: "Unit-economics discipline, board review, pricing posture, and finance-readiness coverage.",
+    boundary:
+      "Operator metrics are aggregate operating metadata, not audited financial reporting, securities offering material, valuation assurance, reimbursement assurance, or clinical validation."
+  },
+  {
     log: "Trust Safety Operations",
     owner: "Trust, safety, legal, security, communications, and executive leadership",
     currentSource: "Incident, copyright, public-claims, safety, escalation, and continuous-improvement registers.",
@@ -509,9 +524,12 @@ export function getPublicMarketReadinessSummary() {
     route: "/public-market-readiness",
     apiRoute: "/api/public-market-readiness",
     briefRoute: "/api/public-market-readiness/brief",
+    protectedOperatorMetricRoute: "/pilot-workspace/access",
+    protectedOperatorMetricApiRoute: "/api/pilot-workspaces/{workspaceSlug}/operator-metrics",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
+    protectedOperatorMetricStatus: protectedOperatorMetricCaptureStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -524,7 +542,9 @@ export function getPublicMarketReadinessSummary() {
     customerProofStageCount: publicMarketCustomerProofStages.length,
     boardCadenceCount: publicMarketBoardCadence.length,
     limitationCount: publicMarketLimitations.length,
+    operatorMetricCatalogCount: protectedOperatorMetricCatalog.length,
     operatingMetrics: publicMarketOperatingMetrics,
+    operatorMetricCatalog: protectedOperatorMetricCatalog,
     unitEconomicsPackages: publicMarketUnitEconomicsPackages,
     modelEfficiencyControls: publicMarketModelEfficiencyControls,
     complianceLogs: publicMarketComplianceLogs,
@@ -532,7 +552,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add protected operator metric capture for model cost, review time, delivery hours, and packet count so SCRIMED can graduate from KPI definitions to finance-reviewed operating dashboards.",
+      "Add finance-reviewed protected metric rollups and packet export so SCRIMED can graduate from raw no-PHI captures to board-review operating dashboards.",
     updated: "2026-06-19"
   };
 }
@@ -546,8 +566,11 @@ export function buildPublicMarketReadinessBrief() {
 - Status: ${summary.status}
 - Proof stack: ${summary.proofStackStatus}
 - Brief proof stack: ${summary.briefProofStackStatus}
+- Protected operator metric capture: ${summary.protectedOperatorMetricStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
+- Protected metric route: ${summary.protectedOperatorMetricRoute}
+- Protected metric API: ${summary.protectedOperatorMetricApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis
@@ -573,6 +596,13 @@ ${summary.operatingMetrics
 - Boundary: ${metric.boundary}`
   )
   .join("\n\n")}
+
+## Protected Operator Metric Capture
+${summary.operatorMetricCatalog
+  .map(
+    (metric) => `- ${metric.label}: ${metric.description} Unit: ${metric.unit}. KPI: ${metric.publicMarketKpiId}. Proof: ${metric.proofRoute}. Discipline: ${metric.costDiscipline}`
+  )
+  .join("\n")}
 
 ## Unit Economics Packages
 ${summary.unitEconomicsPackages

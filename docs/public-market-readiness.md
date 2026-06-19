@@ -9,6 +9,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Public page: `/public-market-readiness`
 - JSON API: `/api/public-market-readiness`
 - Markdown brief: `/api/public-market-readiness/brief`
+- Protected metric workspace: `/pilot-workspace/access`
+- Protected metric API: `/api/pilot-workspaces/{workspaceSlug}/operator-metrics`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -18,6 +20,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Unit-economics package definitions for Workflow Intelligence Assessment, Synthetic Pilot Evaluation, Protected Enterprise Pilot, and Enterprise Operating License.
 - Model-efficiency controls for task-specific agents, open/closed model optionality, token and evidence budgets, and workflow-owned data loops.
 - Compliance-log map connecting protected pilot audit events, QA evidence, clinical activation readiness, buyer diligence, secure evidence vault readiness, and Trust Safety Operations.
+- Protected AAL2 operator metric capture for model cost, review time, delivery hours, proof-packet count, and workflow volume.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.
@@ -32,8 +35,10 @@ While frontier labs burn billions to build general intelligence, SCRIMED capture
 
 This layer is not audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, a valuation guarantee, clinical validation, reimbursement assurance, compliance certification, or live clinical execution authorization.
 
-Current metrics are definitions and synthetic/protected-pilot readiness signals. Finance-reviewed cost accounting, customer-approved baselines, external legal review, privacy/security approval, and clinical governance remain required before external reporting or production clinical use.
+Current metrics are definitions, synthetic/protected-pilot readiness signals, and no-PHI protected operator captures. Finance-reviewed cost accounting, customer-approved baselines, external legal review, privacy/security approval, and clinical governance remain required before external reporting or production clinical use.
+
+Protected operator metrics are aggregate operating metadata only. They must not contain PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities offering material, legal advice, tax advice, accounting advice, valuation assurance, reimbursement assurance, clinical validation, or live clinical execution approval.
 
 ## Next Build
 
-Add protected operator metric capture for model cost, review time, delivery hours, and proof-packet count so SCRIMED can graduate from KPI definitions to finance-reviewed operating dashboards.
+Add finance-reviewed protected metric rollups and packet export so SCRIMED can graduate from raw no-PHI captures to board-review operating dashboards.

@@ -2,6 +2,15 @@
 
 Updated: 2026-06-19
 
+## Latest Protected Operator Metric Capture Release
+
+- Added protected Public Market Operator Metrics inside `/pilot-workspace/access` after the Command Intelligence Hub.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/operator-metrics` for AAL2 no-PHI operating metric review and capture.
+- Added `app/lib/protectedOperatorMetrics.ts` with typed metric catalog, input validation, dashboard aggregation, forbidden-content checks, safe workarounds, and fixed finance/securities boundaries.
+- Added `public.protected_operator_metrics` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `operator-metric-recorded` audit events, and runtime schema `2026-06-19.2`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-protected-operator-metric-capture-no-phi`.
+- Preserved the boundary: operator metrics are aggregate no-PHI operating metadata only. They do not create audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, PHI authorization, production authorization, or live clinical execution approval.
+
 ## Latest Public Market Readiness Release
 
 - Added `/public-market-readiness`, `/api/public-market-readiness`, and `/api/public-market-readiness/brief` as SCRIMED's capital-efficiency and public-company operating-discipline layer.

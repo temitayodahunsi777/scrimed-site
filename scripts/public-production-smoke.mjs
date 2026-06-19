@@ -148,6 +148,13 @@ async function checkProductConsole() {
     throw new Error("product console missing public market readiness brief proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedOperatorMetrics !==
+    "aal2-protected-operator-metric-capture-no-phi"
+  ) {
+    throw new Error("product console missing protected operator metrics proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -548,6 +555,20 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness expected model efficiency controls.");
   }
 
+  if (
+    body.protectedOperatorMetricStatus !==
+    "aal2-protected-operator-metric-capture-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected operator metric status.");
+  }
+
+  if (
+    body.protectedOperatorMetricApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/operator-metrics"
+  ) {
+    throw new Error("Public Market Readiness missing protected operator metric API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -717,6 +738,25 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-approvals/packet`,
   "Clinical Activation Approval Workflow packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/operator-metrics`,
+  "Protected Operator Metrics protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/operator-metrics`,
+  "Protected Operator Metrics write protected API",
+  {
+    metricKey: "workflow-volume",
+    metricValue: 1,
+    workflowKey: "smoke.public-market-readiness",
+    measurementWindowStart: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    measurementWindowEnd: new Date().toISOString(),
+    sourceRoute: "/public-market-readiness",
+    evidenceReference: "smoke-no-phi-operator-metric",
+    operatorAttestation: "no-phi-finance-readiness-operator-metric",
+    dataBoundary: "synthetic-business-workflow-only"
+  }
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

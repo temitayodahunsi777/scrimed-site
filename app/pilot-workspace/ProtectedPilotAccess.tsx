@@ -3,7 +3,7 @@
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type {
   PilotAuditEventRecord,
   PilotSessionRecord,
@@ -26,6 +26,7 @@ import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
+import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
@@ -34,6 +35,11 @@ import type {
   ClinicalActivationApprovalWorkflow,
 } from "../lib/clinicalActivationApprovals";
 import { clinicalActivationApprovalAttestation } from "../lib/clinicalActivationApprovals";
+import type {
+  ProtectedOperatorMetricDashboard,
+  ProtectedOperatorMetricInput,
+  ProtectedOperatorMetricRecord
+} from "../lib/protectedOperatorMetrics";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -92,6 +98,14 @@ type ClinicalActivationApprovalResponse = {
   error?: { message?: string };
 };
 
+type ProtectedOperatorMetricsResponse = {
+  metricId?: string;
+  metrics?: ProtectedOperatorMetricRecord[];
+  dashboard?: ProtectedOperatorMetricDashboard;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -147,6 +161,11 @@ export default function ProtectedPilotAccess({
   const [commandIntelligenceSnapshots, setCommandIntelligenceSnapshots] = useState<CommandIntelligenceSnapshotRecord[]>([]);
   const [clinicalActivationApprovalWorkflow, setClinicalActivationApprovalWorkflow] =
     useState<ClinicalActivationApprovalWorkflow | null>(null);
+  const [protectedOperatorMetrics, setProtectedOperatorMetrics] = useState<ProtectedOperatorMetricRecord[]>([]);
+  const [protectedOperatorMetricDashboard, setProtectedOperatorMetricDashboard] =
+    useState<ProtectedOperatorMetricDashboard | null>(null);
+  const [protectedOperatorMetricStatus, setProtectedOperatorMetricStatus] =
+    useState<"idle" | "saving">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -157,6 +176,12 @@ export default function ProtectedPilotAccess({
   const [mfaFactorStatus, setMfaFactorStatus] = useState<"verified" | "unverified" | "">("");
   const [mfaQrCode, setMfaQrCode] = useState("");
   const [mfaCode, setMfaCode] = useState("");
+
+  const resetProtectedOperatorMetrics = useCallback(() => {
+    setProtectedOperatorMetrics([]);
+    setProtectedOperatorMetricDashboard(null);
+    setProtectedOperatorMetricStatus("idle");
+  }, []);
 
   useEffect(() => {
     const client = supabase;
@@ -206,6 +231,7 @@ export default function ProtectedPilotAccess({
         setClinicalApprovalPacketStatus("idle");
         setClinicalApprovalBusyDomainId(null);
         setClinicalActivationApprovalWorkflow(null);
+        resetProtectedOperatorMetrics();
         setStatus("signed-out");
         return;
       }
@@ -253,6 +279,7 @@ export default function ProtectedPilotAccess({
         setClinicalApprovalPacketStatus("idle");
         setClinicalApprovalBusyDomainId(null);
         setClinicalActivationApprovalWorkflow(null);
+        resetProtectedOperatorMetrics();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -302,6 +329,7 @@ export default function ProtectedPilotAccess({
       setClinicalApprovalPacketStatus("idle");
       setClinicalApprovalBusyDomainId(null);
       setClinicalActivationApprovalWorkflow(null);
+      resetProtectedOperatorMetrics();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -312,7 +340,8 @@ export default function ProtectedPilotAccess({
           loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0]),
           loadManualQaEvidencePackets(activeSession, nextWorkspaces[0]),
           loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0]),
-          loadClinicalActivationApprovals(activeSession, nextWorkspaces[0])
+          loadClinicalActivationApprovals(activeSession, nextWorkspaces[0]),
+          loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -443,6 +472,27 @@ export default function ProtectedPilotAccess({
       setClinicalActivationApprovalWorkflow(body.workflow ?? null);
     }
 
+    async function loadProtectedOperatorMetrics(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/operator-metrics`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedOperatorMetricsResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected operator metrics could not be loaded.");
+        return;
+      }
+
+      setProtectedOperatorMetrics(body.metrics ?? []);
+      setProtectedOperatorMetricDashboard(body.dashboard ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -454,7 +504,7 @@ export default function ProtectedPilotAccess({
       active = false;
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [resetProtectedOperatorMetrics, supabase]);
 
   async function sendMagicLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -622,6 +672,7 @@ export default function ProtectedPilotAccess({
     setClinicalApprovalPacketStatus("idle");
     setClinicalApprovalBusyDomainId(null);
     setClinicalActivationApprovalWorkflow(null);
+    resetProtectedOperatorMetrics();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -644,7 +695,8 @@ export default function ProtectedPilotAccess({
       refreshDemoReadinessSnapshots(session, workspace),
       refreshManualQaEvidencePackets(session, workspace),
       refreshCommandIntelligenceSnapshots(session, workspace),
-      refreshClinicalActivationApprovals(session, workspace)
+      refreshClinicalActivationApprovals(session, workspace),
+      refreshProtectedOperatorMetrics(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -730,6 +782,23 @@ export default function ProtectedPilotAccess({
     }
 
     setClinicalActivationApprovalWorkflow(body.workflow ?? null);
+  }
+
+  async function refreshProtectedOperatorMetrics(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/operator-metrics`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedOperatorMetricsResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected operator metrics could not be loaded.");
+      return;
+    }
+
+    setProtectedOperatorMetrics(body.metrics ?? []);
+    setProtectedOperatorMetricDashboard(body.dashboard ?? null);
   }
 
   async function createSyntheticSession() {
@@ -1103,6 +1172,41 @@ export default function ProtectedPilotAccess({
     setMessage("Clinical Activation Approval Workflow packet downloaded and its audit event was committed.");
   }
 
+  async function recordProtectedOperatorMetric(input: ProtectedOperatorMetricInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedOperatorMetricStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/pilot-workspaces/${selectedWorkspace.slug}/operator-metrics`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(input)
+    });
+    const body = (await response.json()) as ProtectedOperatorMetricsResponse;
+    setProtectedOperatorMetricStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected operator metric could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedOperatorMetrics(body.metrics ?? []);
+    setProtectedOperatorMetricDashboard(body.dashboard ?? null);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected operator metric recorded${body.metricId ? ` with ledger id ${body.metricId}` : ""}.`
+    );
+  }
+
   if (!configured) {
     return (
       <section className="section-band split-band">
@@ -1365,6 +1469,13 @@ export default function ProtectedPilotAccess({
             packetBusy={buyerRoomPacketStatus === "downloading"}
             sessions={sessions}
             workspace={selectedWorkspace}
+          />
+
+          <ProtectedOperatorMetricsPanel
+            busy={protectedOperatorMetricStatus === "saving"}
+            dashboard={protectedOperatorMetricDashboard}
+            metrics={protectedOperatorMetrics}
+            onRecordMetric={recordProtectedOperatorMetric}
           />
 
           <BuyerPilotRoomPanel

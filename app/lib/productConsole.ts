@@ -105,6 +105,7 @@ import {
   publicMarketReadinessBriefProofStackStatus,
   publicMarketReadinessProofStackStatus
 } from "./publicMarketReadiness";
+import { protectedOperatorMetricCaptureStatus } from "./protectedOperatorMetrics";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -527,6 +528,13 @@ export const buyerActions: BuyerAction[] = [
     boundary: "Evaluation uses synthetic workflow packets only and keeps production execution denied."
   },
   {
+    label: "Record Operator Metrics",
+    href: "/pilot-workspace/access",
+    purpose: "Capture no-PHI operating metrics for cost discipline, workflow volume, proof output, and finance-readiness review.",
+    boundary:
+      "Protected operator metrics are internal operating metadata, not audited financial statements or securities offering material."
+  },
+  {
     label: "View Product Console",
     href: "/product",
     purpose: "Review the live product surface, agents, workflows, proof stack, and governance posture.",
@@ -672,6 +680,8 @@ export function getProductConsoleSummary() {
     publicMarketReadinessRoute: publicMarketReadinessSummary.route,
     publicMarketReadinessApiRoute: publicMarketReadinessSummary.apiRoute,
     publicMarketReadinessBriefRoute: publicMarketReadinessSummary.briefRoute,
+    protectedOperatorMetricsRoute: publicMarketReadinessSummary.protectedOperatorMetricRoute,
+    protectedOperatorMetricsApiRoute: publicMarketReadinessSummary.protectedOperatorMetricApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -700,6 +710,7 @@ export function getProductConsoleSummary() {
     publicMarketUnitEconomicsPackageCount: publicMarketReadinessSummary.unitEconomicsPackageCount,
     publicMarketComplianceLogCount: publicMarketReadinessSummary.complianceLogCount,
     publicMarketCustomerProofStageCount: publicMarketReadinessSummary.customerProofStageCount,
+    publicMarketOperatorMetricCatalogCount: publicMarketReadinessSummary.operatorMetricCatalogCount,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -807,6 +818,7 @@ export function getProductConsoleSummary() {
       clinicalActivationApprovals: clinicalActivationApprovalWorkflowProofStackStatus,
       publicMarketReadiness: publicMarketReadinessProofStackStatus,
       publicMarketReadinessBrief: publicMarketReadinessBriefProofStackStatus,
+      protectedOperatorMetrics: protectedOperatorMetricCaptureStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
