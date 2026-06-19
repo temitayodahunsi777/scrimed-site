@@ -68,6 +68,11 @@ const consoleViews = [
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."
   },
   {
+    name: "Public Market Readiness",
+    href: "/public-market-readiness",
+    summary: "Review KPI definitions, unit economics, compliance logs, customer proof, margin discipline, model-efficiency controls, and investor narrative."
+  },
+  {
     name: "Market Activation",
     href: "/market-activation",
     summary: "Review revenue streams, target audiences, FaithCore messaging, communications, PR, advertising, and claims-safe growth controls."

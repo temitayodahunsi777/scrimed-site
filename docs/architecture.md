@@ -15,6 +15,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Persistent Agent Workspace v1: `/agent-workspace`, `/api/agent-workspace`, `/api/agent-workspace/brief`, `/api/agent-workspace/proof-packet`, `/api/agent-workspaces/[workspaceSlug]/work-orders`, `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]`, and `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet`
 - Protected Command Intelligence Hub: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/command-intelligence`, and `/api/pilot-workspaces/[workspaceSlug]/command-intelligence/[snapshotId]/packet`
 - Protected Clinical Activation Dossier: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/clinical-activation-dossier`, and `/api/pilot-workspaces/[workspaceSlug]/clinical-activation-dossier/packet`
+- Public Market Readiness: `/public-market-readiness`, `/api/public-market-readiness`, and `/api/public-market-readiness/brief` for KPI definitions, unit economics, compliance logs, customer proof, margin discipline, model-efficiency controls, and investor narrative
 - Sales Command Center: `/sales-operations` and `/api/sales-operations/opportunities/[intakeId]/command-center` for opportunity-linked command posture, buyer-room maturity, commercial readiness, and synthetic proof timeline
 - Enterprise pilot evidence dashboard: `/pilot-evidence`, `/api/pilot-evidence`, and `/api/pilot-evidence/brief`
 - Executable TrustOS governance surface: `/trust-os`, `/api/trust-os`, and `/api/trust-os/evaluate`
@@ -53,6 +54,7 @@ The current repository is a production-shaped Next.js application, not a static 
 - Deployment: Vercel-hosted product app at `app.scrimedsolutions.com`, linked from the official Wix website at `scrimedsolutions.com`.
 - Product boundary: synthetic-only public product, demo, pilot, evidence, and readiness surfaces. Live PHI, production clinical execution, autonomous diagnosis, autonomous treatment, payer submission, and patient routing remain blocked until approved controls exist.
 - Clinical activation boundary: the current product can prepare regulated clinical-care activation, but does not authorize live care until customer scope, BAA/DPA where applicable, privacy/security/legal review, regulatory classification, licensed clinical governance, human-review workflow validation, connector validation, monitoring, incident response, rollback, and customer go-live approval are complete.
+- Financial and investor-readiness boundary: Public Market Readiness is an operating-discipline and diligence-preparation layer. It does not create audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, valuation assurance, reimbursement assurance, or guaranteed financial outcomes.
 - Architecture style: typed domain libraries under `app/lib`, public pages under `app/*`, route handlers under `app/api/*`, and database migrations under `supabase/migrations`.
 
 ## Healthcare Intelligence OS Build Plan

@@ -2,6 +2,14 @@
 
 Updated: 2026-06-19
 
+## Latest Public Market Readiness Release
+
+- Added `/public-market-readiness`, `/api/public-market-readiness`, and `/api/public-market-readiness/brief` as SCRIMED's capital-efficiency and public-company operating-discipline layer.
+- Added `app/lib/publicMarketReadiness.ts` with KPI definitions, unit-economics packages, model-efficiency controls, compliance logs, customer proof ladder, board cadence, investor narrative, known limitations, workarounds, and graduation gates.
+- Updated the Product Console and product readiness brief with Public Market Readiness proof-stack fields, route references, KPI counts, unit-economics counts, compliance-log counts, and customer-proof stages.
+- Updated `/hub` navigation and public smoke coverage so the public-market route, API, Markdown brief, and financial/securities boundary headers are verified.
+- Preserved the boundary: Public Market Readiness is internal operating discipline and diligence preparation. It is not audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, valuation assurance, clinical validation, reimbursement assurance, compliance certification, or live clinical execution authorization.
+
 ## Latest Clinical Activation Approval Workflow Release
 
 - Added protected Clinical Activation Approval Workflow v1 inside `/pilot-workspace/access` after the Clinical Activation Dossier.

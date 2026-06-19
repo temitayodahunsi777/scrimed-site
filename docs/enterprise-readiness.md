@@ -12,6 +12,8 @@ SCRIMED is not currently authorized for live clinical execution, autonomous diag
 
 The Trust Center is an operational readiness register. It is not legal advice, a compliance certification, a regulatory determination, or authorization for production clinical use.
 
+SCRIMED now exposes Public Market Readiness at `/public-market-readiness`, `/api/public-market-readiness`, and `/api/public-market-readiness/brief`. This surface organizes KPI definitions, unit economics, compliance logs, customer proof, margin discipline, model-efficiency controls, board cadence, and investor narrative. It helps SCRIMED prepare legally, financially, clinically, and brand-wise by requiring explicit boundaries before public or investor-facing claims. It is not audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live clinical execution authorization.
+
 SCRIMED now exposes Clinical Care Activation Readiness at `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief`. This surface tracks the hard gates required before clinical execution can move beyond synthetic evaluation: intended-use and regulatory classification, licensed clinical governance, clinical safety case, customer scope, BAA/DPA and privacy review, HIPAA Security Rule safeguard mapping, production identity, PHI-ready data architecture, FHIR/HL7/DICOM/X12 connector validation, human-review authority, clinical validation, incident response, continuous monitoring, reimbursement review, patient communication/consent, and go-live rollback approval.
 
 The activation surface is a readiness control, not a care-delivery authorization. It must not be used to imply FDA clearance, HIPAA compliance certification, clinical validation, reimbursement certainty, live connector approval, patient-facing authorization, or production clinical care readiness.
@@ -84,6 +86,9 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 - `/api/enterprise-readiness/[slug]`
 - `/api/enterprise-readiness/claims`
 - `/api/enterprise-readiness/diligence-brief`
+- `/public-market-readiness`
+- `/api/public-market-readiness`
+- `/api/public-market-readiness/brief`
 - `/clinical-care-activation`
 - `/api/clinical-care-activation`
 - `/api/clinical-care-activation/brief`

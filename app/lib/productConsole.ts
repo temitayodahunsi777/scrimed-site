@@ -100,6 +100,11 @@ import {
 } from "./clinicalCareActivation";
 import { clinicalActivationDossierProofStackStatus } from "./clinicalActivationDossier";
 import { clinicalActivationApprovalWorkflowProofStackStatus } from "./clinicalActivationApprovals";
+import {
+  getPublicMarketReadinessSummary,
+  publicMarketReadinessBriefProofStackStatus,
+  publicMarketReadinessProofStackStatus
+} from "./publicMarketReadiness";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -459,6 +464,14 @@ export const buyerActions: BuyerAction[] = [
       "Competitive positioning does not imply third-party partnership, certified compliance, live clinical execution, or production connector authorization."
   },
   {
+    label: "Review Public Market Readiness",
+    href: "/public-market-readiness",
+    purpose:
+      "Inspect SCRIMED's KPI stack, unit economics, compliance logs, customer proof ladder, margin discipline, model-efficiency controls, and investor narrative.",
+    boundary:
+      "Public Market Readiness is operating discipline and diligence preparation, not audited financial reporting, securities offering material, investment advice, or valuation assurance."
+  },
+  {
     label: "Inspect Product Demos",
     href: "/demos",
     purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
@@ -611,6 +624,7 @@ export function getProductConsoleSummary() {
   const salesDealRoomSummary = getSalesDealRoomSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const clinicalCareActivationSummary = getClinicalCareActivationSummary();
+  const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -655,6 +669,9 @@ export function getProductConsoleSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals",
     clinicalActivationApprovalWorkflowPacketRoute:
       "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
+    publicMarketReadinessRoute: publicMarketReadinessSummary.route,
+    publicMarketReadinessApiRoute: publicMarketReadinessSummary.apiRoute,
+    publicMarketReadinessBriefRoute: publicMarketReadinessSummary.briefRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -679,6 +696,10 @@ export function getProductConsoleSummary() {
     clinicalCareActivationStatus: clinicalCareActivationSummary.status,
     clinicalCareActivationGateCount: clinicalCareActivationSummary.gateCount,
     clinicalCareActivationBlockedCapabilityCount: clinicalCareActivationSummary.blockedCapabilities.length,
+    publicMarketKpiCount: publicMarketReadinessSummary.metricCount,
+    publicMarketUnitEconomicsPackageCount: publicMarketReadinessSummary.unitEconomicsPackageCount,
+    publicMarketComplianceLogCount: publicMarketReadinessSummary.complianceLogCount,
+    publicMarketCustomerProofStageCount: publicMarketReadinessSummary.customerProofStageCount,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -779,10 +800,13 @@ export function getProductConsoleSummary() {
     sourceIntelligenceSummary,
     qaEvidenceLedger,
     clinicalCareActivationSummary,
+    publicMarketReadinessSummary,
     proofStack: {
       clinicalCareActivation: clinicalCareActivationProofStackStatus,
       clinicalActivationDossier: clinicalActivationDossierProofStackStatus,
       clinicalActivationApprovals: clinicalActivationApprovalWorkflowProofStackStatus,
+      publicMarketReadiness: publicMarketReadinessProofStackStatus,
+      publicMarketReadinessBrief: publicMarketReadinessBriefProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -930,6 +954,24 @@ export function getProductReadinessBrief() {
     `Next diligence step: ${summary.demoPilotProgramSummary.investorReadiness.nextDiligenceStep}`,
     ...summary.demoPilotProgramSummary.investorReadiness.proofSignals.map(
       (signal) => `- ${signal.label} (${signal.status}) -> ${signal.route}: ${signal.evidence}`
+    ),
+    "",
+    "## Public Market Readiness",
+    `Route: ${summary.publicMarketReadinessRoute}`,
+    `API: ${summary.publicMarketReadinessApiRoute}`,
+    `Brief: ${summary.publicMarketReadinessBriefRoute}`,
+    `Status: ${summary.publicMarketReadinessSummary.status}`,
+    `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
+    `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,
+    `KPI definitions: ${summary.publicMarketKpiCount}`,
+    `Unit economics packages: ${summary.publicMarketUnitEconomicsPackageCount}`,
+    `Compliance logs: ${summary.publicMarketComplianceLogCount}`,
+    `Customer proof stages: ${summary.publicMarketCustomerProofStageCount}`,
+    ...summary.publicMarketReadinessSummary.operatingMetrics.map(
+      (metric) => `- KPI: ${metric.name} (${metric.currentMaturity}) -> ${metric.proofRoute}: ${metric.formula}`
+    ),
+    ...summary.publicMarketReadinessSummary.limitations.map(
+      (limitation) => `- Boundary: ${limitation.limitation}. Workaround: ${limitation.workaround}`
     ),
     "",
     "## Strategic Platform Intelligence",

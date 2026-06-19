@@ -83,6 +83,21 @@ function requireSalesBoundary(label, response) {
   }
 }
 
+function requirePublicMarketBoundary(label, response) {
+  const financialAuthority = response.headers.get("x-scrimed-financial-authority");
+  const securitiesAuthority = response.headers.get("x-scrimed-securities-authority");
+
+  requireSyntheticBoundary(label, response);
+
+  if (financialAuthority !== "not-audited-financial-report") {
+    throw new Error(`${label} expected x-scrimed-financial-authority not-audited-financial-report but received ${financialAuthority}.`);
+  }
+
+  if (securitiesAuthority !== "not-securities-offering-material") {
+    throw new Error(`${label} expected x-scrimed-securities-authority not-securities-offering-material but received ${securitiesAuthority}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -117,6 +132,20 @@ async function checkProductConsole() {
     "aal2-clinical-activation-approval-workflow-no-phi"
   ) {
     throw new Error("product console missing clinical activation approval workflow proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.publicMarketReadiness !==
+    "public-market-readiness-capital-efficiency-kpi-stack"
+  ) {
+    throw new Error("product console missing public market readiness proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.publicMarketReadinessBrief !==
+    "public-market-readiness-board-brief-no-financial-advice"
+  ) {
+    throw new Error("product console missing public market readiness brief proof-stack posture.");
   }
 
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
@@ -488,6 +517,53 @@ async function checkClinicalCareActivation() {
   console.log("pass clinical care activation");
 }
 
+async function checkPublicMarketReadiness() {
+  const result = await request("/api/public-market-readiness");
+  requireStatus("Public Market Readiness", result.response.status, 200);
+  requireContentType("Public Market Readiness", result.response, "application/json");
+  requirePublicMarketBoundary("Public Market Readiness", result.response);
+  const body = requireJson("Public Market Readiness", result.body);
+
+  if (body.service !== "scrimed-public-market-readiness") {
+    throw new Error(`Public Market Readiness expected scrimed-public-market-readiness but received ${body.service}.`);
+  }
+
+  if (body.status !== "capital-efficiency-kpi-stack-ready") {
+    throw new Error(`Public Market Readiness expected capital-efficiency-kpi-stack-ready but received ${body.status}.`);
+  }
+
+  if (!Array.isArray(body.operatingMetrics) || body.operatingMetrics.length < 10) {
+    throw new Error("Public Market Readiness expected at least ten operating metric definitions.");
+  }
+
+  if (!body.operatingMetrics.some((metric) => metric.id === "cost-per-workflow")) {
+    throw new Error("Public Market Readiness missing cost per workflow KPI.");
+  }
+
+  if (!body.operatingMetrics.some((metric) => metric.id === "revenue-protected")) {
+    throw new Error("Public Market Readiness missing revenue protected KPI.");
+  }
+
+  if (!Array.isArray(body.modelEfficiencyControls) || body.modelEfficiencyControls.length < 4) {
+    throw new Error("Public Market Readiness expected model efficiency controls.");
+  }
+
+  const brief = await request("/api/public-market-readiness/brief");
+  requireStatus("Public Market Readiness brief", brief.response.status, 200);
+  requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
+  requirePublicMarketBoundary("Public Market Readiness brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Public Market Readiness Brief")) {
+    throw new Error("Public Market Readiness brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not audited financial reporting")) {
+    throw new Error("Public Market Readiness brief missing financial boundary.");
+  }
+
+  console.log("pass public market readiness");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -518,7 +594,9 @@ await checkHtml("/competitive-edge");
 await checkHtml("/pilot-deal-room");
 await checkHtml("/qa-evidence");
 await checkHtml("/clinical-care-activation");
+await checkHtml("/public-market-readiness");
 await checkClinicalCareActivation();
+await checkPublicMarketReadiness();
 await checkProductConsole();
 await checkReadiness();
 await checkCompetitiveEdgeApi();
