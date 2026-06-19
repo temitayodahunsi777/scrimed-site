@@ -65,6 +65,14 @@ export default function ProductConsolePage() {
           <strong>{summary.enterpriseReadinessSummary.domainCount}</strong>
         </article>
         <article>
+          <span>Clinical care gates</span>
+          <strong>{summary.clinicalCareActivationGateCount}</strong>
+        </article>
+        <article>
+          <span>Clinical blocked</span>
+          <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
+        </article>
+        <article>
           <span>Strategic patterns</span>
           <strong>{summary.strategicIntelligencePatternCount}</strong>
         </article>
@@ -338,6 +346,39 @@ export default function ProductConsolePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED clinical care activation readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical care activation</p>
+          <h2>SCRIMED has a controlled path toward clinical care without pretending live care is already authorized.</h2>
+          <p className="section-copy">{summary.clinicalCareActivationSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.clinicalCareActivationRoute}>
+              Open Clinical Activation
+            </Link>
+            <a className="secondary-action" href={summary.clinicalCareActivationBriefRoute}>
+              Download Readiness Brief
+            </a>
+          </div>
+        </div>
+        {summary.clinicalCareActivationSummary.activationPhases.map((phase) => (
+          <article className="module-row" key={phase.phase}>
+            <div>
+              <span>{phase.status}</span>
+              <h2>{phase.phase}</h2>
+            </div>
+            <p>{phase.objective}</p>
+            <div>
+              <strong>{phase.exitCriteria}</strong>
+              <ul className="compact-list">
+                {phase.requiredEvidence.map((evidence) => (
+                  <li key={evidence}>{evidence}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED sales attribution">

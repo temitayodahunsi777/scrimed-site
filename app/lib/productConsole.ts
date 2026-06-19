@@ -94,6 +94,10 @@ import {
   qaEvidenceLedgerProofStackStatus,
   qaManualRunEvidencePersistenceStatus
 } from "./qaEvidenceLedger";
+import {
+  clinicalCareActivationProofStackStatus,
+  getClinicalCareActivationSummary
+} from "./clinicalCareActivation";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -604,6 +608,7 @@ export function getProductConsoleSummary() {
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const salesDealRoomSummary = getSalesDealRoomSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
+  const clinicalCareActivationSummary = getClinicalCareActivationSummary();
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
@@ -635,6 +640,9 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
     healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    clinicalCareActivationRoute: clinicalCareActivationSummary.route,
+    clinicalCareActivationApiRoute: clinicalCareActivationSummary.apiRoute,
+    clinicalCareActivationBriefRoute: clinicalCareActivationSummary.briefRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -656,6 +664,9 @@ export function getProductConsoleSummary() {
     qaManualRunEvidencePacketRoute: qaEvidenceLedger.manualRunEvidenceCapture.route,
     qaManualRunEvidencePersistenceRoute:
       qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute,
+    clinicalCareActivationStatus: clinicalCareActivationSummary.status,
+    clinicalCareActivationGateCount: clinicalCareActivationSummary.gateCount,
+    clinicalCareActivationBlockedCapabilityCount: clinicalCareActivationSummary.blockedCapabilities.length,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -755,7 +766,9 @@ export function getProductConsoleSummary() {
     trustSafetyOperationsSummary,
     sourceIntelligenceSummary,
     qaEvidenceLedger,
+    clinicalCareActivationSummary,
     proofStack: {
+      clinicalCareActivation: clinicalCareActivationProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -825,10 +838,10 @@ export function getProductConsoleSummary() {
       qualityGates: qualityGateSummary.status
     },
     productionBoundary:
-      "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until identity, runtime safety, durable audit, privacy, connector, and human-review controls are approved.",
+      "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
       "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions and the AAL2 buyer-demo QA harness to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, or production connector step.",
-    updated: "2026-06-18"
+    updated: "2026-06-19"
   };
 }
 
@@ -846,6 +859,9 @@ export function getProductReadinessBrief() {
     "",
     "## Product Demos and Pilot Programs",
     `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
+    `Clinical Care Activation Readiness: ${summary.clinicalCareActivationRoute}`,
+    `Clinical Care Activation API: ${summary.clinicalCareActivationApiRoute}`,
+    `Clinical Care Activation Brief: ${summary.clinicalCareActivationBriefRoute}`,
     `Persistent Agent Workspace: ${summary.persistentAgentWorkspaceRoute}`,
     `Pilot Evidence Dashboard: ${summary.pilotEvidenceRoute}`,
     `Demo Center: ${summary.demoRoute}`,

@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-06-18
+Updated: 2026-06-19
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -11,6 +11,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
 - Healthcare Intelligence OS foundation: `/healthcare-intelligence-os`, `/api/healthcare-intelligence-os`, and `/api/healthcare-intelligence-os/brief`
+- Clinical Care Activation Readiness: `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief` for hard-gate tracking before live clinical care
 - Persistent Agent Workspace v1: `/agent-workspace`, `/api/agent-workspace`, `/api/agent-workspace/brief`, `/api/agent-workspace/proof-packet`, `/api/agent-workspaces/[workspaceSlug]/work-orders`, `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]`, and `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet`
 - Protected Command Intelligence Hub: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/command-intelligence`, and `/api/pilot-workspaces/[workspaceSlug]/command-intelligence/[snapshotId]/packet`
 - Sales Command Center: `/sales-operations` and `/api/sales-operations/opportunities/[intakeId]/command-center` for opportunity-linked command posture, buyer-room maturity, commercial readiness, and synthetic proof timeline
@@ -50,6 +51,7 @@ The current repository is a production-shaped Next.js application, not a static 
 - Runtime safety: Upstash Redis rate limiting with bounded fallback for protected mutations.
 - Deployment: Vercel-hosted product app at `app.scrimedsolutions.com`, linked from the official Wix website at `scrimedsolutions.com`.
 - Product boundary: synthetic-only public product, demo, pilot, evidence, and readiness surfaces. Live PHI, production clinical execution, autonomous diagnosis, autonomous treatment, payer submission, and patient routing remain blocked until approved controls exist.
+- Clinical activation boundary: the current product can prepare regulated clinical-care activation, but does not authorize live care until customer scope, BAA/DPA where applicable, privacy/security/legal review, regulatory classification, licensed clinical governance, human-review workflow validation, connector validation, monitoring, incident response, rollback, and customer go-live approval are complete.
 - Architecture style: typed domain libraries under `app/lib`, public pages under `app/*`, route handlers under `app/api/*`, and database migrations under `supabase/migrations`.
 
 ## Healthcare Intelligence OS Build Plan
@@ -98,6 +100,7 @@ Current foundation:
 Required before production:
 
 - Clinical validation studies, data-quality review, equity review, buyer baseline measurement, and human operating procedures.
+- Clinical Care Activation Readiness route evidence, hard-gate clearance, and customer-specific go-live approval.
 - No risk prediction, diagnosis, treatment, patient instruction, care-plan execution, or population scoring without authorized human review and approved governance.
 
 ### Phase 4: Project Ark Healthcare Intelligence Fabric
@@ -209,6 +212,7 @@ Active gates:
 - Agent workflow registry for specialized agent boundaries before execution
 - Command Intelligence Hub for protected operator visibility across agents, buyer diligence, Trust Engine, continuous evaluation, MCP/tool readiness, observability, and safe-mode controls before external proof release
 - Sales Command Center for tying opportunity records to protected workspace command snapshots, buyer diligence packet posture, commercial readiness, and next actions before enterprise follow-up
+- Clinical Care Activation Readiness for tracking regulatory, legal, privacy, security, interoperability, clinical-governance, monitoring, and go-live hard gates before any live clinical-care execution
 - Hub readiness checks for operational visibility
 
 Deferred production gates:

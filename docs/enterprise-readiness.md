@@ -1,6 +1,6 @@
 # SCRIMED Enterprise Readiness and Claims Control
 
-Updated: 2026-06-17
+Updated: 2026-06-19
 
 SCRIMED maintains a public Trust and Enterprise Readiness Center at `/trust-center`, a controlled claims register at `/claims`, and machine-readable readiness APIs under `/api/enterprise-readiness`.
 
@@ -11,6 +11,10 @@ SCRIMED is sellable as a governed synthetic pilot and enterprise evaluation prod
 SCRIMED is not currently authorized for live clinical execution, autonomous diagnosis, treatment, payer submission, patient outreach, production record mutation, or live protected-health-information processing.
 
 The Trust Center is an operational readiness register. It is not legal advice, a compliance certification, a regulatory determination, or authorization for production clinical use.
+
+SCRIMED now exposes Clinical Care Activation Readiness at `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief`. This surface tracks the hard gates required before clinical execution can move beyond synthetic evaluation: intended-use and regulatory classification, licensed clinical governance, clinical safety case, customer scope, BAA/DPA and privacy review, HIPAA Security Rule safeguard mapping, production identity, PHI-ready data architecture, FHIR/HL7/DICOM/X12 connector validation, human-review authority, clinical validation, incident response, continuous monitoring, reimbursement review, patient communication/consent, and go-live rollback approval.
+
+The activation surface is a readiness control, not a care-delivery authorization. It must not be used to imply FDA clearance, HIPAA compliance certification, clinical validation, reimbursement certainty, live connector approval, patient-facing authorization, or production clinical care readiness.
 
 ## Controlled Domains
 
@@ -52,6 +56,7 @@ Before protected enterprise pilots or production clinical use, SCRIMED still req
 - approved enterprise agreement stack, including DPA and BAA where applicable
 - privacy notices, processing register, retention schedule, and regional assessments
 - product regulatory classification and intended-use review
+- licensed clinical governance, clinical safety case, clinical validation protocol, and patient-communication/emergency-boundary approval before patient-specific care workflows
 - trademark clearance, insurance decisions, and formal brand standards
 - formal security program, incident response exercise, and independent penetration test
 - production identity, tenant isolation, durable audit, runtime safety, and connector controls
@@ -75,5 +80,8 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 - `/api/enterprise-readiness/[slug]`
 - `/api/enterprise-readiness/claims`
 - `/api/enterprise-readiness/diligence-brief`
+- `/clinical-care-activation`
+- `/api/clinical-care-activation`
+- `/api/clinical-care-activation/brief`
 - `/pilot-deal-room`
 - `/api/pilot-deal-room`

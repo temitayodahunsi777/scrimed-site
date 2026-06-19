@@ -67,6 +67,14 @@ function requireSyntheticBoundary(label, response) {
   }
 }
 
+function requireNoClinicalCareAuthority(label, response) {
+  const authority = response.headers.get("x-scrimed-clinical-care-authority");
+
+  if (authority !== "not-authorized-live-care") {
+    throw new Error(`${label} expected x-scrimed-clinical-care-authority not-authorized-live-care but received ${authority}.`);
+  }
+}
+
 function requireSalesBoundary(label, response) {
   const boundary = response.headers.get("x-scrimed-data-boundary");
 
@@ -94,6 +102,10 @@ async function checkProductConsole() {
 
   if (body.proofStack?.passkeyTenantAuthentication !== "passkey-or-magic-link-plus-aal2") {
     throw new Error("product console missing passkey tenant authentication proof-stack posture.");
+  }
+
+  if (body.proofStack?.clinicalCareActivation !== "clinical-care-activation-readiness-gated") {
+    throw new Error("product console missing clinical care activation proof-stack posture.");
   }
 
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
@@ -416,6 +428,55 @@ async function checkQaEvidenceLedger() {
   console.log("pass QA evidence ledger");
 }
 
+async function checkClinicalCareActivation() {
+  const result = await request("/api/clinical-care-activation");
+  requireStatus("Clinical care activation", result.response.status, 200);
+  requireContentType("Clinical care activation", result.response, "application/json");
+  requireSyntheticBoundary("Clinical care activation", result.response);
+  requireNoClinicalCareAuthority("Clinical care activation", result.response);
+  const body = requireJson("Clinical care activation", result.body);
+
+  if (body.service !== "scrimed-clinical-care-activation") {
+    throw new Error(`Clinical care activation expected service scrimed-clinical-care-activation but received ${body.service}.`);
+  }
+
+  if (body.status !== "clinical-care-activation-gated") {
+    throw new Error(`Clinical care activation expected clinical-care-activation-gated but received ${body.status}.`);
+  }
+
+  if (body.careExecutionAuthority !== "not-authorized-live-care") {
+    throw new Error("Clinical care activation must not authorize live clinical care.");
+  }
+
+  if (body.proofStackStatus !== "clinical-care-activation-readiness-gated") {
+    throw new Error("Clinical care activation missing proof-stack status.");
+  }
+
+  if (!Array.isArray(body.gates) || body.gates.length < 12) {
+    throw new Error("Clinical care activation expected at least twelve hard gates.");
+  }
+
+  if (!Array.isArray(body.blockedCapabilities) || !body.blockedCapabilities.includes("live diagnosis")) {
+    throw new Error("Clinical care activation expected live diagnosis to remain blocked.");
+  }
+
+  if (body.readinessScore >= 100) {
+    throw new Error("Clinical care activation must not report full clinical readiness.");
+  }
+
+  const brief = await request("/api/clinical-care-activation/brief");
+  requireStatus("Clinical care activation brief", brief.response.status, 200);
+  requireContentType("Clinical care activation brief", brief.response, "text/markdown");
+  requireSyntheticBoundary("Clinical care activation brief", brief.response);
+  requireNoClinicalCareAuthority("Clinical care activation brief", brief.response);
+
+  if (!brief.body.text.includes("Care execution authority: not-authorized-live-care")) {
+    throw new Error("Clinical care activation brief must preserve no-live-care authority.");
+  }
+
+  console.log("pass clinical care activation");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -437,6 +498,8 @@ await checkHtml("/sales-operations");
 await checkHtml("/competitive-edge");
 await checkHtml("/pilot-deal-room");
 await checkHtml("/qa-evidence");
+await checkHtml("/clinical-care-activation");
+await checkClinicalCareActivation();
 await checkProductConsole();
 await checkReadiness();
 await checkCompetitiveEdgeApi();

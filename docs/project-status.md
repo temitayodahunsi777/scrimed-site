@@ -1,6 +1,16 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-18
+Updated: 2026-06-19
+
+## Latest Clinical Care Activation Readiness Release
+
+- Added `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief` as a first-class clinical-care activation readiness surface.
+- Added `app/lib/clinicalCareActivation.ts` with hard gates for intended-use review, licensed clinical governance, clinical safety case, customer scope, BAA/DPA/privacy review, HIPAA Security Rule safeguard mapping, production identity, PHI data architecture, connector validation, human authority/override logging, clinical validation, incident response, continuous monitoring, reimbursement review, patient communication/consent, and go-live rollback.
+- Added Trust Card style activation outputs for readiness decisions and clinical recommendation-like outputs, including confidence, risk score, source attribution, reviewer state, human-review triggers, and audit events.
+- Added a staged path from governed synthetic evaluation to shadow-mode readiness, clinician-supervised prospective pilot, and limited production go-live.
+- Updated the Product Console proof stack and public smoke checks with `clinical-care-activation-readiness-gated`.
+- Public smoke now verifies the clinical activation page, JSON API, Markdown brief, synthetic-only boundary, `not-authorized-live-care` header, hard-gate count, blocked live diagnosis, and non-100% readiness score.
+- Preserved the boundary: SCRIMED can prepare enterprise buyers for clinical-care activation, but the current product does not authorize live clinical care, PHI processing, diagnosis, treatment, order entry, patient outreach, emergency triage, medical-device use, payer submission, record mutation, or autonomous clinical execution. Production clinical care requires signed customer scope, BAA/DPA where applicable, privacy/security/legal review, regulatory classification, licensed clinical governance, validated human-review workflow, approved connectors, monitoring, incident response, rollback, and explicit customer go-live approval.
 
 ## Latest Sales Command Center Release
 
