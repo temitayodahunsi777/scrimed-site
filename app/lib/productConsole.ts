@@ -99,6 +99,7 @@ import {
   getClinicalCareActivationSummary
 } from "./clinicalCareActivation";
 import { clinicalActivationDossierProofStackStatus } from "./clinicalActivationDossier";
+import { clinicalActivationApprovalWorkflowProofStackStatus } from "./clinicalActivationApprovals";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -649,6 +650,11 @@ export function getProductConsoleSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier",
     clinicalActivationDossierPacketRoute:
       "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet",
+    clinicalActivationApprovalWorkflowRoute: "/pilot-workspace/access",
+    clinicalActivationApprovalWorkflowApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals",
+    clinicalActivationApprovalWorkflowPacketRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -776,6 +782,7 @@ export function getProductConsoleSummary() {
     proofStack: {
       clinicalCareActivation: clinicalCareActivationProofStackStatus,
       clinicalActivationDossier: clinicalActivationDossierProofStackStatus,
+      clinicalActivationApprovals: clinicalActivationApprovalWorkflowProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -872,6 +879,9 @@ export function getProductReadinessBrief() {
     `Protected Clinical Activation Dossier: ${summary.clinicalActivationDossierRoute}`,
     `Protected Clinical Activation Dossier API: ${summary.clinicalActivationDossierApiRoute}`,
     `Protected Clinical Activation Dossier Packet: ${summary.clinicalActivationDossierPacketRoute}`,
+    `Protected Clinical Activation Approval Workflow: ${summary.clinicalActivationApprovalWorkflowRoute}`,
+    `Protected Clinical Activation Approval API: ${summary.clinicalActivationApprovalWorkflowApiRoute}`,
+    `Protected Clinical Activation Approval Packet: ${summary.clinicalActivationApprovalWorkflowPacketRoute}`,
     `Persistent Agent Workspace: ${summary.persistentAgentWorkspaceRoute}`,
     `Pilot Evidence Dashboard: ${summary.pilotEvidenceRoute}`,
     `Demo Center: ${summary.demoRoute}`,

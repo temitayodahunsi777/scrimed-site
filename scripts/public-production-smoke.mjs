@@ -112,6 +112,13 @@ async function checkProductConsole() {
     throw new Error("product console missing clinical activation dossier proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.clinicalActivationApprovals !==
+    "aal2-clinical-activation-approval-workflow-no-phi"
+  ) {
+    throw new Error("product console missing clinical activation approval workflow proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -489,6 +496,14 @@ async function checkProtectedFailClosed(path, label) {
   console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
 }
 
+async function checkProtectedPostFailClosed(path, label, payload) {
+  const result = await postJson(path, payload);
+  requireStatus(label, result.response.status, [401, 503]);
+  requireContentType(label, result.response, "application/json");
+  requireSyntheticBoundary(label, result.response);
+  console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
+}
+
 async function checkSalesProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -608,6 +623,22 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-dossier/packet`,
   "Clinical Activation Dossier packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-approvals`,
+  "Clinical Activation Approval Workflow protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-approvals`,
+  "Clinical Activation Approval Workflow write protected API",
+  {
+    domainId: "clinical-governance-safety",
+    attestation: "aal2-readiness-attestation-no-phi"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-approvals/packet`,
+  "Clinical Activation Approval Workflow packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

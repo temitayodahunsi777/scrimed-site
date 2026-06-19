@@ -20,6 +20,7 @@ import {
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
+import ClinicalActivationApprovalsPanel from "./ClinicalActivationApprovalsPanel";
 import ClinicalActivationDossierPanel from "./ClinicalActivationDossierPanel";
 import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
@@ -29,6 +30,10 @@ import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
 import type { QaManualRunEvidencePacketRecord } from "../lib/qaEvidenceLedger";
+import type {
+  ClinicalActivationApprovalWorkflow,
+} from "../lib/clinicalActivationApprovals";
+import { clinicalActivationApprovalAttestation } from "../lib/clinicalActivationApprovals";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -81,6 +86,12 @@ type CommandIntelligenceResponse = {
   error?: { message?: string };
 };
 
+type ClinicalActivationApprovalResponse = {
+  approvalId?: string;
+  workflow?: ClinicalActivationApprovalWorkflow;
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -122,6 +133,11 @@ export default function ProtectedPilotAccess({
   const [buyerRoomPacketStatus, setBuyerRoomPacketStatus] = useState<"idle" | "downloading">("idle");
   const [clinicalDossierPacketStatus, setClinicalDossierPacketStatus] =
     useState<"idle" | "downloading">("idle");
+  const [clinicalApprovalPacketStatus, setClinicalApprovalPacketStatus] =
+    useState<"idle" | "downloading">("idle");
+  const [clinicalApprovalBusyDomainId, setClinicalApprovalBusyDomainId] = useState<string | null>(
+    null
+  );
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
@@ -129,6 +145,8 @@ export default function ProtectedPilotAccess({
   const [demoReadinessSnapshots, setDemoReadinessSnapshots] = useState<PilotDemoReadinessSnapshotRecord[]>([]);
   const [manualQaEvidencePackets, setManualQaEvidencePackets] = useState<QaManualRunEvidencePacketRecord[]>([]);
   const [commandIntelligenceSnapshots, setCommandIntelligenceSnapshots] = useState<CommandIntelligenceSnapshotRecord[]>([]);
+  const [clinicalActivationApprovalWorkflow, setClinicalActivationApprovalWorkflow] =
+    useState<ClinicalActivationApprovalWorkflow | null>(null);
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -185,6 +203,9 @@ export default function ProtectedPilotAccess({
         setEnterprisePacketStatus("idle");
         setBuyerRoomPacketStatus("idle");
         setClinicalDossierPacketStatus("idle");
+        setClinicalApprovalPacketStatus("idle");
+        setClinicalApprovalBusyDomainId(null);
+        setClinicalActivationApprovalWorkflow(null);
         setStatus("signed-out");
         return;
       }
@@ -229,6 +250,9 @@ export default function ProtectedPilotAccess({
         setVerificationReadiness(null);
         setBuyerRoomPacketStatus("idle");
         setClinicalDossierPacketStatus("idle");
+        setClinicalApprovalPacketStatus("idle");
+        setClinicalApprovalBusyDomainId(null);
+        setClinicalActivationApprovalWorkflow(null);
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -275,6 +299,9 @@ export default function ProtectedPilotAccess({
       setCommandSnapshotStatus("idle");
       setBuyerRoomPacketStatus("idle");
       setClinicalDossierPacketStatus("idle");
+      setClinicalApprovalPacketStatus("idle");
+      setClinicalApprovalBusyDomainId(null);
+      setClinicalActivationApprovalWorkflow(null);
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -284,7 +311,8 @@ export default function ProtectedPilotAccess({
           loadAuditEvents(activeSession, nextWorkspaces[0]),
           loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0]),
           loadManualQaEvidencePackets(activeSession, nextWorkspaces[0]),
-          loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0])
+          loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0]),
+          loadClinicalActivationApprovals(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -390,6 +418,29 @@ export default function ProtectedPilotAccess({
       }
 
       setCommandIntelligenceSnapshots(body.snapshots ?? []);
+    }
+
+    async function loadClinicalActivationApprovals(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/clinical-activation-approvals`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ClinicalActivationApprovalResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Clinical activation approvals could not be loaded.");
+        return;
+      }
+
+      setClinicalActivationApprovalWorkflow(body.workflow ?? null);
     }
 
     initializeAccess();
@@ -568,6 +619,9 @@ export default function ProtectedPilotAccess({
     setCommandSnapshotStatus("idle");
     setBuyerRoomPacketStatus("idle");
     setClinicalDossierPacketStatus("idle");
+    setClinicalApprovalPacketStatus("idle");
+    setClinicalApprovalBusyDomainId(null);
+    setClinicalActivationApprovalWorkflow(null);
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -589,7 +643,8 @@ export default function ProtectedPilotAccess({
       refreshAuditEvents(session, workspace),
       refreshDemoReadinessSnapshots(session, workspace),
       refreshManualQaEvidencePackets(session, workspace),
-      refreshCommandIntelligenceSnapshots(session, workspace)
+      refreshCommandIntelligenceSnapshots(session, workspace),
+      refreshClinicalActivationApprovals(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -656,6 +711,25 @@ export default function ProtectedPilotAccess({
     }
 
     setCommandIntelligenceSnapshots(body.snapshots ?? []);
+  }
+
+  async function refreshClinicalActivationApprovals(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/clinical-activation-approvals`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ClinicalActivationApprovalResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Clinical activation approvals could not be loaded.");
+      return;
+    }
+
+    setClinicalActivationApprovalWorkflow(body.workflow ?? null);
   }
 
   async function createSyntheticSession() {
@@ -959,6 +1033,76 @@ export default function ProtectedPilotAccess({
     setMessage("Clinical Activation Dossier downloaded and its audit event was committed.");
   }
 
+  async function recordClinicalActivationApproval(domainId: string) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setClinicalApprovalBusyDomainId(domainId);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/clinical-activation-approvals`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          domainId,
+          attestation: clinicalActivationApprovalAttestation
+        })
+      }
+    );
+    const body = (await response.json()) as ClinicalActivationApprovalResponse;
+
+    setClinicalApprovalBusyDomainId(null);
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "The no-PHI clinical activation approval could not be recorded.");
+      return;
+    }
+
+    setClinicalActivationApprovalWorkflow(body.workflow ?? clinicalActivationApprovalWorkflow);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("No-PHI clinical activation readiness attestation recorded with append-only audit evidence.");
+  }
+
+  async function downloadClinicalActivationApprovalPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setClinicalApprovalPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/clinical-activation-approvals/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    setClinicalApprovalPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+      setMessage(body.error?.message ?? "The Clinical Activation Approval Workflow packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-clinical-activation-approval-workflow.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Clinical Activation Approval Workflow packet downloaded and its audit event was committed.");
+  }
+
   if (!configured) {
     return (
       <section className="section-band split-band">
@@ -1243,6 +1387,14 @@ export default function ProtectedPilotAccess({
             packetBusy={clinicalDossierPacketStatus === "downloading"}
             sessions={sessions}
             workspace={selectedWorkspace}
+          />
+
+          <ClinicalActivationApprovalsPanel
+            busyDomainId={clinicalApprovalBusyDomainId}
+            onDownloadPacket={downloadClinicalActivationApprovalPacket}
+            onRecordApproval={recordClinicalActivationApproval}
+            packetBusy={clinicalApprovalPacketStatus === "downloading"}
+            workflow={clinicalActivationApprovalWorkflow}
           />
 
           <ManualQaEvidencePanel

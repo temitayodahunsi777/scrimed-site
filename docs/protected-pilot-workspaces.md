@@ -65,6 +65,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals`
+- `POST /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -150,6 +153,25 @@ Current boundary: the hub is a command posture for governed synthetic pilots and
 The JSON route at `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier` requires AAL2 governance context, tenant workspace membership, no-store response headers, synthetic-only boundary headers, and rate limiting.
 
 The Markdown export at `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet` commits a protected packet download audit event before release through the existing enterprise proof packet audit path. The export is no-PHI and does not create actual signatures, certify compliance, approve PHI processing, authorize live connectors, validate clinical safety, approve patient outreach, or permit live clinical execution.
+
+## Clinical Activation Approval Workflow
+
+`/pilot-workspace/access` now includes a protected Clinical Activation Approval Workflow immediately after the dossier. It turns the unsigned dossier metadata into an append-only no-PHI attestation ledger for:
+
+- Regulatory classification.
+- Clinical governance and safety.
+- Privacy, security, and PHI readiness.
+- Interoperability and connector validation.
+- Legal, commercial, and reimbursement boundary.
+- Go-live, rollback, and operations.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals` requires AAL2 governance context, tenant workspace membership, no-store headers, synthetic-only boundary headers, and rate limiting. It returns the current approval workflow, latest attestation per domain, retained blockers, safe workarounds, and degraded-section disclosure.
+
+`POST /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals` records only the selected domain and a fixed `aal2-readiness-attestation-no-phi` value. The server recomputes the evidence snapshot, reviewer role, approval status, retained blockers, no-PHI boundary, and live-care denial before calling the guarded Supabase RPC. The browser cannot send free-form clinical facts, documents, PHI, payer member data, production credentials, legal advice, reimbursement determinations, or live-care authorization.
+
+The database layer stores approvals in `public.clinical_activation_approvals` with select-only RLS for authenticated AAL2 tenant members and an append-only `record_clinical_activation_approval` RPC for tenant-admin, pilot-lead, or reviewer roles. The RPC also commits `clinical-activation-approval-recorded` to the workspace audit trail.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet` commits a write-before-release audit event through the existing enterprise proof-packet audit path and returns a Markdown approval workflow packet. The packet is legal, clinical, finance, and brand diligence support only. It does not create legal advice, clinical approval, FDA clearance, HIPAA compliance certification, reimbursement determination, PHI authorization, patient outreach permission, production connector authorization, diagnosis, treatment, record mutation, payer submission, autonomous clinical authority, or live clinical execution approval.
 
 ## Sales Command Center Linkage
 

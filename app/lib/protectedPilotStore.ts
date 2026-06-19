@@ -50,6 +50,10 @@ import type {
   CommandToolAccessPlan,
   CommandTrustEngineOutput
 } from "./commandIntelligenceHub";
+import type {
+  ClinicalActivationApprovalRecord,
+  ClinicalActivationApprovalStatus
+} from "./clinicalActivationApprovals";
 
 type AuthenticatedPilotContext =
   | {
@@ -171,6 +175,26 @@ type CommandIntelligenceSnapshotRow = {
   boundary: string;
   created_by: string;
   created_at: string;
+};
+
+type ClinicalActivationApprovalRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  domain_id: string;
+  domain_label: string;
+  approval_status: ClinicalActivationApprovalStatus;
+  approval_scope: ClinicalActivationApprovalRecord["approvalScope"];
+  reviewer_role: string;
+  attestation: ClinicalActivationApprovalRecord["attestation"];
+  evidence_snapshot: Record<string, unknown>;
+  retained_blockers: string[];
+  no_phi_attestation: boolean;
+  clinical_go_live_authority: ClinicalActivationApprovalRecord["clinicalGoLiveAuthority"];
+  signed_by: string;
+  signed_at: string;
+  created_at: string;
+  boundary: string;
 };
 
 type TrustOSDecisionRow = {
@@ -617,6 +641,30 @@ function mapQaManualRunEvidencePacket(
   };
 }
 
+function mapClinicalActivationApproval(
+  row: ClinicalActivationApprovalRow
+): ClinicalActivationApprovalRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    domainId: row.domain_id,
+    domainLabel: row.domain_label,
+    approvalStatus: row.approval_status,
+    approvalScope: row.approval_scope,
+    reviewerRole: row.reviewer_role,
+    attestation: row.attestation,
+    evidenceSnapshot: row.evidence_snapshot,
+    retainedBlockers: Array.isArray(row.retained_blockers) ? row.retained_blockers : [],
+    noPhiAttestation: true,
+    clinicalGoLiveAuthority: row.clinical_go_live_authority,
+    signedBy: row.signed_by,
+    signedAt: row.signed_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -901,6 +949,8 @@ const pilotDemoReadinessSnapshotSelect =
   "id, tenant_id, workspace_id, readiness_state, readiness_score, passed_count, review_count, blocked_count, required_actions, buyer_brief, check_results, runbook, verification, evidence_counts, snapshot, last_evidence_at, boundary, created_by, created_at";
 const commandIntelligenceSnapshotSelect =
   "id, tenant_id, workspace_id, command_state, command_score, buyer_room_state, buyer_room_score, agent_commander_status, workstream_count, trust_output_count, evaluation_gate_count, tool_access_plan_count, safe_mode_control_count, next_action_count, evidence_counts, metrics, workstreams, trust_engine_outputs, evaluation_pipeline, tool_access_plans, safe_mode_controls, next_actions, limitations, observability, snapshot, last_evidence_at, operator_attestation, boundary, created_by, created_at";
+const clinicalActivationApprovalSelect =
+  "id, tenant_id, workspace_id, domain_id, domain_label, approval_status, approval_scope, reviewer_role, attestation, evidence_snapshot, retained_blockers, no_phi_attestation, clinical_go_live_authority, signed_by, signed_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1060,6 +1110,25 @@ export async function getCommandIntelligenceSnapshot(
     snapshot: data
       ? mapCommandIntelligenceSnapshot(data as unknown as CommandIntelligenceSnapshotRow)
       : null,
+    error
+  };
+}
+
+export async function listClinicalActivationApprovals(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("clinical_activation_approvals")
+    .select(clinicalActivationApprovalSelect)
+    .eq("workspace_id", workspaceId)
+    .order("signed_at", { ascending: false })
+    .limit(100);
+
+  return {
+    approvals: ((data ?? []) as unknown as ClinicalActivationApprovalRow[]).map(
+      mapClinicalActivationApproval
+    ),
     error
   };
 }
@@ -1265,6 +1334,58 @@ export async function recordClinicalActivationDossierPacketDownload(
     p_event_metadata: {
       ...eventMetadata,
       packetType: "clinical-activation-dossier",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      clinicalGoLiveAuthority: "not-authorized-live-care"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function createClinicalActivationApproval(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: {
+    domainId: string;
+    domainLabel: string;
+    approvalStatus: ClinicalActivationApprovalStatus;
+    reviewerRole: string;
+    evidenceSnapshot: Record<string, unknown>;
+    retainedBlockers: string[];
+  }
+) {
+  const { data, error } = await client.rpc("record_clinical_activation_approval", {
+    p_workspace_slug: workspaceSlug,
+    p_domain_id: input.domainId,
+    p_domain_label: input.domainLabel,
+    p_approval_status: input.approvalStatus,
+    p_reviewer_role: input.reviewerRole,
+    p_evidence_snapshot: input.evidenceSnapshot,
+    p_retained_blockers: input.retainedBlockers,
+    p_attestation: "aal2-readiness-attestation-no-phi"
+  });
+
+  return {
+    approvalId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordClinicalActivationApprovalPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "clinical-activation-approval-workflow",
       format: "text/markdown",
       syntheticOnly: true,
       noPhiOnly: true,

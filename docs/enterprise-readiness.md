@@ -18,6 +18,8 @@ The activation surface is a readiness control, not a care-delivery authorization
 
 Protected workspaces now expose Clinical Activation Dossier v1 at `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier` and `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet`. The dossier creates tenant-specific gate ownership, reviewer assignments, unsigned approval metadata, no-PHI evidence references, required sign-off packet inventory, go-live blockers, and rollback controls. It does not create actual legal, clinical, regulatory, privacy, security, or customer signatures; those approvals must be captured through qualified external and customer-specific processes before live care.
 
+Protected workspaces now expose Clinical Activation Approval Workflow v1 at `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals` and `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet`. The workflow persists no-PHI AAL2 readiness attestations for the dossier domains and retains the live-care blocked boundary. It is useful for buyer diligence, counsel review, clinical-governance planning, pricing confidence, and brand protection because it proves SCRIMED distinguishes readiness evidence from regulated production authorization. It does not replace external legal signatures, licensed clinical governance approval, BAA/DPA execution, FDA intended-use review, privacy/security sign-off, reimbursement review, customer go-live authorization, or connector validation.
+
 ## Controlled Domains
 
 The readiness model tracks:
@@ -87,5 +89,7 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 - `/api/clinical-care-activation/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet`
 - `/pilot-deal-room`
 - `/api/pilot-deal-room`

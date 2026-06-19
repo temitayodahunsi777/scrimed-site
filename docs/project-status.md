@@ -2,6 +2,16 @@
 
 Updated: 2026-06-19
 
+## Latest Clinical Activation Approval Workflow Release
+
+- Added protected Clinical Activation Approval Workflow v1 inside `/pilot-workspace/access` after the Clinical Activation Dossier.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals` for AAL2 no-PHI readiness attestation review and capture.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet` for an audited Markdown approval workflow export.
+- Added `app/lib/clinicalActivationApprovals.ts` to derive approval domains, latest attestations, retained blockers, safe workarounds, persistence posture, and legal/clinical/financial/brand value lines from the protected dossier and approval ledger.
+- Added `public.clinical_activation_approvals` with select-only RLS, guarded AAL2 RPC writes, append-only audit events, no direct write grants, fixed no-PHI attestation, and runtime schema `2026-06-19.1`.
+- Updated Product Console proof stack and public smoke coverage with `aal2-clinical-activation-approval-workflow-no-phi`.
+- Preserved the boundary: approval workflow records are no-PHI readiness attestations only. They do not create legal advice, clinical approval, FDA clearance, HIPAA compliance certification, reimbursement determination, PHI authorization, patient outreach permission, production connector authorization, diagnosis, treatment, record mutation, payer submission, autonomous clinical authority, or live clinical execution approval.
+
 ## Latest Clinical Activation Dossier Release
 
 - Added protected Clinical Activation Dossier v1 inside `/pilot-workspace/access`.

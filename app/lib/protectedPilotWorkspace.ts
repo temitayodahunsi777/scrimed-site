@@ -289,17 +289,17 @@ export const pilotWorkspaceRoles: Array<{
 }> = [
   {
     role: "tenant-admin",
-    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Download proof and governance packets"],
+    permissions: ["Review tenant identity configuration", "View all tenant pilot workspaces", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Record no-PHI clinical activation readiness attestations", "Download proof and governance packets"],
     restrictions: ["Cannot enable live clinical execution", "Cannot alter append-only audit events", "Cannot create legal, breach, or compliance certification determinations"]
   },
   {
     role: "pilot-lead",
-    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "View workspace sessions", "Download proof and governance packets"],
+    permissions: ["Run synthetic evaluations", "Create and transition persistent agent work orders", "Record TrustOps incident evidence", "Commit TrustOS decisions", "Record governed reviewer dispositions", "Record no-PHI clinical activation readiness attestations", "View workspace sessions", "Download proof and governance packets"],
     restrictions: ["Cannot manage tenant identity", "Cannot alter append-only audit events", "Cannot create legal, breach, or compliance certification determinations"]
   },
   {
     role: "reviewer",
-    permissions: ["View workspace sessions", "Review Trust Cards, work orders, and TrustOps incidents", "Record governed reviewer dispositions and outcome signals", "Download proof and governance packets"],
+    permissions: ["View workspace sessions", "Review Trust Cards, work orders, and TrustOps incidents", "Record governed reviewer dispositions and outcome signals", "Record no-PHI clinical activation readiness attestations", "Download proof and governance packets"],
     restrictions: ["Cannot create sessions or new work orders", "Cannot manage tenant identity", "Cannot mutate TrustOps incident records"]
   },
   {
@@ -416,6 +416,20 @@ export const protectedPilotApiContracts = [
     route: "/api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet",
     access: "AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit + append-only packet-download audit",
     purpose: "Download an aggregate Markdown enterprise proof packet spanning sessions, audit events, TrustOS decisions, Agent Workspace work orders, TrustOps incidents, tenant access posture, and governance ledger evidence."
+  },
+  {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI attestation + server-held runtime authorization + rate limit",
+    purpose:
+      "Inspect or append no-PHI clinical activation readiness attestations for regulatory, clinical governance, privacy/security, interoperability, legal/commercial, and go-live domains while live care remains blocked."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
+    access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited Markdown Clinical Activation Approval Workflow packet summarizing signed no-PHI readiness attestations, retained blockers, safe workarounds, and unavailable sections."
   },
   {
     method: "GET / POST",

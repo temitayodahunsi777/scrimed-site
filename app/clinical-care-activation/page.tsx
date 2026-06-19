@@ -35,6 +35,9 @@ export default function ClinicalCareActivationPage() {
           <Link className="secondary-action" href="/pilot-workspace/access">
             Protected Dossier
           </Link>
+          <Link className="secondary-action" href="/pilot-workspace/access">
+            Approval Workflow
+          </Link>
           <Link className="secondary-action" href="/trust-os">
             Review TrustOS
           </Link>
