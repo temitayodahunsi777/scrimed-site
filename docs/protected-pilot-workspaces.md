@@ -147,6 +147,8 @@ Sales Operations now exposes `GET /api/sales-operations/opportunities/{intakeId}
 
 The route is read-only and uses existing opportunity records, protected workspace audit events, and Command Intelligence snapshot records. It does not create storage, accept uploads, expose secrets, or authorize production workflow execution. When a buyer workspace is not provisioned yet, it returns a safe workspace-required posture instead of pretending command evidence exists.
 
+Operators can run `npm run smoke:sales-command-center` as a fail-closed public check with no token. Supplying a fresh short-lived AAL2 tenant-admin token through `SCRIMED_SALES_QA_BEARER_TOKEN` and an explicit `SCRIMED_SALES_QA_INTAKE_ID` runs the read-only authenticated Command Center happy path after the existing sales QA token preflight. This smoke never writes records, stores tokens, or bypasses the protected API's Supabase Auth verification.
+
 ## Pilot Deal Room Linkage
 
 `/pilot-deal-room` is the public organization layer that explains how buyers move from SCRIMED's official website and product app into governed intake, Sales Operations, protected Buyer Pilot Room diligence, audited packet release, and paid synthetic pilot.
@@ -171,7 +173,7 @@ Sales Operations can now persist buyer demo sessions through `POST /api/sales-op
 
 Sales Operations now includes an AAL2 buyer-demo session QA harness at `GET` and `POST /api/sales-operations/qa/buyer-demo-sessions`. The harness targets the selected opportunity or an explicit short-lived-token smoke target, records a synthetic buyer-demo session through the same guarded RPC as operator demos, and immediately verifies the audited packet path through the existing packet RPC.
 
-Sales Demo Session QA now has a short-lived operator-token runbook at `docs/operator-token-rotation.md`, a local preflight script, and a manual-only GitHub Actions workflow. Tokenized smoke must pass AAL2, `session_id`, expiry, minted-lifetime, and explicit `SCRIMED_SALES_QA_INTAKE_ID` checks before any authenticated request is sent.
+Sales Demo Session QA and the read-only Sales Command Center smoke now use the short-lived operator-token runbook at `docs/operator-token-rotation.md`, the local preflight script, and the manual-only GitHub Actions policy. Tokenized smoke must pass AAL2, `session_id`, expiry, minted-lifetime, and explicit `SCRIMED_SALES_QA_INTAKE_ID` checks before any authenticated request is sent.
 
 Current boundary: buyer-specific workspaces, lifecycle controls, production readiness packets, activation approval packets, buyer diligence rooms, secure evidence vault readiness records, persisted buyer demo sessions, and the buyer-demo QA harness are logical tenant-per-buyer evaluation controls inside the activated SCRIMED pilot tenant. This resolves the paid-pilot setup, enterprise diligence, sensitive-document storage planning, buyer-demo follow-up, and authenticated happy-path QA process gap without creating live customer infrastructure, upload URLs, object buckets, long-lived test credentials, or a sensitive-document repository prematurely. The production gate is signed customer tenant architecture, production SSO configuration, approved transactional email delivery, retention deletion policy, legal/privacy/security review, clinical governance review, BAA/DPA path where applicable, secure evidence storage controls, live connector authorization, and the first manually approved short-lived-token CI run.
 

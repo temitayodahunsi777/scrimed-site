@@ -4,9 +4,9 @@ Updated: 2026-06-18
 
 ## Purpose
 
-Run authenticated Sales Demo Session QA only when a human tenant-admin intentionally verifies an AAL2 browser session and targets a specific Sales Operations opportunity.
+Run authenticated Sales Demo Session QA and read-only Sales Command Center verification only when a human tenant-admin intentionally verifies an AAL2 browser session and targets a specific Sales Operations opportunity.
 
-This runbook exists to prevent long-lived CI credentials, wrong-opportunity QA writes, leaked bearer tokens, and ungoverned authenticated mutation tests.
+This runbook exists to prevent long-lived CI credentials, wrong-opportunity QA writes, leaked bearer tokens, and ungoverned authenticated tests.
 
 ## Scope
 
@@ -20,8 +20,10 @@ Applies to:
 - `scripts/sales-demo-session-qa-token-policy-selftest.mjs`
 - `scripts/sales-demo-session-qa-token-preflight.mjs`
 - `scripts/sales-demo-session-qa-smoke.mjs`
+- `scripts/sales-command-center-smoke.mjs`
 - `.github/workflows/sales-demo-session-qa-smoke.yml`
 - `POST /api/sales-operations/qa/buyer-demo-sessions`
+- `GET /api/sales-operations/opportunities/{intakeId}/command-center`
 
 Does not authorize PHI processing, production clinical execution, autonomous care decisions, payer submission, patient outreach, customer SSO cutover, source contract storage, credential storage, legal conclusions, compliance certification, or reimbursement determinations.
 
@@ -78,12 +80,18 @@ SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." node script
 SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQUIRE_SALES_QA=1 node scripts/sales-demo-session-qa-smoke.mjs
 ```
 
-10. Unset local shell variables immediately after the run.
-11. Sign out of the tenant-admin session if the token was copied outside the browser context.
-12. Review the Sales Operations audit trail and latest buyer demo session packet proof.
-13. Preferred path: open `/pilot-workspace/access` with the same AAL2 browser session and use the Manual QA Evidence panel to persist the non-secret run metadata.
-14. Fallback path: POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet, then POST the same payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session.
-15. Export the Buyer Diligence Export after persistence so the manual QA evidence count, workflow run ID, packet hash, legal/privacy/security/safety boundaries, and production hard gates appear in enterprise diligence.
+10. Optional read-only Command Center verification:
+
+```bash
+SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQUIRE_SALES_COMMAND_CENTER_QA=1 node scripts/sales-command-center-smoke.mjs
+```
+
+11. Unset local shell variables immediately after the run.
+12. Sign out of the tenant-admin session if the token was copied outside the browser context.
+13. Review the Sales Operations audit trail, latest buyer demo session packet proof, and current Sales Command Center timeline.
+14. Preferred path: open `/pilot-workspace/access` with the same AAL2 browser session and use the Manual QA Evidence panel to persist the non-secret run metadata.
+15. Fallback path: POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet, then POST the same payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session.
+16. Export the Buyer Diligence Export after persistence so the manual QA evidence count, workflow run ID, packet hash, legal/privacy/security/safety boundaries, command-posture timeline, and production hard gates appear in enterprise diligence.
 
 Manual evidence packet payload:
 

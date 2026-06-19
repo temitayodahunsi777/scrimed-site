@@ -8,6 +8,7 @@ Updated: 2026-06-18
 - The route ties Sales Operations opportunities to buyer-specific protected workspaces, retained Command Intelligence snapshots, command packet exports, Buyer Diligence Export posture, sales audit events, protected workspace audit events, commercial readiness, and next buyer actions.
 - Added a Sales Operations console section showing commercial readiness score, command snapshot count, latest command score, score trend, packet export count, degraded sections, and posture timeline.
 - Extended Buyer Pilot Room JSON and Markdown exports with Command Intelligence snapshot counts, latest score, score delta, trend, packet exports, and next action.
+- Added `scripts/sales-command-center-smoke.mjs` and `npm run smoke:sales-command-center` so operators can verify the read-only authenticated Command Center happy path with the existing short-lived AAL2 sales QA token policy and explicit `SCRIMED_SALES_QA_INTAKE_ID`.
 - Updated Product Console proof stack and public smoke coverage with `aal2-sales-command-intelligence-timeline`.
 - Preserved the boundary: this is business-contact, workflow-scope, and synthetic command-posture intelligence only. It does not store PHI, payer member data, medical records, imaging, production credentials, source contracts, legal/security/compliance certification, reimbursement determinations, production connector approval, patient outreach authorization, autonomous clinical authority, or live healthcare execution approval.
 
