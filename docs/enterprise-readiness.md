@@ -16,6 +16,8 @@ SCRIMED now exposes Clinical Care Activation Readiness at `/clinical-care-activa
 
 The activation surface is a readiness control, not a care-delivery authorization. It must not be used to imply FDA clearance, HIPAA compliance certification, clinical validation, reimbursement certainty, live connector approval, patient-facing authorization, or production clinical care readiness.
 
+Protected workspaces now expose Clinical Activation Dossier v1 at `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier` and `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet`. The dossier creates tenant-specific gate ownership, reviewer assignments, unsigned approval metadata, no-PHI evidence references, required sign-off packet inventory, go-live blockers, and rollback controls. It does not create actual legal, clinical, regulatory, privacy, security, or customer signatures; those approvals must be captured through qualified external and customer-specific processes before live care.
+
 ## Controlled Domains
 
 The readiness model tracks:
@@ -83,5 +85,7 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 - `/clinical-care-activation`
 - `/api/clinical-care-activation`
 - `/api/clinical-care-activation/brief`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet`
 - `/pilot-deal-room`
 - `/api/pilot-deal-room`

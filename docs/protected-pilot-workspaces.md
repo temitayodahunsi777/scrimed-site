@@ -63,6 +63,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
 - `POST /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
 - `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -132,6 +134,22 @@ Operators can now persist AAL2 human-reviewed command posture snapshots with `PO
 Command Intelligence packet export at `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet` requires an existing snapshot and commits `command-intelligence-packet-downloaded` before releasing Markdown evidence. This gives enterprise buyers and investors a retained command-history packet without screenshots, PHI, secrets, or unsupported production claims.
 
 Current boundary: the hub is a command posture for governed synthetic pilots and enterprise evaluation only. Production use still requires signed customer scope, BAA/DPA path where applicable, legal/privacy/security/clinical review, approved connectors, live monitoring, and human operating controls.
+
+## Clinical Activation Dossier
+
+`/pilot-workspace/access` now includes a protected Clinical Activation Dossier. It turns the public Clinical Care Activation Readiness model plus tenant-scoped workspace evidence into:
+
+- Gate ownership across regulatory, clinical governance, privacy/security, identity, interoperability, safety monitoring, legal/commercial, and operations.
+- Reviewer assignments for medical director or clinical governance, regulatory counsel, privacy officer, security officer, interoperability architect, legal/commercial owner, and go-live operator.
+- Explicit unsigned approval metadata for each activation domain.
+- No-PHI evidence references tied to current protected workspace sessions, audit events, demo readiness snapshots, Command Intelligence snapshots, and manual QA packets.
+- Required sign-off packet inventory for regulatory classification, clinical safety, PHI readiness, connector validation, reimbursement/legal boundary, and go-live rollback.
+- Go-live decision state that remains `blocked-before-clinical-authorization`.
+- Rollback controls required before any limited production launch.
+
+The JSON route at `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier` requires AAL2 governance context, tenant workspace membership, no-store response headers, synthetic-only boundary headers, and rate limiting.
+
+The Markdown export at `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet` commits a protected packet download audit event before release through the existing enterprise proof packet audit path. The export is no-PHI and does not create actual signatures, certify compliance, approve PHI processing, authorize live connectors, validate clinical safety, approve patient outreach, or permit live clinical execution.
 
 ## Sales Command Center Linkage
 

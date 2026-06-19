@@ -108,6 +108,10 @@ async function checkProductConsole() {
     throw new Error("product console missing clinical care activation proof-stack posture.");
   }
 
+  if (body.proofStack?.clinicalActivationDossier !== "aal2-clinical-activation-dossier-no-phi") {
+    throw new Error("product console missing clinical activation dossier proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -596,6 +600,14 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/command-intelligence/00000000-0000-0000-0000-000000000000/packet`,
   "Command Intelligence packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-dossier`,
+  "Clinical Activation Dossier protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-dossier/packet`,
+  "Clinical Activation Dossier packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

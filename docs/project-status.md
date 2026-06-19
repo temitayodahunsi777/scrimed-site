@@ -2,6 +2,15 @@
 
 Updated: 2026-06-19
 
+## Latest Clinical Activation Dossier Release
+
+- Added protected Clinical Activation Dossier v1 inside `/pilot-workspace/access`.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier` for tenant-scoped AAL2 dossier review.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-dossier/packet` for an audited Markdown export that commits a protected audit event before release.
+- Added `app/lib/clinicalActivationDossier.ts` to derive gate ownership, reviewer assignments, unsigned approval metadata, no-PHI evidence references, required sign-off packets, go-live blockers, and rollback controls from the current workspace evidence and Clinical Care Activation Readiness model.
+- Updated Product Console proof stack and public smoke coverage with `aal2-clinical-activation-dossier-no-phi`.
+- Preserved the boundary: the dossier is a protected no-PHI readiness artifact. It does not create signatures, approve PHI processing, certify HIPAA/SOC/regulatory status, validate clinical safety, authorize live connectors, permit patient outreach, approve payer submission, or allow live clinical execution.
+
 ## Latest Clinical Care Activation Readiness Release
 
 - Added `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief` as a first-class clinical-care activation readiness surface.

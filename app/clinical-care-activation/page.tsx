@@ -32,6 +32,9 @@ export default function ClinicalCareActivationPage() {
           <Link className="secondary-action" href="/pilot-deal-room">
             Open Pilot Deal Room
           </Link>
+          <Link className="secondary-action" href="/pilot-workspace/access">
+            Protected Dossier
+          </Link>
           <Link className="secondary-action" href="/trust-os">
             Review TrustOS
           </Link>

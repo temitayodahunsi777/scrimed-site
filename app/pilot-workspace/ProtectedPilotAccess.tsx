@@ -20,6 +20,7 @@ import {
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import AgentWorkspaceDashboardPanel from "./AgentWorkspaceDashboardPanel";
 import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
+import ClinicalActivationDossierPanel from "./ClinicalActivationDossierPanel";
 import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
@@ -119,6 +120,8 @@ export default function ProtectedPilotAccess({
   const [passkeyStatus, setPasskeyStatus] = useState<PasskeyStatus>("idle");
   const [enterprisePacketStatus, setEnterprisePacketStatus] = useState<"idle" | "downloading">("idle");
   const [buyerRoomPacketStatus, setBuyerRoomPacketStatus] = useState<"idle" | "downloading">("idle");
+  const [clinicalDossierPacketStatus, setClinicalDossierPacketStatus] =
+    useState<"idle" | "downloading">("idle");
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
@@ -181,6 +184,7 @@ export default function ProtectedPilotAccess({
         setVerificationReadiness(null);
         setEnterprisePacketStatus("idle");
         setBuyerRoomPacketStatus("idle");
+        setClinicalDossierPacketStatus("idle");
         setStatus("signed-out");
         return;
       }
@@ -224,6 +228,7 @@ export default function ProtectedPilotAccess({
         setCommandSnapshotStatus("idle");
         setVerificationReadiness(null);
         setBuyerRoomPacketStatus("idle");
+        setClinicalDossierPacketStatus("idle");
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -269,6 +274,7 @@ export default function ProtectedPilotAccess({
       setCommandPacketBusyId(null);
       setCommandSnapshotStatus("idle");
       setBuyerRoomPacketStatus("idle");
+      setClinicalDossierPacketStatus("idle");
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -561,6 +567,7 @@ export default function ProtectedPilotAccess({
     setCommandPacketBusyId(null);
     setCommandSnapshotStatus("idle");
     setBuyerRoomPacketStatus("idle");
+    setClinicalDossierPacketStatus("idle");
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -917,6 +924,41 @@ export default function ProtectedPilotAccess({
     setMessage("Buyer Diligence Export downloaded and its audit event was committed.");
   }
 
+  async function downloadClinicalActivationDossierPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setClinicalDossierPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/clinical-activation-dossier/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    setClinicalDossierPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+      setMessage(body.error?.message ?? "The Clinical Activation Dossier could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-clinical-activation-dossier.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Clinical Activation Dossier downloaded and its audit event was committed.");
+  }
+
   if (!configured) {
     return (
       <section className="section-band split-band">
@@ -1188,6 +1230,17 @@ export default function ProtectedPilotAccess({
             manualQaEvidencePackets={manualQaEvidencePackets}
             onDownloadPacket={downloadBuyerPilotRoomPacket}
             packetBusy={buyerRoomPacketStatus === "downloading"}
+            sessions={sessions}
+            workspace={selectedWorkspace}
+          />
+
+          <ClinicalActivationDossierPanel
+            auditEvents={auditEvents}
+            commandSnapshots={commandIntelligenceSnapshots}
+            demoSnapshots={demoReadinessSnapshots}
+            manualQaEvidencePackets={manualQaEvidencePackets}
+            onDownloadPacket={downloadClinicalActivationDossierPacket}
+            packetBusy={clinicalDossierPacketStatus === "downloading"}
             sessions={sessions}
             workspace={selectedWorkspace}
           />

@@ -1255,6 +1255,29 @@ export async function recordBuyerPilotRoomPacketDownload(
   };
 }
 
+export async function recordClinicalActivationDossierPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "clinical-activation-dossier",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      clinicalGoLiveAuthority: "not-authorized-live-care"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordQaManualRunEvidencePacket(
   client: SupabaseClient,
   workspaceSlug: string,
