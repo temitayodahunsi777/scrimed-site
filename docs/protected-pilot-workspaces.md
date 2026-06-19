@@ -79,6 +79,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards`
 - `POST /api/pilot-workspaces/{workspaceSlug}/board-scorecards`
 - `GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology`
+- `POST /api/pilot-workspaces/{workspaceSlug}/finance-methodology`
+- `GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -225,6 +228,28 @@ Current boundary: trend reviews compare aggregate no-PHI operating metadata only
 Safe workaround: if scorecard storage or packet export is unavailable, use protected trend packets plus external finance-reviewed board materials. Do not use scorecard output as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, revenue guarantee, reimbursement assurance, clinical validation, compliance certification, advertising claim substantiation, or live-care authorization.
 
 Current boundary: scorecards package aggregate no-PHI operating metadata only. Allocation profiles remain pending until finance approves full methodology. Scorecards must not store PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities materials, external valuation claims, reimbursement claims, advertising claim substantiation, or production clinical approval.
+
+## Protected Finance Methodology Gates
+
+`/pilot-workspace/access` now includes protected Finance Methodology Gates immediately after Board Scorecards. This lets tenant operators record no-PHI internal readiness attestations for:
+
+- Finance cost-allocation methodology.
+- Counsel external-use review.
+- Executive release authority.
+- Privacy and security review.
+- Clinical governance boundary.
+- Marketing claims substantiation.
+- Buyer permission and distribution control.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology` requires AAL2 governance context, tenant workspace membership, no-store headers, synthetic-only boundary headers, and rate limiting. It returns the gate workflow, retained records, related board scorecards, external-use status, safe workarounds, and unavailable sections.
+
+`POST /api/pilot-workspaces/{workspaceSlug}/finance-methodology` accepts only an approved gate id, optional protected board scorecard id, fixed `finance-external-use-gates-no-phi-readiness` attestation, `synthetic-business-workflow-only` data boundary, and a bounded no-PHI review note. The guarded Supabase RPC verifies tenant scope, derives the gate metadata server-side, persists the gate record, and commits `protected-finance-methodology-gate-recorded` to the append-only audit trail.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet` commits an enterprise proof-packet audit event before returning the protected finance methodology packet. Packet headers retain `not-audited-financial-methodology`, `external-use-blocked-until-qualified-approval`, `not-audited-financial-report`, `not-securities-offering-material`, `not-advertising-claim-substantiation`, and `not-authorized-live-care` authorities.
+
+Safe workaround: if gate storage or packet export is unavailable, keep board scorecards internal and use qualified external finance, counsel, privacy/security, communications, and customer-specific approval channels. Do not use finance gate output as audited financial reporting, securities offering material, legal approval, advertising claim substantiation, customer permission, reimbursement assurance, clinical validation, compliance certification, or live-care authorization.
+
+Current boundary: finance methodology gates are no-PHI internal readiness attestations only. They must not store PHI, patient identifiers, payer member data, live clinical records, source contracts, credentials, secrets, audited financial statements, securities materials, customer contracts, public claims, or production clinical approval.
 
 ## Clinical Activation Dossier
 

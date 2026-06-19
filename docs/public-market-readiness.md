@@ -17,6 +17,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected metric trend packet API: `/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`
 - Protected board scorecard API: `/api/pilot-workspaces/{workspaceSlug}/board-scorecards`
 - Protected board scorecard packet API: `/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet`
+- Protected finance methodology API: `/api/pilot-workspaces/{workspaceSlug}/finance-methodology`
+- Protected finance methodology packet API: `/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -30,6 +32,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 metric rollup snapshots and audited board packet downloads for internal operating review.
 - Protected AAL2 metric trend reviews that compare rollup snapshots, classify board trend state, surface reach expansion signals, track competitive advantages, and feed agent improvement actions.
 - Protected AAL2 board scorecards that package rolling-quarter trend evidence, finance-allocation readiness, buyer-segment cohorts, competitive edge, and agent improvement priorities.
+- Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.
@@ -54,6 +57,8 @@ Protected metric trend reviews are internal board variance evidence only. They c
 
 Protected board scorecards are internal operating scorecards only. They package no-PHI trend reviews into rolling-quarter board evidence, buyer-segment cohorts, and finance-allocation readiness. Allocation profiles remain pending until finance approves the methodology. Scorecards are not audited financial statements, securities offering material, valuation assurance, revenue guarantees, investment recommendations, legal/accounting/tax advice, reimbursement assurance, clinical validation, compliance certification, advertising claim substantiation, or live clinical execution authority.
 
+Protected finance methodology gates are internal readiness attestations only. They show what has been acknowledged and what remains blocked before external use. They do not create audited finance approval, legal approval, securities approval, advertising claim substantiation, reimbursement assurance, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
+
 ## Next Build
 
-Add finance-approved cost allocation methodology records and rolling buyer-segment scorecard cohorts once finance, counsel, and executive external-use policies are approved.
+Add qualified external-use approval evidence vault linkage and versioned finance-reviewed methodology policies once counsel, finance, privacy, security, communications, and customer-specific evidence retention are approved.

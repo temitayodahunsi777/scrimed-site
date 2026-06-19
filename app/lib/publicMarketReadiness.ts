@@ -14,6 +14,10 @@ import {
   protectedBoardScorecardPacketProofStackStatus,
   protectedBoardScorecardStatus
 } from "./protectedBoardScorecards";
+import {
+  protectedFinanceMethodologyPacketProofStackStatus,
+  protectedFinanceMethodologyStatus
+} from "./protectedFinanceMethodology";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -550,6 +554,11 @@ export function getPublicMarketReadinessSummary() {
     protectedBoardScorecardApiRoute: "/api/pilot-workspaces/{workspaceSlug}/board-scorecards",
     protectedBoardScorecardPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet",
+    protectedFinanceMethodologyRoute: "/pilot-workspace/access",
+    protectedFinanceMethodologyApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/finance-methodology",
+    protectedFinanceMethodologyPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -560,6 +569,8 @@ export function getPublicMarketReadinessSummary() {
     protectedMetricTrendPacketStatus: protectedMetricTrendPacketProofStackStatus,
     protectedBoardScorecardStatus,
     protectedBoardScorecardPacketStatus: protectedBoardScorecardPacketProofStackStatus,
+    protectedFinanceMethodologyStatus,
+    protectedFinanceMethodologyPacketStatus: protectedFinanceMethodologyPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -582,7 +593,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add finance-approved cost allocation methodology records and rolling buyer-segment scorecard cohorts once finance, counsel, and executive external-use policies are approved.",
+      "Add qualified external-use approval evidence vault linkage and versioned finance-reviewed methodology policies once counsel, finance, privacy, security, communications, and customer-specific evidence retention are approved.",
     updated: "2026-06-19"
   };
 }
@@ -603,6 +614,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected metric trend packets: ${summary.protectedMetricTrendPacketStatus}
 - Protected board scorecards: ${summary.protectedBoardScorecardStatus}
 - Protected board scorecard packets: ${summary.protectedBoardScorecardPacketStatus}
+- Protected finance methodology gates: ${summary.protectedFinanceMethodologyStatus}
+- Protected finance methodology packets: ${summary.protectedFinanceMethodologyPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -616,6 +629,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected scorecard route: ${summary.protectedBoardScorecardRoute}
 - Protected scorecard API: ${summary.protectedBoardScorecardApiRoute}
 - Protected scorecard packet API: ${summary.protectedBoardScorecardPacketApiRoute}
+- Protected finance methodology route: ${summary.protectedFinanceMethodologyRoute}
+- Protected finance methodology API: ${summary.protectedFinanceMethodologyApiRoute}
+- Protected finance methodology packet API: ${summary.protectedFinanceMethodologyPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

@@ -474,6 +474,20 @@ export const protectedPilotApiContracts = [
       "Download an audited internal board scorecard packet from a persisted no-PHI scorecard after committing the packet release event."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/finance-methodology",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI finance external-use attestation + rate limit",
+    purpose:
+      "Inspect or record protected no-PHI finance methodology and external-use gate attestations for cost allocation, counsel review, executive release, privacy/security, clinical-governance boundary, marketing claims, and buyer permission without becoming audited financial reporting, securities offering material, advertising substantiation, reimbursement assurance, clinical validation, or live care authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited protected finance methodology gate packet after committing the packet release event while retaining all external-use approval blockers."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",

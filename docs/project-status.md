@@ -2,6 +2,16 @@
 
 Updated: 2026-06-19
 
+## Latest Protected Finance Methodology Gates Release
+
+- Added protected Finance Methodology Gates inside `/pilot-workspace/access` after Protected Board Scorecards.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/finance-methodology` for AAL2 no-PHI finance cost-allocation, counsel external-use, executive release, privacy/security, clinical-governance boundary, marketing-claims, and buyer-permission gate records.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet` for audited protected finance methodology gate packet downloads.
+- Added `app/lib/protectedFinanceMethodology.ts` with typed gate catalog, validation, external-use authority boundaries, workflow derivation, safe workarounds, and packet generation.
+- Added `public.protected_finance_methodology_gates` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-finance-methodology-gate-recorded` audit events, and runtime schema `2026-06-19.6`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-finance-methodology-gates-no-phi` and `aal2-audited-finance-methodology-gate-packets-no-phi`.
+- Preserved the boundary: finance methodology gates are internal no-PHI readiness attestations only. They do not create audited financial reporting, legal approval, securities offering material, investment advice, accounting advice, tax advice, valuation assurance, revenue guarantee, reimbursement assurance, clinical validation, compliance certification, advertising claim substantiation, customer permission, production authorization, or live clinical execution approval.
+
 ## Latest Protected Board Scorecard Release
 
 - Added protected Board Scorecards inside `/pilot-workspace/access` after Protected Metric Trend Reviews.

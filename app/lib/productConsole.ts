@@ -118,6 +118,10 @@ import {
   protectedBoardScorecardPacketProofStackStatus,
   protectedBoardScorecardStatus
 } from "./protectedBoardScorecards";
+import {
+  protectedFinanceMethodologyPacketProofStackStatus,
+  protectedFinanceMethodologyStatus
+} from "./protectedFinanceMethodology";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -706,6 +710,12 @@ export function getProductConsoleSummary() {
     protectedBoardScorecardsApiRoute: publicMarketReadinessSummary.protectedBoardScorecardApiRoute,
     protectedBoardScorecardPacketApiRoute:
       publicMarketReadinessSummary.protectedBoardScorecardPacketApiRoute,
+    protectedFinanceMethodologyRoute:
+      publicMarketReadinessSummary.protectedFinanceMethodologyRoute,
+    protectedFinanceMethodologyApiRoute:
+      publicMarketReadinessSummary.protectedFinanceMethodologyApiRoute,
+    protectedFinanceMethodologyPacketApiRoute:
+      publicMarketReadinessSummary.protectedFinanceMethodologyPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -849,6 +859,8 @@ export function getProductConsoleSummary() {
       protectedMetricTrendPackets: protectedMetricTrendPacketProofStackStatus,
       protectedBoardScorecards: protectedBoardScorecardStatus,
       protectedBoardScorecardPackets: protectedBoardScorecardPacketProofStackStatus,
+      protectedFinanceMethodologyGates: protectedFinanceMethodologyStatus,
+      protectedFinanceMethodologyPackets: protectedFinanceMethodologyPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1011,6 +1023,9 @@ export function getProductReadinessBrief() {
     `Protected board scorecards: ${summary.protectedBoardScorecardsRoute}`,
     `Protected board scorecards API: ${summary.protectedBoardScorecardsApiRoute}`,
     `Protected board scorecard packet API: ${summary.protectedBoardScorecardPacketApiRoute}`,
+    `Protected finance methodology gates: ${summary.protectedFinanceMethodologyRoute}`,
+    `Protected finance methodology API: ${summary.protectedFinanceMethodologyApiRoute}`,
+    `Protected finance methodology packet API: ${summary.protectedFinanceMethodologyPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

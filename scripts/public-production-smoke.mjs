@@ -197,6 +197,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected board scorecard packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedFinanceMethodologyGates !==
+    "aal2-finance-methodology-gates-no-phi"
+  ) {
+    throw new Error("product console missing protected finance methodology gate proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedFinanceMethodologyPackets !==
+    "aal2-audited-finance-methodology-gate-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected finance methodology packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -674,6 +688,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected board scorecard packet API route.");
   }
 
+  if (
+    body.protectedFinanceMethodologyStatus !==
+    "aal2-finance-methodology-gates-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected finance methodology status.");
+  }
+
+  if (
+    body.protectedFinanceMethodologyApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/finance-methodology"
+  ) {
+    throw new Error("Public Market Readiness missing protected finance methodology API route.");
+  }
+
+  if (
+    body.protectedFinanceMethodologyPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected finance methodology packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -925,6 +960,25 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/board-scorecards/00000000-0000-4000-8000-000000000000/packet`,
   "Protected Board Scorecard packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/finance-methodology`,
+  "Protected Finance Methodology protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/finance-methodology`,
+  "Protected Finance Methodology write protected API",
+  {
+    gateId: "finance-cost-allocation",
+    boardScorecardId: "00000000-0000-4000-8000-000000000001",
+    attestation: "finance-external-use-gates-no-phi-readiness",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke-no-phi-finance-methodology-gate"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/finance-methodology/packet`,
+  "Protected Finance Methodology packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

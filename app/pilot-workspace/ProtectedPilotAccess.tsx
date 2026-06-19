@@ -27,6 +27,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
+import ProtectedFinanceMethodologyPanel from "./ProtectedFinanceMethodologyPanel";
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
@@ -58,6 +59,10 @@ import type {
   ProtectedBoardScorecardInput,
   ProtectedBoardScorecardRecord
 } from "../lib/protectedBoardScorecards";
+import type {
+  ProtectedFinanceMethodologyInput,
+  ProtectedFinanceMethodologyWorkflow
+} from "../lib/protectedFinanceMethodology";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -144,6 +149,14 @@ type ProtectedBoardScorecardsResponse = {
   scorecardId?: string;
   scorecards?: ProtectedBoardScorecardRecord[];
   dashboard?: ProtectedBoardScorecardDashboard;
+  errors?: string[];
+  error?: { message?: string };
+};
+
+type ProtectedFinanceMethodologyResponse = {
+  gateRecordId?: string;
+  records?: unknown[];
+  workflow?: ProtectedFinanceMethodologyWorkflow;
   errors?: string[];
   error?: { message?: string };
 };
@@ -235,6 +248,12 @@ export default function ProtectedPilotAccess({
     useState<"idle" | "saving">("idle");
   const [protectedBoardScorecardPacketBusyId, setProtectedBoardScorecardPacketBusyId] =
     useState<string | null>(null);
+  const [protectedFinanceMethodologyWorkflow, setProtectedFinanceMethodologyWorkflow] =
+    useState<ProtectedFinanceMethodologyWorkflow | null>(null);
+  const [protectedFinanceMethodologyBusyGateId, setProtectedFinanceMethodologyBusyGateId] =
+    useState<string | null>(null);
+  const [protectedFinanceMethodologyPacketStatus, setProtectedFinanceMethodologyPacketStatus] =
+    useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -271,6 +290,12 @@ export default function ProtectedPilotAccess({
     setProtectedBoardScorecardDashboard(null);
     setProtectedBoardScorecardStatus("idle");
     setProtectedBoardScorecardPacketBusyId(null);
+  }, []);
+
+  const resetProtectedFinanceMethodology = useCallback(() => {
+    setProtectedFinanceMethodologyWorkflow(null);
+    setProtectedFinanceMethodologyBusyGateId(null);
+    setProtectedFinanceMethodologyPacketStatus("idle");
   }, []);
 
   useEffect(() => {
@@ -325,6 +350,7 @@ export default function ProtectedPilotAccess({
         resetProtectedMetricRollups();
         resetProtectedMetricTrends();
         resetProtectedBoardScorecards();
+        resetProtectedFinanceMethodology();
         setStatus("signed-out");
         return;
       }
@@ -376,6 +402,7 @@ export default function ProtectedPilotAccess({
         resetProtectedMetricRollups();
         resetProtectedMetricTrends();
         resetProtectedBoardScorecards();
+        resetProtectedFinanceMethodology();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -429,6 +456,7 @@ export default function ProtectedPilotAccess({
       resetProtectedMetricRollups();
       resetProtectedMetricTrends();
       resetProtectedBoardScorecards();
+      resetProtectedFinanceMethodology();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -443,7 +471,8 @@ export default function ProtectedPilotAccess({
           loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0]),
           loadProtectedMetricRollups(activeSession, nextWorkspaces[0]),
           loadProtectedMetricTrends(activeSession, nextWorkspaces[0]),
-          loadProtectedBoardScorecards(activeSession, nextWorkspaces[0])
+          loadProtectedBoardScorecards(activeSession, nextWorkspaces[0]),
+          loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -658,6 +687,26 @@ export default function ProtectedPilotAccess({
       setProtectedBoardScorecardDashboard(body.dashboard ?? null);
     }
 
+    async function loadProtectedFinanceMethodology(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/finance-methodology`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedFinanceMethodologyResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected finance methodology gates could not be loaded.");
+        return;
+      }
+
+      setProtectedFinanceMethodologyWorkflow(body.workflow ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -672,6 +721,7 @@ export default function ProtectedPilotAccess({
   }, [
     resetProtectedMetricRollups,
     resetProtectedBoardScorecards,
+    resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
     resetProtectedOperatorMetrics,
     supabase
@@ -847,6 +897,7 @@ export default function ProtectedPilotAccess({
     resetProtectedMetricRollups();
     resetProtectedMetricTrends();
     resetProtectedBoardScorecards();
+    resetProtectedFinanceMethodology();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -873,7 +924,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedOperatorMetrics(session, workspace),
       refreshProtectedMetricRollups(session, workspace),
       refreshProtectedMetricTrends(session, workspace),
-      refreshProtectedBoardScorecards(session, workspace)
+      refreshProtectedBoardScorecards(session, workspace),
+      refreshProtectedFinanceMethodology(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1027,6 +1079,22 @@ export default function ProtectedPilotAccess({
 
     setProtectedBoardScorecards(body.scorecards ?? []);
     setProtectedBoardScorecardDashboard(body.dashboard ?? null);
+  }
+
+  async function refreshProtectedFinanceMethodology(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/finance-methodology`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedFinanceMethodologyResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected finance methodology gates could not be loaded.");
+      return;
+    }
+
+    setProtectedFinanceMethodologyWorkflow(body.workflow ?? null);
   }
 
   async function createSyntheticSession() {
@@ -1608,6 +1676,7 @@ export default function ProtectedPilotAccess({
     setProtectedBoardScorecards(body.scorecards ?? []);
     setProtectedBoardScorecardDashboard(body.dashboard ?? null);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedFinanceMethodology(session, selectedWorkspace);
     setMessage(
       `Protected board scorecard created${body.scorecardId ? ` with scorecard id ${body.scorecardId}` : ""}.`
     );
@@ -1646,6 +1715,78 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected board scorecard packet downloaded and its audit event was committed.");
+  }
+
+  async function recordProtectedFinanceMethodologyGate(input: ProtectedFinanceMethodologyInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedFinanceMethodologyBusyGateId(input.gateId);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/finance-methodology`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedFinanceMethodologyResponse;
+    setProtectedFinanceMethodologyBusyGateId(null);
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected finance methodology gate could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedFinanceMethodologyWorkflow(body.workflow ?? protectedFinanceMethodologyWorkflow);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected finance methodology gate recorded${body.gateRecordId ? ` with gate id ${body.gateRecordId}` : ""}.`
+    );
+  }
+
+  async function downloadProtectedFinanceMethodologyPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedFinanceMethodologyPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/finance-methodology/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedFinanceMethodologyPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(body.error?.message ?? "The protected finance methodology packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-finance-methodology-gates.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected finance methodology packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -1946,6 +2087,15 @@ export default function ProtectedPilotAccess({
             packetBusyId={protectedBoardScorecardPacketBusyId}
             scorecards={protectedBoardScorecards}
             trendReviews={protectedMetricTrendReviews}
+          />
+
+          <ProtectedFinanceMethodologyPanel
+            busyGateId={protectedFinanceMethodologyBusyGateId}
+            onDownloadPacket={downloadProtectedFinanceMethodologyPacket}
+            onRecordGate={recordProtectedFinanceMethodologyGate}
+            packetBusy={protectedFinanceMethodologyPacketStatus === "downloading"}
+            scorecards={protectedBoardScorecards}
+            workflow={protectedFinanceMethodologyWorkflow}
           />
 
           <BuyerPilotRoomPanel

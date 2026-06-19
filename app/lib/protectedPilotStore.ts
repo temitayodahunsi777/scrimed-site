@@ -77,6 +77,12 @@ import type {
   ProtectedBoardScorecardMetricSummary,
   ProtectedBoardScorecardRecord
 } from "./protectedBoardScorecards";
+import type {
+  ProtectedFinanceMethodologyGateId,
+  ProtectedFinanceMethodologyGateRecord,
+  ProtectedFinanceMethodologyGateStatus,
+  ProtectedFinanceMethodologyInput
+} from "./protectedFinanceMethodology";
 
 type AuthenticatedPilotContext =
   | {
@@ -331,6 +337,35 @@ type ProtectedBoardScorecardRow = {
   securities_authority: ProtectedBoardScorecardRecord["securitiesAuthority"];
   clinical_execution_authority: ProtectedBoardScorecardRecord["clinicalExecutionAuthority"];
   created_by: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedFinanceMethodologyGateRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  board_scorecard_id: string | null;
+  gate_id: ProtectedFinanceMethodologyGateId;
+  gate_label: string;
+  gate_status: Exclude<ProtectedFinanceMethodologyGateStatus, "not-recorded">;
+  approval_scope: ProtectedFinanceMethodologyGateRecord["approvalScope"];
+  reviewer_role: string;
+  evidence_snapshot: unknown;
+  retained_blockers: unknown;
+  methodology_components: unknown;
+  external_use_restrictions: unknown;
+  attestation: ProtectedFinanceMethodologyGateRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedFinanceMethodologyGateRecord["dataBoundary"];
+  methodology_authority: ProtectedFinanceMethodologyGateRecord["methodologyAuthority"];
+  external_use_authority: ProtectedFinanceMethodologyGateRecord["externalUseAuthority"];
+  financial_reporting_authority: ProtectedFinanceMethodologyGateRecord["financialReportingAuthority"];
+  securities_authority: ProtectedFinanceMethodologyGateRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedFinanceMethodologyGateRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedFinanceMethodologyGateRecord["clinicalExecutionAuthority"];
+  signed_by: string;
+  signed_at: string;
   created_at: string;
   boundary: string;
 };
@@ -939,6 +974,39 @@ function mapProtectedBoardScorecard(row: ProtectedBoardScorecardRow): ProtectedB
   };
 }
 
+function mapProtectedFinanceMethodologyGate(
+  row: ProtectedFinanceMethodologyGateRow
+): ProtectedFinanceMethodologyGateRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    boardScorecardId: row.board_scorecard_id,
+    gateId: row.gate_id,
+    gateLabel: row.gate_label,
+    gateStatus: row.gate_status,
+    approvalScope: row.approval_scope,
+    reviewerRole: row.reviewer_role,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    retainedBlockers: asStringArray(row.retained_blockers),
+    methodologyComponents: asStringArray(row.methodology_components),
+    externalUseRestrictions: asStringArray(row.external_use_restrictions),
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    methodologyAuthority: row.methodology_authority,
+    externalUseAuthority: row.external_use_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    signedBy: row.signed_by,
+    signedAt: row.signed_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1233,6 +1301,8 @@ const protectedMetricTrendReviewSelect =
   "id, tenant_id, workspace_id, current_snapshot_id, comparison_snapshot_id, trend_period_label, board_trend_state, trend_metrics, reach_expansion_signals, competitive_advantages, agent_improvement_actions, recommendations, limitations, reviewer_attestation, review_note, data_boundary, cost_allocation_policy, cost_allocation_status, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
 const protectedBoardScorecardSelect =
   "id, tenant_id, workspace_id, primary_trend_review_id, secondary_trend_review_id, tertiary_trend_review_id, board_period_label, scorecard_state, trend_review_count, rolling_quarter_metrics, finance_allocation_profile, buyer_segment_focus, buyer_segment_cohorts, competitive_advantages, agent_improvement_priorities, strategic_actions, recommendations, limitations, operator_attestation, review_note, data_boundary, allocation_profile_status, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
+const protectedFinanceMethodologyGateSelect =
+  "id, tenant_id, workspace_id, board_scorecard_id, gate_id, gate_label, gate_status, approval_scope, reviewer_role, evidence_snapshot, retained_blockers, methodology_components, external_use_restrictions, attestation, review_note, data_boundary, methodology_authority, external_use_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, signed_by, signed_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1543,6 +1613,25 @@ export async function getProtectedBoardScorecard(
 
   return {
     scorecard: data ? mapProtectedBoardScorecard(data as unknown as ProtectedBoardScorecardRow) : null,
+    error
+  };
+}
+
+export async function listProtectedFinanceMethodologyGates(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_finance_methodology_gates")
+    .select(protectedFinanceMethodologyGateSelect)
+    .eq("workspace_id", workspaceId)
+    .order("signed_at", { ascending: false })
+    .limit(100);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedFinanceMethodologyGateRow[]).map(
+      mapProtectedFinanceMethodologyGate
+    ),
     error
   };
 }
@@ -1894,6 +1983,44 @@ export async function recordProtectedBoardScorecardPacketDownload(
   const { data, error } = await client.rpc("record_protected_board_scorecard_packet_download", {
     p_workspace_slug: workspaceSlug,
     p_scorecard_id: scorecardId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedFinanceMethodologyGate(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedFinanceMethodologyInput
+) {
+  const { data, error } = await client.rpc("record_protected_finance_methodology_gate", {
+    p_workspace_slug: workspaceSlug,
+    p_gate_input: input
+  });
+
+  return {
+    gateRecordId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedFinanceMethodologyPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-finance-methodology-gates",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true
+    }
   });
 
   return {
