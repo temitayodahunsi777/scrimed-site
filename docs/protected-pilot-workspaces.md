@@ -70,6 +70,12 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/operator-metrics`
 - `POST /api/pilot-workspaces/{workspaceSlug}/operator-metrics`
+- `GET /api/pilot-workspaces/{workspaceSlug}/metric-rollups`
+- `POST /api/pilot-workspaces/{workspaceSlug}/metric-rollups`
+- `GET /api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/metric-trends`
+- `POST /api/pilot-workspaces/{workspaceSlug}/metric-trends`
+- `GET /api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -171,6 +177,29 @@ Current boundary: operator metrics must not store PHI, patient identifiers, paye
 Safe workaround: if rollup storage or packet export is unavailable, use the protected operator metric dashboard plus external finance-reviewed spreadsheets. Do not use rollup output as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live-care authorization.
 
 Current boundary: rollups summarize aggregate no-PHI operating metadata only. They must not store PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities materials, external valuation claims, or production clinical approval.
+
+## Protected Metric Trend Reviews
+
+`/pilot-workspace/access` now includes protected Metric Trend Reviews immediately after Protected Metric Rollups. This lets tenant operators compare two no-PHI rollup snapshots and create an audited monthly variance record for:
+
+- Board trend state.
+- Model-cost-per-workflow direction.
+- Review-minute and delivery-hour movement.
+- Proof-packet coverage.
+- Workflow volume.
+- Reach expansion signals.
+- Competitive advantage tracking.
+- Agent improvement actions.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/metric-trends` requires AAL2 governance context, tenant workspace membership, no-store headers, synthetic-only boundary headers, and rate limiting. It returns persisted trend reviews plus a dashboard focused on the latest board trend and next operating actions.
+
+`POST /api/pilot-workspaces/{workspaceSlug}/metric-trends` accepts only two protected rollup snapshot IDs, a bounded trend label, fixed `finance-reviewed-no-phi-board-trend` attestation, `synthetic-business-workflow-only` boundary, fixed model-cost allocation policy, and a bounded no-PHI review note. The guarded Supabase RPC verifies snapshot order and tenant scope, derives variance metrics, persists the review, and commits `protected-metric-trend-review-created` to the append-only audit trail.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet` commits `protected-metric-trend-packet-downloaded` before returning the internal board trend packet. Packet headers retain the no-audited-financial-report, no-securities-offering-material, and not-authorized-live-care authorities.
+
+Safe workaround: if trend review storage or packet export is unavailable, use the protected rollup packet plus an external finance-reviewed variance workbook. Do not use trend output as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live-care authorization.
+
+Current boundary: trend reviews compare aggregate no-PHI operating metadata only. They must not store PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities materials, external valuation claims, reimbursement claims, or production clinical approval.
 
 ## Clinical Activation Dossier
 

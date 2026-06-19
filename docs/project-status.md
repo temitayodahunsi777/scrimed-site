@@ -2,6 +2,16 @@
 
 Updated: 2026-06-19
 
+## Latest Protected Metric Trend Review Release
+
+- Added protected Metric Trend Reviews inside `/pilot-workspace/access` after Protected Metric Rollups.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/metric-trends` for AAL2 no-PHI monthly variance review, reach expansion signals, competitive advantage tracking, and agent improvement actions.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet` for audited internal board trend packet downloads.
+- Added `app/lib/protectedMetricTrends.ts` with typed trend comparison, snapshot-order validation, board trend state derivation, cost-allocation status, buyer-reach signals, agent improvement actions, limitations, and packet generation.
+- Added `public.protected_metric_trend_reviews` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-metric-trend-review-created` and `protected-metric-trend-packet-downloaded` audit events, and runtime schema `2026-06-19.4`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-board-trend-review-no-phi` and `aal2-audited-board-trend-packets-no-phi`.
+- Preserved the boundary: protected trend reviews and packets are internal no-PHI operating evidence only. They do not create audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, production authorization, or live clinical execution approval.
+
 ## Latest Protected Metric Rollup Release
 
 - Added protected finance-reviewed Metric Rollups inside `/pilot-workspace/access` after Public Market Operator Metrics.

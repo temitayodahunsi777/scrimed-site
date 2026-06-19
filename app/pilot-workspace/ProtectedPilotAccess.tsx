@@ -27,6 +27,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
+import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
@@ -46,6 +47,11 @@ import type {
   ProtectedMetricRollupInput,
   ProtectedMetricRollupRecord
 } from "../lib/protectedMetricRollups";
+import type {
+  ProtectedMetricTrendDashboard,
+  ProtectedMetricTrendReviewInput,
+  ProtectedMetricTrendReviewRecord
+} from "../lib/protectedMetricTrends";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -120,6 +126,14 @@ type ProtectedMetricRollupsResponse = {
   error?: { message?: string };
 };
 
+type ProtectedMetricTrendsResponse = {
+  reviewId?: string;
+  reviews?: ProtectedMetricTrendReviewRecord[];
+  dashboard?: ProtectedMetricTrendDashboard;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -189,6 +203,15 @@ export default function ProtectedPilotAccess({
     useState<"idle" | "saving">("idle");
   const [protectedMetricRollupPacketBusyId, setProtectedMetricRollupPacketBusyId] =
     useState<string | null>(null);
+  const [protectedMetricTrendReviews, setProtectedMetricTrendReviews] = useState<
+    ProtectedMetricTrendReviewRecord[]
+  >([]);
+  const [protectedMetricTrendDashboard, setProtectedMetricTrendDashboard] =
+    useState<ProtectedMetricTrendDashboard | null>(null);
+  const [protectedMetricTrendStatus, setProtectedMetricTrendStatus] =
+    useState<"idle" | "saving">("idle");
+  const [protectedMetricTrendPacketBusyId, setProtectedMetricTrendPacketBusyId] =
+    useState<string | null>(null);
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -211,6 +234,13 @@ export default function ProtectedPilotAccess({
     setProtectedMetricRollupDashboard(null);
     setProtectedMetricRollupStatus("idle");
     setProtectedMetricRollupPacketBusyId(null);
+  }, []);
+
+  const resetProtectedMetricTrends = useCallback(() => {
+    setProtectedMetricTrendReviews([]);
+    setProtectedMetricTrendDashboard(null);
+    setProtectedMetricTrendStatus("idle");
+    setProtectedMetricTrendPacketBusyId(null);
   }, []);
 
   useEffect(() => {
@@ -263,6 +293,7 @@ export default function ProtectedPilotAccess({
         setClinicalActivationApprovalWorkflow(null);
         resetProtectedOperatorMetrics();
         resetProtectedMetricRollups();
+        resetProtectedMetricTrends();
         setStatus("signed-out");
         return;
       }
@@ -312,6 +343,7 @@ export default function ProtectedPilotAccess({
         setClinicalActivationApprovalWorkflow(null);
         resetProtectedOperatorMetrics();
         resetProtectedMetricRollups();
+        resetProtectedMetricTrends();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -363,6 +395,7 @@ export default function ProtectedPilotAccess({
       setClinicalActivationApprovalWorkflow(null);
       resetProtectedOperatorMetrics();
       resetProtectedMetricRollups();
+      resetProtectedMetricTrends();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -375,7 +408,8 @@ export default function ProtectedPilotAccess({
           loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0]),
           loadClinicalActivationApprovals(activeSession, nextWorkspaces[0]),
           loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0]),
-          loadProtectedMetricRollups(activeSession, nextWorkspaces[0])
+          loadProtectedMetricRollups(activeSession, nextWorkspaces[0]),
+          loadProtectedMetricTrends(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -548,6 +582,27 @@ export default function ProtectedPilotAccess({
       setProtectedMetricRollupDashboard(body.dashboard ?? null);
     }
 
+    async function loadProtectedMetricTrends(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/metric-trends`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedMetricTrendsResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected metric trends could not be loaded.");
+        return;
+      }
+
+      setProtectedMetricTrendReviews(body.reviews ?? []);
+      setProtectedMetricTrendDashboard(body.dashboard ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -559,7 +614,12 @@ export default function ProtectedPilotAccess({
       active = false;
       subscription.unsubscribe();
     };
-  }, [resetProtectedMetricRollups, resetProtectedOperatorMetrics, supabase]);
+  }, [
+    resetProtectedMetricRollups,
+    resetProtectedMetricTrends,
+    resetProtectedOperatorMetrics,
+    supabase
+  ]);
 
   async function sendMagicLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -729,6 +789,7 @@ export default function ProtectedPilotAccess({
     setClinicalActivationApprovalWorkflow(null);
     resetProtectedOperatorMetrics();
     resetProtectedMetricRollups();
+    resetProtectedMetricTrends();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -753,7 +814,8 @@ export default function ProtectedPilotAccess({
       refreshCommandIntelligenceSnapshots(session, workspace),
       refreshClinicalActivationApprovals(session, workspace),
       refreshProtectedOperatorMetrics(session, workspace),
-      refreshProtectedMetricRollups(session, workspace)
+      refreshProtectedMetricRollups(session, workspace),
+      refreshProtectedMetricTrends(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -873,6 +935,23 @@ export default function ProtectedPilotAccess({
 
     setProtectedMetricRollupSnapshots(body.snapshots ?? []);
     setProtectedMetricRollupDashboard(body.dashboard ?? null);
+  }
+
+  async function refreshProtectedMetricTrends(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/metric-trends`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedMetricTrendsResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected metric trends could not be loaded.");
+      return;
+    }
+
+    setProtectedMetricTrendReviews(body.reviews ?? []);
+    setProtectedMetricTrendDashboard(body.dashboard ?? null);
   }
 
   async function createSyntheticSession() {
@@ -1312,6 +1391,7 @@ export default function ProtectedPilotAccess({
     setProtectedMetricRollupSnapshots(body.snapshots ?? []);
     setProtectedMetricRollupDashboard(body.dashboard ?? null);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedMetricTrends(session, selectedWorkspace);
     setMessage(
       `Protected metric rollup snapshot created${body.snapshotId ? ` with snapshot id ${body.snapshotId}` : ""}.`
     );
@@ -1350,6 +1430,76 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected metric rollup board packet downloaded and its audit event was committed.");
+  }
+
+  async function createProtectedMetricTrendReview(input: ProtectedMetricTrendReviewInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedMetricTrendStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/pilot-workspaces/${selectedWorkspace.slug}/metric-trends`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(input)
+    });
+    const body = (await response.json()) as ProtectedMetricTrendsResponse;
+    setProtectedMetricTrendStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected metric trend review could not be created."
+      );
+      return;
+    }
+
+    setProtectedMetricTrendReviews(body.reviews ?? []);
+    setProtectedMetricTrendDashboard(body.dashboard ?? null);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected metric trend review created${body.reviewId ? ` with review id ${body.reviewId}` : ""}.`
+    );
+  }
+
+  async function downloadProtectedMetricTrendPacket(review: ProtectedMetricTrendReviewRecord) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedMetricTrendPacketBusyId(review.id);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/metric-trends/${review.id}/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedMetricTrendPacketBusyId(null);
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(body.error?.message ?? "The protected metric trend packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-${review.id}-metric-trend-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected metric trend packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -1630,6 +1780,16 @@ export default function ProtectedPilotAccess({
             onDownloadPacket={downloadProtectedMetricRollupPacket}
             packetBusyId={protectedMetricRollupPacketBusyId}
             snapshots={protectedMetricRollupSnapshots}
+          />
+
+          <ProtectedMetricTrendsPanel
+            busyReview={protectedMetricTrendStatus === "saving"}
+            dashboard={protectedMetricTrendDashboard}
+            onCreateReview={createProtectedMetricTrendReview}
+            onDownloadPacket={downloadProtectedMetricTrendPacket}
+            packetBusyId={protectedMetricTrendPacketBusyId}
+            reviews={protectedMetricTrendReviews}
+            rollupSnapshots={protectedMetricRollupSnapshots}
           />
 
           <BuyerPilotRoomPanel

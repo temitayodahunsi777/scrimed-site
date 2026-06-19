@@ -65,6 +65,11 @@ import type {
   ProtectedMetricRollupRecord,
   ProtectedMetricRollupTotal
 } from "./protectedMetricRollups";
+import type {
+  ProtectedMetricTrendMetric,
+  ProtectedMetricTrendReviewInput,
+  ProtectedMetricTrendReviewRecord
+} from "./protectedMetricTrends";
 
 type AuthenticatedPilotContext =
   | {
@@ -260,6 +265,33 @@ type ProtectedMetricRollupSnapshotRow = {
   financial_reporting_authority: ProtectedMetricRollupRecord["financialReportingAuthority"];
   securities_authority: ProtectedMetricRollupRecord["securitiesAuthority"];
   clinical_execution_authority: ProtectedMetricRollupRecord["clinicalExecutionAuthority"];
+  created_by: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedMetricTrendReviewRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  current_snapshot_id: string;
+  comparison_snapshot_id: string;
+  trend_period_label: string;
+  board_trend_state: ProtectedMetricTrendReviewRecord["boardTrendState"];
+  trend_metrics: unknown;
+  reach_expansion_signals: unknown;
+  competitive_advantages: unknown;
+  agent_improvement_actions: unknown;
+  recommendations: unknown;
+  limitations: unknown;
+  reviewer_attestation: ProtectedMetricTrendReviewRecord["reviewerAttestation"];
+  review_note: string;
+  data_boundary: ProtectedMetricTrendReviewRecord["dataBoundary"];
+  cost_allocation_policy: ProtectedMetricTrendReviewRecord["costAllocationPolicy"];
+  cost_allocation_status: ProtectedMetricTrendReviewRecord["costAllocationStatus"];
+  financial_reporting_authority: ProtectedMetricTrendReviewRecord["financialReportingAuthority"];
+  securities_authority: ProtectedMetricTrendReviewRecord["securitiesAuthority"];
+  clinical_execution_authority: ProtectedMetricTrendReviewRecord["clinicalExecutionAuthority"];
   created_by: string;
   created_at: string;
   boundary: string;
@@ -800,6 +832,37 @@ function mapProtectedMetricRollupSnapshot(
   };
 }
 
+function mapProtectedMetricTrendReview(
+  row: ProtectedMetricTrendReviewRow
+): ProtectedMetricTrendReviewRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    currentSnapshotId: row.current_snapshot_id,
+    comparisonSnapshotId: row.comparison_snapshot_id,
+    trendPeriodLabel: row.trend_period_label,
+    boardTrendState: row.board_trend_state,
+    trendMetrics: asArray<ProtectedMetricTrendMetric>(row.trend_metrics),
+    reachExpansionSignals: asArray<string>(row.reach_expansion_signals),
+    competitiveAdvantages: asArray<string>(row.competitive_advantages),
+    agentImprovementActions: asArray<string>(row.agent_improvement_actions),
+    recommendations: asArray<string>(row.recommendations),
+    limitations: asArray<string>(row.limitations),
+    reviewerAttestation: row.reviewer_attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    costAllocationPolicy: row.cost_allocation_policy,
+    costAllocationStatus: row.cost_allocation_status,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1090,6 +1153,8 @@ const protectedOperatorMetricSelect =
   "id, tenant_id, workspace_id, metric_key, metric_label, metric_unit, metric_value, public_market_kpi_id, workflow_key, measurement_window_start, measurement_window_end, source_route, evidence_reference, operator_attestation, data_boundary, financial_reporting_authority, securities_authority, created_by, created_at, boundary";
 const protectedMetricRollupSnapshotSelect =
   "id, tenant_id, workspace_id, reporting_period_start, reporting_period_end, metric_count, captured_metric_types, required_metric_types, ready_for_board_review, model_cost_usd, model_cost_per_workflow, review_time_minutes, review_minutes_per_workflow, delivery_hours, delivery_hours_per_workflow, proof_packet_count, proof_packets_per_workflow, workflow_volume, cost_per_workflow, totals, recommendations, limitations, reviewer_attestation, review_note, data_boundary, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
+const protectedMetricTrendReviewSelect =
+  "id, tenant_id, workspace_id, current_snapshot_id, comparison_snapshot_id, trend_period_label, board_trend_state, trend_metrics, reach_expansion_signals, competitive_advantages, agent_improvement_actions, recommendations, limitations, reviewer_attestation, review_note, data_boundary, cost_allocation_policy, cost_allocation_status, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1326,6 +1391,43 @@ export async function getProtectedMetricRollupSnapshot(
     snapshot: data
       ? mapProtectedMetricRollupSnapshot(data as unknown as ProtectedMetricRollupSnapshotRow)
       : null,
+    error
+  };
+}
+
+export async function listProtectedMetricTrendReviews(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_metric_trend_reviews")
+    .select(protectedMetricTrendReviewSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return {
+    reviews: ((data ?? []) as unknown as ProtectedMetricTrendReviewRow[]).map(
+      mapProtectedMetricTrendReview
+    ),
+    error
+  };
+}
+
+export async function getProtectedMetricTrendReview(
+  client: SupabaseClient,
+  workspaceId: string,
+  reviewId: string
+) {
+  const { data, error } = await client
+    .from("protected_metric_trend_reviews")
+    .select(protectedMetricTrendReviewSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", reviewId)
+    .maybeSingle();
+
+  return {
+    review: data ? mapProtectedMetricTrendReview(data as unknown as ProtectedMetricTrendReviewRow) : null,
     error
   };
 }
@@ -1613,6 +1715,38 @@ export async function recordProtectedMetricRollupPacketDownload(
   const { data, error } = await client.rpc("record_protected_metric_rollup_packet_download", {
     p_workspace_slug: workspaceSlug,
     p_snapshot_id: snapshotId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function createProtectedMetricTrendReview(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedMetricTrendReviewInput
+) {
+  const { data, error } = await client.rpc("create_protected_metric_trend_review", {
+    p_workspace_slug: workspaceSlug,
+    p_trend_input: input
+  });
+
+  return {
+    reviewId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedMetricTrendPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  reviewId: string
+) {
+  const { data, error } = await client.rpc("record_protected_metric_trend_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_review_id: reviewId
   });
 
   return {

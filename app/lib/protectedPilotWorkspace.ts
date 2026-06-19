@@ -446,6 +446,20 @@ export const protectedPilotApiContracts = [
       "Download an audited internal board metric packet from a persisted no-PHI rollup snapshot after committing the packet release event."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/metric-trends",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed finance-reviewed no-PHI trend attestation + rate limit",
+    purpose:
+      "Inspect or create protected no-PHI metric trend reviews that compare rollup snapshots for monthly variance review, reach expansion planning, competitive advantage tracking, and agent improvement loops without becoming audited financial reporting, securities offering material, clinical validation, reimbursement assurance, or live care authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited internal board trend packet from a persisted no-PHI trend review after committing the packet release event."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",

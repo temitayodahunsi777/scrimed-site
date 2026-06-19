@@ -110,6 +110,10 @@ import {
   protectedMetricRollupPacketProofStackStatus,
   protectedMetricRollupStatus
 } from "./protectedMetricRollups";
+import {
+  protectedMetricTrendPacketProofStackStatus,
+  protectedMetricTrendReviewStatus
+} from "./protectedMetricTrends";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -690,6 +694,10 @@ export function getProductConsoleSummary() {
     protectedMetricRollupsApiRoute: publicMarketReadinessSummary.protectedMetricRollupApiRoute,
     protectedMetricRollupPacketApiRoute:
       publicMarketReadinessSummary.protectedMetricRollupPacketApiRoute,
+    protectedMetricTrendsRoute: publicMarketReadinessSummary.protectedMetricTrendRoute,
+    protectedMetricTrendsApiRoute: publicMarketReadinessSummary.protectedMetricTrendApiRoute,
+    protectedMetricTrendPacketApiRoute:
+      publicMarketReadinessSummary.protectedMetricTrendPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -829,6 +837,8 @@ export function getProductConsoleSummary() {
       protectedOperatorMetrics: protectedOperatorMetricCaptureStatus,
       protectedMetricRollups: protectedMetricRollupStatus,
       protectedMetricRollupPackets: protectedMetricRollupPacketProofStackStatus,
+      protectedMetricTrends: protectedMetricTrendReviewStatus,
+      protectedMetricTrendPackets: protectedMetricTrendPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -985,6 +995,9 @@ export function getProductReadinessBrief() {
     `Protected metric rollups: ${summary.protectedMetricRollupsRoute}`,
     `Protected metric rollups API: ${summary.protectedMetricRollupsApiRoute}`,
     `Protected metric board packet API: ${summary.protectedMetricRollupPacketApiRoute}`,
+    `Protected metric trends: ${summary.protectedMetricTrendsRoute}`,
+    `Protected metric trends API: ${summary.protectedMetricTrendsApiRoute}`,
+    `Protected metric trend packet API: ${summary.protectedMetricTrendPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

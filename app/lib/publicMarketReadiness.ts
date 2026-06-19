@@ -6,6 +6,10 @@ import {
   protectedMetricRollupPacketProofStackStatus,
   protectedMetricRollupStatus
 } from "./protectedMetricRollups";
+import {
+  protectedMetricTrendPacketProofStackStatus,
+  protectedMetricTrendReviewStatus
+} from "./protectedMetricTrends";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -528,18 +532,24 @@ export function getPublicMarketReadinessSummary() {
     route: "/public-market-readiness",
     apiRoute: "/api/public-market-readiness",
     briefRoute: "/api/public-market-readiness/brief",
-  protectedOperatorMetricRoute: "/pilot-workspace/access",
-  protectedOperatorMetricApiRoute: "/api/pilot-workspaces/{workspaceSlug}/operator-metrics",
+    protectedOperatorMetricRoute: "/pilot-workspace/access",
+    protectedOperatorMetricApiRoute: "/api/pilot-workspaces/{workspaceSlug}/operator-metrics",
     protectedMetricRollupRoute: "/pilot-workspace/access",
     protectedMetricRollupApiRoute: "/api/pilot-workspaces/{workspaceSlug}/metric-rollups",
     protectedMetricRollupPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet",
+    protectedMetricTrendRoute: "/pilot-workspace/access",
+    protectedMetricTrendApiRoute: "/api/pilot-workspaces/{workspaceSlug}/metric-trends",
+    protectedMetricTrendPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
     protectedOperatorMetricStatus: protectedOperatorMetricCaptureStatus,
     protectedMetricRollupStatus,
     protectedMetricRollupPacketStatus: protectedMetricRollupPacketProofStackStatus,
+    protectedMetricTrendStatus: protectedMetricTrendReviewStatus,
+    protectedMetricTrendPacketStatus: protectedMetricTrendPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -562,7 +572,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add monthly variance review, finance-approved cost allocation, and board trend comparison across protected no-PHI metric rollups.",
+      "Add finance-approved allocation profiles, rolling-quarter board scorecards, and buyer-segment trend cohorts once finance methodology is approved.",
     updated: "2026-06-19"
   };
 }
@@ -579,6 +589,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected operator metric capture: ${summary.protectedOperatorMetricStatus}
 - Protected metric rollups: ${summary.protectedMetricRollupStatus}
 - Protected metric rollup packets: ${summary.protectedMetricRollupPacketStatus}
+- Protected metric trend reviews: ${summary.protectedMetricTrendStatus}
+- Protected metric trend packets: ${summary.protectedMetricTrendPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -586,6 +598,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected rollup route: ${summary.protectedMetricRollupRoute}
 - Protected rollup API: ${summary.protectedMetricRollupApiRoute}
 - Protected rollup packet API: ${summary.protectedMetricRollupPacketApiRoute}
+- Protected trend route: ${summary.protectedMetricTrendRoute}
+- Protected trend API: ${summary.protectedMetricTrendApiRoute}
+- Protected trend packet API: ${summary.protectedMetricTrendPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

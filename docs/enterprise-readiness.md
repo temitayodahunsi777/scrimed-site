@@ -18,6 +18,8 @@ Protected workspaces now expose Public Market Operator Metrics at `/api/pilot-wo
 
 Protected workspaces now expose finance-reviewed Metric Rollups at `/api/pilot-workspaces/{workspaceSlug}/metric-rollups` and audited packet downloads at `/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet`. This converts no-PHI operator captures into internal board operating snapshots and write-before-release packet evidence. It must not be used as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live clinical execution authorization.
 
+Protected workspaces now expose Metric Trend Reviews at `/api/pilot-workspaces/{workspaceSlug}/metric-trends` and audited packet downloads at `/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`. This compares no-PHI rollup snapshots for monthly variance review, reach expansion planning, competitive advantage tracking, and agent improvement loops. It must not be used as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, revenue guarantee, reimbursement assurance, clinical validation, compliance certification, or live clinical execution authorization.
+
 SCRIMED now exposes Clinical Care Activation Readiness at `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief`. This surface tracks the hard gates required before clinical execution can move beyond synthetic evaluation: intended-use and regulatory classification, licensed clinical governance, clinical safety case, customer scope, BAA/DPA and privacy review, HIPAA Security Rule safeguard mapping, production identity, PHI-ready data architecture, FHIR/HL7/DICOM/X12 connector validation, human-review authority, clinical validation, incident response, continuous monitoring, reimbursement review, patient communication/consent, and go-live rollback approval.
 
 The activation surface is a readiness control, not a care-delivery authorization. It must not be used to imply FDA clearance, HIPAA compliance certification, clinical validation, reimbursement certainty, live connector approval, patient-facing authorization, or production clinical care readiness.
@@ -94,6 +96,10 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 - `/api/public-market-readiness`
 - `/api/public-market-readiness/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/operator-metrics`
+- `/api/pilot-workspaces/{workspaceSlug}/metric-rollups`
+- `/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/metric-trends`
+- `/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`
 - `/clinical-care-activation`
 - `/api/clinical-care-activation`
 - `/api/clinical-care-activation/brief`

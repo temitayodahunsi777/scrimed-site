@@ -169,6 +169,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected metric rollup packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedMetricTrends !==
+    "aal2-board-trend-review-no-phi"
+  ) {
+    throw new Error("product console missing protected metric trends proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedMetricTrendPackets !==
+    "aal2-audited-board-trend-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected metric trend packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -604,6 +618,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected metric rollup packet API route.");
   }
 
+  if (
+    body.protectedMetricTrendStatus !==
+    "aal2-board-trend-review-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected metric trend status.");
+  }
+
+  if (
+    body.protectedMetricTrendApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/metric-trends"
+  ) {
+    throw new Error("Public Market Readiness missing protected metric trend API route.");
+  }
+
+  if (
+    body.protectedMetricTrendPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected metric trend packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -811,6 +846,27 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/metric-rollups/00000000-0000-4000-8000-000000000000/packet`,
   "Protected Metric Rollup packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/metric-trends`,
+  "Protected Metric Trends protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/metric-trends`,
+  "Protected Metric Trends write protected API",
+  {
+    currentSnapshotId: "00000000-0000-4000-8000-000000000001",
+    comparisonSnapshotId: "00000000-0000-4000-8000-000000000002",
+    trendPeriodLabel: "smoke board trend",
+    reviewerAttestation: "finance-reviewed-no-phi-board-trend",
+    dataBoundary: "synthetic-business-workflow-only",
+    costAllocationPolicy: "model-cost-only-finance-allocation-pending",
+    reviewNote: "smoke-no-phi-metric-trend"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/metric-trends/00000000-0000-4000-8000-000000000000/packet`,
+  "Protected Metric Trend packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

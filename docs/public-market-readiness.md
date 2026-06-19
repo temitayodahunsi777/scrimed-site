@@ -13,6 +13,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected metric API: `/api/pilot-workspaces/{workspaceSlug}/operator-metrics`
 - Protected metric rollup API: `/api/pilot-workspaces/{workspaceSlug}/metric-rollups`
 - Protected metric board packet API: `/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet`
+- Protected metric trend review API: `/api/pilot-workspaces/{workspaceSlug}/metric-trends`
+- Protected metric trend packet API: `/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -24,6 +26,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Compliance-log map connecting protected pilot audit events, QA evidence, clinical activation readiness, buyer diligence, secure evidence vault readiness, and Trust Safety Operations.
 - Protected AAL2 operator metric capture for model cost, review time, delivery hours, proof-packet count, and workflow volume.
 - Protected AAL2 metric rollup snapshots and audited board packet downloads for internal operating review.
+- Protected AAL2 metric trend reviews that compare rollup snapshots, classify board trend state, surface reach expansion signals, track competitive advantages, and feed agent improvement actions.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.
@@ -44,6 +47,8 @@ Protected operator metrics are aggregate operating metadata only. They must not 
 
 Protected metric rollups are internal board operating evidence only. They summarize no-PHI operator metrics and keep every packet download audit logged, but they are still not audited financial reporting, securities offering material, valuation assurance, investment advice, accounting advice, tax advice, legal advice, reimbursement assurance, clinical validation, or live clinical execution authority.
 
+Protected metric trend reviews are internal board variance evidence only. They compare no-PHI protected rollup snapshots, generate reach and competitive signals, and recommend agent improvement actions. They are not audited financial statements, securities offering material, revenue guarantees, investment recommendations, legal/accounting/tax advice, reimbursement assurance, clinical validation, compliance certification, or live clinical execution authority.
+
 ## Next Build
 
-Add monthly variance review, finance-approved cost allocation, and board trend comparison across protected no-PHI metric rollups.
+Add finance-approved allocation profiles, rolling-quarter board scorecards, and buyer-segment trend cohorts once finance methodology is approved.
