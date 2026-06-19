@@ -106,6 +106,10 @@ import {
   publicMarketReadinessProofStackStatus
 } from "./publicMarketReadiness";
 import { protectedOperatorMetricCaptureStatus } from "./protectedOperatorMetrics";
+import {
+  protectedMetricRollupPacketProofStackStatus,
+  protectedMetricRollupStatus
+} from "./protectedMetricRollups";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -682,6 +686,10 @@ export function getProductConsoleSummary() {
     publicMarketReadinessBriefRoute: publicMarketReadinessSummary.briefRoute,
     protectedOperatorMetricsRoute: publicMarketReadinessSummary.protectedOperatorMetricRoute,
     protectedOperatorMetricsApiRoute: publicMarketReadinessSummary.protectedOperatorMetricApiRoute,
+    protectedMetricRollupsRoute: publicMarketReadinessSummary.protectedMetricRollupRoute,
+    protectedMetricRollupsApiRoute: publicMarketReadinessSummary.protectedMetricRollupApiRoute,
+    protectedMetricRollupPacketApiRoute:
+      publicMarketReadinessSummary.protectedMetricRollupPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -819,6 +827,8 @@ export function getProductConsoleSummary() {
       publicMarketReadiness: publicMarketReadinessProofStackStatus,
       publicMarketReadinessBrief: publicMarketReadinessBriefProofStackStatus,
       protectedOperatorMetrics: protectedOperatorMetricCaptureStatus,
+      protectedMetricRollups: protectedMetricRollupStatus,
+      protectedMetricRollupPackets: protectedMetricRollupPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -972,6 +982,9 @@ export function getProductReadinessBrief() {
     `Route: ${summary.publicMarketReadinessRoute}`,
     `API: ${summary.publicMarketReadinessApiRoute}`,
     `Brief: ${summary.publicMarketReadinessBriefRoute}`,
+    `Protected metric rollups: ${summary.protectedMetricRollupsRoute}`,
+    `Protected metric rollups API: ${summary.protectedMetricRollupsApiRoute}`,
+    `Protected metric board packet API: ${summary.protectedMetricRollupPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

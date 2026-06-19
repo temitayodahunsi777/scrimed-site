@@ -158,6 +158,20 @@ Safe workaround: if the protected ledger is unavailable, use `/public-market-rea
 
 Current boundary: operator metrics must not store PHI, patient identifiers, payer member data, live clinical records, source contracts, credentials, secrets, medical facts, audited financials, investment advice, accounting advice, tax advice, legal advice, or production clinical approval.
 
+## Protected Metric Rollups
+
+`/pilot-workspace/access` now includes protected Metric Rollups immediately after Public Market Operator Metrics. This lets tenant operators convert no-PHI metric captures into internal board operating snapshots and audited Markdown packet downloads.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/metric-rollups` requires AAL2 governance context, tenant workspace membership, no-store headers, synthetic-only boundary headers, and rate limiting. It returns persisted rollup snapshots plus a live dashboard derived from protected operator metrics.
+
+`POST /api/pilot-workspaces/{workspaceSlug}/metric-rollups` accepts only reporting-period metadata, fixed `finance-reviewed-no-phi-operating-rollup` attestation, `synthetic-business-workflow-only` data boundary, and a bounded no-PHI review note. The guarded Supabase RPC aggregates protected operator metrics, computes model-cost-per-workflow and reviewer/delivery/proof ratios, persists the snapshot, and commits `protected-metric-rollup-created` to the append-only audit trail.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet` commits `protected-metric-rollup-packet-downloaded` before returning the internal board packet. Packet headers carry the no-audited-financial-report and no-securities-offering-material authority.
+
+Safe workaround: if rollup storage or packet export is unavailable, use the protected operator metric dashboard plus external finance-reviewed spreadsheets. Do not use rollup output as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live-care authorization.
+
+Current boundary: rollups summarize aggregate no-PHI operating metadata only. They must not store PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities materials, external valuation claims, or production clinical approval.
+
 ## Clinical Activation Dossier
 
 `/pilot-workspace/access` now includes a protected Clinical Activation Dossier. It turns the public Clinical Care Activation Readiness model plus tenant-scoped workspace evidence into:

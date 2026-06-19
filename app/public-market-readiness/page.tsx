@@ -68,6 +68,32 @@ export default function PublicMarketReadinessPage() {
         </div>
       </section>
 
+      <section className="section-band split-band" aria-label="Protected board packet path">
+        <div>
+          <p className="eyebrow">Protected board packets</p>
+          <h2>Internal rollups convert no-PHI operating captures into audited board packet downloads.</h2>
+          <p className="section-copy">
+            Protected metric rollups are available inside the AAL2 pilot workspace. They are designed for internal
+            operating review and advisor diligence, not audited financial reporting, securities offering material, or
+            valuation assurance.
+          </p>
+        </div>
+        <div className="layer-list">
+          <article className="layer-row">
+            <span>01</span>
+            <strong>{summary.protectedMetricRollupStatus}</strong>
+          </article>
+          <article className="layer-row">
+            <span>02</span>
+            <strong>{summary.protectedMetricRollupPacketStatus}</strong>
+          </article>
+          <article className="layer-row">
+            <span>03</span>
+            <strong>{summary.protectedMetricRollupApiRoute}</strong>
+          </article>
+        </div>
+      </section>
+
       <section className="table-section" aria-label="Internal KPI stack">
         <div className="section-heading">
           <p className="eyebrow">Internal KPI stack</p>

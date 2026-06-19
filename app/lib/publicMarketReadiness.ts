@@ -2,6 +2,10 @@ import {
   protectedOperatorMetricCaptureStatus,
   protectedOperatorMetricCatalog
 } from "./protectedOperatorMetrics";
+import {
+  protectedMetricRollupPacketProofStackStatus,
+  protectedMetricRollupStatus
+} from "./protectedMetricRollups";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -524,12 +528,18 @@ export function getPublicMarketReadinessSummary() {
     route: "/public-market-readiness",
     apiRoute: "/api/public-market-readiness",
     briefRoute: "/api/public-market-readiness/brief",
-    protectedOperatorMetricRoute: "/pilot-workspace/access",
-    protectedOperatorMetricApiRoute: "/api/pilot-workspaces/{workspaceSlug}/operator-metrics",
+  protectedOperatorMetricRoute: "/pilot-workspace/access",
+  protectedOperatorMetricApiRoute: "/api/pilot-workspaces/{workspaceSlug}/operator-metrics",
+    protectedMetricRollupRoute: "/pilot-workspace/access",
+    protectedMetricRollupApiRoute: "/api/pilot-workspaces/{workspaceSlug}/metric-rollups",
+    protectedMetricRollupPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
     protectedOperatorMetricStatus: protectedOperatorMetricCaptureStatus,
+    protectedMetricRollupStatus,
+    protectedMetricRollupPacketStatus: protectedMetricRollupPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -552,7 +562,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add finance-reviewed protected metric rollups and packet export so SCRIMED can graduate from raw no-PHI captures to board-review operating dashboards.",
+      "Add monthly variance review, finance-approved cost allocation, and board trend comparison across protected no-PHI metric rollups.",
     updated: "2026-06-19"
   };
 }
@@ -567,10 +577,15 @@ export function buildPublicMarketReadinessBrief() {
 - Proof stack: ${summary.proofStackStatus}
 - Brief proof stack: ${summary.briefProofStackStatus}
 - Protected operator metric capture: ${summary.protectedOperatorMetricStatus}
+- Protected metric rollups: ${summary.protectedMetricRollupStatus}
+- Protected metric rollup packets: ${summary.protectedMetricRollupPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
 - Protected metric API: ${summary.protectedOperatorMetricApiRoute}
+- Protected rollup route: ${summary.protectedMetricRollupRoute}
+- Protected rollup API: ${summary.protectedMetricRollupApiRoute}
+- Protected rollup packet API: ${summary.protectedMetricRollupPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

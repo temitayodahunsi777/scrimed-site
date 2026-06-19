@@ -2,6 +2,16 @@
 
 Updated: 2026-06-19
 
+## Latest Protected Metric Rollup Release
+
+- Added protected finance-reviewed Metric Rollups inside `/pilot-workspace/access` after Public Market Operator Metrics.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/metric-rollups` for AAL2 no-PHI board-rollup review and snapshot creation.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet` for audited internal board metric packet downloads.
+- Added `app/lib/protectedMetricRollups.ts` with typed rollup derivation, reporting-window validation, ratio math, safe workarounds, packet generation, and fixed finance/securities/clinical boundaries.
+- Added `public.protected_metric_rollup_snapshots` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-metric-rollup-created` and `protected-metric-rollup-packet-downloaded` audit events, and runtime schema `2026-06-19.3`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-finance-reviewed-metric-rollups-no-phi` and `aal2-audited-board-metric-packets-no-phi`.
+- Preserved the boundary: protected rollups and packets are internal no-PHI operating evidence only. They do not create audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, PHI authorization, production authorization, or live clinical execution approval.
+
 ## Latest Protected Operator Metric Capture Release
 
 - Added protected Public Market Operator Metrics inside `/pilot-workspace/access` after the Command Intelligence Hub.

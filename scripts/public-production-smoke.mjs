@@ -155,6 +155,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected operator metrics proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedMetricRollups !==
+    "aal2-finance-reviewed-metric-rollups-no-phi"
+  ) {
+    throw new Error("product console missing protected metric rollups proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedMetricRollupPackets !==
+    "aal2-audited-board-metric-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected metric rollup packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -569,6 +583,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected operator metric API route.");
   }
 
+  if (
+    body.protectedMetricRollupStatus !==
+    "aal2-finance-reviewed-metric-rollups-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected metric rollup status.");
+  }
+
+  if (
+    body.protectedMetricRollupApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/metric-rollups"
+  ) {
+    throw new Error("Public Market Readiness missing protected metric rollup API route.");
+  }
+
+  if (
+    body.protectedMetricRollupPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected metric rollup packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -757,6 +792,25 @@ await checkProtectedPostFailClosed(
     operatorAttestation: "no-phi-finance-readiness-operator-metric",
     dataBoundary: "synthetic-business-workflow-only"
   }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/metric-rollups`,
+  "Protected Metric Rollups protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/metric-rollups`,
+  "Protected Metric Rollups write protected API",
+  {
+    reportingPeriodStart: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    reportingPeriodEnd: new Date().toISOString(),
+    reviewerAttestation: "finance-reviewed-no-phi-operating-rollup",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke-no-phi-board-rollup"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/metric-rollups/00000000-0000-4000-8000-000000000000/packet`,
+  "Protected Metric Rollup packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

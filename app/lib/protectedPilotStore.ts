@@ -60,6 +60,11 @@ import type {
   ProtectedOperatorMetricRecord,
   ProtectedOperatorMetricUnit
 } from "./protectedOperatorMetrics";
+import type {
+  ProtectedMetricRollupInput,
+  ProtectedMetricRollupRecord,
+  ProtectedMetricRollupTotal
+} from "./protectedMetricRollups";
 
 type AuthenticatedPilotContext =
   | {
@@ -221,6 +226,40 @@ type ProtectedOperatorMetricRow = {
   data_boundary: ProtectedOperatorMetricInput["dataBoundary"];
   financial_reporting_authority: ProtectedOperatorMetricRecord["financialReportingAuthority"];
   securities_authority: ProtectedOperatorMetricRecord["securitiesAuthority"];
+  created_by: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedMetricRollupSnapshotRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  reporting_period_start: string;
+  reporting_period_end: string;
+  metric_count: number;
+  captured_metric_types: number;
+  required_metric_types: number;
+  ready_for_board_review: boolean;
+  model_cost_usd: number | string;
+  model_cost_per_workflow: number | string | null;
+  review_time_minutes: number | string;
+  review_minutes_per_workflow: number | string | null;
+  delivery_hours: number | string;
+  delivery_hours_per_workflow: number | string | null;
+  proof_packet_count: number | string;
+  proof_packets_per_workflow: number | string | null;
+  workflow_volume: number | string;
+  cost_per_workflow: number | string | null;
+  totals: unknown;
+  recommendations: unknown;
+  limitations: unknown;
+  reviewer_attestation: ProtectedMetricRollupRecord["reviewerAttestation"];
+  review_note: string;
+  data_boundary: ProtectedMetricRollupRecord["dataBoundary"];
+  financial_reporting_authority: ProtectedMetricRollupRecord["financialReportingAuthority"];
+  securities_authority: ProtectedMetricRollupRecord["securitiesAuthority"];
+  clinical_execution_authority: ProtectedMetricRollupRecord["clinicalExecutionAuthority"];
   created_by: string;
   created_at: string;
   boundary: string;
@@ -719,6 +758,48 @@ function mapProtectedOperatorMetric(row: ProtectedOperatorMetricRow): ProtectedO
   };
 }
 
+function nullableNumber(value: number | string | null) {
+  return value === null ? null : Number(value);
+}
+
+function mapProtectedMetricRollupSnapshot(
+  row: ProtectedMetricRollupSnapshotRow
+): ProtectedMetricRollupRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    reportingPeriodStart: row.reporting_period_start,
+    reportingPeriodEnd: row.reporting_period_end,
+    metricCount: row.metric_count,
+    capturedMetricTypes: row.captured_metric_types,
+    requiredMetricTypes: row.required_metric_types,
+    readyForBoardReview: row.ready_for_board_review,
+    modelCostUsd: Number(row.model_cost_usd),
+    modelCostPerWorkflow: nullableNumber(row.model_cost_per_workflow),
+    reviewTimeMinutes: Number(row.review_time_minutes),
+    reviewMinutesPerWorkflow: nullableNumber(row.review_minutes_per_workflow),
+    deliveryHours: Number(row.delivery_hours),
+    deliveryHoursPerWorkflow: nullableNumber(row.delivery_hours_per_workflow),
+    proofPacketCount: Number(row.proof_packet_count),
+    proofPacketsPerWorkflow: nullableNumber(row.proof_packets_per_workflow),
+    workflowVolume: Number(row.workflow_volume),
+    costPerWorkflow: nullableNumber(row.cost_per_workflow),
+    totals: asArray<ProtectedMetricRollupTotal>(row.totals),
+    recommendations: asArray<string>(row.recommendations),
+    limitations: asArray<string>(row.limitations),
+    reviewerAttestation: row.reviewer_attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1007,6 +1088,8 @@ const clinicalActivationApprovalSelect =
   "id, tenant_id, workspace_id, domain_id, domain_label, approval_status, approval_scope, reviewer_role, attestation, evidence_snapshot, retained_blockers, no_phi_attestation, clinical_go_live_authority, signed_by, signed_at, created_at, boundary";
 const protectedOperatorMetricSelect =
   "id, tenant_id, workspace_id, metric_key, metric_label, metric_unit, metric_value, public_market_kpi_id, workflow_key, measurement_window_start, measurement_window_end, source_route, evidence_reference, operator_attestation, data_boundary, financial_reporting_authority, securities_authority, created_by, created_at, boundary";
+const protectedMetricRollupSnapshotSelect =
+  "id, tenant_id, workspace_id, reporting_period_start, reporting_period_end, metric_count, captured_metric_types, required_metric_types, ready_for_board_review, model_cost_usd, model_cost_per_workflow, review_time_minutes, review_minutes_per_workflow, delivery_hours, delivery_hours_per_workflow, proof_packet_count, proof_packets_per_workflow, workflow_volume, cost_per_workflow, totals, recommendations, limitations, reviewer_attestation, review_note, data_boundary, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1204,6 +1287,45 @@ export async function listProtectedOperatorMetrics(
     metrics: ((data ?? []) as unknown as ProtectedOperatorMetricRow[]).map(
       mapProtectedOperatorMetric
     ),
+    error
+  };
+}
+
+export async function listProtectedMetricRollupSnapshots(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_metric_rollup_snapshots")
+    .select(protectedMetricRollupSnapshotSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return {
+    snapshots: ((data ?? []) as unknown as ProtectedMetricRollupSnapshotRow[]).map(
+      mapProtectedMetricRollupSnapshot
+    ),
+    error
+  };
+}
+
+export async function getProtectedMetricRollupSnapshot(
+  client: SupabaseClient,
+  workspaceId: string,
+  snapshotId: string
+) {
+  const { data, error } = await client
+    .from("protected_metric_rollup_snapshots")
+    .select(protectedMetricRollupSnapshotSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", snapshotId)
+    .maybeSingle();
+
+  return {
+    snapshot: data
+      ? mapProtectedMetricRollupSnapshot(data as unknown as ProtectedMetricRollupSnapshotRow)
+      : null,
     error
   };
 }
@@ -1463,6 +1585,38 @@ export async function recordProtectedOperatorMetric(
 
   return {
     metricId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function createProtectedMetricRollupSnapshot(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedMetricRollupInput
+) {
+  const { data, error } = await client.rpc("create_protected_metric_rollup_snapshot", {
+    p_workspace_slug: workspaceSlug,
+    p_rollup_input: input
+  });
+
+  return {
+    snapshotId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedMetricRollupPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  snapshotId: string
+) {
+  const { data, error } = await client.rpc("record_protected_metric_rollup_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_snapshot_id: snapshotId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
     error
   };
 }

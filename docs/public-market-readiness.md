@@ -11,6 +11,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Markdown brief: `/api/public-market-readiness/brief`
 - Protected metric workspace: `/pilot-workspace/access`
 - Protected metric API: `/api/pilot-workspaces/{workspaceSlug}/operator-metrics`
+- Protected metric rollup API: `/api/pilot-workspaces/{workspaceSlug}/metric-rollups`
+- Protected metric board packet API: `/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -21,6 +23,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Model-efficiency controls for task-specific agents, open/closed model optionality, token and evidence budgets, and workflow-owned data loops.
 - Compliance-log map connecting protected pilot audit events, QA evidence, clinical activation readiness, buyer diligence, secure evidence vault readiness, and Trust Safety Operations.
 - Protected AAL2 operator metric capture for model cost, review time, delivery hours, proof-packet count, and workflow volume.
+- Protected AAL2 metric rollup snapshots and audited board packet downloads for internal operating review.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.
@@ -39,6 +42,8 @@ Current metrics are definitions, synthetic/protected-pilot readiness signals, an
 
 Protected operator metrics are aggregate operating metadata only. They must not contain PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities offering material, legal advice, tax advice, accounting advice, valuation assurance, reimbursement assurance, clinical validation, or live clinical execution approval.
 
+Protected metric rollups are internal board operating evidence only. They summarize no-PHI operator metrics and keep every packet download audit logged, but they are still not audited financial reporting, securities offering material, valuation assurance, investment advice, accounting advice, tax advice, legal advice, reimbursement assurance, clinical validation, or live clinical execution authority.
+
 ## Next Build
 
-Add finance-reviewed protected metric rollups and packet export so SCRIMED can graduate from raw no-PHI captures to board-review operating dashboards.
+Add monthly variance review, finance-approved cost allocation, and board trend comparison across protected no-PHI metric rollups.

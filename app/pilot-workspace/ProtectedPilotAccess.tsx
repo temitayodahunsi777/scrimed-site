@@ -26,6 +26,7 @@ import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
+import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
@@ -40,6 +41,11 @@ import type {
   ProtectedOperatorMetricInput,
   ProtectedOperatorMetricRecord
 } from "../lib/protectedOperatorMetrics";
+import type {
+  ProtectedMetricRollupDashboard,
+  ProtectedMetricRollupInput,
+  ProtectedMetricRollupRecord
+} from "../lib/protectedMetricRollups";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -106,6 +112,14 @@ type ProtectedOperatorMetricsResponse = {
   error?: { message?: string };
 };
 
+type ProtectedMetricRollupsResponse = {
+  snapshotId?: string;
+  snapshots?: ProtectedMetricRollupRecord[];
+  dashboard?: ProtectedMetricRollupDashboard;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -166,6 +180,15 @@ export default function ProtectedPilotAccess({
     useState<ProtectedOperatorMetricDashboard | null>(null);
   const [protectedOperatorMetricStatus, setProtectedOperatorMetricStatus] =
     useState<"idle" | "saving">("idle");
+  const [protectedMetricRollupSnapshots, setProtectedMetricRollupSnapshots] = useState<
+    ProtectedMetricRollupRecord[]
+  >([]);
+  const [protectedMetricRollupDashboard, setProtectedMetricRollupDashboard] =
+    useState<ProtectedMetricRollupDashboard | null>(null);
+  const [protectedMetricRollupStatus, setProtectedMetricRollupStatus] =
+    useState<"idle" | "saving">("idle");
+  const [protectedMetricRollupPacketBusyId, setProtectedMetricRollupPacketBusyId] =
+    useState<string | null>(null);
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -181,6 +204,13 @@ export default function ProtectedPilotAccess({
     setProtectedOperatorMetrics([]);
     setProtectedOperatorMetricDashboard(null);
     setProtectedOperatorMetricStatus("idle");
+  }, []);
+
+  const resetProtectedMetricRollups = useCallback(() => {
+    setProtectedMetricRollupSnapshots([]);
+    setProtectedMetricRollupDashboard(null);
+    setProtectedMetricRollupStatus("idle");
+    setProtectedMetricRollupPacketBusyId(null);
   }, []);
 
   useEffect(() => {
@@ -232,6 +262,7 @@ export default function ProtectedPilotAccess({
         setClinicalApprovalBusyDomainId(null);
         setClinicalActivationApprovalWorkflow(null);
         resetProtectedOperatorMetrics();
+        resetProtectedMetricRollups();
         setStatus("signed-out");
         return;
       }
@@ -280,6 +311,7 @@ export default function ProtectedPilotAccess({
         setClinicalApprovalBusyDomainId(null);
         setClinicalActivationApprovalWorkflow(null);
         resetProtectedOperatorMetrics();
+        resetProtectedMetricRollups();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -330,6 +362,7 @@ export default function ProtectedPilotAccess({
       setClinicalApprovalBusyDomainId(null);
       setClinicalActivationApprovalWorkflow(null);
       resetProtectedOperatorMetrics();
+      resetProtectedMetricRollups();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -341,7 +374,8 @@ export default function ProtectedPilotAccess({
           loadManualQaEvidencePackets(activeSession, nextWorkspaces[0]),
           loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0]),
           loadClinicalActivationApprovals(activeSession, nextWorkspaces[0]),
-          loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0])
+          loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0]),
+          loadProtectedMetricRollups(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -493,6 +527,27 @@ export default function ProtectedPilotAccess({
       setProtectedOperatorMetricDashboard(body.dashboard ?? null);
     }
 
+    async function loadProtectedMetricRollups(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/metric-rollups`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedMetricRollupsResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected metric rollups could not be loaded.");
+        return;
+      }
+
+      setProtectedMetricRollupSnapshots(body.snapshots ?? []);
+      setProtectedMetricRollupDashboard(body.dashboard ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -504,7 +559,7 @@ export default function ProtectedPilotAccess({
       active = false;
       subscription.unsubscribe();
     };
-  }, [resetProtectedOperatorMetrics, supabase]);
+  }, [resetProtectedMetricRollups, resetProtectedOperatorMetrics, supabase]);
 
   async function sendMagicLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -673,6 +728,7 @@ export default function ProtectedPilotAccess({
     setClinicalApprovalBusyDomainId(null);
     setClinicalActivationApprovalWorkflow(null);
     resetProtectedOperatorMetrics();
+    resetProtectedMetricRollups();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -696,7 +752,8 @@ export default function ProtectedPilotAccess({
       refreshManualQaEvidencePackets(session, workspace),
       refreshCommandIntelligenceSnapshots(session, workspace),
       refreshClinicalActivationApprovals(session, workspace),
-      refreshProtectedOperatorMetrics(session, workspace)
+      refreshProtectedOperatorMetrics(session, workspace),
+      refreshProtectedMetricRollups(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -799,6 +856,23 @@ export default function ProtectedPilotAccess({
 
     setProtectedOperatorMetrics(body.metrics ?? []);
     setProtectedOperatorMetricDashboard(body.dashboard ?? null);
+  }
+
+  async function refreshProtectedMetricRollups(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/metric-rollups`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedMetricRollupsResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected metric rollups could not be loaded.");
+      return;
+    }
+
+    setProtectedMetricRollupSnapshots(body.snapshots ?? []);
+    setProtectedMetricRollupDashboard(body.dashboard ?? null);
   }
 
   async function createSyntheticSession() {
@@ -1202,9 +1276,80 @@ export default function ProtectedPilotAccess({
     setProtectedOperatorMetrics(body.metrics ?? []);
     setProtectedOperatorMetricDashboard(body.dashboard ?? null);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedMetricRollups(session, selectedWorkspace);
     setMessage(
       `Protected operator metric recorded${body.metricId ? ` with ledger id ${body.metricId}` : ""}.`
     );
+  }
+
+  async function createProtectedMetricRollupSnapshot(input: ProtectedMetricRollupInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedMetricRollupStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/pilot-workspaces/${selectedWorkspace.slug}/metric-rollups`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(input)
+    });
+    const body = (await response.json()) as ProtectedMetricRollupsResponse;
+    setProtectedMetricRollupStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected metric rollup snapshot could not be created."
+      );
+      return;
+    }
+
+    setProtectedMetricRollupSnapshots(body.snapshots ?? []);
+    setProtectedMetricRollupDashboard(body.dashboard ?? null);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected metric rollup snapshot created${body.snapshotId ? ` with snapshot id ${body.snapshotId}` : ""}.`
+    );
+  }
+
+  async function downloadProtectedMetricRollupPacket(snapshot: ProtectedMetricRollupRecord) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedMetricRollupPacketBusyId(snapshot.id);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/metric-rollups/${snapshot.id}/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedMetricRollupPacketBusyId(null);
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(body.error?.message ?? "The protected metric rollup board packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-${snapshot.id}-metric-board-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected metric rollup board packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -1476,6 +1621,15 @@ export default function ProtectedPilotAccess({
             dashboard={protectedOperatorMetricDashboard}
             metrics={protectedOperatorMetrics}
             onRecordMetric={recordProtectedOperatorMetric}
+          />
+
+          <ProtectedMetricRollupsPanel
+            busySnapshot={protectedMetricRollupStatus === "saving"}
+            dashboard={protectedMetricRollupDashboard}
+            onCreateSnapshot={createProtectedMetricRollupSnapshot}
+            onDownloadPacket={downloadProtectedMetricRollupPacket}
+            packetBusyId={protectedMetricRollupPacketBusyId}
+            snapshots={protectedMetricRollupSnapshots}
           />
 
           <BuyerPilotRoomPanel

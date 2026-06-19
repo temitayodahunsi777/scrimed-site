@@ -432,6 +432,20 @@ export const protectedPilotApiContracts = [
       "Inspect or append tenant-scoped no-PHI Public Market Readiness operator metrics for model cost, review time, delivery hours, proof-packet count, workflow volume, and unit-economics discipline without storing audited financials, securities material, PHI, patient identifiers, payer member data, source contracts, secrets, or clinical validation."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/metric-rollups",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed finance-reviewed no-PHI rollup attestation + rate limit",
+    purpose:
+      "Inspect or create protected no-PHI metric rollup snapshots that aggregate operator metrics into internal board operating evidence without becoming audited financial reporting, securities offering material, valuation assurance, clinical validation, reimbursement assurance, or live care authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/metric-rollups/{snapshotId}/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited internal board metric packet from a persisted no-PHI rollup snapshot after committing the packet release event."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
