@@ -18,6 +18,10 @@ import {
   protectedFinanceMethodologyPacketProofStackStatus,
   protectedFinanceMethodologyStatus
 } from "./protectedFinanceMethodology";
+import {
+  protectedExternalApprovalEvidencePacketProofStackStatus,
+  protectedExternalApprovalEvidenceStatus
+} from "./protectedExternalApprovalEvidence";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -559,6 +563,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/finance-methodology",
     protectedFinanceMethodologyPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet",
+    protectedExternalApprovalEvidenceRoute: "/pilot-workspace/access",
+    protectedExternalApprovalEvidenceApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence",
+    protectedExternalApprovalEvidencePacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -571,6 +580,9 @@ export function getPublicMarketReadinessSummary() {
     protectedBoardScorecardPacketStatus: protectedBoardScorecardPacketProofStackStatus,
     protectedFinanceMethodologyStatus,
     protectedFinanceMethodologyPacketStatus: protectedFinanceMethodologyPacketProofStackStatus,
+    protectedExternalApprovalEvidenceStatus,
+    protectedExternalApprovalEvidencePacketStatus:
+      protectedExternalApprovalEvidencePacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -593,8 +605,8 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add qualified external-use approval evidence vault linkage and versioned finance-reviewed methodology policies once counsel, finance, privacy, security, communications, and customer-specific evidence retention are approved.",
-    updated: "2026-06-19"
+      "Add qualified release decision workflow and versioned claim registry approvals once external reviewers approve metadata-retention policy, artifacts, audience, and distribution controls.",
+    updated: "2026-06-20"
   };
 }
 
@@ -616,6 +628,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected board scorecard packets: ${summary.protectedBoardScorecardPacketStatus}
 - Protected finance methodology gates: ${summary.protectedFinanceMethodologyStatus}
 - Protected finance methodology packets: ${summary.protectedFinanceMethodologyPacketStatus}
+- Protected external approval evidence: ${summary.protectedExternalApprovalEvidenceStatus}
+- Protected external approval evidence packets: ${summary.protectedExternalApprovalEvidencePacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -632,6 +646,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected finance methodology route: ${summary.protectedFinanceMethodologyRoute}
 - Protected finance methodology API: ${summary.protectedFinanceMethodologyApiRoute}
 - Protected finance methodology packet API: ${summary.protectedFinanceMethodologyPacketApiRoute}
+- Protected external approval evidence route: ${summary.protectedExternalApprovalEvidenceRoute}
+- Protected external approval evidence API: ${summary.protectedExternalApprovalEvidenceApiRoute}
+- Protected external approval evidence packet API: ${summary.protectedExternalApprovalEvidencePacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

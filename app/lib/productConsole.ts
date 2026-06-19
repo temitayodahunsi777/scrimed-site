@@ -122,6 +122,10 @@ import {
   protectedFinanceMethodologyPacketProofStackStatus,
   protectedFinanceMethodologyStatus
 } from "./protectedFinanceMethodology";
+import {
+  protectedExternalApprovalEvidencePacketProofStackStatus,
+  protectedExternalApprovalEvidenceStatus
+} from "./protectedExternalApprovalEvidence";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -716,6 +720,12 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedFinanceMethodologyApiRoute,
     protectedFinanceMethodologyPacketApiRoute:
       publicMarketReadinessSummary.protectedFinanceMethodologyPacketApiRoute,
+    protectedExternalApprovalEvidenceRoute:
+      publicMarketReadinessSummary.protectedExternalApprovalEvidenceRoute,
+    protectedExternalApprovalEvidenceApiRoute:
+      publicMarketReadinessSummary.protectedExternalApprovalEvidenceApiRoute,
+    protectedExternalApprovalEvidencePacketApiRoute:
+      publicMarketReadinessSummary.protectedExternalApprovalEvidencePacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -861,6 +871,9 @@ export function getProductConsoleSummary() {
       protectedBoardScorecardPackets: protectedBoardScorecardPacketProofStackStatus,
       protectedFinanceMethodologyGates: protectedFinanceMethodologyStatus,
       protectedFinanceMethodologyPackets: protectedFinanceMethodologyPacketProofStackStatus,
+      protectedExternalApprovalEvidence: protectedExternalApprovalEvidenceStatus,
+      protectedExternalApprovalEvidencePackets:
+        protectedExternalApprovalEvidencePacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1026,6 +1039,9 @@ export function getProductReadinessBrief() {
     `Protected finance methodology gates: ${summary.protectedFinanceMethodologyRoute}`,
     `Protected finance methodology API: ${summary.protectedFinanceMethodologyApiRoute}`,
     `Protected finance methodology packet API: ${summary.protectedFinanceMethodologyPacketApiRoute}`,
+    `Protected external approval evidence: ${summary.protectedExternalApprovalEvidenceRoute}`,
+    `Protected external approval evidence API: ${summary.protectedExternalApprovalEvidenceApiRoute}`,
+    `Protected external approval evidence packet API: ${summary.protectedExternalApprovalEvidencePacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

@@ -1,6 +1,16 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-19
+Updated: 2026-06-20
+
+## Latest Protected External Approval Evidence Linkage Release
+
+- Added protected External Approval Evidence Linkage inside `/pilot-workspace/access` after Protected Finance Methodology Gates.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence` for AAL2 no-PHI metadata references to externally retained finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission approval artifacts.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet` for audited external approval evidence linkage packet downloads.
+- Added `app/lib/protectedExternalApprovalEvidence.ts` with typed domains, validation, metadata-only reference boundaries, external storage authority, release blockers, workflow derivation, safe workarounds, and packet generation.
+- Added `public.protected_external_approval_evidence_references` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-external-approval-evidence-recorded` audit events, and runtime schema `2026-06-20.1`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-qualified-external-approval-evidence-links-no-phi` and `aal2-audited-external-approval-evidence-link-packets-no-phi`.
+- Preserved the boundary: this layer stores bounded reference metadata only. It does not store PHI, source contracts, signed BAAs/DPAs, legal opinions, audited financials, securities material, customer permission artifacts, advertising substantiation, clinical validation, compliance certification, production authorization, or live clinical execution approval.
 
 ## Latest Protected Finance Methodology Gates Release
 

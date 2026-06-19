@@ -82,12 +82,28 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology`
 - `POST /api/pilot-workspaces/{workspaceSlug}/finance-methodology`
 - `GET /api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
+- `POST /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
+- `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
 Protected routes fail closed with `503` until identity and durable storage are configured. They require a verified bearer token after activation.
 
 `GET /api/pilot-workspaces/readiness` verifies the deployed runtime against the migrated Supabase schema and Upstash Redis. Environment-variable presence alone does not mark production activation as verified.
+
+## External Approval Evidence Linkage
+
+`/pilot-workspace/access` now includes Protected External Approval Evidence Linkage immediately after Protected Finance Methodology Gates. Tenant admins, pilot leads, and reviewers can record bounded no-PHI metadata references to externally retained finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission artifacts.
+
+The database stores only a short label, approved external system, non-secret locator, owner label, domain, optional finance-gate link, retained blockers, release restrictions, and audit metadata. It does not store PHI, patient identifiers, payer member data, source contracts, credentials, signed BAAs/DPAs, legal opinions, audited financial statements, securities material, customer permission artifacts, advertising substantiation, clinical validation, compliance certification, production authorization, or live clinical execution approval.
+
+Safe operating pattern:
+
+- Keep actual approval artifacts in qualified external systems such as counsel data rooms, finance workbooks, customer procurement portals, security GRC systems, board materials, or approved secure channels.
+- Record only non-secret reference metadata in SCRIMED.
+- Download the audited linkage packet for diligence after the write-before-release audit event commits.
+- Treat `ready-for-qualified-release-review-not-release-authority` as a review posture only, never as approval to release claims, securities materials, customer references, clinical workflows, or production access.
 
 ## Pilot Demo Readiness Command Center
 

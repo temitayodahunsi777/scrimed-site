@@ -1,6 +1,6 @@
 # SCRIMED Platform Architecture
 
-Updated: 2026-06-19
+Updated: 2026-06-20
 
 SCRIMED is designed as an AI-native healthcare intelligence platform composed of modular services that support clinical workflows, operational automation, healthcare interoperability, and governed AI reliability.
 
@@ -20,6 +20,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Protected Metric Trend Reviews: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/metric-trends`, and `/api/pilot-workspaces/[workspaceSlug]/metric-trends/[reviewId]/packet` for AAL2 no-PHI monthly variance review, reach expansion signals, competitive advantage tracking, agent improvement actions, and audited trend packet downloads
 - Protected Board Scorecards: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/board-scorecards`, and `/api/pilot-workspaces/[workspaceSlug]/board-scorecards/[scorecardId]/packet` for AAL2 no-PHI rolling-quarter scorecards, finance-allocation readiness, buyer-segment cohorts, competitive advantage tracking, agent improvement priorities, and audited scorecard packet downloads
 - Protected Finance Methodology Gates: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/finance-methodology`, and `/api/pilot-workspaces/[workspaceSlug]/finance-methodology/packet` for AAL2 no-PHI cost-allocation methodology, external-use gate records, retained blockers, and audited finance gate packet downloads
+- Protected External Approval Evidence Linkage: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/external-approval-evidence`, and `/api/pilot-workspaces/[workspaceSlug]/external-approval-evidence/packet` for metadata-only references to externally retained qualified approval artifacts while sensitive document storage and release authority remain blocked
 - Public Market Readiness: `/public-market-readiness`, `/api/public-market-readiness`, and `/api/public-market-readiness/brief` for KPI definitions, unit economics, compliance logs, customer proof, margin discipline, model-efficiency controls, and investor narrative
 - Sales Command Center: `/sales-operations` and `/api/sales-operations/opportunities/[intakeId]/command-center` for opportunity-linked command posture, buyer-room maturity, commercial readiness, and synthetic proof timeline
 - Enterprise pilot evidence dashboard: `/pilot-evidence`, `/api/pilot-evidence`, and `/api/pilot-evidence/brief`

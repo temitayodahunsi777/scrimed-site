@@ -1,6 +1,6 @@
 # SCRIMED Public Market Readiness
 
-Updated: 2026-06-19
+Updated: 2026-06-20
 
 SCRIMED Public Market Readiness is the operating layer for building the company with public-company discipline early. It turns investor narrative, pricing posture, unit economics, model-cost discipline, compliance logs, customer proof, and governance cadence into inspectable product evidence.
 
@@ -19,6 +19,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected board scorecard packet API: `/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet`
 - Protected finance methodology API: `/api/pilot-workspaces/{workspaceSlug}/finance-methodology`
 - Protected finance methodology packet API: `/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet`
+- Protected external approval evidence API: `/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
+- Protected external approval evidence packet API: `/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -33,6 +35,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 metric trend reviews that compare rollup snapshots, classify board trend state, surface reach expansion signals, track competitive advantages, and feed agent improvement actions.
 - Protected AAL2 board scorecards that package rolling-quarter trend evidence, finance-allocation readiness, buyer-segment cohorts, competitive edge, and agent improvement priorities.
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
+- Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.

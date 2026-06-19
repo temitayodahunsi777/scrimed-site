@@ -83,6 +83,13 @@ import type {
   ProtectedFinanceMethodologyGateStatus,
   ProtectedFinanceMethodologyInput
 } from "./protectedFinanceMethodology";
+import type {
+  ProtectedExternalApprovalEvidenceDomainId,
+  ProtectedExternalApprovalEvidenceInput,
+  ProtectedExternalApprovalEvidenceRecord,
+  ProtectedExternalApprovalEvidenceReferenceStatus,
+  ProtectedExternalApprovalEvidenceSystem
+} from "./protectedExternalApprovalEvidence";
 
 type AuthenticatedPilotContext =
   | {
@@ -366,6 +373,39 @@ type ProtectedFinanceMethodologyGateRow = {
   clinical_execution_authority: ProtectedFinanceMethodologyGateRecord["clinicalExecutionAuthority"];
   signed_by: string;
   signed_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedExternalApprovalEvidenceRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  finance_gate_record_id: string | null;
+  domain_id: ProtectedExternalApprovalEvidenceDomainId;
+  domain_label: string;
+  reference_status: Exclude<ProtectedExternalApprovalEvidenceReferenceStatus, "not-recorded">;
+  approval_scope: ProtectedExternalApprovalEvidenceRecord["approvalScope"];
+  external_reference_label: string;
+  external_system: ProtectedExternalApprovalEvidenceSystem;
+  reference_locator: string;
+  reference_owner: string;
+  evidence_retained_externally: boolean;
+  evidence_snapshot: unknown;
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  attestation: ProtectedExternalApprovalEvidenceRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedExternalApprovalEvidenceRecord["dataBoundary"];
+  evidence_authority: ProtectedExternalApprovalEvidenceRecord["evidenceAuthority"];
+  storage_authority: ProtectedExternalApprovalEvidenceRecord["storageAuthority"];
+  release_authority: ProtectedExternalApprovalEvidenceRecord["releaseAuthority"];
+  financial_reporting_authority: ProtectedExternalApprovalEvidenceRecord["financialReportingAuthority"];
+  securities_authority: ProtectedExternalApprovalEvidenceRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedExternalApprovalEvidenceRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedExternalApprovalEvidenceRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
   created_at: string;
   boundary: string;
 };
@@ -1007,6 +1047,43 @@ function mapProtectedFinanceMethodologyGate(
   };
 }
 
+function mapProtectedExternalApprovalEvidence(
+  row: ProtectedExternalApprovalEvidenceRow
+): ProtectedExternalApprovalEvidenceRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    financeGateRecordId: row.finance_gate_record_id,
+    domainId: row.domain_id,
+    domainLabel: row.domain_label,
+    referenceStatus: row.reference_status,
+    approvalScope: row.approval_scope,
+    externalReferenceLabel: row.external_reference_label,
+    externalSystem: row.external_system,
+    referenceLocator: row.reference_locator,
+    referenceOwner: row.reference_owner,
+    evidenceRetainedExternally: true,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    evidenceAuthority: row.evidence_authority,
+    storageAuthority: row.storage_authority,
+    releaseAuthority: row.release_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1303,6 +1380,8 @@ const protectedBoardScorecardSelect =
   "id, tenant_id, workspace_id, primary_trend_review_id, secondary_trend_review_id, tertiary_trend_review_id, board_period_label, scorecard_state, trend_review_count, rolling_quarter_metrics, finance_allocation_profile, buyer_segment_focus, buyer_segment_cohorts, competitive_advantages, agent_improvement_priorities, strategic_actions, recommendations, limitations, operator_attestation, review_note, data_boundary, allocation_profile_status, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
 const protectedFinanceMethodologyGateSelect =
   "id, tenant_id, workspace_id, board_scorecard_id, gate_id, gate_label, gate_status, approval_scope, reviewer_role, evidence_snapshot, retained_blockers, methodology_components, external_use_restrictions, attestation, review_note, data_boundary, methodology_authority, external_use_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, signed_by, signed_at, created_at, boundary";
+const protectedExternalApprovalEvidenceSelect =
+  "id, tenant_id, workspace_id, finance_gate_record_id, domain_id, domain_label, reference_status, approval_scope, external_reference_label, external_system, reference_locator, reference_owner, evidence_retained_externally, evidence_snapshot, retained_blockers, release_restrictions, attestation, review_note, data_boundary, evidence_authority, storage_authority, release_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1631,6 +1710,25 @@ export async function listProtectedFinanceMethodologyGates(
   return {
     records: ((data ?? []) as unknown as ProtectedFinanceMethodologyGateRow[]).map(
       mapProtectedFinanceMethodologyGate
+    ),
+    error
+  };
+}
+
+export async function listProtectedExternalApprovalEvidenceReferences(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_external_approval_evidence_references")
+    .select(protectedExternalApprovalEvidenceSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(150);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedExternalApprovalEvidenceRow[]).map(
+      mapProtectedExternalApprovalEvidence
     ),
     error
   };
@@ -2020,6 +2118,48 @@ export async function recordProtectedFinanceMethodologyPacketDownload(
       format: "text/markdown",
       syntheticOnly: true,
       noPhiOnly: true
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedExternalApprovalEvidenceReference(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedExternalApprovalEvidenceInput
+) {
+  const { data, error } = await client.rpc(
+    "record_protected_external_approval_evidence_reference",
+    {
+      p_workspace_slug: workspaceSlug,
+      p_reference_input: input
+    }
+  );
+
+  return {
+    referenceId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedExternalApprovalEvidencePacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-external-approval-evidence-links",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true
     }
   });
 

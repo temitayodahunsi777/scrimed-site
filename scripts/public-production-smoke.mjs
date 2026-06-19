@@ -211,6 +211,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected finance methodology packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedExternalApprovalEvidence !==
+    "aal2-qualified-external-approval-evidence-links-no-phi"
+  ) {
+    throw new Error("product console missing protected external approval evidence proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedExternalApprovalEvidencePackets !==
+    "aal2-audited-external-approval-evidence-link-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected external approval evidence packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -709,6 +723,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected finance methodology packet API route.");
   }
 
+  if (
+    body.protectedExternalApprovalEvidenceStatus !==
+    "aal2-qualified-external-approval-evidence-links-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected external approval evidence status.");
+  }
+
+  if (
+    body.protectedExternalApprovalEvidenceApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence"
+  ) {
+    throw new Error("Public Market Readiness missing protected external approval evidence API route.");
+  }
+
+  if (
+    body.protectedExternalApprovalEvidencePacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected external approval evidence packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -979,6 +1014,30 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/finance-methodology/packet`,
   "Protected Finance Methodology packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/external-approval-evidence`,
+  "Protected External Approval Evidence protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/external-approval-evidence`,
+  "Protected External Approval Evidence write protected API",
+  {
+    domainId: "finance-methodology-policy",
+    financeGateRecordId: "00000000-0000-4000-8000-000000000001",
+    externalReferenceLabel: "Smoke external approval reference",
+    externalSystem: "external-secure-channel",
+    referenceLocator: "external-secure-channel:smoke-reference",
+    referenceOwner: "qualified external reviewer",
+    evidenceRetainedExternally: true,
+    attestation: "external-approval-evidence-reference-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke metadata-only external approval reference"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/external-approval-evidence/packet`,
+  "Protected External Approval Evidence packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

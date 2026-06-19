@@ -27,6 +27,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
+import ProtectedExternalApprovalEvidencePanel from "./ProtectedExternalApprovalEvidencePanel";
 import ProtectedFinanceMethodologyPanel from "./ProtectedFinanceMethodologyPanel";
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
@@ -63,6 +64,10 @@ import type {
   ProtectedFinanceMethodologyInput,
   ProtectedFinanceMethodologyWorkflow
 } from "../lib/protectedFinanceMethodology";
+import type {
+  ProtectedExternalApprovalEvidenceInput,
+  ProtectedExternalApprovalEvidenceWorkflow
+} from "../lib/protectedExternalApprovalEvidence";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -161,6 +166,15 @@ type ProtectedFinanceMethodologyResponse = {
   error?: { message?: string };
 };
 
+type ProtectedExternalApprovalEvidenceResponse = {
+  referenceId?: string;
+  records?: unknown[];
+  workflow?: ProtectedExternalApprovalEvidenceWorkflow;
+  financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -254,6 +268,16 @@ export default function ProtectedPilotAccess({
     useState<string | null>(null);
   const [protectedFinanceMethodologyPacketStatus, setProtectedFinanceMethodologyPacketStatus] =
     useState<"idle" | "downloading">("idle");
+  const [protectedExternalApprovalEvidenceWorkflow, setProtectedExternalApprovalEvidenceWorkflow] =
+    useState<ProtectedExternalApprovalEvidenceWorkflow | null>(null);
+  const [
+    protectedExternalApprovalEvidenceBusyDomainId,
+    setProtectedExternalApprovalEvidenceBusyDomainId
+  ] = useState<string | null>(null);
+  const [
+    protectedExternalApprovalEvidencePacketStatus,
+    setProtectedExternalApprovalEvidencePacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -296,6 +320,12 @@ export default function ProtectedPilotAccess({
     setProtectedFinanceMethodologyWorkflow(null);
     setProtectedFinanceMethodologyBusyGateId(null);
     setProtectedFinanceMethodologyPacketStatus("idle");
+  }, []);
+
+  const resetProtectedExternalApprovalEvidence = useCallback(() => {
+    setProtectedExternalApprovalEvidenceWorkflow(null);
+    setProtectedExternalApprovalEvidenceBusyDomainId(null);
+    setProtectedExternalApprovalEvidencePacketStatus("idle");
   }, []);
 
   useEffect(() => {
@@ -351,6 +381,7 @@ export default function ProtectedPilotAccess({
         resetProtectedMetricTrends();
         resetProtectedBoardScorecards();
         resetProtectedFinanceMethodology();
+        resetProtectedExternalApprovalEvidence();
         setStatus("signed-out");
         return;
       }
@@ -403,6 +434,7 @@ export default function ProtectedPilotAccess({
         resetProtectedMetricTrends();
         resetProtectedBoardScorecards();
         resetProtectedFinanceMethodology();
+        resetProtectedExternalApprovalEvidence();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -457,6 +489,7 @@ export default function ProtectedPilotAccess({
       resetProtectedMetricTrends();
       resetProtectedBoardScorecards();
       resetProtectedFinanceMethodology();
+      resetProtectedExternalApprovalEvidence();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -472,7 +505,8 @@ export default function ProtectedPilotAccess({
           loadProtectedMetricRollups(activeSession, nextWorkspaces[0]),
           loadProtectedMetricTrends(activeSession, nextWorkspaces[0]),
           loadProtectedBoardScorecards(activeSession, nextWorkspaces[0]),
-          loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0])
+          loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0]),
+          loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -707,6 +741,35 @@ export default function ProtectedPilotAccess({
       setProtectedFinanceMethodologyWorkflow(body.workflow ?? null);
     }
 
+    async function loadProtectedExternalApprovalEvidence(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/external-approval-evidence`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedExternalApprovalEvidenceResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected external approval evidence could not be loaded.");
+        return;
+      }
+
+      setProtectedExternalApprovalEvidenceWorkflow(body.workflow ?? null);
+      if (body.financeWorkflow) {
+        setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -721,6 +784,7 @@ export default function ProtectedPilotAccess({
   }, [
     resetProtectedMetricRollups,
     resetProtectedBoardScorecards,
+    resetProtectedExternalApprovalEvidence,
     resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
     resetProtectedOperatorMetrics,
@@ -898,6 +962,7 @@ export default function ProtectedPilotAccess({
     resetProtectedMetricTrends();
     resetProtectedBoardScorecards();
     resetProtectedFinanceMethodology();
+    resetProtectedExternalApprovalEvidence();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -925,7 +990,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedMetricRollups(session, workspace),
       refreshProtectedMetricTrends(session, workspace),
       refreshProtectedBoardScorecards(session, workspace),
-      refreshProtectedFinanceMethodology(session, workspace)
+      refreshProtectedFinanceMethodology(session, workspace),
+      refreshProtectedExternalApprovalEvidence(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1095,6 +1161,31 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedFinanceMethodologyWorkflow(body.workflow ?? null);
+  }
+
+  async function refreshProtectedExternalApprovalEvidence(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/external-approval-evidence`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedExternalApprovalEvidenceResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected external approval evidence could not be loaded.");
+      return;
+    }
+
+    setProtectedExternalApprovalEvidenceWorkflow(body.workflow ?? null);
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
   }
 
   async function createSyntheticSession() {
@@ -1749,6 +1840,7 @@ export default function ProtectedPilotAccess({
 
     setProtectedFinanceMethodologyWorkflow(body.workflow ?? protectedFinanceMethodologyWorkflow);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedExternalApprovalEvidence(session, selectedWorkspace);
     setMessage(
       `Protected finance methodology gate recorded${body.gateRecordId ? ` with gate id ${body.gateRecordId}` : ""}.`
     );
@@ -1787,6 +1879,87 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected finance methodology packet downloaded and its audit event was committed.");
+  }
+
+  async function recordProtectedExternalApprovalEvidenceReference(
+    input: ProtectedExternalApprovalEvidenceInput
+  ) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedExternalApprovalEvidenceBusyDomainId(input.domainId);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/external-approval-evidence`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedExternalApprovalEvidenceResponse;
+    setProtectedExternalApprovalEvidenceBusyDomainId(null);
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected external approval evidence reference could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedExternalApprovalEvidenceWorkflow(
+      body.workflow ?? protectedExternalApprovalEvidenceWorkflow
+    );
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected external approval evidence reference recorded${
+        body.referenceId ? ` with reference id ${body.referenceId}` : ""
+      }.`
+    );
+  }
+
+  async function downloadProtectedExternalApprovalEvidencePacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedExternalApprovalEvidencePacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/external-approval-evidence/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedExternalApprovalEvidencePacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(body.error?.message ?? "The protected external approval evidence packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-external-approval-evidence-links.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected external approval evidence packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -2096,6 +2269,15 @@ export default function ProtectedPilotAccess({
             packetBusy={protectedFinanceMethodologyPacketStatus === "downloading"}
             scorecards={protectedBoardScorecards}
             workflow={protectedFinanceMethodologyWorkflow}
+          />
+
+          <ProtectedExternalApprovalEvidencePanel
+            busyDomainId={protectedExternalApprovalEvidenceBusyDomainId}
+            financeWorkflow={protectedFinanceMethodologyWorkflow}
+            onDownloadPacket={downloadProtectedExternalApprovalEvidencePacket}
+            onRecordReference={recordProtectedExternalApprovalEvidenceReference}
+            packetBusy={protectedExternalApprovalEvidencePacketStatus === "downloading"}
+            workflow={protectedExternalApprovalEvidenceWorkflow}
           />
 
           <BuyerPilotRoomPanel
