@@ -76,6 +76,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/metric-trends`
 - `POST /api/pilot-workspaces/{workspaceSlug}/metric-trends`
 - `GET /api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards`
+- `POST /api/pilot-workspaces/{workspaceSlug}/board-scorecards`
+- `GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -200,6 +203,28 @@ Current boundary: rollups summarize aggregate no-PHI operating metadata only. Th
 Safe workaround: if trend review storage or packet export is unavailable, use the protected rollup packet plus an external finance-reviewed variance workbook. Do not use trend output as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, clinical validation, compliance certification, or live-care authorization.
 
 Current boundary: trend reviews compare aggregate no-PHI operating metadata only. They must not store PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities materials, external valuation claims, reimbursement claims, or production clinical approval.
+
+## Protected Board Scorecards
+
+`/pilot-workspace/access` now includes protected Board Scorecards immediately after Metric Trend Reviews. This lets tenant operators convert one to three no-PHI trend reviews into rolling-quarter board scorecards for:
+
+- Scorecard state.
+- Rolling-quarter metric summaries.
+- Finance-allocation profile readiness.
+- Buyer-segment cohort strategy.
+- Competitive advantage tracking.
+- Agent improvement priorities.
+- Strategic operating actions.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards` requires AAL2 governance context, tenant workspace membership, no-store headers, synthetic-only boundary headers, and rate limiting. It returns persisted scorecards plus a dashboard focused on the latest scorecard state, finance allocation readiness, buyer cohorts, and agent priorities.
+
+`POST /api/pilot-workspaces/{workspaceSlug}/board-scorecards` accepts only one to three protected trend review IDs, a bounded board period label, approved buyer-segment focus, fixed `finance-methodology-pending-no-phi-board-scorecard` attestation, `synthetic-business-workflow-only` boundary, fixed `finance-allocation-profile-pending` status, and a bounded no-PHI review note. The guarded Supabase RPC verifies tenant scope, derives rolling-quarter metrics, persists the scorecard, and commits `protected-board-scorecard-created` to the append-only audit trail.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet` commits `protected-board-scorecard-packet-downloaded` before returning the internal board scorecard packet. Packet headers retain the no-audited-financial-report and no-securities-offering-material authorities.
+
+Safe workaround: if scorecard storage or packet export is unavailable, use protected trend packets plus external finance-reviewed board materials. Do not use scorecard output as audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, revenue guarantee, reimbursement assurance, clinical validation, compliance certification, advertising claim substantiation, or live-care authorization.
+
+Current boundary: scorecards package aggregate no-PHI operating metadata only. Allocation profiles remain pending until finance approves full methodology. Scorecards must not store PHI, patient identifiers, payer member data, source contracts, credentials, secrets, audited financial statements, securities materials, external valuation claims, reimbursement claims, advertising claim substantiation, or production clinical approval.
 
 ## Clinical Activation Dossier
 

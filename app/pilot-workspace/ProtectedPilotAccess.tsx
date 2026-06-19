@@ -26,6 +26,7 @@ import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
+import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
@@ -52,6 +53,11 @@ import type {
   ProtectedMetricTrendReviewInput,
   ProtectedMetricTrendReviewRecord
 } from "../lib/protectedMetricTrends";
+import type {
+  ProtectedBoardScorecardDashboard,
+  ProtectedBoardScorecardInput,
+  ProtectedBoardScorecardRecord
+} from "../lib/protectedBoardScorecards";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -134,6 +140,14 @@ type ProtectedMetricTrendsResponse = {
   error?: { message?: string };
 };
 
+type ProtectedBoardScorecardsResponse = {
+  scorecardId?: string;
+  scorecards?: ProtectedBoardScorecardRecord[];
+  dashboard?: ProtectedBoardScorecardDashboard;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -212,6 +226,15 @@ export default function ProtectedPilotAccess({
     useState<"idle" | "saving">("idle");
   const [protectedMetricTrendPacketBusyId, setProtectedMetricTrendPacketBusyId] =
     useState<string | null>(null);
+  const [protectedBoardScorecards, setProtectedBoardScorecards] = useState<
+    ProtectedBoardScorecardRecord[]
+  >([]);
+  const [protectedBoardScorecardDashboard, setProtectedBoardScorecardDashboard] =
+    useState<ProtectedBoardScorecardDashboard | null>(null);
+  const [protectedBoardScorecardStatus, setProtectedBoardScorecardStatus] =
+    useState<"idle" | "saving">("idle");
+  const [protectedBoardScorecardPacketBusyId, setProtectedBoardScorecardPacketBusyId] =
+    useState<string | null>(null);
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -241,6 +264,13 @@ export default function ProtectedPilotAccess({
     setProtectedMetricTrendDashboard(null);
     setProtectedMetricTrendStatus("idle");
     setProtectedMetricTrendPacketBusyId(null);
+  }, []);
+
+  const resetProtectedBoardScorecards = useCallback(() => {
+    setProtectedBoardScorecards([]);
+    setProtectedBoardScorecardDashboard(null);
+    setProtectedBoardScorecardStatus("idle");
+    setProtectedBoardScorecardPacketBusyId(null);
   }, []);
 
   useEffect(() => {
@@ -294,6 +324,7 @@ export default function ProtectedPilotAccess({
         resetProtectedOperatorMetrics();
         resetProtectedMetricRollups();
         resetProtectedMetricTrends();
+        resetProtectedBoardScorecards();
         setStatus("signed-out");
         return;
       }
@@ -344,6 +375,7 @@ export default function ProtectedPilotAccess({
         resetProtectedOperatorMetrics();
         resetProtectedMetricRollups();
         resetProtectedMetricTrends();
+        resetProtectedBoardScorecards();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -396,6 +428,7 @@ export default function ProtectedPilotAccess({
       resetProtectedOperatorMetrics();
       resetProtectedMetricRollups();
       resetProtectedMetricTrends();
+      resetProtectedBoardScorecards();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -409,7 +442,8 @@ export default function ProtectedPilotAccess({
           loadClinicalActivationApprovals(activeSession, nextWorkspaces[0]),
           loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0]),
           loadProtectedMetricRollups(activeSession, nextWorkspaces[0]),
-          loadProtectedMetricTrends(activeSession, nextWorkspaces[0])
+          loadProtectedMetricTrends(activeSession, nextWorkspaces[0]),
+          loadProtectedBoardScorecards(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -603,6 +637,27 @@ export default function ProtectedPilotAccess({
       setProtectedMetricTrendDashboard(body.dashboard ?? null);
     }
 
+    async function loadProtectedBoardScorecards(activeSession: Session, workspace: PilotWorkspaceRecord) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/board-scorecards`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedBoardScorecardsResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected board scorecards could not be loaded.");
+        return;
+      }
+
+      setProtectedBoardScorecards(body.scorecards ?? []);
+      setProtectedBoardScorecardDashboard(body.dashboard ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -616,6 +671,7 @@ export default function ProtectedPilotAccess({
     };
   }, [
     resetProtectedMetricRollups,
+    resetProtectedBoardScorecards,
     resetProtectedMetricTrends,
     resetProtectedOperatorMetrics,
     supabase
@@ -790,6 +846,7 @@ export default function ProtectedPilotAccess({
     resetProtectedOperatorMetrics();
     resetProtectedMetricRollups();
     resetProtectedMetricTrends();
+    resetProtectedBoardScorecards();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -815,7 +872,8 @@ export default function ProtectedPilotAccess({
       refreshClinicalActivationApprovals(session, workspace),
       refreshProtectedOperatorMetrics(session, workspace),
       refreshProtectedMetricRollups(session, workspace),
-      refreshProtectedMetricTrends(session, workspace)
+      refreshProtectedMetricTrends(session, workspace),
+      refreshProtectedBoardScorecards(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -952,6 +1010,23 @@ export default function ProtectedPilotAccess({
 
     setProtectedMetricTrendReviews(body.reviews ?? []);
     setProtectedMetricTrendDashboard(body.dashboard ?? null);
+  }
+
+  async function refreshProtectedBoardScorecards(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/board-scorecards`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedBoardScorecardsResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected board scorecards could not be loaded.");
+      return;
+    }
+
+    setProtectedBoardScorecards(body.scorecards ?? []);
+    setProtectedBoardScorecardDashboard(body.dashboard ?? null);
   }
 
   async function createSyntheticSession() {
@@ -1462,6 +1537,7 @@ export default function ProtectedPilotAccess({
     setProtectedMetricTrendReviews(body.reviews ?? []);
     setProtectedMetricTrendDashboard(body.dashboard ?? null);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedBoardScorecards(session, selectedWorkspace);
     setMessage(
       `Protected metric trend review created${body.reviewId ? ` with review id ${body.reviewId}` : ""}.`
     );
@@ -1500,6 +1576,76 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected metric trend packet downloaded and its audit event was committed.");
+  }
+
+  async function createProtectedBoardScorecard(input: ProtectedBoardScorecardInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedBoardScorecardStatus("saving");
+    setMessage("");
+    const response = await fetch(`/api/pilot-workspaces/${selectedWorkspace.slug}/board-scorecards`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(input)
+    });
+    const body = (await response.json()) as ProtectedBoardScorecardsResponse;
+    setProtectedBoardScorecardStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected board scorecard could not be created."
+      );
+      return;
+    }
+
+    setProtectedBoardScorecards(body.scorecards ?? []);
+    setProtectedBoardScorecardDashboard(body.dashboard ?? null);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected board scorecard created${body.scorecardId ? ` with scorecard id ${body.scorecardId}` : ""}.`
+    );
+  }
+
+  async function downloadProtectedBoardScorecardPacket(scorecard: ProtectedBoardScorecardRecord) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedBoardScorecardPacketBusyId(scorecard.id);
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/board-scorecards/${scorecard.id}/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedBoardScorecardPacketBusyId(null);
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(body.error?.message ?? "The protected board scorecard packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-${scorecard.id}-board-scorecard-packet.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected board scorecard packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -1790,6 +1936,16 @@ export default function ProtectedPilotAccess({
             packetBusyId={protectedMetricTrendPacketBusyId}
             reviews={protectedMetricTrendReviews}
             rollupSnapshots={protectedMetricRollupSnapshots}
+          />
+
+          <ProtectedBoardScorecardsPanel
+            busyScorecard={protectedBoardScorecardStatus === "saving"}
+            dashboard={protectedBoardScorecardDashboard}
+            onCreateScorecard={createProtectedBoardScorecard}
+            onDownloadPacket={downloadProtectedBoardScorecardPacket}
+            packetBusyId={protectedBoardScorecardPacketBusyId}
+            scorecards={protectedBoardScorecards}
+            trendReviews={protectedMetricTrendReviews}
           />
 
           <BuyerPilotRoomPanel

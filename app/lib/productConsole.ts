@@ -114,6 +114,10 @@ import {
   protectedMetricTrendPacketProofStackStatus,
   protectedMetricTrendReviewStatus
 } from "./protectedMetricTrends";
+import {
+  protectedBoardScorecardPacketProofStackStatus,
+  protectedBoardScorecardStatus
+} from "./protectedBoardScorecards";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -698,6 +702,10 @@ export function getProductConsoleSummary() {
     protectedMetricTrendsApiRoute: publicMarketReadinessSummary.protectedMetricTrendApiRoute,
     protectedMetricTrendPacketApiRoute:
       publicMarketReadinessSummary.protectedMetricTrendPacketApiRoute,
+    protectedBoardScorecardsRoute: publicMarketReadinessSummary.protectedBoardScorecardRoute,
+    protectedBoardScorecardsApiRoute: publicMarketReadinessSummary.protectedBoardScorecardApiRoute,
+    protectedBoardScorecardPacketApiRoute:
+      publicMarketReadinessSummary.protectedBoardScorecardPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -839,6 +847,8 @@ export function getProductConsoleSummary() {
       protectedMetricRollupPackets: protectedMetricRollupPacketProofStackStatus,
       protectedMetricTrends: protectedMetricTrendReviewStatus,
       protectedMetricTrendPackets: protectedMetricTrendPacketProofStackStatus,
+      protectedBoardScorecards: protectedBoardScorecardStatus,
+      protectedBoardScorecardPackets: protectedBoardScorecardPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -998,6 +1008,9 @@ export function getProductReadinessBrief() {
     `Protected metric trends: ${summary.protectedMetricTrendsRoute}`,
     `Protected metric trends API: ${summary.protectedMetricTrendsApiRoute}`,
     `Protected metric trend packet API: ${summary.protectedMetricTrendPacketApiRoute}`,
+    `Protected board scorecards: ${summary.protectedBoardScorecardsRoute}`,
+    `Protected board scorecards API: ${summary.protectedBoardScorecardsApiRoute}`,
+    `Protected board scorecard packet API: ${summary.protectedBoardScorecardPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

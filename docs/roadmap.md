@@ -38,6 +38,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Protected Operator Metrics are the active AAL2 no-PHI capture gate for model cost, review time, delivery hours, proof-packet count, workflow volume, unit-economics discipline, and protected rollup inputs.
 - Protected Metric Rollups are the active AAL2 no-PHI board-operating gate for finance-reviewed snapshots, model-cost-per-workflow discipline, audited packet release, and external-use boundary control before any audited reporting or securities material.
 - Protected Metric Trend Reviews are the active AAL2 no-PHI board-variance gate for comparing rollup snapshots, reach expansion signals, competitive advantage tracking, agent improvement loops, and audited trend packet release before any finance-approved external reporting, securities material, clinical validation, or live-care authority.
+- Protected Board Scorecards are the active AAL2 no-PHI rolling-quarter board gate for finance-allocation readiness, buyer-segment cohorts, competitive advantage tracking, agent improvement priorities, and audited scorecard packet release before finance-approved allocation methodology, external reporting, securities material, advertising claim substantiation, clinical validation, or live-care authority.
 - Authenticated Buyer Demo Execution Path is the active operator gate for sequencing no-PHI buyer demos, audited packet release, known workarounds, retained hard gates, and paid implementation next steps.
 - The Trust and Enterprise Readiness Center governs company-level launch gates and public claims before marketing, PR, sales, advertising, protected pilots, or production use.
 
@@ -79,6 +80,7 @@ Completed foundations:
 - Protected Operator Metrics with AAL2 tenant-scoped no-PHI capture for model cost, review time, delivery hours, proof-packet count, workflow volume, dashboard coverage, safe workarounds, append-only audit events, and fixed financial/securities boundaries
 - Protected Metric Rollups with AAL2 no-PHI internal board snapshots, audited packet downloads, model-cost-per-workflow math, metric coverage checks, safe workarounds, append-only audit events, and fixed financial/securities/clinical boundaries
 - Protected Metric Trend Reviews with AAL2 no-PHI monthly variance review, board trend state, reach expansion signals, competitive advantage tracking, agent improvement actions, audited packet downloads, safe workarounds, append-only audit events, and fixed financial/securities/clinical boundaries
+- Protected Board Scorecards with AAL2 no-PHI rolling-quarter scorecards, finance-allocation pending profiles, buyer-segment cohorts, competitive advantage tracking, agent improvement priorities, audited packet downloads, safe workarounds, append-only audit events, and fixed financial/securities/clinical/advertising boundaries
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -132,7 +134,7 @@ Completed foundations:
 
 Next build targets:
 
-- Add finance-approved allocation profiles, rolling-quarter board scorecards, buyer-segment trend cohorts, and external reporting review gates once qualified finance methodology and counsel-reviewed investor-material policy are approved.
+- Add finance-approved allocation methodology records, external-use approval workflows, rolling buyer-segment cohort comparison, and counsel-reviewed investor/marketing material gates once qualified finance methodology and external-use policy are approved.
 - Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, generate the sanitized packet through `/api/qa-evidence/manual-run-packet`, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.

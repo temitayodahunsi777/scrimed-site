@@ -70,6 +70,13 @@ import type {
   ProtectedMetricTrendReviewInput,
   ProtectedMetricTrendReviewRecord
 } from "./protectedMetricTrends";
+import type {
+  ProtectedBoardBuyerSegmentCohort,
+  ProtectedBoardFinanceAllocationProfile,
+  ProtectedBoardScorecardInput,
+  ProtectedBoardScorecardMetricSummary,
+  ProtectedBoardScorecardRecord
+} from "./protectedBoardScorecards";
 
 type AuthenticatedPilotContext =
   | {
@@ -292,6 +299,37 @@ type ProtectedMetricTrendReviewRow = {
   financial_reporting_authority: ProtectedMetricTrendReviewRecord["financialReportingAuthority"];
   securities_authority: ProtectedMetricTrendReviewRecord["securitiesAuthority"];
   clinical_execution_authority: ProtectedMetricTrendReviewRecord["clinicalExecutionAuthority"];
+  created_by: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedBoardScorecardRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  primary_trend_review_id: string;
+  secondary_trend_review_id: string | null;
+  tertiary_trend_review_id: string | null;
+  board_period_label: string;
+  scorecard_state: ProtectedBoardScorecardRecord["scorecardState"];
+  trend_review_count: number;
+  rolling_quarter_metrics: unknown;
+  finance_allocation_profile: unknown;
+  buyer_segment_focus: ProtectedBoardScorecardRecord["buyerSegmentFocus"];
+  buyer_segment_cohorts: unknown;
+  competitive_advantages: unknown;
+  agent_improvement_priorities: unknown;
+  strategic_actions: unknown;
+  recommendations: unknown;
+  limitations: unknown;
+  operator_attestation: ProtectedBoardScorecardRecord["operatorAttestation"];
+  review_note: string;
+  data_boundary: ProtectedBoardScorecardRecord["dataBoundary"];
+  allocation_profile_status: ProtectedBoardScorecardRecord["allocationProfileStatus"];
+  financial_reporting_authority: ProtectedBoardScorecardRecord["financialReportingAuthority"];
+  securities_authority: ProtectedBoardScorecardRecord["securitiesAuthority"];
+  clinical_execution_authority: ProtectedBoardScorecardRecord["clinicalExecutionAuthority"];
   created_by: string;
   created_at: string;
   boundary: string;
@@ -863,6 +901,44 @@ function mapProtectedMetricTrendReview(
   };
 }
 
+function mapProtectedBoardScorecard(row: ProtectedBoardScorecardRow): ProtectedBoardScorecardRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    primaryTrendReviewId: row.primary_trend_review_id,
+    secondaryTrendReviewId: row.secondary_trend_review_id,
+    tertiaryTrendReviewId: row.tertiary_trend_review_id,
+    boardPeriodLabel: row.board_period_label,
+    scorecardState: row.scorecard_state,
+    trendReviewCount: row.trend_review_count,
+    rollingQuarterMetrics: asArray<ProtectedBoardScorecardMetricSummary>(
+      row.rolling_quarter_metrics
+    ),
+    financeAllocationProfile:
+      asRecord(row.finance_allocation_profile) as unknown as ProtectedBoardFinanceAllocationProfile,
+    buyerSegmentFocus: row.buyer_segment_focus,
+    buyerSegmentCohorts: asArray<ProtectedBoardBuyerSegmentCohort>(
+      row.buyer_segment_cohorts
+    ),
+    competitiveAdvantages: asArray<string>(row.competitive_advantages),
+    agentImprovementPriorities: asArray<string>(row.agent_improvement_priorities),
+    strategicActions: asArray<string>(row.strategic_actions),
+    recommendations: asArray<string>(row.recommendations),
+    limitations: asArray<string>(row.limitations),
+    operatorAttestation: row.operator_attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    allocationProfileStatus: row.allocation_profile_status,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1155,6 +1231,8 @@ const protectedMetricRollupSnapshotSelect =
   "id, tenant_id, workspace_id, reporting_period_start, reporting_period_end, metric_count, captured_metric_types, required_metric_types, ready_for_board_review, model_cost_usd, model_cost_per_workflow, review_time_minutes, review_minutes_per_workflow, delivery_hours, delivery_hours_per_workflow, proof_packet_count, proof_packets_per_workflow, workflow_volume, cost_per_workflow, totals, recommendations, limitations, reviewer_attestation, review_note, data_boundary, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
 const protectedMetricTrendReviewSelect =
   "id, tenant_id, workspace_id, current_snapshot_id, comparison_snapshot_id, trend_period_label, board_trend_state, trend_metrics, reach_expansion_signals, competitive_advantages, agent_improvement_actions, recommendations, limitations, reviewer_attestation, review_note, data_boundary, cost_allocation_policy, cost_allocation_status, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
+const protectedBoardScorecardSelect =
+  "id, tenant_id, workspace_id, primary_trend_review_id, secondary_trend_review_id, tertiary_trend_review_id, board_period_label, scorecard_state, trend_review_count, rolling_quarter_metrics, finance_allocation_profile, buyer_segment_focus, buyer_segment_cohorts, competitive_advantages, agent_improvement_priorities, strategic_actions, recommendations, limitations, operator_attestation, review_note, data_boundary, allocation_profile_status, financial_reporting_authority, securities_authority, clinical_execution_authority, created_by, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1428,6 +1506,43 @@ export async function getProtectedMetricTrendReview(
 
   return {
     review: data ? mapProtectedMetricTrendReview(data as unknown as ProtectedMetricTrendReviewRow) : null,
+    error
+  };
+}
+
+export async function listProtectedBoardScorecards(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_board_scorecards")
+    .select(protectedBoardScorecardSelect)
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return {
+    scorecards: ((data ?? []) as unknown as ProtectedBoardScorecardRow[]).map(
+      mapProtectedBoardScorecard
+    ),
+    error
+  };
+}
+
+export async function getProtectedBoardScorecard(
+  client: SupabaseClient,
+  workspaceId: string,
+  scorecardId: string
+) {
+  const { data, error } = await client
+    .from("protected_board_scorecards")
+    .select(protectedBoardScorecardSelect)
+    .eq("workspace_id", workspaceId)
+    .eq("id", scorecardId)
+    .maybeSingle();
+
+  return {
+    scorecard: data ? mapProtectedBoardScorecard(data as unknown as ProtectedBoardScorecardRow) : null,
     error
   };
 }
@@ -1747,6 +1862,38 @@ export async function recordProtectedMetricTrendPacketDownload(
   const { data, error } = await client.rpc("record_protected_metric_trend_packet_download", {
     p_workspace_slug: workspaceSlug,
     p_review_id: reviewId
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function createProtectedBoardScorecard(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedBoardScorecardInput
+) {
+  const { data, error } = await client.rpc("create_protected_board_scorecard", {
+    p_workspace_slug: workspaceSlug,
+    p_scorecard_input: input
+  });
+
+  return {
+    scorecardId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedBoardScorecardPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  scorecardId: string
+) {
+  const { data, error } = await client.rpc("record_protected_board_scorecard_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_scorecard_id: scorecardId
   });
 
   return {

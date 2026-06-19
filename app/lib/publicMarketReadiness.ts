@@ -10,6 +10,10 @@ import {
   protectedMetricTrendPacketProofStackStatus,
   protectedMetricTrendReviewStatus
 } from "./protectedMetricTrends";
+import {
+  protectedBoardScorecardPacketProofStackStatus,
+  protectedBoardScorecardStatus
+} from "./protectedBoardScorecards";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -542,6 +546,10 @@ export function getPublicMarketReadinessSummary() {
     protectedMetricTrendApiRoute: "/api/pilot-workspaces/{workspaceSlug}/metric-trends",
     protectedMetricTrendPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet",
+    protectedBoardScorecardRoute: "/pilot-workspace/access",
+    protectedBoardScorecardApiRoute: "/api/pilot-workspaces/{workspaceSlug}/board-scorecards",
+    protectedBoardScorecardPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -550,6 +558,8 @@ export function getPublicMarketReadinessSummary() {
     protectedMetricRollupPacketStatus: protectedMetricRollupPacketProofStackStatus,
     protectedMetricTrendStatus: protectedMetricTrendReviewStatus,
     protectedMetricTrendPacketStatus: protectedMetricTrendPacketProofStackStatus,
+    protectedBoardScorecardStatus,
+    protectedBoardScorecardPacketStatus: protectedBoardScorecardPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -572,7 +582,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add finance-approved allocation profiles, rolling-quarter board scorecards, and buyer-segment trend cohorts once finance methodology is approved.",
+      "Add finance-approved cost allocation methodology records and rolling buyer-segment scorecard cohorts once finance, counsel, and executive external-use policies are approved.",
     updated: "2026-06-19"
   };
 }
@@ -591,6 +601,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected metric rollup packets: ${summary.protectedMetricRollupPacketStatus}
 - Protected metric trend reviews: ${summary.protectedMetricTrendStatus}
 - Protected metric trend packets: ${summary.protectedMetricTrendPacketStatus}
+- Protected board scorecards: ${summary.protectedBoardScorecardStatus}
+- Protected board scorecard packets: ${summary.protectedBoardScorecardPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -601,6 +613,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected trend route: ${summary.protectedMetricTrendRoute}
 - Protected trend API: ${summary.protectedMetricTrendApiRoute}
 - Protected trend packet API: ${summary.protectedMetricTrendPacketApiRoute}
+- Protected scorecard route: ${summary.protectedBoardScorecardRoute}
+- Protected scorecard API: ${summary.protectedBoardScorecardApiRoute}
+- Protected scorecard packet API: ${summary.protectedBoardScorecardPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

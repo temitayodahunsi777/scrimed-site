@@ -183,6 +183,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected metric trend packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedBoardScorecards !==
+    "aal2-rolling-quarter-board-scorecards-no-phi"
+  ) {
+    throw new Error("product console missing protected board scorecards proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedBoardScorecardPackets !==
+    "aal2-audited-board-scorecard-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected board scorecard packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -639,6 +653,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected metric trend packet API route.");
   }
 
+  if (
+    body.protectedBoardScorecardStatus !==
+    "aal2-rolling-quarter-board-scorecards-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected board scorecard status.");
+  }
+
+  if (
+    body.protectedBoardScorecardApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/board-scorecards"
+  ) {
+    throw new Error("Public Market Readiness missing protected board scorecard API route.");
+  }
+
+  if (
+    body.protectedBoardScorecardPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected board scorecard packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -867,6 +902,29 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/metric-trends/00000000-0000-4000-8000-000000000000/packet`,
   "Protected Metric Trend packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/board-scorecards`,
+  "Protected Board Scorecards protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/board-scorecards`,
+  "Protected Board Scorecards write protected API",
+  {
+    primaryTrendReviewId: "00000000-0000-4000-8000-000000000001",
+    secondaryTrendReviewId: "00000000-0000-4000-8000-000000000002",
+    tertiaryTrendReviewId: "00000000-0000-4000-8000-000000000003",
+    boardPeriodLabel: "smoke board scorecard",
+    buyerSegmentFocus: "multi-segment",
+    operatorAttestation: "finance-methodology-pending-no-phi-board-scorecard",
+    dataBoundary: "synthetic-business-workflow-only",
+    allocationProfileStatus: "finance-allocation-profile-pending",
+    reviewNote: "smoke-no-phi-board-scorecard"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/board-scorecards/00000000-0000-4000-8000-000000000000/packet`,
+  "Protected Board Scorecard packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

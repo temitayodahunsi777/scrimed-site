@@ -2,6 +2,16 @@
 
 Updated: 2026-06-19
 
+## Latest Protected Board Scorecard Release
+
+- Added protected Board Scorecards inside `/pilot-workspace/access` after Protected Metric Trend Reviews.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/board-scorecards` for AAL2 no-PHI rolling-quarter board scorecards, finance-allocation readiness, buyer-segment cohort strategy, competitive advantage tracking, and agent improvement priorities.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet` for audited internal board scorecard packet downloads.
+- Added `app/lib/protectedBoardScorecards.ts` with typed scorecard validation, finance-allocation pending profiles, buyer-segment cohorts, strategic actions, agent priorities, limitations, and packet generation.
+- Added `public.protected_board_scorecards` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-board-scorecard-created` and `protected-board-scorecard-packet-downloaded` audit events, and runtime schema `2026-06-19.5`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-rolling-quarter-board-scorecards-no-phi` and `aal2-audited-board-scorecard-packets-no-phi`.
+- Preserved the boundary: protected scorecards and packets are internal no-PHI operating evidence only. They do not create audited financial reporting, securities offering material, investment advice, accounting advice, tax advice, legal advice, valuation assurance, revenue guarantee, reimbursement assurance, clinical validation, compliance certification, production authorization, or live clinical execution approval.
+
 ## Latest Protected Metric Trend Review Release
 
 - Added protected Metric Trend Reviews inside `/pilot-workspace/access` after Protected Metric Rollups.

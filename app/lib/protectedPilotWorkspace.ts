@@ -460,6 +460,20 @@ export const protectedPilotApiContracts = [
       "Download an audited internal board trend packet from a persisted no-PHI trend review after committing the packet release event."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/board-scorecards",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed finance-methodology-pending no-PHI scorecard attestation + rate limit",
+    purpose:
+      "Inspect or create protected no-PHI rolling-quarter board scorecards that convert trend reviews into finance-allocation readiness, buyer-segment cohort signals, competitive advantage tracking, and agent improvement priorities without becoming audited financial reporting, securities offering material, valuation assurance, clinical validation, reimbursement assurance, or live care authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited internal board scorecard packet from a persisted no-PHI scorecard after committing the packet release event."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
