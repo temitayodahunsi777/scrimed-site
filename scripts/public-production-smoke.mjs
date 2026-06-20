@@ -333,6 +333,22 @@ async function checkProductConsole() {
     );
   }
 
+  if (
+    body.proofStack?.protectedProviderSecurityReviews !==
+    "aal2-provider-security-review-workbench-no-phi"
+  ) {
+    throw new Error("product console missing protected provider security review proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedProviderSecurityReviewPackets !==
+    "aal2-audited-provider-security-review-packets-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected provider security review packet proof-stack posture."
+    );
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -1009,6 +1025,29 @@ async function checkPublicMarketReadiness() {
     );
   }
 
+  if (
+    body.protectedProviderSecurityReviewStatus !==
+    "aal2-provider-security-review-workbench-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected provider security review status.");
+  }
+
+  if (
+    body.protectedProviderSecurityReviewApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews"
+  ) {
+    throw new Error("Public Market Readiness missing protected provider security review API route.");
+  }
+
+  if (
+    body.protectedProviderSecurityReviewPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected provider security review packet API route."
+    );
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1512,6 +1551,39 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/evidence-room-provider-adapters/packet`,
   "Protected Evidence Room Provider Adapters packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/provider-security-reviews`,
+  "Protected Provider Security Reviews protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/provider-security-reviews`,
+  "Protected Provider Security Reviews write protected API",
+  {
+    providerAdapterRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    reviewDomain: "security-architecture",
+    securityOwnerLabel: "enterprise security review owner",
+    privacyOwnerLabel: "enterprise privacy review owner",
+    agreementPathLabel: "baa dpa readiness path defined",
+    incidentResponsePathLabel: "incident response path defined",
+    retentionResidencyPathLabel: "retention residency review path",
+    rollbackPlanLabel: "go live rollback plan defined",
+    reviewCadence: "review before production connector activation",
+    providerSecurityRisk: "not-assessed",
+    externalSecurityReviewRetained: true,
+    phiProcessingDisabled: true,
+    credentialStorageDisabled: true,
+    signedAgreementStorageDisabled: true,
+    liveIntegrationDisabled: true,
+    humanApprovalRequired: true,
+    attestation: "provider-security-review-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke security review metadata only"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/provider-security-reviews/packet`,
+  "Protected Provider Security Reviews packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

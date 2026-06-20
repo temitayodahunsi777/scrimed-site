@@ -50,6 +50,10 @@ import {
   protectedEvidenceRoomProviderAdapterPacketProofStackStatus,
   protectedEvidenceRoomProviderAdapterStatus
 } from "./protectedEvidenceRoomProviderAdapters";
+import {
+  protectedProviderSecurityReviewPacketProofStackStatus,
+  protectedProviderSecurityReviewStatus
+} from "./protectedProviderSecurityReviews";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -631,6 +635,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters",
     protectedEvidenceRoomProviderAdapterPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet",
+    protectedProviderSecurityReviewRoute: "/pilot-workspace/access",
+    protectedProviderSecurityReviewApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews",
+    protectedProviderSecurityReviewPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -666,6 +675,9 @@ export function getPublicMarketReadinessSummary() {
     protectedEvidenceRoomProviderAdapterStatus,
     protectedEvidenceRoomProviderAdapterPacketStatus:
       protectedEvidenceRoomProviderAdapterPacketProofStackStatus,
+    protectedProviderSecurityReviewStatus,
+    protectedProviderSecurityReviewPacketStatus:
+      protectedProviderSecurityReviewPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -688,7 +700,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add provider security review workbench and pre-production BAA/DPA readiness gates without storing provider credentials, raw logs, signed legal artifacts, PHI, or sensitive customer documents in SCRIMED.",
+      "Add customer-ready security questionnaire response registry and procurement evidence routing without storing confidential questionnaires, SOC reports, penetration-test reports, credentials, PHI, signed legal artifacts, or sensitive customer documents in SCRIMED.",
     updated: "2026-06-20"
   };
 }
@@ -727,6 +739,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected evidence-room access-log reconciliation packets: ${summary.protectedEvidenceRoomAccessLogReconciliationPacketStatus}
 - Protected evidence-room provider adapters: ${summary.protectedEvidenceRoomProviderAdapterStatus}
 - Protected evidence-room provider adapter packets: ${summary.protectedEvidenceRoomProviderAdapterPacketStatus}
+- Protected provider security reviews: ${summary.protectedProviderSecurityReviewStatus}
+- Protected provider security review packets: ${summary.protectedProviderSecurityReviewPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -767,6 +781,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected evidence-room provider adapter route: ${summary.protectedEvidenceRoomProviderAdapterRoute}
 - Protected evidence-room provider adapter API: ${summary.protectedEvidenceRoomProviderAdapterApiRoute}
 - Protected evidence-room provider adapter packet API: ${summary.protectedEvidenceRoomProviderAdapterPacketApiRoute}
+- Protected provider security review route: ${summary.protectedProviderSecurityReviewRoute}
+- Protected provider security review API: ${summary.protectedProviderSecurityReviewApiRoute}
+- Protected provider security review packet API: ${summary.protectedProviderSecurityReviewPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

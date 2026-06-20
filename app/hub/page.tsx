@@ -63,6 +63,11 @@ const consoleViews = [
     summary: "Inspect tenant identity, durable synthetic sessions, append-only audit controls, rate limits, and downloadable proof packets."
   },
   {
+    name: "Provider Security Reviews",
+    href: "/pilot-workspace/access",
+    summary: "Record no-PHI security, privacy, BAA/DPA, credential, incident-response, retention/residency, and rollback readiness metadata after provider adapter contracts are ready."
+  },
+  {
     name: "Pricing",
     href: "/pricing",
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."

@@ -146,6 +146,36 @@ export default function ProductConsolePage() {
         </article>
       </section>
 
+      <section className="table-section" aria-label="SCRIMED buyer and investor navigation paths">
+        <div className="section-heading">
+          <p className="eyebrow">Navigation paths</p>
+          <h2>Choose the right SCRIMED proof path for the person evaluating the company.</h2>
+          <p className="section-copy">
+            The product is organized for enterprise buyers, security reviewers, investors, and clinical operators, with each path tied to evidence and explicit boundaries.
+          </p>
+        </div>
+        {summary.buyerDecisionPaths.map((path) => (
+          <article className="module-row" key={path.audience}>
+            <div>
+              <span>{path.audience}</span>
+              <h2>{path.primaryQuestion}</h2>
+            </div>
+            <p>{path.recommendedStart} {path.proof}</p>
+            <div>
+              <Link className="module-link" href={path.route}>
+                Start here
+              </Link>
+              <ul className="compact-list">
+                {path.supportingRoutes.map((route) => (
+                  <li key={route}>{route}</li>
+                ))}
+                <li>{path.boundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED competitive edge">
         <div className="section-heading">
           <p className="eyebrow">Competitive edge</p>

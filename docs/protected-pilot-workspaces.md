@@ -106,6 +106,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
 - `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
 - `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews`
+- `POST /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews`
+- `GET /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -410,6 +413,21 @@ Safe operating pattern:
 - Record only bounded no-PHI provider-adapter contract metadata and disabled audit-log import stub readiness in SCRIMED.
 - Download the audited provider-adapter packet only after the write-before-release audit event commits.
 - Treat provider-adapter readiness as an internal control state. It is not provider contracting approval, legal approval, public release approval, external distribution approval, live integration approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
+
+## Provider Security Review Workbench
+
+Protected workspaces now expose `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews` plus `GET /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet`.
+
+Provider security reviews sit after provider adapter contracts. They record only metadata for security architecture, privacy impact, BAA/DPA readiness, credential handling, incident response, retention/residency, vendor risk, and go-live rollback review. The highest workflow state is `provider-security-review-ready-not-approval`; PHI processing, credential storage, signed agreement storage, live integration, and clinical execution remain disabled.
+
+The database stores records in `public.protected_provider_security_reviews` with select-only RLS for authenticated AAL2 tenant members. Writes go through `record_protected_provider_security_review`, require tenant-admin, pilot-lead, or reviewer role, validate linked provider adapters, and append `protected-provider-security-review-recorded` audit events. Packet downloads use the existing write-before-release proof-packet audit path.
+
+Safe operating pattern:
+
+- Keep signed BAAs, DPAs, SOC reports, penetration-test reports, security questionnaires, legal opinions, production runbooks, credentials, URLs, tokens, raw logs, source contracts, and customer approvals in qualified external systems.
+- Record only bounded no-PHI owner labels, review path labels, review cadence, risk tier, linked provider adapter ids, retained blockers, and review metadata in SCRIMED.
+- Download the audited provider security review packet only after the write-before-release audit event commits.
+- Treat provider security review readiness as a pre-production diligence posture. It is not security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, production authorization, live integration approval, or live clinical execution authority.
 
 ## Sales Command Center Linkage
 

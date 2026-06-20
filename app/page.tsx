@@ -46,6 +46,29 @@ const systemLayers = [
   "Trust, governance, safety, and observability"
 ];
 
+const homepageDecisionPaths = [
+  {
+    audience: "Providers and operators",
+    route: "/product",
+    summary: "Inspect product offers, workflow demos, AgentOS, proof routes, and governed pilot boundaries."
+  },
+  {
+    audience: "Security and compliance",
+    route: "/trust-center",
+    summary: "Review claims controls, privacy posture, protected workspaces, auditability, and diligence gates."
+  },
+  {
+    audience: "Investors and board reviewers",
+    route: "/public-market-readiness",
+    summary: "Review KPI discipline, unit economics, customer proof, model-efficiency controls, and investor narrative."
+  },
+  {
+    audience: "Enterprise pilot sponsors",
+    route: "/pilot-deal-room",
+    summary: "Move from buyer proof to pricing, protected evidence, activation gates, and pilot execution path."
+  }
+];
+
 const readinessSignals = [
   { label: "Deployment", value: "Ready" },
   { label: "Product", value: "/product" },
@@ -221,6 +244,28 @@ export default function Home() {
             </div>
           </aside>
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED navigation paths">
+        <div className="section-heading">
+          <p className="eyebrow">Start here</p>
+          <h2>Find the right SCRIMED path by role.</h2>
+          <p className="section-copy">
+            SCRIMED is organized for enterprise evaluation: product value, diligence evidence, investor readiness, and protected pilot execution each have a clear surface.
+          </p>
+        </div>
+        {homepageDecisionPaths.map((path) => (
+          <article className="module-row" key={path.audience}>
+            <div>
+              <span>path</span>
+              <h2>{path.audience}</h2>
+            </div>
+            <p>{path.summary}</p>
+            <Link className="module-link" href={path.route}>
+              Open path
+            </Link>
+          </article>
+        ))}
       </section>
 
       <section className="section-band" id="platform">

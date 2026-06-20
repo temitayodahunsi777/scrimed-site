@@ -35,6 +35,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected evidence-room access-log reconciliation packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`
 - Protected evidence-room provider adapter API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
 - Protected evidence-room provider adapter packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`
+- Protected provider security review API: `/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews`
+- Protected provider security review packet API: `/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -52,6 +54,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 evidence-room recipient attestations that record intended recipient segment, access-window, packet-reference, and revocation metadata after release authority is complete while exact recipient lists, emails, access grants, and export approval remain external.
 - Protected AAL2 evidence-room access-log reconciliation that records externally retained log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review while raw logs, recipient identifiers, addresses, device identifiers, and export approval remain external.
 - Protected AAL2 evidence-room provider adapter contracts that record externally retained provider contract references, adapter design references, audit-log import stub labels, supported summary formats, verification cadence, and provider risk tier while provider credentials, URLs, tokens, raw logs, sensitive artifacts, live integration approval, and export approval remain external.
+- Protected AAL2 provider security reviews that record security, privacy, BAA/DPA, credential-handling, incident-response, retention/residency, vendor-risk, and go-live rollback readiness metadata while signed legal artifacts, SOC reports, security questionnaires, credentials, PHI, and production authorization remain external.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
 - Protected AAL2 release authority attestations that link ready disabled lockboxes to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata while release remains disabled.
@@ -99,6 +102,8 @@ Protected evidence-room access-log reconciliation records are metadata-only refe
 
 Protected evidence-room provider adapter records are metadata-only references to externally retained provider contract and audit-log import-stub readiness. `provider-adapter-contract-review-ready-not-integration-approval` is not public release approval, external distribution approval, provider contracting approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, live integration approval, or live clinical execution authority.
 
+Protected provider security review records are metadata-only readiness references to externally retained security, privacy, BAA/DPA, credential, incident-response, retention/residency, vendor-risk, and rollback review. `provider-security-review-ready-not-approval` is not security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, production authorization, live integration approval, reimbursement assurance, clinical validation, or live clinical execution authority.
+
 ## Next Build
 
-Add provider security review workbench and pre-production BAA/DPA readiness gates without storing provider credentials, raw logs, signed legal artifacts, PHI, or sensitive customer documents in SCRIMED.
+Add customer-ready security questionnaire response registry and procurement evidence routing without storing confidential questionnaires, SOC reports, penetration-test reports, credentials, PHI, signed legal artifacts, or sensitive customer documents in SCRIMED.

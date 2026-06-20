@@ -37,6 +37,7 @@ import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedNamedReviewerSignoffPanel from "./ProtectedNamedReviewerSignoffPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
+import ProtectedProviderSecurityReviewPanel from "./ProtectedProviderSecurityReviewPanel";
 import ProtectedReleaseDecisionPanel from "./ProtectedReleaseDecisionPanel";
 import ProtectedReleaseAuthorityAttestationPanel from "./ProtectedReleaseAuthorityAttestationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
@@ -103,6 +104,10 @@ import type {
   ProtectedEvidenceRoomProviderAdapterInput,
   ProtectedEvidenceRoomProviderAdapterWorkflow
 } from "../lib/protectedEvidenceRoomProviderAdapters";
+import type {
+  ProtectedProviderSecurityReviewInput,
+  ProtectedProviderSecurityReviewWorkflow
+} from "../lib/protectedProviderSecurityReviews";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -301,6 +306,15 @@ type ProtectedEvidenceRoomProviderAdapterResponse = {
   error?: { message?: string };
 };
 
+type ProtectedProviderSecurityReviewResponse = {
+  reviewId?: string;
+  records?: unknown[];
+  workflow?: ProtectedProviderSecurityReviewWorkflow;
+  providerAdapterRecords?: unknown[];
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -470,6 +484,18 @@ export default function ProtectedPilotAccess({
     protectedEvidenceRoomProviderAdapterPacketStatus,
     setProtectedEvidenceRoomProviderAdapterPacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [
+    protectedProviderSecurityReviewWorkflow,
+    setProtectedProviderSecurityReviewWorkflow
+  ] = useState<ProtectedProviderSecurityReviewWorkflow | null>(null);
+  const [
+    protectedProviderSecurityReviewStatus,
+    setProtectedProviderSecurityReviewStatus
+  ] = useState<"idle" | "saving">("idle");
+  const [
+    protectedProviderSecurityReviewPacketStatus,
+    setProtectedProviderSecurityReviewPacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -562,6 +588,12 @@ export default function ProtectedPilotAccess({
     setProtectedEvidenceRoomProviderAdapterPacketStatus("idle");
   }, []);
 
+  const resetProtectedProviderSecurityReview = useCallback(() => {
+    setProtectedProviderSecurityReviewWorkflow(null);
+    setProtectedProviderSecurityReviewStatus("idle");
+    setProtectedProviderSecurityReviewPacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -623,6 +655,7 @@ export default function ProtectedPilotAccess({
         resetProtectedEvidenceRoomRecipientAttestation();
         resetProtectedEvidenceRoomAccessLogReconciliation();
         resetProtectedEvidenceRoomProviderAdapter();
+        resetProtectedProviderSecurityReview();
         setStatus("signed-out");
         return;
       }
@@ -683,6 +716,7 @@ export default function ProtectedPilotAccess({
         resetProtectedEvidenceRoomRecipientAttestation();
         resetProtectedEvidenceRoomAccessLogReconciliation();
         resetProtectedEvidenceRoomProviderAdapter();
+        resetProtectedProviderSecurityReview();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -745,6 +779,7 @@ export default function ProtectedPilotAccess({
       resetProtectedEvidenceRoomRecipientAttestation();
       resetProtectedEvidenceRoomAccessLogReconciliation();
       resetProtectedEvidenceRoomProviderAdapter();
+      resetProtectedProviderSecurityReview();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -768,7 +803,8 @@ export default function ProtectedPilotAccess({
           loadProtectedReleaseAuthorityAttestations(activeSession, nextWorkspaces[0]),
           loadProtectedEvidenceRoomRecipientAttestations(activeSession, nextWorkspaces[0]),
           loadProtectedEvidenceRoomAccessLogReconciliation(activeSession, nextWorkspaces[0]),
-          loadProtectedEvidenceRoomProviderAdapters(activeSession, nextWorkspaces[0])
+          loadProtectedEvidenceRoomProviderAdapters(activeSession, nextWorkspaces[0]),
+          loadProtectedProviderSecurityReviews(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -1321,6 +1357,35 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedProviderSecurityReviews(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/provider-security-reviews`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedProviderSecurityReviewResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ??
+            "Protected provider security reviews could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedProviderSecurityReviewWorkflow(body.workflow ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -1342,6 +1407,7 @@ export default function ProtectedPilotAccess({
     resetProtectedEvidenceRoomAccessLogReconciliation,
     resetProtectedEvidenceRoomProviderAdapter,
     resetProtectedEvidenceRoomRecipientAttestation,
+    resetProtectedProviderSecurityReview,
     resetProtectedReleaseAuthorityAttestation,
     resetProtectedNamedReviewerSignoff,
     resetProtectedOperatorMetrics,
@@ -1563,7 +1629,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedReleaseAuthorityAttestations(session, workspace),
       refreshProtectedEvidenceRoomRecipientAttestations(session, workspace),
       refreshProtectedEvidenceRoomAccessLogReconciliation(session, workspace),
-      refreshProtectedEvidenceRoomProviderAdapters(session, workspace)
+      refreshProtectedEvidenceRoomProviderAdapters(session, workspace),
+      refreshProtectedProviderSecurityReviews(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -2014,6 +2081,31 @@ export default function ProtectedPilotAccess({
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
+  }
+
+  async function refreshProtectedProviderSecurityReviews(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/provider-security-reviews`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedProviderSecurityReviewResponse;
+
+    if (!response.ok) {
+      setMessage(
+        body.error?.message ??
+          "Protected provider security reviews could not be loaded."
+      );
+      return;
+    }
+
+    setProtectedProviderSecurityReviewWorkflow(body.workflow ?? null);
   }
 
   async function createSyntheticSession() {
@@ -3376,6 +3468,7 @@ export default function ProtectedPilotAccess({
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
+    await refreshProtectedProviderSecurityReviews(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected evidence-room provider adapter contract recorded${
@@ -3421,6 +3514,89 @@ export default function ProtectedPilotAccess({
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       "Protected evidence-room provider adapter packet downloaded and its audit event was committed."
+    );
+  }
+
+  async function recordProtectedProviderSecurityReview(
+    input: ProtectedProviderSecurityReviewInput
+  ) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedProviderSecurityReviewStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/provider-security-reviews`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedProviderSecurityReviewResponse;
+    setProtectedProviderSecurityReviewStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected provider security review could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedProviderSecurityReviewWorkflow(
+      body.workflow ?? protectedProviderSecurityReviewWorkflow
+    );
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected provider security review recorded${
+        body.reviewId ? ` with review id ${body.reviewId}` : ""
+      }. Security approval, BAA/DPA execution, credential storage, PHI processing, and live integration remain disabled.`
+    );
+  }
+
+  async function downloadProtectedProviderSecurityReviewPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedProviderSecurityReviewPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/provider-security-reviews/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedProviderSecurityReviewPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected provider security review packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-provider-security-reviews.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      "Protected provider security review packet downloaded and its audit event was committed."
     );
   }
 
@@ -3843,6 +4019,15 @@ export default function ProtectedPilotAccess({
             onRecordAdapter={recordProtectedEvidenceRoomProviderAdapter}
             packetBusy={protectedEvidenceRoomProviderAdapterPacketStatus === "downloading"}
             workflow={protectedEvidenceRoomProviderAdapterWorkflow}
+          />
+
+          <ProtectedProviderSecurityReviewPanel
+            busy={protectedProviderSecurityReviewStatus === "saving"}
+            onDownloadPacket={downloadProtectedProviderSecurityReviewPacket}
+            onRecordReview={recordProtectedProviderSecurityReview}
+            packetBusy={protectedProviderSecurityReviewPacketStatus === "downloading"}
+            providerAdapterWorkflow={protectedEvidenceRoomProviderAdapterWorkflow}
+            workflow={protectedProviderSecurityReviewWorkflow}
           />
 
           <BuyerPilotRoomPanel

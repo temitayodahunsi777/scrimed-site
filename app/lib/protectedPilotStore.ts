@@ -143,6 +143,14 @@ import type {
   ProtectedEvidenceRoomProviderIntegrationMode,
   ProtectedEvidenceRoomProviderRiskTier
 } from "./protectedEvidenceRoomProviderAdapters";
+import type {
+  ProtectedProviderSecurityReviewControl,
+  ProtectedProviderSecurityReviewDomain,
+  ProtectedProviderSecurityReviewInput,
+  ProtectedProviderSecurityReviewRecord,
+  ProtectedProviderSecurityReviewRecordStatus,
+  ProtectedProviderSecurityRiskTier
+} from "./protectedProviderSecurityReviews";
 
 type AuthenticatedPilotContext =
   | {
@@ -771,6 +779,53 @@ type ProtectedEvidenceRoomProviderAdapterRow = {
   securities_authority: ProtectedEvidenceRoomProviderAdapterRecord["securitiesAuthority"];
   advertising_claims_authority: ProtectedEvidenceRoomProviderAdapterRecord["advertisingClaimsAuthority"];
   clinical_execution_authority: ProtectedEvidenceRoomProviderAdapterRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedProviderSecurityReviewRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  review_domain: ProtectedProviderSecurityReviewDomain;
+  review_domain_label: string;
+  review_status: ProtectedProviderSecurityReviewRecordStatus;
+  approval_scope: ProtectedProviderSecurityReviewRecord["approvalScope"];
+  provider_adapter_record_ids: string[];
+  security_owner_label: string;
+  privacy_owner_label: string;
+  agreement_path_label: string;
+  incident_response_path_label: string;
+  retention_residency_path_label: string;
+  rollback_plan_label: string;
+  review_cadence: string;
+  provider_security_risk: ProtectedProviderSecurityRiskTier;
+  evidence_snapshot: unknown;
+  required_security_controls: ProtectedProviderSecurityReviewControl[];
+  linked_security_controls: ProtectedProviderSecurityReviewControl[];
+  missing_security_controls: ProtectedProviderSecurityReviewControl[];
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  external_security_review_retained: boolean;
+  phi_processing_disabled: boolean;
+  credential_storage_disabled: boolean;
+  signed_agreement_storage_disabled: boolean;
+  live_integration_disabled: boolean;
+  human_approval_required: boolean;
+  attestation: ProtectedProviderSecurityReviewRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedProviderSecurityReviewRecord["dataBoundary"];
+  provider_security_review_authority: ProtectedProviderSecurityReviewRecord["providerSecurityReviewAuthority"];
+  baa_dpa_authority: ProtectedProviderSecurityReviewRecord["baaDpaAuthority"];
+  storage_authority: ProtectedProviderSecurityReviewRecord["storageAuthority"];
+  provider_adapter_authority: ProtectedProviderSecurityReviewRecord["providerAdapterAuthority"];
+  provider_adapter_release_authority: ProtectedProviderSecurityReviewRecord["providerAdapterReleaseAuthority"];
+  financial_reporting_authority: ProtectedProviderSecurityReviewRecord["financialReportingAuthority"];
+  securities_authority: ProtectedProviderSecurityReviewRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedProviderSecurityReviewRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedProviderSecurityReviewRecord["clinicalExecutionAuthority"];
   recorded_by: string;
   recorded_at: string;
   created_at: string;
@@ -1791,6 +1846,57 @@ function mapProtectedEvidenceRoomProviderAdapter(
   };
 }
 
+function mapProtectedProviderSecurityReview(
+  row: ProtectedProviderSecurityReviewRow
+): ProtectedProviderSecurityReviewRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    reviewDomain: row.review_domain,
+    reviewDomainLabel: row.review_domain_label,
+    reviewStatus: row.review_status,
+    approvalScope: row.approval_scope,
+    providerAdapterRecordIds: row.provider_adapter_record_ids,
+    securityOwnerLabel: row.security_owner_label,
+    privacyOwnerLabel: row.privacy_owner_label,
+    agreementPathLabel: row.agreement_path_label,
+    incidentResponsePathLabel: row.incident_response_path_label,
+    retentionResidencyPathLabel: row.retention_residency_path_label,
+    rollbackPlanLabel: row.rollback_plan_label,
+    reviewCadence: row.review_cadence,
+    providerSecurityRisk: row.provider_security_risk,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    requiredSecurityControls: row.required_security_controls,
+    linkedSecurityControls: row.linked_security_controls,
+    missingSecurityControls: row.missing_security_controls,
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    externalSecurityReviewRetained: row.external_security_review_retained,
+    phiProcessingDisabled: row.phi_processing_disabled,
+    credentialStorageDisabled: row.credential_storage_disabled,
+    signedAgreementStorageDisabled: row.signed_agreement_storage_disabled,
+    liveIntegrationDisabled: row.live_integration_disabled,
+    humanApprovalRequired: row.human_approval_required,
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    providerSecurityReviewAuthority: row.provider_security_review_authority,
+    baaDpaAuthority: row.baa_dpa_authority,
+    storageAuthority: row.storage_authority,
+    providerAdapterAuthority: row.provider_adapter_authority,
+    providerAdapterReleaseAuthority: row.provider_adapter_release_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -2103,6 +2209,8 @@ const protectedEvidenceRoomAccessLogReconciliationSelect =
   "id, tenant_id, workspace_id, distribution_audience, reconciliation_scope, reconciliation_scope_label, reconciliation_status, approval_scope, external_log_system_label, access_log_reference_label, access_log_reference_locator, reconciliation_window_start, reconciliation_window_end, observed_access_event_count, expected_recipient_segment_count, anomaly_state, revocation_exercise_state, anomaly_escalation_path, recipient_attestation_record_ids, evidence_snapshot, required_access_log_controls, linked_access_log_controls, missing_access_log_controls, retained_blockers, release_restrictions, external_log_authority_retained, export_disabled, attestation, review_note, data_boundary, access_log_reconciliation_authority, release_authority, storage_authority, recipient_attestation_authority, recipient_release_authority, recipient_storage_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const protectedEvidenceRoomProviderAdapterSelect =
   "id, tenant_id, workspace_id, distribution_audience, provider_class, provider_class_label, integration_mode, integration_mode_label, adapter_status, approval_scope, external_provider_label, adapter_contract_reference_label, adapter_contract_reference_locator, audit_log_import_stub_label, audit_log_import_stub_locator, supported_audit_log_format, verification_cadence, provider_risk_tier, access_log_reconciliation_record_ids, evidence_snapshot, required_provider_controls, linked_provider_controls, missing_provider_controls, retained_blockers, release_restrictions, external_provider_authority_retained, raw_log_import_disabled, credential_storage_disabled, export_disabled, attestation, review_note, data_boundary, provider_adapter_authority, release_authority, storage_authority, access_log_reconciliation_authority, access_log_release_authority, access_log_storage_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
+const protectedProviderSecurityReviewSelect =
+  "id, tenant_id, workspace_id, review_domain, review_domain_label, review_status, approval_scope, provider_adapter_record_ids, security_owner_label, privacy_owner_label, agreement_path_label, incident_response_path_label, retention_residency_path_label, rollback_plan_label, review_cadence, provider_security_risk, evidence_snapshot, required_security_controls, linked_security_controls, missing_security_controls, retained_blockers, release_restrictions, external_security_review_retained, phi_processing_disabled, credential_storage_disabled, signed_agreement_storage_disabled, live_integration_disabled, human_approval_required, attestation, review_note, data_boundary, provider_security_review_authority, baa_dpa_authority, storage_authority, provider_adapter_authority, provider_adapter_release_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -2574,6 +2682,25 @@ export async function listProtectedEvidenceRoomProviderAdapters(
   return {
     records: ((data ?? []) as unknown as ProtectedEvidenceRoomProviderAdapterRow[]).map(
       mapProtectedEvidenceRoomProviderAdapter
+    ),
+    error
+  };
+}
+
+export async function listProtectedProviderSecurityReviews(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_provider_security_reviews")
+    .select(protectedProviderSecurityReviewSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(150);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedProviderSecurityReviewRow[]).map(
+      mapProtectedProviderSecurityReview
     ),
     error
   };
@@ -3103,6 +3230,22 @@ export async function recordProtectedEvidenceRoomProviderAdapter(
   };
 }
 
+export async function recordProtectedProviderSecurityReview(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedProviderSecurityReviewInput
+) {
+  const { data, error } = await client.rpc("record_protected_provider_security_review", {
+    p_workspace_slug: workspaceSlug,
+    p_review_input: input
+  });
+
+  return {
+    reviewId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedExternalApprovalEvidencePacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -3303,6 +3446,38 @@ export async function recordProtectedEvidenceRoomProviderAdapterPacketDownload(
       integrationDisabled: true,
       releaseAuthority: "integration-disabled-pending-external-provider-contracting",
       storageAuthority: "provider-adapter-metadata-only-no-credentials-raw-logs-or-recipient-identifiers"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedProviderSecurityReviewPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-provider-security-reviews",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      providerSecurityReviewMetadataOnly: true,
+      credentialStorageDisabled: true,
+      signedAgreementStorageDisabled: true,
+      phiProcessingDisabled: true,
+      liveIntegrationDisabled: true,
+      humanApprovalRequired: true,
+      releaseAuthority: "provider-security-review-readiness-not-security-approval",
+      baaDpaAuthority: "pre-production-baa-dpa-readiness-not-executed-agreement",
+      storageAuthority: "provider-security-review-metadata-only-no-credentials-phi-or-legal-artifacts"
     }
   });
 

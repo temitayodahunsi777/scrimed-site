@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Provider Security Review Workbench Release
+
+- Added Protected Provider Security Review Workbench inside `/pilot-workspace/access` after Evidence Room Provider Adapter Contracts.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews` for AAL2 no-PHI metadata references to externally retained security, privacy, BAA/DPA, credential-handling, incident-response, retention/residency, vendor-risk, and go-live rollback review.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet` for audited provider security review packet downloads.
+- Added `app/lib/protectedProviderSecurityReviews.ts` with typed review domains, risk tiers, required security controls, no-sensitive-artifact validation, provider-adapter readiness linkage, safe workarounds, and packet generation.
+- Added `public.protected_provider_security_reviews` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-provider-security-review-recorded` audit events, and runtime schema `2026-06-20.9`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-provider-security-review-workbench-no-phi` and `aal2-audited-provider-security-review-packets-no-phi`.
+- Preserved the boundary: this layer stores provider security review metadata only and keeps PHI processing, credential storage, signed agreement storage, live integration, production authorization, public release, external distribution, reimbursement assurance, compliance certification, and live clinical execution disabled.
+
 ## Latest Protected Evidence Room Provider Adapter Contracts Release
 
 - Added protected Evidence Room Provider Adapter Contracts inside `/pilot-workspace/access` after Evidence Room Access Log Reconciliation.

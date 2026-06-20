@@ -154,6 +154,10 @@ import {
   protectedEvidenceRoomProviderAdapterPacketProofStackStatus,
   protectedEvidenceRoomProviderAdapterStatus
 } from "./protectedEvidenceRoomProviderAdapters";
+import {
+  protectedProviderSecurityReviewPacketProofStackStatus,
+  protectedProviderSecurityReviewStatus
+} from "./protectedProviderSecurityReviews";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -228,6 +232,16 @@ export type BuyerAction = {
   label: string;
   href: string;
   purpose: string;
+  boundary: string;
+};
+
+export type BuyerDecisionPath = {
+  audience: string;
+  primaryQuestion: string;
+  recommendedStart: string;
+  route: string;
+  supportingRoutes: string[];
+  proof: string;
   boundary: string;
 };
 
@@ -602,6 +616,53 @@ export const buyerActions: BuyerAction[] = [
   }
 ];
 
+export const buyerDecisionPaths: BuyerDecisionPath[] = [
+  {
+    audience: "Healthcare executive buyer",
+    primaryQuestion: "Can SCRIMED turn fragmented workflows into governed operational intelligence?",
+    recommendedStart: "Start with the Product Console and Pilot Evidence Dashboard.",
+    route: "/product",
+    supportingRoutes: ["/pilot-evidence", "/demos", "/pilots", "/pricing"],
+    proof:
+      "Sellable pilot offers, workflow demos, outcome metrics, pricing posture, and production boundaries.",
+    boundary:
+      "Evaluation remains synthetic and review-gated; no autonomous diagnosis, patient routing, payer submission, or live care."
+  },
+  {
+    audience: "Security, privacy, and compliance reviewer",
+    primaryQuestion: "Can SCRIMED pass enterprise diligence without exposing sensitive artifacts?",
+    recommendedStart: "Start with the Trust Center and protected workspace access path.",
+    route: "/trust-center",
+    supportingRoutes: ["/public-market-readiness", "/pilot-workspace/access", "/trust-safety-operations"],
+    proof:
+      "Claims controls, protected provider security reviews, audit logs, review packets, and no-PHI evidence-room boundaries.",
+    boundary:
+      "Readiness metadata is not security approval, legal advice, compliance certification, executed BAA/DPA, or production authorization."
+  },
+  {
+    audience: "Investor or board reviewer",
+    primaryQuestion: "Is SCRIMED building defensible healthcare intelligence infrastructure with operating discipline?",
+    recommendedStart: "Start with Public Market Readiness and Competitive Edge.",
+    route: "/public-market-readiness",
+    supportingRoutes: ["/competitive-edge", "/market-activation", "/pilot-deal-room"],
+    proof:
+      "KPI stack, unit economics, customer proof ladder, margin discipline, model-efficiency controls, and buyer-room evidence.",
+    boundary:
+      "Investor materials are operating-readiness evidence, not audited financial reporting, securities offering material, valuation assurance, or investment advice."
+  },
+  {
+    audience: "Clinical transformation operator",
+    primaryQuestion: "How does SCRIMED move from demos toward controlled clinical operations safely?",
+    recommendedStart: "Start with Clinical Care Activation and Healthcare Intelligence OS.",
+    route: "/clinical-care-activation",
+    supportingRoutes: ["/healthcare-intelligence-os", "/agents", "/workflows", "/interoperability"],
+    proof:
+      "Human-review gates, AgentOS roles, workflow contracts, interoperability standards, and blocked live execution controls.",
+    boundary:
+      "Clinical care activation is a gated roadmap; it does not authorize PHI ingestion, treatment decisions, EHR mutation, or autonomous clinical execution."
+  }
+];
+
 export const deploymentStages: DeploymentStage[] = [
   {
     stage: "1. Synthetic demo",
@@ -794,6 +855,12 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedEvidenceRoomProviderAdapterApiRoute,
     protectedEvidenceRoomProviderAdapterPacketApiRoute:
       publicMarketReadinessSummary.protectedEvidenceRoomProviderAdapterPacketApiRoute,
+    protectedProviderSecurityReviewRoute:
+      publicMarketReadinessSummary.protectedProviderSecurityReviewRoute,
+    protectedProviderSecurityReviewApiRoute:
+      publicMarketReadinessSummary.protectedProviderSecurityReviewApiRoute,
+    protectedProviderSecurityReviewPacketApiRoute:
+      publicMarketReadinessSummary.protectedProviderSecurityReviewPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -899,6 +966,7 @@ export function getProductConsoleSummary() {
     governanceControls,
     evidenceMetrics,
     buyerActions,
+    buyerDecisionPaths,
     deploymentStages,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
@@ -963,6 +1031,10 @@ export function getProductConsoleSummary() {
         protectedEvidenceRoomProviderAdapterStatus,
       protectedEvidenceRoomProviderAdapterPackets:
         protectedEvidenceRoomProviderAdapterPacketProofStackStatus,
+      protectedProviderSecurityReviews:
+        protectedProviderSecurityReviewStatus,
+      protectedProviderSecurityReviewPackets:
+        protectedProviderSecurityReviewPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1152,6 +1224,9 @@ export function getProductReadinessBrief() {
     `Protected evidence-room provider adapters: ${summary.protectedEvidenceRoomProviderAdapterRoute}`,
     `Protected evidence-room provider adapters API: ${summary.protectedEvidenceRoomProviderAdapterApiRoute}`,
     `Protected evidence-room provider adapters packet API: ${summary.protectedEvidenceRoomProviderAdapterPacketApiRoute}`,
+    `Protected provider security reviews: ${summary.protectedProviderSecurityReviewRoute}`,
+    `Protected provider security reviews API: ${summary.protectedProviderSecurityReviewApiRoute}`,
+    `Protected provider security review packet API: ${summary.protectedProviderSecurityReviewPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,
