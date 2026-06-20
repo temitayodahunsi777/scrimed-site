@@ -116,6 +116,14 @@ import type {
   ProtectedReleaseAuthorityAttestationStatus,
   ProtectedReleaseAuthorityDomain
 } from "./protectedReleaseAuthorityAttestations";
+import type {
+  ProtectedEvidenceRoomRecipientAttestationInput,
+  ProtectedEvidenceRoomRecipientAttestationRecord,
+  ProtectedEvidenceRoomRecipientAttestationStatus,
+  ProtectedEvidenceRoomRecipientControl,
+  ProtectedEvidenceRoomRecipientSegment,
+  ProtectedEvidenceRoomRevocationState
+} from "./protectedEvidenceRoomRecipientAttestations";
 
 type AuthenticatedPilotContext =
   | {
@@ -598,6 +606,56 @@ type ProtectedReleaseAuthorityAttestationRow = {
   securities_authority: ProtectedReleaseAuthorityAttestationRecord["securitiesAuthority"];
   advertising_claims_authority: ProtectedReleaseAuthorityAttestationRecord["advertisingClaimsAuthority"];
   clinical_execution_authority: ProtectedReleaseAuthorityAttestationRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedEvidenceRoomRecipientAttestationRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  distribution_audience: ProtectedDistributionAudience;
+  recipient_segment: ProtectedEvidenceRoomRecipientSegment;
+  recipient_segment_label: string;
+  attestation_status: Exclude<ProtectedEvidenceRoomRecipientAttestationStatus, "not-recorded">;
+  approval_scope: ProtectedEvidenceRoomRecipientAttestationRecord["approvalScope"];
+  recipient_scope_label: string;
+  evidence_room_reference_label: string;
+  evidence_room_reference_locator: string;
+  packet_reference_label: string;
+  packet_reference_locator: string;
+  access_window_start: string;
+  access_window_end: string;
+  revocation_state: ProtectedEvidenceRoomRevocationState;
+  revocation_trigger: string;
+  release_authority_attestation_record_ids: string[];
+  evidence_snapshot: unknown;
+  required_recipient_controls: ProtectedEvidenceRoomRecipientControl[];
+  linked_recipient_controls: ProtectedEvidenceRoomRecipientControl[];
+  missing_recipient_controls: ProtectedEvidenceRoomRecipientControl[];
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  external_recipient_authority_retained: boolean;
+  export_disabled: boolean;
+  attestation: ProtectedEvidenceRoomRecipientAttestationRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedEvidenceRoomRecipientAttestationRecord["dataBoundary"];
+  recipient_attestation_authority: ProtectedEvidenceRoomRecipientAttestationRecord["recipientAttestationAuthority"];
+  release_authority: ProtectedEvidenceRoomRecipientAttestationRecord["releaseAuthority"];
+  storage_authority: ProtectedEvidenceRoomRecipientAttestationRecord["storageAuthority"];
+  release_authority_attestation_authority: ProtectedEvidenceRoomRecipientAttestationRecord["releaseAuthorityAttestationAuthority"];
+  release_authority_release_authority: ProtectedEvidenceRoomRecipientAttestationRecord["releaseAuthorityReleaseAuthority"];
+  release_authority_storage_authority: ProtectedEvidenceRoomRecipientAttestationRecord["releaseAuthorityStorageAuthority"];
+  lockbox_authority: ProtectedEvidenceRoomRecipientAttestationRecord["lockboxAuthority"];
+  lockbox_release_authority: ProtectedEvidenceRoomRecipientAttestationRecord["lockboxReleaseAuthority"];
+  lockbox_storage_authority: ProtectedEvidenceRoomRecipientAttestationRecord["lockboxStorageAuthority"];
+  release_decision_authority: ProtectedEvidenceRoomRecipientAttestationRecord["releaseDecisionAuthority"];
+  financial_reporting_authority: ProtectedEvidenceRoomRecipientAttestationRecord["financialReportingAuthority"];
+  securities_authority: ProtectedEvidenceRoomRecipientAttestationRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedEvidenceRoomRecipientAttestationRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedEvidenceRoomRecipientAttestationRecord["clinicalExecutionAuthority"];
   recorded_by: string;
   recorded_at: string;
   created_at: string;
@@ -1460,6 +1518,60 @@ function mapProtectedReleaseAuthorityAttestation(
   };
 }
 
+function mapProtectedEvidenceRoomRecipientAttestation(
+  row: ProtectedEvidenceRoomRecipientAttestationRow
+): ProtectedEvidenceRoomRecipientAttestationRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    distributionAudience: row.distribution_audience,
+    recipientSegment: row.recipient_segment,
+    recipientSegmentLabel: row.recipient_segment_label,
+    attestationStatus: row.attestation_status,
+    approvalScope: row.approval_scope,
+    recipientScopeLabel: row.recipient_scope_label,
+    evidenceRoomReferenceLabel: row.evidence_room_reference_label,
+    evidenceRoomReferenceLocator: row.evidence_room_reference_locator,
+    packetReferenceLabel: row.packet_reference_label,
+    packetReferenceLocator: row.packet_reference_locator,
+    accessWindowStart: row.access_window_start,
+    accessWindowEnd: row.access_window_end,
+    revocationState: row.revocation_state,
+    revocationTrigger: row.revocation_trigger,
+    releaseAuthorityAttestationRecordIds: row.release_authority_attestation_record_ids,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    requiredRecipientControls: row.required_recipient_controls,
+    linkedRecipientControls: row.linked_recipient_controls,
+    missingRecipientControls: row.missing_recipient_controls,
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    externalRecipientAuthorityRetained: row.external_recipient_authority_retained,
+    exportDisabled: row.export_disabled,
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    recipientAttestationAuthority: row.recipient_attestation_authority,
+    releaseAuthority: row.release_authority,
+    storageAuthority: row.storage_authority,
+    releaseAuthorityAttestationAuthority: row.release_authority_attestation_authority,
+    releaseAuthorityReleaseAuthority: row.release_authority_release_authority,
+    releaseAuthorityStorageAuthority: row.release_authority_storage_authority,
+    lockboxAuthority: row.lockbox_authority,
+    lockboxReleaseAuthority: row.lockbox_release_authority,
+    lockboxStorageAuthority: row.lockbox_storage_authority,
+    releaseDecisionAuthority: row.release_decision_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1766,6 +1878,8 @@ const protectedDistributionLockboxSelect =
   "id, tenant_id, workspace_id, distribution_audience, distribution_channel_control, lockbox_status, approval_scope, manifest_version, manifest_title, artifact_manifest_label, artifact_manifest_locator, customer_permission_reference, counsel_review_reference, distribution_window_start, distribution_window_end, recipient_scope, revocation_plan, signoff_record_ids, evidence_snapshot, required_reviewer_roles, linked_reviewer_roles, missing_reviewer_roles, expired_signoff_roles, retained_blockers, release_restrictions, external_approvals_retained, distribution_disabled, attestation, review_note, data_boundary, lockbox_authority, release_authority, storage_authority, signoff_authority, signoff_release_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const protectedReleaseAuthorityAttestationSelect =
   "id, tenant_id, workspace_id, authority_domain, authority_domain_label, attestation_status, approval_scope, distribution_audience, release_authority_reference_label, release_authority_reference_locator, authority_owner_label, attested_manifest_version, authority_window_start, authority_window_end, release_scope, revocation_trigger, lockbox_record_ids, evidence_snapshot, required_authority_domains, linked_authority_domains, missing_authority_domains, retained_blockers, release_restrictions, external_authority_retained, release_disabled, attestation, review_note, data_boundary, attestation_authority, release_authority, storage_authority, lockbox_authority, lockbox_release_authority, lockbox_storage_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
+const protectedEvidenceRoomRecipientAttestationSelect =
+  "id, tenant_id, workspace_id, distribution_audience, recipient_segment, recipient_segment_label, attestation_status, approval_scope, recipient_scope_label, evidence_room_reference_label, evidence_room_reference_locator, packet_reference_label, packet_reference_locator, access_window_start, access_window_end, revocation_state, revocation_trigger, release_authority_attestation_record_ids, evidence_snapshot, required_recipient_controls, linked_recipient_controls, missing_recipient_controls, retained_blockers, release_restrictions, external_recipient_authority_retained, export_disabled, attestation, review_note, data_boundary, recipient_attestation_authority, release_authority, storage_authority, release_authority_attestation_authority, release_authority_release_authority, release_authority_storage_authority, lockbox_authority, lockbox_release_authority, lockbox_storage_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -2180,6 +2294,25 @@ export async function listProtectedReleaseAuthorityAttestations(
   return {
     records: ((data ?? []) as unknown as ProtectedReleaseAuthorityAttestationRow[]).map(
       mapProtectedReleaseAuthorityAttestation
+    ),
+    error
+  };
+}
+
+export async function listProtectedEvidenceRoomRecipientAttestations(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_evidence_room_recipient_attestations")
+    .select(protectedEvidenceRoomRecipientAttestationSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(150);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedEvidenceRoomRecipientAttestationRow[]).map(
+      mapProtectedEvidenceRoomRecipientAttestation
     ),
     error
   };
@@ -2661,6 +2794,22 @@ export async function recordProtectedReleaseAuthorityAttestation(
   };
 }
 
+export async function recordProtectedEvidenceRoomRecipientAttestation(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedEvidenceRoomRecipientAttestationInput
+) {
+  const { data, error } = await client.rpc("record_protected_evidence_room_recipient_attestation", {
+    p_workspace_slug: workspaceSlug,
+    p_attestation_input: input
+  });
+
+  return {
+    attestationId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedExternalApprovalEvidencePacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -2776,6 +2925,33 @@ export async function recordProtectedReleaseAuthorityAttestationPacketDownload(
       releaseDisabled: true,
       releaseAuthority: "release-disabled-pending-executed-external-authority",
       storageAuthority: "authority-metadata-only-no-sensitive-documents"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedEvidenceRoomRecipientAttestationPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-evidence-room-recipient-attestations",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      recipientMetadataOnly: true,
+      exportDisabled: true,
+      releaseAuthority: "release-disabled-pending-external-recipient-authority",
+      storageAuthority: "recipient-metadata-only-no-recipient-lists-or-sensitive-artifacts"
     }
   });
 

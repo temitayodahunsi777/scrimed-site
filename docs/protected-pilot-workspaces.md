@@ -97,6 +97,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations`
 - `POST /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations`
 - `GET /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations`
+- `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations`
+- `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -168,6 +171,19 @@ Safe operating pattern:
 - Record only bounded no-PHI authority domain, external locator label, owner label, manifest version, authority window, scope, and revocation trigger metadata in SCRIMED.
 - Download the audited release authority attestation packet only after the write-before-release audit event commits.
 - Treat release authority metadata as internal diligence evidence. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
+
+## Evidence Room Recipient Attestations
+
+`/pilot-workspace/access` now includes Protected Evidence Room Recipient Attestations immediately after Release Authority Attestations. Tenant admins, pilot leads, and reviewers can record no-PHI metadata for intended evidence-room recipient segments, access windows, packet references, and revocation posture after release authority metadata is complete.
+
+Recipient attestation records link to completed release authority attestation ids and compute recipient-control coverage. The highest state is `recipient-attestation-review-ready-not-release-approval`; export remains disabled in the current product boundary.
+
+Safe operating pattern:
+
+- Keep exact recipient lists, recipient emails, access grants, signatures, customer permissions, legal opinions, and evidence-room permissions in qualified external systems.
+- Record only bounded no-PHI recipient segment, role-scope label, external evidence-room locator, packet locator, access window, and revocation trigger metadata in SCRIMED.
+- Download the audited recipient attestation packet only after the write-before-release audit event commits.
+- Treat recipient attestation metadata as internal diligence evidence. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
 
 ## Pilot Demo Readiness Command Center
 

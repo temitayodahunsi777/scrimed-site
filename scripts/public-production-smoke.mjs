@@ -283,6 +283,22 @@ async function checkProductConsole() {
     );
   }
 
+  if (
+    body.proofStack?.protectedEvidenceRoomRecipientAttestations !==
+    "aal2-evidence-room-recipient-attestations-disabled-no-phi"
+  ) {
+    throw new Error("product console missing protected evidence-room recipient attestation proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedEvidenceRoomRecipientAttestationPackets !==
+    "aal2-audited-evidence-room-recipient-attestation-packets-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected evidence-room recipient attestation packet proof-stack posture."
+    );
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -888,6 +904,29 @@ async function checkPublicMarketReadiness() {
     );
   }
 
+  if (
+    body.protectedEvidenceRoomRecipientAttestationStatus !==
+    "aal2-evidence-room-recipient-attestations-disabled-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected evidence-room recipient attestation status.");
+  }
+
+  if (
+    body.protectedEvidenceRoomRecipientAttestationApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations"
+  ) {
+    throw new Error("Public Market Readiness missing protected evidence-room recipient attestation API route.");
+  }
+
+  if (
+    body.protectedEvidenceRoomRecipientAttestationPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected evidence-room recipient attestation packet API route."
+    );
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1295,6 +1334,37 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/release-authority-attestations/packet`,
   "Protected Release Authority Attestations packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-recipient-attestations`,
+  "Protected Evidence Room Recipient Attestations protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-recipient-attestations`,
+  "Protected Evidence Room Recipient Attestations write protected API",
+  {
+    releaseAuthorityAttestationRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    distributionAudience: "buyer-diligence-room",
+    recipientSegment: "named-buyer-reviewers",
+    recipientScopeLabel: "named buyer diligence reviewer group",
+    evidenceRoomReferenceLabel: "external evidence room recipient control",
+    evidenceRoomReferenceLocator: "evidence-room:recipient-control",
+    packetReferenceLabel: "controlled recipient proof packet",
+    packetReferenceLocator: "evidence-room:packet-reference",
+    accessWindowStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    accessWindowEnd: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
+    revocationState: "access-not-issued",
+    revocationTrigger: "revoke and re-review evidence room access if scope changes",
+    externalRecipientAuthorityRetained: true,
+    exportDisabled: true,
+    attestation: "evidence-room-recipient-attestation-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke metadata-only recipient attestation"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-recipient-attestations/packet`,
+  "Protected Evidence Room Recipient Attestations packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

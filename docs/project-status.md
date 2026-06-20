@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Evidence Room Recipient Attestations Release
+
+- Added protected Evidence Room Recipient Attestations inside `/pilot-workspace/access` after Release Authority Attestations.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations` for AAL2 no-PHI metadata references to intended recipient segments, evidence-room references, packet references, access windows, and revocation posture.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet` for audited recipient attestation packet downloads.
+- Added `app/lib/protectedEvidenceRoomRecipientAttestations.ts` with typed recipient segments, no-recipient-list validation, release-authority readiness linkage, export-disabled state, safe workarounds, and packet generation.
+- Added `public.protected_evidence_room_recipient_attestations` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-evidence-room-recipient-attestation-recorded` audit events, and runtime schema `2026-06-20.6`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-evidence-room-recipient-attestations-disabled-no-phi` and `aal2-audited-evidence-room-recipient-attestation-packets-no-phi`.
+- Preserved the boundary: this layer stores recipient metadata only and keeps export disabled. It does not store exact recipient lists, recipient emails, access grants, signed approvals, legal opinions, customer permission artifacts, public release approval, external distribution approval, audited financial reporting, securities materials, advertising substantiation, clinical validation, compliance certification, production authorization, reimbursement assurance, or live clinical execution.
+
 ## Latest Protected Release Authority Attestations Release
 
 - Added protected Release Authority Attestations inside `/pilot-workspace/access` after Distribution Lockbox.

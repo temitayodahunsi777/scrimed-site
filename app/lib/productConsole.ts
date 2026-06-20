@@ -142,6 +142,10 @@ import {
   protectedReleaseAuthorityAttestationPacketProofStackStatus,
   protectedReleaseAuthorityAttestationStatus
 } from "./protectedReleaseAuthorityAttestations";
+import {
+  protectedEvidenceRoomRecipientAttestationPacketProofStackStatus,
+  protectedEvidenceRoomRecipientAttestationStatus
+} from "./protectedEvidenceRoomRecipientAttestations";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -764,6 +768,12 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedReleaseAuthorityAttestationApiRoute,
     protectedReleaseAuthorityAttestationPacketApiRoute:
       publicMarketReadinessSummary.protectedReleaseAuthorityAttestationPacketApiRoute,
+    protectedEvidenceRoomRecipientAttestationRoute:
+      publicMarketReadinessSummary.protectedEvidenceRoomRecipientAttestationRoute,
+    protectedEvidenceRoomRecipientAttestationApiRoute:
+      publicMarketReadinessSummary.protectedEvidenceRoomRecipientAttestationApiRoute,
+    protectedEvidenceRoomRecipientAttestationPacketApiRoute:
+      publicMarketReadinessSummary.protectedEvidenceRoomRecipientAttestationPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -921,6 +931,10 @@ export function getProductConsoleSummary() {
       protectedReleaseAuthorityAttestations: protectedReleaseAuthorityAttestationStatus,
       protectedReleaseAuthorityAttestationPackets:
         protectedReleaseAuthorityAttestationPacketProofStackStatus,
+      protectedEvidenceRoomRecipientAttestations:
+        protectedEvidenceRoomRecipientAttestationStatus,
+      protectedEvidenceRoomRecipientAttestationPackets:
+        protectedEvidenceRoomRecipientAttestationPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1101,6 +1115,9 @@ export function getProductReadinessBrief() {
     `Protected release authority attestations: ${summary.protectedReleaseAuthorityAttestationRoute}`,
     `Protected release authority attestations API: ${summary.protectedReleaseAuthorityAttestationApiRoute}`,
     `Protected release authority attestations packet API: ${summary.protectedReleaseAuthorityAttestationPacketApiRoute}`,
+    `Protected evidence-room recipient attestations: ${summary.protectedEvidenceRoomRecipientAttestationRoute}`,
+    `Protected evidence-room recipient attestations API: ${summary.protectedEvidenceRoomRecipientAttestationApiRoute}`,
+    `Protected evidence-room recipient attestations packet API: ${summary.protectedEvidenceRoomRecipientAttestationPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

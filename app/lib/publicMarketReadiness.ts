@@ -38,6 +38,10 @@ import {
   protectedReleaseAuthorityAttestationPacketProofStackStatus,
   protectedReleaseAuthorityAttestationStatus
 } from "./protectedReleaseAuthorityAttestations";
+import {
+  protectedEvidenceRoomRecipientAttestationPacketProofStackStatus,
+  protectedEvidenceRoomRecipientAttestationStatus
+} from "./protectedEvidenceRoomRecipientAttestations";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -604,6 +608,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations",
     protectedReleaseAuthorityAttestationPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet",
+    protectedEvidenceRoomRecipientAttestationRoute: "/pilot-workspace/access",
+    protectedEvidenceRoomRecipientAttestationApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations",
+    protectedEvidenceRoomRecipientAttestationPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -630,6 +639,9 @@ export function getPublicMarketReadinessSummary() {
     protectedReleaseAuthorityAttestationStatus,
     protectedReleaseAuthorityAttestationPacketStatus:
       protectedReleaseAuthorityAttestationPacketProofStackStatus,
+    protectedEvidenceRoomRecipientAttestationStatus,
+    protectedEvidenceRoomRecipientAttestationPacketStatus:
+      protectedEvidenceRoomRecipientAttestationPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -652,7 +664,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add controlled external evidence-room recipient attestation exports only after real release-authority references are retained outside SCRIMED.",
+      "Add externally retained access-log reconciliation for evidence-room recipient attestations without storing recipient lists, emails, secrets, signed approvals, or sensitive artifacts in SCRIMED.",
     updated: "2026-06-20"
   };
 }
@@ -685,6 +697,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected distribution lockbox packets: ${summary.protectedDistributionLockboxPacketStatus}
 - Protected release authority attestations: ${summary.protectedReleaseAuthorityAttestationStatus}
 - Protected release authority attestation packets: ${summary.protectedReleaseAuthorityAttestationPacketStatus}
+- Protected evidence-room recipient attestations: ${summary.protectedEvidenceRoomRecipientAttestationStatus}
+- Protected evidence-room recipient attestation packets: ${summary.protectedEvidenceRoomRecipientAttestationPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -716,6 +730,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected release authority attestation route: ${summary.protectedReleaseAuthorityAttestationRoute}
 - Protected release authority attestation API: ${summary.protectedReleaseAuthorityAttestationApiRoute}
 - Protected release authority attestation packet API: ${summary.protectedReleaseAuthorityAttestationPacketApiRoute}
+- Protected evidence-room recipient attestation route: ${summary.protectedEvidenceRoomRecipientAttestationRoute}
+- Protected evidence-room recipient attestation API: ${summary.protectedEvidenceRoomRecipientAttestationApiRoute}
+- Protected evidence-room recipient attestation packet API: ${summary.protectedEvidenceRoomRecipientAttestationPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

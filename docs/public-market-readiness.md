@@ -29,6 +29,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected distribution lockbox packet API: `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`
 - Protected release authority attestation API: `/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations`
 - Protected release authority attestation packet API: `/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet`
+- Protected evidence-room recipient attestation API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations`
+- Protected evidence-room recipient attestation packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -43,6 +45,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 metric trend reviews that compare rollup snapshots, classify board trend state, surface reach expansion signals, track competitive advantages, and feed agent improvement actions.
 - Protected AAL2 board scorecards that package rolling-quarter trend evidence, finance-allocation readiness, buyer-segment cohorts, competitive edge, and agent improvement priorities.
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
+- Protected AAL2 evidence-room recipient attestations that record intended recipient segment, access-window, packet-reference, and revocation metadata after release authority is complete while exact recipient lists, emails, access grants, and export approval remain external.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
 - Protected AAL2 release authority attestations that link ready disabled lockboxes to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata while release remains disabled.
@@ -84,6 +87,8 @@ Protected distribution lockbox records are disabled-by-default metadata only. `r
 
 Protected release authority attestations are metadata-only references to externally retained authority. `release-authority-review-ready-not-release-approval` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
 
+Protected evidence-room recipient attestations are metadata-only references to intended recipient scope, access windows, packet references, and revocation posture. `recipient-attestation-review-ready-not-release-approval` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
+
 ## Next Build
 
-Add controlled external evidence-room recipient attestation exports only after real release-authority references are retained outside SCRIMED.
+Add externally retained access-log reconciliation for evidence-room recipient attestations without storing recipient lists, emails, secrets, signed approvals, or sensitive artifacts in SCRIMED.
