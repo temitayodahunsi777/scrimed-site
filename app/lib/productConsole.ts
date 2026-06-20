@@ -158,6 +158,10 @@ import {
   protectedProviderSecurityReviewPacketProofStackStatus,
   protectedProviderSecurityReviewStatus
 } from "./protectedProviderSecurityReviews";
+import {
+  protectedProcurementEvidenceRegistryPacketProofStackStatus,
+  protectedProcurementEvidenceRegistryStatus
+} from "./protectedProcurementEvidenceRegistry";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -861,6 +865,12 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedProviderSecurityReviewApiRoute,
     protectedProviderSecurityReviewPacketApiRoute:
       publicMarketReadinessSummary.protectedProviderSecurityReviewPacketApiRoute,
+    protectedProcurementEvidenceRegistryRoute:
+      publicMarketReadinessSummary.protectedProcurementEvidenceRegistryRoute,
+    protectedProcurementEvidenceRegistryApiRoute:
+      publicMarketReadinessSummary.protectedProcurementEvidenceRegistryApiRoute,
+    protectedProcurementEvidenceRegistryPacketApiRoute:
+      publicMarketReadinessSummary.protectedProcurementEvidenceRegistryPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -1035,6 +1045,10 @@ export function getProductConsoleSummary() {
         protectedProviderSecurityReviewStatus,
       protectedProviderSecurityReviewPackets:
         protectedProviderSecurityReviewPacketProofStackStatus,
+      protectedProcurementEvidenceRegistry:
+        protectedProcurementEvidenceRegistryStatus,
+      protectedProcurementEvidenceRegistryPackets:
+        protectedProcurementEvidenceRegistryPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1227,6 +1241,9 @@ export function getProductReadinessBrief() {
     `Protected provider security reviews: ${summary.protectedProviderSecurityReviewRoute}`,
     `Protected provider security reviews API: ${summary.protectedProviderSecurityReviewApiRoute}`,
     `Protected provider security review packet API: ${summary.protectedProviderSecurityReviewPacketApiRoute}`,
+    `Protected procurement evidence registry: ${summary.protectedProcurementEvidenceRegistryRoute}`,
+    `Protected procurement evidence registry API: ${summary.protectedProcurementEvidenceRegistryApiRoute}`,
+    `Protected procurement evidence registry packet API: ${summary.protectedProcurementEvidenceRegistryPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

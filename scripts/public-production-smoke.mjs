@@ -349,6 +349,22 @@ async function checkProductConsole() {
     );
   }
 
+  if (
+    body.proofStack?.protectedProcurementEvidenceRegistry !==
+    "aal2-procurement-evidence-registry-no-sensitive-artifacts"
+  ) {
+    throw new Error("product console missing protected procurement evidence registry proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedProcurementEvidenceRegistryPackets !==
+    "aal2-audited-procurement-evidence-registry-packets-no-sensitive-artifacts"
+  ) {
+    throw new Error(
+      "product console missing protected procurement evidence registry packet proof-stack posture."
+    );
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -1048,6 +1064,29 @@ async function checkPublicMarketReadiness() {
     );
   }
 
+  if (
+    body.protectedProcurementEvidenceRegistryStatus !==
+    "aal2-procurement-evidence-registry-no-sensitive-artifacts"
+  ) {
+    throw new Error("Public Market Readiness missing protected procurement evidence registry status.");
+  }
+
+  if (
+    body.protectedProcurementEvidenceRegistryApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/procurement-evidence"
+  ) {
+    throw new Error("Public Market Readiness missing protected procurement evidence registry API route.");
+  }
+
+  if (
+    body.protectedProcurementEvidenceRegistryPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected procurement evidence registry packet API route."
+    );
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1584,6 +1623,43 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/provider-security-reviews/packet`,
   "Protected Provider Security Reviews packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/procurement-evidence`,
+  "Protected Procurement Evidence Registry protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/procurement-evidence`,
+  "Protected Procurement Evidence Registry write protected API",
+  {
+    providerSecurityReviewRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    targetAudience: "provider-health-system",
+    procurementDomain: "security-questionnaire",
+    evidenceClass: "questionnaire-response-routing",
+    procurementOwnerLabel: "enterprise procurement evidence owner",
+    buyerSegmentLabel: "health system security procurement reviewer",
+    externalSystemLabel: "qualified external diligence system",
+    evidenceRoutingLabel: "metadata only evidence routing label",
+    evidenceRoutingLocator: "external-system:procurement-evidence-room",
+    responseCadence: "review before buyer diligence response",
+    procurementRiskTier: "not-assessed",
+    securityQuestionnaireRetainedExternally: true,
+    socReportRetainedExternally: true,
+    pentestReportRetainedExternally: true,
+    signedLegalArtifactsRetainedExternally: true,
+    credentialStorageDisabled: true,
+    phiProcessingDisabled: true,
+    confidentialAnswerStorageDisabled: true,
+    humanApprovalRequired: true,
+    externalDistributionDisabled: true,
+    attestation: "procurement-evidence-routing-metadata-no-sensitive-artifacts",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke procurement routing metadata only"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/procurement-evidence/packet`,
+  "Protected Procurement Evidence Registry packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

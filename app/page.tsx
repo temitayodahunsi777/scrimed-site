@@ -58,6 +58,11 @@ const homepageDecisionPaths = [
     summary: "Review claims controls, privacy posture, protected workspaces, auditability, and diligence gates."
   },
   {
+    audience: "Procurement and vendor-risk",
+    route: "/pilot-workspace/access",
+    summary: "Review metadata-only routing for questionnaires, SOC and pentest evidence, legal artifacts, vendor-risk, implementation, and buyer diligence without storing sensitive artifacts."
+  },
+  {
     audience: "Investors and board reviewers",
     route: "/public-market-readiness",
     summary: "Review KPI discipline, unit economics, customer proof, model-efficiency controls, and investor narrative."

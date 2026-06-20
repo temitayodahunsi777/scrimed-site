@@ -38,6 +38,7 @@ import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedNamedReviewerSignoffPanel from "./ProtectedNamedReviewerSignoffPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
 import ProtectedProviderSecurityReviewPanel from "./ProtectedProviderSecurityReviewPanel";
+import ProtectedProcurementEvidenceRegistryPanel from "./ProtectedProcurementEvidenceRegistryPanel";
 import ProtectedReleaseDecisionPanel from "./ProtectedReleaseDecisionPanel";
 import ProtectedReleaseAuthorityAttestationPanel from "./ProtectedReleaseAuthorityAttestationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
@@ -108,6 +109,10 @@ import type {
   ProtectedProviderSecurityReviewInput,
   ProtectedProviderSecurityReviewWorkflow
 } from "../lib/protectedProviderSecurityReviews";
+import type {
+  ProtectedProcurementEvidenceRegistryInput,
+  ProtectedProcurementEvidenceRegistryWorkflow
+} from "../lib/protectedProcurementEvidenceRegistry";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -315,6 +320,15 @@ type ProtectedProviderSecurityReviewResponse = {
   error?: { message?: string };
 };
 
+type ProtectedProcurementEvidenceRegistryResponse = {
+  registryId?: string;
+  records?: unknown[];
+  workflow?: ProtectedProcurementEvidenceRegistryWorkflow;
+  providerSecurityReviewRecords?: unknown[];
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -496,6 +510,18 @@ export default function ProtectedPilotAccess({
     protectedProviderSecurityReviewPacketStatus,
     setProtectedProviderSecurityReviewPacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [
+    protectedProcurementEvidenceRegistryWorkflow,
+    setProtectedProcurementEvidenceRegistryWorkflow
+  ] = useState<ProtectedProcurementEvidenceRegistryWorkflow | null>(null);
+  const [
+    protectedProcurementEvidenceRegistryStatus,
+    setProtectedProcurementEvidenceRegistryStatus
+  ] = useState<"idle" | "saving">("idle");
+  const [
+    protectedProcurementEvidenceRegistryPacketStatus,
+    setProtectedProcurementEvidenceRegistryPacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -592,6 +618,12 @@ export default function ProtectedPilotAccess({
     setProtectedProviderSecurityReviewWorkflow(null);
     setProtectedProviderSecurityReviewStatus("idle");
     setProtectedProviderSecurityReviewPacketStatus("idle");
+  }, []);
+
+  const resetProtectedProcurementEvidenceRegistry = useCallback(() => {
+    setProtectedProcurementEvidenceRegistryWorkflow(null);
+    setProtectedProcurementEvidenceRegistryStatus("idle");
+    setProtectedProcurementEvidenceRegistryPacketStatus("idle");
   }, []);
 
   useEffect(() => {
@@ -780,6 +812,7 @@ export default function ProtectedPilotAccess({
       resetProtectedEvidenceRoomAccessLogReconciliation();
       resetProtectedEvidenceRoomProviderAdapter();
       resetProtectedProviderSecurityReview();
+      resetProtectedProcurementEvidenceRegistry();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -804,7 +837,8 @@ export default function ProtectedPilotAccess({
           loadProtectedEvidenceRoomRecipientAttestations(activeSession, nextWorkspaces[0]),
           loadProtectedEvidenceRoomAccessLogReconciliation(activeSession, nextWorkspaces[0]),
           loadProtectedEvidenceRoomProviderAdapters(activeSession, nextWorkspaces[0]),
-          loadProtectedProviderSecurityReviews(activeSession, nextWorkspaces[0])
+          loadProtectedProviderSecurityReviews(activeSession, nextWorkspaces[0]),
+          loadProtectedProcurementEvidenceRegistry(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -1386,6 +1420,35 @@ export default function ProtectedPilotAccess({
       setProtectedProviderSecurityReviewWorkflow(body.workflow ?? null);
     }
 
+    async function loadProtectedProcurementEvidenceRegistry(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/procurement-evidence`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedProcurementEvidenceRegistryResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ??
+            "Protected procurement evidence registry could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedProcurementEvidenceRegistryWorkflow(body.workflow ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -1408,6 +1471,7 @@ export default function ProtectedPilotAccess({
     resetProtectedEvidenceRoomProviderAdapter,
     resetProtectedEvidenceRoomRecipientAttestation,
     resetProtectedProviderSecurityReview,
+    resetProtectedProcurementEvidenceRegistry,
     resetProtectedReleaseAuthorityAttestation,
     resetProtectedNamedReviewerSignoff,
     resetProtectedOperatorMetrics,
@@ -2106,6 +2170,31 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedProviderSecurityReviewWorkflow(body.workflow ?? null);
+  }
+
+  async function refreshProtectedProcurementEvidenceRegistry(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/procurement-evidence`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedProcurementEvidenceRegistryResponse;
+
+    if (!response.ok) {
+      setMessage(
+        body.error?.message ??
+          "Protected procurement evidence registry could not be loaded."
+      );
+      return;
+    }
+
+    setProtectedProcurementEvidenceRegistryWorkflow(body.workflow ?? null);
   }
 
   async function createSyntheticSession() {
@@ -3552,6 +3641,7 @@ export default function ProtectedPilotAccess({
     setProtectedProviderSecurityReviewWorkflow(
       body.workflow ?? protectedProviderSecurityReviewWorkflow
     );
+    await refreshProtectedProcurementEvidenceRegistry(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected provider security review recorded${
@@ -3597,6 +3687,89 @@ export default function ProtectedPilotAccess({
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       "Protected provider security review packet downloaded and its audit event was committed."
+    );
+  }
+
+  async function recordProtectedProcurementEvidenceRegistry(
+    input: ProtectedProcurementEvidenceRegistryInput
+  ) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedProcurementEvidenceRegistryStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/procurement-evidence`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedProcurementEvidenceRegistryResponse;
+    setProtectedProcurementEvidenceRegistryStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected procurement evidence registry entry could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedProcurementEvidenceRegistryWorkflow(
+      body.workflow ?? protectedProcurementEvidenceRegistryWorkflow
+    );
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected procurement evidence routing recorded${
+        body.registryId ? ` with registry id ${body.registryId}` : ""
+      }. Questionnaire answers, reports, signed artifacts, credentials, PHI, external distribution, procurement approval, and live clinical execution remain disabled.`
+    );
+  }
+
+  async function downloadProtectedProcurementEvidenceRegistryPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedProcurementEvidenceRegistryPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/procurement-evidence/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedProcurementEvidenceRegistryPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected procurement evidence registry packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-procurement-evidence-registry.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      "Protected procurement evidence registry packet downloaded and its audit event was committed."
     );
   }
 
@@ -4028,6 +4201,15 @@ export default function ProtectedPilotAccess({
             packetBusy={protectedProviderSecurityReviewPacketStatus === "downloading"}
             providerAdapterWorkflow={protectedEvidenceRoomProviderAdapterWorkflow}
             workflow={protectedProviderSecurityReviewWorkflow}
+          />
+
+          <ProtectedProcurementEvidenceRegistryPanel
+            busy={protectedProcurementEvidenceRegistryStatus === "saving"}
+            onDownloadPacket={downloadProtectedProcurementEvidenceRegistryPacket}
+            onRecordRegistry={recordProtectedProcurementEvidenceRegistry}
+            packetBusy={protectedProcurementEvidenceRegistryPacketStatus === "downloading"}
+            providerSecurityWorkflow={protectedProviderSecurityReviewWorkflow}
+            workflow={protectedProcurementEvidenceRegistryWorkflow}
           />
 
           <BuyerPilotRoomPanel

@@ -10,7 +10,7 @@ Current product boundary: this repository presents SCRIMED as a governed synthet
 
 Enterprise readiness boundary: `/trust-center` and `/claims` expose accountable legal, security, privacy, brand, governance, marketing, PR, sales, advertising, and claims-control readiness. These surfaces are operational registers, not legal advice, certification, regulatory approval, or authorization for live clinical execution.
 
-Protected release governance: `/pilot-workspace/access` includes no-PHI finance methodology, external approval evidence, release decisions, named reviewer sign-offs, disabled distribution lockbox, release authority attestation controls, evidence-room recipient/access-log/provider-adapter controls, and provider security review readiness. These controls produce audited synthetic pilot evidence only and do not authorize public release, external distribution, legal claims, customer proof, advertising claims, security approval, BAA/DPA execution, production use, live integration, or clinical care.
+Protected release governance: `/pilot-workspace/access` includes no-PHI finance methodology, external approval evidence, release decisions, named reviewer sign-offs, disabled distribution lockbox, release authority attestation controls, evidence-room recipient/access-log/provider-adapter controls, provider security review readiness, and procurement evidence routing. These controls produce audited synthetic pilot evidence only and do not authorize public release, external distribution, legal claims, customer proof, advertising claims, security approval, procurement approval, BAA/DPA execution, production use, live integration, or clinical care.
 
 ---
 
@@ -102,7 +102,7 @@ Current focus areas include:
 - fixture change review and quality gates
 - safety and governance infrastructure
 - deployment monitoring systems
-- public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, metadata-only evidence-room recipient attestations, access-log reconciliation, and provider-adapter contract readiness
+- public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, metadata-only evidence-room recipient attestations, access-log reconciliation, provider-adapter contract readiness, provider security review readiness, and procurement evidence routing
 
 ---
 

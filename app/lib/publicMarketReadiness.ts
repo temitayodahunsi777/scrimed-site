@@ -54,6 +54,10 @@ import {
   protectedProviderSecurityReviewPacketProofStackStatus,
   protectedProviderSecurityReviewStatus
 } from "./protectedProviderSecurityReviews";
+import {
+  protectedProcurementEvidenceRegistryPacketProofStackStatus,
+  protectedProcurementEvidenceRegistryStatus
+} from "./protectedProcurementEvidenceRegistry";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -640,6 +644,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews",
     protectedProviderSecurityReviewPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet",
+    protectedProcurementEvidenceRegistryRoute: "/pilot-workspace/access",
+    protectedProcurementEvidenceRegistryApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/procurement-evidence",
+    protectedProcurementEvidenceRegistryPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -678,6 +687,9 @@ export function getPublicMarketReadinessSummary() {
     protectedProviderSecurityReviewStatus,
     protectedProviderSecurityReviewPacketStatus:
       protectedProviderSecurityReviewPacketProofStackStatus,
+    protectedProcurementEvidenceRegistryStatus,
+    protectedProcurementEvidenceRegistryPacketStatus:
+      protectedProcurementEvidenceRegistryPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -741,6 +753,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected evidence-room provider adapter packets: ${summary.protectedEvidenceRoomProviderAdapterPacketStatus}
 - Protected provider security reviews: ${summary.protectedProviderSecurityReviewStatus}
 - Protected provider security review packets: ${summary.protectedProviderSecurityReviewPacketStatus}
+- Protected procurement evidence registry: ${summary.protectedProcurementEvidenceRegistryStatus}
+- Protected procurement evidence registry packets: ${summary.protectedProcurementEvidenceRegistryPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -784,6 +798,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected provider security review route: ${summary.protectedProviderSecurityReviewRoute}
 - Protected provider security review API: ${summary.protectedProviderSecurityReviewApiRoute}
 - Protected provider security review packet API: ${summary.protectedProviderSecurityReviewPacketApiRoute}
+- Protected procurement evidence registry route: ${summary.protectedProcurementEvidenceRegistryRoute}
+- Protected procurement evidence registry API: ${summary.protectedProcurementEvidenceRegistryApiRoute}
+- Protected procurement evidence registry packet API: ${summary.protectedProcurementEvidenceRegistryPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

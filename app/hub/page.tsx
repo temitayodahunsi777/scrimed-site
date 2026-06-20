@@ -68,6 +68,11 @@ const consoleViews = [
     summary: "Record no-PHI security, privacy, BAA/DPA, credential, incident-response, retention/residency, and rollback readiness metadata after provider adapter contracts are ready."
   },
   {
+    name: "Procurement Evidence Registry",
+    href: "/pilot-workspace/access",
+    summary: "Route security questionnaires, privacy questionnaires, vendor-risk, technical diligence, legal procurement, commercial, data-governance, and implementation evidence without storing confidential artifacts."
+  },
+  {
     name: "Pricing",
     href: "/pricing",
     summary: "Review SCRIMED pricing tiers, sales motion, value metrics, buyer route strategy, and commercial guardrails."

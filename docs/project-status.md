@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Procurement Evidence Registry Release
+
+- Added Protected Procurement Evidence Registry inside `/pilot-workspace/access` after Provider Security Review Workbench.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/procurement-evidence` for AAL2 metadata-only routing across security questionnaires, privacy questionnaires, legal procurement, vendor risk, technical diligence, commercial procurement, data governance, and implementation readiness.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet` for audited procurement evidence registry packet downloads.
+- Added `app/lib/protectedProcurementEvidenceRegistry.ts` with typed buyer audiences, procurement domains, evidence classes, risk tiers, required procurement controls, no-sensitive-artifact validation, provider-security-review readiness linkage, target audience expansion, competitive edge signals, safe workarounds, and packet generation.
+- Added `public.protected_procurement_evidence_registry` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-procurement-evidence-recorded` audit events, and runtime schema `2026-06-20.10`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, hub/home navigation, docs, and public smoke coverage with `aal2-procurement-evidence-registry-no-sensitive-artifacts` and `aal2-audited-procurement-evidence-registry-packets-no-sensitive-artifacts`.
+- Preserved the boundary: this layer stores procurement routing metadata only and keeps questionnaire answers, SOC reports, penetration-test reports, vulnerability reports, source contracts, signed legal artifacts, credentials, URLs, PHI, external distribution, procurement approval, production authorization, reimbursement assurance, compliance certification, and live clinical execution disabled.
+
 ## Latest Protected Provider Security Review Workbench Release
 
 - Added Protected Provider Security Review Workbench inside `/pilot-workspace/access` after Evidence Room Provider Adapter Contracts.

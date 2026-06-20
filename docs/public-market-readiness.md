@@ -37,6 +37,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected evidence-room provider adapter packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`
 - Protected provider security review API: `/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews`
 - Protected provider security review packet API: `/api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet`
+- Protected procurement evidence registry API: `/api/pilot-workspaces/{workspaceSlug}/procurement-evidence`
+- Protected procurement evidence registry packet API: `/api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -55,6 +57,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 evidence-room access-log reconciliation that records externally retained log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review while raw logs, recipient identifiers, addresses, device identifiers, and export approval remain external.
 - Protected AAL2 evidence-room provider adapter contracts that record externally retained provider contract references, adapter design references, audit-log import stub labels, supported summary formats, verification cadence, and provider risk tier while provider credentials, URLs, tokens, raw logs, sensitive artifacts, live integration approval, and export approval remain external.
 - Protected AAL2 provider security reviews that record security, privacy, BAA/DPA, credential-handling, incident-response, retention/residency, vendor-risk, and go-live rollback readiness metadata while signed legal artifacts, SOC reports, security questionnaires, credentials, PHI, and production authorization remain external.
+- Protected AAL2 procurement evidence registry that routes buyer-specific diligence evidence across security questionnaires, privacy questionnaires, legal procurement, vendor risk, technical diligence, commercial procurement, data governance, and implementation readiness while confidential questionnaires, SOC reports, penetration-test reports, signed legal artifacts, credentials, PHI, and external distribution remain external.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
 - Protected AAL2 release authority attestations that link ready disabled lockboxes to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata while release remains disabled.
@@ -104,6 +107,8 @@ Protected evidence-room provider adapter records are metadata-only references to
 
 Protected provider security review records are metadata-only readiness references to externally retained security, privacy, BAA/DPA, credential, incident-response, retention/residency, vendor-risk, and rollback review. `provider-security-review-ready-not-approval` is not security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, production authorization, live integration approval, reimbursement assurance, clinical validation, or live clinical execution authority.
 
+Protected procurement evidence registry records are metadata-only routing references for buyer diligence. `procurement-evidence-routing-ready-not-approval` is not procurement approval, security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, public release approval, external distribution approval, production authorization, reimbursement assurance, clinical validation, or live clinical execution authority.
+
 ## Next Build
 
-Add customer-ready security questionnaire response registry and procurement evidence routing without storing confidential questionnaires, SOC reports, penetration-test reports, credentials, PHI, signed legal artifacts, or sensitive customer documents in SCRIMED.
+Add partner/channel readiness and global buyer localization packs that map provider, payer, government, research, employer, channel-partner, investor, and board audiences to region-specific procurement needs while keeping legal, compliance, security, privacy, reimbursement, and clinical execution approvals externally retained.

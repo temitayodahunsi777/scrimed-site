@@ -109,6 +109,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews`
 - `POST /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews`
 - `GET /api/pilot-workspaces/{workspaceSlug}/provider-security-reviews/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence`
+- `POST /api/pilot-workspaces/{workspaceSlug}/procurement-evidence`
+- `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -428,6 +431,21 @@ Safe operating pattern:
 - Record only bounded no-PHI owner labels, review path labels, review cadence, risk tier, linked provider adapter ids, retained blockers, and review metadata in SCRIMED.
 - Download the audited provider security review packet only after the write-before-release audit event commits.
 - Treat provider security review readiness as a pre-production diligence posture. It is not security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, production authorization, live integration approval, or live clinical execution authority.
+
+## Procurement Evidence Registry
+
+Protected workspaces now expose `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/procurement-evidence` plus `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet`.
+
+Procurement evidence registry records sit after provider security reviews. They route metadata for security questionnaires, privacy questionnaires, legal procurement, vendor risk, technical diligence, commercial procurement, data governance, and implementation readiness across provider, payer, government, research, employer, channel-partner, investor, and board audiences. The highest workflow state is `procurement-evidence-routing-ready-not-approval`; external distribution, questionnaire answer storage, report storage, credential storage, PHI processing, procurement approval, and live clinical execution remain disabled.
+
+The database stores records in `public.protected_procurement_evidence_registry` with select-only RLS for authenticated AAL2 tenant members. Writes go through `record_protected_procurement_evidence`, require tenant-admin, pilot-lead, or reviewer role, validate linked provider security reviews, and append `protected-procurement-evidence-recorded` audit events. Packet downloads use the existing write-before-release proof-packet audit path.
+
+Safe operating pattern:
+
+- Keep questionnaires, SOC reports, penetration-test reports, vulnerability reports, signed legal artifacts, legal opinions, source contracts, confidential answers, credentials, URLs, tokens, PHI, customer permissions, and production approvals in qualified external systems.
+- Record only bounded target-audience, procurement-domain, evidence-class, external-system-label, non-secret routing locator, cadence, risk tier, linked provider security review ids, retained blockers, and metadata in SCRIMED.
+- Download the audited procurement evidence registry packet only after the write-before-release audit event commits.
+- Treat procurement evidence readiness as a buyer-diligence routing posture. It is not procurement approval, security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, public release approval, external distribution approval, production authorization, or live clinical execution authority.
 
 ## Sales Command Center Linkage
 
