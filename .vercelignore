@@ -1,0 +1,13 @@
+.git
+.next
+.next-quarantine-*/
+.tools
+.vercel
+node_modules
+out
+coverage
+*.log
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
