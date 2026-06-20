@@ -502,6 +502,20 @@ export const protectedPilotApiContracts = [
       "Download an audited protected external approval evidence linkage packet after committing the packet release event while retaining no-PHI metadata-only storage and all qualified external release blockers."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/release-decisions",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI claim registry attestation + rate limit",
+    purpose:
+      "Inspect or record bounded no-PHI versioned claim registry release decisions that require external approval evidence references before a claim can become ready for qualified release review. This does not approve public distribution, legal claims, advertising substantiation, securities claims, customer references, clinical validation, production authorization, or live clinical execution."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/release-decisions/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited protected release decision claim registry packet after committing the packet release event while retaining all public-release, legal, finance, advertising, customer, compliance, production, and clinical execution blockers."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",

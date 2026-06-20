@@ -32,6 +32,7 @@ import ProtectedFinanceMethodologyPanel from "./ProtectedFinanceMethodologyPanel
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
+import ProtectedReleaseDecisionPanel from "./ProtectedReleaseDecisionPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
@@ -68,6 +69,10 @@ import type {
   ProtectedExternalApprovalEvidenceInput,
   ProtectedExternalApprovalEvidenceWorkflow
 } from "../lib/protectedExternalApprovalEvidence";
+import type {
+  ProtectedReleaseDecisionInput,
+  ProtectedReleaseDecisionWorkflow
+} from "../lib/protectedReleaseDecisionWorkflow";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -170,6 +175,16 @@ type ProtectedExternalApprovalEvidenceResponse = {
   referenceId?: string;
   records?: unknown[];
   workflow?: ProtectedExternalApprovalEvidenceWorkflow;
+  financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
+  errors?: string[];
+  error?: { message?: string };
+};
+
+type ProtectedReleaseDecisionResponse = {
+  decisionId?: string;
+  records?: unknown[];
+  workflow?: ProtectedReleaseDecisionWorkflow;
+  externalWorkflow?: ProtectedExternalApprovalEvidenceWorkflow;
   financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
   errors?: string[];
   error?: { message?: string };
@@ -278,6 +293,12 @@ export default function ProtectedPilotAccess({
     protectedExternalApprovalEvidencePacketStatus,
     setProtectedExternalApprovalEvidencePacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [protectedReleaseDecisionWorkflow, setProtectedReleaseDecisionWorkflow] =
+    useState<ProtectedReleaseDecisionWorkflow | null>(null);
+  const [protectedReleaseDecisionStatus, setProtectedReleaseDecisionStatus] =
+    useState<"idle" | "saving">("idle");
+  const [protectedReleaseDecisionPacketStatus, setProtectedReleaseDecisionPacketStatus] =
+    useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -326,6 +347,12 @@ export default function ProtectedPilotAccess({
     setProtectedExternalApprovalEvidenceWorkflow(null);
     setProtectedExternalApprovalEvidenceBusyDomainId(null);
     setProtectedExternalApprovalEvidencePacketStatus("idle");
+  }, []);
+
+  const resetProtectedReleaseDecision = useCallback(() => {
+    setProtectedReleaseDecisionWorkflow(null);
+    setProtectedReleaseDecisionStatus("idle");
+    setProtectedReleaseDecisionPacketStatus("idle");
   }, []);
 
   useEffect(() => {
@@ -382,6 +409,7 @@ export default function ProtectedPilotAccess({
         resetProtectedBoardScorecards();
         resetProtectedFinanceMethodology();
         resetProtectedExternalApprovalEvidence();
+        resetProtectedReleaseDecision();
         setStatus("signed-out");
         return;
       }
@@ -435,6 +463,7 @@ export default function ProtectedPilotAccess({
         resetProtectedBoardScorecards();
         resetProtectedFinanceMethodology();
         resetProtectedExternalApprovalEvidence();
+        resetProtectedReleaseDecision();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -490,6 +519,7 @@ export default function ProtectedPilotAccess({
       resetProtectedBoardScorecards();
       resetProtectedFinanceMethodology();
       resetProtectedExternalApprovalEvidence();
+      resetProtectedReleaseDecision();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -506,7 +536,8 @@ export default function ProtectedPilotAccess({
           loadProtectedMetricTrends(activeSession, nextWorkspaces[0]),
           loadProtectedBoardScorecards(activeSession, nextWorkspaces[0]),
           loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0]),
-          loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0])
+          loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0]),
+          loadProtectedReleaseDecision(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -770,6 +801,35 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedReleaseDecision(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/release-decisions`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedReleaseDecisionResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected release decisions could not be loaded.");
+        return;
+      }
+
+      setProtectedReleaseDecisionWorkflow(body.workflow ?? null);
+      if (body.externalWorkflow) {
+        setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+      }
+      if (body.financeWorkflow) {
+        setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -788,6 +848,7 @@ export default function ProtectedPilotAccess({
     resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
     resetProtectedOperatorMetrics,
+    resetProtectedReleaseDecision,
     supabase
   ]);
 
@@ -963,6 +1024,7 @@ export default function ProtectedPilotAccess({
     resetProtectedBoardScorecards();
     resetProtectedFinanceMethodology();
     resetProtectedExternalApprovalEvidence();
+    resetProtectedReleaseDecision();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -991,7 +1053,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedMetricTrends(session, workspace),
       refreshProtectedBoardScorecards(session, workspace),
       refreshProtectedFinanceMethodology(session, workspace),
-      refreshProtectedExternalApprovalEvidence(session, workspace)
+      refreshProtectedExternalApprovalEvidence(session, workspace),
+      refreshProtectedReleaseDecision(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1183,6 +1246,28 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedExternalApprovalEvidenceWorkflow(body.workflow ?? null);
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+  }
+
+  async function refreshProtectedReleaseDecision(activeSession: Session, workspace: PilotWorkspaceRecord) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/release-decisions`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedReleaseDecisionResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected release decisions could not be loaded.");
+      return;
+    }
+
+    setProtectedReleaseDecisionWorkflow(body.workflow ?? null);
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
@@ -1920,6 +2005,7 @@ export default function ProtectedPilotAccess({
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedReleaseDecision(session, selectedWorkspace);
     setMessage(
       `Protected external approval evidence reference recorded${
         body.referenceId ? ` with reference id ${body.referenceId}` : ""
@@ -1960,6 +2046,86 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected external approval evidence packet downloaded and its audit event was committed.");
+  }
+
+  async function recordProtectedReleaseDecision(input: ProtectedReleaseDecisionInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedReleaseDecisionStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/release-decisions`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedReleaseDecisionResponse;
+    setProtectedReleaseDecisionStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected release decision could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedReleaseDecisionWorkflow(body.workflow ?? protectedReleaseDecisionWorkflow);
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected release decision recorded${
+        body.decisionId ? ` with decision id ${body.decisionId}` : ""
+      }.`
+    );
+  }
+
+  async function downloadProtectedReleaseDecisionPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedReleaseDecisionPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/release-decisions/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedReleaseDecisionPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(body.error?.message ?? "The protected release decision packet could not be downloaded.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-release-decision-claim-registry.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected release decision packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -2278,6 +2444,15 @@ export default function ProtectedPilotAccess({
             onRecordReference={recordProtectedExternalApprovalEvidenceReference}
             packetBusy={protectedExternalApprovalEvidencePacketStatus === "downloading"}
             workflow={protectedExternalApprovalEvidenceWorkflow}
+          />
+
+          <ProtectedReleaseDecisionPanel
+            busy={protectedReleaseDecisionStatus === "saving"}
+            externalWorkflow={protectedExternalApprovalEvidenceWorkflow}
+            onDownloadPacket={downloadProtectedReleaseDecisionPacket}
+            onRecordDecision={recordProtectedReleaseDecision}
+            packetBusy={protectedReleaseDecisionPacketStatus === "downloading"}
+            workflow={protectedReleaseDecisionWorkflow}
           />
 
           <BuyerPilotRoomPanel

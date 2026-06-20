@@ -225,6 +225,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected external approval evidence packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedReleaseDecisions !==
+    "aal2-qualified-release-decision-workflow-no-phi"
+  ) {
+    throw new Error("product console missing protected release decision workflow proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedReleaseDecisionPackets !==
+    "aal2-audited-release-decision-claim-registry-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected release decision packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -744,6 +758,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected external approval evidence packet API route.");
   }
 
+  if (
+    body.protectedReleaseDecisionStatus !==
+    "aal2-qualified-release-decision-workflow-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected release decision workflow status.");
+  }
+
+  if (
+    body.protectedReleaseDecisionApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/release-decisions"
+  ) {
+    throw new Error("Public Market Readiness missing protected release decision API route.");
+  }
+
+  if (
+    body.protectedReleaseDecisionPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/release-decisions/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected release decision packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1038,6 +1073,29 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/external-approval-evidence/packet`,
   "Protected External Approval Evidence packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/release-decisions`,
+  "Protected Release Decisions protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/release-decisions`,
+  "Protected Release Decisions write protected API",
+  {
+    releaseAudience: "buyer-diligence",
+    claimCategory: "governance",
+    claimVersion: "claims-v1.0.0",
+    claimText: "SCRIMED provides governed synthetic pilot evidence for healthcare workflow intelligence review.",
+    distributionChannel: "buyer-data-room",
+    externalApprovalEvidenceRecordIds: [],
+    attestation: "release-decision-claim-registry-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke no-phi release decision"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/release-decisions/packet`,
+  "Protected Release Decisions packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

@@ -85,6 +85,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
 - `POST /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
 - `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions`
+- `POST /api/pilot-workspaces/{workspaceSlug}/release-decisions`
+- `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -104,6 +107,19 @@ Safe operating pattern:
 - Record only non-secret reference metadata in SCRIMED.
 - Download the audited linkage packet for diligence after the write-before-release audit event commits.
 - Treat `ready-for-qualified-release-review-not-release-authority` as a review posture only, never as approval to release claims, securities materials, customer references, clinical workflows, or production access.
+
+## Release Decision Workflow
+
+`/pilot-workspace/access` now includes Protected Release Decision Workflow immediately after External Approval Evidence Linkage. Tenant admins, pilot leads, and reviewers can record no-PHI versioned claim registry decisions for buyer diligence, investor data rooms, public relations, marketing site language, sales collateral, internal board review, or customer case-study readiness.
+
+Release decisions consume the latest external approval evidence references and compute whether all required approval domains are linked. A decision can reach `ready-for-qualified-release-review-not-release-authority` only when finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission metadata references are complete.
+
+Safe operating pattern:
+
+- Keep exact approval artifacts and claim sign-offs in qualified external systems.
+- Record only bounded claim text, claim version, audience, channel label, evidence ids, and no-PHI review metadata in SCRIMED.
+- Download the audited claim registry packet only after the write-before-release audit event commits.
+- Treat release-review readiness as an internal control state. It is not legal approval, public release approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
 
 ## Pilot Demo Readiness Command Center
 

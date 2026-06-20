@@ -21,6 +21,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected finance methodology packet API: `/api/pilot-workspaces/{workspaceSlug}/finance-methodology/packet`
 - Protected external approval evidence API: `/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
 - Protected external approval evidence packet API: `/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet`
+- Protected release decision API: `/api/pilot-workspaces/{workspaceSlug}/release-decisions`
+- Protected release decision packet API: `/api/pilot-workspaces/{workspaceSlug}/release-decisions/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -36,6 +38,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 board scorecards that package rolling-quarter trend evidence, finance-allocation readiness, buyer-segment cohorts, competitive edge, and agent improvement priorities.
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
+- Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.
@@ -62,6 +65,10 @@ Protected board scorecards are internal operating scorecards only. They package 
 
 Protected finance methodology gates are internal readiness attestations only. They show what has been acknowledged and what remains blocked before external use. They do not create audited finance approval, legal approval, securities approval, advertising claim substantiation, reimbursement assurance, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
 
+Protected external approval evidence references are metadata-only links to externally retained approval artifacts. They do not store sensitive documents, legal opinions, audited financial statements, signed BAAs/DPAs, customer permission artifacts, advertising substantiation, clinical validation, compliance certification, production authorization, or live clinical execution approval.
+
+Protected release decisions are versioned claim registry readiness records only. `ready-for-qualified-release-review-not-release-authority` is not public release approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
+
 ## Next Build
 
-Add qualified external-use approval evidence vault linkage and versioned finance-reviewed methodology policies once counsel, finance, privacy, security, communications, and customer-specific evidence retention are approved.
+Add final named reviewer sign-off packets once qualified external reviewers approve exact artifacts, claim wording, audience, and distribution controls outside SCRIMED.

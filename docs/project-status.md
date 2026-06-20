@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Release Decision Workflow Release
+
+- Added protected Release Decision Workflow inside `/pilot-workspace/access` after External Approval Evidence Linkage.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/release-decisions` for AAL2 no-PHI versioned claim registry release decisions across buyer diligence, investor data room, PR, marketing site, sales collateral, board, and case-study audiences.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions/packet` for audited release decision claim registry packet downloads.
+- Added `app/lib/protectedReleaseDecisionWorkflow.ts` with typed audiences, claim categories, validation, approval-domain coverage, release authorities, workflow derivation, safe workarounds, and packet generation.
+- Added `public.protected_release_decisions` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-release-decision-recorded` audit events, and runtime schema `2026-06-20.2`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-qualified-release-decision-workflow-no-phi` and `aal2-audited-release-decision-claim-registry-packets-no-phi`.
+- Preserved the boundary: this layer can mark claims ready for qualified release review only. It does not approve public release, legal claims, audited financial reporting, securities materials, customer references, advertising substantiation, clinical validation, compliance certification, production authorization, or live clinical execution.
+
 ## Latest Protected External Approval Evidence Linkage Release
 
 - Added protected External Approval Evidence Linkage inside `/pilot-workspace/access` after Protected Finance Methodology Gates.

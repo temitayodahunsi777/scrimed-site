@@ -126,6 +126,10 @@ import {
   protectedExternalApprovalEvidencePacketProofStackStatus,
   protectedExternalApprovalEvidenceStatus
 } from "./protectedExternalApprovalEvidence";
+import {
+  protectedReleaseDecisionPacketProofStackStatus,
+  protectedReleaseDecisionWorkflowStatus
+} from "./protectedReleaseDecisionWorkflow";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -726,6 +730,10 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedExternalApprovalEvidenceApiRoute,
     protectedExternalApprovalEvidencePacketApiRoute:
       publicMarketReadinessSummary.protectedExternalApprovalEvidencePacketApiRoute,
+    protectedReleaseDecisionRoute: publicMarketReadinessSummary.protectedReleaseDecisionRoute,
+    protectedReleaseDecisionApiRoute: publicMarketReadinessSummary.protectedReleaseDecisionApiRoute,
+    protectedReleaseDecisionPacketApiRoute:
+      publicMarketReadinessSummary.protectedReleaseDecisionPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -874,6 +882,8 @@ export function getProductConsoleSummary() {
       protectedExternalApprovalEvidence: protectedExternalApprovalEvidenceStatus,
       protectedExternalApprovalEvidencePackets:
         protectedExternalApprovalEvidencePacketProofStackStatus,
+      protectedReleaseDecisions: protectedReleaseDecisionWorkflowStatus,
+      protectedReleaseDecisionPackets: protectedReleaseDecisionPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -945,8 +955,8 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions and the AAL2 buyer-demo QA harness to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, or production connector step.",
-    updated: "2026-06-19"
+      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+    updated: "2026-06-20"
   };
 }
 
@@ -1042,6 +1052,9 @@ export function getProductReadinessBrief() {
     `Protected external approval evidence: ${summary.protectedExternalApprovalEvidenceRoute}`,
     `Protected external approval evidence API: ${summary.protectedExternalApprovalEvidenceApiRoute}`,
     `Protected external approval evidence packet API: ${summary.protectedExternalApprovalEvidencePacketApiRoute}`,
+    `Protected release decisions: ${summary.protectedReleaseDecisionRoute}`,
+    `Protected release decisions API: ${summary.protectedReleaseDecisionApiRoute}`,
+    `Protected release decision packet API: ${summary.protectedReleaseDecisionPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

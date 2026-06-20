@@ -22,6 +22,10 @@ import {
   protectedExternalApprovalEvidencePacketProofStackStatus,
   protectedExternalApprovalEvidenceStatus
 } from "./protectedExternalApprovalEvidence";
+import {
+  protectedReleaseDecisionPacketProofStackStatus,
+  protectedReleaseDecisionWorkflowStatus
+} from "./protectedReleaseDecisionWorkflow";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -568,6 +572,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence",
     protectedExternalApprovalEvidencePacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet",
+    protectedReleaseDecisionRoute: "/pilot-workspace/access",
+    protectedReleaseDecisionApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/release-decisions",
+    protectedReleaseDecisionPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/release-decisions/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -583,6 +592,8 @@ export function getPublicMarketReadinessSummary() {
     protectedExternalApprovalEvidenceStatus,
     protectedExternalApprovalEvidencePacketStatus:
       protectedExternalApprovalEvidencePacketProofStackStatus,
+    protectedReleaseDecisionStatus: protectedReleaseDecisionWorkflowStatus,
+    protectedReleaseDecisionPacketStatus: protectedReleaseDecisionPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -605,7 +616,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add qualified release decision workflow and versioned claim registry approvals once external reviewers approve metadata-retention policy, artifacts, audience, and distribution controls.",
+      "Add final named reviewer sign-off packets once qualified external reviewers approve exact artifacts, claim wording, audience, and distribution controls outside SCRIMED.",
     updated: "2026-06-20"
   };
 }
@@ -630,6 +641,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected finance methodology packets: ${summary.protectedFinanceMethodologyPacketStatus}
 - Protected external approval evidence: ${summary.protectedExternalApprovalEvidenceStatus}
 - Protected external approval evidence packets: ${summary.protectedExternalApprovalEvidencePacketStatus}
+- Protected release decisions: ${summary.protectedReleaseDecisionStatus}
+- Protected release decision packets: ${summary.protectedReleaseDecisionPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -649,6 +662,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected external approval evidence route: ${summary.protectedExternalApprovalEvidenceRoute}
 - Protected external approval evidence API: ${summary.protectedExternalApprovalEvidenceApiRoute}
 - Protected external approval evidence packet API: ${summary.protectedExternalApprovalEvidencePacketApiRoute}
+- Protected release decision route: ${summary.protectedReleaseDecisionRoute}
+- Protected release decision API: ${summary.protectedReleaseDecisionApiRoute}
+- Protected release decision packet API: ${summary.protectedReleaseDecisionPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis
