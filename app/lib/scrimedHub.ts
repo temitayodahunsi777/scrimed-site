@@ -57,6 +57,7 @@ import {
 } from "./enterpriseReadiness";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getGlobalPartnerLocalizationSummary } from "./globalPartnerLocalization";
+import { getClinicalAuthorityReadinessSummary } from "./clinicalAuthorityReadiness";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
 import {
@@ -140,6 +141,14 @@ export const hubModules: HubModule[] = [
     status: "design",
     owner: "Global partnerships and market activation",
     objective: "Map regions, buyer packs, partner channels, procurement paths, and retained approval gates."
+  },
+  {
+    name: "Clinical Authority Readiness",
+    route: "/clinical-authority-readiness",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Clinical governance, legal, privacy, security, and operations",
+    objective: "Prepare hard gates for live care, PHI, legal, regional, reimbursement, security certification, and production authorization."
   }
 ];
 
@@ -182,6 +191,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
   { name: "Attribution analytics", value: "source-to-pilot cohorts active", tone: "good" },
+  { name: "Clinical authority", value: "hard gates contained with workarounds", tone: "good" },
   { name: "Global reach", value: "region and buyer localization packs active", tone: "good" },
   { name: "Source intelligence", value: "public platform signals encoded", tone: "good" },
   { name: "Persistent Agent Workspace", value: "work-order proof layer active", tone: "good" },
@@ -305,6 +315,7 @@ export const hubRoutes = [
   "/demos",
   "/pricing",
   "/market-activation",
+  "/clinical-authority-readiness",
   "/global-reach",
   "/sales-attribution",
   "/attribution-analytics",
@@ -409,6 +420,8 @@ export const hubRoutes = [
   "/api/commercial/pricing",
   "/api/competitive-edge",
   "/api/market-activation",
+  "/api/clinical-authority-readiness",
+  "/api/clinical-authority-readiness/brief",
   "/api/global-reach",
   "/api/global-reach/brief",
   "/api/sales-attribution",
@@ -518,6 +531,7 @@ export function getHubSummary() {
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
+  const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
 
@@ -546,6 +560,7 @@ export function getHubSummary() {
     enterpriseReadinessSummary,
     attributionAnalyticsSummary,
     globalPartnerLocalizationSummary,
+    clinicalAuthorityReadinessSummary,
     trustSafetyOperationsSummary,
     qaEvidenceLedger,
     agentEvaluationWorkspaceSummary,

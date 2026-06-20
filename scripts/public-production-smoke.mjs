@@ -109,6 +109,32 @@ function requireGlobalReachBoundary(label, response) {
   }
 }
 
+function requireClinicalAuthorityBoundary(label, response) {
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const regulatoryAuthority = response.headers.get("x-scrimed-regulatory-authority");
+  const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (regulatoryAuthority !== "external-approval-required") {
+    throw new Error(`${label} expected x-scrimed-regulatory-authority external-approval-required but received ${regulatoryAuthority}.`);
+  }
+
+  if (reimbursementAuthority !== "no-reimbursement-guarantee") {
+    throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -128,6 +154,20 @@ async function checkProductConsole() {
 
   if (body.proofStack?.passkeyTenantAuthentication !== "passkey-or-magic-link-plus-aal2") {
     throw new Error("product console missing passkey tenant authentication proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.clinicalAuthorityReadiness !==
+    "clinical-authority-readiness-hard-gates-contained"
+  ) {
+    throw new Error("product console missing clinical authority readiness proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.clinicalAuthorityReadinessBrief !==
+    "clinical-authority-readiness-brief-no-authority-claim"
+  ) {
+    throw new Error("product console missing clinical authority readiness brief proof-stack posture.");
   }
 
   if (body.proofStack?.clinicalCareActivation !== "clinical-care-activation-readiness-gated") {
@@ -1179,6 +1219,73 @@ async function checkGlobalReach() {
   console.log("pass global reach");
 }
 
+async function checkClinicalAuthorityReadiness() {
+  const result = await request("/api/clinical-authority-readiness");
+  requireStatus("Clinical Authority Readiness", result.response.status, 200);
+  requireContentType("Clinical Authority Readiness", result.response, "application/json");
+  requireClinicalAuthorityBoundary("Clinical Authority Readiness", result.response);
+  const body = requireJson("Clinical Authority Readiness", result.body);
+
+  if (body.service !== "scrimed-clinical-authority-readiness") {
+    throw new Error(`Clinical Authority Readiness expected scrimed-clinical-authority-readiness but received ${body.service}.`);
+  }
+
+  if (body.status !== "clinical-authority-readiness-hard-gates-contained") {
+    throw new Error(`Clinical Authority Readiness expected hard-gates-contained status but received ${body.status}.`);
+  }
+
+  if (body.authorizationStatus !== "not-authorized-live-clinical-care") {
+    throw new Error("Clinical Authority Readiness must remain not authorized for live clinical care.");
+  }
+
+  if (body.phiStatus !== "not-authorized-production-phi-processing") {
+    throw new Error("Clinical Authority Readiness must remain not authorized for production PHI processing.");
+  }
+
+  if (body.reimbursementStatus !== "no-reimbursement-guarantee") {
+    throw new Error("Clinical Authority Readiness must preserve no reimbursement guarantee.");
+  }
+
+  if (body.securityCertificationStatus !== "not-security-certified") {
+    throw new Error("Clinical Authority Readiness must preserve not-security-certified posture.");
+  }
+
+  if (!Array.isArray(body.domains) || body.domains.length < 8) {
+    throw new Error("Clinical Authority Readiness expected at least eight authority domains.");
+  }
+
+  if (!Array.isArray(body.boundaryResolutions) || body.boundaryResolutions.length < 7) {
+    throw new Error("Clinical Authority Readiness expected boundary resolutions.");
+  }
+
+  if (!body.boundaryResolutions.every((resolution) => resolution.status === "contained-with-workaround")) {
+    throw new Error("Clinical Authority Readiness expected all boundary resolutions contained with workarounds.");
+  }
+
+  if (!Array.isArray(body.sourceReferences) || body.sourceReferences.length < 6) {
+    throw new Error("Clinical Authority Readiness expected source references.");
+  }
+
+  const brief = await request("/api/clinical-authority-readiness/brief");
+  requireStatus("Clinical Authority Readiness brief", brief.response.status, 200);
+  requireContentType("Clinical Authority Readiness brief", brief.response, "text/markdown");
+  requireClinicalAuthorityBoundary("Clinical Authority Readiness brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Clinical Authority Readiness Brief")) {
+    throw new Error("Clinical Authority Readiness brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not legal advice")) {
+    throw new Error("Clinical Authority Readiness brief missing legal boundary.");
+  }
+
+  if (!brief.body.text.includes("not live clinical authorization")) {
+    throw new Error("Clinical Authority Readiness brief missing clinical authority boundary.");
+  }
+
+  console.log("pass clinical authority readiness");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -1208,9 +1315,11 @@ await checkHtml("/sales-operations");
 await checkHtml("/competitive-edge");
 await checkHtml("/pilot-deal-room");
 await checkHtml("/qa-evidence");
+await checkHtml("/clinical-authority-readiness");
 await checkHtml("/clinical-care-activation");
 await checkHtml("/public-market-readiness");
 await checkHtml("/global-reach");
+await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
 await checkGlobalReach();

@@ -58,6 +58,11 @@ const homepageDecisionPaths = [
     summary: "Review claims controls, privacy posture, protected workspaces, auditability, and diligence gates."
   },
   {
+    audience: "Clinical authority reviewers",
+    route: "/clinical-authority-readiness",
+    summary: "Review retained gates for live care, PHI processing, legal approval, regional approval, reimbursement, security certification, and production clinical authorization."
+  },
+  {
     audience: "Procurement and vendor-risk",
     route: "/pilot-workspace/access",
     summary: "Review metadata-only routing for questionnaires, SOC and pentest evidence, legal artifacts, vendor-risk, implementation, and buyer diligence without storing sensitive artifacts."
@@ -86,6 +91,7 @@ const readinessSignals = [
   { label: "Demos", value: "/demos" },
   { label: "Programs", value: "/pilots" },
   { label: "Pricing", value: "/api/commercial/pricing" },
+  { label: "Authority", value: "/api/clinical-authority-readiness" },
   { label: "Global", value: "/api/global-reach" },
   { label: "Operations", value: "/api/operations/readiness" },
   { label: "Trust Center", value: "/api/enterprise-readiness" },
@@ -135,6 +141,7 @@ export default function Home() {
             <Link href="/demos">Demos</Link>
             <Link href="/pilots">Programs</Link>
             <Link href="/pricing">Pricing</Link>
+            <Link href="/clinical-authority-readiness">Authority</Link>
             <Link href="/global-reach">Global</Link>
             <Link href="/trust-center">Trust Center</Link>
             <Link href="/pilot">Pilot</Link>
@@ -156,6 +163,7 @@ export default function Home() {
               <Link className="secondary-action" href="/product">Open Product Console</Link>
               <Link className="secondary-action" href="/pilot-deal-room">Open Deal Room</Link>
               <Link className="secondary-action" href="/pricing">Review Pricing</Link>
+              <Link className="secondary-action" href="/clinical-authority-readiness">Review Authority Readiness</Link>
               <Link className="secondary-action" href="/global-reach">Review Global Reach</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
               <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
@@ -199,6 +207,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-muted" /> Clinical connectors remain gated
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Clinical authority hard gates mapped
               </div>
               <div>
                 <span className="trace-dot" /> Global operating doctrine codified

@@ -69,6 +69,14 @@ export default function ProductConsolePage() {
           <strong>{summary.clinicalCareActivationGateCount}</strong>
         </article>
         <article>
+          <span>Authority domains</span>
+          <strong>{summary.clinicalAuthorityDomainCount}</strong>
+        </article>
+        <article>
+          <span>Authority fixes</span>
+          <strong>{summary.clinicalAuthorityBoundaryResolutionCount}</strong>
+        </article>
+        <article>
           <span>Clinical blocked</span>
           <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
         </article>
@@ -156,6 +164,38 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED clinical authority readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical authority readiness</p>
+          <h2>Hard gates for live care, PHI, legal approval, regional approval, reimbursement, security certification, and production authorization are now explicit.</h2>
+          <p className="section-copy">{summary.clinicalAuthorityReadinessSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.clinicalAuthorityReadinessRoute}>
+              Open Authority Readiness
+            </Link>
+            <a className="secondary-action" href={summary.clinicalAuthorityReadinessBriefRoute}>
+              Download Authority Brief
+            </a>
+          </div>
+        </div>
+        {summary.clinicalAuthorityReadinessSummary.domains.slice(0, 5).map((domain) => (
+          <article className="module-row" key={domain.key}>
+            <div>
+              <span>{domain.status}</span>
+              <h2>{domain.name}</h2>
+            </div>
+            <p>{domain.currentBoundary}</p>
+            <div>
+              <strong>{domain.retainedGate}</strong>
+              <ul className="compact-list">
+                <li>{domain.safeWorkaround}</li>
+                <li>Proof routes: {domain.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED buyer and investor navigation paths">

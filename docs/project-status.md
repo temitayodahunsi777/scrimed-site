@@ -2,6 +2,15 @@
 
 Updated: 2026-06-20
 
+## Latest Clinical Authority Readiness Release
+
+- Added `/clinical-authority-readiness`, `/api/clinical-authority-readiness`, and `/api/clinical-authority-readiness/brief` as SCRIMED's hard-gate authority readiness layer.
+- Added `app/lib/clinicalAuthorityReadiness.ts` with authority domains for live clinical care authority, PHI/ePHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, production clinical authorization, and certified health IT connector approval.
+- Added boundary-resolution workarounds for live care, PHI, legal approval, regional approval, reimbursement certainty, security certification, and production clinical authorization while retaining signed external approval gates.
+- Added evidence-pack routing into protected no-PHI clinical activation dossier, external approval evidence, provider security review, procurement evidence registry, and public authority readiness brief surfaces.
+- Updated Product Console, Hub, homepage, Clinical Care Activation, README, roadmap, and public smoke checks with `clinical-authority-readiness-hard-gates-contained` and `clinical-authority-readiness-brief-no-authority-claim`.
+- Preserved the boundary: this layer prepares evidence and operating paths only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, or live clinical-care authority.
+
 ## Latest Global Partner And Buyer Localization Release
 
 - Added `/global-reach`, `/api/global-reach`, and `/api/global-reach/brief` as SCRIMED's Global Partner and Buyer Localization Layer.

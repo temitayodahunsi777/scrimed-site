@@ -14,6 +14,8 @@ Protected release governance: `/pilot-workspace/access` includes no-PHI finance 
 
 Global reach boundary: `/global-reach`, `/api/global-reach`, and `/api/global-reach/brief` expose region focus, buyer localization packs, partner channels, procurement questions, competitive edge, and contained boundary workarounds for global expansion. This is localization and go-to-market readiness only. It is not legal advice, regional regulatory approval, public-sector procurement approval, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
 
+Clinical authority boundary: `/clinical-authority-readiness`, `/api/clinical-authority-readiness`, and `/api/clinical-authority-readiness/brief` expose hard-gate preparation for live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector acceptance, and production clinical authorization. This is readiness only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, or live clinical-care authority.
+
 ---
 
 ## Core Vision
@@ -106,6 +108,7 @@ Current focus areas include:
 - deployment monitoring systems
 - public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, metadata-only evidence-room recipient attestations, access-log reconciliation, provider-adapter contract readiness, provider security review readiness, and procurement evidence routing
 - global partner and buyer localization with region packs, audience packs, partner channels, procurement questions, competitive edge, and retained legal/privacy/clinical gates
+- clinical authority readiness with hard-gate preparation for live care, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production authorization
 
 ---
 
@@ -149,6 +152,7 @@ Core enterprise evaluation surfaces:
 - `/demos` - executable buyer demos with guided proof paths and retained production exclusions
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
+- `/clinical-authority-readiness` - hard-gate readiness for live clinical care authority, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production clinical authorization
 - `/global-reach` - region focus, buyer localization packs, partner channels, procurement questions, and retained approval gates
 - `/operations` - company operations readiness, blockers, owners, fallbacks, and buyer route checklist
 - `/trust-center` - enterprise readiness domains, owners, evidence, required actions, launch gates, and external-review requirements
@@ -171,6 +175,8 @@ Core APIs:
 - `/api/demos`
 - `/api/pilots`
 - `/api/commercial/pricing`
+- `/api/clinical-authority-readiness`
+- `/api/clinical-authority-readiness/brief`
 - `/api/global-reach`
 - `/api/global-reach/brief`
 - `/api/operations/readiness`

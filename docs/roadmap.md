@@ -35,6 +35,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Buyer-ready demos and pilot programs bind executable proof to measurable outcomes, commercial scope, governance gates, and production exclusions.
 - Pilot Deal Room is the active commercial conversion gate from public product proof to Sales Operations, buyer-specific protected workspace provisioning, tenant-per-buyer lifecycle activation, production readiness, activation approvals, buyer evidence and signed controls diligence, secure evidence vault readiness, protected Buyer Pilot Room proof, audited packet release, and paid synthetic pilot.
 - Public Market Readiness is the active capital-efficiency gate for KPI definitions, unit economics, model-cost controls, compliance logs, customer proof, margin discipline, investor narrative, and financial/securities claim boundaries before external fundraising or board-scale reporting.
+- Clinical Authority Readiness is the active hard-gate preparation layer before live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector approval, or production clinical authorization.
 - Global Reach is the active region, buyer, partner, procurement, deployment, and localization gate before international outreach, partner claims, public-sector positioning, localized marketing, or regional production planning.
 - Protected Operator Metrics are the active AAL2 no-PHI capture gate for model cost, review time, delivery hours, proof-packet count, workflow volume, unit-economics discipline, and protected rollup inputs.
 - Protected Metric Rollups are the active AAL2 no-PHI board-operating gate for finance-reviewed snapshots, model-cost-per-workflow discipline, audited packet release, and external-use boundary control before any audited reporting or securities material.
@@ -59,6 +60,7 @@ Objective: Establish the foundational architecture, deployment surface, document
 Completed foundations:
 
 - Five executable product demos and four structured enterprise pilot programs
+- Clinical Authority Readiness with hard-gate domains, contained workarounds, source references, evidence-pack routing, and no-authority-claim brief
 - Nine-domain enterprise readiness and claims-control plane with downloadable diligence brief
 - Baseline browser response-security headers across application routes
 - Protected pilot workspace contract with Supabase Auth, Postgres row-level security, durable synthetic sessions, append-only audit events, and audited proof packets

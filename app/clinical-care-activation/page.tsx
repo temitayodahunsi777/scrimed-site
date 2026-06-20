@@ -29,6 +29,9 @@ export default function ClinicalCareActivationPage() {
           <a className="secondary-action" href={summary.apiRoute}>
             Inspect Activation API
           </a>
+          <Link className="secondary-action" href="/clinical-authority-readiness">
+            Authority Readiness
+          </Link>
           <Link className="secondary-action" href="/pilot-deal-room">
             Open Pilot Deal Room
           </Link>

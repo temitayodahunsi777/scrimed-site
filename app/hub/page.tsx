@@ -28,6 +28,11 @@ const consoleViews = [
     summary: "Review SCRIMED's Agent Runtime, Clinical Knowledge Graph, Validation Trust Lab, model router, sovereign deployment, and production gates."
   },
   {
+    name: "Clinical Authority Readiness",
+    href: "/clinical-authority-readiness",
+    summary: "Review hard gates for live care, PHI processing, legal approval, regional approval, reimbursement, security certification, connectors, and production authorization."
+  },
+  {
     name: "Agent Workspace",
     href: "/agent-workspace",
     summary: "Review Persistent Agent Workspace v1 work orders, resumable state, model-router policy, reviewer checkpoints, audit timeline, proof packets, and limitation-resolution paths."
@@ -318,6 +323,14 @@ export default function HubPage() {
         <article>
           <span>Buyer packs</span>
           <strong>{summary.globalPartnerLocalizationSummary.buyerPackCount}</strong>
+        </article>
+        <article>
+          <span>Authority domains</span>
+          <strong>{summary.clinicalAuthorityReadinessSummary.authorityDomainCount}</strong>
+        </article>
+        <article>
+          <span>Authority fixes</span>
+          <strong>{summary.clinicalAuthorityReadinessSummary.containedWithWorkaroundCount}</strong>
         </article>
       </section>
 

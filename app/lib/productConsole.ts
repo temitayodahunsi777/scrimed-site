@@ -26,6 +26,11 @@ import {
   globalPartnerLocalizationBriefStatus,
   globalPartnerLocalizationStatus
 } from "./globalPartnerLocalization";
+import {
+  clinicalAuthorityReadinessBriefStatus,
+  clinicalAuthorityReadinessStatus,
+  getClinicalAuthorityReadinessSummary
+} from "./clinicalAuthorityReadiness";
 import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
@@ -544,6 +549,14 @@ export const buyerActions: BuyerAction[] = [
       "Public Market Readiness is operating discipline and diligence preparation, not audited financial reporting, securities offering material, investment advice, or valuation assurance."
   },
   {
+    label: "Review Clinical Authority Readiness",
+    href: "/clinical-authority-readiness",
+    purpose:
+      "Inspect hard-gate preparation for live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector acceptance, and production clinical authorization.",
+    boundary:
+      "Authority Readiness prepares evidence and safe workarounds; it does not grant legal approval, PHI processing authority, security certification, reimbursement certainty, regional approval, or live clinical execution."
+  },
+  {
     label: "Inspect Product Demos",
     href: "/demos",
     purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
@@ -662,13 +675,13 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
   {
     audience: "Clinical transformation operator",
     primaryQuestion: "How does SCRIMED move from demos toward controlled clinical operations safely?",
-    recommendedStart: "Start with Clinical Care Activation and Healthcare Intelligence OS.",
-    route: "/clinical-care-activation",
-    supportingRoutes: ["/healthcare-intelligence-os", "/agents", "/workflows", "/interoperability"],
+    recommendedStart: "Start with Clinical Authority Readiness and Clinical Care Activation.",
+    route: "/clinical-authority-readiness",
+    supportingRoutes: ["/clinical-care-activation", "/healthcare-intelligence-os", "/agents", "/workflows", "/interoperability"],
     proof:
-      "Human-review gates, AgentOS roles, workflow contracts, interoperability standards, and blocked live execution controls.",
+      "Hard authority gates, human-review controls, AgentOS roles, workflow contracts, interoperability standards, and blocked live execution controls.",
     boundary:
-      "Clinical care activation is a gated roadmap; it does not authorize PHI ingestion, treatment decisions, EHR mutation, or autonomous clinical execution."
+      "Clinical authority readiness is a gated preparation layer; it does not authorize PHI ingestion, treatment decisions, EHR mutation, reimbursement claims, certification claims, or autonomous clinical execution."
   },
   {
     audience: "Global buyer or channel partner",
@@ -755,6 +768,7 @@ export function getProductConsoleSummary() {
   const deploymentProfileSummary = getDeploymentProfileSummary();
   const marketActivationSummary = getMarketActivationSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
+  const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
   const sourceIntelligenceSummary = getSourceIntelligenceSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
@@ -794,6 +808,9 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
     healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    clinicalAuthorityReadinessRoute: clinicalAuthorityReadinessSummary.route,
+    clinicalAuthorityReadinessApiRoute: clinicalAuthorityReadinessSummary.apiRoute,
+    clinicalAuthorityReadinessBriefRoute: clinicalAuthorityReadinessSummary.briefRoute,
     clinicalCareActivationRoute: clinicalCareActivationSummary.route,
     clinicalCareActivationApiRoute: clinicalCareActivationSummary.apiRoute,
     clinicalCareActivationBriefRoute: clinicalCareActivationSummary.briefRoute,
@@ -915,6 +932,12 @@ export function getProductConsoleSummary() {
     clinicalCareActivationStatus: clinicalCareActivationSummary.status,
     clinicalCareActivationGateCount: clinicalCareActivationSummary.gateCount,
     clinicalCareActivationBlockedCapabilityCount: clinicalCareActivationSummary.blockedCapabilities.length,
+    clinicalAuthorityReadinessStatus: clinicalAuthorityReadinessSummary.status,
+    clinicalAuthorityDomainCount: clinicalAuthorityReadinessSummary.authorityDomainCount,
+    clinicalAuthorityBoundaryResolutionCount:
+      clinicalAuthorityReadinessSummary.containedWithWorkaroundCount,
+    clinicalAuthorityBlockedBeforeApprovalCount:
+      clinicalAuthorityReadinessSummary.blockedBeforeApprovalCount,
     publicMarketKpiCount: publicMarketReadinessSummary.metricCount,
     publicMarketUnitEconomicsPackageCount: publicMarketReadinessSummary.unitEconomicsPackageCount,
     publicMarketComplianceLogCount: publicMarketReadinessSummary.complianceLogCount,
@@ -1020,6 +1043,7 @@ export function getProductConsoleSummary() {
     deploymentProfileSummary,
     marketActivationSummary,
     globalPartnerLocalizationSummary,
+    clinicalAuthorityReadinessSummary,
     salesAttributionSummary,
     attributionAnalyticsSummary,
     trustSafetyOperationsSummary,
@@ -1028,6 +1052,8 @@ export function getProductConsoleSummary() {
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
     proofStack: {
+      clinicalAuthorityReadiness: clinicalAuthorityReadinessStatus,
+      clinicalAuthorityReadinessBrief: clinicalAuthorityReadinessBriefStatus,
       clinicalCareActivation: clinicalCareActivationProofStackStatus,
       clinicalActivationDossier: clinicalActivationDossierProofStackStatus,
       clinicalActivationApprovals: clinicalActivationApprovalWorkflowProofStackStatus,
@@ -1147,7 +1173,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-20"
   };
 }
@@ -1166,6 +1192,17 @@ export function getProductReadinessBrief() {
     "",
     "## Product Demos and Pilot Programs",
     `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
+    `Clinical Authority Readiness: ${summary.clinicalAuthorityReadinessRoute}`,
+    `Clinical Authority API: ${summary.clinicalAuthorityReadinessApiRoute}`,
+    `Clinical Authority Brief: ${summary.clinicalAuthorityReadinessBriefRoute}`,
+    `Clinical Authority Domains: ${summary.clinicalAuthorityDomainCount}`,
+    `Clinical Authority Boundary Resolutions: ${summary.clinicalAuthorityBoundaryResolutionCount}`,
+    ...summary.clinicalAuthorityReadinessSummary.domains.map(
+      (domain) => `- Authority domain: ${domain.name} (${domain.status}) -> ${domain.retainedGate}`
+    ),
+    ...summary.clinicalAuthorityReadinessSummary.boundaryResolutions.map(
+      (resolution) => `- Authority boundary: ${resolution.boundary}. Resolution: ${resolution.resolution}`
+    ),
     `Clinical Care Activation Readiness: ${summary.clinicalCareActivationRoute}`,
     `Clinical Care Activation API: ${summary.clinicalCareActivationApiRoute}`,
     `Clinical Care Activation Brief: ${summary.clinicalCareActivationBriefRoute}`,
