@@ -134,6 +134,10 @@ import {
   protectedNamedReviewerSignoffPacketProofStackStatus,
   protectedNamedReviewerSignoffStatus
 } from "./protectedNamedReviewerSignoffs";
+import {
+  protectedDistributionLockboxPacketProofStackStatus,
+  protectedDistributionLockboxStatus
+} from "./protectedDistributionLockbox";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -744,6 +748,12 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedNamedReviewerSignoffApiRoute,
     protectedNamedReviewerSignoffPacketApiRoute:
       publicMarketReadinessSummary.protectedNamedReviewerSignoffPacketApiRoute,
+    protectedDistributionLockboxRoute:
+      publicMarketReadinessSummary.protectedDistributionLockboxRoute,
+    protectedDistributionLockboxApiRoute:
+      publicMarketReadinessSummary.protectedDistributionLockboxApiRoute,
+    protectedDistributionLockboxPacketApiRoute:
+      publicMarketReadinessSummary.protectedDistributionLockboxPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -896,6 +906,8 @@ export function getProductConsoleSummary() {
       protectedReleaseDecisionPackets: protectedReleaseDecisionPacketProofStackStatus,
       protectedNamedReviewerSignoffs: protectedNamedReviewerSignoffStatus,
       protectedNamedReviewerSignoffPackets: protectedNamedReviewerSignoffPacketProofStackStatus,
+      protectedDistributionLockboxes: protectedDistributionLockboxStatus,
+      protectedDistributionLockboxPackets: protectedDistributionLockboxPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1070,6 +1082,9 @@ export function getProductReadinessBrief() {
     `Protected named reviewer sign-offs: ${summary.protectedNamedReviewerSignoffRoute}`,
     `Protected named reviewer sign-offs API: ${summary.protectedNamedReviewerSignoffApiRoute}`,
     `Protected named reviewer sign-off packet API: ${summary.protectedNamedReviewerSignoffPacketApiRoute}`,
+    `Protected distribution lockbox: ${summary.protectedDistributionLockboxRoute}`,
+    `Protected distribution lockbox API: ${summary.protectedDistributionLockboxApiRoute}`,
+    `Protected distribution lockbox packet API: ${summary.protectedDistributionLockboxPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

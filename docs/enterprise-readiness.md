@@ -30,6 +30,8 @@ Protected workspaces now expose Release Decision Workflow at `/api/pilot-workspa
 
 Protected workspaces now expose Named Reviewer Sign-Off Packets at `/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs` and audited packet downloads at `/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet`. This records no-PHI metadata references to externally retained reviewer sign-offs across finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission roles. It can indicate readiness for controlled distribution review only. It must not be used as public release approval, external distribution approval, legal advice, audited financial reporting, securities offering material, investment advice, valuation assurance, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authorization.
 
+Protected workspaces now expose Distribution Lockbox controls at `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox` and audited packet downloads at `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`. This records no-PHI disabled-by-default metadata for externally retained artifact manifests, customer permission references, counsel review references, recipient scopes, revocation plans, and named reviewer sign-off ids. It must not be used as public release approval, external distribution approval, legal advice, audited financial reporting, securities offering material, investment advice, valuation assurance, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authorization.
+
 SCRIMED now exposes Clinical Care Activation Readiness at `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief`. This surface tracks the hard gates required before clinical execution can move beyond synthetic evaluation: intended-use and regulatory classification, licensed clinical governance, clinical safety case, customer scope, BAA/DPA and privacy review, HIPAA Security Rule safeguard mapping, production identity, PHI-ready data architecture, FHIR/HL7/DICOM/X12 connector validation, human-review authority, clinical validation, incident response, continuous monitoring, reimbursement review, patient communication/consent, and go-live rollback approval.
 
 The activation surface is a readiness control, not a care-delivery authorization. It must not be used to imply FDA clearance, HIPAA compliance certification, clinical validation, reimbursement certainty, live connector approval, patient-facing authorization, or production clinical care readiness.
@@ -112,6 +114,8 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 - `/api/pilot-workspaces/{workspaceSlug}/metric-trends/{reviewId}/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/board-scorecards`
 - `/api/pilot-workspaces/{workspaceSlug}/board-scorecards/{scorecardId}/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox`
+- `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`
 - `/clinical-care-activation`
 - `/api/clinical-care-activation`
 - `/api/clinical-care-activation/brief`

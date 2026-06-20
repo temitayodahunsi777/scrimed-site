@@ -253,6 +253,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected named reviewer sign-off packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedDistributionLockboxes !==
+    "aal2-external-distribution-lockbox-disabled-no-phi"
+  ) {
+    throw new Error("product console missing protected distribution lockbox proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedDistributionLockboxPackets !==
+    "aal2-audited-distribution-lockbox-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected distribution lockbox packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -814,6 +828,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected named reviewer sign-off packet API route.");
   }
 
+  if (
+    body.protectedDistributionLockboxStatus !==
+    "aal2-external-distribution-lockbox-disabled-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected distribution lockbox status.");
+  }
+
+  if (
+    body.protectedDistributionLockboxApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox"
+  ) {
+    throw new Error("Public Market Readiness missing protected distribution lockbox API route.");
+  }
+
+  if (
+    body.protectedDistributionLockboxPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected distribution lockbox packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1159,6 +1194,38 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/reviewer-signoffs/packet`,
   "Protected Named Reviewer Sign-Offs packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/distribution-lockbox`,
+  "Protected Distribution Lockbox protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/distribution-lockbox`,
+  "Protected Distribution Lockbox write protected API",
+  {
+    signoffRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    distributionAudience: "buyer-diligence-room",
+    distributionChannelControl: "counsel-reviewed-room",
+    manifestVersion: "distribution-v1.0.0",
+    manifestTitle: "SCRIMED controlled buyer diligence packet",
+    artifactManifestLabel: "controlled distribution manifest",
+    artifactManifestLocator: "external-lockbox:controlled-manifest",
+    customerPermissionReference: "external-permission-channel:retained",
+    counselReviewReference: "counsel-review-channel:retained",
+    distributionWindowStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    distributionWindowEnd: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+    recipientScope: "named buyer diligence reviewers",
+    revocationPlan: "revoke access and re-review claims if scope changes",
+    externalApprovalsRetained: true,
+    distributionDisabled: true,
+    attestation: "external-distribution-lockbox-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke metadata-only disabled lockbox"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/distribution-lockbox/packet`,
+  "Protected Distribution Lockbox packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

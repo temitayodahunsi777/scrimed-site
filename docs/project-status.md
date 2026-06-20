@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Distribution Lockbox Release
+
+- Added protected Distribution Lockbox inside `/pilot-workspace/access` after Named Reviewer Sign-Off Packets.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox` for AAL2 no-PHI disabled-by-default metadata records linked to externally retained reviewer sign-offs, customer permission references, counsel review references, and artifact manifest locators.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet` for audited protected lockbox packet downloads.
+- Added `app/lib/protectedDistributionLockbox.ts` with typed audiences, channel controls, disabled distribution validation, sign-off coverage, release authorities, workflow derivation, safe workarounds, and packet generation.
+- Added `public.protected_distribution_lockboxes` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-distribution-lockbox-recorded` audit events, and runtime schema `2026-06-20.4`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-external-distribution-lockbox-disabled-no-phi` and `aal2-audited-distribution-lockbox-packets-no-phi`.
+- Preserved the boundary: the lockbox is metadata-only and distribution-disabled. It does not approve public release, external distribution, legal claims, audited financial reporting, securities materials, customer references, advertising substantiation, clinical validation, compliance certification, production authorization, or live clinical execution.
+
 ## Latest Protected Named Reviewer Sign-Off Packets Release
 
 - Added protected Named Reviewer Sign-Off Packets inside `/pilot-workspace/access` after Release Decision Workflow.

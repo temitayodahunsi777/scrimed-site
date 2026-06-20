@@ -88,6 +88,12 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions`
 - `POST /api/pilot-workspaces/{workspaceSlug}/release-decisions`
 - `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs`
+- `POST /api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs`
+- `GET /api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox`
+- `POST /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox`
+- `GET /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -133,6 +139,19 @@ Safe operating pattern:
 - Record only bounded reviewer-role, claim-version, artifact-scope, external locator, expiration, and no-PHI review metadata in SCRIMED.
 - Download the audited named reviewer sign-off packet only after the write-before-release audit event commits.
 - Treat controlled distribution review readiness as an internal control state. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
+
+## Distribution Lockbox
+
+`/pilot-workspace/access` now includes Protected Distribution Lockbox immediately after Named Reviewer Sign-Off Packets. Tenant admins, pilot leads, and reviewers can record no-PHI disabled-by-default metadata for buyer diligence rooms, investor data rooms, board rooms, sales collateral, marketing releases, public relations, and customer case-study channels.
+
+Distribution lockbox records link to named reviewer sign-off ids and track audience, channel control, manifest version, external manifest locator, customer permission reference, counsel review reference, distribution window, recipient scope, and revocation plan. Distribution remains disabled in the current product boundary even when all reviewer roles are linked.
+
+Safe operating pattern:
+
+- Keep actual artifacts, signatures, legal opinions, customer permissions, counsel reviews, recipient lists, and distribution approvals in qualified external systems.
+- Record only bounded no-PHI metadata references in SCRIMED.
+- Download the audited distribution lockbox packet only after the write-before-release audit event commits.
+- Treat lockbox readiness as an internal operator control. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
 
 ## Pilot Demo Readiness Command Center
 

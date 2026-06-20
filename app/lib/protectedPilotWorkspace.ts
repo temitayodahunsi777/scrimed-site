@@ -530,6 +530,20 @@ export const protectedPilotApiContracts = [
       "Download an audited protected named reviewer sign-off packet after committing the packet release event while retaining metadata-only storage and all public-release, external distribution, legal, finance, customer, compliance, production, and clinical execution blockers."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI disabled distribution lockbox attestation + rate limit",
+    purpose:
+      "Inspect or record bounded no-PHI disabled-by-default distribution lockbox metadata linked to externally retained named reviewer sign-offs, customer permission references, counsel review references, and artifact manifest locators. This does not enable public release, external distribution, legal claims, advertising substantiation, customer proof, compliance certification, production authorization, or clinical execution."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited protected distribution lockbox packet after committing the packet release event while preserving disabled distribution, metadata-only storage, and all public-release, external distribution, legal, finance, customer, compliance, production, and clinical execution blockers."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",

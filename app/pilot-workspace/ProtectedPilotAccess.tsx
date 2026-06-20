@@ -27,6 +27,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
+import ProtectedDistributionLockboxPanel from "./ProtectedDistributionLockboxPanel";
 import ProtectedExternalApprovalEvidencePanel from "./ProtectedExternalApprovalEvidencePanel";
 import ProtectedFinanceMethodologyPanel from "./ProtectedFinanceMethodologyPanel";
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
@@ -78,6 +79,10 @@ import type {
   ProtectedNamedReviewerSignoffInput,
   ProtectedNamedReviewerSignoffWorkflow
 } from "../lib/protectedNamedReviewerSignoffs";
+import type {
+  ProtectedDistributionLockboxInput,
+  ProtectedDistributionLockboxWorkflow
+} from "../lib/protectedDistributionLockbox";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -206,6 +211,18 @@ type ProtectedNamedReviewerSignoffResponse = {
   error?: { message?: string };
 };
 
+type ProtectedDistributionLockboxResponse = {
+  lockboxId?: string;
+  records?: unknown[];
+  workflow?: ProtectedDistributionLockboxWorkflow;
+  signoffWorkflow?: ProtectedNamedReviewerSignoffWorkflow;
+  releaseWorkflow?: ProtectedReleaseDecisionWorkflow;
+  externalWorkflow?: ProtectedExternalApprovalEvidenceWorkflow;
+  financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -321,6 +338,12 @@ export default function ProtectedPilotAccess({
     useState<"idle" | "saving">("idle");
   const [protectedNamedReviewerSignoffPacketStatus, setProtectedNamedReviewerSignoffPacketStatus] =
     useState<"idle" | "downloading">("idle");
+  const [protectedDistributionLockboxWorkflow, setProtectedDistributionLockboxWorkflow] =
+    useState<ProtectedDistributionLockboxWorkflow | null>(null);
+  const [protectedDistributionLockboxStatus, setProtectedDistributionLockboxStatus] =
+    useState<"idle" | "saving">("idle");
+  const [protectedDistributionLockboxPacketStatus, setProtectedDistributionLockboxPacketStatus] =
+    useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -383,6 +406,12 @@ export default function ProtectedPilotAccess({
     setProtectedNamedReviewerSignoffPacketStatus("idle");
   }, []);
 
+  const resetProtectedDistributionLockbox = useCallback(() => {
+    setProtectedDistributionLockboxWorkflow(null);
+    setProtectedDistributionLockboxStatus("idle");
+    setProtectedDistributionLockboxPacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -438,6 +467,8 @@ export default function ProtectedPilotAccess({
         resetProtectedFinanceMethodology();
         resetProtectedExternalApprovalEvidence();
         resetProtectedReleaseDecision();
+        resetProtectedNamedReviewerSignoff();
+        resetProtectedDistributionLockbox();
         setStatus("signed-out");
         return;
       }
@@ -492,6 +523,8 @@ export default function ProtectedPilotAccess({
         resetProtectedFinanceMethodology();
         resetProtectedExternalApprovalEvidence();
         resetProtectedReleaseDecision();
+        resetProtectedNamedReviewerSignoff();
+        resetProtectedDistributionLockbox();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -549,6 +582,7 @@ export default function ProtectedPilotAccess({
       resetProtectedExternalApprovalEvidence();
       resetProtectedReleaseDecision();
       resetProtectedNamedReviewerSignoff();
+      resetProtectedDistributionLockbox();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -567,7 +601,8 @@ export default function ProtectedPilotAccess({
           loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0]),
           loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0]),
           loadProtectedReleaseDecision(activeSession, nextWorkspaces[0]),
-          loadProtectedNamedReviewerSignoffs(activeSession, nextWorkspaces[0])
+          loadProtectedNamedReviewerSignoffs(activeSession, nextWorkspaces[0]),
+          loadProtectedDistributionLockboxes(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -892,6 +927,41 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedDistributionLockboxes(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/distribution-lockbox`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedDistributionLockboxResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected distribution lockbox records could not be loaded.");
+        return;
+      }
+
+      setProtectedDistributionLockboxWorkflow(body.workflow ?? null);
+      if (body.signoffWorkflow) {
+        setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+      }
+      if (body.releaseWorkflow) {
+        setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+      }
+      if (body.externalWorkflow) {
+        setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+      }
+      if (body.financeWorkflow) {
+        setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -909,6 +979,7 @@ export default function ProtectedPilotAccess({
     resetProtectedExternalApprovalEvidence,
     resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
+    resetProtectedDistributionLockbox,
     resetProtectedNamedReviewerSignoff,
     resetProtectedOperatorMetrics,
     resetProtectedReleaseDecision,
@@ -1089,6 +1160,7 @@ export default function ProtectedPilotAccess({
     resetProtectedExternalApprovalEvidence();
     resetProtectedReleaseDecision();
     resetProtectedNamedReviewerSignoff();
+    resetProtectedDistributionLockbox();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1119,7 +1191,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedFinanceMethodology(session, workspace),
       refreshProtectedExternalApprovalEvidence(session, workspace),
       refreshProtectedReleaseDecision(session, workspace),
-      refreshProtectedNamedReviewerSignoffs(session, workspace)
+      refreshProtectedNamedReviewerSignoffs(session, workspace),
+      refreshProtectedDistributionLockboxes(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1355,6 +1428,37 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedNamedReviewerSignoffWorkflow(body.workflow ?? null);
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+  }
+
+  async function refreshProtectedDistributionLockboxes(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/distribution-lockbox`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedDistributionLockboxResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected distribution lockbox records could not be loaded.");
+      return;
+    }
+
+    setProtectedDistributionLockboxWorkflow(body.workflow ?? null);
+    if (body.signoffWorkflow) {
+      setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+    }
     if (body.releaseWorkflow) {
       setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
     }
@@ -2179,6 +2283,7 @@ export default function ProtectedPilotAccess({
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
     await refreshProtectedNamedReviewerSignoffs(session, selectedWorkspace);
+    await refreshProtectedDistributionLockboxes(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected release decision recorded${
@@ -2262,6 +2367,7 @@ export default function ProtectedPilotAccess({
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
+    await refreshProtectedDistributionLockboxes(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected named reviewer sign-off metadata recorded${
@@ -2305,6 +2411,94 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected named reviewer sign-off packet downloaded and its audit event was committed.");
+  }
+
+  async function recordProtectedDistributionLockbox(input: ProtectedDistributionLockboxInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedDistributionLockboxStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/distribution-lockbox`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedDistributionLockboxResponse;
+    setProtectedDistributionLockboxStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected distribution lockbox could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedDistributionLockboxWorkflow(body.workflow ?? protectedDistributionLockboxWorkflow);
+    if (body.signoffWorkflow) {
+      setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+    }
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected distribution lockbox metadata recorded${
+        body.lockboxId ? ` with lockbox id ${body.lockboxId}` : ""
+      }. External distribution remains disabled.`
+    );
+  }
+
+  async function downloadProtectedDistributionLockboxPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedDistributionLockboxPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/distribution-lockbox/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedDistributionLockboxPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ?? "The protected distribution lockbox packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-distribution-lockbox.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected distribution lockbox packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -2641,6 +2835,15 @@ export default function ProtectedPilotAccess({
             packetBusy={protectedNamedReviewerSignoffPacketStatus === "downloading"}
             releaseWorkflow={protectedReleaseDecisionWorkflow}
             workflow={protectedNamedReviewerSignoffWorkflow}
+          />
+
+          <ProtectedDistributionLockboxPanel
+            busy={protectedDistributionLockboxStatus === "saving"}
+            onDownloadPacket={downloadProtectedDistributionLockboxPacket}
+            onRecordLockbox={recordProtectedDistributionLockbox}
+            packetBusy={protectedDistributionLockboxPacketStatus === "downloading"}
+            signoffWorkflow={protectedNamedReviewerSignoffWorkflow}
+            workflow={protectedDistributionLockboxWorkflow}
           />
 
           <BuyerPilotRoomPanel

@@ -103,6 +103,13 @@ import type {
   ProtectedNamedReviewerSignoffStatus,
   ProtectedReviewerRole
 } from "./protectedNamedReviewerSignoffs";
+import type {
+  ProtectedDistributionAudience,
+  ProtectedDistributionChannelControl,
+  ProtectedDistributionLockboxInput,
+  ProtectedDistributionLockboxRecord,
+  ProtectedDistributionLockboxStatus
+} from "./protectedDistributionLockbox";
 
 type AuthenticatedPilotContext =
   | {
@@ -492,6 +499,53 @@ type ProtectedNamedReviewerSignoffRow = {
   securities_authority: ProtectedNamedReviewerSignoffRecord["securitiesAuthority"];
   advertising_claims_authority: ProtectedNamedReviewerSignoffRecord["advertisingClaimsAuthority"];
   clinical_execution_authority: ProtectedNamedReviewerSignoffRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedDistributionLockboxRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  distribution_audience: ProtectedDistributionAudience;
+  distribution_channel_control: ProtectedDistributionChannelControl;
+  lockbox_status: Exclude<ProtectedDistributionLockboxStatus, "not-recorded">;
+  approval_scope: ProtectedDistributionLockboxRecord["approvalScope"];
+  manifest_version: string;
+  manifest_title: string;
+  artifact_manifest_label: string;
+  artifact_manifest_locator: string;
+  customer_permission_reference: string;
+  counsel_review_reference: string;
+  distribution_window_start: string;
+  distribution_window_end: string;
+  recipient_scope: string;
+  revocation_plan: string;
+  signoff_record_ids: string[];
+  evidence_snapshot: unknown;
+  required_reviewer_roles: ProtectedReviewerRole[];
+  linked_reviewer_roles: ProtectedReviewerRole[];
+  missing_reviewer_roles: ProtectedReviewerRole[];
+  expired_signoff_roles: ProtectedReviewerRole[];
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  external_approvals_retained: boolean;
+  distribution_disabled: boolean;
+  attestation: ProtectedDistributionLockboxRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedDistributionLockboxRecord["dataBoundary"];
+  lockbox_authority: ProtectedDistributionLockboxRecord["lockboxAuthority"];
+  release_authority: ProtectedDistributionLockboxRecord["releaseAuthority"];
+  storage_authority: ProtectedDistributionLockboxRecord["storageAuthority"];
+  signoff_authority: ProtectedDistributionLockboxRecord["signoffAuthority"];
+  signoff_release_authority: ProtectedDistributionLockboxRecord["signoffReleaseAuthority"];
+  release_decision_authority: ProtectedDistributionLockboxRecord["releaseDecisionAuthority"];
+  financial_reporting_authority: ProtectedDistributionLockboxRecord["financialReportingAuthority"];
+  securities_authority: ProtectedDistributionLockboxRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedDistributionLockboxRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedDistributionLockboxRecord["clinicalExecutionAuthority"];
   recorded_by: string;
   recorded_at: string;
   created_at: string;
@@ -1253,6 +1307,57 @@ function mapProtectedNamedReviewerSignoff(
   };
 }
 
+function mapProtectedDistributionLockbox(
+  row: ProtectedDistributionLockboxRow
+): ProtectedDistributionLockboxRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    distributionAudience: row.distribution_audience,
+    distributionChannelControl: row.distribution_channel_control,
+    lockboxStatus: row.lockbox_status,
+    approvalScope: row.approval_scope,
+    manifestVersion: row.manifest_version,
+    manifestTitle: row.manifest_title,
+    artifactManifestLabel: row.artifact_manifest_label,
+    artifactManifestLocator: row.artifact_manifest_locator,
+    customerPermissionReference: row.customer_permission_reference,
+    counselReviewReference: row.counsel_review_reference,
+    distributionWindowStart: row.distribution_window_start,
+    distributionWindowEnd: row.distribution_window_end,
+    recipientScope: row.recipient_scope,
+    revocationPlan: row.revocation_plan,
+    signoffRecordIds: row.signoff_record_ids,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    requiredReviewerRoles: row.required_reviewer_roles,
+    linkedReviewerRoles: row.linked_reviewer_roles,
+    missingReviewerRoles: row.missing_reviewer_roles,
+    expiredSignoffRoles: row.expired_signoff_roles,
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    externalApprovalsRetained: row.external_approvals_retained,
+    distributionDisabled: row.distribution_disabled,
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    lockboxAuthority: row.lockbox_authority,
+    releaseAuthority: row.release_authority,
+    storageAuthority: row.storage_authority,
+    signoffAuthority: row.signoff_authority,
+    signoffReleaseAuthority: row.signoff_release_authority,
+    releaseDecisionAuthority: row.release_decision_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1555,6 +1660,8 @@ const protectedReleaseDecisionSelect =
   "id, tenant_id, workspace_id, release_audience, claim_category, claim_version, claim_text, decision_status, approval_scope, distribution_channel, external_approval_evidence_record_ids, evidence_snapshot, required_approval_domains, linked_approval_domains, missing_approval_domains, retained_blockers, release_restrictions, attestation, review_note, data_boundary, claim_registry_authority, release_decision_authority, distribution_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const protectedNamedReviewerSignoffSelect =
   "id, tenant_id, workspace_id, release_decision_id, reviewer_role, reviewer_role_label, signoff_status, approval_scope, reviewer_display_name, reviewer_organization, signoff_reference_label, signoff_reference_locator, artifact_scope, approved_claim_version, distribution_scope, expires_at, external_signoff_retained, evidence_snapshot, required_reviewer_roles, linked_reviewer_roles, missing_reviewer_roles, retained_blockers, release_restrictions, attestation, review_note, data_boundary, signoff_authority, release_authority, storage_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
+const protectedDistributionLockboxSelect =
+  "id, tenant_id, workspace_id, distribution_audience, distribution_channel_control, lockbox_status, approval_scope, manifest_version, manifest_title, artifact_manifest_label, artifact_manifest_locator, customer_permission_reference, counsel_review_reference, distribution_window_start, distribution_window_end, recipient_scope, revocation_plan, signoff_record_ids, evidence_snapshot, required_reviewer_roles, linked_reviewer_roles, missing_reviewer_roles, expired_signoff_roles, retained_blockers, release_restrictions, external_approvals_retained, distribution_disabled, attestation, review_note, data_boundary, lockbox_authority, release_authority, storage_authority, signoff_authority, signoff_release_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1934,6 +2041,22 @@ export async function listProtectedNamedReviewerSignoffs(client: SupabaseClient,
   return {
     records: ((data ?? []) as unknown as ProtectedNamedReviewerSignoffRow[]).map(
       mapProtectedNamedReviewerSignoff
+    ),
+    error
+  };
+}
+
+export async function listProtectedDistributionLockboxes(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("protected_distribution_lockboxes")
+    .select(protectedDistributionLockboxSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(150);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedDistributionLockboxRow[]).map(
+      mapProtectedDistributionLockbox
     ),
     error
   };
@@ -2383,6 +2506,22 @@ export async function recordProtectedNamedReviewerSignoff(
   };
 }
 
+export async function recordProtectedDistributionLockbox(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedDistributionLockboxInput
+) {
+  const { data, error } = await client.rpc("record_protected_distribution_lockbox", {
+    p_workspace_slug: workspaceSlug,
+    p_lockbox_input: input
+  });
+
+  return {
+    lockboxId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedExternalApprovalEvidencePacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -2446,6 +2585,32 @@ export async function recordProtectedNamedReviewerSignoffPacketDownload(
       metadataOnly: true,
       releaseAuthority: "controlled-distribution-review-not-release-authority",
       storageAuthority: "no-sensitive-signature-document-storage"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedDistributionLockboxPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-distribution-lockbox",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      distributionDisabled: true,
+      releaseAuthority: "external-distribution-disabled-pending-real-approval",
+      storageAuthority: "manifest-metadata-only-no-sensitive-artifacts"
     }
   });
 
