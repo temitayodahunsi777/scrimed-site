@@ -46,6 +46,10 @@ import {
   protectedEvidenceRoomAccessLogReconciliationPacketProofStackStatus,
   protectedEvidenceRoomAccessLogReconciliationStatus
 } from "./protectedEvidenceRoomAccessLogReconciliation";
+import {
+  protectedEvidenceRoomProviderAdapterPacketProofStackStatus,
+  protectedEvidenceRoomProviderAdapterStatus
+} from "./protectedEvidenceRoomProviderAdapters";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -622,6 +626,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation",
     protectedEvidenceRoomAccessLogReconciliationPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet",
+    protectedEvidenceRoomProviderAdapterRoute: "/pilot-workspace/access",
+    protectedEvidenceRoomProviderAdapterApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters",
+    protectedEvidenceRoomProviderAdapterPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -654,6 +663,9 @@ export function getPublicMarketReadinessSummary() {
     protectedEvidenceRoomAccessLogReconciliationStatus,
     protectedEvidenceRoomAccessLogReconciliationPacketStatus:
       protectedEvidenceRoomAccessLogReconciliationPacketProofStackStatus,
+    protectedEvidenceRoomProviderAdapterStatus,
+    protectedEvidenceRoomProviderAdapterPacketStatus:
+      protectedEvidenceRoomProviderAdapterPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -676,7 +688,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add third-party evidence-room provider adapter contracts and external audit-log import stubs without storing recipient identifiers, raw logs, secrets, signed approvals, or sensitive artifacts in SCRIMED.",
+      "Add provider security review workbench and pre-production BAA/DPA readiness gates without storing provider credentials, raw logs, signed legal artifacts, PHI, or sensitive customer documents in SCRIMED.",
     updated: "2026-06-20"
   };
 }
@@ -713,6 +725,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected evidence-room recipient attestation packets: ${summary.protectedEvidenceRoomRecipientAttestationPacketStatus}
 - Protected evidence-room access-log reconciliation: ${summary.protectedEvidenceRoomAccessLogReconciliationStatus}
 - Protected evidence-room access-log reconciliation packets: ${summary.protectedEvidenceRoomAccessLogReconciliationPacketStatus}
+- Protected evidence-room provider adapters: ${summary.protectedEvidenceRoomProviderAdapterStatus}
+- Protected evidence-room provider adapter packets: ${summary.protectedEvidenceRoomProviderAdapterPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -750,6 +764,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected evidence-room access-log reconciliation route: ${summary.protectedEvidenceRoomAccessLogReconciliationRoute}
 - Protected evidence-room access-log reconciliation API: ${summary.protectedEvidenceRoomAccessLogReconciliationApiRoute}
 - Protected evidence-room access-log reconciliation packet API: ${summary.protectedEvidenceRoomAccessLogReconciliationPacketApiRoute}
+- Protected evidence-room provider adapter route: ${summary.protectedEvidenceRoomProviderAdapterRoute}
+- Protected evidence-room provider adapter API: ${summary.protectedEvidenceRoomProviderAdapterApiRoute}
+- Protected evidence-room provider adapter packet API: ${summary.protectedEvidenceRoomProviderAdapterPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis

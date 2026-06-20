@@ -33,6 +33,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected evidence-room recipient attestation packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet`
 - Protected evidence-room access-log reconciliation API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation`
 - Protected evidence-room access-log reconciliation packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`
+- Protected evidence-room provider adapter API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
+- Protected evidence-room provider adapter packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -49,6 +51,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
 - Protected AAL2 evidence-room recipient attestations that record intended recipient segment, access-window, packet-reference, and revocation metadata after release authority is complete while exact recipient lists, emails, access grants, and export approval remain external.
 - Protected AAL2 evidence-room access-log reconciliation that records externally retained log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review while raw logs, recipient identifiers, addresses, device identifiers, and export approval remain external.
+- Protected AAL2 evidence-room provider adapter contracts that record externally retained provider contract references, adapter design references, audit-log import stub labels, supported summary formats, verification cadence, and provider risk tier while provider credentials, URLs, tokens, raw logs, sensitive artifacts, live integration approval, and export approval remain external.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
 - Protected AAL2 release authority attestations that link ready disabled lockboxes to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata while release remains disabled.
@@ -94,6 +97,8 @@ Protected evidence-room recipient attestations are metadata-only references to i
 
 Protected evidence-room access-log reconciliation records are metadata-only references to externally retained access-log review. `access-log-reconciliation-review-ready-not-export-approval` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
 
+Protected evidence-room provider adapter records are metadata-only references to externally retained provider contract and audit-log import-stub readiness. `provider-adapter-contract-review-ready-not-integration-approval` is not public release approval, external distribution approval, provider contracting approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, live integration approval, or live clinical execution authority.
+
 ## Next Build
 
-Add third-party evidence-room provider adapter contracts and external audit-log import stubs without storing recipient identifiers, raw logs, secrets, signed approvals, or sensitive artifacts in SCRIMED.
+Add provider security review workbench and pre-production BAA/DPA readiness gates without storing provider credentials, raw logs, signed legal artifacts, PHI, or sensitive customer documents in SCRIMED.

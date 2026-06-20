@@ -101,6 +101,8 @@ SCRIMED also exposes a Pilot Deal Room at `/pilot-deal-room`, protected opportun
 
 Protected pilot workspaces also include evidence-room access-log reconciliation at `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation` and audited packet download at `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`. This supports enterprise diligence by tying recipient attestations to externally retained access-log references without storing raw logs, recipient identifiers, secrets, signed approvals, legal opinions, or sensitive artifacts in SCRIMED.
 
+Protected pilot workspaces now include evidence-room provider adapter contracts at `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters` and audited packet download at `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`. This supports provider diligence by tying completed access-log reconciliation to metadata-only provider contract references and audit-log import stubs without storing provider credentials, URLs, tokens, raw logs, signed legal artifacts, legal opinions, PHI, sensitive customer documents, live integration approval, or clinical execution authority in SCRIMED.
+
 ## Routes
 
 - `/trust-center`
@@ -124,6 +126,8 @@ Protected pilot workspaces also include evidence-room access-log reconciliation 
 - `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation`
 - `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
+- `/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`
 - `/clinical-care-activation`
 - `/api/clinical-care-activation`
 - `/api/clinical-care-activation/brief`

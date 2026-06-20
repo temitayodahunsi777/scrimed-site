@@ -586,6 +586,20 @@ export const protectedPilotApiContracts = [
       "Download an audited protected evidence-room access-log reconciliation packet after committing the packet release event while preserving export-disabled posture, access-log-metadata-only storage, and all public-release, external distribution, legal, finance, customer, compliance, production, reimbursement, and clinical execution blockers."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI provider adapter contract metadata + rate limit",
+    purpose:
+      "Inspect or record bounded no-PHI metadata for externally retained evidence-room provider contracts, adapter design references, and audit-log import stubs linked to completed access-log reconciliation. This does not store provider credentials, URLs, access tokens, raw logs, recipient identifiers, signed legal artifacts, customer permission artifacts, public release approval, external distribution approval, live integration approval, compliance certification, production authorization, or clinical execution authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited protected evidence-room provider adapter packet after committing the packet release event while preserving integration-disabled posture, provider-adapter-metadata-only storage, and all public-release, external distribution, legal, finance, customer, compliance, production, reimbursement, live integration, and clinical execution blockers."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",

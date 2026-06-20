@@ -102,7 +102,7 @@ Current focus areas include:
 - fixture change review and quality gates
 - safety and governance infrastructure
 - deployment monitoring systems
-- public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, and metadata-only evidence-room recipient attestations
+- public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, metadata-only evidence-room recipient attestations, access-log reconciliation, and provider-adapter contract readiness
 
 ---
 
@@ -194,7 +194,7 @@ Current go-live blockers and manual actions are tracked in `/operations`: the pu
 
 The Product Console and readiness brief also include operations readiness so buyer, investor, and operator reviews see launch blockers, owners, fallback paths, and remaining manual actions in one place.
 
-Protected pilot workspaces now include metadata-only evidence-room access-log reconciliation after recipient attestations. This gives SCRIMED a buyer/investor diligence path for externally retained access logs while keeping raw logs, recipient identifiers, secrets, signed approvals, legal opinions, sensitive artifacts, export approval, and live clinical execution outside the product boundary.
+Protected pilot workspaces now include metadata-only evidence-room access-log reconciliation and provider-adapter contract readiness after recipient attestations. This gives SCRIMED a buyer/investor diligence path for externally retained access logs, provider contract references, and audit-log import stubs while keeping raw logs, recipient identifiers, provider credentials, URLs, tokens, signed approvals, legal opinions, sensitive artifacts, export approval, live integration approval, and live clinical execution outside the product boundary.
 
 ---
 

@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Evidence Room Provider Adapter Contracts Release
+
+- Added protected Evidence Room Provider Adapter Contracts inside `/pilot-workspace/access` after Evidence Room Access Log Reconciliation.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters` for AAL2 no-PHI metadata references to externally retained evidence-room provider contracts, adapter design references, and audit-log import stubs.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet` for audited provider-adapter packet downloads.
+- Added `app/lib/protectedEvidenceRoomProviderAdapters.ts` with typed provider classes, disabled integration modes, supported audit-log summary formats, risk-tier handling, access-log reconciliation linkage, no-credential validation, safe workarounds, and packet generation.
+- Added `public.protected_evidence_room_provider_adapters` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-evidence-room-provider-adapter-recorded` audit events, and runtime schema `2026-06-20.8`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-evidence-room-provider-adapter-contracts-disabled-no-phi` and `aal2-audited-evidence-room-provider-adapter-packets-no-phi`.
+- Preserved the boundary: this layer stores provider-adapter metadata only and keeps integration and export disabled. It does not store PHI, patient identifiers, payer member data, raw access logs, recipient identifiers, provider credentials, URLs, tokens, source contracts, signed BAAs/DPAs, legal opinions, sensitive artifacts, public release approval, external distribution approval, live integration approval, compliance certification, production authorization, reimbursement assurance, or live clinical execution.
+
 ## Latest Protected Evidence Room Access Log Reconciliation Release
 
 - Added protected Evidence Room Access Log Reconciliation inside `/pilot-workspace/access` after Evidence Room Recipient Attestations.

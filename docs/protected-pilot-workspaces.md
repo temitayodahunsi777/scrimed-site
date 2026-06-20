@@ -100,6 +100,12 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations`
 - `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations`
 - `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation`
+- `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation`
+- `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
+- `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters`
+- `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -389,6 +395,21 @@ Protected workspaces now expose `GET` and `POST /api/pilot-workspaces/{workspace
 This workflow sits after evidence-room recipient attestations. It records only bounded no-PHI metadata for externally retained evidence-room access-log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review. It does not store raw access logs, recipient identifiers, recipient emails, exact recipient lists, IP addresses, device identifiers, access grants, signed approvals, legal opinions, customer permission artifacts, public release approval, external distribution approval, compliance certification, production authorization, or clinical execution authority.
 
 The database stores records in `public.protected_evidence_room_access_log_reconciliations` with select-only RLS for authenticated AAL2 tenant members. Writes go through `record_protected_evidence_room_access_log_reconciliation`, require tenant-admin, pilot-lead, or reviewer role, and append `protected-evidence-room-access-log-reconciliation-recorded` audit events. Packet downloads use the existing write-before-release proof-packet audit path.
+
+## Evidence Room Provider Adapter Contracts
+
+Protected workspaces now expose `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters` plus `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet`.
+
+Provider adapter records link to completed access-log reconciliation records and capture only metadata for externally retained provider contract references, disabled adapter design references, audit-log import stub labels, supported summary formats, verification cadence, provider class, and provider risk tier. The highest workflow state is `provider-adapter-contract-review-ready-not-integration-approval`; live integration and export remain disabled in the current product boundary.
+
+The database stores records in `public.protected_evidence_room_provider_adapters` with select-only RLS for authenticated AAL2 tenant members. Writes go through `record_protected_evidence_room_provider_adapter`, require tenant-admin, pilot-lead, or reviewer role, and append `protected-evidence-room-provider-adapter-recorded` audit events. Packet downloads use the existing write-before-release proof-packet audit path.
+
+Safe operating pattern:
+
+- Keep provider credentials, URLs, tokens, source contracts, signed legal artifacts, BAAs/DPAs, customer permissions, raw logs, and legal opinions in qualified external systems.
+- Record only bounded no-PHI provider-adapter contract metadata and disabled audit-log import stub readiness in SCRIMED.
+- Download the audited provider-adapter packet only after the write-before-release audit event commits.
+- Treat provider-adapter readiness as an internal control state. It is not provider contracting approval, legal approval, public release approval, external distribution approval, live integration approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
 
 ## Sales Command Center Linkage
 

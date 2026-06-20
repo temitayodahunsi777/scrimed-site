@@ -317,6 +317,22 @@ async function checkProductConsole() {
     );
   }
 
+  if (
+    body.proofStack?.protectedEvidenceRoomProviderAdapters !==
+    "aal2-evidence-room-provider-adapter-contracts-disabled-no-phi"
+  ) {
+    throw new Error("product console missing protected evidence-room provider adapter proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedEvidenceRoomProviderAdapterPackets !==
+    "aal2-audited-evidence-room-provider-adapter-packets-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected evidence-room provider adapter packet proof-stack posture."
+    );
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -970,6 +986,29 @@ async function checkPublicMarketReadiness() {
     );
   }
 
+  if (
+    body.protectedEvidenceRoomProviderAdapterStatus !==
+    "aal2-evidence-room-provider-adapter-contracts-disabled-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected evidence-room provider adapter status.");
+  }
+
+  if (
+    body.protectedEvidenceRoomProviderAdapterApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters"
+  ) {
+    throw new Error("Public Market Readiness missing protected evidence-room provider adapter API route.");
+  }
+
+  if (
+    body.protectedEvidenceRoomProviderAdapterPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/evidence-room-provider-adapters/packet"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected evidence-room provider adapter packet API route."
+    );
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1440,6 +1479,39 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/evidence-room-access-log-reconciliation/packet`,
   "Protected Evidence Room Access Log Reconciliation packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-provider-adapters`,
+  "Protected Evidence Room Provider Adapters protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-provider-adapters`,
+  "Protected Evidence Room Provider Adapters write protected API",
+  {
+    accessLogReconciliationRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    distributionAudience: "buyer-diligence-room",
+    providerClass: "evidence-room-platform",
+    integrationMode: "contract-only",
+    externalProviderLabel: "qualified external evidence room provider",
+    adapterContractReferenceLabel: "provider adapter contract metadata",
+    adapterContractReferenceLocator: "provider-adapter:contract-readiness",
+    auditLogImportStubLabel: "metadata-only audit log import stub",
+    auditLogImportStubLocator: "provider-adapter:audit-log-import-stub",
+    supportedAuditLogFormat: "access-review-report",
+    verificationCadence: "review before each external release window",
+    providerRiskTier: "not-assessed",
+    externalProviderAuthorityRetained: true,
+    rawLogImportDisabled: true,
+    credentialStorageDisabled: true,
+    exportDisabled: true,
+    attestation: "evidence-room-provider-adapter-contract-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke provider adapter metadata only"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-provider-adapters/packet`,
+  "Protected Evidence Room Provider Adapters packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

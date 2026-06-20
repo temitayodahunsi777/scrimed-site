@@ -133,6 +133,16 @@ import type {
   ProtectedEvidenceRoomAccessLogReconciliationStatus,
   ProtectedEvidenceRoomAccessLogRevocationExerciseState
 } from "./protectedEvidenceRoomAccessLogReconciliation";
+import type {
+  ProtectedEvidenceRoomAuditLogImportFormat,
+  ProtectedEvidenceRoomProviderAdapterContractStatus,
+  ProtectedEvidenceRoomProviderAdapterControl,
+  ProtectedEvidenceRoomProviderAdapterInput,
+  ProtectedEvidenceRoomProviderAdapterRecord,
+  ProtectedEvidenceRoomProviderClass,
+  ProtectedEvidenceRoomProviderIntegrationMode,
+  ProtectedEvidenceRoomProviderRiskTier
+} from "./protectedEvidenceRoomProviderAdapters";
 
 type AuthenticatedPilotContext =
   | {
@@ -712,6 +722,55 @@ type ProtectedEvidenceRoomAccessLogReconciliationRow = {
   securities_authority: ProtectedEvidenceRoomAccessLogReconciliationRecord["securitiesAuthority"];
   advertising_claims_authority: ProtectedEvidenceRoomAccessLogReconciliationRecord["advertisingClaimsAuthority"];
   clinical_execution_authority: ProtectedEvidenceRoomAccessLogReconciliationRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedEvidenceRoomProviderAdapterRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  distribution_audience: ProtectedDistributionAudience;
+  provider_class: ProtectedEvidenceRoomProviderClass;
+  provider_class_label: string;
+  integration_mode: ProtectedEvidenceRoomProviderIntegrationMode;
+  integration_mode_label: string;
+  adapter_status: Exclude<ProtectedEvidenceRoomProviderAdapterContractStatus, "not-recorded">;
+  approval_scope: ProtectedEvidenceRoomProviderAdapterRecord["approvalScope"];
+  external_provider_label: string;
+  adapter_contract_reference_label: string;
+  adapter_contract_reference_locator: string;
+  audit_log_import_stub_label: string;
+  audit_log_import_stub_locator: string;
+  supported_audit_log_format: ProtectedEvidenceRoomAuditLogImportFormat;
+  verification_cadence: string;
+  provider_risk_tier: ProtectedEvidenceRoomProviderRiskTier;
+  access_log_reconciliation_record_ids: string[];
+  evidence_snapshot: unknown;
+  required_provider_controls: ProtectedEvidenceRoomProviderAdapterControl[];
+  linked_provider_controls: ProtectedEvidenceRoomProviderAdapterControl[];
+  missing_provider_controls: ProtectedEvidenceRoomProviderAdapterControl[];
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  external_provider_authority_retained: boolean;
+  raw_log_import_disabled: boolean;
+  credential_storage_disabled: boolean;
+  export_disabled: boolean;
+  attestation: ProtectedEvidenceRoomProviderAdapterRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedEvidenceRoomProviderAdapterRecord["dataBoundary"];
+  provider_adapter_authority: ProtectedEvidenceRoomProviderAdapterRecord["providerAdapterAuthority"];
+  release_authority: ProtectedEvidenceRoomProviderAdapterRecord["releaseAuthority"];
+  storage_authority: ProtectedEvidenceRoomProviderAdapterRecord["storageAuthority"];
+  access_log_reconciliation_authority: ProtectedEvidenceRoomProviderAdapterRecord["accessLogReconciliationAuthority"];
+  access_log_release_authority: ProtectedEvidenceRoomProviderAdapterRecord["accessLogReleaseAuthority"];
+  access_log_storage_authority: ProtectedEvidenceRoomProviderAdapterRecord["accessLogStorageAuthority"];
+  financial_reporting_authority: ProtectedEvidenceRoomProviderAdapterRecord["financialReportingAuthority"];
+  securities_authority: ProtectedEvidenceRoomProviderAdapterRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedEvidenceRoomProviderAdapterRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedEvidenceRoomProviderAdapterRecord["clinicalExecutionAuthority"];
   recorded_by: string;
   recorded_at: string;
   created_at: string;
@@ -1679,6 +1738,59 @@ function mapProtectedEvidenceRoomAccessLogReconciliation(
   };
 }
 
+function mapProtectedEvidenceRoomProviderAdapter(
+  row: ProtectedEvidenceRoomProviderAdapterRow
+): ProtectedEvidenceRoomProviderAdapterRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    distributionAudience: row.distribution_audience,
+    providerClass: row.provider_class,
+    providerClassLabel: row.provider_class_label,
+    integrationMode: row.integration_mode,
+    integrationModeLabel: row.integration_mode_label,
+    adapterStatus: row.adapter_status,
+    approvalScope: row.approval_scope,
+    externalProviderLabel: row.external_provider_label,
+    adapterContractReferenceLabel: row.adapter_contract_reference_label,
+    adapterContractReferenceLocator: row.adapter_contract_reference_locator,
+    auditLogImportStubLabel: row.audit_log_import_stub_label,
+    auditLogImportStubLocator: row.audit_log_import_stub_locator,
+    supportedAuditLogFormat: row.supported_audit_log_format,
+    verificationCadence: row.verification_cadence,
+    providerRiskTier: row.provider_risk_tier,
+    accessLogReconciliationRecordIds: row.access_log_reconciliation_record_ids,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    requiredProviderControls: row.required_provider_controls,
+    linkedProviderControls: row.linked_provider_controls,
+    missingProviderControls: row.missing_provider_controls,
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    externalProviderAuthorityRetained: row.external_provider_authority_retained,
+    rawLogImportDisabled: row.raw_log_import_disabled,
+    credentialStorageDisabled: row.credential_storage_disabled,
+    exportDisabled: row.export_disabled,
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    providerAdapterAuthority: row.provider_adapter_authority,
+    releaseAuthority: row.release_authority,
+    storageAuthority: row.storage_authority,
+    accessLogReconciliationAuthority: row.access_log_reconciliation_authority,
+    accessLogReleaseAuthority: row.access_log_release_authority,
+    accessLogStorageAuthority: row.access_log_storage_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1989,6 +2101,8 @@ const protectedEvidenceRoomRecipientAttestationSelect =
   "id, tenant_id, workspace_id, distribution_audience, recipient_segment, recipient_segment_label, attestation_status, approval_scope, recipient_scope_label, evidence_room_reference_label, evidence_room_reference_locator, packet_reference_label, packet_reference_locator, access_window_start, access_window_end, revocation_state, revocation_trigger, release_authority_attestation_record_ids, evidence_snapshot, required_recipient_controls, linked_recipient_controls, missing_recipient_controls, retained_blockers, release_restrictions, external_recipient_authority_retained, export_disabled, attestation, review_note, data_boundary, recipient_attestation_authority, release_authority, storage_authority, release_authority_attestation_authority, release_authority_release_authority, release_authority_storage_authority, lockbox_authority, lockbox_release_authority, lockbox_storage_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const protectedEvidenceRoomAccessLogReconciliationSelect =
   "id, tenant_id, workspace_id, distribution_audience, reconciliation_scope, reconciliation_scope_label, reconciliation_status, approval_scope, external_log_system_label, access_log_reference_label, access_log_reference_locator, reconciliation_window_start, reconciliation_window_end, observed_access_event_count, expected_recipient_segment_count, anomaly_state, revocation_exercise_state, anomaly_escalation_path, recipient_attestation_record_ids, evidence_snapshot, required_access_log_controls, linked_access_log_controls, missing_access_log_controls, retained_blockers, release_restrictions, external_log_authority_retained, export_disabled, attestation, review_note, data_boundary, access_log_reconciliation_authority, release_authority, storage_authority, recipient_attestation_authority, recipient_release_authority, recipient_storage_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
+const protectedEvidenceRoomProviderAdapterSelect =
+  "id, tenant_id, workspace_id, distribution_audience, provider_class, provider_class_label, integration_mode, integration_mode_label, adapter_status, approval_scope, external_provider_label, adapter_contract_reference_label, adapter_contract_reference_locator, audit_log_import_stub_label, audit_log_import_stub_locator, supported_audit_log_format, verification_cadence, provider_risk_tier, access_log_reconciliation_record_ids, evidence_snapshot, required_provider_controls, linked_provider_controls, missing_provider_controls, retained_blockers, release_restrictions, external_provider_authority_retained, raw_log_import_disabled, credential_storage_disabled, export_disabled, attestation, review_note, data_boundary, provider_adapter_authority, release_authority, storage_authority, access_log_reconciliation_authority, access_log_release_authority, access_log_storage_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -2441,6 +2555,25 @@ export async function listProtectedEvidenceRoomAccessLogReconciliations(
   return {
     records: ((data ?? []) as unknown as ProtectedEvidenceRoomAccessLogReconciliationRow[]).map(
       mapProtectedEvidenceRoomAccessLogReconciliation
+    ),
+    error
+  };
+}
+
+export async function listProtectedEvidenceRoomProviderAdapters(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_evidence_room_provider_adapters")
+    .select(protectedEvidenceRoomProviderAdapterSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(150);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedEvidenceRoomProviderAdapterRow[]).map(
+      mapProtectedEvidenceRoomProviderAdapter
     ),
     error
   };
@@ -2954,6 +3087,22 @@ export async function recordProtectedEvidenceRoomAccessLogReconciliation(
   };
 }
 
+export async function recordProtectedEvidenceRoomProviderAdapter(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedEvidenceRoomProviderAdapterInput
+) {
+  const { data, error } = await client.rpc("record_protected_evidence_room_provider_adapter", {
+    p_workspace_slug: workspaceSlug,
+    p_adapter_input: input
+  });
+
+  return {
+    adapterId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedExternalApprovalEvidencePacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -3124,6 +3273,36 @@ export async function recordProtectedEvidenceRoomAccessLogReconciliationPacketDo
       exportDisabled: true,
       releaseAuthority: "export-disabled-pending-external-access-log-reconciliation",
       storageAuthority: "access-log-metadata-only-no-recipient-identifiers-or-sensitive-artifacts"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedEvidenceRoomProviderAdapterPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-evidence-room-provider-adapters",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      providerAdapterMetadataOnly: true,
+      rawLogImportDisabled: true,
+      credentialStorageDisabled: true,
+      exportDisabled: true,
+      integrationDisabled: true,
+      releaseAuthority: "integration-disabled-pending-external-provider-contracting",
+      storageAuthority: "provider-adapter-metadata-only-no-credentials-raw-logs-or-recipient-identifiers"
     }
   });
 
