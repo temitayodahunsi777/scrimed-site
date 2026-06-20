@@ -27,6 +27,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected named reviewer sign-off packet API: `/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet`
 - Protected distribution lockbox API: `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox`
 - Protected distribution lockbox packet API: `/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`
+- Protected release authority attestation API: `/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations`
+- Protected release authority attestation packet API: `/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -43,6 +45,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
+- Protected AAL2 release authority attestations that link ready disabled lockboxes to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata while release remains disabled.
 - Protected AAL2 named reviewer sign-off packets that track metadata references to externally retained finance, counsel, executive, privacy/security, clinical-governance, marketing, and buyer-permission sign-offs before controlled distribution review.
 - Protected AAL2 distribution lockbox records that keep buyer, investor, board, sales, marketing, PR, and case-study distribution metadata disabled until external approvals, customer permissions, counsel review, and artifact scope are retained outside SCRIMED.
 - Customer proof ladder from public product proof through enterprise operating license.
@@ -79,6 +82,8 @@ Protected named reviewer sign-offs are metadata references only. `ready-for-cont
 
 Protected distribution lockbox records are disabled-by-default metadata only. `ready-for-external-distribution-lockbox-review-not-release-authority` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
 
+Protected release authority attestations are metadata-only references to externally retained authority. `release-authority-review-ready-not-release-approval` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
+
 ## Next Build
 
-Add externally retained release-authority attestation intake only after qualified counsel, customer permission owners, and executive sponsors approve exact distribution artifacts outside SCRIMED.
+Add controlled external evidence-room recipient attestation exports only after real release-authority references are retained outside SCRIMED.

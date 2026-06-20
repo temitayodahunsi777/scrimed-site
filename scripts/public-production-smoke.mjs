@@ -267,6 +267,22 @@ async function checkProductConsole() {
     throw new Error("product console missing protected distribution lockbox packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedReleaseAuthorityAttestations !==
+    "aal2-external-release-authority-attestations-disabled-no-phi"
+  ) {
+    throw new Error("product console missing protected release authority attestation proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedReleaseAuthorityAttestationPackets !==
+    "aal2-audited-release-authority-attestation-packets-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected release authority attestation packet proof-stack posture."
+    );
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -849,6 +865,29 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected distribution lockbox packet API route.");
   }
 
+  if (
+    body.protectedReleaseAuthorityAttestationStatus !==
+    "aal2-external-release-authority-attestations-disabled-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected release authority attestation status.");
+  }
+
+  if (
+    body.protectedReleaseAuthorityAttestationApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations"
+  ) {
+    throw new Error("Public Market Readiness missing protected release authority attestation API route.");
+  }
+
+  if (
+    body.protectedReleaseAuthorityAttestationPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected release authority attestation packet API route."
+    );
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1226,6 +1265,36 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/distribution-lockbox/packet`,
   "Protected Distribution Lockbox packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/release-authority-attestations`,
+  "Protected Release Authority Attestations protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/release-authority-attestations`,
+  "Protected Release Authority Attestations write protected API",
+  {
+    lockboxRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    authorityDomain: "qualified-counsel",
+    distributionAudience: "buyer-diligence-room",
+    releaseAuthorityReferenceLabel: "external release authority attestation",
+    releaseAuthorityReferenceLocator: "release-authority-room:attestation",
+    authorityOwnerLabel: "external authority owner",
+    attestedManifestVersion: "distribution-v1.0.0",
+    authorityWindowStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    authorityWindowEnd: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+    releaseScope: "controlled buyer diligence release review",
+    revocationTrigger: "revoke release scope and re-review authority if audience changes",
+    externalAuthorityRetained: true,
+    releaseDisabled: true,
+    attestation: "external-release-authority-attestation-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke metadata-only release authority reference"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/release-authority-attestations/packet`,
+  "Protected Release Authority Attestations packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

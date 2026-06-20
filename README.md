@@ -10,6 +10,8 @@ Current product boundary: this repository presents SCRIMED as a governed synthet
 
 Enterprise readiness boundary: `/trust-center` and `/claims` expose accountable legal, security, privacy, brand, governance, marketing, PR, sales, advertising, and claims-control readiness. These surfaces are operational registers, not legal advice, certification, regulatory approval, or authorization for live clinical execution.
 
+Protected release governance: `/pilot-workspace/access` includes no-PHI finance methodology, external approval evidence, release decisions, named reviewer sign-offs, disabled distribution lockbox, and release authority attestation controls. These controls produce audited synthetic pilot evidence only and do not authorize public release, external distribution, legal claims, customer proof, advertising claims, production use, or clinical care.
+
 ---
 
 ## Core Vision

@@ -35,6 +35,7 @@ import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
 import ProtectedNamedReviewerSignoffPanel from "./ProtectedNamedReviewerSignoffPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
 import ProtectedReleaseDecisionPanel from "./ProtectedReleaseDecisionPanel";
+import ProtectedReleaseAuthorityAttestationPanel from "./ProtectedReleaseAuthorityAttestationPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
 import TrustOSDecisionLedgerPanel from "./TrustOSDecisionLedgerPanel";
 import TrustSafetyIncidentWorkspacePanel from "./TrustSafetyIncidentWorkspacePanel";
@@ -83,6 +84,10 @@ import type {
   ProtectedDistributionLockboxInput,
   ProtectedDistributionLockboxWorkflow
 } from "../lib/protectedDistributionLockbox";
+import type {
+  ProtectedReleaseAuthorityAttestationInput,
+  ProtectedReleaseAuthorityAttestationWorkflow
+} from "../lib/protectedReleaseAuthorityAttestations";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -223,6 +228,19 @@ type ProtectedDistributionLockboxResponse = {
   error?: { message?: string };
 };
 
+type ProtectedReleaseAuthorityAttestationResponse = {
+  attestationId?: string;
+  records?: unknown[];
+  workflow?: ProtectedReleaseAuthorityAttestationWorkflow;
+  lockboxWorkflow?: ProtectedDistributionLockboxWorkflow;
+  signoffWorkflow?: ProtectedNamedReviewerSignoffWorkflow;
+  releaseWorkflow?: ProtectedReleaseDecisionWorkflow;
+  externalWorkflow?: ProtectedExternalApprovalEvidenceWorkflow;
+  financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -344,6 +362,18 @@ export default function ProtectedPilotAccess({
     useState<"idle" | "saving">("idle");
   const [protectedDistributionLockboxPacketStatus, setProtectedDistributionLockboxPacketStatus] =
     useState<"idle" | "downloading">("idle");
+  const [
+    protectedReleaseAuthorityAttestationWorkflow,
+    setProtectedReleaseAuthorityAttestationWorkflow
+  ] = useState<ProtectedReleaseAuthorityAttestationWorkflow | null>(null);
+  const [
+    protectedReleaseAuthorityAttestationStatus,
+    setProtectedReleaseAuthorityAttestationStatus
+  ] = useState<"idle" | "saving">("idle");
+  const [
+    protectedReleaseAuthorityAttestationPacketStatus,
+    setProtectedReleaseAuthorityAttestationPacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -412,6 +442,12 @@ export default function ProtectedPilotAccess({
     setProtectedDistributionLockboxPacketStatus("idle");
   }, []);
 
+  const resetProtectedReleaseAuthorityAttestation = useCallback(() => {
+    setProtectedReleaseAuthorityAttestationWorkflow(null);
+    setProtectedReleaseAuthorityAttestationStatus("idle");
+    setProtectedReleaseAuthorityAttestationPacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -469,6 +505,7 @@ export default function ProtectedPilotAccess({
         resetProtectedReleaseDecision();
         resetProtectedNamedReviewerSignoff();
         resetProtectedDistributionLockbox();
+        resetProtectedReleaseAuthorityAttestation();
         setStatus("signed-out");
         return;
       }
@@ -525,6 +562,7 @@ export default function ProtectedPilotAccess({
         resetProtectedReleaseDecision();
         resetProtectedNamedReviewerSignoff();
         resetProtectedDistributionLockbox();
+        resetProtectedReleaseAuthorityAttestation();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -583,6 +621,7 @@ export default function ProtectedPilotAccess({
       resetProtectedReleaseDecision();
       resetProtectedNamedReviewerSignoff();
       resetProtectedDistributionLockbox();
+      resetProtectedReleaseAuthorityAttestation();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -602,7 +641,8 @@ export default function ProtectedPilotAccess({
           loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0]),
           loadProtectedReleaseDecision(activeSession, nextWorkspaces[0]),
           loadProtectedNamedReviewerSignoffs(activeSession, nextWorkspaces[0]),
-          loadProtectedDistributionLockboxes(activeSession, nextWorkspaces[0])
+          loadProtectedDistributionLockboxes(activeSession, nextWorkspaces[0]),
+          loadProtectedReleaseAuthorityAttestations(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -962,6 +1002,49 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedReleaseAuthorityAttestations(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/release-authority-attestations`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedReleaseAuthorityAttestationResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ?? "Protected release authority attestations could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedReleaseAuthorityAttestationWorkflow(body.workflow ?? null);
+      if (body.lockboxWorkflow) {
+        setProtectedDistributionLockboxWorkflow(body.lockboxWorkflow);
+      }
+      if (body.signoffWorkflow) {
+        setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+      }
+      if (body.releaseWorkflow) {
+        setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+      }
+      if (body.externalWorkflow) {
+        setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+      }
+      if (body.financeWorkflow) {
+        setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -980,6 +1063,7 @@ export default function ProtectedPilotAccess({
     resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
     resetProtectedDistributionLockbox,
+    resetProtectedReleaseAuthorityAttestation,
     resetProtectedNamedReviewerSignoff,
     resetProtectedOperatorMetrics,
     resetProtectedReleaseDecision,
@@ -1161,6 +1245,7 @@ export default function ProtectedPilotAccess({
     resetProtectedReleaseDecision();
     resetProtectedNamedReviewerSignoff();
     resetProtectedDistributionLockbox();
+    resetProtectedReleaseAuthorityAttestation();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1192,7 +1277,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedExternalApprovalEvidence(session, workspace),
       refreshProtectedReleaseDecision(session, workspace),
       refreshProtectedNamedReviewerSignoffs(session, workspace),
-      refreshProtectedDistributionLockboxes(session, workspace)
+      refreshProtectedDistributionLockboxes(session, workspace),
+      refreshProtectedReleaseAuthorityAttestations(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1456,6 +1542,43 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedDistributionLockboxWorkflow(body.workflow ?? null);
+    if (body.signoffWorkflow) {
+      setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+    }
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+  }
+
+  async function refreshProtectedReleaseAuthorityAttestations(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/release-authority-attestations`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedReleaseAuthorityAttestationResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected release authority attestations could not be loaded.");
+      return;
+    }
+
+    setProtectedReleaseAuthorityAttestationWorkflow(body.workflow ?? null);
+    if (body.lockboxWorkflow) {
+      setProtectedDistributionLockboxWorkflow(body.lockboxWorkflow);
+    }
     if (body.signoffWorkflow) {
       setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
     }
@@ -2456,6 +2579,7 @@ export default function ProtectedPilotAccess({
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
+    await refreshProtectedReleaseAuthorityAttestations(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected distribution lockbox metadata recorded${
@@ -2499,6 +2623,102 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected distribution lockbox packet downloaded and its audit event was committed.");
+  }
+
+  async function recordProtectedReleaseAuthorityAttestation(
+    input: ProtectedReleaseAuthorityAttestationInput
+  ) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedReleaseAuthorityAttestationStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/release-authority-attestations`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedReleaseAuthorityAttestationResponse;
+    setProtectedReleaseAuthorityAttestationStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected release authority attestation could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedReleaseAuthorityAttestationWorkflow(
+      body.workflow ?? protectedReleaseAuthorityAttestationWorkflow
+    );
+    if (body.lockboxWorkflow) {
+      setProtectedDistributionLockboxWorkflow(body.lockboxWorkflow);
+    }
+    if (body.signoffWorkflow) {
+      setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+    }
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected release authority metadata recorded${
+        body.attestationId ? ` with attestation id ${body.attestationId}` : ""
+      }. Release remains disabled pending externally executed authority.`
+    );
+  }
+
+  async function downloadProtectedReleaseAuthorityAttestationPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedReleaseAuthorityAttestationPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/release-authority-attestations/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedReleaseAuthorityAttestationPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected release authority attestation packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-release-authority-attestations.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected release authority attestation packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -2844,6 +3064,15 @@ export default function ProtectedPilotAccess({
             packetBusy={protectedDistributionLockboxPacketStatus === "downloading"}
             signoffWorkflow={protectedNamedReviewerSignoffWorkflow}
             workflow={protectedDistributionLockboxWorkflow}
+          />
+
+          <ProtectedReleaseAuthorityAttestationPanel
+            busy={protectedReleaseAuthorityAttestationStatus === "saving"}
+            lockboxWorkflow={protectedDistributionLockboxWorkflow}
+            onDownloadPacket={downloadProtectedReleaseAuthorityAttestationPacket}
+            onRecordAttestation={recordProtectedReleaseAuthorityAttestation}
+            packetBusy={protectedReleaseAuthorityAttestationPacketStatus === "downloading"}
+            workflow={protectedReleaseAuthorityAttestationWorkflow}
           />
 
           <BuyerPilotRoomPanel

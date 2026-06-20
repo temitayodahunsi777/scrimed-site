@@ -94,6 +94,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox`
 - `POST /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox`
 - `GET /api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations`
+- `POST /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations`
+- `GET /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -152,6 +155,19 @@ Safe operating pattern:
 - Record only bounded no-PHI metadata references in SCRIMED.
 - Download the audited distribution lockbox packet only after the write-before-release audit event commits.
 - Treat lockbox readiness as an internal operator control. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
+
+## Release Authority Attestations
+
+`/pilot-workspace/access` now includes Protected Release Authority Attestations immediately after Distribution Lockbox. Tenant admins, pilot leads, and reviewers can record no-PHI metadata references to externally retained release authority across counsel, customer permission, executive sponsorship, privacy/security, finance, clinical-governance, and marketing-claims owners.
+
+Release authority attestations link to ready disabled distribution lockboxes and compute domain coverage for the attested manifest version. The highest state is `release-authority-review-ready-not-release-approval`; release remains disabled in the current product boundary.
+
+Safe operating pattern:
+
+- Keep actual signatures, legal opinions, customer permissions, recipient lists, approval artifacts, contracts, and release decisions in qualified external systems.
+- Record only bounded no-PHI authority domain, external locator label, owner label, manifest version, authority window, scope, and revocation trigger metadata in SCRIMED.
+- Download the audited release authority attestation packet only after the write-before-release audit event commits.
+- Treat release authority metadata as internal diligence evidence. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
 
 ## Pilot Demo Readiness Command Center
 

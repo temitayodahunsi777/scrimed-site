@@ -138,6 +138,10 @@ import {
   protectedDistributionLockboxPacketProofStackStatus,
   protectedDistributionLockboxStatus
 } from "./protectedDistributionLockbox";
+import {
+  protectedReleaseAuthorityAttestationPacketProofStackStatus,
+  protectedReleaseAuthorityAttestationStatus
+} from "./protectedReleaseAuthorityAttestations";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -754,6 +758,12 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedDistributionLockboxApiRoute,
     protectedDistributionLockboxPacketApiRoute:
       publicMarketReadinessSummary.protectedDistributionLockboxPacketApiRoute,
+    protectedReleaseAuthorityAttestationRoute:
+      publicMarketReadinessSummary.protectedReleaseAuthorityAttestationRoute,
+    protectedReleaseAuthorityAttestationApiRoute:
+      publicMarketReadinessSummary.protectedReleaseAuthorityAttestationApiRoute,
+    protectedReleaseAuthorityAttestationPacketApiRoute:
+      publicMarketReadinessSummary.protectedReleaseAuthorityAttestationPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -908,6 +918,9 @@ export function getProductConsoleSummary() {
       protectedNamedReviewerSignoffPackets: protectedNamedReviewerSignoffPacketProofStackStatus,
       protectedDistributionLockboxes: protectedDistributionLockboxStatus,
       protectedDistributionLockboxPackets: protectedDistributionLockboxPacketProofStackStatus,
+      protectedReleaseAuthorityAttestations: protectedReleaseAuthorityAttestationStatus,
+      protectedReleaseAuthorityAttestationPackets:
+        protectedReleaseAuthorityAttestationPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1085,6 +1098,9 @@ export function getProductReadinessBrief() {
     `Protected distribution lockbox: ${summary.protectedDistributionLockboxRoute}`,
     `Protected distribution lockbox API: ${summary.protectedDistributionLockboxApiRoute}`,
     `Protected distribution lockbox packet API: ${summary.protectedDistributionLockboxPacketApiRoute}`,
+    `Protected release authority attestations: ${summary.protectedReleaseAuthorityAttestationRoute}`,
+    `Protected release authority attestations API: ${summary.protectedReleaseAuthorityAttestationApiRoute}`,
+    `Protected release authority attestations packet API: ${summary.protectedReleaseAuthorityAttestationPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

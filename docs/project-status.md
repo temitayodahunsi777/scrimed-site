@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Release Authority Attestations Release
+
+- Added protected Release Authority Attestations inside `/pilot-workspace/access` after Distribution Lockbox.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations` for AAL2 no-PHI metadata references to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet` for audited release authority attestation packet downloads.
+- Added `app/lib/protectedReleaseAuthorityAttestations.ts` with typed authority domains, metadata-only validation, lockbox readiness linkage, release-disabled state, safe workarounds, and packet generation.
+- Added `public.protected_release_authority_attestations` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-release-authority-attestation-recorded` audit events, and runtime schema `2026-06-20.5`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-external-release-authority-attestations-disabled-no-phi` and `aal2-audited-release-authority-attestation-packets-no-phi`.
+- Preserved the boundary: this layer stores metadata references only and keeps release disabled. It does not approve public release, external distribution, legal claims, audited financial reporting, securities materials, customer references, advertising substantiation, clinical validation, compliance certification, production authorization, reimbursement assurance, or live clinical execution.
+
 ## Latest Protected Distribution Lockbox Release
 
 - Added protected Distribution Lockbox inside `/pilot-workspace/access` after Named Reviewer Sign-Off Packets.

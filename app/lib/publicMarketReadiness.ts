@@ -34,6 +34,10 @@ import {
   protectedDistributionLockboxPacketProofStackStatus,
   protectedDistributionLockboxStatus
 } from "./protectedDistributionLockbox";
+import {
+  protectedReleaseAuthorityAttestationPacketProofStackStatus,
+  protectedReleaseAuthorityAttestationStatus
+} from "./protectedReleaseAuthorityAttestations";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -595,6 +599,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox",
     protectedDistributionLockboxPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/distribution-lockbox/packet",
+    protectedReleaseAuthorityAttestationRoute: "/pilot-workspace/access",
+    protectedReleaseAuthorityAttestationApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations",
+    protectedReleaseAuthorityAttestationPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -618,6 +627,9 @@ export function getPublicMarketReadinessSummary() {
     protectedDistributionLockboxStatus,
     protectedDistributionLockboxPacketStatus:
       protectedDistributionLockboxPacketProofStackStatus,
+    protectedReleaseAuthorityAttestationStatus,
+    protectedReleaseAuthorityAttestationPacketStatus:
+      protectedReleaseAuthorityAttestationPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -640,7 +652,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add externally retained release-authority attestation intake only after qualified counsel, customer permission owners, and executive sponsors approve exact distribution artifacts outside SCRIMED.",
+      "Add controlled external evidence-room recipient attestation exports only after real release-authority references are retained outside SCRIMED.",
     updated: "2026-06-20"
   };
 }
@@ -671,6 +683,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected named reviewer sign-off packets: ${summary.protectedNamedReviewerSignoffPacketStatus}
 - Protected distribution lockbox: ${summary.protectedDistributionLockboxStatus}
 - Protected distribution lockbox packets: ${summary.protectedDistributionLockboxPacketStatus}
+- Protected release authority attestations: ${summary.protectedReleaseAuthorityAttestationStatus}
+- Protected release authority attestation packets: ${summary.protectedReleaseAuthorityAttestationPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -699,6 +713,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected distribution lockbox route: ${summary.protectedDistributionLockboxRoute}
 - Protected distribution lockbox API: ${summary.protectedDistributionLockboxApiRoute}
 - Protected distribution lockbox packet API: ${summary.protectedDistributionLockboxPacketApiRoute}
+- Protected release authority attestation route: ${summary.protectedReleaseAuthorityAttestationRoute}
+- Protected release authority attestation API: ${summary.protectedReleaseAuthorityAttestationApiRoute}
+- Protected release authority attestation packet API: ${summary.protectedReleaseAuthorityAttestationPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis
