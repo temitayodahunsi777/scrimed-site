@@ -572,6 +572,20 @@ export const protectedPilotApiContracts = [
       "Download an audited protected evidence-room recipient attestation packet after committing the packet release event while preserving export-disabled posture, recipient-metadata-only storage, and all public-release, external distribution, legal, finance, customer, compliance, production, reimbursement, and clinical execution blockers."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI access-log reconciliation metadata + rate limit",
+    purpose:
+      "Inspect or record bounded no-PHI metadata for externally retained evidence-room access-log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review linked to completed recipient attestations. This does not store raw logs, recipient identifiers, IP addresses, device identifiers, access grants, legal approvals, customer permission artifacts, public release approval, external distribution approval, compliance certification, production authorization, or clinical execution authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited protected evidence-room access-log reconciliation packet after committing the packet release event while preserving export-disabled posture, access-log-metadata-only storage, and all public-release, external distribution, legal, finance, customer, compliance, production, reimbursement, and clinical execution blockers."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",

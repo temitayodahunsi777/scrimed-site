@@ -194,6 +194,8 @@ Current go-live blockers and manual actions are tracked in `/operations`: the pu
 
 The Product Console and readiness brief also include operations readiness so buyer, investor, and operator reviews see launch blockers, owners, fallback paths, and remaining manual actions in one place.
 
+Protected pilot workspaces now include metadata-only evidence-room access-log reconciliation after recipient attestations. This gives SCRIMED a buyer/investor diligence path for externally retained access logs while keeping raw logs, recipient identifiers, secrets, signed approvals, legal opinions, sensitive artifacts, export approval, and live clinical execution outside the product boundary.
+
 ---
 
 ## Vision for the Future

@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Evidence Room Access Log Reconciliation Release
+
+- Added protected Evidence Room Access Log Reconciliation inside `/pilot-workspace/access` after Evidence Room Recipient Attestations.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation` for AAL2 no-PHI metadata references to externally retained evidence-room access logs, reconciliation windows, event-count summaries, anomaly posture, and revocation review.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet` for audited access-log reconciliation packet downloads.
+- Added `app/lib/protectedEvidenceRoomAccessLogReconciliation.ts` with typed reconciliation scopes, no-raw-log validation, recipient-attestation readiness linkage, export-disabled state, safe workarounds, and packet generation.
+- Added `public.protected_evidence_room_access_log_reconciliations` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-evidence-room-access-log-reconciliation-recorded` audit events, and runtime schema `2026-06-20.7`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-evidence-room-access-log-reconciliation-disabled-no-phi` and `aal2-audited-evidence-room-access-log-reconciliation-packets-no-phi`.
+- Preserved the boundary: this layer stores access-log reconciliation metadata only and keeps export disabled. It does not store raw access logs, recipient identifiers, recipient emails, exact recipient lists, IP addresses, device identifiers, access grants, signed approvals, legal opinions, customer permission artifacts, public release approval, external distribution approval, audited financial reporting, securities materials, advertising substantiation, clinical validation, compliance certification, production authorization, reimbursement assurance, or live clinical execution.
+
 ## Latest Protected Evidence Room Recipient Attestations Release
 
 - Added protected Evidence Room Recipient Attestations inside `/pilot-workspace/access` after Release Authority Attestations.

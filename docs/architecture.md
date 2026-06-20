@@ -401,6 +401,10 @@ The Watchtower system is the trust layer for deployed and staged SCRIMED workflo
 
 This architecture keeps clinical integration work gated until reliability signals, synthetic fixtures, and operational status surfaces are in place.
 
+## Evidence Room Governance Chain
+
+The protected pilot workspace now models enterprise proof release as a governed chain: finance methodology gates, external approval evidence, release decisions, named reviewer sign-offs, distribution lockbox, release authority attestations, recipient attestations, and access-log reconciliation. The final access-log step stores only metadata references to externally retained logs and preserves export-disabled posture until qualified external authority, legal/privacy/security review, and customer permission are complete.
+
 ## Vision
 
 SCRIMED is designed to function as the intelligence layer above existing healthcare systems, enabling providers, payers, researchers, governments, and public health organizations to operate with more insight, automation, interoperability, and trust.

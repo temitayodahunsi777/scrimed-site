@@ -28,6 +28,7 @@ import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
 import ProtectedDistributionLockboxPanel from "./ProtectedDistributionLockboxPanel";
+import ProtectedEvidenceRoomAccessLogReconciliationPanel from "./ProtectedEvidenceRoomAccessLogReconciliationPanel";
 import ProtectedEvidenceRoomRecipientAttestationPanel from "./ProtectedEvidenceRoomRecipientAttestationPanel";
 import ProtectedExternalApprovalEvidencePanel from "./ProtectedExternalApprovalEvidencePanel";
 import ProtectedFinanceMethodologyPanel from "./ProtectedFinanceMethodologyPanel";
@@ -93,6 +94,10 @@ import type {
   ProtectedEvidenceRoomRecipientAttestationInput,
   ProtectedEvidenceRoomRecipientAttestationWorkflow
 } from "../lib/protectedEvidenceRoomRecipientAttestations";
+import type {
+  ProtectedEvidenceRoomAccessLogReconciliationInput,
+  ProtectedEvidenceRoomAccessLogReconciliationWorkflow
+} from "../lib/protectedEvidenceRoomAccessLogReconciliation";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -260,6 +265,21 @@ type ProtectedEvidenceRoomRecipientAttestationResponse = {
   error?: { message?: string };
 };
 
+type ProtectedEvidenceRoomAccessLogReconciliationResponse = {
+  reconciliationId?: string;
+  records?: unknown[];
+  workflow?: ProtectedEvidenceRoomAccessLogReconciliationWorkflow;
+  recipientWorkflow?: ProtectedEvidenceRoomRecipientAttestationWorkflow;
+  authorityWorkflow?: ProtectedReleaseAuthorityAttestationWorkflow;
+  lockboxWorkflow?: ProtectedDistributionLockboxWorkflow;
+  signoffWorkflow?: ProtectedNamedReviewerSignoffWorkflow;
+  releaseWorkflow?: ProtectedReleaseDecisionWorkflow;
+  externalWorkflow?: ProtectedExternalApprovalEvidenceWorkflow;
+  financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -405,6 +425,18 @@ export default function ProtectedPilotAccess({
     protectedEvidenceRoomRecipientAttestationPacketStatus,
     setProtectedEvidenceRoomRecipientAttestationPacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [
+    protectedEvidenceRoomAccessLogReconciliationWorkflow,
+    setProtectedEvidenceRoomAccessLogReconciliationWorkflow
+  ] = useState<ProtectedEvidenceRoomAccessLogReconciliationWorkflow | null>(null);
+  const [
+    protectedEvidenceRoomAccessLogReconciliationStatus,
+    setProtectedEvidenceRoomAccessLogReconciliationStatus
+  ] = useState<"idle" | "saving">("idle");
+  const [
+    protectedEvidenceRoomAccessLogReconciliationPacketStatus,
+    setProtectedEvidenceRoomAccessLogReconciliationPacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -485,6 +517,12 @@ export default function ProtectedPilotAccess({
     setProtectedEvidenceRoomRecipientAttestationPacketStatus("idle");
   }, []);
 
+  const resetProtectedEvidenceRoomAccessLogReconciliation = useCallback(() => {
+    setProtectedEvidenceRoomAccessLogReconciliationWorkflow(null);
+    setProtectedEvidenceRoomAccessLogReconciliationStatus("idle");
+    setProtectedEvidenceRoomAccessLogReconciliationPacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -544,6 +582,7 @@ export default function ProtectedPilotAccess({
         resetProtectedDistributionLockbox();
         resetProtectedReleaseAuthorityAttestation();
         resetProtectedEvidenceRoomRecipientAttestation();
+        resetProtectedEvidenceRoomAccessLogReconciliation();
         setStatus("signed-out");
         return;
       }
@@ -602,6 +641,7 @@ export default function ProtectedPilotAccess({
         resetProtectedDistributionLockbox();
         resetProtectedReleaseAuthorityAttestation();
         resetProtectedEvidenceRoomRecipientAttestation();
+        resetProtectedEvidenceRoomAccessLogReconciliation();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -662,6 +702,7 @@ export default function ProtectedPilotAccess({
       resetProtectedDistributionLockbox();
       resetProtectedReleaseAuthorityAttestation();
       resetProtectedEvidenceRoomRecipientAttestation();
+      resetProtectedEvidenceRoomAccessLogReconciliation();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -683,7 +724,8 @@ export default function ProtectedPilotAccess({
           loadProtectedNamedReviewerSignoffs(activeSession, nextWorkspaces[0]),
           loadProtectedDistributionLockboxes(activeSession, nextWorkspaces[0]),
           loadProtectedReleaseAuthorityAttestations(activeSession, nextWorkspaces[0]),
-          loadProtectedEvidenceRoomRecipientAttestations(activeSession, nextWorkspaces[0])
+          loadProtectedEvidenceRoomRecipientAttestations(activeSession, nextWorkspaces[0]),
+          loadProtectedEvidenceRoomAccessLogReconciliation(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -1133,6 +1175,56 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedEvidenceRoomAccessLogReconciliation(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/evidence-room-access-log-reconciliation`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedEvidenceRoomAccessLogReconciliationResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ??
+            "Protected evidence-room access-log reconciliation could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedEvidenceRoomAccessLogReconciliationWorkflow(body.workflow ?? null);
+      if (body.recipientWorkflow) {
+        setProtectedEvidenceRoomRecipientAttestationWorkflow(body.recipientWorkflow);
+      }
+      if (body.authorityWorkflow) {
+        setProtectedReleaseAuthorityAttestationWorkflow(body.authorityWorkflow);
+      }
+      if (body.lockboxWorkflow) {
+        setProtectedDistributionLockboxWorkflow(body.lockboxWorkflow);
+      }
+      if (body.signoffWorkflow) {
+        setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+      }
+      if (body.releaseWorkflow) {
+        setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+      }
+      if (body.externalWorkflow) {
+        setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+      }
+      if (body.financeWorkflow) {
+        setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -1151,6 +1243,7 @@ export default function ProtectedPilotAccess({
     resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
     resetProtectedDistributionLockbox,
+    resetProtectedEvidenceRoomAccessLogReconciliation,
     resetProtectedEvidenceRoomRecipientAttestation,
     resetProtectedReleaseAuthorityAttestation,
     resetProtectedNamedReviewerSignoff,
@@ -1336,6 +1429,7 @@ export default function ProtectedPilotAccess({
     resetProtectedDistributionLockbox();
     resetProtectedReleaseAuthorityAttestation();
     resetProtectedEvidenceRoomRecipientAttestation();
+    resetProtectedEvidenceRoomAccessLogReconciliation();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1369,7 +1463,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedNamedReviewerSignoffs(session, workspace),
       refreshProtectedDistributionLockboxes(session, workspace),
       refreshProtectedReleaseAuthorityAttestations(session, workspace),
-      refreshProtectedEvidenceRoomRecipientAttestations(session, workspace)
+      refreshProtectedEvidenceRoomRecipientAttestations(session, workspace),
+      refreshProtectedEvidenceRoomAccessLogReconciliation(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1707,6 +1802,52 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedEvidenceRoomRecipientAttestationWorkflow(body.workflow ?? null);
+    if (body.authorityWorkflow) {
+      setProtectedReleaseAuthorityAttestationWorkflow(body.authorityWorkflow);
+    }
+    if (body.lockboxWorkflow) {
+      setProtectedDistributionLockboxWorkflow(body.lockboxWorkflow);
+    }
+    if (body.signoffWorkflow) {
+      setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+    }
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+  }
+
+  async function refreshProtectedEvidenceRoomAccessLogReconciliation(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/evidence-room-access-log-reconciliation`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedEvidenceRoomAccessLogReconciliationResponse;
+
+    if (!response.ok) {
+      setMessage(
+        body.error?.message ??
+          "Protected evidence-room access-log reconciliation could not be loaded."
+      );
+      return;
+    }
+
+    setProtectedEvidenceRoomAccessLogReconciliationWorkflow(body.workflow ?? null);
+    if (body.recipientWorkflow) {
+      setProtectedEvidenceRoomRecipientAttestationWorkflow(body.recipientWorkflow);
+    }
     if (body.authorityWorkflow) {
       setProtectedReleaseAuthorityAttestationWorkflow(body.authorityWorkflow);
     }
@@ -2810,6 +2951,7 @@ export default function ProtectedPilotAccess({
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
     await refreshProtectedEvidenceRoomRecipientAttestations(session, selectedWorkspace);
+    await refreshProtectedEvidenceRoomAccessLogReconciliation(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected release authority metadata recorded${
@@ -2871,6 +3013,7 @@ export default function ProtectedPilotAccess({
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
+    await refreshProtectedEvidenceRoomAccessLogReconciliation(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected evidence-room recipient metadata recorded${
@@ -2916,6 +3059,110 @@ export default function ProtectedPilotAccess({
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       "Protected evidence-room recipient attestation packet downloaded and its audit event was committed."
+    );
+  }
+
+  async function recordProtectedEvidenceRoomAccessLogReconciliation(
+    input: ProtectedEvidenceRoomAccessLogReconciliationInput
+  ) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedEvidenceRoomAccessLogReconciliationStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/evidence-room-access-log-reconciliation`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedEvidenceRoomAccessLogReconciliationResponse;
+    setProtectedEvidenceRoomAccessLogReconciliationStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected evidence-room access-log reconciliation could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedEvidenceRoomAccessLogReconciliationWorkflow(
+      body.workflow ?? protectedEvidenceRoomAccessLogReconciliationWorkflow
+    );
+    if (body.recipientWorkflow) {
+      setProtectedEvidenceRoomRecipientAttestationWorkflow(body.recipientWorkflow);
+    }
+    if (body.authorityWorkflow) {
+      setProtectedReleaseAuthorityAttestationWorkflow(body.authorityWorkflow);
+    }
+    if (body.lockboxWorkflow) {
+      setProtectedDistributionLockboxWorkflow(body.lockboxWorkflow);
+    }
+    if (body.signoffWorkflow) {
+      setProtectedNamedReviewerSignoffWorkflow(body.signoffWorkflow);
+    }
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected evidence-room access-log reconciliation recorded${
+        body.reconciliationId ? ` with reconciliation id ${body.reconciliationId}` : ""
+      }. Export remains disabled pending externally retained access-log authority.`
+    );
+  }
+
+  async function downloadProtectedEvidenceRoomAccessLogReconciliationPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedEvidenceRoomAccessLogReconciliationPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/evidence-room-access-log-reconciliation/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedEvidenceRoomAccessLogReconciliationPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected evidence-room access-log reconciliation packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-evidence-room-access-log-reconciliation.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      "Protected evidence-room access-log reconciliation packet downloaded and its audit event was committed."
     );
   }
 
@@ -3318,6 +3565,17 @@ export default function ProtectedPilotAccess({
             onRecordAttestation={recordProtectedEvidenceRoomRecipientAttestation}
             packetBusy={protectedEvidenceRoomRecipientAttestationPacketStatus === "downloading"}
             workflow={protectedEvidenceRoomRecipientAttestationWorkflow}
+          />
+
+          <ProtectedEvidenceRoomAccessLogReconciliationPanel
+            busy={protectedEvidenceRoomAccessLogReconciliationStatus === "saving"}
+            onDownloadPacket={downloadProtectedEvidenceRoomAccessLogReconciliationPacket}
+            onRecordReconciliation={recordProtectedEvidenceRoomAccessLogReconciliation}
+            packetBusy={
+              protectedEvidenceRoomAccessLogReconciliationPacketStatus === "downloading"
+            }
+            recipientWorkflow={protectedEvidenceRoomRecipientAttestationWorkflow}
+            workflow={protectedEvidenceRoomAccessLogReconciliationWorkflow}
           />
 
           <BuyerPilotRoomPanel

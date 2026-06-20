@@ -382,6 +382,14 @@ The database layer stores approvals in `public.clinical_activation_approvals` wi
 
 `GET /api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet` commits a write-before-release audit event through the existing enterprise proof-packet audit path and returns a Markdown approval workflow packet. The packet is legal, clinical, finance, and brand diligence support only. It does not create legal advice, clinical approval, FDA clearance, HIPAA compliance certification, reimbursement determination, PHI authorization, patient outreach permission, production connector authorization, diagnosis, treatment, record mutation, payer submission, autonomous clinical authority, or live clinical execution approval.
 
+## Evidence Room Access Log Reconciliation
+
+Protected workspaces now expose `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation` plus `GET /api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`.
+
+This workflow sits after evidence-room recipient attestations. It records only bounded no-PHI metadata for externally retained evidence-room access-log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review. It does not store raw access logs, recipient identifiers, recipient emails, exact recipient lists, IP addresses, device identifiers, access grants, signed approvals, legal opinions, customer permission artifacts, public release approval, external distribution approval, compliance certification, production authorization, or clinical execution authority.
+
+The database stores records in `public.protected_evidence_room_access_log_reconciliations` with select-only RLS for authenticated AAL2 tenant members. Writes go through `record_protected_evidence_room_access_log_reconciliation`, require tenant-admin, pilot-lead, or reviewer role, and append `protected-evidence-room-access-log-reconciliation-recorded` audit events. Packet downloads use the existing write-before-release proof-packet audit path.
+
 ## Sales Command Center Linkage
 
 Sales Operations now exposes `GET /api/sales-operations/opportunities/{intakeId}/command-center` for tenant-admin AAL2 users. The route links the selected Sales Operations opportunity to its buyer-specific protected workspace when one exists, then derives:

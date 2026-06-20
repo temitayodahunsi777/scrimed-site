@@ -31,6 +31,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected release authority attestation packet API: `/api/pilot-workspaces/{workspaceSlug}/release-authority-attestations/packet`
 - Protected evidence-room recipient attestation API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations`
 - Protected evidence-room recipient attestation packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet`
+- Protected evidence-room access-log reconciliation API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation`
+- Protected evidence-room access-log reconciliation packet API: `/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -46,6 +48,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 board scorecards that package rolling-quarter trend evidence, finance-allocation readiness, buyer-segment cohorts, competitive edge, and agent improvement priorities.
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
 - Protected AAL2 evidence-room recipient attestations that record intended recipient segment, access-window, packet-reference, and revocation metadata after release authority is complete while exact recipient lists, emails, access grants, and export approval remain external.
+- Protected AAL2 evidence-room access-log reconciliation that records externally retained log references, reconciliation windows, event-count summaries, anomaly posture, and revocation review while raw logs, recipient identifiers, addresses, device identifiers, and export approval remain external.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
 - Protected AAL2 release authority attestations that link ready disabled lockboxes to externally retained counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata while release remains disabled.
@@ -89,6 +92,8 @@ Protected release authority attestations are metadata-only references to externa
 
 Protected evidence-room recipient attestations are metadata-only references to intended recipient scope, access windows, packet references, and revocation posture. `recipient-attestation-review-ready-not-release-approval` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
 
+Protected evidence-room access-log reconciliation records are metadata-only references to externally retained access-log review. `access-log-reconciliation-review-ready-not-export-approval` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
+
 ## Next Build
 
-Add externally retained access-log reconciliation for evidence-room recipient attestations without storing recipient lists, emails, secrets, signed approvals, or sensitive artifacts in SCRIMED.
+Add third-party evidence-room provider adapter contracts and external audit-log import stubs without storing recipient identifiers, raw logs, secrets, signed approvals, or sensitive artifacts in SCRIMED.

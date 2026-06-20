@@ -299,6 +299,24 @@ async function checkProductConsole() {
     );
   }
 
+  if (
+    body.proofStack?.protectedEvidenceRoomAccessLogReconciliations !==
+    "aal2-evidence-room-access-log-reconciliation-disabled-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected evidence-room access-log reconciliation proof-stack posture."
+    );
+  }
+
+  if (
+    body.proofStack?.protectedEvidenceRoomAccessLogReconciliationPackets !==
+    "aal2-audited-evidence-room-access-log-reconciliation-packets-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected evidence-room access-log reconciliation packet proof-stack posture."
+    );
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -927,6 +945,31 @@ async function checkPublicMarketReadiness() {
     );
   }
 
+  if (
+    body.protectedEvidenceRoomAccessLogReconciliationStatus !==
+    "aal2-evidence-room-access-log-reconciliation-disabled-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected evidence-room access-log reconciliation status.");
+  }
+
+  if (
+    body.protectedEvidenceRoomAccessLogReconciliationApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected evidence-room access-log reconciliation API route."
+    );
+  }
+
+  if (
+    body.protectedEvidenceRoomAccessLogReconciliationPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet"
+  ) {
+    throw new Error(
+      "Public Market Readiness missing protected evidence-room access-log reconciliation packet API route."
+    );
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1365,6 +1408,38 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/evidence-room-recipient-attestations/packet`,
   "Protected Evidence Room Recipient Attestations packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-access-log-reconciliation`,
+  "Protected Evidence Room Access Log Reconciliation protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-access-log-reconciliation`,
+  "Protected Evidence Room Access Log Reconciliation write protected API",
+  {
+    recipientAttestationRecordIds: ["00000000-0000-4000-8000-000000000001"],
+    distributionAudience: "buyer-diligence-room",
+    reconciliationScope: "pre-release-access-log-review",
+    externalLogSystemLabel: "external evidence room access ledger",
+    accessLogReferenceLabel: "metadata access log reconciliation",
+    accessLogReferenceLocator: "evidence-room:access-log-ledger",
+    reconciliationWindowStart: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    reconciliationWindowEnd: new Date().toISOString(),
+    observedAccessEventCount: 0,
+    expectedRecipientSegmentCount: 1,
+    anomalyState: "none-observed",
+    revocationExerciseState: "not-issued",
+    anomalyEscalationPath: "escalate to governance owner and keep export disabled",
+    externalLogAuthorityRetained: true,
+    exportDisabled: true,
+    attestation: "evidence-room-access-log-reconciliation-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke metadata-only access log reconciliation"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/evidence-room-access-log-reconciliation/packet`,
+  "Protected Evidence Room Access Log Reconciliation packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

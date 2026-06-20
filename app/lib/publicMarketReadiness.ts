@@ -42,6 +42,10 @@ import {
   protectedEvidenceRoomRecipientAttestationPacketProofStackStatus,
   protectedEvidenceRoomRecipientAttestationStatus
 } from "./protectedEvidenceRoomRecipientAttestations";
+import {
+  protectedEvidenceRoomAccessLogReconciliationPacketProofStackStatus,
+  protectedEvidenceRoomAccessLogReconciliationStatus
+} from "./protectedEvidenceRoomAccessLogReconciliation";
 
 export type PublicMarketMetricCategory =
   | "unit-economics"
@@ -613,6 +617,11 @@ export function getPublicMarketReadinessSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations",
     protectedEvidenceRoomRecipientAttestationPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/evidence-room-recipient-attestations/packet",
+    protectedEvidenceRoomAccessLogReconciliationRoute: "/pilot-workspace/access",
+    protectedEvidenceRoomAccessLogReconciliationApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation",
+    protectedEvidenceRoomAccessLogReconciliationPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/evidence-room-access-log-reconciliation/packet",
     status: "capital-efficiency-kpi-stack-ready",
     proofStackStatus: publicMarketReadinessProofStackStatus,
     briefProofStackStatus: publicMarketReadinessBriefProofStackStatus,
@@ -642,6 +651,9 @@ export function getPublicMarketReadinessSummary() {
     protectedEvidenceRoomRecipientAttestationStatus,
     protectedEvidenceRoomRecipientAttestationPacketStatus:
       protectedEvidenceRoomRecipientAttestationPacketProofStackStatus,
+    protectedEvidenceRoomAccessLogReconciliationStatus,
+    protectedEvidenceRoomAccessLogReconciliationPacketStatus:
+      protectedEvidenceRoomAccessLogReconciliationPacketProofStackStatus,
     thesis: "SCRIMED is healthcare intelligence infrastructure, not another AI model company.",
     investorNarrative: publicMarketInvestorThesis,
     efficientHealthcareIntelligence:
@@ -664,7 +676,7 @@ export function getPublicMarketReadinessSummary() {
     boardCadence: publicMarketBoardCadence,
     limitations: publicMarketLimitations,
     nextBuildStep:
-      "Add externally retained access-log reconciliation for evidence-room recipient attestations without storing recipient lists, emails, secrets, signed approvals, or sensitive artifacts in SCRIMED.",
+      "Add third-party evidence-room provider adapter contracts and external audit-log import stubs without storing recipient identifiers, raw logs, secrets, signed approvals, or sensitive artifacts in SCRIMED.",
     updated: "2026-06-20"
   };
 }
@@ -699,6 +711,8 @@ export function buildPublicMarketReadinessBrief() {
 - Protected release authority attestation packets: ${summary.protectedReleaseAuthorityAttestationPacketStatus}
 - Protected evidence-room recipient attestations: ${summary.protectedEvidenceRoomRecipientAttestationStatus}
 - Protected evidence-room recipient attestation packets: ${summary.protectedEvidenceRoomRecipientAttestationPacketStatus}
+- Protected evidence-room access-log reconciliation: ${summary.protectedEvidenceRoomAccessLogReconciliationStatus}
+- Protected evidence-room access-log reconciliation packets: ${summary.protectedEvidenceRoomAccessLogReconciliationPacketStatus}
 - Route: ${summary.route}
 - API: ${summary.apiRoute}
 - Protected metric route: ${summary.protectedOperatorMetricRoute}
@@ -733,6 +747,9 @@ export function buildPublicMarketReadinessBrief() {
 - Protected evidence-room recipient attestation route: ${summary.protectedEvidenceRoomRecipientAttestationRoute}
 - Protected evidence-room recipient attestation API: ${summary.protectedEvidenceRoomRecipientAttestationApiRoute}
 - Protected evidence-room recipient attestation packet API: ${summary.protectedEvidenceRoomRecipientAttestationPacketApiRoute}
+- Protected evidence-room access-log reconciliation route: ${summary.protectedEvidenceRoomAccessLogReconciliationRoute}
+- Protected evidence-room access-log reconciliation API: ${summary.protectedEvidenceRoomAccessLogReconciliationApiRoute}
+- Protected evidence-room access-log reconciliation packet API: ${summary.protectedEvidenceRoomAccessLogReconciliationPacketApiRoute}
 - Updated: ${summary.updated}
 
 ## Thesis
