@@ -239,6 +239,20 @@ async function checkProductConsole() {
     throw new Error("product console missing protected release decision packet proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.protectedNamedReviewerSignoffs !==
+    "aal2-named-reviewer-signoff-metadata-no-phi"
+  ) {
+    throw new Error("product console missing protected named reviewer sign-off proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedNamedReviewerSignoffPackets !==
+    "aal2-audited-named-reviewer-signoff-packets-no-phi"
+  ) {
+    throw new Error("product console missing protected named reviewer sign-off packet proof-stack posture.");
+  }
+
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
     throw new Error("product console missing passkey management proof-stack posture.");
   }
@@ -779,6 +793,27 @@ async function checkPublicMarketReadiness() {
     throw new Error("Public Market Readiness missing protected release decision packet API route.");
   }
 
+  if (
+    body.protectedNamedReviewerSignoffStatus !==
+    "aal2-named-reviewer-signoff-metadata-no-phi"
+  ) {
+    throw new Error("Public Market Readiness missing protected named reviewer sign-off status.");
+  }
+
+  if (
+    body.protectedNamedReviewerSignoffApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs"
+  ) {
+    throw new Error("Public Market Readiness missing protected named reviewer sign-off API route.");
+  }
+
+  if (
+    body.protectedNamedReviewerSignoffPacketApiRoute !==
+    "/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet"
+  ) {
+    throw new Error("Public Market Readiness missing protected named reviewer sign-off packet API route.");
+  }
+
   const brief = await request("/api/public-market-readiness/brief");
   requireStatus("Public Market Readiness brief", brief.response.status, 200);
   requireContentType("Public Market Readiness brief", brief.response, "text/markdown");
@@ -1096,6 +1131,34 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/release-decisions/packet`,
   "Protected Release Decisions packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/reviewer-signoffs`,
+  "Protected Named Reviewer Sign-Offs protected API"
+);
+await checkProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/reviewer-signoffs`,
+  "Protected Named Reviewer Sign-Offs write protected API",
+  {
+    reviewerRole: "qualified-counsel",
+    releaseDecisionId: "00000000-0000-4000-8000-000000000001",
+    reviewerDisplayName: "qualified reviewer",
+    reviewerOrganization: "external review channel",
+    signoffReferenceLabel: "Smoke named reviewer signoff",
+    signoffReferenceLocator: "review-room:claim-signoff",
+    artifactScope: "governance claim registry version",
+    approvedClaimVersion: "claims-v1.0.0",
+    distributionScope: "controlled buyer diligence review",
+    expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+    externalSignoffRetained: true,
+    attestation: "named-reviewer-signoff-metadata-no-phi",
+    dataBoundary: "synthetic-business-workflow-only",
+    reviewNote: "smoke metadata-only named reviewer signoff"
+  }
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/reviewer-signoffs/packet`,
+  "Protected Named Reviewer Sign-Offs packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/buyer-room/packet`,

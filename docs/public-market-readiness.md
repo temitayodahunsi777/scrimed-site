@@ -23,6 +23,8 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected external approval evidence packet API: `/api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet`
 - Protected release decision API: `/api/pilot-workspaces/{workspaceSlug}/release-decisions`
 - Protected release decision packet API: `/api/pilot-workspaces/{workspaceSlug}/release-decisions/packet`
+- Protected named reviewer sign-off API: `/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs`
+- Protected named reviewer sign-off packet API: `/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet`
 - Product Console: `/product`
 - Product Console API: `/api/product/console`
 
@@ -39,6 +41,7 @@ SCRIMED Public Market Readiness is the operating layer for building the company 
 - Protected AAL2 finance methodology gates that record internal no-PHI readiness for cost allocation, counsel review, executive release, privacy/security, clinical boundary, marketing claims, and buyer permission while external-use authority remains blocked.
 - Protected AAL2 external approval evidence linkage that records metadata-only references to externally retained finance, counsel, security, clinical-governance, marketing-claims, executive, and buyer-permission artifacts without storing sensitive approval documents or creating release authority.
 - Protected AAL2 release decision workflow that versions claim registry language, audience, channel, linked approval evidence, missing domains, and release-review readiness without creating public release authority.
+- Protected AAL2 named reviewer sign-off packets that track metadata references to externally retained finance, counsel, executive, privacy/security, clinical-governance, marketing, and buyer-permission sign-offs before controlled distribution review.
 - Customer proof ladder from public product proof through enterprise operating license.
 - Board cadence for weekly operating review, monthly metric review, quarterly governance review, and investor diligence review.
 - Known limitations with workarounds and graduation gates.
@@ -69,6 +72,8 @@ Protected external approval evidence references are metadata-only links to exter
 
 Protected release decisions are versioned claim registry readiness records only. `ready-for-qualified-release-review-not-release-authority` is not public release approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
 
+Protected named reviewer sign-offs are metadata references only. `ready-for-controlled-distribution-review-not-release-authority` is not public release approval, external distribution approval, legal approval, audited financial reporting, securities offering material, investment advice, customer permission, advertising substantiation, clinical validation, reimbursement assurance, compliance certification, production authorization, or live clinical execution authority.
+
 ## Next Build
 
-Add final named reviewer sign-off packets once qualified external reviewers approve exact artifacts, claim wording, audience, and distribution controls outside SCRIMED.
+Add external distribution lockbox controls only after qualified external reviewers approve exact artifacts, claim wording, audience, and distribution controls outside SCRIMED.

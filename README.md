@@ -100,6 +100,7 @@ Current focus areas include:
 - fixture change review and quality gates
 - safety and governance infrastructure
 - deployment monitoring systems
+- public-market claim controls with external approval evidence, versioned release decisions, and named reviewer sign-off metadata packets
 
 ---
 

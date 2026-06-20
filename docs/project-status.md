@@ -2,6 +2,16 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Named Reviewer Sign-Off Packets Release
+
+- Added protected Named Reviewer Sign-Off Packets inside `/pilot-workspace/access` after Release Decision Workflow.
+- Added `GET` and `POST /api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs` for AAL2 no-PHI metadata references to externally retained finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission reviewer sign-offs.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet` for audited named reviewer sign-off packet downloads.
+- Added `app/lib/protectedNamedReviewerSignoffs.ts` with typed reviewer roles, claim-version linkage, expiry checks, controlled distribution review state, release authorities, workflow derivation, safe workarounds, and packet generation.
+- Added `public.protected_named_reviewer_signoffs` with select-only RLS, guarded RPC writes, no direct authenticated write grants, append-only `protected-named-reviewer-signoff-recorded` audit events, and runtime schema `2026-06-20.3`.
+- Updated Public Market Readiness, Product Console proof stack, protected workspace API contracts, docs, and public smoke coverage with `aal2-named-reviewer-signoff-metadata-no-phi` and `aal2-audited-named-reviewer-signoff-packets-no-phi`.
+- Preserved the boundary: this layer stores metadata references only and can indicate readiness for controlled distribution review. It does not approve public release, external distribution, legal claims, audited financial reporting, securities materials, customer references, advertising substantiation, clinical validation, compliance certification, production authorization, or live clinical execution.
+
 ## Latest Protected Release Decision Workflow Release
 
 - Added protected Release Decision Workflow inside `/pilot-workspace/access` after External Approval Evidence Linkage.

@@ -97,6 +97,12 @@ import type {
   ProtectedReleaseDecisionRecord,
   ProtectedReleaseDecisionStatus
 } from "./protectedReleaseDecisionWorkflow";
+import type {
+  ProtectedNamedReviewerSignoffInput,
+  ProtectedNamedReviewerSignoffRecord,
+  ProtectedNamedReviewerSignoffStatus,
+  ProtectedReviewerRole
+} from "./protectedNamedReviewerSignoffs";
 
 type AuthenticatedPilotContext =
   | {
@@ -445,6 +451,47 @@ type ProtectedReleaseDecisionRow = {
   securities_authority: ProtectedReleaseDecisionRecord["securitiesAuthority"];
   advertising_claims_authority: ProtectedReleaseDecisionRecord["advertisingClaimsAuthority"];
   clinical_execution_authority: ProtectedReleaseDecisionRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedNamedReviewerSignoffRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  release_decision_id: string | null;
+  reviewer_role: ProtectedReviewerRole;
+  reviewer_role_label: string;
+  signoff_status: Exclude<ProtectedNamedReviewerSignoffStatus, "not-recorded">;
+  approval_scope: ProtectedNamedReviewerSignoffRecord["approvalScope"];
+  reviewer_display_name: string;
+  reviewer_organization: string;
+  signoff_reference_label: string;
+  signoff_reference_locator: string;
+  artifact_scope: string;
+  approved_claim_version: string;
+  distribution_scope: string;
+  expires_at: string;
+  external_signoff_retained: boolean;
+  evidence_snapshot: unknown;
+  required_reviewer_roles: ProtectedReviewerRole[];
+  linked_reviewer_roles: ProtectedReviewerRole[];
+  missing_reviewer_roles: ProtectedReviewerRole[];
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  attestation: ProtectedNamedReviewerSignoffRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedNamedReviewerSignoffRecord["dataBoundary"];
+  signoff_authority: ProtectedNamedReviewerSignoffRecord["signoffAuthority"];
+  release_authority: ProtectedNamedReviewerSignoffRecord["releaseAuthority"];
+  storage_authority: ProtectedNamedReviewerSignoffRecord["storageAuthority"];
+  release_decision_authority: ProtectedNamedReviewerSignoffRecord["releaseDecisionAuthority"];
+  financial_reporting_authority: ProtectedNamedReviewerSignoffRecord["financialReportingAuthority"];
+  securities_authority: ProtectedNamedReviewerSignoffRecord["securitiesAuthority"];
+  advertising_claims_authority: ProtectedNamedReviewerSignoffRecord["advertisingClaimsAuthority"];
+  clinical_execution_authority: ProtectedNamedReviewerSignoffRecord["clinicalExecutionAuthority"];
   recorded_by: string;
   recorded_at: string;
   created_at: string;
@@ -1161,6 +1208,51 @@ function mapProtectedReleaseDecision(row: ProtectedReleaseDecisionRow): Protecte
   };
 }
 
+function mapProtectedNamedReviewerSignoff(
+  row: ProtectedNamedReviewerSignoffRow
+): ProtectedNamedReviewerSignoffRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    releaseDecisionId: row.release_decision_id,
+    reviewerRole: row.reviewer_role,
+    reviewerRoleLabel: row.reviewer_role_label,
+    signoffStatus: row.signoff_status,
+    approvalScope: row.approval_scope,
+    reviewerDisplayName: row.reviewer_display_name,
+    reviewerOrganization: row.reviewer_organization,
+    signoffReferenceLabel: row.signoff_reference_label,
+    signoffReferenceLocator: row.signoff_reference_locator,
+    artifactScope: row.artifact_scope,
+    approvedClaimVersion: row.approved_claim_version,
+    distributionScope: row.distribution_scope,
+    expiresAt: row.expires_at,
+    externalSignoffRetained: row.external_signoff_retained,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    requiredReviewerRoles: row.required_reviewer_roles,
+    linkedReviewerRoles: row.linked_reviewer_roles,
+    missingReviewerRoles: row.missing_reviewer_roles,
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    signoffAuthority: row.signoff_authority,
+    releaseAuthority: row.release_authority,
+    storageAuthority: row.storage_authority,
+    releaseDecisionAuthority: row.release_decision_authority,
+    financialReportingAuthority: row.financial_reporting_authority,
+    securitiesAuthority: row.securities_authority,
+    advertisingClaimsAuthority: row.advertising_claims_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -1461,6 +1553,8 @@ const protectedExternalApprovalEvidenceSelect =
   "id, tenant_id, workspace_id, finance_gate_record_id, domain_id, domain_label, reference_status, approval_scope, external_reference_label, external_system, reference_locator, reference_owner, evidence_retained_externally, evidence_snapshot, retained_blockers, release_restrictions, attestation, review_note, data_boundary, evidence_authority, storage_authority, release_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const protectedReleaseDecisionSelect =
   "id, tenant_id, workspace_id, release_audience, claim_category, claim_version, claim_text, decision_status, approval_scope, distribution_channel, external_approval_evidence_record_ids, evidence_snapshot, required_approval_domains, linked_approval_domains, missing_approval_domains, retained_blockers, release_restrictions, attestation, review_note, data_boundary, claim_registry_authority, release_decision_authority, distribution_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
+const protectedNamedReviewerSignoffSelect =
+  "id, tenant_id, workspace_id, release_decision_id, reviewer_role, reviewer_role_label, signoff_status, approval_scope, reviewer_display_name, reviewer_organization, signoff_reference_label, signoff_reference_locator, artifact_scope, approved_claim_version, distribution_scope, expires_at, external_signoff_retained, evidence_snapshot, required_reviewer_roles, linked_reviewer_roles, missing_reviewer_roles, retained_blockers, release_restrictions, attestation, review_note, data_boundary, signoff_authority, release_authority, storage_authority, release_decision_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -1824,6 +1918,22 @@ export async function listProtectedReleaseDecisions(client: SupabaseClient, work
   return {
     records: ((data ?? []) as unknown as ProtectedReleaseDecisionRow[]).map(
       mapProtectedReleaseDecision
+    ),
+    error
+  };
+}
+
+export async function listProtectedNamedReviewerSignoffs(client: SupabaseClient, workspaceId: string) {
+  const { data, error } = await client
+    .from("protected_named_reviewer_signoffs")
+    .select(protectedNamedReviewerSignoffSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(150);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedNamedReviewerSignoffRow[]).map(
+      mapProtectedNamedReviewerSignoff
     ),
     error
   };
@@ -2257,6 +2367,22 @@ export async function recordProtectedReleaseDecision(
   };
 }
 
+export async function recordProtectedNamedReviewerSignoff(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedNamedReviewerSignoffInput
+) {
+  const { data, error } = await client.rpc("record_protected_named_reviewer_signoff", {
+    p_workspace_slug: workspaceSlug,
+    p_signoff_input: input
+  });
+
+  return {
+    signoffId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedExternalApprovalEvidencePacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -2295,6 +2421,31 @@ export async function recordProtectedReleaseDecisionPacketDownload(
       noPhiOnly: true,
       metadataOnly: true,
       releaseAuthority: "qualified-release-review-not-public-release"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedNamedReviewerSignoffPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-named-reviewer-signoffs",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      releaseAuthority: "controlled-distribution-review-not-release-authority",
+      storageAuthority: "no-sensitive-signature-document-storage"
     }
   });
 

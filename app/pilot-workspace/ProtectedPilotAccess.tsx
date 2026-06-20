@@ -31,6 +31,7 @@ import ProtectedExternalApprovalEvidencePanel from "./ProtectedExternalApprovalE
 import ProtectedFinanceMethodologyPanel from "./ProtectedFinanceMethodologyPanel";
 import ProtectedMetricRollupsPanel from "./ProtectedMetricRollupsPanel";
 import ProtectedMetricTrendsPanel from "./ProtectedMetricTrendsPanel";
+import ProtectedNamedReviewerSignoffPanel from "./ProtectedNamedReviewerSignoffPanel";
 import ProtectedOperatorMetricsPanel from "./ProtectedOperatorMetricsPanel";
 import ProtectedReleaseDecisionPanel from "./ProtectedReleaseDecisionPanel";
 import TenantAccessAdministrationPanel from "./TenantAccessAdministrationPanel";
@@ -73,6 +74,10 @@ import type {
   ProtectedReleaseDecisionInput,
   ProtectedReleaseDecisionWorkflow
 } from "../lib/protectedReleaseDecisionWorkflow";
+import type {
+  ProtectedNamedReviewerSignoffInput,
+  ProtectedNamedReviewerSignoffWorkflow
+} from "../lib/protectedNamedReviewerSignoffs";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -190,6 +195,17 @@ type ProtectedReleaseDecisionResponse = {
   error?: { message?: string };
 };
 
+type ProtectedNamedReviewerSignoffResponse = {
+  signoffId?: string;
+  records?: unknown[];
+  workflow?: ProtectedNamedReviewerSignoffWorkflow;
+  releaseWorkflow?: ProtectedReleaseDecisionWorkflow;
+  externalWorkflow?: ProtectedExternalApprovalEvidenceWorkflow;
+  financeWorkflow?: ProtectedFinanceMethodologyWorkflow;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -299,6 +315,12 @@ export default function ProtectedPilotAccess({
     useState<"idle" | "saving">("idle");
   const [protectedReleaseDecisionPacketStatus, setProtectedReleaseDecisionPacketStatus] =
     useState<"idle" | "downloading">("idle");
+  const [protectedNamedReviewerSignoffWorkflow, setProtectedNamedReviewerSignoffWorkflow] =
+    useState<ProtectedNamedReviewerSignoffWorkflow | null>(null);
+  const [protectedNamedReviewerSignoffStatus, setProtectedNamedReviewerSignoffStatus] =
+    useState<"idle" | "saving">("idle");
+  const [protectedNamedReviewerSignoffPacketStatus, setProtectedNamedReviewerSignoffPacketStatus] =
+    useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -353,6 +375,12 @@ export default function ProtectedPilotAccess({
     setProtectedReleaseDecisionWorkflow(null);
     setProtectedReleaseDecisionStatus("idle");
     setProtectedReleaseDecisionPacketStatus("idle");
+  }, []);
+
+  const resetProtectedNamedReviewerSignoff = useCallback(() => {
+    setProtectedNamedReviewerSignoffWorkflow(null);
+    setProtectedNamedReviewerSignoffStatus("idle");
+    setProtectedNamedReviewerSignoffPacketStatus("idle");
   }, []);
 
   useEffect(() => {
@@ -520,6 +548,7 @@ export default function ProtectedPilotAccess({
       resetProtectedFinanceMethodology();
       resetProtectedExternalApprovalEvidence();
       resetProtectedReleaseDecision();
+      resetProtectedNamedReviewerSignoff();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -537,7 +566,8 @@ export default function ProtectedPilotAccess({
           loadProtectedBoardScorecards(activeSession, nextWorkspaces[0]),
           loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0]),
           loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0]),
-          loadProtectedReleaseDecision(activeSession, nextWorkspaces[0])
+          loadProtectedReleaseDecision(activeSession, nextWorkspaces[0]),
+          loadProtectedNamedReviewerSignoffs(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -830,6 +860,38 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedNamedReviewerSignoffs(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/reviewer-signoffs`, {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const body = (await response.json()) as ProtectedNamedReviewerSignoffResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(body.error?.message ?? "Protected named reviewer sign-offs could not be loaded.");
+        return;
+      }
+
+      setProtectedNamedReviewerSignoffWorkflow(body.workflow ?? null);
+      if (body.releaseWorkflow) {
+        setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+      }
+      if (body.externalWorkflow) {
+        setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+      }
+      if (body.financeWorkflow) {
+        setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -847,6 +909,7 @@ export default function ProtectedPilotAccess({
     resetProtectedExternalApprovalEvidence,
     resetProtectedFinanceMethodology,
     resetProtectedMetricTrends,
+    resetProtectedNamedReviewerSignoff,
     resetProtectedOperatorMetrics,
     resetProtectedReleaseDecision,
     supabase
@@ -1025,6 +1088,7 @@ export default function ProtectedPilotAccess({
     resetProtectedFinanceMethodology();
     resetProtectedExternalApprovalEvidence();
     resetProtectedReleaseDecision();
+    resetProtectedNamedReviewerSignoff();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1054,7 +1118,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedBoardScorecards(session, workspace),
       refreshProtectedFinanceMethodology(session, workspace),
       refreshProtectedExternalApprovalEvidence(session, workspace),
-      refreshProtectedReleaseDecision(session, workspace)
+      refreshProtectedReleaseDecision(session, workspace),
+      refreshProtectedNamedReviewerSignoffs(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -1265,6 +1330,34 @@ export default function ProtectedPilotAccess({
     }
 
     setProtectedReleaseDecisionWorkflow(body.workflow ?? null);
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+  }
+
+  async function refreshProtectedNamedReviewerSignoffs(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(`/api/pilot-workspaces/${workspace.slug}/reviewer-signoffs`, {
+      headers: {
+        Authorization: `Bearer ${activeSession.access_token}`
+      }
+    });
+    const body = (await response.json()) as ProtectedNamedReviewerSignoffResponse;
+
+    if (!response.ok) {
+      setMessage(body.error?.message ?? "Protected named reviewer sign-offs could not be loaded.");
+      return;
+    }
+
+    setProtectedNamedReviewerSignoffWorkflow(body.workflow ?? null);
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
     if (body.externalWorkflow) {
       setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
     }
@@ -2085,6 +2178,7 @@ export default function ProtectedPilotAccess({
     if (body.financeWorkflow) {
       setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
     }
+    await refreshProtectedNamedReviewerSignoffs(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       `Protected release decision recorded${
@@ -2126,6 +2220,91 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage("Protected release decision packet downloaded and its audit event was committed.");
+  }
+
+  async function recordProtectedNamedReviewerSignoff(input: ProtectedNamedReviewerSignoffInput) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedNamedReviewerSignoffStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/reviewer-signoffs`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedNamedReviewerSignoffResponse;
+    setProtectedNamedReviewerSignoffStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected named reviewer sign-off could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedNamedReviewerSignoffWorkflow(body.workflow ?? protectedNamedReviewerSignoffWorkflow);
+    if (body.releaseWorkflow) {
+      setProtectedReleaseDecisionWorkflow(body.releaseWorkflow);
+    }
+    if (body.externalWorkflow) {
+      setProtectedExternalApprovalEvidenceWorkflow(body.externalWorkflow);
+    }
+    if (body.financeWorkflow) {
+      setProtectedFinanceMethodologyWorkflow(body.financeWorkflow);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected named reviewer sign-off metadata recorded${
+        body.signoffId ? ` with sign-off id ${body.signoffId}` : ""
+      }.`
+    );
+  }
+
+  async function downloadProtectedNamedReviewerSignoffPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedNamedReviewerSignoffPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/reviewer-signoffs/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedNamedReviewerSignoffPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ?? "The protected named reviewer sign-off packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-named-reviewer-signoffs.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage("Protected named reviewer sign-off packet downloaded and its audit event was committed.");
   }
 
   if (!configured) {
@@ -2453,6 +2632,15 @@ export default function ProtectedPilotAccess({
             onRecordDecision={recordProtectedReleaseDecision}
             packetBusy={protectedReleaseDecisionPacketStatus === "downloading"}
             workflow={protectedReleaseDecisionWorkflow}
+          />
+
+          <ProtectedNamedReviewerSignoffPanel
+            busy={protectedNamedReviewerSignoffStatus === "saving"}
+            onDownloadPacket={downloadProtectedNamedReviewerSignoffPacket}
+            onRecordSignoff={recordProtectedNamedReviewerSignoff}
+            packetBusy={protectedNamedReviewerSignoffPacketStatus === "downloading"}
+            releaseWorkflow={protectedReleaseDecisionWorkflow}
+            workflow={protectedNamedReviewerSignoffWorkflow}
           />
 
           <BuyerPilotRoomPanel

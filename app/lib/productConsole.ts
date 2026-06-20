@@ -130,6 +130,10 @@ import {
   protectedReleaseDecisionPacketProofStackStatus,
   protectedReleaseDecisionWorkflowStatus
 } from "./protectedReleaseDecisionWorkflow";
+import {
+  protectedNamedReviewerSignoffPacketProofStackStatus,
+  protectedNamedReviewerSignoffStatus
+} from "./protectedNamedReviewerSignoffs";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -734,6 +738,12 @@ export function getProductConsoleSummary() {
     protectedReleaseDecisionApiRoute: publicMarketReadinessSummary.protectedReleaseDecisionApiRoute,
     protectedReleaseDecisionPacketApiRoute:
       publicMarketReadinessSummary.protectedReleaseDecisionPacketApiRoute,
+    protectedNamedReviewerSignoffRoute:
+      publicMarketReadinessSummary.protectedNamedReviewerSignoffRoute,
+    protectedNamedReviewerSignoffApiRoute:
+      publicMarketReadinessSummary.protectedNamedReviewerSignoffApiRoute,
+    protectedNamedReviewerSignoffPacketApiRoute:
+      publicMarketReadinessSummary.protectedNamedReviewerSignoffPacketApiRoute,
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -884,6 +894,8 @@ export function getProductConsoleSummary() {
         protectedExternalApprovalEvidencePacketProofStackStatus,
       protectedReleaseDecisions: protectedReleaseDecisionWorkflowStatus,
       protectedReleaseDecisionPackets: protectedReleaseDecisionPacketProofStackStatus,
+      protectedNamedReviewerSignoffs: protectedNamedReviewerSignoffStatus,
+      protectedNamedReviewerSignoffPackets: protectedNamedReviewerSignoffPacketProofStackStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1055,6 +1067,9 @@ export function getProductReadinessBrief() {
     `Protected release decisions: ${summary.protectedReleaseDecisionRoute}`,
     `Protected release decisions API: ${summary.protectedReleaseDecisionApiRoute}`,
     `Protected release decision packet API: ${summary.protectedReleaseDecisionPacketApiRoute}`,
+    `Protected named reviewer sign-offs: ${summary.protectedNamedReviewerSignoffRoute}`,
+    `Protected named reviewer sign-offs API: ${summary.protectedNamedReviewerSignoffApiRoute}`,
+    `Protected named reviewer sign-off packet API: ${summary.protectedNamedReviewerSignoffPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

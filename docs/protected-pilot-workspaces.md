@@ -121,6 +121,19 @@ Safe operating pattern:
 - Download the audited claim registry packet only after the write-before-release audit event commits.
 - Treat release-review readiness as an internal control state. It is not legal approval, public release approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
 
+## Named Reviewer Sign-Off Packets
+
+`/pilot-workspace/access` now includes Protected Named Reviewer Sign-Off Packets immediately after Release Decision Workflow. Tenant admins, pilot leads, and reviewers can record no-PHI metadata references to externally retained sign-offs for finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission reviewer roles.
+
+Named reviewer sign-offs compute whether all required reviewer roles are linked to a ready release decision for the same claim version and whether sign-off metadata is expired or expiring soon. The highest state is `ready-for-controlled-distribution-review-not-release-authority`.
+
+Safe operating pattern:
+
+- Keep reviewer approvals, signatures, legal opinions, customer permissions, and source artifacts in qualified external systems.
+- Record only bounded reviewer-role, claim-version, artifact-scope, external locator, expiration, and no-PHI review metadata in SCRIMED.
+- Download the audited named reviewer sign-off packet only after the write-before-release audit event commits.
+- Treat controlled distribution review readiness as an internal control state. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, production authorization, or live clinical execution authority.
+
 ## Pilot Demo Readiness Command Center
 
 `/pilot-workspace/access` now includes a protected Pilot Demo Readiness Command Center. It turns the current workspace, durable synthetic sessions, append-only audit events, proof-packet release events, and tenant-session verification results into:

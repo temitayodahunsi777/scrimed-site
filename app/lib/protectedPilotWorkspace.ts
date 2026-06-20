@@ -516,6 +516,20 @@ export const protectedPilotApiContracts = [
       "Download an audited protected release decision claim registry packet after committing the packet release event while retaining all public-release, legal, finance, advertising, customer, compliance, production, and clinical execution blockers."
   },
   {
+    method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + tenant-admin, pilot-lead, or reviewer role + fixed no-PHI named reviewer sign-off metadata attestation + rate limit",
+    purpose:
+      "Inspect or record bounded no-PHI metadata references to externally retained named reviewer sign-offs for finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission roles. This can prepare controlled distribution review, but does not create public-release, legal, finance, advertising, customer, compliance, production, or clinical execution authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/reviewer-signoffs/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited protected named reviewer sign-off packet after committing the packet release event while retaining metadata-only storage and all public-release, external distribution, legal, finance, customer, compliance, production, and clinical execution blockers."
+  },
+  {
     method: "GET",
     route: "/api/pilot-workspaces/{workspaceSlug}/clinical-activation-approvals/packet",
     access: "AAL2 bearer token + authorized tenant role + server-held runtime authorization + rate limit + append-only packet-download audit",
