@@ -56,6 +56,7 @@ import {
   getReadinessDomains
 } from "./enterpriseReadiness";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
+import { getGlobalPartnerLocalizationSummary } from "./globalPartnerLocalization";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
 import {
@@ -131,6 +132,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Trust infrastructure",
     objective: "Monitor drift, regressions, runtime traces, cost, latency, and safety signals."
+  },
+  {
+    name: "Global Reach",
+    route: "/global-reach",
+    phase: "staged",
+    status: "design",
+    owner: "Global partnerships and market activation",
+    objective: "Map regions, buyer packs, partner channels, procurement paths, and retained approval gates."
   }
 ];
 
@@ -173,6 +182,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
   { name: "Attribution analytics", value: "source-to-pilot cohorts active", tone: "good" },
+  { name: "Global reach", value: "region and buyer localization packs active", tone: "good" },
   { name: "Source intelligence", value: "public platform signals encoded", tone: "good" },
   { name: "Persistent Agent Workspace", value: "work-order proof layer active", tone: "good" },
   { name: "Pilot evidence", value: "enterprise proof dashboard active", tone: "good" },
@@ -295,6 +305,7 @@ export const hubRoutes = [
   "/demos",
   "/pricing",
   "/market-activation",
+  "/global-reach",
   "/sales-attribution",
   "/attribution-analytics",
   "/source-intelligence",
@@ -398,6 +409,8 @@ export const hubRoutes = [
   "/api/commercial/pricing",
   "/api/competitive-edge",
   "/api/market-activation",
+  "/api/global-reach",
+  "/api/global-reach/brief",
   "/api/sales-attribution",
   "/api/attribution-analytics",
   "/api/sales-operations/attribution-analytics",
@@ -504,6 +517,7 @@ export function getHubSummary() {
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
+  const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
 
@@ -531,6 +545,7 @@ export function getHubSummary() {
     companyOperationsSummary,
     enterpriseReadinessSummary,
     attributionAnalyticsSummary,
+    globalPartnerLocalizationSummary,
     trustSafetyOperationsSummary,
     qaEvidenceLedger,
     agentEvaluationWorkspaceSummary,
@@ -556,6 +571,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-18"
+    updated: "2026-06-20"
   };
 }

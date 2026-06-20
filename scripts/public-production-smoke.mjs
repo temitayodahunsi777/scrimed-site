@@ -98,6 +98,17 @@ function requirePublicMarketBoundary(label, response) {
   }
 }
 
+function requireGlobalReachBoundary(label, response) {
+  const globalAuthority = response.headers.get("x-scrimed-global-authority");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (globalAuthority !== "localization-readiness-not-legal-approval") {
+    throw new Error(`${label} expected x-scrimed-global-authority localization-readiness-not-legal-approval but received ${globalAuthority}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -363,6 +374,20 @@ async function checkProductConsole() {
     throw new Error(
       "product console missing protected procurement evidence registry packet proof-stack posture."
     );
+  }
+
+  if (
+    body.proofStack?.globalPartnerLocalization !==
+    "global-partner-localization-layer-ready"
+  ) {
+    throw new Error("product console missing global partner localization proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.globalPartnerLocalizationBrief !==
+    "global-partner-localization-brief-ready-no-legal-advice"
+  ) {
+    throw new Error("product console missing global partner localization brief proof-stack posture.");
   }
 
   if (body.proofStack?.passkeyManagement !== "self-service-list-rename-register-revoke") {
@@ -1103,6 +1128,57 @@ async function checkPublicMarketReadiness() {
   console.log("pass public market readiness");
 }
 
+async function checkGlobalReach() {
+  const result = await request("/api/global-reach");
+  requireStatus("Global Reach", result.response.status, 200);
+  requireContentType("Global Reach", result.response, "application/json");
+  requireGlobalReachBoundary("Global Reach", result.response);
+  const body = requireJson("Global Reach", result.body);
+
+  if (body.service !== "scrimed-global-partner-localization") {
+    throw new Error(`Global Reach expected scrimed-global-partner-localization but received ${body.service}.`);
+  }
+
+  if (body.status !== "global-partner-localization-layer-ready") {
+    throw new Error(`Global Reach expected global-partner-localization-layer-ready but received ${body.status}.`);
+  }
+
+  if (!Array.isArray(body.regions) || body.regions.length < 8) {
+    throw new Error("Global Reach expected at least eight region focus packs.");
+  }
+
+  if (!Array.isArray(body.buyerPacks) || body.buyerPacks.length < 7) {
+    throw new Error("Global Reach expected at least seven buyer localization packs.");
+  }
+
+  if (!Array.isArray(body.boundaryResolutions) || body.boundaryResolutions.length < 8) {
+    throw new Error("Global Reach expected boundary resolution coverage.");
+  }
+
+  if (!body.boundaryResolutions.every((resolution) => resolution.status === "contained-with-workaround")) {
+    throw new Error("Global Reach expected all known boundaries to be contained with workarounds.");
+  }
+
+  if (!Array.isArray(body.competitiveEdges) || body.competitiveEdges.length < 5) {
+    throw new Error("Global Reach expected at least five competitive edge pillars.");
+  }
+
+  const brief = await request("/api/global-reach/brief");
+  requireStatus("Global Reach brief", brief.response.status, 200);
+  requireContentType("Global Reach brief", brief.response, "text/markdown");
+  requireGlobalReachBoundary("Global Reach brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Global Partner And Buyer Localization Brief")) {
+    throw new Error("Global Reach brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not legal advice")) {
+    throw new Error("Global Reach brief missing legal boundary.");
+  }
+
+  console.log("pass global reach");
+}
+
 async function checkProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -1134,8 +1210,10 @@ await checkHtml("/pilot-deal-room");
 await checkHtml("/qa-evidence");
 await checkHtml("/clinical-care-activation");
 await checkHtml("/public-market-readiness");
+await checkHtml("/global-reach");
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
+await checkGlobalReach();
 await checkProductConsole();
 await checkReadiness();
 await checkCompetitiveEdgeApi();

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAttributionAnalyticsSummary } from "../lib/attributionAnalytics";
+import { getGlobalPartnerLocalizationSummary } from "../lib/globalPartnerLocalization";
 import { getMarketActivationSummary } from "../lib/marketActivation";
 import { getSalesAttributionSummary } from "../lib/salesAttribution";
 
@@ -13,6 +14,7 @@ export default function MarketActivationPage() {
   const summary = getMarketActivationSummary();
   const attribution = getSalesAttributionSummary();
   const analytics = getAttributionAnalyticsSummary();
+  const globalReach = getGlobalPartnerLocalizationSummary();
 
   return (
     <main>
@@ -28,6 +30,7 @@ export default function MarketActivationPage() {
           <Link className="secondary-action" href="/pricing">Pricing</Link>
           <Link className="secondary-action" href="/sales-attribution">Attribution</Link>
           <Link className="secondary-action" href={analytics.route}>Analytics</Link>
+          <Link className="secondary-action" href={globalReach.route}>Global Reach</Link>
           <Link className="secondary-action" href="/faithcore">FaithCore</Link>
           <Link className="secondary-action" href="/claims">Claims Register</Link>
         </div>
@@ -120,6 +123,37 @@ export default function MarketActivationPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Global market activation">
+        <div className="section-heading">
+          <p className="eyebrow">Global reach</p>
+          <h2>Regional expansion now has buyer packs, partner channels, procurement questions, and retained gates.</h2>
+          <p className="section-copy">{globalReach.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={globalReach.route}>
+              Open Global Reach
+            </Link>
+            <a className="secondary-action" href={globalReach.briefRoute}>
+              Download Global Brief
+            </a>
+          </div>
+        </div>
+        {globalReach.competitiveEdges.slice(0, 4).map((edge) => (
+          <article className="module-row" key={edge.pillar}>
+            <div>
+              <span>global edge</span>
+              <h2>{edge.pillar}</h2>
+            </div>
+            <p>{edge.buyerSignal}</p>
+            <div>
+              <Link className="module-link" href={edge.proofRoute}>
+                {edge.scrimedAdvantage}
+              </Link>
+              <p>{edge.blockedClaim}</p>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Revenue streams">

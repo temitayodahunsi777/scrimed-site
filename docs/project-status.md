@@ -2,6 +2,15 @@
 
 Updated: 2026-06-20
 
+## Latest Global Partner And Buyer Localization Release
+
+- Added `/global-reach`, `/api/global-reach`, and `/api/global-reach/brief` as SCRIMED's Global Partner and Buyer Localization Layer.
+- Added `app/lib/globalPartnerLocalization.ts` with region focus packs for the United States, UAE, Saudi Arabia, Kuwait, Nigeria, Kenya, Rwanda, Ghana, and Europe.
+- Added buyer localization packs for provider health systems, payers, governments and public health, life sciences and research, employers, global channel partners, and investor or board reviewers.
+- Added partner-channel paths, global competitive edges, activation sequence, and boundary-resolution workarounds for legal/privacy, PHI, clinical authority, security procurement, finance claims, localization, partner authority, and PR or advertising release.
+- Updated Product Console, Hub, homepage, Market Activation, README, roadmap, and public smoke checks with `global-partner-localization-layer-ready` and `global-partner-localization-brief-ready-no-legal-advice`.
+- Preserved the boundary: Global Reach is localization and go-to-market readiness only. It is not legal advice, privacy advice, tax advice, regional regulatory approval, public-sector procurement approval, reimbursement assurance, compliance certification, clinical validation, production authorization, partner authority, or live clinical execution.
+
 ## Latest Protected Procurement Evidence Registry Release
 
 - Added Protected Procurement Evidence Registry inside `/pilot-workspace/access` after Provider Security Review Workbench.

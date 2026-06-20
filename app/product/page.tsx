@@ -89,6 +89,18 @@ export default function ProductConsolePage() {
           <strong>{summary.targetAudienceCount}</strong>
         </article>
         <article>
+          <span>Global regions</span>
+          <strong>{summary.globalRegionCount}</strong>
+        </article>
+        <article>
+          <span>Buyer packs</span>
+          <strong>{summary.globalBuyerPackCount}</strong>
+        </article>
+        <article>
+          <span>Partner paths</span>
+          <strong>{summary.globalPartnerChannelCount}</strong>
+        </article>
+        <article>
           <span>Source signals</span>
           <strong>{summary.sourceIntelligenceSourceCount}</strong>
         </article>
@@ -170,6 +182,40 @@ export default function ProductConsolePage() {
                   <li key={route}>{route}</li>
                 ))}
                 <li>{path.boundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED global reach">
+        <div className="section-heading">
+          <p className="eyebrow">Global reach</p>
+          <h2>Region, buyer, partner, procurement, and localization readiness are now first-class product evidence.</h2>
+          <p className="section-copy">{summary.globalPartnerLocalizationSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.globalReachRoute}>
+              Open Global Reach
+            </Link>
+            <a className="secondary-action" href={summary.globalReachBriefRoute}>
+              Download Global Brief
+            </a>
+          </div>
+        </div>
+        {summary.globalPartnerLocalizationSummary.buyerPacks.slice(0, 5).map((pack) => (
+          <article className="module-row" key={pack.key}>
+            <div>
+              <span>{pack.priority}</span>
+              <h2>{pack.audience}</h2>
+            </div>
+            <p>{pack.localizedMessage}</p>
+            <div>
+              <Link className="module-link" href={pack.entryRoute}>
+                {pack.recommendedOffer}
+              </Link>
+              <ul className="compact-list">
+                <li>{pack.competitiveEdge}</li>
+                <li>Disqualifiers: {pack.disqualifiers.join(", ")}</li>
               </ul>
             </div>
           </article>

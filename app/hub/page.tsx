@@ -88,6 +88,11 @@ const consoleViews = [
     summary: "Review revenue streams, target audiences, FaithCore messaging, communications, PR, advertising, and claims-safe growth controls."
   },
   {
+    name: "Global Reach",
+    href: "/global-reach",
+    summary: "Review region focus, buyer localization packs, partner channels, procurement questions, competitive edge, and retained global approval gates."
+  },
+  {
     name: "Sales Attribution",
     href: "/sales-attribution",
     summary: "Review CRM-safe source tracking, UTM/referrer capture, revenue routing, deployment profile mapping, and sales cadence."
@@ -305,6 +310,14 @@ export default function HubPage() {
         <article>
           <span>Controlled claims</span>
           <strong>{summary.enterpriseReadinessSummary.claims.total}</strong>
+        </article>
+        <article>
+          <span>Global regions</span>
+          <strong>{summary.globalPartnerLocalizationSummary.regionCount}</strong>
+        </article>
+        <article>
+          <span>Buyer packs</span>
+          <strong>{summary.globalPartnerLocalizationSummary.buyerPackCount}</strong>
         </article>
       </section>
 

@@ -193,6 +193,39 @@ export const targetAudiences: TargetAudience[] = [
     disqualifiers: ["Buyer needs immediate public health reporting", "Buyer requires jurisdictional approval before scoping"]
   },
   {
+    segment: "Life sciences and research operations leaders",
+    priority: "strategic",
+    buyerTrigger: "Trial matching delays, eligibility evidence gaps, oncology workflow friction, and research operations burden.",
+    pain: "Research teams need explainable, reviewable operations intelligence without patient enrollment automation or treatment claims.",
+    primaryOffer: "TrialCore Research Operations Synthetic Pilot",
+    message:
+      "SCRIMED can structure research operations evidence, eligibility gaps, and reviewer queues while keeping patient outreach, enrollment, and treatment recommendations gated.",
+    proofRoutes: ["/modules/trialcore", "/demos/trialcore-research-operations", "/global-reach"],
+    disqualifiers: ["Buyer wants patient enrollment guarantees", "Buyer bypasses research governance"]
+  },
+  {
+    segment: "Employers and benefits leaders",
+    priority: "secondary",
+    buyerTrigger: "Rising healthcare costs, access friction, care navigation gaps, and workforce health program complexity.",
+    pain: "Employers need privacy-safe operational intelligence without becoming a medical decision-maker or exposing member data prematurely.",
+    primaryOffer: "Workflow Intelligence Assessment",
+    message:
+      "SCRIMED helps employers evaluate access, navigation, and care-gap workflows through no-member-data assessment before any protected pilot.",
+    proofRoutes: ["/global-reach", "/pilot-evidence", "/trust-center"],
+    disqualifiers: ["Buyer wants employee diagnosis", "Buyer requires member data before agreements"]
+  },
+  {
+    segment: "Global channel partners and implementers",
+    priority: "strategic",
+    buyerTrigger: "Regional partners need differentiated healthcare AI infrastructure with trust, proof, and deployment readiness.",
+    pain: "Partners need a credible operating layer and safe claims path before co-selling regulated healthcare AI.",
+    primaryOffer: "Strategic Platform Partnership",
+    message:
+      "SCRIMED equips qualified partners with global buyer packs, deployment profiles, protected proof paths, and claims-safe regional positioning.",
+    proofRoutes: ["/global-reach", "/deployment-profiles", "/pilot-deal-room"],
+    disqualifiers: ["Partner claims authorization without agreement", "Partner lacks healthcare-grade security posture"]
+  },
+  {
     segment: "Faith-aligned care, community, and patient-experience leaders",
     priority: "secondary",
     buyerTrigger: "Desire for dignity, trust, encouragement, spiritual support, and culturally sensitive patient experience.",
@@ -214,6 +247,7 @@ export const messageHouse: MessageHouse = {
     "Governed synthetic pilots and enterprise evaluations are available now.",
     "AgentOS, Atlas, TrustOS, protected workspaces, proof packets, and governance packs are inspectable in the product.",
     "SCRIMED maintains clear boundaries: synthetic-only public flows, human review, no autonomous diagnosis, no payer submission, and no live clinical execution without approvals.",
+    "Global Reach maps regions, buyer packs, partner paths, procurement questions, and retained gates before international expansion claims scale.",
     "Revenue value is measured through time saved, workflow friction reduced, documentation quality, denial-risk signals, access bottlenecks, and trust completeness."
   ],
   toneRules: [

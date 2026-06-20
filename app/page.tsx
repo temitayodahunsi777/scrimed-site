@@ -63,6 +63,11 @@ const homepageDecisionPaths = [
     summary: "Review metadata-only routing for questionnaires, SOC and pentest evidence, legal artifacts, vendor-risk, implementation, and buyer diligence without storing sensitive artifacts."
   },
   {
+    audience: "Global buyers and partners",
+    route: "/global-reach",
+    summary: "Review region focus, buyer localization packs, partner channels, procurement questions, and retained legal/privacy/clinical gates."
+  },
+  {
     audience: "Investors and board reviewers",
     route: "/public-market-readiness",
     summary: "Review KPI discipline, unit economics, customer proof, model-efficiency controls, and investor narrative."
@@ -81,6 +86,7 @@ const readinessSignals = [
   { label: "Demos", value: "/demos" },
   { label: "Programs", value: "/pilots" },
   { label: "Pricing", value: "/api/commercial/pricing" },
+  { label: "Global", value: "/api/global-reach" },
   { label: "Operations", value: "/api/operations/readiness" },
   { label: "Trust Center", value: "/api/enterprise-readiness" },
   { label: "Claims", value: "/api/enterprise-readiness/claims" },
@@ -129,6 +135,7 @@ export default function Home() {
             <Link href="/demos">Demos</Link>
             <Link href="/pilots">Programs</Link>
             <Link href="/pricing">Pricing</Link>
+            <Link href="/global-reach">Global</Link>
             <Link href="/trust-center">Trust Center</Link>
             <Link href="/pilot">Pilot</Link>
             <Link href="/hub">Hub</Link>
@@ -149,6 +156,7 @@ export default function Home() {
               <Link className="secondary-action" href="/product">Open Product Console</Link>
               <Link className="secondary-action" href="/pilot-deal-room">Open Deal Room</Link>
               <Link className="secondary-action" href="/pricing">Review Pricing</Link>
+              <Link className="secondary-action" href="/global-reach">Review Global Reach</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
               <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
               <Link className="secondary-action" href="/trust-os">Run TrustOS Decision</Link>
@@ -194,6 +202,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Global operating doctrine codified
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Global buyer and partner packs active
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Agent governance registry online

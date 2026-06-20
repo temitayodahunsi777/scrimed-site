@@ -21,6 +21,11 @@ import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
 import { getStrategicPlatformIntelligenceSummary } from "./strategicPlatformIntelligence";
 import { getDeploymentProfileSummary } from "./deploymentProfiles";
 import { getMarketActivationSummary } from "./marketActivation";
+import {
+  getGlobalPartnerLocalizationSummary,
+  globalPartnerLocalizationBriefStatus,
+  globalPartnerLocalizationStatus
+} from "./globalPartnerLocalization";
 import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
@@ -664,6 +669,17 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
       "Human-review gates, AgentOS roles, workflow contracts, interoperability standards, and blocked live execution controls.",
     boundary:
       "Clinical care activation is a gated roadmap; it does not authorize PHI ingestion, treatment decisions, EHR mutation, or autonomous clinical execution."
+  },
+  {
+    audience: "Global buyer or channel partner",
+    primaryQuestion: "Which region, buyer pack, partner channel, and procurement path should SCRIMED use?",
+    recommendedStart: "Start with Global Reach and Deployment Profiles.",
+    route: "/global-reach",
+    supportingRoutes: ["/deployment-profiles", "/market-activation", "/pilot-deal-room", "/trust-center"],
+    proof:
+      "Region focus, buyer localization packs, partner channel paths, procurement questions, competitive edge, and retained approval gates.",
+    boundary:
+      "Global Reach is localization and go-to-market readiness; it is not legal advice, regional regulatory approval, procurement approval, compliance certification, or production clinical authority."
   }
 ];
 
@@ -738,6 +754,7 @@ export function getProductConsoleSummary() {
   const strategicPlatformIntelligenceSummary = getStrategicPlatformIntelligenceSummary();
   const deploymentProfileSummary = getDeploymentProfileSummary();
   const marketActivationSummary = getMarketActivationSummary();
+  const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
   const sourceIntelligenceSummary = getSourceIntelligenceSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
@@ -878,6 +895,9 @@ export function getProductConsoleSummary() {
     deploymentProfilesApiRoute: deploymentProfileSummary.apiRoute,
     marketActivationRoute: marketActivationSummary.route,
     marketActivationApiRoute: marketActivationSummary.apiRoute,
+    globalReachRoute: globalPartnerLocalizationSummary.route,
+    globalReachApiRoute: globalPartnerLocalizationSummary.apiRoute,
+    globalReachBriefRoute: globalPartnerLocalizationSummary.briefRoute,
     salesAttributionRoute: salesAttributionSummary.route,
     salesAttributionApiRoute: salesAttributionSummary.apiRoute,
     attributionAnalyticsRoute: attributionAnalyticsSummary.route,
@@ -921,6 +941,10 @@ export function getProductConsoleSummary() {
     deploymentProfileCount: deploymentProfileSummary.profileCount,
     revenueStreamCount: marketActivationSummary.revenueStreamCount,
     targetAudienceCount: marketActivationSummary.targetAudienceCount,
+    globalRegionCount: globalPartnerLocalizationSummary.regionCount,
+    globalBuyerPackCount: globalPartnerLocalizationSummary.buyerPackCount,
+    globalPartnerChannelCount: globalPartnerLocalizationSummary.partnerChannelCount,
+    globalBoundaryResolutionCount: globalPartnerLocalizationSummary.boundaryResolutionCount,
     sourceIntelligenceSourceCount: sourceIntelligenceSummary.sourceCount,
     attributionCapturedFieldCount: salesAttributionSummary.capturedFields.length,
     attributionAnalyticsRecordCount: attributionAnalyticsSummary.totals.recordCount,
@@ -995,6 +1019,7 @@ export function getProductConsoleSummary() {
     strategicPlatformIntelligenceSummary,
     deploymentProfileSummary,
     marketActivationSummary,
+    globalPartnerLocalizationSummary,
     salesAttributionSummary,
     attributionAnalyticsSummary,
     trustSafetyOperationsSummary,
@@ -1049,6 +1074,8 @@ export function getProductConsoleSummary() {
         protectedProcurementEvidenceRegistryStatus,
       protectedProcurementEvidenceRegistryPackets:
         protectedProcurementEvidenceRegistryPacketProofStackStatus,
+      globalPartnerLocalization: globalPartnerLocalizationStatus,
+      globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
       salesAttribution: salesAttributionSummary.status,
       attributionAnalytics: attributionAnalyticsSummary.status,
@@ -1120,7 +1147,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing, Attribution Analytics to compare source-to-pilot cohorts, Tenant TrustOps incident workspaces to prove enterprise risk governance, Market Activation to focus the audience and message, Sales Operations to qualify retained buyer intake, Deployment Profiles to scope infrastructure readiness, then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-20"
   };
 }
@@ -1281,6 +1308,25 @@ export function getProductReadinessBrief() {
     `Profiles: ${summary.deploymentProfileSummary.profileCount}`,
     ...summary.deploymentProfileSummary.profiles.map(
       (profile) => `- ${profile.name} (${profile.status}): ${profile.revenueUse}`
+    ),
+    "",
+    "## Global Reach",
+    `Route: ${summary.globalReachRoute}`,
+    `API: ${summary.globalReachApiRoute}`,
+    `Brief: ${summary.globalReachBriefRoute}`,
+    `Status: ${summary.globalPartnerLocalizationSummary.status}`,
+    `Regions: ${summary.globalRegionCount}`,
+    `Buyer packs: ${summary.globalBuyerPackCount}`,
+    `Partner channels: ${summary.globalPartnerChannelCount}`,
+    `Boundary resolutions: ${summary.globalBoundaryResolutionCount}`,
+    ...summary.globalPartnerLocalizationSummary.regions.map(
+      (region) => `- Region: ${region.region} (${region.priority}) -> ${region.deploymentThesis}`
+    ),
+    ...summary.globalPartnerLocalizationSummary.buyerPacks.map(
+      (pack) => `- Buyer pack: ${pack.audience} -> ${pack.recommendedOffer}`
+    ),
+    ...summary.globalPartnerLocalizationSummary.boundaryResolutions.map(
+      (resolution) => `- Global boundary: ${resolution.boundary}. Resolution: ${resolution.resolution}`
     ),
     "",
     "## Market Activation",

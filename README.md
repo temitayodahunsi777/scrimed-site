@@ -12,6 +12,8 @@ Enterprise readiness boundary: `/trust-center` and `/claims` expose accountable 
 
 Protected release governance: `/pilot-workspace/access` includes no-PHI finance methodology, external approval evidence, release decisions, named reviewer sign-offs, disabled distribution lockbox, release authority attestation controls, evidence-room recipient/access-log/provider-adapter controls, provider security review readiness, and procurement evidence routing. These controls produce audited synthetic pilot evidence only and do not authorize public release, external distribution, legal claims, customer proof, advertising claims, security approval, procurement approval, BAA/DPA execution, production use, live integration, or clinical care.
 
+Global reach boundary: `/global-reach`, `/api/global-reach`, and `/api/global-reach/brief` expose region focus, buyer localization packs, partner channels, procurement questions, competitive edge, and contained boundary workarounds for global expansion. This is localization and go-to-market readiness only. It is not legal advice, regional regulatory approval, public-sector procurement approval, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
+
 ---
 
 ## Core Vision
@@ -103,6 +105,7 @@ Current focus areas include:
 - safety and governance infrastructure
 - deployment monitoring systems
 - public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, metadata-only evidence-room recipient attestations, access-log reconciliation, provider-adapter contract readiness, provider security review readiness, and procurement evidence routing
+- global partner and buyer localization with region packs, audience packs, partner channels, procurement questions, competitive edge, and retained legal/privacy/clinical gates
 
 ---
 
@@ -146,6 +149,7 @@ Core enterprise evaluation surfaces:
 - `/demos` - executable buyer demos with guided proof paths and retained production exclusions
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
+- `/global-reach` - region focus, buyer localization packs, partner channels, procurement questions, and retained approval gates
 - `/operations` - company operations readiness, blockers, owners, fallbacks, and buyer route checklist
 - `/trust-center` - enterprise readiness domains, owners, evidence, required actions, launch gates, and external-review requirements
 - `/claims` - approved, evidence-required, and prohibited public claims
@@ -167,6 +171,8 @@ Core APIs:
 - `/api/demos`
 - `/api/pilots`
 - `/api/commercial/pricing`
+- `/api/global-reach`
+- `/api/global-reach/brief`
 - `/api/operations/readiness`
 - `/api/enterprise-readiness`
 - `/api/enterprise-readiness/claims`
