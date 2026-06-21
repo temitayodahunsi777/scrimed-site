@@ -27,6 +27,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
+import ProtectedAuthorityArtifactReferencePanel from "./ProtectedAuthorityArtifactReferencePanel";
 import ProtectedClinicalAuthorityArtifactIntakePanel from "./ProtectedClinicalAuthorityArtifactIntakePanel";
 import ProtectedClinicalAuthorityEvidenceRoomPanel from "./ProtectedClinicalAuthorityEvidenceRoomPanel";
 import ProtectedClinicalAuthorityOwnerMatrixPanel from "./ProtectedClinicalAuthorityOwnerMatrixPanel";
@@ -116,6 +117,10 @@ import type {
   ProtectedProcurementEvidenceRegistryInput,
   ProtectedProcurementEvidenceRegistryWorkflow
 } from "../lib/protectedProcurementEvidenceRegistry";
+import type {
+  ProtectedAuthorityArtifactReferenceInput,
+  ProtectedAuthorityArtifactReferenceWorkflow
+} from "../lib/protectedAuthorityArtifactReferences";
 import type { ProtectedClinicalAuthorityEvidenceRoom } from "../lib/protectedClinicalAuthorityEvidenceRoom";
 import type { ProtectedClinicalAuthorityArtifactIntakeChecklist } from "../lib/protectedClinicalAuthorityArtifactIntake";
 import type { ProtectedClinicalAuthorityOwnerMatrix } from "../lib/protectedClinicalAuthorityOwnerMatrix";
@@ -356,6 +361,17 @@ type ProtectedClinicalAuthorityArtifactIntakeResponse = {
   error?: { message?: string };
 };
 
+type ProtectedAuthorityArtifactReferenceResponse = {
+  referenceId?: string;
+  records?: unknown[];
+  workflow?: ProtectedAuthorityArtifactReferenceWorkflow;
+  checklist?: ProtectedClinicalAuthorityArtifactIntakeChecklist;
+  matrix?: ProtectedClinicalAuthorityOwnerMatrix;
+  evidenceRoom?: ProtectedClinicalAuthorityEvidenceRoom;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -573,6 +589,18 @@ export default function ProtectedPilotAccess({
     protectedClinicalAuthorityArtifactIntakePacketStatus,
     setProtectedClinicalAuthorityArtifactIntakePacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [
+    protectedAuthorityArtifactReferenceWorkflow,
+    setProtectedAuthorityArtifactReferenceWorkflow
+  ] = useState<ProtectedAuthorityArtifactReferenceWorkflow | null>(null);
+  const [
+    protectedAuthorityArtifactReferenceStatus,
+    setProtectedAuthorityArtifactReferenceStatus
+  ] = useState<"idle" | "saving">("idle");
+  const [
+    protectedAuthorityArtifactReferencePacketStatus,
+    setProtectedAuthorityArtifactReferencePacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -692,6 +720,12 @@ export default function ProtectedPilotAccess({
     setProtectedClinicalAuthorityArtifactIntakePacketStatus("idle");
   }, []);
 
+  const resetProtectedAuthorityArtifactReferences = useCallback(() => {
+    setProtectedAuthorityArtifactReferenceWorkflow(null);
+    setProtectedAuthorityArtifactReferenceStatus("idle");
+    setProtectedAuthorityArtifactReferencePacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -758,6 +792,7 @@ export default function ProtectedPilotAccess({
         resetProtectedClinicalAuthorityEvidenceRoom();
         resetProtectedClinicalAuthorityOwnerMatrix();
         resetProtectedClinicalAuthorityArtifactIntake();
+        resetProtectedAuthorityArtifactReferences();
         setStatus("signed-out");
         return;
       }
@@ -823,6 +858,7 @@ export default function ProtectedPilotAccess({
         resetProtectedClinicalAuthorityEvidenceRoom();
         resetProtectedClinicalAuthorityOwnerMatrix();
         resetProtectedClinicalAuthorityArtifactIntake();
+        resetProtectedAuthorityArtifactReferences();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -890,6 +926,7 @@ export default function ProtectedPilotAccess({
       resetProtectedClinicalAuthorityEvidenceRoom();
       resetProtectedClinicalAuthorityOwnerMatrix();
       resetProtectedClinicalAuthorityArtifactIntake();
+      resetProtectedAuthorityArtifactReferences();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -918,7 +955,8 @@ export default function ProtectedPilotAccess({
           loadProtectedProcurementEvidenceRegistry(activeSession, nextWorkspaces[0]),
           loadProtectedClinicalAuthorityEvidenceRoom(activeSession, nextWorkspaces[0]),
           loadProtectedClinicalAuthorityOwnerMatrix(activeSession, nextWorkspaces[0]),
-          loadProtectedClinicalAuthorityArtifactIntake(activeSession, nextWorkspaces[0])
+          loadProtectedClinicalAuthorityArtifactIntake(activeSession, nextWorkspaces[0]),
+          loadProtectedAuthorityArtifactReferences(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -1625,6 +1663,44 @@ export default function ProtectedPilotAccess({
       }
     }
 
+    async function loadProtectedAuthorityArtifactReferences(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/authority-artifact-references`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedAuthorityArtifactReferenceResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ??
+            "Protected Authority Artifact References could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedAuthorityArtifactReferenceWorkflow(body.workflow ?? null);
+      if (body.checklist) {
+        setProtectedClinicalAuthorityArtifactIntake(body.checklist);
+      }
+      if (body.matrix) {
+        setProtectedClinicalAuthorityOwnerMatrix(body.matrix);
+      }
+      if (body.evidenceRoom) {
+        setProtectedClinicalAuthorityEvidenceRoom(body.evidenceRoom);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -1649,6 +1725,7 @@ export default function ProtectedPilotAccess({
     resetProtectedClinicalAuthorityEvidenceRoom,
     resetProtectedClinicalAuthorityOwnerMatrix,
     resetProtectedClinicalAuthorityArtifactIntake,
+    resetProtectedAuthorityArtifactReferences,
     resetProtectedProviderSecurityReview,
     resetProtectedProcurementEvidenceRegistry,
     resetProtectedReleaseAuthorityAttestation,
@@ -1842,6 +1919,7 @@ export default function ProtectedPilotAccess({
     resetProtectedClinicalAuthorityEvidenceRoom();
     resetProtectedClinicalAuthorityOwnerMatrix();
     resetProtectedClinicalAuthorityArtifactIntake();
+    resetProtectedAuthorityArtifactReferences();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1882,7 +1960,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedProcurementEvidenceRegistry(session, workspace),
       refreshProtectedClinicalAuthorityEvidenceRoom(session, workspace),
       refreshProtectedClinicalAuthorityOwnerMatrix(session, workspace),
-      refreshProtectedClinicalAuthorityArtifactIntake(session, workspace)
+      refreshProtectedClinicalAuthorityArtifactIntake(session, workspace),
+      refreshProtectedAuthorityArtifactReferences(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -2469,6 +2548,40 @@ export default function ProtectedPilotAccess({
     }
   }
 
+  async function refreshProtectedAuthorityArtifactReferences(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/authority-artifact-references`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedAuthorityArtifactReferenceResponse;
+
+    if (!response.ok) {
+      setMessage(
+        body.error?.message ??
+          "Protected Authority Artifact References could not be loaded."
+      );
+      return;
+    }
+
+    setProtectedAuthorityArtifactReferenceWorkflow(body.workflow ?? null);
+    if (body.checklist) {
+      setProtectedClinicalAuthorityArtifactIntake(body.checklist);
+    }
+    if (body.matrix) {
+      setProtectedClinicalAuthorityOwnerMatrix(body.matrix);
+    }
+    if (body.evidenceRoom) {
+      setProtectedClinicalAuthorityEvidenceRoom(body.evidenceRoom);
+    }
+  }
+
   async function createSyntheticSession() {
     if (!session || !selectedWorkspace) {
       return;
@@ -2665,6 +2778,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage("Command Intelligence snapshot saved with append-only audit evidence.");
   }
 
@@ -2808,6 +2922,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage("No-PHI clinical activation readiness attestation recorded with append-only audit evidence.");
   }
 
@@ -3131,6 +3246,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       `Protected finance methodology gate recorded${body.gateRecordId ? ` with gate id ${body.gateRecordId}` : ""}.`
     );
@@ -3214,6 +3330,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       `Protected external approval evidence reference recorded${
         body.referenceId ? ` with reference id ${body.referenceId}` : ""
@@ -3930,6 +4047,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       `Protected provider security review recorded${
         body.reviewId ? ` with review id ${body.reviewId}` : ""
@@ -4016,6 +4134,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       `Protected procurement evidence routing recorded${
         body.registryId ? ` with registry id ${body.registryId}` : ""
@@ -4101,6 +4220,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       "Protected Clinical Authority Evidence Room packet downloaded and its audit event was committed."
     );
@@ -4144,6 +4264,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       "Protected Clinical Authority Owner Matrix packet downloaded and its audit event was committed."
     );
@@ -4187,8 +4308,102 @@ export default function ProtectedPilotAccess({
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityArtifactIntake(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
     setMessage(
       "Protected Clinical Authority Artifact Intake Checklist packet downloaded and its audit event was committed."
+    );
+  }
+
+  async function recordProtectedAuthorityArtifactReference(
+    input: ProtectedAuthorityArtifactReferenceInput
+  ) {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedAuthorityArtifactReferenceStatus("saving");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/authority-artifact-references`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(input)
+      }
+    );
+    const body = (await response.json()) as ProtectedAuthorityArtifactReferenceResponse;
+    setProtectedAuthorityArtifactReferenceStatus("idle");
+
+    if (!response.ok) {
+      setMessage(
+        body.errors?.join(" ") ??
+          body.error?.message ??
+          "The protected authority artifact reference could not be recorded."
+      );
+      return;
+    }
+
+    setProtectedAuthorityArtifactReferenceWorkflow(
+      body.workflow ?? protectedAuthorityArtifactReferenceWorkflow
+    );
+    if (body.checklist) {
+      setProtectedClinicalAuthorityArtifactIntake(body.checklist);
+    }
+    if (body.matrix) {
+      setProtectedClinicalAuthorityOwnerMatrix(body.matrix);
+    }
+    if (body.evidenceRoom) {
+      setProtectedClinicalAuthorityEvidenceRoom(body.evidenceRoom);
+    }
+    await refreshAuditEvents(session, selectedWorkspace);
+    setMessage(
+      `Protected authority artifact reference recorded${
+        body.referenceId ? ` with reference id ${body.referenceId}` : ""
+      }. Artifacts, URLs, PHI, signed approvals, legal opinions, security reports, production authorization, and live clinical execution remain disabled.`
+    );
+  }
+
+  async function downloadProtectedAuthorityArtifactReferencePacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedAuthorityArtifactReferencePacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/authority-artifact-references/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedAuthorityArtifactReferencePacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected authority artifact reference packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-authority-artifact-references.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedAuthorityArtifactReferences(session, selectedWorkspace);
+    setMessage(
+      "Protected authority artifact reference packet downloaded and its audit event was committed."
     );
   }
 
@@ -4647,6 +4862,14 @@ export default function ProtectedPilotAccess({
             checklist={protectedClinicalAuthorityArtifactIntake}
             onDownloadPacket={downloadProtectedClinicalAuthorityArtifactIntakePacket}
             packetBusy={protectedClinicalAuthorityArtifactIntakePacketStatus === "downloading"}
+          />
+
+          <ProtectedAuthorityArtifactReferencePanel
+            busy={protectedAuthorityArtifactReferenceStatus === "saving"}
+            onDownloadPacket={downloadProtectedAuthorityArtifactReferencePacket}
+            onRecordReference={recordProtectedAuthorityArtifactReference}
+            packetBusy={protectedAuthorityArtifactReferencePacketStatus === "downloading"}
+            workflow={protectedAuthorityArtifactReferenceWorkflow}
           />
 
           <BuyerPilotRoomPanel

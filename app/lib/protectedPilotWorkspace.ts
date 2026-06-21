@@ -650,6 +650,20 @@ export const protectedPilotApiContracts = [
   },
   {
     method: "GET / POST",
+    route: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+    access: "GET: AAL2 bearer token + workspace membership + rate limit. POST: AAL2 bearer token + authorized tenant role + guarded RPC + rate limit",
+    purpose:
+      "Inspect or record protected metadata-only external authority artifact references with reviewer labels, validation timestamps, expiration dates, renewal alerts, and status flags without storing artifacts, PHI, URLs, credentials, signed approvals, or granting authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited Markdown Authority Artifact Reference packet with no-PHI metadata status, renewal queue, retained blockers, storage restrictions, and explicit no-live-care/no-production authority boundaries."
+  },
+  {
+    method: "GET / POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents",
     access: "GET: AAL2 bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",
     purpose: "Inspect or create tenant-scoped TrustOps incident evidence for synthetic-pilot and enterprise-readiness review."

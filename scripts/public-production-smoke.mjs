@@ -467,6 +467,24 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.protectedAuthorityArtifactReferences !==
+    "aal2-authority-artifact-reference-status-capture-no-artifact-storage"
+  ) {
+    throw new Error(
+      "product console missing protected authority artifact reference proof-stack posture."
+    );
+  }
+
+  if (
+    body.proofStack?.protectedAuthorityArtifactReferencePackets !==
+    "aal2-audited-authority-artifact-reference-status-packet-no-artifact-storage"
+  ) {
+    throw new Error(
+      "product console missing protected authority artifact reference packet proof-stack posture."
+    );
+  }
+
+  if (
     body.proofStack?.globalPartnerLocalization !==
     "global-partner-localization-layer-ready"
   ) {
@@ -1517,6 +1535,14 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/clinical-authority-artifact-intake/packet`,
   "Clinical Authority Artifact Intake packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/authority-artifact-references`,
+  "Authority Artifact References protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/authority-artifact-references/packet`,
+  "Authority Artifact References packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/operator-metrics`,

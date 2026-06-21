@@ -27,6 +27,7 @@ export default function ClinicalAuthorityReadinessPage() {
           <Link className="secondary-action" href="/pilot-workspace/access#clinical-authority-evidence-room">Protected Evidence Room</Link>
           <Link className="secondary-action" href="/pilot-workspace/access#clinical-authority-owner-matrix">Owner Matrix</Link>
           <Link className="secondary-action" href="/pilot-workspace/access#clinical-authority-artifact-intake">Artifact Intake</Link>
+          <Link className="secondary-action" href="/pilot-workspace/access#authority-artifact-references">Artifact References</Link>
           <Link className="secondary-action" href="/trust-center">Trust Center</Link>
           <Link className="secondary-action" href="/global-reach">Regional Readiness</Link>
         </div>

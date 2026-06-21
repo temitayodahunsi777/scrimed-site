@@ -184,6 +184,10 @@ import {
   protectedClinicalAuthorityArtifactIntakePacketStatus,
   protectedClinicalAuthorityArtifactIntakeStatus
 } from "./protectedClinicalAuthorityArtifactIntake";
+import {
+  protectedAuthorityArtifactReferencePacketStatus,
+  protectedAuthorityArtifactReferenceStatus
+} from "./protectedAuthorityArtifactReferences";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -934,6 +938,12 @@ export function getProductConsoleSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake",
     protectedClinicalAuthorityArtifactIntakePacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
+    protectedAuthorityArtifactReferenceRoute:
+      "/pilot-workspace/access#authority-artifact-references",
+    protectedAuthorityArtifactReferenceApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+    protectedAuthorityArtifactReferencePacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -1141,6 +1151,10 @@ export function getProductConsoleSummary() {
         protectedClinicalAuthorityArtifactIntakeStatus,
       protectedClinicalAuthorityArtifactIntakePackets:
         protectedClinicalAuthorityArtifactIntakePacketStatus,
+      protectedAuthorityArtifactReferences:
+        protectedAuthorityArtifactReferenceStatus,
+      protectedAuthorityArtifactReferencePackets:
+        protectedAuthorityArtifactReferencePacketStatus,
       globalPartnerLocalization: globalPartnerLocalizationStatus,
       globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
@@ -1358,6 +1372,9 @@ export function getProductReadinessBrief() {
     `Protected clinical authority artifact intake: ${summary.protectedClinicalAuthorityArtifactIntakeRoute}`,
     `Protected clinical authority artifact intake API: ${summary.protectedClinicalAuthorityArtifactIntakeApiRoute}`,
     `Protected clinical authority artifact intake packet API: ${summary.protectedClinicalAuthorityArtifactIntakePacketApiRoute}`,
+    `Protected authority artifact references: ${summary.protectedAuthorityArtifactReferenceRoute}`,
+    `Protected authority artifact references API: ${summary.protectedAuthorityArtifactReferenceApiRoute}`,
+    `Protected authority artifact references packet API: ${summary.protectedAuthorityArtifactReferencePacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

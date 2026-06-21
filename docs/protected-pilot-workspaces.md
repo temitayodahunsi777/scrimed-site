@@ -118,6 +118,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
+- `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
+- `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -491,6 +494,19 @@ Safe operating pattern:
 - Keep PHI, payer member data, credentials, signed agreements, legal opinions, security reports, reimbursement determinations, regional approvals, clinical validation artifacts, certification evidence, connector approvals, and production authorizations in qualified external systems.
 - Require validation timestamp, reviewer role, external system of record, expiration cadence, scope, and evidence reference ID before any authority review.
 - Treat checklist readiness as preparation only. It is not signed approval, privacy approval, legal authority, security certification, reimbursement certainty, connector approval, production authorization, or live clinical execution authority.
+
+## Protected Authority Artifact References
+
+`/pilot-workspace/access` now includes Protected Authority Artifact References after the Artifact Intake Checklist. It records sanitized metadata-only references to externally retained authority artifacts with reviewer labels, validation timestamps, expiration dates, renewal alerts, and status flags.
+
+Protected workspaces expose `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, and `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`. Writes use the guarded Supabase RPC `record_protected_authority_artifact_reference`; packet downloads use the existing write-before-release proof-packet audit path with `packetType: protected-authority-artifact-references`.
+
+Safe operating pattern:
+
+- Record external system labels and non-secret reference IDs only. Do not paste artifact contents, URLs, tokens, signatures, reports, contracts, legal opinions, approvals, or PHI.
+- Keep signed artifacts, approval records, BAA/DPA documents, clinical validation artifacts, security reports, reimbursement determinations, regional approvals, connector approvals, and production authorizations in qualified external systems.
+- Use expiration and renewal alert timestamps to surface stale references before any buyer diligence packet is treated as ready.
+- Treat accepted metadata-only references as diligence support only. They are not approval, certification, reimbursement certainty, production authorization, public distribution, or live clinical execution authority.
 
 ## Sales Command Center Linkage
 

@@ -12,12 +12,15 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - `/pilot-workspace/access#clinical-authority-evidence-room`
 - `/pilot-workspace/access#clinical-authority-owner-matrix`
 - `/pilot-workspace/access#clinical-authority-artifact-intake`
+- `/pilot-workspace/access#authority-artifact-references`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
+- `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`
 
 ## What It Adds
 
@@ -27,6 +30,7 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - AAL2 protected clinical authority evidence room assembly with reviewer owners, retained gates, expiration posture, audit history, and audited no-PHI packet export.
 - AAL2 protected owner matrix routing across customer, SCRIMED, and qualified external approver roles for every clinical authority hard gate.
 - AAL2 protected artifact intake checklist criteria for external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, and no-artifact-storage packet export.
+- AAL2 protected authority artifact reference capture with metadata-only external reference IDs, reviewer labels, validation timestamps, expiration dates, renewal alerts, and no-artifact-storage packet export.
 - Operating modes that clearly distinguish synthetic evaluation from de-identified shadow review, clinician-supervised prospective pilots, and production clinical execution.
 - Official source references and SCRIMED internal control references for diligence conversations.
 

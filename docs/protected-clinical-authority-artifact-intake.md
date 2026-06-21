@@ -35,6 +35,8 @@ The checklist derives from the Protected Clinical Authority Owner Matrix instead
 
 This preserves a no-upload, metadata-reference-only operating model while giving operators a concrete authority-preparation checklist for buyer diligence and future approval workflows.
 
+The downstream Protected Authority Artifact References ledger records status for these checklist items at `/pilot-workspace/access#authority-artifact-references`. It stores only sanitized external reference metadata, validation timestamps, expiration dates, renewal alerts, reviewer labels, and status flags; it does not store the artifacts or grant authority.
+
 ## Verification
 
 Run:
@@ -52,3 +54,4 @@ Production smoke should verify:
 - product console packet proof stack includes `aal2-audited-clinical-authority-artifact-intake-checklist-packet-no-phi`
 - protected artifact-intake API fails closed without authentication
 - protected artifact-intake packet API fails closed without authentication
+- downstream authority artifact reference routes fail closed without authentication

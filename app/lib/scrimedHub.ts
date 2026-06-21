@@ -173,6 +173,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Customer authority owners, SCRIMED governance, qualified reviewers, legal, privacy, security, and operations",
     objective: "Map each authority owner assignment to external artifact systems, reviewer roles, validation timestamps, expiration cadences, and prohibited-content rules without storing sensitive artifacts."
+  },
+  {
+    name: "Protected Authority Artifact References",
+    route: "/pilot-workspace/access#authority-artifact-references",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Customer authority owners, qualified external reviewers, SCRIMED governance, legal, privacy, security, and operations",
+    objective: "Record metadata-only external authority artifact reference status, reviewer labels, validation timestamps, expiration dates, and renewal alerts without storing artifacts or granting authority."
   }
 ];
 
@@ -229,6 +237,11 @@ export const hubSignals: HubSignal[] = [
   {
     name: "Authority artifact intake",
     value: "external artifact reference checklist active",
+    tone: "good"
+  },
+  {
+    name: "Authority references",
+    value: "metadata-only status capture active",
     tone: "good"
   },
   { name: "Global reach", value: "region and buyer localization packs active", tone: "good" },
@@ -358,6 +371,7 @@ export const hubRoutes = [
   "/pilot-workspace/access#clinical-authority-evidence-room",
   "/pilot-workspace/access#clinical-authority-owner-matrix",
   "/pilot-workspace/access#clinical-authority-artifact-intake",
+  "/pilot-workspace/access#authority-artifact-references",
   "/global-reach",
   "/sales-attribution",
   "/attribution-analytics",
@@ -470,6 +484,8 @@ export const hubRoutes = [
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
+  "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+  "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
   "/api/global-reach",
   "/api/global-reach/brief",
   "/api/sales-attribution",

@@ -2,7 +2,16 @@
 
 Updated: 2026-06-21
 
-## Latest Protected Clinical Authority Artifact Intake Checklist Release
+## Latest Protected Authority Artifact References Release
+
+- Added Protected Authority Artifact References inside `/pilot-workspace/access#authority-artifact-references`.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references` and `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references` for AAL2 tenant-scoped, no-PHI, metadata-only external authority artifact reference status capture.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet` for audited Markdown reference-status packet downloads through the existing write-before-release proof-packet audit path.
+- Added `app/lib/protectedAuthorityArtifactReferences.ts`, `ProtectedAuthorityArtifactReferencePanel`, guarded store helpers, and Supabase migration `20260621120000_protected_authority_artifact_references.sql` with RLS, strict forbidden-content checks, guarded RPC writes, and append-only audit event `protected-authority-artifact-reference-recorded`.
+- Updated protected workspace UI, Product Console proof stack, Hub route catalog, clinical authority evidence packs, readiness CTA, protected workspace runbook, and public smoke checks with `aal2-authority-artifact-reference-status-capture-no-artifact-storage` and `aal2-audited-authority-artifact-reference-status-packet-no-artifact-storage`.
+- Preserved the boundary: the ledger records sanitized reference metadata only. It does not store artifacts, URLs, PHI, signed approvals, legal opinions, security reports, clinical validation artifacts, reimbursement determinations, certification evidence, production approvals, or live clinical authority.
+
+## Previous Protected Clinical Authority Artifact Intake Checklist Release
 
 - Added the Protected Clinical Authority Artifact Intake Checklist inside `/pilot-workspace/access#clinical-authority-artifact-intake`.
 - Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake` for AAL2 tenant-scoped, no-PHI external artifact intake criteria derived from the protected Clinical Authority Owner Matrix.

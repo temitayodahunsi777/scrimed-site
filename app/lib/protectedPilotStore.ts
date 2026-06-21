@@ -161,6 +161,12 @@ import type {
   ProtectedProcurementEvidenceRegistryRecordStatus,
   ProtectedProcurementRiskTier
 } from "./protectedProcurementEvidenceRegistry";
+import type {
+  ProtectedAuthorityArtifactReferenceControl,
+  ProtectedAuthorityArtifactReferenceInput,
+  ProtectedAuthorityArtifactReferenceRecord,
+  ProtectedAuthorityArtifactReferenceStatus
+} from "./protectedAuthorityArtifactReferences";
 
 type AuthenticatedPilotContext =
   | {
@@ -889,6 +895,49 @@ type ProtectedProcurementEvidenceRegistryRow = {
   securities_authority: ProtectedProcurementEvidenceRegistryRecord["securitiesAuthority"];
   advertising_claims_authority: ProtectedProcurementEvidenceRegistryRecord["advertisingClaimsAuthority"];
   clinical_execution_authority: ProtectedProcurementEvidenceRegistryRecord["clinicalExecutionAuthority"];
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  boundary: string;
+};
+
+type ProtectedAuthorityArtifactReferenceRow = {
+  id: string;
+  tenant_id: string;
+  workspace_id: string;
+  artifact_intake_item_id: string;
+  authority_key: ProtectedAuthorityArtifactReferenceRecord["authorityKey"];
+  authority_label: string;
+  owner_assignment_id: string;
+  owner_role: string;
+  owner_label: string;
+  owner_side: ProtectedAuthorityArtifactReferenceRecord["ownerSide"];
+  reference_status: ProtectedAuthorityArtifactReferenceStatus;
+  external_system_label: string;
+  external_reference_id: string;
+  reviewer_label: string;
+  reviewer_role: string;
+  validated_at: string;
+  expires_at: string;
+  renewal_alert_at: string;
+  evidence_snapshot: unknown;
+  required_reference_controls: ProtectedAuthorityArtifactReferenceControl[];
+  linked_reference_controls: ProtectedAuthorityArtifactReferenceControl[];
+  missing_reference_controls: ProtectedAuthorityArtifactReferenceControl[];
+  retained_blockers: unknown;
+  release_restrictions: unknown;
+  artifact_retained_externally: boolean;
+  artifact_upload_disabled: boolean;
+  phi_storage_disabled: boolean;
+  sensitive_artifact_storage_disabled: boolean;
+  authority_granted: boolean;
+  human_review_required: boolean;
+  attestation: ProtectedAuthorityArtifactReferenceRecord["attestation"];
+  review_note: string;
+  data_boundary: ProtectedAuthorityArtifactReferenceRecord["dataBoundary"];
+  reference_authority: ProtectedAuthorityArtifactReferenceRecord["referenceAuthority"];
+  storage_authority: ProtectedAuthorityArtifactReferenceRecord["storageAuthority"];
+  clinical_execution_authority: ProtectedAuthorityArtifactReferenceRecord["clinicalExecutionAuthority"];
   recorded_by: string;
   recorded_at: string;
   created_at: string;
@@ -2017,6 +2066,53 @@ function mapProtectedProcurementEvidenceRegistry(
   };
 }
 
+function mapProtectedAuthorityArtifactReference(
+  row: ProtectedAuthorityArtifactReferenceRow
+): ProtectedAuthorityArtifactReferenceRecord {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    workspaceId: row.workspace_id,
+    artifactIntakeItemId: row.artifact_intake_item_id,
+    authorityKey: row.authority_key,
+    authorityLabel: row.authority_label,
+    ownerAssignmentId: row.owner_assignment_id,
+    ownerRole: row.owner_role,
+    ownerLabel: row.owner_label,
+    ownerSide: row.owner_side,
+    referenceStatus: row.reference_status,
+    externalSystemLabel: row.external_system_label,
+    externalReferenceId: row.external_reference_id,
+    reviewerLabel: row.reviewer_label,
+    reviewerRole: row.reviewer_role,
+    validatedAt: row.validated_at,
+    expiresAt: row.expires_at,
+    renewalAlertAt: row.renewal_alert_at,
+    evidenceSnapshot: asRecord(row.evidence_snapshot),
+    requiredReferenceControls: row.required_reference_controls,
+    linkedReferenceControls: row.linked_reference_controls,
+    missingReferenceControls: row.missing_reference_controls,
+    retainedBlockers: asStringArray(row.retained_blockers),
+    releaseRestrictions: asStringArray(row.release_restrictions),
+    artifactRetainedExternally: row.artifact_retained_externally,
+    artifactUploadDisabled: row.artifact_upload_disabled,
+    phiStorageDisabled: row.phi_storage_disabled,
+    sensitiveArtifactStorageDisabled: row.sensitive_artifact_storage_disabled,
+    authorityGranted: row.authority_granted,
+    humanReviewRequired: row.human_review_required,
+    attestation: row.attestation,
+    reviewNote: row.review_note,
+    dataBoundary: row.data_boundary,
+    referenceAuthority: row.reference_authority,
+    storageAuthority: row.storage_authority,
+    clinicalExecutionAuthority: row.clinical_execution_authority,
+    recordedBy: row.recorded_by,
+    recordedAt: row.recorded_at,
+    createdAt: row.created_at,
+    boundary: row.boundary
+  };
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -2333,6 +2429,8 @@ const protectedProviderSecurityReviewSelect =
   "id, tenant_id, workspace_id, review_domain, review_domain_label, review_status, approval_scope, provider_adapter_record_ids, security_owner_label, privacy_owner_label, agreement_path_label, incident_response_path_label, retention_residency_path_label, rollback_plan_label, review_cadence, provider_security_risk, evidence_snapshot, required_security_controls, linked_security_controls, missing_security_controls, retained_blockers, release_restrictions, external_security_review_retained, phi_processing_disabled, credential_storage_disabled, signed_agreement_storage_disabled, live_integration_disabled, human_approval_required, attestation, review_note, data_boundary, provider_security_review_authority, baa_dpa_authority, storage_authority, provider_adapter_authority, provider_adapter_release_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const protectedProcurementEvidenceRegistrySelect =
   "id, tenant_id, workspace_id, target_audience, target_audience_label, procurement_domain, procurement_domain_label, evidence_class, evidence_class_label, registry_status, approval_scope, provider_security_review_record_ids, procurement_owner_label, buyer_segment_label, external_system_label, evidence_routing_label, evidence_routing_locator, response_cadence, procurement_risk_tier, evidence_snapshot, required_procurement_controls, linked_procurement_controls, missing_procurement_controls, retained_blockers, release_restrictions, security_questionnaire_retained_externally, soc_report_retained_externally, pentest_report_retained_externally, signed_legal_artifacts_retained_externally, credential_storage_disabled, phi_processing_disabled, confidential_answer_storage_disabled, human_approval_required, external_distribution_disabled, attestation, review_note, data_boundary, procurement_evidence_registry_authority, provider_security_review_authority, provider_security_review_baa_dpa_authority, provider_security_review_storage_authority, storage_authority, financial_reporting_authority, securities_authority, advertising_claims_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
+const protectedAuthorityArtifactReferenceSelect =
+  "id, tenant_id, workspace_id, artifact_intake_item_id, authority_key, authority_label, owner_assignment_id, owner_role, owner_label, owner_side, reference_status, external_system_label, external_reference_id, reviewer_label, reviewer_role, validated_at, expires_at, renewal_alert_at, evidence_snapshot, required_reference_controls, linked_reference_controls, missing_reference_controls, retained_blockers, release_restrictions, artifact_retained_externally, artifact_upload_disabled, phi_storage_disabled, sensitive_artifact_storage_disabled, authority_granted, human_review_required, attestation, review_note, data_boundary, reference_authority, storage_authority, clinical_execution_authority, recorded_by, recorded_at, created_at, boundary";
 const trustOSDecisionSelect =
   "id, workspace_id, pilot_session_id, decision_id, trace_id, policy_version, workflow, decision, confidence, uncertainty, decision_record, created_by, created_at";
 const trustOSReviewEventSelect =
@@ -2842,6 +2940,25 @@ export async function listProtectedProcurementEvidenceRegistryRecords(
   return {
     records: ((data ?? []) as unknown as ProtectedProcurementEvidenceRegistryRow[]).map(
       mapProtectedProcurementEvidenceRegistry
+    ),
+    error
+  };
+}
+
+export async function listProtectedAuthorityArtifactReferences(
+  client: SupabaseClient,
+  workspaceId: string
+) {
+  const { data, error } = await client
+    .from("protected_authority_artifact_references")
+    .select(protectedAuthorityArtifactReferenceSelect)
+    .eq("workspace_id", workspaceId)
+    .order("recorded_at", { ascending: false })
+    .limit(200);
+
+  return {
+    records: ((data ?? []) as unknown as ProtectedAuthorityArtifactReferenceRow[]).map(
+      mapProtectedAuthorityArtifactReference
     ),
     error
   };
@@ -3491,6 +3608,22 @@ export async function recordProtectedProcurementEvidenceRegistry(
   };
 }
 
+export async function recordProtectedAuthorityArtifactReference(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: ProtectedAuthorityArtifactReferenceInput
+) {
+  const { data, error } = await client.rpc("record_protected_authority_artifact_reference", {
+    p_workspace_slug: workspaceSlug,
+    p_reference_input: input
+  });
+
+  return {
+    referenceId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedExternalApprovalEvidencePacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,
@@ -3760,6 +3893,36 @@ export async function recordProtectedProcurementEvidenceRegistryPacketDownload(
       releaseAuthority: "procurement-evidence-routing-readiness-not-procurement-approval",
       storageAuthority:
         "procurement-routing-metadata-only-no-questionnaires-reports-credentials-or-phi"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
+export async function recordProtectedAuthorityArtifactReferencePacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-authority-artifact-references",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      noArtifactStorage: true,
+      noArtifactUpload: true,
+      authorityGranted: false,
+      humanReviewRequired: true,
+      referenceAuthority: "external-authority-artifact-reference-status-not-approval",
+      storageAuthority: "no-artifact-storage-no-sensitive-documents",
+      clinicalExecutionAuthority: "not-authorized-live-care"
     }
   });
 
