@@ -5,8 +5,11 @@ SCRIMED Protected Clinical Authority Owner Matrix v1 is an authenticated, AAL2-g
 Routes:
 
 - `/pilot-workspace/access#clinical-authority-owner-matrix`
+- `/pilot-workspace/access#clinical-authority-artifact-intake`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
 
 ## Purpose
 
@@ -33,6 +36,8 @@ It must not store PHI, patient identifiers, payer member data, credentials, URLs
 
 The matrix derives from the existing Protected Clinical Authority Evidence Room instead of introducing a new database table. Packet downloads use the existing enterprise proof-packet audit RPC with packet metadata `clinical-authority-owner-matrix`.
 
+The downstream Protected Clinical Authority Artifact Intake Checklist converts owner assignments into external system-of-record criteria, qualified reviewer roles, validation timestamps, expiration cadences, prohibited-content rules, and acceptance criteria while continuing to store no artifacts.
+
 ## Verification
 
 Run:
@@ -50,3 +55,5 @@ Production smoke should verify:
 - product console packet proof stack includes `aal2-audited-clinical-authority-owner-matrix-packet-no-phi`
 - protected owner-matrix API fails closed without authentication
 - protected owner-matrix packet API fails closed without authentication
+- protected artifact-intake API fails closed without authentication
+- protected artifact-intake packet API fails closed without authentication

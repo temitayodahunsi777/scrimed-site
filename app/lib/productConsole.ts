@@ -180,6 +180,10 @@ import {
   protectedClinicalAuthorityOwnerMatrixPacketStatus,
   protectedClinicalAuthorityOwnerMatrixStatus
 } from "./protectedClinicalAuthorityOwnerMatrix";
+import {
+  protectedClinicalAuthorityArtifactIntakePacketStatus,
+  protectedClinicalAuthorityArtifactIntakeStatus
+} from "./protectedClinicalAuthorityArtifactIntake";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -924,6 +928,12 @@ export function getProductConsoleSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix",
     protectedClinicalAuthorityOwnerMatrixPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet",
+    protectedClinicalAuthorityArtifactIntakeRoute:
+      "/pilot-workspace/access#clinical-authority-artifact-intake",
+    protectedClinicalAuthorityArtifactIntakeApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake",
+    protectedClinicalAuthorityArtifactIntakePacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -1127,6 +1137,10 @@ export function getProductConsoleSummary() {
         protectedClinicalAuthorityOwnerMatrixStatus,
       protectedClinicalAuthorityOwnerMatrixPackets:
         protectedClinicalAuthorityOwnerMatrixPacketStatus,
+      protectedClinicalAuthorityArtifactIntake:
+        protectedClinicalAuthorityArtifactIntakeStatus,
+      protectedClinicalAuthorityArtifactIntakePackets:
+        protectedClinicalAuthorityArtifactIntakePacketStatus,
       globalPartnerLocalization: globalPartnerLocalizationStatus,
       globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
@@ -1341,6 +1355,9 @@ export function getProductReadinessBrief() {
     `Protected clinical authority owner matrix: ${summary.protectedClinicalAuthorityOwnerMatrixRoute}`,
     `Protected clinical authority owner matrix API: ${summary.protectedClinicalAuthorityOwnerMatrixApiRoute}`,
     `Protected clinical authority owner matrix packet API: ${summary.protectedClinicalAuthorityOwnerMatrixPacketApiRoute}`,
+    `Protected clinical authority artifact intake: ${summary.protectedClinicalAuthorityArtifactIntakeRoute}`,
+    `Protected clinical authority artifact intake API: ${summary.protectedClinicalAuthorityArtifactIntakeApiRoute}`,
+    `Protected clinical authority artifact intake packet API: ${summary.protectedClinicalAuthorityArtifactIntakePacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

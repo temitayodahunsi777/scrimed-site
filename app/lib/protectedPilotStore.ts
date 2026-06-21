@@ -3118,6 +3118,37 @@ export async function recordClinicalAuthorityOwnerMatrixPacketDownload(
   };
 }
 
+export async function recordClinicalAuthorityArtifactIntakePacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "clinical-authority-artifact-intake-checklist",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataReferencesOnly: true,
+      externalArtifactStorageOnly: true,
+      noArtifactUpload: true,
+      clinicalGoLiveAuthority: "not-authorized-live-care",
+      phiAuthority: "not-authorized-production-phi",
+      legalAuthority: "not-legal-approval",
+      reimbursementAuthority: "no-reimbursement-guarantee",
+      securityCertification: "not-security-certified",
+      productionAuthority: "not-production-authorized"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function createClinicalActivationApproval(
   client: SupabaseClient,
   workspaceSlug: string,

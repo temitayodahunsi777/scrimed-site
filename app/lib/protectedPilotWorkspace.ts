@@ -635,6 +635,20 @@ export const protectedPilotApiContracts = [
       "Download an audited Markdown Clinical Authority Owner Matrix packet with required approver roles, metadata-only owner labels, retained gates, external artifact policies, and no-PHI/no-live-care authority boundaries."
   },
   {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake",
+    access: "AAL2 bearer token + workspace membership + rate limit",
+    purpose:
+      "Inspect a protected no-PHI Clinical Authority Artifact Intake Checklist that maps owner assignments to required external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, and acceptance criteria without storing artifacts or granting authority."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited Markdown Clinical Authority Artifact Intake Checklist packet with external artifact reference requirements, metadata-only system-of-record policies, prohibited-content rules, retained gates, and no-PHI/no-live-care authority boundaries."
+  },
+  {
     method: "GET / POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents",
     access: "GET: AAL2 bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",

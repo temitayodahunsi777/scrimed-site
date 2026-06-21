@@ -1,6 +1,6 @@
 # SCRIMED Clinical Authority Readiness
 
-Updated: 2026-06-20
+Updated: 2026-06-21
 
 SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector acceptance, and production clinical authorization.
 
@@ -11,10 +11,13 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - `/api/clinical-authority-readiness/brief`
 - `/pilot-workspace/access#clinical-authority-evidence-room`
 - `/pilot-workspace/access#clinical-authority-owner-matrix`
+- `/pilot-workspace/access#clinical-authority-artifact-intake`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
 
 ## What It Adds
 
@@ -23,6 +26,7 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - Evidence-pack routing into protected no-PHI workspace artifacts, including clinical activation dossier, external approval evidence, provider security review, and procurement evidence registry.
 - AAL2 protected clinical authority evidence room assembly with reviewer owners, retained gates, expiration posture, audit history, and audited no-PHI packet export.
 - AAL2 protected owner matrix routing across customer, SCRIMED, and qualified external approver roles for every clinical authority hard gate.
+- AAL2 protected artifact intake checklist criteria for external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, and no-artifact-storage packet export.
 - Operating modes that clearly distinguish synthetic evaluation from de-identified shadow review, clinician-supervised prospective pilots, and production clinical execution.
 - Official source references and SCRIMED internal control references for diligence conversations.
 
@@ -38,4 +42,4 @@ Use this page before any buyer conversation about PHI, patient-specific workflow
 
 ## Next Build
 
-Add signed external authority artifact intake checklists that point each owner role to its required external system, expiration cadence, and qualified reviewer before any live clinical execution path is considered.
+Add customer-specific external artifact reference status capture with evidence IDs, reviewer labels, expiration dates, and renewal alerts while continuing to block artifact uploads, PHI, signed approvals, legal opinions, credentials, reimbursement determinations, security reports, and production authorizations from SCRIMED storage.

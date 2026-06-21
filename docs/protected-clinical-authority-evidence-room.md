@@ -6,10 +6,13 @@ Routes:
 
 - `/pilot-workspace/access#clinical-authority-evidence-room`
 - `/pilot-workspace/access#clinical-authority-owner-matrix`
+- `/pilot-workspace/access#clinical-authority-artifact-intake`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
 
 ## Purpose
 
@@ -26,7 +29,7 @@ The room consolidates existing protected workspace evidence into one authority-c
 
 It tracks reviewer owners, metadata-only evidence references, retained gates, 90-day expiration posture, audit history, safe workarounds, and packet export readiness.
 
-The downstream Protected Clinical Authority Owner Matrix converts this room into customer, SCRIMED, and qualified external approver-role routing while retaining the same no-PHI and no-authority boundary.
+The downstream Protected Clinical Authority Owner Matrix converts this room into customer, SCRIMED, and qualified external approver-role routing while retaining the same no-PHI and no-authority boundary. The downstream Protected Clinical Authority Artifact Intake Checklist converts those owner assignments into external system-of-record criteria, qualified reviewer roles, validation timestamps, expiration cadences, prohibited-content rules, and acceptance criteria without storing artifacts.
 
 ## Boundaries
 

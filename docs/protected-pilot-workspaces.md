@@ -116,6 +116,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -476,6 +478,19 @@ Safe operating pattern:
 - Keep all required external artifacts in buyer-controlled VDRs, counsel workspaces, security GRC systems, payer policy files, regional authority files, platform partner portals, or approved external evidence rooms.
 - Treat metadata owner assignment as routing only. It is not signed approval, delegated medical authority, legal authority, privacy approval, security certification, reimbursement certainty, connector approval, production authorization, or live clinical execution authority.
 - Download the audited owner-matrix packet only after the write-before-release audit event commits.
+
+## Protected Clinical Authority Artifact Intake Checklist
+
+`/pilot-workspace/access` now includes the Protected Clinical Authority Artifact Intake Checklist after the Owner Matrix. It derives from the owner matrix and maps each owner assignment to required external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, and acceptance criteria.
+
+Protected workspaces expose `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake` plus `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`. The packet route uses the existing write-before-release proof-packet audit path with `packetType: clinical-authority-artifact-intake-checklist`.
+
+Safe operating pattern:
+
+- Record artifact metadata requirements and external reference criteria only. Do not upload, store, paste, or summarize artifacts inside SCRIMED.
+- Keep PHI, payer member data, credentials, signed agreements, legal opinions, security reports, reimbursement determinations, regional approvals, clinical validation artifacts, certification evidence, connector approvals, and production authorizations in qualified external systems.
+- Require validation timestamp, reviewer role, external system of record, expiration cadence, scope, and evidence reference ID before any authority review.
+- Treat checklist readiness as preparation only. It is not signed approval, privacy approval, legal authority, security certification, reimbursement certainty, connector approval, production authorization, or live clinical execution authority.
 
 ## Sales Command Center Linkage
 

@@ -165,6 +165,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Customer authority owners, SCRIMED governance, and qualified external reviewers",
     objective: "Map each live-care, PHI, legal, regional, reimbursement, security, connector, and production gate to required no-PHI approver roles."
+  },
+  {
+    name: "Protected Clinical Authority Artifact Intake",
+    route: "/pilot-workspace/access#clinical-authority-artifact-intake",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Customer authority owners, SCRIMED governance, qualified reviewers, legal, privacy, security, and operations",
+    objective: "Map each authority owner assignment to external artifact systems, reviewer roles, validation timestamps, expiration cadences, and prohibited-content rules without storing sensitive artifacts."
   }
 ];
 
@@ -216,6 +224,11 @@ export const hubSignals: HubSignal[] = [
   {
     name: "Authority owner matrix",
     value: "customer-specific no-PHI approver routing active",
+    tone: "good"
+  },
+  {
+    name: "Authority artifact intake",
+    value: "external artifact reference checklist active",
     tone: "good"
   },
   { name: "Global reach", value: "region and buyer localization packs active", tone: "good" },
@@ -344,6 +357,7 @@ export const hubRoutes = [
   "/clinical-authority-readiness",
   "/pilot-workspace/access#clinical-authority-evidence-room",
   "/pilot-workspace/access#clinical-authority-owner-matrix",
+  "/pilot-workspace/access#clinical-authority-artifact-intake",
   "/global-reach",
   "/sales-attribution",
   "/attribution-analytics",
@@ -454,6 +468,8 @@ export const hubRoutes = [
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet",
+  "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake",
+  "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
   "/api/global-reach",
   "/api/global-reach/brief",
   "/api/sales-attribution",

@@ -475,6 +475,14 @@ export const clinicalAuthorityEvidencePacks: ClinicalAuthorityEvidencePack[] = [
     boundary: "Protected owner labels and routing metadata only; not signed approval, authority, legal advice, certification, reimbursement certainty, or live clinical authorization."
   },
   {
+    name: "Protected clinical authority artifact intake checklist",
+    purpose:
+      "AAL2-protected no-PHI checklist that maps authority owner assignments to required external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, and acceptance criteria before any signed authority review.",
+    route: "/pilot-workspace/access#clinical-authority-artifact-intake",
+    packetRoute: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
+    boundary: "Protected metadata references only; not artifact upload, signed approval, PHI processing, legal advice, certification, reimbursement certainty, production authorization, or live clinical authorization."
+  },
+  {
     name: "Clinical activation dossier",
     purpose:
       "Tenant-scoped no-PHI evidence packet for clinical go-live planning, reviewer assignments, unsigned approvals, and blocked capabilities.",

@@ -1,6 +1,15 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-20
+Updated: 2026-06-21
+
+## Latest Protected Clinical Authority Artifact Intake Checklist Release
+
+- Added the Protected Clinical Authority Artifact Intake Checklist inside `/pilot-workspace/access#clinical-authority-artifact-intake`.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake` for AAL2 tenant-scoped, no-PHI external artifact intake criteria derived from the protected Clinical Authority Owner Matrix.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet` for audited Markdown checklist downloads through the existing write-before-release proof-packet audit path.
+- Added `app/lib/protectedClinicalAuthorityArtifactIntake.ts` with required external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, acceptance criteria, and safe workarounds for every live-care, PHI, legal, regional, reimbursement, security, connector, and production authority gate.
+- Updated protected workspace UI, Product Console proof stack, Hub route catalog, clinical authority evidence packs, README, roadmap/runbooks, and public smoke checks with `aal2-clinical-authority-artifact-intake-checklist-no-phi` and `aal2-audited-clinical-authority-artifact-intake-checklist-packet-no-phi`.
+- Preserved the boundary: the checklist records metadata criteria only. It does not store artifacts, PHI, signed contracts, signatures, legal opinions, security reports, reimbursement decisions, regional approvals, certification evidence, connector approvals, production approvals, or live clinical authority.
 
 ## Latest Protected Clinical Authority Owner Matrix Release
 
