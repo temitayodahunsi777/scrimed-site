@@ -114,6 +114,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -461,6 +463,19 @@ Safe operating pattern:
 - Record and assemble only no-PHI reviewer-owner labels, evidence-route references, retained gates, expiration posture, source workflow summaries, and audit metadata in SCRIMED.
 - Download the audited clinical authority evidence room packet only after the write-before-release audit event commits.
 - Treat the room as readiness evidence only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, production connector activation, or live clinical-care authority.
+
+## Protected Clinical Authority Owner Matrix
+
+`/pilot-workspace/access` now includes the Protected Clinical Authority Owner Matrix after the Clinical Authority Evidence Room. It derives from the evidence room and maps each hard gate to customer, SCRIMED, and qualified external approver roles.
+
+Protected workspaces expose `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix` plus `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`. The packet route uses the existing write-before-release proof-packet audit path with `packetType: clinical-authority-owner-matrix`.
+
+Safe operating pattern:
+
+- Record owner labels and role routing only. Do not store named patient data, payer member data, credentials, URLs, signed agreements, legal opinions, security reports, reimbursement decisions, regional approvals, certifications, connector approvals, or production artifacts.
+- Keep all required external artifacts in buyer-controlled VDRs, counsel workspaces, security GRC systems, payer policy files, regional authority files, platform partner portals, or approved external evidence rooms.
+- Treat metadata owner assignment as routing only. It is not signed approval, delegated medical authority, legal authority, privacy approval, security certification, reimbursement certainty, connector approval, production authorization, or live clinical execution authority.
+- Download the audited owner-matrix packet only after the write-before-release audit event commits.
 
 ## Sales Command Center Linkage
 

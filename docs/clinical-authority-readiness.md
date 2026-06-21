@@ -10,8 +10,11 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - `/api/clinical-authority-readiness`
 - `/api/clinical-authority-readiness/brief`
 - `/pilot-workspace/access#clinical-authority-evidence-room`
+- `/pilot-workspace/access#clinical-authority-owner-matrix`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`
 
 ## What It Adds
 
@@ -19,6 +22,7 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - Boundary resolutions that keep every hard gate contained with a safe workaround.
 - Evidence-pack routing into protected no-PHI workspace artifacts, including clinical activation dossier, external approval evidence, provider security review, and procurement evidence registry.
 - AAL2 protected clinical authority evidence room assembly with reviewer owners, retained gates, expiration posture, audit history, and audited no-PHI packet export.
+- AAL2 protected owner matrix routing across customer, SCRIMED, and qualified external approver roles for every clinical authority hard gate.
 - Operating modes that clearly distinguish synthetic evaluation from de-identified shadow review, clinician-supervised prospective pilots, and production clinical execution.
 - Official source references and SCRIMED internal control references for diligence conversations.
 
@@ -34,4 +38,4 @@ Use this page before any buyer conversation about PHI, patient-specific workflow
 
 ## Next Build
 
-Add external-review intake checklists and customer-specific authority owner mapping so the evidence room can track which legal, privacy, security, clinical governance, reimbursement, regional, and connector approvers must provide signed artifacts outside SCRIMED before any live clinical execution path is considered.
+Add signed external authority artifact intake checklists that point each owner role to its required external system, expiration cadence, and qualified reviewer before any live clinical execution path is considered.

@@ -28,6 +28,7 @@ import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
 import ProtectedClinicalAuthorityEvidenceRoomPanel from "./ProtectedClinicalAuthorityEvidenceRoomPanel";
+import ProtectedClinicalAuthorityOwnerMatrixPanel from "./ProtectedClinicalAuthorityOwnerMatrixPanel";
 import ProtectedDistributionLockboxPanel from "./ProtectedDistributionLockboxPanel";
 import ProtectedEvidenceRoomAccessLogReconciliationPanel from "./ProtectedEvidenceRoomAccessLogReconciliationPanel";
 import ProtectedEvidenceRoomProviderAdapterPanel from "./ProtectedEvidenceRoomProviderAdapterPanel";
@@ -115,6 +116,7 @@ import type {
   ProtectedProcurementEvidenceRegistryWorkflow
 } from "../lib/protectedProcurementEvidenceRegistry";
 import type { ProtectedClinicalAuthorityEvidenceRoom } from "../lib/protectedClinicalAuthorityEvidenceRoom";
+import type { ProtectedClinicalAuthorityOwnerMatrix } from "../lib/protectedClinicalAuthorityOwnerMatrix";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -337,6 +339,13 @@ type ProtectedClinicalAuthorityEvidenceRoomResponse = {
   error?: { message?: string };
 };
 
+type ProtectedClinicalAuthorityOwnerMatrixResponse = {
+  matrix?: ProtectedClinicalAuthorityOwnerMatrix;
+  evidenceRoom?: ProtectedClinicalAuthorityEvidenceRoom;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -538,6 +547,14 @@ export default function ProtectedPilotAccess({
     protectedClinicalAuthorityEvidenceRoomPacketStatus,
     setProtectedClinicalAuthorityEvidenceRoomPacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [
+    protectedClinicalAuthorityOwnerMatrix,
+    setProtectedClinicalAuthorityOwnerMatrix
+  ] = useState<ProtectedClinicalAuthorityOwnerMatrix | null>(null);
+  const [
+    protectedClinicalAuthorityOwnerMatrixPacketStatus,
+    setProtectedClinicalAuthorityOwnerMatrixPacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -647,6 +664,11 @@ export default function ProtectedPilotAccess({
     setProtectedClinicalAuthorityEvidenceRoomPacketStatus("idle");
   }, []);
 
+  const resetProtectedClinicalAuthorityOwnerMatrix = useCallback(() => {
+    setProtectedClinicalAuthorityOwnerMatrix(null);
+    setProtectedClinicalAuthorityOwnerMatrixPacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -711,6 +733,7 @@ export default function ProtectedPilotAccess({
         resetProtectedProviderSecurityReview();
         resetProtectedProcurementEvidenceRegistry();
         resetProtectedClinicalAuthorityEvidenceRoom();
+        resetProtectedClinicalAuthorityOwnerMatrix();
         setStatus("signed-out");
         return;
       }
@@ -774,6 +797,7 @@ export default function ProtectedPilotAccess({
         resetProtectedProviderSecurityReview();
         resetProtectedProcurementEvidenceRegistry();
         resetProtectedClinicalAuthorityEvidenceRoom();
+        resetProtectedClinicalAuthorityOwnerMatrix();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -839,6 +863,7 @@ export default function ProtectedPilotAccess({
       resetProtectedProviderSecurityReview();
       resetProtectedProcurementEvidenceRegistry();
       resetProtectedClinicalAuthorityEvidenceRoom();
+      resetProtectedClinicalAuthorityOwnerMatrix();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -865,7 +890,8 @@ export default function ProtectedPilotAccess({
           loadProtectedEvidenceRoomProviderAdapters(activeSession, nextWorkspaces[0]),
           loadProtectedProviderSecurityReviews(activeSession, nextWorkspaces[0]),
           loadProtectedProcurementEvidenceRegistry(activeSession, nextWorkspaces[0]),
-          loadProtectedClinicalAuthorityEvidenceRoom(activeSession, nextWorkspaces[0])
+          loadProtectedClinicalAuthorityEvidenceRoom(activeSession, nextWorkspaces[0]),
+          loadProtectedClinicalAuthorityOwnerMatrix(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -1505,6 +1531,38 @@ export default function ProtectedPilotAccess({
       setProtectedClinicalAuthorityEvidenceRoom(body.room ?? null);
     }
 
+    async function loadProtectedClinicalAuthorityOwnerMatrix(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/clinical-authority-owner-matrix`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedClinicalAuthorityOwnerMatrixResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ??
+            "Protected Clinical Authority Owner Matrix could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedClinicalAuthorityOwnerMatrix(body.matrix ?? null);
+      if (body.evidenceRoom) {
+        setProtectedClinicalAuthorityEvidenceRoom(body.evidenceRoom);
+      }
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -1527,6 +1585,7 @@ export default function ProtectedPilotAccess({
     resetProtectedEvidenceRoomProviderAdapter,
     resetProtectedEvidenceRoomRecipientAttestation,
     resetProtectedClinicalAuthorityEvidenceRoom,
+    resetProtectedClinicalAuthorityOwnerMatrix,
     resetProtectedProviderSecurityReview,
     resetProtectedProcurementEvidenceRegistry,
     resetProtectedReleaseAuthorityAttestation,
@@ -1718,6 +1777,7 @@ export default function ProtectedPilotAccess({
     resetProtectedProviderSecurityReview();
     resetProtectedProcurementEvidenceRegistry();
     resetProtectedClinicalAuthorityEvidenceRoom();
+    resetProtectedClinicalAuthorityOwnerMatrix();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1756,7 +1816,8 @@ export default function ProtectedPilotAccess({
       refreshProtectedEvidenceRoomProviderAdapters(session, workspace),
       refreshProtectedProviderSecurityReviews(session, workspace),
       refreshProtectedProcurementEvidenceRegistry(session, workspace),
-      refreshProtectedClinicalAuthorityEvidenceRoom(session, workspace)
+      refreshProtectedClinicalAuthorityEvidenceRoom(session, workspace),
+      refreshProtectedClinicalAuthorityOwnerMatrix(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -2284,6 +2345,34 @@ export default function ProtectedPilotAccess({
     setProtectedClinicalAuthorityEvidenceRoom(body.room ?? null);
   }
 
+  async function refreshProtectedClinicalAuthorityOwnerMatrix(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/clinical-authority-owner-matrix`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedClinicalAuthorityOwnerMatrixResponse;
+
+    if (!response.ok) {
+      setMessage(
+        body.error?.message ??
+          "Protected Clinical Authority Owner Matrix could not be loaded."
+      );
+      return;
+    }
+
+    setProtectedClinicalAuthorityOwnerMatrix(body.matrix ?? null);
+    if (body.evidenceRoom) {
+      setProtectedClinicalAuthorityEvidenceRoom(body.evidenceRoom);
+    }
+  }
+
   async function createSyntheticSession() {
     if (!session || !selectedWorkspace) {
       return;
@@ -2478,6 +2567,7 @@ export default function ProtectedPilotAccess({
     setCommandIntelligenceSnapshots(body.snapshots ?? (body.snapshot ? [body.snapshot] : []));
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage("Command Intelligence snapshot saved with append-only audit evidence.");
   }
 
@@ -2619,6 +2709,7 @@ export default function ProtectedPilotAccess({
     setClinicalActivationApprovalWorkflow(body.workflow ?? clinicalActivationApprovalWorkflow);
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage("No-PHI clinical activation readiness attestation recorded with append-only audit evidence.");
   }
 
@@ -2940,6 +3031,7 @@ export default function ProtectedPilotAccess({
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedExternalApprovalEvidence(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage(
       `Protected finance methodology gate recorded${body.gateRecordId ? ` with gate id ${body.gateRecordId}` : ""}.`
     );
@@ -3021,6 +3113,7 @@ export default function ProtectedPilotAccess({
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedReleaseDecision(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage(
       `Protected external approval evidence reference recorded${
         body.referenceId ? ` with reference id ${body.referenceId}` : ""
@@ -3735,6 +3828,7 @@ export default function ProtectedPilotAccess({
     await refreshProtectedProcurementEvidenceRegistry(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage(
       `Protected provider security review recorded${
         body.reviewId ? ` with review id ${body.reviewId}` : ""
@@ -3819,6 +3913,7 @@ export default function ProtectedPilotAccess({
     );
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage(
       `Protected procurement evidence routing recorded${
         body.registryId ? ` with registry id ${body.registryId}` : ""
@@ -3902,8 +3997,51 @@ export default function ProtectedPilotAccess({
     URL.revokeObjectURL(url);
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
     setMessage(
       "Protected Clinical Authority Evidence Room packet downloaded and its audit event was committed."
+    );
+  }
+
+  async function downloadProtectedClinicalAuthorityOwnerMatrixPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedClinicalAuthorityOwnerMatrixPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/clinical-authority-owner-matrix/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedClinicalAuthorityOwnerMatrixPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected Clinical Authority Owner Matrix packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-clinical-authority-owner-matrix.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityOwnerMatrix(session, selectedWorkspace);
+    setMessage(
+      "Protected Clinical Authority Owner Matrix packet downloaded and its audit event was committed."
     );
   }
 
@@ -4350,6 +4488,12 @@ export default function ProtectedPilotAccess({
             onDownloadPacket={downloadProtectedClinicalAuthorityEvidenceRoomPacket}
             packetBusy={protectedClinicalAuthorityEvidenceRoomPacketStatus === "downloading"}
             room={protectedClinicalAuthorityEvidenceRoom}
+          />
+
+          <ProtectedClinicalAuthorityOwnerMatrixPanel
+            matrix={protectedClinicalAuthorityOwnerMatrix}
+            onDownloadPacket={downloadProtectedClinicalAuthorityOwnerMatrixPacket}
+            packetBusy={protectedClinicalAuthorityOwnerMatrixPacketStatus === "downloading"}
           />
 
           <BuyerPilotRoomPanel

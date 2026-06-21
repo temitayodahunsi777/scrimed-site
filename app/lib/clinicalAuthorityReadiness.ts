@@ -467,6 +467,14 @@ export const clinicalAuthorityEvidencePacks: ClinicalAuthorityEvidencePack[] = [
     boundary: "Protected metadata-only authority readiness; not clinical, legal, PHI, reimbursement, security, regional, connector, or production approval."
   },
   {
+    name: "Protected clinical authority owner matrix",
+    purpose:
+      "AAL2-protected no-PHI owner routing matrix that maps every hard gate to customer, SCRIMED, and qualified external approver roles before authority review.",
+    route: "/pilot-workspace/access#clinical-authority-owner-matrix",
+    packetRoute: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet",
+    boundary: "Protected owner labels and routing metadata only; not signed approval, authority, legal advice, certification, reimbursement certainty, or live clinical authorization."
+  },
+  {
     name: "Clinical activation dossier",
     purpose:
       "Tenant-scoped no-PHI evidence packet for clinical go-live planning, reviewer assignments, unsigned approvals, and blocked capabilities.",

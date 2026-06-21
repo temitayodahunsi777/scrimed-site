@@ -433,6 +433,22 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.protectedClinicalAuthorityOwnerMatrix !==
+    "aal2-clinical-authority-owner-matrix-no-phi"
+  ) {
+    throw new Error("product console missing protected clinical authority owner matrix proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedClinicalAuthorityOwnerMatrixPackets !==
+    "aal2-audited-clinical-authority-owner-matrix-packet-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected clinical authority owner matrix packet proof-stack posture."
+    );
+  }
+
+  if (
     body.proofStack?.globalPartnerLocalization !==
     "global-partner-localization-layer-ready"
   ) {
@@ -1467,6 +1483,14 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/clinical-authority-evidence-room/packet`,
   "Clinical Authority Evidence Room packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-authority-owner-matrix`,
+  "Clinical Authority Owner Matrix protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-authority-owner-matrix/packet`,
+  "Clinical Authority Owner Matrix packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/operator-metrics`,

@@ -176,6 +176,10 @@ import {
   protectedClinicalAuthorityEvidenceRoomPacketStatus,
   protectedClinicalAuthorityEvidenceRoomStatus
 } from "./protectedClinicalAuthorityEvidenceRoom";
+import {
+  protectedClinicalAuthorityOwnerMatrixPacketStatus,
+  protectedClinicalAuthorityOwnerMatrixStatus
+} from "./protectedClinicalAuthorityOwnerMatrix";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -914,6 +918,12 @@ export function getProductConsoleSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room",
     protectedClinicalAuthorityEvidenceRoomPacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet",
+    protectedClinicalAuthorityOwnerMatrixRoute:
+      "/pilot-workspace/access#clinical-authority-owner-matrix",
+    protectedClinicalAuthorityOwnerMatrixApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix",
+    protectedClinicalAuthorityOwnerMatrixPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -1113,6 +1123,10 @@ export function getProductConsoleSummary() {
         protectedClinicalAuthorityEvidenceRoomStatus,
       protectedClinicalAuthorityEvidenceRoomPackets:
         protectedClinicalAuthorityEvidenceRoomPacketStatus,
+      protectedClinicalAuthorityOwnerMatrix:
+        protectedClinicalAuthorityOwnerMatrixStatus,
+      protectedClinicalAuthorityOwnerMatrixPackets:
+        protectedClinicalAuthorityOwnerMatrixPacketStatus,
       globalPartnerLocalization: globalPartnerLocalizationStatus,
       globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
@@ -1324,6 +1338,9 @@ export function getProductReadinessBrief() {
     `Protected clinical authority evidence room: ${summary.protectedClinicalAuthorityEvidenceRoomRoute}`,
     `Protected clinical authority evidence room API: ${summary.protectedClinicalAuthorityEvidenceRoomApiRoute}`,
     `Protected clinical authority evidence room packet API: ${summary.protectedClinicalAuthorityEvidenceRoomPacketApiRoute}`,
+    `Protected clinical authority owner matrix: ${summary.protectedClinicalAuthorityOwnerMatrixRoute}`,
+    `Protected clinical authority owner matrix API: ${summary.protectedClinicalAuthorityOwnerMatrixApiRoute}`,
+    `Protected clinical authority owner matrix packet API: ${summary.protectedClinicalAuthorityOwnerMatrixPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

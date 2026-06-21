@@ -157,6 +157,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Clinical governance, legal, privacy, security, reimbursement, and customer operations",
     objective: "Assemble no-PHI reviewer owners, retained gates, evidence links, expiration posture, and audit history inside authenticated pilot workspaces."
+  },
+  {
+    name: "Protected Clinical Authority Owner Matrix",
+    route: "/pilot-workspace/access#clinical-authority-owner-matrix",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Customer authority owners, SCRIMED governance, and qualified external reviewers",
+    objective: "Map each live-care, PHI, legal, regional, reimbursement, security, connector, and production gate to required no-PHI approver roles."
   }
 ];
 
@@ -203,6 +211,11 @@ export const hubSignals: HubSignal[] = [
   {
     name: "Authority evidence room",
     value: "AAL2 no-PHI protected packet active",
+    tone: "good"
+  },
+  {
+    name: "Authority owner matrix",
+    value: "customer-specific no-PHI approver routing active",
     tone: "good"
   },
   { name: "Global reach", value: "region and buyer localization packs active", tone: "good" },
@@ -330,6 +343,7 @@ export const hubRoutes = [
   "/market-activation",
   "/clinical-authority-readiness",
   "/pilot-workspace/access#clinical-authority-evidence-room",
+  "/pilot-workspace/access#clinical-authority-owner-matrix",
   "/global-reach",
   "/sales-attribution",
   "/attribution-analytics",
@@ -438,6 +452,8 @@ export const hubRoutes = [
   "/api/clinical-authority-readiness/brief",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet",
+  "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix",
+  "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet",
   "/api/global-reach",
   "/api/global-reach/brief",
   "/api/sales-attribution",

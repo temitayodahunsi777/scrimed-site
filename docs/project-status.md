@@ -2,6 +2,15 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Clinical Authority Owner Matrix Release
+
+- Added the Protected Clinical Authority Owner Matrix inside `/pilot-workspace/access#clinical-authority-owner-matrix`.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix` for AAL2 tenant-scoped, no-PHI approver-role routing derived from the protected Clinical Authority Evidence Room.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet` for audited Markdown owner-matrix packet downloads through the existing write-before-release proof-packet audit path.
+- Added `app/lib/protectedClinicalAuthorityOwnerMatrix.ts` with customer, SCRIMED, and qualified external owner roles for live-care, PHI, legal, regional, reimbursement, security, connector, and production authority gates.
+- Updated protected workspace UI, Product Console proof stack, Hub route catalog, clinical authority evidence packs, README, roadmap, protected workspace runbook, and public smoke checks with `aal2-clinical-authority-owner-matrix-no-phi` and `aal2-audited-clinical-authority-owner-matrix-packet-no-phi`.
+- Preserved the boundary: owner labels are metadata-only routing records. They do not store signatures, contracts, PHI, legal opinions, security reports, reimbursement decisions, certifications, regional approvals, production credentials, connector approvals, or live clinical authority.
+
 ## Latest Protected Clinical Authority Evidence Room Release
 
 - Added the Protected Clinical Authority Evidence Room inside `/pilot-workspace/access#clinical-authority-evidence-room`.
