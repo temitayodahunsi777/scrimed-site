@@ -2,6 +2,15 @@
 
 Updated: 2026-06-20
 
+## Latest Protected Clinical Authority Evidence Room Release
+
+- Added the Protected Clinical Authority Evidence Room inside `/pilot-workspace/access#clinical-authority-evidence-room`.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room` for AAL2 tenant-scoped, no-PHI authority evidence assembly.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet` for audited Markdown authority evidence packet downloads through the existing write-before-release proof-packet audit path.
+- Added `app/lib/protectedClinicalAuthorityEvidenceRoom.ts` to consolidate clinical authority readiness domains, clinical activation dossier posture, clinical activation approval workflow posture, protected external approval evidence, provider security reviews, procurement evidence registry, audit history, reviewer ownership, retained gates, expiration posture, and safe workarounds.
+- Updated protected pilot workspace UI, Product Console proof stack, Hub routes, clinical authority readiness routing, README, roadmap, protected workspace runbook, and public smoke checks with `aal2-clinical-authority-evidence-room-no-phi` and `aal2-audited-clinical-authority-evidence-room-packet-no-phi`.
+- Preserved the boundary: the room assembles metadata-only readiness evidence and does not authorize live clinical care, PHI processing, diagnosis, treatment, prescribing, patient outreach, medical-record mutation, payer submission, legal approval, regulatory approval, reimbursement certainty, security certification, regional launch, production connector activation, or production clinical authorization.
+
 ## Latest Clinical Authority Readiness Release
 
 - Added `/clinical-authority-readiness`, `/api/clinical-authority-readiness`, and `/api/clinical-authority-readiness/brief` as SCRIMED's hard-gate authority readiness layer.

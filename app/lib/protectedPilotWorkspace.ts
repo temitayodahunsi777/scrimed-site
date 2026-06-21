@@ -607,6 +607,20 @@ export const protectedPilotApiContracts = [
       "Download an audited Markdown Clinical Activation Approval Workflow packet summarizing signed no-PHI readiness attestations, retained blockers, safe workarounds, and unavailable sections."
   },
   {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room",
+    access: "AAL2 bearer token + workspace membership + rate limit",
+    purpose:
+      "Inspect a protected no-PHI Clinical Authority Evidence Room that unifies live-care, PHI, legal, regional, reimbursement, security, connector, and production authority gates from existing protected workspace evidence without granting approval."
+  },
+  {
+    method: "GET",
+    route: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet",
+    access: "AAL2 bearer token + authorized tenant role + rate limit + append-only packet-download audit",
+    purpose:
+      "Download an audited Markdown Clinical Authority Evidence Room packet with reviewer owners, evidence links, expiration posture, retained gates, audit history, and explicit no-PHI/no-live-care authority boundaries."
+  },
+  {
     method: "GET / POST",
     route: "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents",
     access: "GET: AAL2 bearer token + workspace membership. POST: AAL2 bearer token + tenant-admin or pilot-lead role + server-held runtime authorization + rate limit",

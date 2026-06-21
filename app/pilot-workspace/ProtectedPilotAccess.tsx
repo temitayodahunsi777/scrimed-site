@@ -27,6 +27,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
+import ProtectedClinicalAuthorityEvidenceRoomPanel from "./ProtectedClinicalAuthorityEvidenceRoomPanel";
 import ProtectedDistributionLockboxPanel from "./ProtectedDistributionLockboxPanel";
 import ProtectedEvidenceRoomAccessLogReconciliationPanel from "./ProtectedEvidenceRoomAccessLogReconciliationPanel";
 import ProtectedEvidenceRoomProviderAdapterPanel from "./ProtectedEvidenceRoomProviderAdapterPanel";
@@ -113,6 +114,7 @@ import type {
   ProtectedProcurementEvidenceRegistryInput,
   ProtectedProcurementEvidenceRegistryWorkflow
 } from "../lib/protectedProcurementEvidenceRegistry";
+import type { ProtectedClinicalAuthorityEvidenceRoom } from "../lib/protectedClinicalAuthorityEvidenceRoom";
 
 type AccessStatus =
   | "infrastructure-required"
@@ -329,6 +331,12 @@ type ProtectedProcurementEvidenceRegistryResponse = {
   error?: { message?: string };
 };
 
+type ProtectedClinicalAuthorityEvidenceRoomResponse = {
+  room?: ProtectedClinicalAuthorityEvidenceRoom;
+  errors?: string[];
+  error?: { message?: string };
+};
+
 const syntheticSessionRequest = {
   scenarioSlug: "enterprise-workflow-assessment",
   organizationId: "tenant-protected-pilot",
@@ -522,6 +530,14 @@ export default function ProtectedPilotAccess({
     protectedProcurementEvidenceRegistryPacketStatus,
     setProtectedProcurementEvidenceRegistryPacketStatus
   ] = useState<"idle" | "downloading">("idle");
+  const [
+    protectedClinicalAuthorityEvidenceRoom,
+    setProtectedClinicalAuthorityEvidenceRoom
+  ] = useState<ProtectedClinicalAuthorityEvidenceRoom | null>(null);
+  const [
+    protectedClinicalAuthorityEvidenceRoomPacketStatus,
+    setProtectedClinicalAuthorityEvidenceRoomPacketStatus
+  ] = useState<"idle" | "downloading">("idle");
   const [demoSnapshotStatus, setDemoSnapshotStatus] = useState<"idle" | "saving">("idle");
   const [demoPacketBusyId, setDemoPacketBusyId] = useState<string | null>(null);
   const [commandSnapshotStatus, setCommandSnapshotStatus] = useState<"idle" | "saving">("idle");
@@ -626,6 +642,11 @@ export default function ProtectedPilotAccess({
     setProtectedProcurementEvidenceRegistryPacketStatus("idle");
   }, []);
 
+  const resetProtectedClinicalAuthorityEvidenceRoom = useCallback(() => {
+    setProtectedClinicalAuthorityEvidenceRoom(null);
+    setProtectedClinicalAuthorityEvidenceRoomPacketStatus("idle");
+  }, []);
+
   useEffect(() => {
     const client = supabase;
 
@@ -688,6 +709,8 @@ export default function ProtectedPilotAccess({
         resetProtectedEvidenceRoomAccessLogReconciliation();
         resetProtectedEvidenceRoomProviderAdapter();
         resetProtectedProviderSecurityReview();
+        resetProtectedProcurementEvidenceRegistry();
+        resetProtectedClinicalAuthorityEvidenceRoom();
         setStatus("signed-out");
         return;
       }
@@ -749,6 +772,8 @@ export default function ProtectedPilotAccess({
         resetProtectedEvidenceRoomAccessLogReconciliation();
         resetProtectedEvidenceRoomProviderAdapter();
         resetProtectedProviderSecurityReview();
+        resetProtectedProcurementEvidenceRegistry();
+        resetProtectedClinicalAuthorityEvidenceRoom();
         setStatus("mfa-required");
         setMessage(
           verifiedFactor
@@ -813,6 +838,7 @@ export default function ProtectedPilotAccess({
       resetProtectedEvidenceRoomProviderAdapter();
       resetProtectedProviderSecurityReview();
       resetProtectedProcurementEvidenceRegistry();
+      resetProtectedClinicalAuthorityEvidenceRoom();
       setVerificationReadiness(null);
       setStatus("ready");
 
@@ -838,7 +864,8 @@ export default function ProtectedPilotAccess({
           loadProtectedEvidenceRoomAccessLogReconciliation(activeSession, nextWorkspaces[0]),
           loadProtectedEvidenceRoomProviderAdapters(activeSession, nextWorkspaces[0]),
           loadProtectedProviderSecurityReviews(activeSession, nextWorkspaces[0]),
-          loadProtectedProcurementEvidenceRegistry(activeSession, nextWorkspaces[0])
+          loadProtectedProcurementEvidenceRegistry(activeSession, nextWorkspaces[0]),
+          loadProtectedClinicalAuthorityEvidenceRoom(activeSession, nextWorkspaces[0])
         ]);
       }
     }
@@ -1449,6 +1476,35 @@ export default function ProtectedPilotAccess({
       setProtectedProcurementEvidenceRegistryWorkflow(body.workflow ?? null);
     }
 
+    async function loadProtectedClinicalAuthorityEvidenceRoom(
+      activeSession: Session,
+      workspace: PilotWorkspaceRecord
+    ) {
+      const response = await fetch(
+        `/api/pilot-workspaces/${workspace.slug}/clinical-authority-evidence-room`,
+        {
+          headers: {
+            Authorization: `Bearer ${activeSession.access_token}`
+          }
+        }
+      );
+      const body = (await response.json()) as ProtectedClinicalAuthorityEvidenceRoomResponse;
+
+      if (!active) {
+        return;
+      }
+
+      if (!response.ok) {
+        setMessage(
+          body.error?.message ??
+            "Protected Clinical Authority Evidence Room could not be loaded."
+        );
+        return;
+      }
+
+      setProtectedClinicalAuthorityEvidenceRoom(body.room ?? null);
+    }
+
     initializeAccess();
     const {
       data: { subscription }
@@ -1470,6 +1526,7 @@ export default function ProtectedPilotAccess({
     resetProtectedEvidenceRoomAccessLogReconciliation,
     resetProtectedEvidenceRoomProviderAdapter,
     resetProtectedEvidenceRoomRecipientAttestation,
+    resetProtectedClinicalAuthorityEvidenceRoom,
     resetProtectedProviderSecurityReview,
     resetProtectedProcurementEvidenceRegistry,
     resetProtectedReleaseAuthorityAttestation,
@@ -1658,6 +1715,9 @@ export default function ProtectedPilotAccess({
     resetProtectedEvidenceRoomRecipientAttestation();
     resetProtectedEvidenceRoomAccessLogReconciliation();
     resetProtectedEvidenceRoomProviderAdapter();
+    resetProtectedProviderSecurityReview();
+    resetProtectedProcurementEvidenceRegistry();
+    resetProtectedClinicalAuthorityEvidenceRoom();
     setVerificationReadiness(null);
     setStatus("loading");
     setMessage("");
@@ -1694,7 +1754,9 @@ export default function ProtectedPilotAccess({
       refreshProtectedEvidenceRoomRecipientAttestations(session, workspace),
       refreshProtectedEvidenceRoomAccessLogReconciliation(session, workspace),
       refreshProtectedEvidenceRoomProviderAdapters(session, workspace),
-      refreshProtectedProviderSecurityReviews(session, workspace)
+      refreshProtectedProviderSecurityReviews(session, workspace),
+      refreshProtectedProcurementEvidenceRegistry(session, workspace),
+      refreshProtectedClinicalAuthorityEvidenceRoom(session, workspace)
     ]);
     setStatus("ready");
   }
@@ -2197,6 +2259,31 @@ export default function ProtectedPilotAccess({
     setProtectedProcurementEvidenceRegistryWorkflow(body.workflow ?? null);
   }
 
+  async function refreshProtectedClinicalAuthorityEvidenceRoom(
+    activeSession: Session,
+    workspace: PilotWorkspaceRecord
+  ) {
+    const response = await fetch(
+      `/api/pilot-workspaces/${workspace.slug}/clinical-authority-evidence-room`,
+      {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      }
+    );
+    const body = (await response.json()) as ProtectedClinicalAuthorityEvidenceRoomResponse;
+
+    if (!response.ok) {
+      setMessage(
+        body.error?.message ??
+          "Protected Clinical Authority Evidence Room could not be loaded."
+      );
+      return;
+    }
+
+    setProtectedClinicalAuthorityEvidenceRoom(body.room ?? null);
+  }
+
   async function createSyntheticSession() {
     if (!session || !selectedWorkspace) {
       return;
@@ -2390,6 +2477,7 @@ export default function ProtectedPilotAccess({
 
     setCommandIntelligenceSnapshots(body.snapshots ?? (body.snapshot ? [body.snapshot] : []));
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     setMessage("Command Intelligence snapshot saved with append-only audit evidence.");
   }
 
@@ -2530,6 +2618,7 @@ export default function ProtectedPilotAccess({
 
     setClinicalActivationApprovalWorkflow(body.workflow ?? clinicalActivationApprovalWorkflow);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     setMessage("No-PHI clinical activation readiness attestation recorded with append-only audit evidence.");
   }
 
@@ -2850,6 +2939,7 @@ export default function ProtectedPilotAccess({
     setProtectedFinanceMethodologyWorkflow(body.workflow ?? protectedFinanceMethodologyWorkflow);
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedExternalApprovalEvidence(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     setMessage(
       `Protected finance methodology gate recorded${body.gateRecordId ? ` with gate id ${body.gateRecordId}` : ""}.`
     );
@@ -2930,6 +3020,7 @@ export default function ProtectedPilotAccess({
     }
     await refreshAuditEvents(session, selectedWorkspace);
     await refreshProtectedReleaseDecision(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     setMessage(
       `Protected external approval evidence reference recorded${
         body.referenceId ? ` with reference id ${body.referenceId}` : ""
@@ -3643,6 +3734,7 @@ export default function ProtectedPilotAccess({
     );
     await refreshProtectedProcurementEvidenceRegistry(session, selectedWorkspace);
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     setMessage(
       `Protected provider security review recorded${
         body.reviewId ? ` with review id ${body.reviewId}` : ""
@@ -3726,6 +3818,7 @@ export default function ProtectedPilotAccess({
       body.workflow ?? protectedProcurementEvidenceRegistryWorkflow
     );
     await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
     setMessage(
       `Protected procurement evidence routing recorded${
         body.registryId ? ` with registry id ${body.registryId}` : ""
@@ -3770,6 +3863,47 @@ export default function ProtectedPilotAccess({
     await refreshAuditEvents(session, selectedWorkspace);
     setMessage(
       "Protected procurement evidence registry packet downloaded and its audit event was committed."
+    );
+  }
+
+  async function downloadProtectedClinicalAuthorityEvidenceRoomPacket() {
+    if (!session || !selectedWorkspace) {
+      return;
+    }
+
+    setProtectedClinicalAuthorityEvidenceRoomPacketStatus("downloading");
+    setMessage("");
+    const response = await fetch(
+      `/api/pilot-workspaces/${selectedWorkspace.slug}/clinical-authority-evidence-room/packet`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+    setProtectedClinicalAuthorityEvidenceRoomPacketStatus("idle");
+
+    if (!response.ok) {
+      const body = (await response.json()) as ProofPacketResponse;
+
+      setMessage(
+        body.error?.message ??
+          "The protected Clinical Authority Evidence Room packet could not be downloaded."
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrimed-${selectedWorkspace.slug}-clinical-authority-evidence-room.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    await refreshAuditEvents(session, selectedWorkspace);
+    await refreshProtectedClinicalAuthorityEvidenceRoom(session, selectedWorkspace);
+    setMessage(
+      "Protected Clinical Authority Evidence Room packet downloaded and its audit event was committed."
     );
   }
 
@@ -4210,6 +4344,12 @@ export default function ProtectedPilotAccess({
             packetBusy={protectedProcurementEvidenceRegistryPacketStatus === "downloading"}
             providerSecurityWorkflow={protectedProviderSecurityReviewWorkflow}
             workflow={protectedProcurementEvidenceRegistryWorkflow}
+          />
+
+          <ProtectedClinicalAuthorityEvidenceRoomPanel
+            onDownloadPacket={downloadProtectedClinicalAuthorityEvidenceRoomPacket}
+            packetBusy={protectedClinicalAuthorityEvidenceRoomPacketStatus === "downloading"}
+            room={protectedClinicalAuthorityEvidenceRoom}
           />
 
           <BuyerPilotRoomPanel

@@ -1012,6 +1012,61 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.evidence-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 24px 0;
+}
+
+.evidence-grid article {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  min-height: 132px;
+  padding: 18px;
+}
+
+.evidence-grid span,
+.timeline-list span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.evidence-grid strong {
+  color: var(--green-dark);
+  font-size: 18px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.timeline-list {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+}
+
+.timeline-list article {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.timeline-list strong {
+  color: var(--green-dark);
+}
+
+.timeline-list p {
+  color: var(--muted);
+  margin: 0;
+}
+
 .status-pill {
   align-self: start;
   background: #f7faf8;
@@ -1537,7 +1592,8 @@ h3 {
   .decision-ledger-grid,
   .decision-metrics,
   .review-event-list article,
-  .agent-readiness-grid {
+  .agent-readiness-grid,
+  .evidence-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1631,7 +1687,8 @@ h3 {
   }
 
   .demo-readiness-summary,
-  .demo-readiness-brief {
+  .demo-readiness-brief,
+  .evidence-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -112,6 +112,8 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence`
 - `POST /api/pilot-workspaces/{workspaceSlug}/procurement-evidence`
 - `GET /api/pilot-workspaces/{workspaceSlug}/procurement-evidence/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
+- `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
 
@@ -446,6 +448,19 @@ Safe operating pattern:
 - Record only bounded target-audience, procurement-domain, evidence-class, external-system-label, non-secret routing locator, cadence, risk tier, linked provider security review ids, retained blockers, and metadata in SCRIMED.
 - Download the audited procurement evidence registry packet only after the write-before-release audit event commits.
 - Treat procurement evidence readiness as a buyer-diligence routing posture. It is not procurement approval, security approval, privacy approval, legal approval, BAA/DPA execution, compliance certification, public release approval, external distribution approval, production authorization, or live clinical execution authority.
+
+## Protected Clinical Authority Evidence Room
+
+`/pilot-workspace/access` now includes the Protected Clinical Authority Evidence Room after procurement evidence routing. It derives from existing protected workspace evidence instead of adding another database table, then assembles live-care authority, PHI processing, legal approval, regional approval, reimbursement review, security certification, connector acceptance, and production clinical authorization readiness into one no-PHI control plane.
+
+Protected workspaces expose `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room` plus `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`. The packet route uses the existing write-before-release proof-packet audit path with `packetType: clinical-authority-evidence-room`.
+
+Safe operating pattern:
+
+- Keep clinical validation artifacts, signed BAAs/DPAs, source contracts, legal opinions, security reports, reimbursement determinations, regional approvals, certifications, connector credentials, URLs, tokens, PHI, patient identifiers, payer member data, and production approvals in qualified external systems.
+- Record and assemble only no-PHI reviewer-owner labels, evidence-route references, retained gates, expiration posture, source workflow summaries, and audit metadata in SCRIMED.
+- Download the audited clinical authority evidence room packet only after the write-before-release audit event commits.
+- Treat the room as readiness evidence only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, production connector activation, or live clinical-care authority.
 
 ## Sales Command Center Linkage
 

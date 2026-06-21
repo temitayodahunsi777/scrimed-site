@@ -10,11 +10,11 @@ Current product boundary: this repository presents SCRIMED as a governed synthet
 
 Enterprise readiness boundary: `/trust-center` and `/claims` expose accountable legal, security, privacy, brand, governance, marketing, PR, sales, advertising, and claims-control readiness. These surfaces are operational registers, not legal advice, certification, regulatory approval, or authorization for live clinical execution.
 
-Protected release governance: `/pilot-workspace/access` includes no-PHI finance methodology, external approval evidence, release decisions, named reviewer sign-offs, disabled distribution lockbox, release authority attestation controls, evidence-room recipient/access-log/provider-adapter controls, provider security review readiness, and procurement evidence routing. These controls produce audited synthetic pilot evidence only and do not authorize public release, external distribution, legal claims, customer proof, advertising claims, security approval, procurement approval, BAA/DPA execution, production use, live integration, or clinical care.
+Protected release governance: `/pilot-workspace/access` includes no-PHI finance methodology, external approval evidence, release decisions, named reviewer sign-offs, disabled distribution lockbox, release authority attestation controls, evidence-room recipient/access-log/provider-adapter controls, provider security review readiness, procurement evidence routing, and the Protected Clinical Authority Evidence Room. These controls produce audited synthetic pilot evidence only and do not authorize public release, external distribution, legal claims, customer proof, advertising claims, security approval, procurement approval, BAA/DPA execution, production use, live integration, PHI processing, or clinical care.
 
 Global reach boundary: `/global-reach`, `/api/global-reach`, and `/api/global-reach/brief` expose region focus, buyer localization packs, partner channels, procurement questions, competitive edge, and contained boundary workarounds for global expansion. This is localization and go-to-market readiness only. It is not legal advice, regional regulatory approval, public-sector procurement approval, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
 
-Clinical authority boundary: `/clinical-authority-readiness`, `/api/clinical-authority-readiness`, and `/api/clinical-authority-readiness/brief` expose hard-gate preparation for live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector acceptance, and production clinical authorization. This is readiness only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, or live clinical-care authority.
+Clinical authority boundary: `/clinical-authority-readiness`, `/api/clinical-authority-readiness`, `/api/clinical-authority-readiness/brief`, `/pilot-workspace/access#clinical-authority-evidence-room`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`, and `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet` expose hard-gate preparation and protected no-PHI evidence assembly for live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector acceptance, and production clinical authorization. This is readiness only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, or live clinical-care authority.
 
 ---
 
@@ -109,6 +109,7 @@ Current focus areas include:
 - public-market claim controls with external approval evidence, versioned release decisions, named reviewer sign-off metadata packets, disabled distribution lockbox controls, release authority attestations, metadata-only evidence-room recipient attestations, access-log reconciliation, provider-adapter contract readiness, provider security review readiness, and procurement evidence routing
 - global partner and buyer localization with region packs, audience packs, partner channels, procurement questions, competitive edge, and retained legal/privacy/clinical gates
 - clinical authority readiness with hard-gate preparation for live care, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production authorization
+- protected clinical authority evidence rooms with AAL2 no-PHI reviewer owners, retained authority gates, expiration posture, audit history, and audited authority evidence packets
 
 ---
 
@@ -153,6 +154,7 @@ Core enterprise evaluation surfaces:
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
 - `/clinical-authority-readiness` - hard-gate readiness for live clinical care authority, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production clinical authorization
+- `/pilot-workspace/access#clinical-authority-evidence-room` - AAL2 protected no-PHI clinical authority evidence assembly for reviewer owners, retained gates, audit history, expiration posture, and readiness packet export
 - `/global-reach` - region focus, buyer localization packs, partner channels, procurement questions, and retained approval gates
 - `/operations` - company operations readiness, blockers, owners, fallbacks, and buyer route checklist
 - `/trust-center` - enterprise readiness domains, owners, evidence, required actions, launch gates, and external-review requirements
@@ -177,6 +179,8 @@ Core APIs:
 - `/api/commercial/pricing`
 - `/api/clinical-authority-readiness`
 - `/api/clinical-authority-readiness/brief`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/global-reach`
 - `/api/global-reach/brief`
 - `/api/operations/readiness`
@@ -206,7 +210,7 @@ Current go-live blockers and manual actions are tracked in `/operations`: the pu
 
 The Product Console and readiness brief also include operations readiness so buyer, investor, and operator reviews see launch blockers, owners, fallback paths, and remaining manual actions in one place.
 
-Protected pilot workspaces now include metadata-only evidence-room access-log reconciliation and provider-adapter contract readiness after recipient attestations. This gives SCRIMED a buyer/investor diligence path for externally retained access logs, provider contract references, and audit-log import stubs while keeping raw logs, recipient identifiers, provider credentials, URLs, tokens, signed approvals, legal opinions, sensitive artifacts, export approval, live integration approval, and live clinical execution outside the product boundary.
+Protected pilot workspaces now include metadata-only evidence-room access-log reconciliation, provider-adapter contract readiness, provider security review readiness, procurement evidence routing, and Protected Clinical Authority Evidence Room assembly. This gives SCRIMED a buyer/investor diligence path for externally retained access logs, provider contract references, audit-log import stubs, security/procurement review metadata, and clinical authority readiness packets while keeping raw logs, recipient identifiers, provider credentials, URLs, tokens, signed approvals, legal opinions, sensitive artifacts, PHI, export approval, live integration approval, and live clinical execution outside the product boundary.
 
 ---
 

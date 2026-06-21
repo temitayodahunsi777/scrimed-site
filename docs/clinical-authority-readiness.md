@@ -9,12 +9,16 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - `/clinical-authority-readiness`
 - `/api/clinical-authority-readiness`
 - `/api/clinical-authority-readiness/brief`
+- `/pilot-workspace/access#clinical-authority-evidence-room`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
+- `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 
 ## What It Adds
 
 - Authority domains for live care, PHI, legal, regional, reimbursement, security certification, production authorization, and health IT connector approval.
 - Boundary resolutions that keep every hard gate contained with a safe workaround.
 - Evidence-pack routing into protected no-PHI workspace artifacts, including clinical activation dossier, external approval evidence, provider security review, and procurement evidence registry.
+- AAL2 protected clinical authority evidence room assembly with reviewer owners, retained gates, expiration posture, audit history, and audited no-PHI packet export.
 - Operating modes that clearly distinguish synthetic evaluation from de-identified shadow review, clinician-supervised prospective pilots, and production clinical execution.
 - Official source references and SCRIMED internal control references for diligence conversations.
 
@@ -30,4 +34,4 @@ Use this page before any buyer conversation about PHI, patient-specific workflow
 
 ## Next Build
 
-Create authenticated authority evidence packet assembly inside protected pilot workspaces so customer-specific reviewer status, evidence links, approval owners, and retained go-live gates can be exported without storing sensitive artifacts.
+Add external-review intake checklists and customer-specific authority owner mapping so the evidence room can track which legal, privacy, security, clinical governance, reimbursement, regional, and connector approvers must provide signed artifacts outside SCRIMED before any live clinical execution path is considered.

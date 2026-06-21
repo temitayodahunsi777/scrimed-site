@@ -24,7 +24,7 @@ export default function ClinicalAuthorityReadinessPage() {
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Authority Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
-          <Link className="secondary-action" href="/pilot-workspace/access">Protected Evidence Packs</Link>
+          <Link className="secondary-action" href="/pilot-workspace/access#clinical-authority-evidence-room">Protected Evidence Room</Link>
           <Link className="secondary-action" href="/trust-center">Trust Center</Link>
           <Link className="secondary-action" href="/global-reach">Regional Readiness</Link>
         </div>

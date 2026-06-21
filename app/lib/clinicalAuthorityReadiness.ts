@@ -459,6 +459,14 @@ export const clinicalAuthorityOperatingModes: ClinicalAuthorityOperatingMode[] =
 
 export const clinicalAuthorityEvidencePacks: ClinicalAuthorityEvidencePack[] = [
   {
+    name: "Protected clinical authority evidence room",
+    purpose:
+      "AAL2-protected no-PHI control plane that assembles reviewer owners, evidence links, expiration posture, retained gates, and audit history across every clinical authority hard gate.",
+    route: "/pilot-workspace/access#clinical-authority-evidence-room",
+    packetRoute: "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet",
+    boundary: "Protected metadata-only authority readiness; not clinical, legal, PHI, reimbursement, security, regional, connector, or production approval."
+  },
+  {
     name: "Clinical activation dossier",
     purpose:
       "Tenant-scoped no-PHI evidence packet for clinical go-live planning, reviewer assignments, unsigned approvals, and blocked capabilities.",

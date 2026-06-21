@@ -172,6 +172,10 @@ import {
   protectedProcurementEvidenceRegistryPacketProofStackStatus,
   protectedProcurementEvidenceRegistryStatus
 } from "./protectedProcurementEvidenceRegistry";
+import {
+  protectedClinicalAuthorityEvidenceRoomPacketStatus,
+  protectedClinicalAuthorityEvidenceRoomStatus
+} from "./protectedClinicalAuthorityEvidenceRoom";
 
 export type ProductOfferStatus = "sellable-pilot" | "staged-demo" | "foundation";
 
@@ -905,6 +909,11 @@ export function getProductConsoleSummary() {
       publicMarketReadinessSummary.protectedProcurementEvidenceRegistryApiRoute,
     protectedProcurementEvidenceRegistryPacketApiRoute:
       publicMarketReadinessSummary.protectedProcurementEvidenceRegistryPacketApiRoute,
+    protectedClinicalAuthorityEvidenceRoomRoute: "/pilot-workspace/access",
+    protectedClinicalAuthorityEvidenceRoomApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room",
+    protectedClinicalAuthorityEvidenceRoomPacketApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
@@ -1100,6 +1109,10 @@ export function getProductConsoleSummary() {
         protectedProcurementEvidenceRegistryStatus,
       protectedProcurementEvidenceRegistryPackets:
         protectedProcurementEvidenceRegistryPacketProofStackStatus,
+      protectedClinicalAuthorityEvidenceRoom:
+        protectedClinicalAuthorityEvidenceRoomStatus,
+      protectedClinicalAuthorityEvidenceRoomPackets:
+        protectedClinicalAuthorityEvidenceRoomPacketStatus,
       globalPartnerLocalization: globalPartnerLocalizationStatus,
       globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
@@ -1308,6 +1321,9 @@ export function getProductReadinessBrief() {
     `Protected procurement evidence registry: ${summary.protectedProcurementEvidenceRegistryRoute}`,
     `Protected procurement evidence registry API: ${summary.protectedProcurementEvidenceRegistryApiRoute}`,
     `Protected procurement evidence registry packet API: ${summary.protectedProcurementEvidenceRegistryPacketApiRoute}`,
+    `Protected clinical authority evidence room: ${summary.protectedClinicalAuthorityEvidenceRoomRoute}`,
+    `Protected clinical authority evidence room API: ${summary.protectedClinicalAuthorityEvidenceRoomApiRoute}`,
+    `Protected clinical authority evidence room packet API: ${summary.protectedClinicalAuthorityEvidenceRoomPacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,
     `Investor narrative: ${summary.publicMarketReadinessSummary.investorNarrative}`,

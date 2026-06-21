@@ -417,6 +417,22 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.protectedClinicalAuthorityEvidenceRoom !==
+    "aal2-clinical-authority-evidence-room-no-phi"
+  ) {
+    throw new Error("product console missing protected clinical authority evidence room proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedClinicalAuthorityEvidenceRoomPackets !==
+    "aal2-audited-clinical-authority-evidence-room-packet-no-phi"
+  ) {
+    throw new Error(
+      "product console missing protected clinical authority evidence room packet proof-stack posture."
+    );
+  }
+
+  if (
     body.proofStack?.globalPartnerLocalization !==
     "global-partner-localization-layer-ready"
   ) {
@@ -1443,6 +1459,14 @@ await checkProtectedPostFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/clinical-activation-approvals/packet`,
   "Clinical Activation Approval Workflow packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-authority-evidence-room`,
+  "Clinical Authority Evidence Room protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/clinical-authority-evidence-room/packet`,
+  "Clinical Authority Evidence Room packet protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/operator-metrics`,
