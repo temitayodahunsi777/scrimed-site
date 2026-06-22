@@ -77,6 +77,12 @@ import {
   qaManualRunEvidencePacketApiRoute,
   qaManualRunEvidencePersistenceApiRoute
 } from "./qaEvidenceLedger";
+import {
+  getQaCompletionBridgeSummary,
+  qaCompletionBridgeApiRoute,
+  qaCompletionBridgeBriefRoute,
+  qaCompletionBridgeRoute
+} from "./qaCompletionBridge";
 
 export type HubModule = {
   name: string;
@@ -197,6 +203,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Release engineering, TrustOS, security, and tenant governance",
     objective: "Package the no-secret human-run AAL2 workflow handoff before retained authenticated QA proof can be claimed."
+  },
+  {
+    name: "QA Completion Bridge",
+    route: qaCompletionBridgeRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release engineering, TrustOS, tenant governance, and Buyer Diligence",
+    objective: "Validate no-secret post-run candidate evidence before protected persistence and buyer proof promotion."
   }
 ];
 
@@ -317,6 +331,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "QA Completion Bridge",
+    value: "no-secret pre-persistence validation ready",
+    tone: "good"
+  },
+  {
     name: "Manual QA evidence packet",
     value: "no-secret capture contract active",
     tone: "good"
@@ -386,6 +405,9 @@ export const hubRoutes = [
   "/qa-launch-kit",
   "/api/qa-evidence/launch-kit",
   "/api/qa-evidence/launch-kit/brief",
+  qaCompletionBridgeRoute,
+  qaCompletionBridgeApiRoute,
+  qaCompletionBridgeBriefRoute,
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -623,6 +645,7 @@ export function getHubSummary() {
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
+  const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -652,6 +675,7 @@ export function getHubSummary() {
     clinicalAuthorityReadinessSummary,
     trustSafetyOperationsSummary,
     qaEvidenceLedger,
+    qaCompletionBridgeSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
@@ -675,6 +699,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-20"
+    updated: "2026-06-22"
   };
 }

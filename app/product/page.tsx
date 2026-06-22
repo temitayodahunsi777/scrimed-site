@@ -113,6 +113,14 @@ export default function ProductConsolePage() {
           <strong>{summary.qaLaunchKitSafeCopyFieldCount}</strong>
         </article>
         <article>
+          <span>QA bridge gates</span>
+          <strong>{summary.qaCompletionBridgeCheckpointCount}</strong>
+        </article>
+        <article>
+          <span>QA bridge hard stops</span>
+          <strong>{summary.qaCompletionBridgeHardStopCount}</strong>
+        </article>
+        <article>
           <span>QA proof rules</span>
           <strong>{summary.qaProofPromotionRuleCount}</strong>
         </article>
@@ -341,6 +349,38 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>Pass: {phase.passSignal}</li>
                 <li>Fail closed: {phase.failClosedIf}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA completion bridge">
+        <div className="section-heading">
+          <p className="eyebrow">QA completion bridge</p>
+          <h2>Completion Bridge validates post-run evidence before protected persistence and buyer proof.</h2>
+          <p className="section-copy">{summary.qaCompletionBridgeSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaCompletionBridgeRoute}>
+              Open Completion Bridge
+            </Link>
+            <a className="secondary-action" href={summary.qaCompletionBridgeBriefRoute}>
+              Download Bridge Brief
+            </a>
+          </div>
+        </div>
+        {summary.qaCompletionBridgeSummary.checkpoints.map((checkpoint) => (
+          <article className="module-row" key={checkpoint.checkpoint}>
+            <div>
+              <span>{checkpoint.state}</span>
+              <h2>{checkpoint.checkpoint}</h2>
+            </div>
+            <p>{checkpoint.evidenceRequired}</p>
+            <div>
+              <strong>{checkpoint.owner}</strong>
+              <ul className="compact-list">
+                <li>Pass: {checkpoint.passSignal}</li>
+                <li>Fail closed: {checkpoint.failClosedIf}</li>
               </ul>
             </div>
           </article>

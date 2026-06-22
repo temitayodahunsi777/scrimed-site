@@ -1,6 +1,6 @@
 # SCRIMED Manual AAL2 QA Execution Readiness
 
-Updated: 2026-06-21
+Updated: 2026-06-22
 
 SCRIMED exposes Manual AAL2 QA Execution Readiness at `/qa-execution-readiness`, `/api/qa-evidence/execution-readiness`, and `/api/qa-evidence/execution-readiness/brief`.
 
@@ -14,6 +14,7 @@ This layer turns the remaining authenticated QA boundary into a controlled go/no
 - manual GitHub workflow dispatch
 - temporary secret disposal
 - no-secret evidence packet generation
+- QA Completion Bridge candidate validation
 - protected workspace persistence
 - Buyer Diligence export after retained packet visibility
 
@@ -36,6 +37,6 @@ Not allowed yet:
 
 ## Next Step
 
-Open `/qa-launch-kit`, use its no-secret operator handoff for the first fresh human AAL2 run, delete or rotate the temporary secret, persist only safe metadata, then export Buyer Diligence after the packet hash appears.
+Open `/qa-launch-kit`, use its no-secret operator handoff for the first fresh human AAL2 run, delete or rotate the temporary secret, validate the candidate metadata through `/qa-completion-bridge`, persist only accepted safe metadata, then export Buyer Diligence after the packet hash appears.
 
 Before exporting, open `/qa-proof-promotion` and confirm retained-packet promotion is allowed. If the promotion state is still `pending-retained-packet`, keep buyer-facing language at activation readiness only.

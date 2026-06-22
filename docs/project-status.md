@@ -2,6 +2,14 @@
 
 Updated: 2026-06-22
 
+## Latest QA Completion Bridge Release
+
+- Added `/qa-completion-bridge`, `/api/qa-evidence/completion-bridge`, and `/api/qa-evidence/completion-bridge/brief` as the no-secret bridge after a human AAL2 synthetic QA run and before protected evidence persistence.
+- Added candidate packet validation, packet preview hashing, checkpoint ownership, hard-stop boundaries, sample no-secret payloads, and buyer-proof blocking until protected packet hashes are visible.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution, `/qa-evidence`, `/product`, `/qa-run-control`, `/qa-launch-kit`, `/qa-proof-promotion`, Buyer Pilot Room navigation, Hub inventory, and public smoke coverage with Completion Bridge visibility.
+- Added `docs/qa-completion-bridge.md` as the operator runbook for validating post-run metadata before protected Manual QA Evidence persistence.
+- Preserved the boundary: Completion Bridge does not execute passkey ceremonies, mint or store tokens, persist evidence, store PHI, authorize live clinical care, certify security or compliance, guarantee reimbursement, approve production connectors, or allow buyer proof promotion before protected packet hashes are visible.
+
 ## Latest Manual AAL2 QA Launch Kit Release
 
 - Added `/qa-launch-kit`, `/api/qa-evidence/launch-kit`, and `/api/qa-evidence/launch-kit/brief` as the no-secret operator handoff for the first human AAL2 synthetic QA run.

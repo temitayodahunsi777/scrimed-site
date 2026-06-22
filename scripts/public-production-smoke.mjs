@@ -254,6 +254,37 @@ function requireQaLaunchKitBoundary(label, response) {
   }
 }
 
+function requireQaCompletionBridgeBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const completionBridge = response.headers.get("x-scrimed-qa-completion-bridge");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (completionBridge !== "no-secret-pre-persistence-validation") {
+    throw new Error(`${label} expected x-scrimed-qa-completion-bridge no-secret-pre-persistence-validation but received ${completionBridge}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "candidate-ready-not-retained-proof") {
+    throw new Error(`${label} expected x-scrimed-qa-proof candidate-ready-not-retained-proof but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 function requireQaProofPromotionBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
@@ -908,6 +939,20 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.qaCompletionBridge !==
+    "manual-aal2-qa-completion-bridge-no-secret-pre-persistence"
+  ) {
+    throw new Error("product console missing QA completion bridge proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaCompletionBridgeBrief !==
+    "manual-aal2-qa-completion-bridge-brief-no-retained-proof-claim"
+  ) {
+    throw new Error("product console missing QA completion bridge brief proof-stack posture.");
+  }
+
+  if (
     body.proofStack?.qaProofPromotion !==
     "retained-manual-qa-proof-promotion-gate-no-secret"
   ) {
@@ -955,6 +1000,22 @@ async function checkProductConsole() {
 
   if (!body.qaLaunchKitBlockedClaimCount || body.qaLaunchKitBlockedClaimCount < 9) {
     throw new Error("product console expected QA launch-kit blocked-claim coverage.");
+  }
+
+  if (!body.qaCompletionBridgeCheckpointCount || body.qaCompletionBridgeCheckpointCount < 5) {
+    throw new Error("product console expected QA completion bridge checkpoint coverage.");
+  }
+
+  if (!body.qaCompletionBridgeHardStopCount || body.qaCompletionBridgeHardStopCount < 2) {
+    throw new Error("product console expected QA completion bridge hard-stop coverage.");
+  }
+
+  if (!body.qaCompletionBridgeSafeFieldCount || body.qaCompletionBridgeSafeFieldCount < 10) {
+    throw new Error("product console expected QA completion bridge safe-field coverage.");
+  }
+
+  if (!body.qaCompletionBridgeBlockedClaimCount || body.qaCompletionBridgeBlockedClaimCount < 9) {
+    throw new Error("product console expected QA completion bridge blocked-claim coverage.");
   }
 
   if (!body.qaProofPromotionRuleCount || body.qaProofPromotionRuleCount < 5) {
@@ -1403,6 +1464,139 @@ async function checkQaLaunchKit() {
   }
 
   console.log("pass QA launch kit");
+}
+
+async function checkQaCompletionBridge() {
+  const result = await request("/api/qa-evidence/completion-bridge");
+  requireStatus("QA completion bridge", result.response.status, 200);
+  requireContentType("QA completion bridge", result.response, "application/json");
+  requireQaCompletionBridgeBoundary("QA completion bridge", result.response);
+  const body = requireJson("QA completion bridge", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-qa-completion-bridge") {
+    throw new Error(`QA completion bridge expected scrimed-qa-completion-bridge but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-completion-bridge-ready") {
+    throw new Error(`QA completion bridge expected ready status but received ${body.status}.`);
+  }
+
+  if (body.completionDecisionState !== "waiting-for-human-aal2-run") {
+    throw new Error("QA completion bridge must preserve waiting-for-human-aal2-run public decision.");
+  }
+
+  if (body.buyerClaimStatus !== "completion-bridge-ready-not-retained-authenticated-proof") {
+    throw new Error("QA completion bridge must preserve not-retained authenticated proof boundary.");
+  }
+
+  if (!Array.isArray(body.checkpoints) || body.checkpoints.length < 5) {
+    throw new Error("QA completion bridge expected checkpoint coverage.");
+  }
+
+  if (!body.checkpoints.some((checkpoint) => checkpoint.state === "protected-only")) {
+    throw new Error("QA completion bridge expected protected-only persistence checkpoint.");
+  }
+
+  if (!Array.isArray(body.bridgeRules) || !body.bridgeRules.some((rule) => rule.includes("Not allowed here"))) {
+    throw new Error("QA completion bridge expected not-allowed bridge rule.");
+  }
+
+  if (!Array.isArray(body.blockedClaims) || !body.blockedClaims.includes("live clinical care authorized")) {
+    throw new Error("QA completion bridge expected live clinical care to remain blocked.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA completion bridge response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA completion bridge response must not contain bearer-token material.");
+  }
+
+  const rejectedSecret = await postJson("/api/qa-evidence/completion-bridge", {
+    workflowKind: "sales-demo-session-qa",
+    workflowRunId: "1234567890",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567890",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "synthetic-intake-001",
+    createdSessionId: "11111111-1111-4111-8111-111111111111",
+    packetAuditEventId: "22222222-2222-4222-8222-222222222222",
+    bearerToken: "Bearer eyJshould.not.persist.fake",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA completion bridge secret rejection", rejectedSecret.response.status, 400);
+  requireContentType("QA completion bridge secret rejection", rejectedSecret.response, "application/json");
+  requireQaCompletionBridgeBoundary("QA completion bridge secret rejection", rejectedSecret.response);
+  const rejectedBody = requireJson("QA completion bridge secret rejection", rejectedSecret.body);
+
+  if (rejectedBody.decisionState !== "candidate-validation-failed") {
+    throw new Error("QA completion bridge must fail closed for secret-like candidate material.");
+  }
+
+  const acceptedCandidate = await postJson("/api/qa-evidence/completion-bridge", {
+    workflowKind: "authority-reference-qa",
+    workflowRunId: "1234567890",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567890",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "atlas-synthetic-evaluation",
+    createdSessionId: "11111111-1111-4111-8111-111111111111",
+    packetAuditEventId: "22222222-2222-4222-8222-222222222222",
+    evidenceTargetLabel: "Workspace target",
+    evidenceObjectLabel: "Created authority reference ID",
+    packetAuditEventLabel: "Authority packet audit event ID",
+    evidenceRoute: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+    packetRoute: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
+    operatorRunbook: "/docs/protected-authority-artifact-references.md",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA completion bridge accepted candidate", acceptedCandidate.response.status, 200);
+  requireContentType("QA completion bridge accepted candidate", acceptedCandidate.response, "application/json");
+  requireQaCompletionBridgeBoundary("QA completion bridge accepted candidate", acceptedCandidate.response);
+  const acceptedBody = requireJson("QA completion bridge accepted candidate", acceptedCandidate.body);
+
+  if (acceptedBody.decisionState !== "ready-for-protected-persistence") {
+    throw new Error("QA completion bridge accepted candidate must be ready for protected persistence.");
+  }
+
+  if (acceptedBody.promotionAllowed !== false) {
+    throw new Error("QA completion bridge must not promote buyer proof before protected packet persistence.");
+  }
+
+  if (!/^[a-f0-9]{64}$/.test(acceptedBody.packetPreviewSha256)) {
+    throw new Error("QA completion bridge accepted candidate expected packet preview SHA-256.");
+  }
+
+  if (!acceptedBody.packetPreviewMarkdown?.includes("SCRIMED Manual Authority Reference QA Evidence Packet")) {
+    throw new Error("QA completion bridge accepted candidate expected authority reference packet preview.");
+  }
+
+  const brief = await request("/api/qa-evidence/completion-bridge/brief");
+  requireStatus("QA completion bridge brief", brief.response.status, 200);
+  requireContentType("QA completion bridge brief", brief.response, "text/markdown");
+  requireQaCompletionBridgeBoundary("QA completion bridge brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED QA Completion Bridge Brief")) {
+    throw new Error("QA completion bridge brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("waiting-for-human-aal2-run")) {
+    throw new Error("QA completion bridge brief missing waiting-for-human decision.");
+  }
+
+  if (!brief.body.text.includes("Protected persistence route")) {
+    throw new Error("QA completion bridge brief missing protected persistence route.");
+  }
+
+  console.log("pass QA completion bridge");
 }
 
 async function checkQaProofPromotion() {
@@ -2100,6 +2294,7 @@ await checkHtml("/boundary-resolution");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
+await checkHtml("/qa-completion-bridge");
 await checkHtml("/qa-proof-promotion");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
@@ -2114,6 +2309,7 @@ await checkQaEvidenceLedger();
 await checkQaExecutionReadiness();
 await checkQaRunControl();
 await checkQaLaunchKit();
+await checkQaCompletionBridge();
 await checkQaProofPromotion();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",

@@ -209,6 +209,9 @@ export default function BuyerPilotRoomPanel({
             <Link className="secondary-action" href="/qa-launch-kit">
               Launch Kit
             </Link>
+            <Link className="secondary-action" href="/qa-completion-bridge">
+              Completion Bridge
+            </Link>
             <Link className="secondary-action" href={room.qaProofPromotion.route}>
               Review Promotion Rules
             </Link>

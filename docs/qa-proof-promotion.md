@@ -19,6 +19,8 @@ Before a protected no-secret packet hash is visible, buyer proof may reference:
 - QA Evidence Ledger
 - Execution Readiness
 - Run Control
+- Launch Kit
+- Completion Bridge candidate validation
 - fail-closed protected route checks
 - no-secret packet contract
 - protected persistence route
@@ -51,11 +53,12 @@ Proof Promotion does not execute AAL2 workflows, mint tokens, store credentials,
 2. Open `/qa-launch-kit`.
 3. Complete the human AAL2 workflow with exactly one synthetic target.
 4. Delete or rotate the temporary token secret.
-5. Persist only safe metadata through `/pilot-workspace/access` -> Manual QA Evidence.
-6. Open `/qa-proof-promotion`.
-7. Confirm the state is `ready-for-buyer-diligence`.
-8. Export Buyer Diligence with only safe run metadata and packet SHA-256.
+5. Validate only safe candidate metadata through `/qa-completion-bridge`.
+6. Persist accepted metadata through `/pilot-workspace/access` -> Manual QA Evidence.
+7. Open `/qa-proof-promotion`.
+8. Confirm the state is `ready-for-buyer-diligence`.
+9. Export Buyer Diligence with only safe run metadata and packet SHA-256.
 
 ## Next Step
 
-Run the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow through `/qa-launch-kit`, persist the no-secret packet, then use `/qa-proof-promotion` before releasing buyer-facing retained QA proof.
+Run the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow through `/qa-launch-kit`, validate the no-secret candidate through `/qa-completion-bridge`, persist the accepted packet, then use `/qa-proof-promotion` before releasing buyer-facing retained QA proof.

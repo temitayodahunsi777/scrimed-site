@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
+import { getQaCompletionBridgeSummary } from "../lib/qaCompletionBridge";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
 import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
 import { getQaProofPromotionSummary } from "../lib/qaProofPromotion";
@@ -16,6 +17,7 @@ export default function QaEvidencePage() {
   const executionReadiness = getQaExecutionReadinessSummary();
   const runControl = getQaRunControlSummary();
   const launchKit = getQaLaunchKitSummary();
+  const completionBridge = getQaCompletionBridgeSummary();
   const proofPromotion = getQaProofPromotionSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
@@ -53,6 +55,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={launchKit.route}>
             Launch Kit
+          </Link>
+          <Link className="secondary-action" href={completionBridge.route}>
+            Completion Bridge
           </Link>
           <Link className="secondary-action" href={proofPromotion.route}>
             Proof Promotion
@@ -111,6 +116,14 @@ export default function QaEvidencePage() {
         <article>
           <span>Launch phases</span>
           <strong>{launchKit.phaseCount}</strong>
+        </article>
+        <article>
+          <span>Completion bridge</span>
+          <strong>{completionBridge.completionDecisionState}</strong>
+        </article>
+        <article>
+          <span>Bridge hard stops</span>
+          <strong>{completionBridge.hardStopCount}</strong>
         </article>
         <article>
           <span>Proof promotion</span>
@@ -290,6 +303,38 @@ export default function QaEvidencePage() {
               <ul className="compact-list">
                 <li>Pass: {phase.passSignal}</li>
                 <li>Fail closed: {phase.failClosedIf}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA completion bridge">
+        <div className="section-heading">
+          <p className="eyebrow">Completion bridge</p>
+          <h2>After the human run, validate the no-secret packet before protected persistence.</h2>
+          <p className="section-copy">{completionBridge.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={completionBridge.route}>
+              Open Completion Bridge
+            </Link>
+            <a className="secondary-action" href={completionBridge.briefRoute}>
+              Download Bridge Brief
+            </a>
+          </div>
+        </div>
+        {completionBridge.checkpoints.map((checkpoint) => (
+          <article className="module-row" key={checkpoint.checkpoint}>
+            <div>
+              <span>{checkpoint.state}</span>
+              <h2>{checkpoint.checkpoint}</h2>
+            </div>
+            <p>{checkpoint.evidenceRequired}</p>
+            <div>
+              <strong>{checkpoint.owner}</strong>
+              <ul className="compact-list">
+                <li>Pass: {checkpoint.passSignal}</li>
+                <li>Fail closed: {checkpoint.failClosedIf}</li>
               </ul>
             </div>
           </article>

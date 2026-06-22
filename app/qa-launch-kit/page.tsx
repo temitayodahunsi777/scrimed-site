@@ -29,6 +29,7 @@ export default function QaLaunchKitPage() {
           <a className="primary-action" href={summary.briefRoute}>Download Launch Kit</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/qa-run-control">Run Control</Link>
+          <Link className="secondary-action" href="/qa-completion-bridge">Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-proof-promotion">Proof Promotion</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
         </div>
