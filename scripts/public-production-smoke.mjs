@@ -414,6 +414,41 @@ function requireQaActivationSealBoundary(label, response) {
   }
 }
 
+function requireQaBuyerProofReleaseBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const buyerProofRelease = response.headers.get("x-scrimed-qa-buyer-proof-release");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (!["protected-release-required", "retained-packet-gated"].includes(buyerProofRelease ?? "")) {
+    throw new Error(`${label} expected x-scrimed-qa-buyer-proof-release protected-release-required or retained-packet-gated but received ${buyerProofRelease}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (![
+    "buyer-proof-release-gated-retained-packet-required",
+    "buyer-proof-release-brief-no-public-release",
+    "buyer-proof-release-gated"
+  ].includes(qaProof ?? "")) {
+    throw new Error(`${label} expected buyer proof release qa-proof boundary but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -1106,6 +1141,20 @@ async function checkProductConsole() {
     throw new Error("product console missing QA proof-promotion brief proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.qaBuyerProofRelease !==
+    "manual-aal2-qa-buyer-proof-release-retained-packet-gate"
+  ) {
+    throw new Error("product console missing QA buyer proof release proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaBuyerProofReleaseBrief !==
+    "manual-aal2-qa-buyer-proof-release-brief-no-public-release"
+  ) {
+    throw new Error("product console missing QA buyer proof release brief proof-stack posture.");
+  }
+
   if (!body.qaExecutionReadinessWorkflowCount || body.qaExecutionReadinessWorkflowCount < 2) {
     throw new Error("product console expected QA execution readiness workflow coverage.");
   }
@@ -1224,6 +1273,22 @@ async function checkProductConsole() {
 
   if (!body.qaProofPromotionBlockedClaimCount || body.qaProofPromotionBlockedClaimCount < 8) {
     throw new Error("product console expected QA proof-promotion blocked-claim coverage.");
+  }
+
+  if (!body.qaBuyerProofReleaseRuleCount || body.qaBuyerProofReleaseRuleCount < 5) {
+    throw new Error("product console expected QA buyer proof release rule coverage.");
+  }
+
+  if (!body.qaBuyerProofReleaseHardStopCount || body.qaBuyerProofReleaseHardStopCount < 8) {
+    throw new Error("product console expected QA buyer proof release hard-stop coverage.");
+  }
+
+  if (!body.qaBuyerProofReleaseRequiredEvidenceCount || body.qaBuyerProofReleaseRequiredEvidenceCount < 10) {
+    throw new Error("product console expected QA buyer proof release evidence coverage.");
+  }
+
+  if (!body.qaBuyerProofReleaseBlockedClaimCount || body.qaBuyerProofReleaseBlockedClaimCount < 8) {
+    throw new Error("product console expected QA buyer proof release blocked-claim coverage.");
   }
 
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
@@ -2192,6 +2257,116 @@ async function checkQaProofPromotion() {
   console.log("pass QA proof promotion");
 }
 
+async function checkQaBuyerProofRelease() {
+  const result = await request("/api/qa-evidence/buyer-proof-release");
+  requireStatus("QA buyer proof release", result.response.status, 200);
+  requireContentType("QA buyer proof release", result.response, "application/json");
+  requireQaBuyerProofReleaseBoundary("QA buyer proof release", result.response);
+  const body = requireJson("QA buyer proof release", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-qa-buyer-proof-release") {
+    throw new Error(`QA buyer proof release expected scrimed-qa-buyer-proof-release but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-buyer-proof-release-gate-ready") {
+    throw new Error(`QA buyer proof release expected ready status but received ${body.status}.`);
+  }
+
+  if (body.releaseDecisionState !== "locked-retained-packet-required") {
+    throw new Error(`QA buyer proof release expected locked-retained-packet-required but received ${body.releaseDecisionState}.`);
+  }
+
+  if (body.buyerDiligenceExportAllowed !== false || body.protectedVerificationRequired !== true) {
+    throw new Error("QA buyer proof release must block public/default buyer export and require protected verification.");
+  }
+
+  if (body.externalDistributionAllowed !== false || body.publicClaimAllowed !== false) {
+    throw new Error("QA buyer proof release must block external distribution and public claims.");
+  }
+
+  if (!Array.isArray(body.requiredEvidence) || body.requiredEvidence.length < 10) {
+    throw new Error("QA buyer proof release expected required evidence coverage.");
+  }
+
+  if (!Array.isArray(body.hardStops) || !body.hardStops.some((stop) => stop.includes("PHI"))) {
+    throw new Error("QA buyer proof release expected PHI hard-stop coverage.");
+  }
+
+  if (!Array.isArray(body.blockedClaims) || !body.blockedClaims.includes("SCRIMED can process production PHI")) {
+    throw new Error("QA buyer proof release expected production PHI blocked claim.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA buyer proof release response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA buyer proof release response must not contain bearer-token material.");
+  }
+
+  const blocked = await postJson("/api/qa-evidence/buyer-proof-release", {
+    claim: "SCRIMED is HIPAA certified with live clinical care authorized and reimbursement guaranteed."
+  });
+  requireStatus("QA buyer proof release blocked authority claim", blocked.response.status, 409);
+  requireContentType("QA buyer proof release blocked authority claim", blocked.response, "application/json");
+  requireQaBuyerProofReleaseBoundary("QA buyer proof release blocked authority claim", blocked.response);
+  const blockedBody = requireJson("QA buyer proof release blocked authority claim", blocked.body);
+
+  if (
+    blockedBody.releaseDecisionState !== "blocked-boundary-violation" ||
+    blockedBody.buyerDiligenceExportAllowed !== false
+  ) {
+    throw new Error("QA buyer proof release expected authority claim to remain blocked.");
+  }
+
+  const candidate = await postJson("/api/qa-evidence/buyer-proof-release", {
+    workflowRunId: "1234567890",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567890",
+    packetSha256: "b".repeat(64),
+    packetAuditEventId: "22222222-2222-4222-8222-222222222222",
+    protectedWorkspaceSlug: "atlas-synthetic-evaluation",
+    proofPromotionState: "ready-for-buyer-diligence",
+    activationSealState: "sealed-for-buyer-diligence",
+    claimDecisionState: "requires-retained-packet",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA buyer proof release candidate", candidate.response.status, 200);
+  requireContentType("QA buyer proof release candidate", candidate.response, "application/json");
+  requireQaBuyerProofReleaseBoundary("QA buyer proof release candidate", candidate.response);
+  const candidateBody = requireJson("QA buyer proof release candidate", candidate.body);
+
+  if (
+    candidateBody.releaseDecisionState !== "candidate-ready-protected-verification-required" ||
+    candidateBody.candidateComplete !== true ||
+    candidateBody.buyerDiligenceExportAllowed !== false ||
+    candidateBody.protectedVerificationRequired !== true
+  ) {
+    throw new Error("QA buyer proof release candidate must remain protected-verification-only.");
+  }
+
+  const brief = await request("/api/qa-evidence/buyer-proof-release/brief");
+  requireStatus("QA buyer proof release brief", brief.response.status, 200);
+  requireContentType("QA buyer proof release brief", brief.response, "text/markdown");
+  requireQaBuyerProofReleaseBoundary("QA buyer proof release brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED QA Buyer Proof Release Brief")) {
+    throw new Error("QA buyer proof release brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("locked-retained-packet-required")) {
+    throw new Error("QA buyer proof release brief missing locked retained-packet state.");
+  }
+
+  if (!brief.body.text.includes("Protected release route")) {
+    throw new Error("QA buyer proof release brief missing protected release route.");
+  }
+
+  console.log("pass QA buyer proof release");
+}
+
 async function checkClinicalCareActivation() {
   const result = await request("/api/clinical-care-activation");
   requireStatus("Clinical care activation", result.response.status, 200);
@@ -2828,6 +3003,7 @@ await checkHtml("/qa-completion-bridge");
 await checkHtml("/qa-claim-guard");
 await checkHtml("/qa-activation-seal");
 await checkHtml("/qa-proof-promotion");
+await checkHtml("/qa-buyer-proof-release");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
@@ -2846,6 +3022,7 @@ await checkQaCompletionBridge();
 await checkQaClaimGuard();
 await checkQaActivationSeal();
 await checkQaProofPromotion();
+await checkQaBuyerProofRelease();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"
@@ -3409,6 +3586,10 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-run-packets`,
   "Manual QA evidence persistence protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/buyer-proof-release`,
+  "QA Buyer Proof Release protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,

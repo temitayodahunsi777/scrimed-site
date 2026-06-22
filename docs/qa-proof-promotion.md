@@ -9,6 +9,7 @@ It exposes:
 - `/qa-proof-promotion`
 - `/api/qa-evidence/proof-promotion`
 - `/api/qa-evidence/proof-promotion/brief`
+- `/qa-buyer-proof-release`
 
 ## Purpose
 
@@ -63,8 +64,9 @@ Proof Promotion does not execute AAL2 workflows, mint tokens, store credentials,
 9. Confirm the state is `ready-for-buyer-diligence`.
 10. Confirm `/qa-activation-seal` has protected packet visibility before packet-backed language.
 11. Run buyer-facing language through `/qa-claim-guard`.
-12. Export Buyer Diligence with only safe run metadata and packet SHA-256.
+12. Run `/qa-buyer-proof-release` as the protected final go/no-go gate.
+13. Export Buyer Diligence with only safe run metadata and packet SHA-256.
 
 ## Next Step
 
-Use `/qa-claim-guard` for every buyer-facing statement while the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow moves through `/qa-human-run-packet`, `/qa-completion-bridge`, protected persistence, `/qa-activation-seal`, and `/qa-proof-promotion`.
+Use `/qa-buyer-proof-release` as the final protected decision after the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow moves through `/qa-human-run-packet`, `/qa-completion-bridge`, protected persistence, `/qa-activation-seal`, `/qa-proof-promotion`, and `/qa-claim-guard`.

@@ -17,6 +17,7 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 - Public packet generator: `/api/qa-evidence/manual-run-packet`
 - Protected persistence route: `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`
 - Proof promotion: `/qa-proof-promotion`
+- Buyer proof release: `/qa-buyer-proof-release`
 - Claim guard: `/qa-claim-guard`
 - Activation seal: `/qa-activation-seal`
 
@@ -28,7 +29,7 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 4. POST the candidate metadata to `/api/qa-evidence/completion-bridge`.
 5. Continue only if the bridge returns `ready-for-protected-persistence`.
 6. Persist the same no-secret metadata through the protected Manual QA Evidence route from the tenant workspace.
-7. Verify `/qa-proof-promotion` before any Buyer Diligence export references retained authenticated QA evidence.
+7. Verify `/qa-proof-promotion` and `/qa-buyer-proof-release` before any Buyer Diligence export references retained authenticated QA evidence.
 8. Use `/qa-claim-guard` before any buyer, investor, sales, PR, or operator language references the QA state.
 9. Use `/qa-activation-seal` as the final no-secret seal check before packet-backed proof language.
 
@@ -43,4 +44,4 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 
 ## Next Step
 
-Use QA Human Run Packet for the approved dispatch and QA Claim Guard for every external or buyer-facing statement while the tenant-admin operator completes one synthetic AAL2 workflow, validates the no-secret candidate through QA Completion Bridge, persists the packet through protected Manual QA Evidence, confirms QA Activation Seal posture, and confirms Proof Promotion before exporting Buyer Diligence.
+Use QA Human Run Packet for the approved dispatch and QA Claim Guard for every external or buyer-facing statement while the tenant-admin operator completes one synthetic AAL2 workflow, validates the no-secret candidate through QA Completion Bridge, persists the packet through protected Manual QA Evidence, confirms QA Activation Seal posture, confirms Proof Promotion, and runs Buyer Proof Release before exporting Buyer Diligence.

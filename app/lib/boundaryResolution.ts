@@ -246,6 +246,7 @@ export function getBoundaryResolutionSummary() {
       "/qa-claim-guard",
       "/qa-activation-seal",
       "/qa-proof-promotion",
+      "/qa-buyer-proof-release",
       qaActivationPlan.route,
       qaActivationPlan.briefRoute,
       workflow.workflowPath,
@@ -278,7 +279,8 @@ export function getBoundaryResolutionSummary() {
       "/qa-completion-bridge",
       "/qa-claim-guard",
       "/qa-activation-seal",
-      "/qa-proof-promotion"
+      "/qa-proof-promotion",
+      "/qa-buyer-proof-release"
     ],
     nextAction: limitation.resolutionPath,
     prohibitedClaims: universalProhibitedClaims
@@ -349,7 +351,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-human-run-packet dispatches the first human AAL2 QA workflow, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, /qa-activation-seal confirms final seal posture, and /qa-proof-promotion gates retained packet language.",
+      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-human-run-packet dispatches the first human AAL2 QA workflow, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, /qa-activation-seal confirms final seal posture, /qa-proof-promotion gates retained packet language, and /qa-buyer-proof-release decides whether Buyer Diligence may reference retained proof.",
     records,
     updated: "2026-06-22"
   };

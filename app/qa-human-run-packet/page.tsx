@@ -47,6 +47,9 @@ export default function QaHumanRunPacketPage() {
           <Link className="secondary-action" href="/qa-claim-guard">
             Claim Guard
           </Link>
+          <Link className="secondary-action" href="/qa-buyer-proof-release">
+            Buyer Proof Release
+          </Link>
           <Link className="secondary-action" href="/pilot-workspace/access">
             Protected Workspace
           </Link>

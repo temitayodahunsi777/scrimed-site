@@ -2,6 +2,15 @@
 
 Updated: 2026-06-22
 
+## Latest QA Buyer Proof Release
+
+- Added `/qa-buyer-proof-release`, `/api/qa-evidence/buyer-proof-release`, `/api/qa-evidence/buyer-proof-release/brief`, and `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/buyer-proof-release` as the protected go/no-go gate before retained manual AAL2 synthetic QA proof enters Buyer Diligence.
+- Added public candidate validation that rejects secrets, regulated identifiers, and authority overclaims while preserving the rule that public APIs cannot release buyer proof.
+- Added protected workspace release logic that reads retained Manual QA Evidence packets and audit events, then combines Proof Promotion, Activation Seal, Claim Guard, and hard authority boundaries into one release decision.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, `/qa-evidence`, `/product`, SCRIMED Hub inventory, route catalog, and public smoke coverage with Buyer Proof Release visibility.
+- Added `docs/qa-buyer-proof-release.md` as the final pre-export runbook after Human Run Packet, Completion Bridge, Activation Seal, Proof Promotion, and Claim Guard.
+- Preserved the boundary: Buyer Proof Release does not execute AAL2 workflows, mint tokens, store credentials, store PHI, authorize public distribution, certify security or compliance, authorize live clinical care, guarantee reimbursement, approve production connectors, or grant production authority.
+
 ## Latest QA Human Run Packet Release
 
 - Added `/qa-human-run-packet`, `/api/qa-evidence/human-run-packet`, and `/api/qa-evidence/human-run-packet/brief` as the no-secret dispatch packet for the first approved human AAL2 synthetic QA run.

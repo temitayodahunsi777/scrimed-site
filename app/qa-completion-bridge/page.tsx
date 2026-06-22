@@ -27,7 +27,8 @@ export default function QaCompletionBridgePage() {
         <h1>SCRIMED now has a no-secret bridge from human AAL2 run completion to protected proof.</h1>
         <p className="hero-text">
           The bridge validates candidate post-run metadata, generates a preview hash, and keeps buyer proof blocked
-          until the same no-secret metadata is persisted through the protected workspace and approved by Proof Promotion.
+          until the same no-secret metadata is persisted through the protected workspace and cleared by Proof Promotion
+          plus Buyer Proof Release.
         </p>
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Bridge Brief</a>
@@ -36,6 +37,7 @@ export default function QaCompletionBridgePage() {
           <Link className="secondary-action" href="/qa-claim-guard">Claim Guard</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>
           <Link className="secondary-action" href={summary.proofPromotionRoute}>Proof Promotion</Link>
+          <Link className="secondary-action" href="/qa-buyer-proof-release">Buyer Proof Release</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
         </div>
       </section>

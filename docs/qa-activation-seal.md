@@ -14,6 +14,7 @@ It exists to prevent a common failure mode: treating a public packet preview, op
 - Completion Bridge: `/qa-completion-bridge`
 - Claim Guard: `/qa-claim-guard`
 - Proof Promotion: `/qa-proof-promotion`
+- Buyer Proof Release: `/qa-buyer-proof-release`
 
 ## Current Safe Position
 
@@ -27,6 +28,7 @@ The Activation Seal remains unsealed until:
 - an append-only packet audit event is visible;
 - Proof Promotion returns buyer-diligence-ready;
 - Claim Guard confirms language stays bounded;
+- Buyer Proof Release returns protected buyer-diligence export readiness;
 - token disposal is attested;
 - production clinical, PHI, reimbursement, certification, connector, and authority claims remain blocked.
 
@@ -46,7 +48,8 @@ Public checks can validate candidate completeness only. They cannot prove protec
 6. Persist the same safe metadata through protected Manual QA Evidence.
 7. Confirm `/qa-proof-promotion` sees retained packet evidence.
 8. Run `/qa-claim-guard` against buyer, investor, sales, PR, or operator language.
-9. Use `/qa-activation-seal` as the final buyer-proof posture check.
+9. Use `/qa-activation-seal` as the final seal posture check.
+10. Use `/qa-buyer-proof-release` as the protected go/no-go gate before Buyer Diligence export.
 
 ## Allowed Language
 

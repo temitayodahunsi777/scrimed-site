@@ -27,6 +27,7 @@ export default function QaActivationSealPage() {
           <Link className="secondary-action" href={summary.completionBridgeRoute}>Completion Bridge</Link>
           <Link className="secondary-action" href={summary.claimGuardRoute}>Claim Guard</Link>
           <Link className="secondary-action" href={summary.proofPromotionRoute}>Proof Promotion</Link>
+          <Link className="secondary-action" href="/qa-buyer-proof-release">Buyer Proof Release</Link>
         </div>
       </section>
 

@@ -165,6 +165,18 @@ export default function ProductConsolePage() {
           <strong>{summary.qaProofPromotionBlockedClaimCount}</strong>
         </article>
         <article>
+          <span>Buyer proof release</span>
+          <strong>{summary.qaBuyerProofReleaseSummary.releaseDecisionState}</strong>
+        </article>
+        <article>
+          <span>Release hard stops</span>
+          <strong>{summary.qaBuyerProofReleaseHardStopCount}</strong>
+        </article>
+        <article>
+          <span>Release evidence</span>
+          <strong>{summary.qaBuyerProofReleaseRequiredEvidenceCount}</strong>
+        </article>
+        <article>
           <span>Clinical blocked</span>
           <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
         </article>
@@ -252,6 +264,51 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA buyer proof release">
+        <div className="section-heading">
+          <p className="eyebrow">QA buyer proof release</p>
+          <h2>Buyer Diligence now has a single protected release gate for retained manual QA proof.</h2>
+          <p className="section-copy">{summary.qaBuyerProofReleaseSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaBuyerProofReleaseRoute}>
+              Open Buyer Proof Release
+            </Link>
+            <a className="secondary-action" href={summary.qaBuyerProofReleaseBriefRoute}>
+              Download Release Brief
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.qaBuyerProofReleaseSummary.releaseDecisionState}</span>
+            <h2>{summary.qaBuyerProofReleaseSummary.decision.buyerSafeClaim}</h2>
+          </div>
+          <p>{summary.qaBuyerProofReleaseSummary.decision.nextAction}</p>
+          <div>
+            <strong>
+              Buyer export: {summary.qaBuyerProofReleaseSummary.buyerDiligenceExportAllowed ? "allowed" : "blocked"}
+            </strong>
+            <ul className="compact-list">
+              <li>Protected route: {summary.qaBuyerProofReleaseProtectedRoute}</li>
+              <li>Buyer packet: {summary.qaBuyerProofReleaseBuyerPacketRoute}</li>
+              <li>Public release: {summary.qaBuyerProofReleaseSummary.publicClaimAllowed ? "allowed" : "blocked"}</li>
+            </ul>
+          </div>
+        </article>
+        {summary.qaBuyerProofReleaseSummary.decision.releaseCriteria.map((criterion) => (
+          <article className="module-row" key={criterion.id}>
+            <div>
+              <span>{criterion.status}</span>
+              <h2>{criterion.name}</h2>
+            </div>
+            <p>{criterion.evidence}</p>
+            <div>
+              <strong>{criterion.nextAction}</strong>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED boundary resolution register">

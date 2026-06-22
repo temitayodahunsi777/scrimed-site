@@ -96,6 +96,13 @@ import {
   qaActivationSealRoute
 } from "./qaActivationSeal";
 import {
+  getQaBuyerProofReleaseSummary,
+  qaBuyerProofReleaseApiRoute,
+  qaBuyerProofReleaseBriefRoute,
+  qaBuyerProofReleaseProtectedRoute,
+  qaBuyerProofReleaseRoute
+} from "./qaBuyerProofRelease";
+import {
   qaHumanRunPacketApiRoute,
   qaHumanRunPacketBriefRoute,
   qaHumanRunPacketRoute
@@ -252,6 +259,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "TrustOS, release engineering, tenant governance, buyer diligence, and claims governance",
     objective: "Confirm the final no-secret seal posture before packet-backed manual AAL2 QA proof enters buyer diligence."
+  },
+  {
+    name: "QA Buyer Proof Release",
+    route: qaBuyerProofReleaseRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "TrustOS, release engineering, tenant governance, buyer diligence, and claims governance",
+    objective: "Unify retained packet visibility, Proof Promotion, Activation Seal, and Claim Guard into a protected Buyer Diligence go/no-go gate."
   }
 ];
 
@@ -392,6 +407,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "QA Buyer Proof Release",
+    value: "protected buyer-proof release gate active",
+    tone: "good"
+  },
+  {
     name: "Manual QA evidence packet",
     value: "no-secret capture contract active",
     tone: "good"
@@ -473,6 +493,9 @@ export const hubRoutes = [
   qaActivationSealRoute,
   qaActivationSealApiRoute,
   qaActivationSealBriefRoute,
+  qaBuyerProofReleaseRoute,
+  qaBuyerProofReleaseApiRoute,
+  qaBuyerProofReleaseBriefRoute,
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -629,6 +652,7 @@ export const hubRoutes = [
   "/api/pilot-workspaces/{workspaceSlug}/audit",
   "/api/pilot-workspaces/{workspaceSlug}/buyer-room",
   "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet",
+  qaBuyerProofReleaseProtectedRoute,
   "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
   "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions",
   "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/reviews",
@@ -713,6 +737,7 @@ export function getHubSummary() {
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
   const qaClaimGuardSummary = getQaClaimGuardSummary();
   const qaActivationSealSummary = getQaActivationSealSummary();
+  const qaBuyerProofReleaseSummary = getQaBuyerProofReleaseSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -745,6 +770,7 @@ export function getHubSummary() {
     qaCompletionBridgeSummary,
     qaClaimGuardSummary,
     qaActivationSealSummary,
+    qaBuyerProofReleaseSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

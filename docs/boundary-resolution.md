@@ -9,7 +9,7 @@ The register aggregates known limits from:
 - Clinical Authority Readiness
 - Clinical Care Activation
 - Persistent Agent Workspace limitations
-- QA Evidence Ledger, Manual AAL2 Activation Plan, Execution Readiness, Run Control, Launch Kit, Human Run Packet, Completion Bridge, Claim Guard, Activation Seal, and Proof Promotion
+- QA Evidence Ledger, Manual AAL2 Activation Plan, Execution Readiness, Run Control, Launch Kit, Human Run Packet, Completion Bridge, Claim Guard, Activation Seal, Proof Promotion, and Buyer Proof Release
 - Public Market Readiness limitations
 
 ## Operating Purpose
@@ -35,4 +35,4 @@ Do not treat a safe workaround as external approval. If a record says `human-aal
 
 ## Next Step
 
-Use `/qa-claim-guard` to keep buyer and external language inside current evidence while `/qa-human-run-packet` dispatches the first deliberate short-lived human AAL2 QA workflow, `/qa-completion-bridge` validates candidate metadata, protected persistence records the safe packet metadata, `/qa-activation-seal` confirms final seal posture, and `/qa-proof-promotion` gates retained packet language.
+Use `/qa-claim-guard` to keep buyer and external language inside current evidence while `/qa-human-run-packet` dispatches the first deliberate short-lived human AAL2 QA workflow, `/qa-completion-bridge` validates candidate metadata, protected persistence records the safe packet metadata, `/qa-activation-seal` confirms final seal posture, `/qa-proof-promotion` gates retained packet language, and `/qa-buyer-proof-release` decides whether Buyer Diligence may reference the retained proof.

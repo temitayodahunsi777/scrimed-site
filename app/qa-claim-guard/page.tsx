@@ -18,7 +18,7 @@ export default function QaClaimGuardPage() {
         <h1>SCRIMED now has a claim guard for buyer, investor, sales, and operator language.</h1>
         <p className="hero-text">
           Claim Guard keeps current language bounded to synthetic, no-secret, activation-ready proof until retained
-          packet hashes are visible and Proof Promotion allows packet-backed language.
+          packet hashes are visible and Buyer Proof Release permits protected buyer diligence export.
         </p>
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Claim Brief</a>
@@ -27,6 +27,7 @@ export default function QaClaimGuardPage() {
           <Link className="secondary-action" href={summary.completionBridgeRoute}>Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>
           <Link className="secondary-action" href={summary.proofPromotionRoute}>Proof Promotion</Link>
+          <Link className="secondary-action" href="/qa-buyer-proof-release">Buyer Proof Release</Link>
         </div>
       </section>
 

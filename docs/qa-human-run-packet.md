@@ -40,7 +40,7 @@ It does not execute passkey ceremonies, mint tokens, store credentials, persist 
 9. Validate the no-secret result through `/qa-completion-bridge`.
 10. Generate the post-run packet through `/api/qa-evidence/manual-run-packet`.
 11. Persist only accepted metadata through `/pilot-workspace/access` -> Manual QA Evidence.
-12. Confirm `/qa-activation-seal`, `/qa-proof-promotion`, and `/qa-claim-guard` before Buyer Diligence export.
+12. Confirm `/qa-activation-seal`, `/qa-proof-promotion`, `/qa-claim-guard`, and `/qa-buyer-proof-release` before Buyer Diligence export.
 
 ## Boundary
 
@@ -48,4 +48,4 @@ The packet is a dispatch artifact, not retained authenticated proof. Packet-back
 
 ## Next Step
 
-Have an approved tenant-admin or pilot-lead run exactly one synthetic workflow with this packet, persist the no-secret metadata through the protected workspace, then export Buyer Diligence only after the proof gates permit it.
+Have an approved tenant-admin or pilot-lead run exactly one synthetic workflow with this packet, persist the no-secret metadata through the protected workspace, then export Buyer Diligence only after `/qa-buyer-proof-release` permits it.

@@ -49,6 +49,7 @@ The Launch Kit does not execute passkey ceremonies, mint tokens, store credentia
 11. Generate and persist the no-secret evidence packet through `/pilot-workspace/access` -> Manual QA Evidence only after the bridge accepts it.
 12. Open `/qa-activation-seal`.
 13. Open `/qa-proof-promotion`.
+14. Open `/qa-buyer-proof-release`.
 14. Export Buyer Diligence only after the retained packet hash and audit event are visible.
 
 ## Hard Stops
@@ -61,4 +62,4 @@ The Launch Kit does not execute passkey ceremonies, mint tokens, store credentia
 
 ## Next Step
 
-Have an approved tenant-admin operator use `/qa-human-run-packet` to dispatch one workflow with a fresh short-lived AAL2 token, validate safe metadata through `/qa-completion-bridge`, persist only accepted metadata, then confirm `/qa-activation-seal`, `/qa-proof-promotion`, and `/qa-claim-guard` before exporting Buyer Diligence.
+Have an approved tenant-admin operator use `/qa-human-run-packet` to dispatch one workflow with a fresh short-lived AAL2 token, validate safe metadata through `/qa-completion-bridge`, persist only accepted metadata, then confirm `/qa-activation-seal`, `/qa-proof-promotion`, `/qa-claim-guard`, and `/qa-buyer-proof-release` before exporting Buyer Diligence.

@@ -29,6 +29,7 @@ export default function QaProofPromotionPage() {
           <Link className="secondary-action" href="/qa-completion-bridge">Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-claim-guard">Claim Guard</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>
+          <Link className="secondary-action" href="/qa-buyer-proof-release">Buyer Proof Release</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
           <Link className="secondary-action" href="/boundary-resolution">Boundary Register</Link>
         </div>

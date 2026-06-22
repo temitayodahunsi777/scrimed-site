@@ -165,7 +165,7 @@ const dispatchControls: QaHumanRunPacketControl[] = [
     control: "Proof and claim gates",
     state: "hard-stop",
     owner: "Buyer diligence and claims governance",
-    passSignal: "Completion Bridge, Activation Seal, Proof Promotion, and Claim Guard all preserve the retained-packet boundary.",
+    passSignal: "Completion Bridge, Activation Seal, Proof Promotion, Claim Guard, and Buyer Proof Release all preserve the retained-packet boundary.",
     failClosedIf: "Any buyer, investor, sales, PR, or operator language claims retained proof or production authority too early."
   },
   {
@@ -388,7 +388,7 @@ export function getQaHumanRunPacketSummary() {
       "Not allowed yet: claim retained authenticated QA proof, buyer-ready proof, clinical authority, PHI authority, reimbursement certainty, certification, or production connector approval."
     ],
     nextRecommendedBuildStep:
-      "Have an approved tenant-admin or pilot-lead operator use this packet for exactly one synthetic AAL2 workflow, validate the no-secret result through Completion Bridge, persist it through protected Manual QA Evidence, then confirm Activation Seal, Proof Promotion, and Claim Guard before Buyer Diligence export.",
+      "Have an approved tenant-admin or pilot-lead operator use this packet for exactly one synthetic AAL2 workflow, validate the no-secret result through Completion Bridge, persist it through protected Manual QA Evidence, then confirm Activation Seal, Proof Promotion, Claim Guard, and Buyer Proof Release before Buyer Diligence export.",
     updated: "2026-06-22"
   };
 }

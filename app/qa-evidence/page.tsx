@@ -8,6 +8,7 @@ import { getQaHumanRunPacketSummary } from "../lib/qaHumanRunPacket";
 import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
 import { getQaProofPromotionSummary } from "../lib/qaProofPromotion";
 import { getQaRunControlSummary } from "../lib/qaRunControl";
+import { getQaBuyerProofReleaseSummary } from "../lib/qaBuyerProofRelease";
 
 export const metadata = {
   title: "SCRIMED QA Evidence Ledger",
@@ -25,6 +26,7 @@ export default function QaEvidencePage() {
   const claimGuard = getQaClaimGuardSummary();
   const activationSeal = getQaActivationSealSummary();
   const proofPromotion = getQaProofPromotionSummary();
+  const buyerProofRelease = getQaBuyerProofReleaseSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
       ? ledger.currentDeployment.commitSha
@@ -76,6 +78,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={proofPromotion.route}>
             Proof Promotion
+          </Link>
+          <Link className="secondary-action" href={buyerProofRelease.route}>
+            Buyer Proof Release
           </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
@@ -179,6 +184,14 @@ export default function QaEvidencePage() {
         <article>
           <span>Proof blocked</span>
           <strong>{proofPromotion.blockedClaims.length}</strong>
+        </article>
+        <article>
+          <span>Buyer release</span>
+          <strong>{buyerProofRelease.releaseDecisionState}</strong>
+        </article>
+        <article>
+          <span>Release stops</span>
+          <strong>{buyerProofRelease.hardStopCount}</strong>
         </article>
         <article>
           <span>Data boundary</span>
@@ -533,6 +546,51 @@ export default function QaEvidencePage() {
               <ul className="compact-list">
                 <li>{rule.boundary}</li>
               </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA buyer proof release">
+        <div className="section-heading">
+          <p className="eyebrow">Buyer proof release</p>
+          <h2>Use one protected go/no-go gate before retained manual QA proof enters Buyer Diligence.</h2>
+          <p className="section-copy">{buyerProofRelease.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={buyerProofRelease.route}>
+              Open Buyer Proof Release
+            </Link>
+            <a className="secondary-action" href={buyerProofRelease.briefRoute}>
+              Download Release Brief
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{buyerProofRelease.releaseDecisionState}</span>
+            <h2>{buyerProofRelease.decision.buyerSafeClaim}</h2>
+          </div>
+          <p>{buyerProofRelease.decision.nextAction}</p>
+          <div>
+            <strong>
+              Buyer export: {buyerProofRelease.buyerDiligenceExportAllowed ? "allowed" : "blocked"}
+            </strong>
+            <ul className="compact-list">
+              <li>Protected route: {buyerProofRelease.protectedReleaseRoute}</li>
+              <li>Buyer packet: {buyerProofRelease.buyerDiligencePacketRoute}</li>
+              <li>Public claims: {buyerProofRelease.publicClaimAllowed ? "allowed" : "blocked"}</li>
+            </ul>
+          </div>
+        </article>
+        {buyerProofRelease.decision.releaseCriteria.map((criterion) => (
+          <article className="module-row" key={criterion.id}>
+            <div>
+              <span>{criterion.status}</span>
+              <h2>{criterion.name}</h2>
+            </div>
+            <p>{criterion.evidence}</p>
+            <div>
+              <strong>{criterion.nextAction}</strong>
             </div>
           </article>
         ))}

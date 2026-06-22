@@ -33,6 +33,7 @@ export default function QaLaunchKitPage() {
           <Link className="secondary-action" href="/qa-claim-guard">Claim Guard</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>
           <Link className="secondary-action" href="/qa-proof-promotion">Proof Promotion</Link>
+          <Link className="secondary-action" href="/qa-buyer-proof-release">Buyer Proof Release</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
         </div>
       </section>
