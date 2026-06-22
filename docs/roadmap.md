@@ -29,6 +29,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Quality gates document active and planned checks, with explicit replacement paths whenever a future bypass is required.
 - QA Evidence Ledger is the active dated proof surface for release smoke, fail-closed routes, token-policy readiness, contained limitations, and manual AAL2 operator gates.
 - Manual AAL2 QA Evidence Activation Plan is the active no-secret runbook gate for workflow dispatch, token preflight, safe evidence fields, prohibited content, temporary-secret disposal, protected persistence, and Buyer Diligence export before authenticated QA evidence is claimed.
+- Buyer Diligence QA Activation Posture is the active buyer-safe workaround for pending human AAL2 packets; exports must disclose activation workflows, safe fields, completion criteria, and remaining human gates instead of hiding missing authenticated proof.
 - Manual QA Evidence Packet generation is the active no-secret capture process after the human-run AAL2 Sales Demo Session QA workflow completes.
 - Tenant-scoped Manual QA Evidence Packet persistence is the active AAL2 durable evidence gate before manual QA evidence appears in Buyer Pilot Room diligence.
 - Browser-session Manual QA Evidence Capture is the preferred operator process so AAL2 evidence can be retained without copying bearer tokens into scripts or CI.
@@ -105,6 +106,7 @@ Completed foundations:
 - Protected Authority Renewal Queue and QA Harness with no-PHI risk-ranked renewal actions, protected route fail-closed coverage, optional short-lived AAL2 authenticated synthetic write verification, audited packet verification, and fixed token/no-artifact/no-approval/no-live-care boundaries
 - Authority Reference QA Evidence Bridge with manual GitHub Actions dispatch, local token preflight, safe smoke output, Manual QA Evidence workflow-kind selection, protected no-secret persistence, Product Console proof-stack visibility, and public smoke coverage
 - Manual AAL2 QA Evidence Activation Plan with workflow-specific targets, safe-copy fields, prohibited-input controls, completion criteria, Buyer Diligence export sequencing, Product Console proof-stack visibility, downloadable brief, and public smoke coverage
+- Buyer Diligence QA Activation Posture with protected buyer-room UI visibility, QA activation workflow counts, safe-copy fields, completion criteria, dedicated export section, and explicit retained human AAL2 boundary before packets exist
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline

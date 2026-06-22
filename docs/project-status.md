@@ -2,6 +2,14 @@
 
 Updated: 2026-06-21
 
+## Latest Buyer Diligence QA Activation Posture Release
+
+- Added the Manual AAL2 QA Evidence Activation Plan into protected Buyer Pilot Room summaries and audited Buyer Diligence Exports.
+- Updated Buyer Diligence controls so missing retained manual QA packets now show the activation workflow count, safe evidence path, completion criteria, and remaining human AAL2 gate instead of a vague empty state.
+- Added protected Buyer Pilot Room UI coverage for Sales Demo Session QA activation and Authority Reference QA activation with target inputs, temporary secret names, safe evidence fields, and buyer diligence impact.
+- Updated Buyer Diligence export Markdown with a dedicated `Manual AAL2 QA Activation Plan` section, activation brief route, completion criteria, workflow paths, safe-copy fields, and retained boundary.
+- Preserved the boundary: this is buyer-safe activation posture only. It does not mint tokens, execute authenticated QA, store bearer tokens, store PHI, authorize live clinical execution, certify compliance, grant reimbursement certainty, or replace the required human AAL2 run.
+
 ## Latest Manual AAL2 QA Evidence Activation Plan Release
 
 - Added `GET /api/qa-evidence/activation-plan` and `GET /api/qa-evidence/activation-plan/brief` as a no-secret operator activation layer for the remaining human AAL2 QA gates.

@@ -243,12 +243,13 @@ Demo Readiness Packet export requires a selected snapshot and commits `demo-read
 - Latest demo readiness snapshot posture.
 - Competitive edge pillars with proof routes and blocked claims.
 - Premium enterprise sales path from assessment through protected pilot and annual operating license.
+- Manual AAL2 QA activation posture with workflow count, safe evidence fields, completion criteria, and remaining human-run boundary when retained packets are not visible yet.
 - Known limitations with safe workarounds and production gates.
-- Audited Markdown Buyer Diligence Export with readiness, QA evidence, pricing posture, legal/privacy/security/safety controls, demo and pilot proof, degraded-section disclosure, and production hard gates.
+- Audited Markdown Buyer Diligence Export with readiness, QA evidence, QA activation posture, pricing posture, legal/privacy/security/safety controls, demo and pilot proof, degraded-section disclosure, and production hard gates.
 
 The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The export route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact and preserves the legacy packet route for compatibility.
 
-This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, QA evidence, legal/privacy/security/safety posture, limitations, workarounds, and competitive edge in one tenant-scoped export without weakening the synthetic-only boundary.
+This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, retained QA evidence or the controlled QA activation path, legal/privacy/security/safety posture, limitations, workarounds, and competitive edge in one tenant-scoped export without weakening the synthetic-only boundary.
 
 ## Command Intelligence Hub
 

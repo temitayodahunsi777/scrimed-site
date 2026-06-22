@@ -9,7 +9,11 @@ import type {
   PilotWorkspaceRecord
 } from "./protectedPilotWorkspace";
 import type { PilotDemoReadinessSnapshotRecord } from "./pilotDemoReadiness";
-import type { QaManualRunEvidencePacketRecord } from "./qaEvidenceLedger";
+import {
+  getQaEvidenceActivationPlan,
+  type QaEvidenceActivationWorkflow,
+  type QaManualRunEvidencePacketRecord
+} from "./qaEvidenceLedger";
 import type { CommandIntelligenceSnapshotRecord } from "./commandIntelligenceHub";
 
 export type BuyerPilotRoomState = "ready" | "review" | "blocked";
@@ -53,6 +57,31 @@ export type BuyerPilotRoomDiligenceControl = {
   boundary: string;
   workaround: string;
   productionGate: string;
+};
+
+export type BuyerPilotRoomQaActivationPlan = {
+  status: string;
+  route: string;
+  briefRoute: string;
+  workflowCount: number;
+  completionCriteria: string[];
+  unresolvedBoundary: string;
+  nextAction: string;
+  workflows: Array<
+    Pick<
+      QaEvidenceActivationWorkflow,
+      | "workflowKind"
+      | "name"
+      | "status"
+      | "workflowPath"
+      | "targetInput"
+      | "requiredSecretName"
+      | "safeEvidenceFields"
+      | "buyerDiligenceImpact"
+      | "currentBoundary"
+      | "nextAction"
+    >
+  >;
 };
 
 export type BuyerPilotRoomSummary = {
@@ -101,6 +130,7 @@ export type BuyerPilotRoomSummary = {
     withheldItems: string[];
   };
   diligenceControls: BuyerPilotRoomDiligenceControl[];
+  qaActivationPlan: BuyerPilotRoomQaActivationPlan;
   commandIntelligence: {
     snapshotCount: number;
     latestSnapshotId: string | null;
@@ -279,6 +309,32 @@ function buildCommercialPath(state: BuyerPilotRoomState): BuyerPilotRoomCommerci
   ];
 }
 
+function buyerQaActivationPlan(): BuyerPilotRoomQaActivationPlan {
+  const plan = getQaEvidenceActivationPlan();
+
+  return {
+    status: plan.status,
+    route: plan.route,
+    briefRoute: plan.briefRoute,
+    workflowCount: plan.workflowCount,
+    completionCriteria: plan.completionCriteria,
+    unresolvedBoundary: plan.unresolvedBoundary,
+    nextAction: plan.nextAction,
+    workflows: plan.workflows.map((workflow) => ({
+      workflowKind: workflow.workflowKind,
+      name: workflow.name,
+      status: workflow.status,
+      workflowPath: workflow.workflowPath,
+      targetInput: workflow.targetInput,
+      requiredSecretName: workflow.requiredSecretName,
+      safeEvidenceFields: workflow.safeEvidenceFields,
+      buyerDiligenceImpact: workflow.buyerDiligenceImpact,
+      currentBoundary: workflow.currentBoundary,
+      nextAction: workflow.nextAction
+    }))
+  };
+}
+
 function buildDiligenceControls({
   auditEvents,
   commandSnapshots,
@@ -305,6 +361,7 @@ function buildDiligenceControls({
   unavailableSections: string[];
 }): BuyerPilotRoomDiligenceControl[] {
   const commandPosture = commandSnapshotPosture(commandSnapshots, auditEvents);
+  const activationPlan = buyerQaActivationPlan();
 
   return [
     {
@@ -338,10 +395,22 @@ function buildDiligenceControls({
       domain: "Manual QA Evidence",
       status: hasManualQaEvidence ? "ready" : "review",
       buyerQuestion: "Can SCRIMED show human-run QA evidence without storing secrets in CI?",
-      evidence: `${manualQaEvidencePackets.length} tenant-scoped manual QA evidence packet${manualQaEvidencePackets.length === 1 ? "" : "s"} retained or audited.`,
+      evidence: hasManualQaEvidence
+        ? `${manualQaEvidencePackets.length} tenant-scoped manual QA evidence packet${manualQaEvidencePackets.length === 1 ? "" : "s"} retained or audited.`
+        : `No retained packet yet; activation plan ${activationPlan.status} covers ${activationPlan.workflowCount} human-run QA workflows.`,
       boundary: "Manual QA evidence contains no bearer tokens, credentials, PHI, payer member identifiers, or source contracts.",
-      workaround: "Use the Manual QA Evidence panel after a human AAL2 run; do not paste secrets into packet fields.",
+      workaround: `Use ${activationPlan.briefRoute}, run a human AAL2 workflow, then persist only safe metadata through the Manual QA Evidence panel.`,
       productionGate: "Approved short-lived token policy, identity operations, and optional CI-held token process."
+    },
+    {
+      domain: "QA Activation Plan",
+      status: "ready",
+      buyerQuestion: "Is there a controlled path to convert pending manual AAL2 QA gates into buyer-ready proof?",
+      evidence: `${activationPlan.workflowCount} activation workflow${activationPlan.workflowCount === 1 ? "" : "s"} documented with safe evidence fields, prohibited inputs, temporary-secret disposal, and Buyer Diligence sequencing.`,
+      boundary: activationPlan.unresolvedBoundary,
+      workaround:
+        "Use the activation plan as the buyer-safe replacement for ad hoc token handling until a human AAL2 packet is retained.",
+      productionGate: "First successful human AAL2 workflow run, protected evidence persistence, packet hash visibility, and export review."
     },
     {
       domain: "Auditability",
@@ -483,6 +552,7 @@ export function deriveBuyerPilotRoom({
     hasAuditEvent(auditEvents, "agent-work-order-transitioned") ||
     hasAuditEvent(auditEvents, "agent-work-order-proof-packet-downloaded");
   const commandPosture = commandSnapshotPosture(commandSnapshots, auditEvents);
+  const qaActivationPlan = buyerQaActivationPlan();
 
   const checks: BuyerPilotRoomCheck[] = [
     {
@@ -666,6 +736,7 @@ export function deriveBuyerPilotRoom({
       includedArtifacts: [
         "Executive thesis and tenant workspace posture",
         "Readiness score, checks, blockers, and workaround owners",
+        "Manual AAL2 QA activation plan, safe evidence fields, and pending human-run boundary",
         "Manual QA evidence counts, workflow run IDs, and packet hashes when retained",
         "Demo readiness, durable synthetic session, and append-only audit evidence",
         "Command Intelligence snapshot timeline, score trend, and packet export posture",
@@ -678,6 +749,7 @@ export function deriveBuyerPilotRoom({
         "Keep the tenant browser session at AAL2 before download",
         "Review the export for buyer-specific context before sending externally",
         "Use manual QA evidence capture for human-run proof instead of storing bearer tokens",
+        "Use the QA activation plan before running Sales Demo Session QA or Authority Reference QA",
         "Escalate any live-data, PHI, payer, EHR, imaging, device, legal, or clinical request"
       ],
       withheldItems: [
@@ -688,6 +760,7 @@ export function deriveBuyerPilotRoom({
       ]
     },
     diligenceControls,
+    qaActivationPlan,
     commandIntelligence: commandPosture,
     limitations: [
       {
@@ -776,6 +849,15 @@ function diligenceControlLines(controls: BuyerPilotRoomDiligenceControl[]) {
     .map(
       (control) =>
         `- ${control.domain}: ${control.status}. Buyer question: ${control.buyerQuestion} Evidence: ${control.evidence} Boundary: ${control.boundary} Workaround: ${control.workaround} Gate: ${control.productionGate}`
+    )
+    .join("\n");
+}
+
+function qaActivationWorkflowLines(plan: BuyerPilotRoomQaActivationPlan) {
+  return plan.workflows
+    .map(
+      (workflow) =>
+        `- ${workflow.name} (${workflow.workflowKind}, ${workflow.status}): workflow ${workflow.workflowPath}; target ${workflow.targetInput}; temporary secret ${workflow.requiredSecretName}; buyer impact: ${workflow.buyerDiligenceImpact}; boundary: ${workflow.currentBoundary}; safe fields: ${workflow.safeEvidenceFields.join(", ")}.`
     )
     .join("\n");
 }
@@ -880,6 +962,9 @@ ${checkLines(room.checks)}
 - Command Intelligence snapshots: ${room.evidenceCounts.commandSnapshots}
 - Command Intelligence packet exports: ${room.evidenceCounts.commandPacketExports}
 - Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
+- Manual AAL2 QA activation plan: ${room.qaActivationPlan.status}
+- QA activation workflows: ${room.qaActivationPlan.workflowCount}
+- QA activation brief: ${baseUrl}${room.qaActivationPlan.briefRoute}
 - Degraded evidence sections: ${room.evidenceCounts.unavailableSections}
 - Latest demo snapshot: ${
     room.latestSnapshot
@@ -897,6 +982,19 @@ ${checkLines(room.checks)}
 - Trend: ${room.commandIntelligence.trend}
 - Packet exports: ${room.commandIntelligence.packetExports}
 - Next action: ${room.commandIntelligence.nextAction}
+
+## Manual AAL2 QA Activation Plan
+- Status: ${room.qaActivationPlan.status}
+- Route: ${baseUrl}${room.qaActivationPlan.route}
+- Brief: ${baseUrl}${room.qaActivationPlan.briefRoute}
+- Remaining boundary: ${room.qaActivationPlan.unresolvedBoundary}
+- Next action: ${room.qaActivationPlan.nextAction}
+
+Completion criteria:
+${markdownItems(room.qaActivationPlan.completionCriteria)}
+
+Activation workflows:
+${qaActivationWorkflowLines(room.qaActivationPlan)}
 
 ## Legal, Privacy, Security, Safety, And Production Control Matrix
 ${diligenceControlLines(room.diligenceControls)}

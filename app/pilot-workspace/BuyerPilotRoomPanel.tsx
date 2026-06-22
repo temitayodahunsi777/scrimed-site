@@ -113,6 +113,10 @@ export default function BuyerPilotRoomPanel({
           <strong>{room.evidenceCounts.manualQaEvidencePackets}</strong>
         </article>
         <article>
+          <span>QA activation</span>
+          <strong>{room.qaActivationPlan.workflowCount}</strong>
+        </article>
+        <article>
           <span>Controls</span>
           <strong>{room.diligenceControls.length}</strong>
         </article>
@@ -162,6 +166,32 @@ export default function BuyerPilotRoomPanel({
               The export keeps this artifact tenant-scoped, synthetic-only, and tied to the protected workspace
               evidence boundary.
             </p>
+          </article>
+        ))}
+      </div>
+
+      <div className="demo-runbook" aria-label="Manual AAL2 QA activation plan">
+        <div className="section-heading">
+          <p className="eyebrow">QA activation plan</p>
+          <h2>Convert pending human AAL2 QA gates into buyer-ready evidence without storing secrets.</h2>
+          <p className="section-copy">{room.qaActivationPlan.unresolvedBoundary}</p>
+        </div>
+        {room.qaActivationPlan.workflows.map((workflow) => (
+          <article className="module-row" key={workflow.workflowKind}>
+            <div>
+              <span>{workflow.status}</span>
+              <h2>{workflow.name}</h2>
+            </div>
+            <p>{workflow.buyerDiligenceImpact}</p>
+            <div>
+              <strong>{workflow.workflowPath}</strong>
+              <ul className="compact-list">
+                <li>Target input: {workflow.targetInput}</li>
+                <li>Temporary secret: {workflow.requiredSecretName}</li>
+                <li>Safe fields: {workflow.safeEvidenceFields.join(", ")}</li>
+                <li>Next: {workflow.nextAction}</li>
+              </ul>
+            </div>
           </article>
         ))}
       </div>
