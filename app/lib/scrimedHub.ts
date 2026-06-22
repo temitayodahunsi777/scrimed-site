@@ -83,6 +83,12 @@ import {
   qaCompletionBridgeBriefRoute,
   qaCompletionBridgeRoute
 } from "./qaCompletionBridge";
+import {
+  getQaClaimGuardSummary,
+  qaClaimGuardApiRoute,
+  qaClaimGuardBriefRoute,
+  qaClaimGuardRoute
+} from "./qaClaimGuard";
 
 export type HubModule = {
   name: string;
@@ -211,6 +217,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Release engineering, TrustOS, tenant governance, and Buyer Diligence",
     objective: "Validate no-secret post-run candidate evidence before protected persistence and buyer proof promotion."
+  },
+  {
+    name: "QA Claim Guard",
+    route: qaClaimGuardRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "TrustOS, legal, sales engineering, buyer diligence, and marketing governance",
+    objective: "Classify buyer, investor, sales, PR, and operator language so current claims never outrun retained evidence."
   }
 ];
 
@@ -336,6 +350,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "QA Claim Guard",
+    value: "current-state claim control active",
+    tone: "good"
+  },
+  {
     name: "Manual QA evidence packet",
     value: "no-secret capture contract active",
     tone: "good"
@@ -408,6 +427,9 @@ export const hubRoutes = [
   qaCompletionBridgeRoute,
   qaCompletionBridgeApiRoute,
   qaCompletionBridgeBriefRoute,
+  qaClaimGuardRoute,
+  qaClaimGuardApiRoute,
+  qaClaimGuardBriefRoute,
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -646,6 +668,7 @@ export function getHubSummary() {
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
+  const qaClaimGuardSummary = getQaClaimGuardSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -676,6 +699,7 @@ export function getHubSummary() {
     trustSafetyOperationsSummary,
     qaEvidenceLedger,
     qaCompletionBridgeSummary,
+    qaClaimGuardSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

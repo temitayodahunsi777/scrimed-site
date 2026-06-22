@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
+import { getQaClaimGuardSummary } from "../lib/qaClaimGuard";
 import { getQaCompletionBridgeSummary } from "../lib/qaCompletionBridge";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
 import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
@@ -18,6 +19,7 @@ export default function QaEvidencePage() {
   const runControl = getQaRunControlSummary();
   const launchKit = getQaLaunchKitSummary();
   const completionBridge = getQaCompletionBridgeSummary();
+  const claimGuard = getQaClaimGuardSummary();
   const proofPromotion = getQaProofPromotionSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
@@ -58,6 +60,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={completionBridge.route}>
             Completion Bridge
+          </Link>
+          <Link className="secondary-action" href={claimGuard.route}>
+            Claim Guard
           </Link>
           <Link className="secondary-action" href={proofPromotion.route}>
             Proof Promotion
@@ -124,6 +129,14 @@ export default function QaEvidencePage() {
         <article>
           <span>Bridge hard stops</span>
           <strong>{completionBridge.hardStopCount}</strong>
+        </article>
+        <article>
+          <span>Claim guard</span>
+          <strong>{claimGuard.buyerClaimPosture}</strong>
+        </article>
+        <article>
+          <span>Claim blocks</span>
+          <strong>{claimGuard.blockedAuthorityClaimCount}</strong>
         </article>
         <article>
           <span>Proof promotion</span>
@@ -335,6 +348,37 @@ export default function QaEvidencePage() {
               <ul className="compact-list">
                 <li>Pass: {checkpoint.passSignal}</li>
                 <li>Fail closed: {checkpoint.failClosedIf}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA claim guard">
+        <div className="section-heading">
+          <p className="eyebrow">Claim guard</p>
+          <h2>Keep external and buyer language aligned with retained evidence, not ambition.</h2>
+          <p className="section-copy">{claimGuard.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={claimGuard.route}>
+              Open Claim Guard
+            </Link>
+            <a className="secondary-action" href={claimGuard.briefRoute}>
+              Download Claim Brief
+            </a>
+          </div>
+        </div>
+        {claimGuard.rules.map((rule) => (
+          <article className="module-row" key={rule.rule}>
+            <div>
+              <span>{rule.state}</span>
+              <h2>{rule.rule}</h2>
+            </div>
+            <p>{rule.appliesWhen}</p>
+            <div>
+              <strong>{rule.requiredEvidence}</strong>
+              <ul className="compact-list">
+                <li>{rule.saferLanguage}</li>
               </ul>
             </div>
           </article>

@@ -16,6 +16,7 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 - Public packet generator: `/api/qa-evidence/manual-run-packet`
 - Protected persistence route: `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`
 - Proof promotion: `/qa-proof-promotion`
+- Claim guard: `/qa-claim-guard`
 
 ## Operating Sequence
 
@@ -26,6 +27,7 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 5. Continue only if the bridge returns `ready-for-protected-persistence`.
 6. Persist the same no-secret metadata through the protected Manual QA Evidence route from the tenant workspace.
 7. Verify `/qa-proof-promotion` before any Buyer Diligence export references retained authenticated QA evidence.
+8. Use `/qa-claim-guard` before any buyer, investor, sales, PR, or operator language references the QA state.
 
 ## Hard Boundaries
 
@@ -38,4 +40,4 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 
 ## Next Step
 
-After the approved tenant-admin operator completes one Launch Kit workflow, validate the no-secret candidate through QA Completion Bridge, persist the packet through protected Manual QA Evidence, then confirm Proof Promotion before exporting Buyer Diligence.
+Use QA Claim Guard for every external or buyer-facing statement while the approved tenant-admin operator completes one Launch Kit workflow, validates the no-secret candidate through QA Completion Bridge, persists the packet through protected Manual QA Evidence, and confirms Proof Promotion before exporting Buyer Diligence.

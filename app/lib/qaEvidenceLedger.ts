@@ -412,6 +412,31 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
       "After the approved operator completes one Launch Kit workflow, POST the no-secret candidate metadata to /api/qa-evidence/completion-bridge, persist only if the bridge returns ready-for-protected-persistence, then confirm /qa-proof-promotion before Buyer Diligence export."
   },
   {
+    id: "manual-aal2-qa-claim-guard",
+    name: "Manual AAL2 QA claim guard",
+    status: "workaround-active",
+    owner: "TrustOS, legal, sales engineering, buyer diligence, and marketing governance",
+    recordedAt: "2026-06-22",
+    artifact: "/api/qa-evidence/claim-guard",
+    routes: [
+      "/qa-claim-guard",
+      "/api/qa-evidence/claim-guard",
+      "/api/qa-evidence/claim-guard/brief",
+      "/qa-launch-kit",
+      "/qa-completion-bridge",
+      "/qa-proof-promotion",
+      qaManualRunEvidencePersistenceApiRoute
+    ],
+    evidence:
+      "A no-secret Claim Guard now classifies buyer, investor, sales, PR, and operator language into current-safe, retained-packet-required, blocked-authority, or qualified-review states so claims do not outrun evidence.",
+    limitation:
+      "The Claim Guard provides current-state guidance only; it does not replace counsel, certify security or compliance, create retained QA proof, authorize PHI processing, authorize live clinical care, guarantee reimbursement, or approve production connectors.",
+    workaround:
+      "Use Claim Guard before Buyer Diligence, public materials, investor updates, sales language, PR, advertising, and operator summaries while protected packet proof and qualified approvals are pending.",
+    nextAction:
+      "Route every QA-related buyer or external claim through /qa-claim-guard until a protected manual QA packet hash is retained and /qa-proof-promotion allows packet-backed language."
+  },
+  {
     id: "manual-aal2-qa-proof-promotion",
     name: "Manual QA proof promotion gate",
     status: "workaround-active",
@@ -516,7 +541,7 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     impact:
       "SCRIMED has the workflow and token policy, but cannot claim an authenticated CI mutation run until a fresh AAL2 operator token is used deliberately.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, explicit intake targeting, Run Control mission brief, Launch Kit handoff, Completion Bridge candidate validation, Proof Promotion gate, fail-closed public smoke, and no long-lived secret storage.",
+      "Manual-only GitHub workflow, short-lived JWT preflight, explicit intake targeting, Run Control mission brief, Launch Kit handoff, Completion Bridge candidate validation, Claim Guard overclaim prevention, Proof Promotion gate, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
       "Use /qa-launch-kit, mint a fresh AAL2 token from the tenant-admin session, run the workflow once against a synthetic intake ID, archive only safe IDs, validate them through /qa-completion-bridge, persist the packet hash, delete or rotate the token secret, then use /qa-proof-promotion before buyer proof claims.",
     status: "manual-action-required"
@@ -526,7 +551,7 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     impact:
       "SCRIMED has the protected authority-reference QA harness and renewal queue, but cannot claim an authenticated authority-reference mutation run until a fresh AAL2 operator token is used deliberately.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, Run Control mission brief, Launch Kit handoff, Completion Bridge candidate validation, Proof Promotion gate, fail-closed public smoke, and no long-lived secret storage.",
+      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, Run Control mission brief, Launch Kit handoff, Completion Bridge candidate validation, Claim Guard overclaim prevention, Proof Promotion gate, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
       "Use /qa-launch-kit, mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, validate them through /qa-completion-bridge, delete or rotate the token secret, then use /qa-proof-promotion before buyer proof claims.",
     status: "manual-action-required"
@@ -678,7 +703,7 @@ export function getQaEvidenceLedger() {
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, token-policy readiness, and no-secret evidence capture today; remaining authenticated QA evidence requires deliberate short-lived AAL2 operator runs against synthetic targets.",
     nextRecommendedBuildStep:
-      "Use /qa-launch-kit to run the Sales Demo Session QA and Authority Reference QA manual workflows with fresh short-lived AAL2 tokens, validate no-secret candidate metadata through /qa-completion-bridge, persist accepted packets through the protected workspace evidence route, confirm /qa-proof-promotion allows only retained packet metadata, then export the Buyer Diligence Export with the manual QA evidence signal included.",
+      "Use /qa-claim-guard for every buyer or external claim while /qa-launch-kit, /qa-completion-bridge, protected persistence, and /qa-proof-promotion remain the required sequence for packet-backed manual QA evidence.",
     updated: "2026-06-22"
   };
 }

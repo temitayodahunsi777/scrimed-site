@@ -33,6 +33,7 @@ export default function QaCompletionBridgePage() {
           <a className="primary-action" href={summary.briefRoute}>Download Bridge Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href={summary.launchKitRoute}>Launch Kit</Link>
+          <Link className="secondary-action" href="/qa-claim-guard">Claim Guard</Link>
           <Link className="secondary-action" href={summary.proofPromotionRoute}>Proof Promotion</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
         </div>

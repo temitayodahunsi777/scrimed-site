@@ -2,6 +2,14 @@
 
 Updated: 2026-06-22
 
+## Latest QA Claim Guard Release
+
+- Added `/qa-claim-guard`, `/api/qa-evidence/claim-guard`, and `/api/qa-evidence/claim-guard/brief` as the current-state claim-control layer for buyer, investor, sales, PR, advertising, and operator language.
+- Added claim evaluation states for safe current claims, retained-packet-required claims, blocked authority claims, and qualified-review-required claims.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution, `/qa-evidence`, `/product`, `/qa-run-control`, `/qa-launch-kit`, `/qa-completion-bridge`, `/qa-proof-promotion`, Buyer Pilot Room navigation, Hub inventory, and public smoke coverage with Claim Guard visibility.
+- Added `docs/qa-claim-guard.md` as the operating runbook for preventing overclaims while retained packet proof and qualified approvals remain pending.
+- Preserved the boundary: Claim Guard is guidance only. It does not replace counsel, create authenticated QA proof, certify security or compliance, authorize PHI processing, authorize live clinical care, guarantee reimbursement, approve production connectors, or approve public claims without retained evidence and qualified review.
+
 ## Latest QA Completion Bridge Release
 
 - Added `/qa-completion-bridge`, `/api/qa-evidence/completion-bridge`, and `/api/qa-evidence/completion-bridge/brief` as the no-secret bridge after a human AAL2 synthetic QA run and before protected evidence persistence.

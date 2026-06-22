@@ -285,6 +285,42 @@ function requireQaCompletionBridgeBoundary(label, response) {
   }
 }
 
+function requireQaClaimGuardBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const claimAuthority = response.headers.get("x-scrimed-claim-authority");
+  const claimGuard = response.headers.get("x-scrimed-qa-claim-guard");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (claimAuthority !== "claim-guidance-not-legal-approval") {
+    throw new Error(`${label} expected x-scrimed-claim-authority claim-guidance-not-legal-approval but received ${claimAuthority}.`);
+  }
+
+  if (claimGuard !== "current-state-no-overclaim") {
+    throw new Error(`${label} expected x-scrimed-qa-claim-guard current-state-no-overclaim but received ${claimGuard}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "claim-guard-ready-not-retained-proof") {
+    throw new Error(`${label} expected x-scrimed-qa-proof claim-guard-ready-not-retained-proof but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 function requireQaProofPromotionBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
@@ -953,6 +989,20 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.qaClaimGuard !==
+    "manual-aal2-qa-claim-guard-no-overclaim"
+  ) {
+    throw new Error("product console missing QA claim guard proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaClaimGuardBrief !==
+    "manual-aal2-qa-claim-guard-brief-current-state-language"
+  ) {
+    throw new Error("product console missing QA claim guard brief proof-stack posture.");
+  }
+
+  if (
     body.proofStack?.qaProofPromotion !==
     "retained-manual-qa-proof-promotion-gate-no-secret"
   ) {
@@ -1016,6 +1066,26 @@ async function checkProductConsole() {
 
   if (!body.qaCompletionBridgeBlockedClaimCount || body.qaCompletionBridgeBlockedClaimCount < 9) {
     throw new Error("product console expected QA completion bridge blocked-claim coverage.");
+  }
+
+  if (!body.qaClaimGuardRuleCount || body.qaClaimGuardRuleCount < 4) {
+    throw new Error("product console expected QA claim guard rule coverage.");
+  }
+
+  if (!body.qaClaimGuardSafeCurrentClaimCount || body.qaClaimGuardSafeCurrentClaimCount < 5) {
+    throw new Error("product console expected QA claim guard safe-current claim coverage.");
+  }
+
+  if (!body.qaClaimGuardRetainedPacketClaimCount || body.qaClaimGuardRetainedPacketClaimCount < 5) {
+    throw new Error("product console expected QA claim guard retained-packet claim coverage.");
+  }
+
+  if (!body.qaClaimGuardBlockedAuthorityClaimCount || body.qaClaimGuardBlockedAuthorityClaimCount < 10) {
+    throw new Error("product console expected QA claim guard blocked-authority claim coverage.");
+  }
+
+  if (!body.qaClaimGuardReviewTriggerCount || body.qaClaimGuardReviewTriggerCount < 8) {
+    throw new Error("product console expected QA claim guard review-trigger coverage.");
   }
 
   if (!body.qaProofPromotionRuleCount || body.qaProofPromotionRuleCount < 5) {
@@ -1597,6 +1667,103 @@ async function checkQaCompletionBridge() {
   }
 
   console.log("pass QA completion bridge");
+}
+
+async function checkQaClaimGuard() {
+  const result = await request("/api/qa-evidence/claim-guard");
+  requireStatus("QA claim guard", result.response.status, 200);
+  requireContentType("QA claim guard", result.response, "application/json");
+  requireQaClaimGuardBoundary("QA claim guard", result.response);
+  const body = requireJson("QA claim guard", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-qa-claim-guard") {
+    throw new Error(`QA claim guard expected scrimed-qa-claim-guard but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-claim-guard-ready") {
+    throw new Error(`QA claim guard expected ready status but received ${body.status}.`);
+  }
+
+  if (body.buyerClaimPosture !== "activation-ready-until-retained-packet-proof") {
+    throw new Error("QA claim guard must preserve current activation-ready claim posture.");
+  }
+
+  if (!Array.isArray(body.rules) || body.rules.length < 4) {
+    throw new Error("QA claim guard expected rule coverage.");
+  }
+
+  if (!Array.isArray(body.blockedAuthorityClaims) || !body.blockedAuthorityClaims.includes("live clinical care authorized")) {
+    throw new Error("QA claim guard expected live clinical care authority to remain blocked.");
+  }
+
+  if (!Array.isArray(body.reviewTriggers) || !body.reviewTriggers.includes("press release")) {
+    throw new Error("QA claim guard expected external-use review triggers.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA claim guard response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA claim guard response must not contain bearer-token material.");
+  }
+
+  const safeClaim = await postJson("/api/qa-evidence/claim-guard", {
+    claim:
+      "SCRIMED has a no-secret synthetic operator-ready human AAL2 required QA path with protected persistence required."
+  });
+  requireStatus("QA claim guard safe current claim", safeClaim.response.status, 200);
+  requireContentType("QA claim guard safe current claim", safeClaim.response, "application/json");
+  requireQaClaimGuardBoundary("QA claim guard safe current claim", safeClaim.response);
+  const safeBody = requireJson("QA claim guard safe current claim", safeClaim.body);
+
+  if (safeBody.decisionState !== "safe-current-claim" || safeBody.allowedForCurrentBuyerUse !== true) {
+    throw new Error("QA claim guard expected safe current claim to be allowed.");
+  }
+
+  const packetClaim = await postJson("/api/qa-evidence/claim-guard", {
+    claim: "SCRIMED has retained authenticated QA evidence for the completed human AAL2 QA workflow."
+  });
+  requireStatus("QA claim guard packet-gated claim", packetClaim.response.status, 200);
+  requireContentType("QA claim guard packet-gated claim", packetClaim.response, "application/json");
+  requireQaClaimGuardBoundary("QA claim guard packet-gated claim", packetClaim.response);
+  const packetBody = requireJson("QA claim guard packet-gated claim", packetClaim.body);
+
+  if (packetBody.decisionState !== "requires-retained-packet" || packetBody.allowedForCurrentBuyerUse !== false) {
+    throw new Error("QA claim guard expected packet-backed claim to require retained packet evidence.");
+  }
+
+  const blockedClaim = await postJson("/api/qa-evidence/claim-guard", {
+    claim: "SCRIMED is HIPAA compliant and live clinical care authorized with reimbursement guaranteed."
+  });
+  requireStatus("QA claim guard blocked authority claim", blockedClaim.response.status, 409);
+  requireContentType("QA claim guard blocked authority claim", blockedClaim.response, "application/json");
+  requireQaClaimGuardBoundary("QA claim guard blocked authority claim", blockedClaim.response);
+  const blockedBody = requireJson("QA claim guard blocked authority claim", blockedClaim.body);
+
+  if (blockedBody.decisionState !== "blocked-authority-claim" || blockedBody.allowedForCurrentBuyerUse !== false) {
+    throw new Error("QA claim guard expected authority claim to remain blocked.");
+  }
+
+  const brief = await request("/api/qa-evidence/claim-guard/brief");
+  requireStatus("QA claim guard brief", brief.response.status, 200);
+  requireContentType("QA claim guard brief", brief.response, "text/markdown");
+  requireQaClaimGuardBoundary("QA claim guard brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED QA Claim Guard Brief")) {
+    throw new Error("QA claim guard brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("activation-ready-until-retained-packet-proof")) {
+    throw new Error("QA claim guard brief missing activation-ready posture.");
+  }
+
+  if (!brief.body.text.includes("Blocked Authority Claims")) {
+    throw new Error("QA claim guard brief missing blocked authority claims.");
+  }
+
+  console.log("pass QA claim guard");
 }
 
 async function checkQaProofPromotion() {
@@ -2295,6 +2462,7 @@ await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
 await checkHtml("/qa-completion-bridge");
+await checkHtml("/qa-claim-guard");
 await checkHtml("/qa-proof-promotion");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
@@ -2310,6 +2478,7 @@ await checkQaExecutionReadiness();
 await checkQaRunControl();
 await checkQaLaunchKit();
 await checkQaCompletionBridge();
+await checkQaClaimGuard();
 await checkQaProofPromotion();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",

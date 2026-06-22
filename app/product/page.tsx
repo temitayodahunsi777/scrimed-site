@@ -121,6 +121,14 @@ export default function ProductConsolePage() {
           <strong>{summary.qaCompletionBridgeHardStopCount}</strong>
         </article>
         <article>
+          <span>QA claim rules</span>
+          <strong>{summary.qaClaimGuardRuleCount}</strong>
+        </article>
+        <article>
+          <span>Blocked claims</span>
+          <strong>{summary.qaClaimGuardBlockedAuthorityClaimCount}</strong>
+        </article>
+        <article>
           <span>QA proof rules</span>
           <strong>{summary.qaProofPromotionRuleCount}</strong>
         </article>
@@ -381,6 +389,37 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>Pass: {checkpoint.passSignal}</li>
                 <li>Fail closed: {checkpoint.failClosedIf}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA claim guard">
+        <div className="section-heading">
+          <p className="eyebrow">QA claim guard</p>
+          <h2>Claim Guard keeps buyer, investor, sales, PR, and operator language inside current evidence.</h2>
+          <p className="section-copy">{summary.qaClaimGuardSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaClaimGuardRoute}>
+              Open Claim Guard
+            </Link>
+            <a className="secondary-action" href={summary.qaClaimGuardBriefRoute}>
+              Download Claim Brief
+            </a>
+          </div>
+        </div>
+        {summary.qaClaimGuardSummary.rules.map((rule) => (
+          <article className="module-row" key={rule.rule}>
+            <div>
+              <span>{rule.state}</span>
+              <h2>{rule.rule}</h2>
+            </div>
+            <p>{rule.appliesWhen}</p>
+            <div>
+              <strong>{rule.requiredEvidence}</strong>
+              <ul className="compact-list">
+                <li>{rule.saferLanguage}</li>
               </ul>
             </div>
           </article>

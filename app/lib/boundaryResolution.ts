@@ -243,6 +243,7 @@ export function getBoundaryResolutionSummary() {
       "/qa-run-control",
       "/qa-launch-kit",
       "/qa-completion-bridge",
+      "/qa-claim-guard",
       "/qa-proof-promotion",
       qaActivationPlan.route,
       qaActivationPlan.briefRoute,
@@ -274,6 +275,7 @@ export function getBoundaryResolutionSummary() {
       qaLedger.briefRoute,
       "/qa-launch-kit",
       "/qa-completion-bridge",
+      "/qa-claim-guard",
       "/qa-proof-promotion"
     ],
     nextAction: limitation.resolutionPath,
@@ -345,7 +347,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-launch-kit to execute the first human AAL2 QA workflow with the no-secret operator handoff, validate the candidate metadata through /qa-completion-bridge, persist the safe evidence packet, confirm /qa-proof-promotion allows only retained packet metadata, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
+      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-launch-kit executes the first human AAL2 QA workflow, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, and /qa-proof-promotion gates retained packet language.",
     records,
     updated: "2026-06-22"
   };
