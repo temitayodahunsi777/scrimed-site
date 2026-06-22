@@ -215,6 +215,9 @@ export default function BuyerPilotRoomPanel({
             <Link className="secondary-action" href="/qa-claim-guard">
               Claim Guard
             </Link>
+            <Link className="secondary-action" href="/qa-activation-seal">
+              Activation Seal
+            </Link>
             <Link className="secondary-action" href={room.qaProofPromotion.route}>
               Review Promotion Rules
             </Link>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
+import { getQaActivationSealSummary } from "../lib/qaActivationSeal";
 import { getQaClaimGuardSummary } from "../lib/qaClaimGuard";
 import { getQaCompletionBridgeSummary } from "../lib/qaCompletionBridge";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
@@ -20,6 +21,7 @@ export default function QaEvidencePage() {
   const launchKit = getQaLaunchKitSummary();
   const completionBridge = getQaCompletionBridgeSummary();
   const claimGuard = getQaClaimGuardSummary();
+  const activationSeal = getQaActivationSealSummary();
   const proofPromotion = getQaProofPromotionSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
@@ -63,6 +65,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={claimGuard.route}>
             Claim Guard
+          </Link>
+          <Link className="secondary-action" href={activationSeal.route}>
+            Activation Seal
           </Link>
           <Link className="secondary-action" href={proofPromotion.route}>
             Proof Promotion
@@ -137,6 +142,14 @@ export default function QaEvidencePage() {
         <article>
           <span>Claim blocks</span>
           <strong>{claimGuard.blockedAuthorityClaimCount}</strong>
+        </article>
+        <article>
+          <span>Activation seal</span>
+          <strong>{activationSeal.decisionState}</strong>
+        </article>
+        <article>
+          <span>Seal hard stops</span>
+          <strong>{activationSeal.hardStopRuleCount}</strong>
         </article>
         <article>
           <span>Proof promotion</span>
@@ -379,6 +392,52 @@ export default function QaEvidencePage() {
               <strong>{rule.requiredEvidence}</strong>
               <ul className="compact-list">
                 <li>{rule.saferLanguage}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA activation seal">
+        <div className="section-heading">
+          <p className="eyebrow">Activation seal</p>
+          <h2>Use the seal after protected persistence to keep buyer proof tied to retained packet evidence.</h2>
+          <p className="section-copy">{activationSeal.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={activationSeal.route}>
+              Open Activation Seal
+            </Link>
+            <a className="secondary-action" href={activationSeal.briefRoute}>
+              Download Seal Brief
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{activationSeal.decisionState}</span>
+            <h2>{activationSeal.decision.buyerSafeClaim}</h2>
+          </div>
+          <p>{activationSeal.decision.nextAction}</p>
+          <div>
+            <strong>Seal allowed: {activationSeal.sealAllowed ? "yes" : "no"}</strong>
+            <ul className="compact-list">
+              <li>Buyer use: {activationSeal.buyerUseAllowed ? "yes" : "no"}</li>
+              <li>Required evidence: {activationSeal.requiredEvidenceCount}</li>
+              <li>Blocked claims: {activationSeal.hardStopClaimCount}</li>
+            </ul>
+          </div>
+        </article>
+        {activationSeal.rules.map((rule) => (
+          <article className="module-row" key={rule.rule}>
+            <div>
+              <span>{rule.status}</span>
+              <h2>{rule.rule}</h2>
+            </div>
+            <p>{rule.evidenceRequired}</p>
+            <div>
+              <strong>{rule.passSignal}</strong>
+              <ul className="compact-list">
+                <li>Fail closed: {rule.failClosedIf}</li>
               </ul>
             </div>
           </article>

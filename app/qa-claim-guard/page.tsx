@@ -25,6 +25,7 @@ export default function QaClaimGuardPage() {
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href={summary.launchKitRoute}>Launch Kit</Link>
           <Link className="secondary-action" href={summary.completionBridgeRoute}>Completion Bridge</Link>
+          <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>
           <Link className="secondary-action" href={summary.proofPromotionRoute}>Proof Promotion</Link>
         </div>
       </section>

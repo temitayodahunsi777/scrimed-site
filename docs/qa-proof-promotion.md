@@ -22,6 +22,7 @@ Before a protected no-secret packet hash is visible, buyer proof may reference:
 - Launch Kit
 - Completion Bridge candidate validation
 - Claim Guard current-state language control
+- Activation Seal final packet-visibility check
 - fail-closed protected route checks
 - no-secret packet contract
 - protected persistence route
@@ -58,9 +59,10 @@ Proof Promotion does not execute AAL2 workflows, mint tokens, store credentials,
 6. Persist accepted metadata through `/pilot-workspace/access` -> Manual QA Evidence.
 7. Open `/qa-proof-promotion`.
 8. Confirm the state is `ready-for-buyer-diligence`.
-9. Run buyer-facing language through `/qa-claim-guard`.
-10. Export Buyer Diligence with only safe run metadata and packet SHA-256.
+9. Confirm `/qa-activation-seal` has protected packet visibility before packet-backed language.
+10. Run buyer-facing language through `/qa-claim-guard`.
+11. Export Buyer Diligence with only safe run metadata and packet SHA-256.
 
 ## Next Step
 
-Use `/qa-claim-guard` for every buyer-facing statement while the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow moves through `/qa-launch-kit`, `/qa-completion-bridge`, protected persistence, and `/qa-proof-promotion`.
+Use `/qa-claim-guard` for every buyer-facing statement while the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow moves through `/qa-launch-kit`, `/qa-completion-bridge`, protected persistence, `/qa-activation-seal`, and `/qa-proof-promotion`.

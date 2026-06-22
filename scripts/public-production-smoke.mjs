@@ -352,6 +352,37 @@ function requireQaProofPromotionBoundary(label, response) {
   }
 }
 
+function requireQaActivationSealBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const activationSeal = response.headers.get("x-scrimed-qa-activation-seal");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (activationSeal !== "protected-packet-required") {
+    throw new Error(`${label} expected x-scrimed-qa-activation-seal protected-packet-required but received ${activationSeal}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "activation-seal-ready-not-retained-proof") {
+    throw new Error(`${label} expected x-scrimed-qa-proof activation-seal-ready-not-retained-proof but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -1003,6 +1034,20 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.qaActivationSeal !==
+    "manual-aal2-qa-activation-seal-no-secret-boundary-check"
+  ) {
+    throw new Error("product console missing QA activation seal proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaActivationSealBrief !==
+    "manual-aal2-qa-activation-seal-brief-retained-packet-required"
+  ) {
+    throw new Error("product console missing QA activation seal brief proof-stack posture.");
+  }
+
+  if (
     body.proofStack?.qaProofPromotion !==
     "retained-manual-qa-proof-promotion-gate-no-secret"
   ) {
@@ -1086,6 +1131,22 @@ async function checkProductConsole() {
 
   if (!body.qaClaimGuardReviewTriggerCount || body.qaClaimGuardReviewTriggerCount < 8) {
     throw new Error("product console expected QA claim guard review-trigger coverage.");
+  }
+
+  if (!body.qaActivationSealRuleCount || body.qaActivationSealRuleCount < 7) {
+    throw new Error("product console expected QA activation seal rule coverage.");
+  }
+
+  if (!body.qaActivationSealHardStopRuleCount || body.qaActivationSealHardStopRuleCount < 4) {
+    throw new Error("product console expected QA activation seal hard-stop coverage.");
+  }
+
+  if (!body.qaActivationSealRequiredEvidenceCount || body.qaActivationSealRequiredEvidenceCount < 10) {
+    throw new Error("product console expected QA activation seal evidence coverage.");
+  }
+
+  if (!body.qaActivationSealHardStopClaimCount || body.qaActivationSealHardStopClaimCount < 10) {
+    throw new Error("product console expected QA activation seal blocked-claim coverage.");
   }
 
   if (!body.qaProofPromotionRuleCount || body.qaProofPromotionRuleCount < 5) {
@@ -1764,6 +1825,107 @@ async function checkQaClaimGuard() {
   }
 
   console.log("pass QA claim guard");
+}
+
+async function checkQaActivationSeal() {
+  const result = await request("/api/qa-evidence/activation-seal");
+  requireStatus("QA activation seal", result.response.status, 200);
+  requireContentType("QA activation seal", result.response, "application/json");
+  requireQaActivationSealBoundary("QA activation seal", result.response);
+  const body = requireJson("QA activation seal", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-qa-activation-seal") {
+    throw new Error(`QA activation seal expected scrimed-qa-activation-seal but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-activation-seal-ready") {
+    throw new Error(`QA activation seal expected ready status but received ${body.status}.`);
+  }
+
+  if (body.decisionState !== "unsealed-human-aal2-required") {
+    throw new Error(`QA activation seal expected unsealed-human-aal2-required but received ${body.decisionState}.`);
+  }
+
+  if (body.sealAllowed !== false || body.buyerUseAllowed !== false) {
+    throw new Error("QA activation seal must not allow public/default seal or buyer use.");
+  }
+
+  if (!Array.isArray(body.rules) || body.rules.length < 7) {
+    throw new Error("QA activation seal expected rule coverage.");
+  }
+
+  if (!Array.isArray(body.requiredEvidence) || !body.requiredEvidence.includes("protected Manual QA Evidence packet SHA-256")) {
+    throw new Error("QA activation seal expected protected packet evidence requirement.");
+  }
+
+  if (!Array.isArray(body.hardStopClaims) || !body.hardStopClaims.includes("live clinical care authorized")) {
+    throw new Error("QA activation seal expected live clinical care authority to remain blocked.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA activation seal response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA activation seal response must not contain bearer-token material.");
+  }
+
+  const candidate = await postJson("/api/qa-evidence/activation-seal", {
+    workflowRunId: "1234567890",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567890",
+    packetSha256: "a".repeat(64),
+    packetAuditEventId: "22222222-2222-4222-8222-222222222222",
+    protectedWorkspaceSlug: "atlas-synthetic-evaluation",
+    proofPromotionState: "ready-for-buyer-diligence",
+    claimDecisionState: "requires-retained-packet",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA activation seal candidate", candidate.response.status, 200);
+  requireContentType("QA activation seal candidate", candidate.response, "application/json");
+  requireQaActivationSealBoundary("QA activation seal candidate", candidate.response);
+  const candidateBody = requireJson("QA activation seal candidate", candidate.body);
+
+  if (
+    candidateBody.decisionState !== "candidate-ready-protected-verification-required" ||
+    candidateBody.sealAllowed !== false ||
+    candidateBody.publicVerificationOnly !== true
+  ) {
+    throw new Error("QA activation seal expected candidate-ready public verification without seal allowance.");
+  }
+
+  const blocked = await postJson("/api/qa-evidence/activation-seal", {
+    claim: "SCRIMED is HIPAA compliant with live clinical care authorized and reimbursement guaranteed."
+  });
+  requireStatus("QA activation seal blocked authority claim", blocked.response.status, 409);
+  requireContentType("QA activation seal blocked authority claim", blocked.response, "application/json");
+  requireQaActivationSealBoundary("QA activation seal blocked authority claim", blocked.response);
+  const blockedBody = requireJson("QA activation seal blocked authority claim", blocked.body);
+
+  if (blockedBody.decisionState !== "blocked-boundary-violation" || blockedBody.sealAllowed !== false) {
+    throw new Error("QA activation seal expected authority claim to remain blocked.");
+  }
+
+  const brief = await request("/api/qa-evidence/activation-seal/brief");
+  requireStatus("QA activation seal brief", brief.response.status, 200);
+  requireContentType("QA activation seal brief", brief.response, "text/markdown");
+  requireQaActivationSealBoundary("QA activation seal brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED QA Activation Seal Brief")) {
+    throw new Error("QA activation seal brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("unsealed-human-aal2-required")) {
+    throw new Error("QA activation seal brief missing unsealed decision.");
+  }
+
+  if (!brief.body.text.includes("Protected packet required")) {
+    throw new Error("QA activation seal brief missing protected packet rule.");
+  }
+
+  console.log("pass QA activation seal");
 }
 
 async function checkQaProofPromotion() {
@@ -2463,6 +2625,7 @@ await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
 await checkHtml("/qa-completion-bridge");
 await checkHtml("/qa-claim-guard");
+await checkHtml("/qa-activation-seal");
 await checkHtml("/qa-proof-promotion");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
@@ -2479,6 +2642,7 @@ await checkQaRunControl();
 await checkQaLaunchKit();
 await checkQaCompletionBridge();
 await checkQaClaimGuard();
+await checkQaActivationSeal();
 await checkQaProofPromotion();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",

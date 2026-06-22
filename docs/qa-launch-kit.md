@@ -25,6 +25,7 @@ It includes:
 - secret-disposal requirements
 - protected persistence routes
 - QA Completion Bridge validation
+- Claim Guard and Activation Seal checks
 - Proof Promotion checks
 - blocked production and clinical claims
 
@@ -44,8 +45,9 @@ The Launch Kit does not execute passkey ceremonies, mint tokens, store credentia
 8. Delete or rotate the temporary secret.
 9. Validate the no-secret candidate metadata through `/qa-completion-bridge`.
 10. Generate and persist the no-secret evidence packet through `/pilot-workspace/access` -> Manual QA Evidence only after the bridge accepts it.
-11. Open `/qa-proof-promotion`.
-12. Export Buyer Diligence only after the retained packet hash and audit event are visible.
+11. Open `/qa-activation-seal`.
+12. Open `/qa-proof-promotion`.
+13. Export Buyer Diligence only after the retained packet hash and audit event are visible.
 
 ## Hard Stops
 
@@ -57,4 +59,4 @@ The Launch Kit does not execute passkey ceremonies, mint tokens, store credentia
 
 ## Next Step
 
-Have an approved tenant-admin operator use `/qa-launch-kit` to run one workflow with a fresh short-lived AAL2 token, validate safe metadata through `/qa-completion-bridge`, persist only accepted metadata, then confirm `/qa-proof-promotion` before exporting Buyer Diligence.
+Have an approved tenant-admin operator use `/qa-launch-kit` to run one workflow with a fresh short-lived AAL2 token, validate safe metadata through `/qa-completion-bridge`, persist only accepted metadata, then confirm `/qa-activation-seal` and `/qa-proof-promotion` before exporting Buyer Diligence.

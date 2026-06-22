@@ -89,6 +89,12 @@ import {
   qaClaimGuardBriefRoute,
   qaClaimGuardRoute
 } from "./qaClaimGuard";
+import {
+  getQaActivationSealSummary,
+  qaActivationSealApiRoute,
+  qaActivationSealBriefRoute,
+  qaActivationSealRoute
+} from "./qaActivationSeal";
 
 export type HubModule = {
   name: string;
@@ -225,6 +231,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "TrustOS, legal, sales engineering, buyer diligence, and marketing governance",
     objective: "Classify buyer, investor, sales, PR, and operator language so current claims never outrun retained evidence."
+  },
+  {
+    name: "QA Activation Seal",
+    route: qaActivationSealRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "TrustOS, release engineering, tenant governance, buyer diligence, and claims governance",
+    objective: "Confirm the final no-secret seal posture before packet-backed manual AAL2 QA proof enters buyer diligence."
   }
 ];
 
@@ -355,6 +369,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "QA Activation Seal",
+    value: "protected-packet seal gate active",
+    tone: "good"
+  },
+  {
     name: "Manual QA evidence packet",
     value: "no-secret capture contract active",
     tone: "good"
@@ -430,6 +449,9 @@ export const hubRoutes = [
   qaClaimGuardRoute,
   qaClaimGuardApiRoute,
   qaClaimGuardBriefRoute,
+  qaActivationSealRoute,
+  qaActivationSealApiRoute,
+  qaActivationSealBriefRoute,
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -669,6 +691,7 @@ export function getHubSummary() {
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
   const qaClaimGuardSummary = getQaClaimGuardSummary();
+  const qaActivationSealSummary = getQaActivationSealSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -700,6 +723,7 @@ export function getHubSummary() {
     qaEvidenceLedger,
     qaCompletionBridgeSummary,
     qaClaimGuardSummary,
+    qaActivationSealSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

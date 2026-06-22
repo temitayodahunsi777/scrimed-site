@@ -18,6 +18,7 @@ It classifies claims into:
 - Operator page: `/qa-claim-guard`
 - Public API: `/api/qa-evidence/claim-guard`
 - Downloadable brief: `/api/qa-evidence/claim-guard/brief`
+- Activation seal: `/qa-activation-seal`
 
 ## Current Safe Position
 
@@ -47,7 +48,8 @@ Do not claim:
 1. Route every buyer, investor, sales, PR, advertising, and operator claim through `/qa-claim-guard`.
 2. Use only safe current-state language until retained packet evidence exists.
 3. If a claim references retained authenticated QA proof, require protected packet SHA-256, audit event ID, workflow run ID, and Proof Promotion ready state.
-4. If a claim references clinical, PHI, compliance, security, reimbursement, production, or public distribution authority, route it to qualified reviewers and Boundary Resolution.
+4. Use `/qa-activation-seal` to confirm public candidate completeness has not been mistaken for protected packet visibility.
+5. If a claim references clinical, PHI, compliance, security, reimbursement, production, or public distribution authority, route it to qualified reviewers and Boundary Resolution.
 
 ## Boundary
 

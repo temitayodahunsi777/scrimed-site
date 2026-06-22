@@ -129,6 +129,18 @@ export default function ProductConsolePage() {
           <strong>{summary.qaClaimGuardBlockedAuthorityClaimCount}</strong>
         </article>
         <article>
+          <span>QA seal rules</span>
+          <strong>{summary.qaActivationSealRuleCount}</strong>
+        </article>
+        <article>
+          <span>QA seal stops</span>
+          <strong>{summary.qaActivationSealHardStopRuleCount}</strong>
+        </article>
+        <article>
+          <span>QA seal evidence</span>
+          <strong>{summary.qaActivationSealRequiredEvidenceCount}</strong>
+        </article>
+        <article>
           <span>QA proof rules</span>
           <strong>{summary.qaProofPromotionRuleCount}</strong>
         </article>
@@ -420,6 +432,52 @@ export default function ProductConsolePage() {
               <strong>{rule.requiredEvidence}</strong>
               <ul className="compact-list">
                 <li>{rule.saferLanguage}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA activation seal">
+        <div className="section-heading">
+          <p className="eyebrow">QA activation seal</p>
+          <h2>Activation Seal gives SCRIMED a final no-secret check before packet-backed buyer proof language.</h2>
+          <p className="section-copy">{summary.qaActivationSealSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaActivationSealRoute}>
+              Open Activation Seal
+            </Link>
+            <a className="secondary-action" href={summary.qaActivationSealBriefRoute}>
+              Download Seal Brief
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.qaActivationSealSummary.decisionState}</span>
+            <h2>{summary.qaActivationSealSummary.decision.buyerSafeClaim}</h2>
+          </div>
+          <p>{summary.qaActivationSealSummary.decision.nextAction}</p>
+          <div>
+            <strong>Seal allowed: {summary.qaActivationSealSummary.sealAllowed ? "yes" : "no"}</strong>
+            <ul className="compact-list">
+              <li>Buyer use: {summary.qaActivationSealSummary.buyerUseAllowed ? "yes" : "no"}</li>
+              <li>Required evidence: {summary.qaActivationSealRequiredEvidenceCount}</li>
+              <li>Hard stops: {summary.qaActivationSealHardStopRuleCount}</li>
+            </ul>
+          </div>
+        </article>
+        {summary.qaActivationSealSummary.rules.map((rule) => (
+          <article className="module-row" key={rule.rule}>
+            <div>
+              <span>{rule.status}</span>
+              <h2>{rule.rule}</h2>
+            </div>
+            <p>{rule.evidenceRequired}</p>
+            <div>
+              <strong>{rule.passSignal}</strong>
+              <ul className="compact-list">
+                <li>Fail closed: {rule.failClosedIf}</li>
               </ul>
             </div>
           </article>

@@ -2,6 +2,14 @@
 
 Updated: 2026-06-22
 
+## Latest QA Activation Seal Release
+
+- Added `/qa-activation-seal`, `/api/qa-evidence/activation-seal`, and `/api/qa-evidence/activation-seal/brief` as the final no-secret seal check before packet-backed manual AAL2 QA proof language enters buyer diligence.
+- Added seal states for unsealed human-AAL2-required posture, candidate-ready protected verification, sealed buyer-diligence posture for future protected packet visibility, and blocked boundary violations.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution, `/qa-evidence`, `/product`, QA workflow navigation, Buyer Pilot Room navigation, Hub inventory, and public smoke coverage with Activation Seal visibility.
+- Added `docs/qa-activation-seal.md` as the operator runbook for separating public candidate completeness from protected packet evidence.
+- Preserved the boundary: Activation Seal does not execute AAL2 workflows, store tokens, store PHI, certify security or compliance, authorize live clinical care, guarantee reimbursement, approve production connectors, or create public release authority.
+
 ## Latest QA Claim Guard Release
 
 - Added `/qa-claim-guard`, `/api/qa-evidence/claim-guard`, and `/api/qa-evidence/claim-guard/brief` as the current-state claim-control layer for buyer, investor, sales, PR, advertising, and operator language.

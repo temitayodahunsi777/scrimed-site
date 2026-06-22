@@ -244,6 +244,7 @@ export function getBoundaryResolutionSummary() {
       "/qa-launch-kit",
       "/qa-completion-bridge",
       "/qa-claim-guard",
+      "/qa-activation-seal",
       "/qa-proof-promotion",
       qaActivationPlan.route,
       qaActivationPlan.briefRoute,
@@ -276,6 +277,7 @@ export function getBoundaryResolutionSummary() {
       "/qa-launch-kit",
       "/qa-completion-bridge",
       "/qa-claim-guard",
+      "/qa-activation-seal",
       "/qa-proof-promotion"
     ],
     nextAction: limitation.resolutionPath,
@@ -347,7 +349,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-launch-kit executes the first human AAL2 QA workflow, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, and /qa-proof-promotion gates retained packet language.",
+      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-launch-kit executes the first human AAL2 QA workflow, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, /qa-activation-seal confirms final seal posture, and /qa-proof-promotion gates retained packet language.",
     records,
     updated: "2026-06-22"
   };
