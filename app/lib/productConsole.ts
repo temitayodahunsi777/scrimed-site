@@ -102,6 +102,7 @@ import {
 import {
   getQaEvidenceLedger,
   qaAuthorityReferenceEvidenceBridgeStatus,
+  qaEvidenceActivationPlanStatus,
   qaEvidenceLedgerProofStackStatus,
   qaManualRunEvidencePersistenceStatus
 } from "./qaEvidenceLedger";
@@ -970,6 +971,8 @@ export function getProductConsoleSummary() {
     qaEvidenceRoute: qaEvidenceLedger.route,
     qaEvidenceApiRoute: qaEvidenceLedger.apiRoute,
     qaEvidenceBriefRoute: qaEvidenceLedger.briefRoute,
+    qaEvidenceActivationPlanRoute: qaEvidenceLedger.activationPlan.route,
+    qaEvidenceActivationPlanBriefRoute: qaEvidenceLedger.activationPlan.briefRoute,
     qaManualRunEvidencePacketRoute: qaEvidenceLedger.manualRunEvidenceCapture.route,
     qaManualRunEvidencePersistenceRoute:
       qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute,
@@ -1207,6 +1210,7 @@ export function getProductConsoleSummary() {
       qaManualRunEvidencePacket: qaEvidenceLedger.manualRunEvidenceCapture.status,
       qaManualRunEvidencePersistence: qaManualRunEvidencePersistenceStatus,
       qaAuthorityReferenceEvidenceBridge: qaAuthorityReferenceEvidenceBridgeStatus,
+      qaEvidenceActivationPlan: qaEvidenceActivationPlanStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -1301,6 +1305,11 @@ export function getProductReadinessBrief() {
     `Persisted Buyer Demo Sessions: ${summary.buyerDemoSessionsRoute}`,
     `Buyer Demo Session Packet: ${summary.buyerDemoSessionPacketRoute}`,
     `Buyer Demo Session QA Harness: ${summary.buyerDemoSessionQaRoute}`,
+    `QA Evidence Ledger: ${summary.qaEvidenceRoute}`,
+    `QA Evidence API: ${summary.qaEvidenceApiRoute}`,
+    `QA Evidence Brief: ${summary.qaEvidenceBriefRoute}`,
+    `QA Evidence Activation Plan: ${summary.qaEvidenceActivationPlanRoute}`,
+    `QA Evidence Activation Brief: ${summary.qaEvidenceActivationPlanBriefRoute}`,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

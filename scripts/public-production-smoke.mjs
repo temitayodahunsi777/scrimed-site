@@ -686,6 +686,13 @@ async function checkProductConsole() {
     throw new Error("product console missing authority-reference QA evidence bridge posture.");
   }
 
+  if (
+    body.proofStack?.qaEvidenceActivationPlan !==
+    "manual-aal2-qa-evidence-activation-plan-ready"
+  ) {
+    throw new Error("product console missing QA evidence activation plan posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -790,10 +797,41 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA evidence ledger expected manual run evidence persistence status.");
   }
 
+  if (body.activationPlan?.status !== "manual-aal2-qa-evidence-activation-plan-ready") {
+    throw new Error("QA evidence ledger expected activation plan status.");
+  }
+
   const brief = await request("/api/qa-evidence/brief");
   requireStatus("QA evidence brief", brief.response.status, 200);
   requireContentType("QA evidence brief", brief.response, "text/markdown");
   requireSyntheticBoundary("QA evidence brief", brief.response);
+
+  const activationPlan = await request("/api/qa-evidence/activation-plan");
+  requireStatus("QA evidence activation plan", activationPlan.response.status, 200);
+  requireContentType("QA evidence activation plan", activationPlan.response, "application/json");
+  requireSyntheticBoundary("QA evidence activation plan", activationPlan.response);
+  const activationPlanBody = requireJson("QA evidence activation plan", activationPlan.body);
+
+  if (activationPlanBody.status !== "manual-aal2-qa-evidence-activation-plan-ready") {
+    throw new Error("QA evidence activation plan expected ready status.");
+  }
+
+  if (!activationPlanBody.workflows?.some((workflow) => workflow.workflowKind === "authority-reference-qa")) {
+    throw new Error("QA evidence activation plan missing authority-reference workflow.");
+  }
+
+  if (!activationPlanBody.workflows?.some((workflow) => workflow.workflowKind === "sales-demo-session-qa")) {
+    throw new Error("QA evidence activation plan missing sales-demo workflow.");
+  }
+
+  const activationPlanBrief = await request("/api/qa-evidence/activation-plan/brief");
+  requireStatus("QA evidence activation plan brief", activationPlanBrief.response.status, 200);
+  requireContentType("QA evidence activation plan brief", activationPlanBrief.response, "text/markdown");
+  requireSyntheticBoundary("QA evidence activation plan brief", activationPlanBrief.response);
+
+  if (!activationPlanBrief.body.text.includes("SCRIMED Manual AAL2 QA Evidence Activation Plan")) {
+    throw new Error("QA evidence activation plan brief missing expected heading.");
+  }
 
   const contract = await request("/api/qa-evidence/manual-run-packet");
   requireStatus("QA manual run evidence packet contract", contract.response.status, 200);

@@ -34,6 +34,26 @@ export type QaManualRunWorkflowKind =
   | "sales-demo-session-qa"
   | "authority-reference-qa";
 
+export type QaEvidenceActivationWorkflow = {
+  workflowKind: QaManualRunWorkflowKind;
+  name: string;
+  status: "ready-for-human-aal2-run";
+  workflowPath: string;
+  preflightScript: string;
+  smokeScript: string;
+  targetInput: string;
+  requiredSecretName: string;
+  protectedRoutes: string[];
+  safeEvidenceFields: string[];
+  prohibitedInputs: string[];
+  operatorSteps: string[];
+  persistenceTarget: string;
+  buyerDiligenceImpact: string;
+  currentBoundary: string;
+  workaround: string;
+  nextAction: string;
+};
+
 export type QaManualRunEvidenceInput = {
   workflowKind?: QaManualRunWorkflowKind;
   workflowRunId: string;
@@ -69,6 +89,9 @@ export type QaManualRunEvidencePacketRecord = QaManualRunEvidenceInput & {
 export const qaEvidenceLedgerRoute = "/qa-evidence";
 export const qaEvidenceLedgerApiRoute = "/api/qa-evidence";
 export const qaEvidenceLedgerBriefRoute = "/api/qa-evidence/brief";
+export const qaEvidenceActivationPlanApiRoute = "/api/qa-evidence/activation-plan";
+export const qaEvidenceActivationPlanBriefRoute =
+  "/api/qa-evidence/activation-plan/brief";
 export const qaManualRunEvidencePacketApiRoute = "/api/qa-evidence/manual-run-packet";
 export const qaManualRunEvidencePersistenceApiRoute =
   "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets";
@@ -82,9 +105,122 @@ export const qaManualRunEvidencePersistenceStatus =
   "tenant-scoped-aal2-manual-qa-evidence-ledger";
 export const qaAuthorityReferenceEvidenceBridgeStatus =
   "authority-reference-qa-evidence-bridge-ready";
+export const qaEvidenceActivationPlanStatus =
+  "manual-aal2-qa-evidence-activation-plan-ready";
 
 export const qaEvidenceLedgerBoundary =
   "SCRIMED QA Evidence Ledger records synthetic-only release, smoke, token-policy, fail-closed, and operator-gate evidence. It is not a clinical validation report, security certification, legal opinion, SOC report, HIPAA attestation, or authorization for live healthcare execution.";
+
+export const qaEvidenceActivationWorkflows: QaEvidenceActivationWorkflow[] = [
+  {
+    workflowKind: "sales-demo-session-qa",
+    name: "Sales Demo Session QA activation",
+    status: "ready-for-human-aal2-run",
+    workflowPath: ".github/workflows/sales-demo-session-qa-smoke.yml",
+    preflightScript: "scripts/sales-demo-session-qa-token-preflight.mjs",
+    smokeScript: "scripts/sales-demo-session-qa-smoke.mjs",
+    targetInput: "intake_id",
+    requiredSecretName: "SCRIMED_SALES_QA_BEARER_TOKEN",
+    protectedRoutes: [salesDemoSessionQaApiRoute, "/sales-operations", "/pilot-deal-room"],
+    safeEvidenceFields: [
+      "workflowKind=sales-demo-session-qa",
+      "workflowRunId",
+      "workflowRunUrl",
+      "executedAt",
+      "baseUrl",
+      "intakeId",
+      "createdSessionId",
+      "packetAuditEventId",
+      "packetSha256 after protected persistence"
+    ],
+    prohibitedInputs: [
+      "bearer tokens",
+      "refresh tokens",
+      "passwords",
+      "patient identifiers",
+      "payer member identifiers",
+      "source contracts",
+      "clinical records",
+      "legal conclusions"
+    ],
+    operatorSteps: [
+      "Open Sales Operations with an approved AAL2 tenant-admin session.",
+      "Select one explicit synthetic buyer opportunity and capture its intake ID.",
+      "Create a temporary masked GitHub secret only for the short-lived AAL2 token.",
+      "Dispatch the Sales Demo Session QA workflow with require_authenticated_path enabled.",
+      "Confirm preflight and smoke pass; copy only safe IDs from workflow output.",
+      "Delete or rotate the temporary secret immediately after the workflow finishes.",
+      "Persist the safe metadata through /pilot-workspace/access -> Manual QA Evidence.",
+      "Export Buyer Diligence so the retained packet hash and audit trail appear in buyer proof."
+    ],
+    persistenceTarget: qaManualRunEvidencePersistenceApiRoute,
+    buyerDiligenceImpact:
+      "Adds tenant-scoped evidence that SCRIMED can create and audit a governed synthetic buyer demo session under human AAL2 control.",
+    currentBoundary:
+      "No authenticated sales-demo CI evidence can be claimed until a human runs the workflow with a fresh short-lived AAL2 token.",
+    workaround:
+      "All surrounding controls remain verified by public smoke and fail-closed checks; the activation plan prevents token material from becoming evidence.",
+    nextAction:
+      "Run the manual workflow once a fresh AAL2 tenant-admin token and safe synthetic intake target are available."
+  },
+  {
+    workflowKind: "authority-reference-qa",
+    name: "Authority Reference QA activation",
+    status: "ready-for-human-aal2-run",
+    workflowPath: ".github/workflows/authority-reference-qa-smoke.yml",
+    preflightScript: "scripts/authority-artifact-reference-qa-token-preflight.mjs",
+    smokeScript: "scripts/authority-artifact-reference-qa-smoke.mjs",
+    targetInput: "workspace_slug",
+    requiredSecretName: "SCRIMED_BEARER_TOKEN",
+    protectedRoutes: [
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet"
+    ],
+    safeEvidenceFields: [
+      "workflowKind=authority-reference-qa",
+      "workflowRunId",
+      "workflowRunUrl",
+      "executedAt",
+      "baseUrl",
+      "workspace slug as intakeId",
+      "created authority reference UUID as createdSessionId",
+      "authority packet audit event UUID as packetAuditEventId",
+      "packetSha256 after protected persistence"
+    ],
+    prohibitedInputs: [
+      "bearer tokens",
+      "refresh tokens",
+      "artifact URLs",
+      "signed approvals",
+      "legal opinions",
+      "security reports",
+      "reimbursement determinations",
+      "PHI",
+      "production credentials"
+    ],
+    operatorSteps: [
+      "Open /pilot-workspace/access with an approved AAL2 tenant governance session.",
+      "Use the protected workspace slug as the explicit workflow target.",
+      "Create a temporary masked GitHub secret only for the short-lived AAL2 token.",
+      "Dispatch the Authority Reference QA workflow with require_authenticated_path enabled.",
+      "Confirm the workflow records one synthetic metadata-only reference, verifies the renewal queue, and downloads the audited packet.",
+      "Copy only the printed safe evidence fields: workflow kind, workspace target, reference UUID, and packet audit event UUID.",
+      "Delete or rotate the temporary secret immediately after the workflow finishes.",
+      "Persist the safe metadata through /pilot-workspace/access -> Manual QA Evidence in authority-reference mode.",
+      "Export Buyer Diligence so authority-reference QA evidence appears with the retained hard-gate boundaries."
+    ],
+    persistenceTarget: qaManualRunEvidencePersistenceApiRoute,
+    buyerDiligenceImpact:
+      "Adds tenant-scoped evidence that SCRIMED can record and audit no-PHI authority-reference readiness metadata under human AAL2 control.",
+    currentBoundary:
+      "No authenticated authority-reference CI evidence can be claimed until a human runs the workflow with a fresh short-lived AAL2 token.",
+    workaround:
+      "The renewal queue, fail-closed protected routes, stateless packet generation, and no-secret persistence bridge are already verified without storing credentials.",
+    nextAction:
+      "Run the manual workflow once a fresh AAL2 tenant governance token and synthetic workspace target are available."
+  }
+];
 
 export const qaEvidenceEntries: QaEvidenceEntry[] = [
   {
@@ -180,6 +316,28 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
       "Run the manual workflow with a temporary masked GitHub Actions secret, capture only the workflow run ID, created authority reference ID, packet audit event ID, and packet hash, then delete or rotate the secret.",
     nextAction:
       "Run the authority-reference QA workflow once a fresh AAL2 token is available, then persist the safe metadata through the Manual QA Evidence panel in authority-reference mode."
+  },
+  {
+    id: "manual-aal2-qa-activation-plan",
+    name: "Manual AAL2 QA evidence activation plan",
+    status: "workaround-active",
+    owner: "Release engineering",
+    recordedAt: "2026-06-21",
+    artifact: qaEvidenceActivationPlanApiRoute,
+    routes: [
+      qaEvidenceActivationPlanApiRoute,
+      qaEvidenceActivationPlanBriefRoute,
+      ".github/workflows/sales-demo-session-qa-smoke.yml",
+      ".github/workflows/authority-reference-qa-smoke.yml"
+    ],
+    evidence:
+      "A no-secret activation plan now gives operators workflow-specific target inputs, token preflight paths, safe evidence fields, prohibited content, persistence route, Buyer Diligence impact, and retained boundaries before any AAL2 run.",
+    limitation:
+      "The activation plan coordinates the human run; it does not mint tokens, execute passkey ceremonies, or create authenticated proof by itself.",
+    workaround:
+      "Use the plan as the mandatory bridge between manual GitHub workflow execution, secret disposal, protected Manual QA Evidence persistence, and Buyer Diligence export.",
+    nextAction:
+      "Run each manual AAL2 QA workflow from the plan, persist only safe metadata, then export Buyer Diligence after packet hashes appear."
   },
   {
     id: "manual-run-evidence-capture",
@@ -338,6 +496,46 @@ export const qaManualRunEvidenceContract = {
     "For authority-reference QA, createdSessionId carries the created authority reference UUID and packetAuditEventId carries the authority reference packet audit event UUID. The packet labels these fields explicitly; the database column names remain generic legacy storage."
 };
 
+export function getQaEvidenceActivationPlan() {
+  return {
+    service: "scrimed-qa-evidence-activation-plan",
+    status: qaEvidenceActivationPlanStatus,
+    route: qaEvidenceActivationPlanApiRoute,
+    briefRoute: qaEvidenceActivationPlanBriefRoute,
+    boundary:
+      "The QA Evidence Activation Plan is a no-secret operator runbook for governed synthetic AAL2 QA only. It does not store or reveal bearer tokens, execute passkey ceremonies, authorize PHI processing, certify compliance, or grant live clinical authority.",
+    activationPrinciple:
+      "Human AAL2 session plus short-lived token plus explicit synthetic target plus no-secret evidence persistence.",
+    workflowCount: qaEvidenceActivationWorkflows.length,
+    workflows: qaEvidenceActivationWorkflows,
+    sharedControls: [
+      "Use only fresh short-lived AAL2 tokens.",
+      "Keep workflows manual-only; do not schedule authenticated mutation checks.",
+      "Target exactly one explicit synthetic opportunity or protected workspace.",
+      "Run preflight before any authenticated request.",
+      "Copy only safe evidence IDs into SCRIMED.",
+      "Delete or rotate temporary GitHub secrets immediately after the run.",
+      "Persist evidence only through the protected Manual QA Evidence route.",
+      "Export Buyer Diligence only after safe metadata is retained and packet hashes are visible."
+    ],
+    forbiddenContent:
+      "Never paste bearer tokens, refresh tokens, passwords, API keys, PHI, patient identifiers, payer member identifiers, artifact URLs, signed approvals, legal opinions, security reports, reimbursement determinations, source contracts, production credentials, or clinical records into QA evidence fields.",
+    completionCriteria: [
+      "Preflight passed for the short-lived AAL2 token.",
+      "Authenticated smoke passed against the explicit synthetic target.",
+      "Temporary secret was deleted or rotated after run completion.",
+      "Manual QA Evidence packet was persisted through the protected workspace session.",
+      "Packet hash and append-only audit event are visible in Buyer Pilot Room.",
+      "Buyer Diligence Export was generated after persistence."
+    ],
+    unresolvedBoundary:
+      "Authenticated QA evidence remains pending until a human operator performs the AAL2 run; code must not bypass this with committed credentials or long-lived secrets.",
+    nextAction:
+      "Use this activation plan to run Sales Demo Session QA and Authority Reference QA with fresh AAL2 tokens, persist only safe metadata, then export Buyer Diligence.",
+    updated: "2026-06-21"
+  };
+}
+
 function getCurrentDeploymentEvidence() {
   return {
     environment: process.env.VERCEL_ENV ?? "local-or-unset",
@@ -372,6 +570,7 @@ export function getQaEvidenceLedger() {
     salesDemoSessionQaBoundary,
     salesDemoSessionQaControls,
     tokenPolicy: salesDemoSessionQaTokenPolicy,
+    activationPlan: getQaEvidenceActivationPlan(),
     manualRunEvidenceCapture: qaManualRunEvidenceContract,
     manualRunEvidencePersistence: {
       route: qaManualRunEvidencePersistenceApiRoute,
@@ -651,6 +850,62 @@ export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) 
   ].join("\n");
 }
 
+export function buildQaEvidenceActivationPlanBrief() {
+  const plan = getQaEvidenceActivationPlan();
+
+  return [
+    "# SCRIMED Manual AAL2 QA Evidence Activation Plan",
+    "",
+    `Status: ${plan.status}`,
+    `Boundary: ${plan.boundary}`,
+    `Activation principle: ${plan.activationPrinciple}`,
+    "",
+    "## Shared Controls",
+    ...plan.sharedControls.map((control) => `- ${control}`),
+    "",
+    "## Forbidden Content",
+    plan.forbiddenContent,
+    "",
+    "## Workflows",
+    ...plan.workflows.flatMap((workflow) => [
+      `### ${workflow.name}`,
+      `- Workflow kind: ${workflow.workflowKind}`,
+      `- Status: ${workflow.status}`,
+      `- GitHub workflow: ${workflow.workflowPath}`,
+      `- Preflight script: ${workflow.preflightScript}`,
+      `- Smoke script: ${workflow.smokeScript}`,
+      `- Target input: ${workflow.targetInput}`,
+      `- Required temporary secret: ${workflow.requiredSecretName}`,
+      `- Persistence target: ${workflow.persistenceTarget}`,
+      `- Buyer Diligence impact: ${workflow.buyerDiligenceImpact}`,
+      `- Current boundary: ${workflow.currentBoundary}`,
+      `- Workaround: ${workflow.workaround}`,
+      `- Next action: ${workflow.nextAction}`,
+      "",
+      "Protected routes:",
+      ...workflow.protectedRoutes.map((route) => `- ${route}`),
+      "",
+      "Safe evidence fields:",
+      ...workflow.safeEvidenceFields.map((field) => `- ${field}`),
+      "",
+      "Prohibited inputs:",
+      ...workflow.prohibitedInputs.map((field) => `- ${field}`),
+      "",
+      "Operator steps:",
+      ...workflow.operatorSteps.map((step, index) => `${index + 1}. ${step}`),
+      ""
+    ]),
+    "## Completion Criteria",
+    ...plan.completionCriteria.map((criterion) => `- ${criterion}`),
+    "",
+    "## Remaining Boundary",
+    plan.unresolvedBoundary,
+    "",
+    "## Next Action",
+    plan.nextAction
+  ].join("\n");
+}
+
 export function buildQaEvidenceBrief() {
   const ledger = getQaEvidenceLedger();
 
@@ -685,6 +940,14 @@ export function buildQaEvidenceBrief() {
     `- Workflow: ${ledger.tokenPolicy.workflowPath}`,
     `- Required claims: ${ledger.tokenPolicy.requiredClaims.join(", ")}`,
     `- Max token lifetime seconds: ${ledger.tokenPolicy.maxTokenLifetimeSeconds}`,
+    "",
+    "## Manual AAL2 QA Activation Plan",
+    `- Status: ${ledger.activationPlan.status}`,
+    `- Route: ${ledger.activationPlan.route}`,
+    `- Brief: ${ledger.activationPlan.briefRoute}`,
+    `- Workflow count: ${ledger.activationPlan.workflowCount}`,
+    `- Completion criteria: ${ledger.activationPlan.completionCriteria.join("; ")}`,
+    `- Boundary: ${ledger.activationPlan.unresolvedBoundary}`,
     "",
     "## Next Recommended Build Step",
     ledger.nextRecommendedBuildStep

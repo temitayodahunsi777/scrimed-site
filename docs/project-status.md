@@ -2,6 +2,14 @@
 
 Updated: 2026-06-21
 
+## Latest Manual AAL2 QA Evidence Activation Plan Release
+
+- Added `GET /api/qa-evidence/activation-plan` and `GET /api/qa-evidence/activation-plan/brief` as a no-secret operator activation layer for the remaining human AAL2 QA gates.
+- Added typed activation workflows for Sales Demo Session QA and Authority Reference QA with workflow paths, preflight scripts, smoke scripts, target inputs, temporary secret names, safe evidence fields, prohibited inputs, operator steps, persistence target, Buyer Diligence impact, and retained boundaries.
+- Updated `/qa-evidence`, `/api/qa-evidence`, `/api/qa-evidence/brief`, Product Console proof stack, Product Readiness Brief, and public smoke coverage with `manual-aal2-qa-evidence-activation-plan-ready`.
+- Fixed manual evidence packet downloads so Authority Reference QA packets use an authority-reference filename instead of the sales-demo filename.
+- Preserved the boundary: the activation plan coordinates human-run QA only. It does not mint tokens, execute passkey ceremonies, bypass AAL2, store secrets, store PHI, certify compliance, grant security approval, create reimbursement certainty, authorize production connectors, or enable live clinical care.
+
 ## Latest Authority Reference QA Evidence Bridge Release
 
 - Added manual-only GitHub Actions workflow `.github/workflows/authority-reference-qa-smoke.yml` for protected Authority Reference QA execution against a short-lived AAL2 operator token and explicit workspace slug.

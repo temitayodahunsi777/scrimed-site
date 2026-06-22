@@ -15,6 +15,8 @@ Applies to:
 - `/qa-evidence`
 - `/api/qa-evidence`
 - `/api/qa-evidence/brief`
+- `/api/qa-evidence/activation-plan`
+- `/api/qa-evidence/activation-plan/brief`
 - `/api/qa-evidence/manual-run-packet`
 - `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`
 - `scripts/sales-demo-session-qa-token-policy-selftest.mjs`
@@ -66,42 +68,48 @@ The preflight does not verify the JWT signature. Signature and user verification
 
 ## Human Operator Flow
 
-1. Run the no-secret policy self-test after any token-policy code change.
+1. Review the no-secret activation plan before any manual authenticated QA run.
+
+```bash
+curl https://app.scrimedsolutions.com/api/qa-evidence/activation-plan/brief
+```
+
+2. Run the no-secret policy self-test after any token-policy code change.
 
 ```bash
 node scripts/sales-demo-session-qa-token-policy-selftest.mjs
 ```
 
-2. Open `/sales-operations`.
-3. Sign in with approved tenant-admin identity.
-4. Complete passkey or passwordless sign-in plus authenticator verification until the session reaches AAL2.
-5. Select the target Sales Operations opportunity and copy its `intakeId`.
-6. Mint or obtain the current access token only through the approved internal browser-session procedure.
-7. Place the token into an ephemeral shell variable only. Do not write it to `.env`, documentation, tickets, chat, logs, or source control.
-8. Run preflight:
+3. Open `/sales-operations`.
+4. Sign in with approved tenant-admin identity.
+5. Complete passkey or passwordless sign-in plus authenticator verification until the session reaches AAL2.
+6. Select the target Sales Operations opportunity and copy its `intakeId`.
+7. Mint or obtain the current access token only through the approved internal browser-session procedure.
+8. Place the token into an ephemeral shell variable only. Do not write it to `.env`, documentation, tickets, chat, logs, or source control.
+9. Run preflight:
 
 ```bash
 SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." node scripts/sales-demo-session-qa-token-preflight.mjs
 ```
 
-9. Run the smoke:
+10. Run the smoke:
 
 ```bash
 SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQUIRE_SALES_QA=1 node scripts/sales-demo-session-qa-smoke.mjs
 ```
 
-10. Optional read-only Command Center verification:
+11. Optional read-only Command Center verification:
 
 ```bash
 SCRIMED_SALES_QA_BEARER_TOKEN="..." SCRIMED_SALES_QA_INTAKE_ID="..." SCRIMED_REQUIRE_SALES_COMMAND_CENTER_QA=1 node scripts/sales-command-center-smoke.mjs
 ```
 
-11. Unset local shell variables immediately after the run.
-12. Sign out of the tenant-admin session if the token was copied outside the browser context.
-13. Review the Sales Operations audit trail, latest buyer demo session packet proof, and current Sales Command Center timeline.
-14. Preferred path: open `/pilot-workspace/access` with the same AAL2 browser session and use the Manual QA Evidence panel to persist the non-secret run metadata.
-15. Fallback path: POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet, then POST the same payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session.
-16. Export the Buyer Diligence Export after persistence so the manual QA evidence count, workflow run ID, packet hash, legal/privacy/security/safety boundaries, command-posture timeline, and production hard gates appear in enterprise diligence.
+12. Unset local shell variables immediately after the run.
+13. Sign out of the tenant-admin session if the token was copied outside the browser context.
+14. Review the Sales Operations audit trail, latest buyer demo session packet proof, and current Sales Command Center timeline.
+15. Preferred path: open `/pilot-workspace/access` with the same AAL2 browser session and use the Manual QA Evidence panel to persist the non-secret run metadata.
+16. Fallback path: POST only the non-secret run metadata to `/api/qa-evidence/manual-run-packet` to generate the sanitized evidence packet, then POST the same payload to `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets` with the current AAL2 tenant governance session.
+17. Export the Buyer Diligence Export after persistence so the manual QA evidence count, workflow run ID, packet hash, legal/privacy/security/safety boundaries, command-posture timeline, and production hard gates appear in enterprise diligence.
 
 Manual evidence packet payload:
 
@@ -203,6 +211,10 @@ Status: `short-lived-aal2-token-preflight-and-manual-ci-policy`
 Boundary: governed synthetic pilot and enterprise evaluation only.
 
 Evidence ledger: `/qa-evidence`
+
+Activation plan: `/api/qa-evidence/activation-plan`
+
+Activation plan brief: `/api/qa-evidence/activation-plan/brief`
 
 Manual evidence packet route: `/api/qa-evidence/manual-run-packet`
 

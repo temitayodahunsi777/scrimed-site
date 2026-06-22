@@ -52,9 +52,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const filename =
+    validation.input.workflowKind === "authority-reference-qa"
+      ? "scrimed-manual-authority-reference-qa-evidence-packet.md"
+      : "scrimed-manual-sales-demo-session-qa-evidence-packet.md";
+
   return new NextResponse(buildQaManualRunEvidencePacket(validation.input), {
     headers: {
-      "Content-Disposition": "attachment; filename=\"scrimed-manual-sales-demo-session-qa-evidence-packet.md\"",
+      "Content-Disposition": `attachment; filename="${filename}"`,
       "Content-Type": "text/markdown; charset=utf-8",
       "X-SCRIMED-Data-Boundary": "synthetic-only"
     }

@@ -76,6 +76,11 @@ The harness records one synthetic metadata-only authority reference, verifies th
 
 The manual GitHub workflow `.github/workflows/authority-reference-qa-smoke.yml` runs the same preflight and smoke path without scheduling authenticated mutations or committing credentials.
 
+Before dispatching the workflow, review the QA Evidence Activation Plan:
+
+- `/api/qa-evidence/activation-plan`
+- `/api/qa-evidence/activation-plan/brief`
+
 After a passing authenticated workflow run, copy only these safe values into `/pilot-workspace/access -> Manual QA Evidence`:
 
 - `workflowKind`: `authority-reference-qa`

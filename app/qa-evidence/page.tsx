@@ -34,6 +34,9 @@ export default function QaEvidencePage() {
           <a className="secondary-action" href={ledger.manualRunEvidenceCapture.route}>
             Capture Run Packet
           </a>
+          <a className="secondary-action" href={ledger.activationPlan.briefRoute}>
+            Download Activation Plan
+          </a>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
           </Link>
@@ -66,6 +69,10 @@ export default function QaEvidencePage() {
           <strong>{ledger.manualRunEvidenceCapture.status}</strong>
         </article>
         <article>
+          <span>Activation</span>
+          <strong>{ledger.activationPlan.status}</strong>
+        </article>
+        <article>
           <span>Persistence</span>
           <strong>{ledger.manualRunEvidencePersistence.status}</strong>
         </article>
@@ -95,6 +102,51 @@ export default function QaEvidencePage() {
             <strong>{commitSha}</strong>
           </div>
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA activation plan">
+        <div className="section-heading">
+          <p className="eyebrow">Activation plan</p>
+          <h2>Human AAL2 QA runs now have a no-secret sequence from workflow dispatch to Buyer Diligence export.</h2>
+          <p className="section-copy">{ledger.activationPlan.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>status</span>
+            <h3>{ledger.activationPlan.status}</h3>
+            <p>{ledger.activationPlan.activationPrinciple}</p>
+          </article>
+          <article>
+            <span>route</span>
+            <h3>{ledger.activationPlan.route}</h3>
+            <p>{ledger.activationPlan.forbiddenContent}</p>
+          </article>
+          <article>
+            <span>completion</span>
+            <h3>{ledger.activationPlan.completionCriteria.length} criteria</h3>
+            <p>{ledger.activationPlan.unresolvedBoundary}</p>
+          </article>
+        </div>
+        {ledger.activationPlan.workflows.map((workflow) => (
+          <article className="module-row" key={workflow.workflowKind}>
+            <div>
+              <span>{workflow.status}</span>
+              <h2>{workflow.name}</h2>
+            </div>
+            <p>{workflow.buyerDiligenceImpact}</p>
+            <div>
+              <strong>{workflow.workflowPath}</strong>
+              <ul className="compact-list">
+                <li>Target input: {workflow.targetInput}</li>
+                <li>Preflight: {workflow.preflightScript}</li>
+                <li>Smoke: {workflow.smokeScript}</li>
+                <li>Temporary secret: {workflow.requiredSecretName}</li>
+                <li>Persistence: {workflow.persistenceTarget}</li>
+                <li>Next: {workflow.nextAction}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED QA evidence entries">
