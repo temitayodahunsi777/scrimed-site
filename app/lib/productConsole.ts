@@ -117,6 +117,11 @@ import {
   qaExecutionReadinessProofStackStatus
 } from "./qaExecutionReadiness";
 import {
+  getQaRunControlSummary,
+  qaRunControlBriefProofStackStatus,
+  qaRunControlProofStackStatus
+} from "./qaRunControl";
+import {
   clinicalCareActivationProofStackStatus,
   getClinicalCareActivationSummary
 } from "./clinicalCareActivation";
@@ -807,6 +812,7 @@ export function getProductConsoleSummary() {
   const salesDealRoomSummary = getSalesDealRoomSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaExecutionReadinessSummary = getQaExecutionReadinessSummary();
+  const qaRunControlSummary = getQaRunControlSummary();
   const clinicalCareActivationSummary = getClinicalCareActivationSummary();
   const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
   const productAgents = getProductAgents();
@@ -991,6 +997,9 @@ export function getProductConsoleSummary() {
     qaExecutionReadinessRoute: qaExecutionReadinessSummary.route,
     qaExecutionReadinessApiRoute: qaExecutionReadinessSummary.apiRoute,
     qaExecutionReadinessBriefRoute: qaExecutionReadinessSummary.briefRoute,
+    qaRunControlRoute: qaRunControlSummary.route,
+    qaRunControlApiRoute: qaRunControlSummary.apiRoute,
+    qaRunControlBriefRoute: qaRunControlSummary.briefRoute,
     qaManualRunEvidencePacketRoute: qaEvidenceLedger.manualRunEvidenceCapture.route,
     qaManualRunEvidencePersistenceRoute:
       qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute,
@@ -1012,6 +1021,10 @@ export function getProductConsoleSummary() {
     qaExecutionReadinessStageCount: qaExecutionReadinessSummary.stageCount,
     qaExecutionReadinessHumanRequiredStageCount:
       qaExecutionReadinessSummary.humanRequiredStages,
+    qaRunControlWorkflowCount: qaRunControlSummary.workflowCount,
+    qaRunControlGateCount: qaRunControlSummary.gateCount,
+    qaRunControlCommandTemplateCount: qaRunControlSummary.commandTemplateCount,
+    qaRunControlEvidenceTemplateCount: qaRunControlSummary.evidenceTemplateCount,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -1124,6 +1137,7 @@ export function getProductConsoleSummary() {
     sourceIntelligenceSummary,
     qaEvidenceLedger,
     qaExecutionReadinessSummary,
+    qaRunControlSummary,
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
     proofStack: {
@@ -1243,6 +1257,8 @@ export function getProductConsoleSummary() {
       qaEvidenceActivationPlan: qaEvidenceActivationPlanStatus,
       qaExecutionReadiness: qaExecutionReadinessProofStackStatus,
       qaExecutionReadinessBrief: qaExecutionReadinessBriefProofStackStatus,
+      qaRunControl: qaRunControlProofStackStatus,
+      qaRunControlBrief: qaRunControlBriefProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -1357,6 +1373,13 @@ export function getProductReadinessBrief() {
     `Manual AAL2 QA Execution Stages: ${summary.qaExecutionReadinessStageCount}`,
     `Manual AAL2 QA Human Required Stages: ${summary.qaExecutionReadinessHumanRequiredStageCount}`,
     summary.qaExecutionReadinessSummary.buyerClaimStatus,
+    `Manual AAL2 QA Run Control: ${summary.qaRunControlRoute}`,
+    `Manual AAL2 QA Run Control API: ${summary.qaRunControlApiRoute}`,
+    `Manual AAL2 QA Run Control Brief: ${summary.qaRunControlBriefRoute}`,
+    `Manual AAL2 QA Run Control Workflows: ${summary.qaRunControlWorkflowCount}`,
+    `Manual AAL2 QA Run Control Gates: ${summary.qaRunControlGateCount}`,
+    `Manual AAL2 QA Run Control Commands: ${summary.qaRunControlCommandTemplateCount}`,
+    summary.qaRunControlSummary.buyerClaimStatus,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

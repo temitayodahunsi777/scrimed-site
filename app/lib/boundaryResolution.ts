@@ -240,6 +240,7 @@ export function getBoundaryResolutionSummary() {
     owner: "SCRIMED operator, release engineering, and tenant governance owner",
     proofRoutes: [
       "/qa-execution-readiness",
+      "/qa-run-control",
       qaActivationPlan.route,
       qaActivationPlan.briefRoute,
       workflow.workflowPath,
@@ -334,7 +335,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-execution-readiness to run the first human AAL2 QA workflow, persist the safe evidence packet, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
+      "Use /qa-run-control to execute the first human AAL2 QA workflow with the no-secret operator brief, persist the safe evidence packet, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
     records,
     updated: "2026-06-21"
   };

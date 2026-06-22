@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
+import { getQaRunControlSummary } from "../lib/qaRunControl";
 
 export const metadata = {
   title: "SCRIMED Manual AAL2 QA Execution Readiness",
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default function QaExecutionReadinessPage() {
   const summary = getQaExecutionReadinessSummary();
+  const runControl = getQaRunControlSummary();
 
   return (
     <main>
@@ -24,6 +26,7 @@ export default function QaExecutionReadinessPage() {
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Execution Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
+          <Link className="secondary-action" href={runControl.route}>Run Control</Link>
           <Link className="secondary-action" href="/qa-evidence">QA Ledger</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
           <Link className="secondary-action" href="/boundary-resolution">Boundary Register</Link>
@@ -103,6 +106,32 @@ export default function QaExecutionReadinessPage() {
                 <li>Safe fields: {workflow.safeEvidenceFields.join(", ")}</li>
               </ul>
             </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Manual AAL2 QA run-control bridge">
+        <div className="section-heading">
+          <p className="eyebrow">Run-control bridge</p>
+          <h2>The next operator step is controlled dispatch, not a code bypass.</h2>
+          <p className="section-copy">{runControl.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={runControl.route}>
+              Open Run Control
+            </Link>
+            <a className="secondary-action" href={runControl.briefRoute}>
+              Download Run-Control Brief
+            </a>
+          </div>
+        </div>
+        {runControl.gates.slice(0, 4).map((gate) => (
+          <article className="module-row" key={gate.gate}>
+            <div>
+              <span>{gate.state}</span>
+              <h2>{gate.gate}</h2>
+            </div>
+            <p>{gate.passSignal}</p>
+            <strong>{gate.failSignal}</strong>
           </article>
         ))}
       </section>

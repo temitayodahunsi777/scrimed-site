@@ -359,6 +359,9 @@ export default function ManualQaEvidencePanel({
         </div>
 
         <div className="form-actions">
+          <a className="secondary-action" href="/qa-run-control">
+            Open Run Control
+          </a>
           <button className="primary-action" disabled={status === "saving"} type="submit">
             {status === "saving" ? "Persisting Evidence" : "Persist Manual QA Evidence"}
           </button>

@@ -249,13 +249,14 @@ export function getQaExecutionReadinessSummary() {
     ],
     buyerDiligenceSequence: [
       activationPlan.briefRoute,
+      "/qa-run-control",
       ledger.manualRunEvidenceCapture.route,
       ledger.manualRunEvidenceCapture.protectedPersistenceRoute,
       "/pilot-workspace/access#buyer-pilot-room",
       "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet"
     ],
     nextRecommendedBuildStep:
-      "Run one workflow from this readiness layer with a fresh human AAL2 token, delete or rotate the temporary secret, persist only safe metadata, then export Buyer Diligence after the packet hash appears.",
+      "Open /qa-run-control, run one workflow with its no-secret operator brief and a fresh human AAL2 token, delete or rotate the temporary secret, persist only safe metadata, then export Buyer Diligence after the packet hash appears.",
     updated: "2026-06-21"
   };
 }

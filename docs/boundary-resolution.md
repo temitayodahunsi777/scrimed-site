@@ -9,7 +9,7 @@ The register aggregates known limits from:
 - Clinical Authority Readiness
 - Clinical Care Activation
 - Persistent Agent Workspace limitations
-- QA Evidence Ledger and Manual AAL2 Activation Plan
+- QA Evidence Ledger, Manual AAL2 Activation Plan, Execution Readiness, and Run Control
 - Public Market Readiness limitations
 
 ## Operating Purpose
@@ -35,4 +35,4 @@ Do not treat a safe workaround as external approval. If a record says `human-aal
 
 ## Next Step
 
-Use `/qa-execution-readiness` to run the first deliberate short-lived human AAL2 QA workflow, persist the safe packet metadata through the protected workspace, then link that retained proof into Buyer Pilot Room and Boundary Resolution evidence.
+Use `/qa-run-control` to execute the first deliberate short-lived human AAL2 QA workflow with a no-secret operator brief, persist the safe packet metadata through the protected workspace, then link that retained proof into Buyer Pilot Room and Boundary Resolution evidence.

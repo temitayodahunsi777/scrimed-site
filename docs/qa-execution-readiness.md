@@ -36,4 +36,4 @@ Not allowed yet:
 
 ## Next Step
 
-Run one workflow from the execution-readiness layer with a fresh human AAL2 token, delete or rotate the temporary secret, persist only safe metadata, then export Buyer Diligence after the packet hash appears.
+Open `/qa-run-control`, use its workflow-specific no-secret operator brief for the first fresh human AAL2 run, delete or rotate the temporary secret, persist only safe metadata, then export Buyer Diligence after the packet hash appears.

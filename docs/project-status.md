@@ -2,6 +2,14 @@
 
 Updated: 2026-06-21
 
+## Latest Manual AAL2 QA Run Control Release
+
+- Added `/qa-run-control`, `/api/qa-evidence/run-control`, and `/api/qa-evidence/run-control/brief` as the no-secret mission-control layer for first human AAL2 synthetic QA runs.
+- Added workflow-specific dispatch inputs, preflight command templates, smoke command templates, safe evidence payload templates, abort conditions, operator sequences, and buyer-proof promotion rules for Sales Demo Session QA and Authority Reference QA.
+- Updated `/qa-evidence`, `/qa-execution-readiness`, `/product`, Product Console proof stack, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution proof routes, and public smoke coverage with run-control visibility.
+- Added `docs/qa-run-control.md` as the operator runbook for using Run Control before touching a short-lived AAL2 token.
+- Preserved the boundary: Run Control does not execute passkey ceremonies, mint tokens, store credentials, run unattended authenticated CI, process PHI, authorize clinical care, certify security or compliance, guarantee reimbursement, approve production connectors, or claim retained authenticated proof before protected no-secret evidence is persisted.
+
 ## Latest Manual AAL2 QA Execution Readiness Release
 
 - Added `/qa-execution-readiness`, `/api/qa-evidence/execution-readiness`, and `/api/qa-evidence/execution-readiness/brief` as the no-secret go/no-go layer for the remaining human AAL2 QA workflows.

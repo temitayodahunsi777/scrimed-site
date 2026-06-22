@@ -340,6 +340,29 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
       "Run each manual AAL2 QA workflow from the plan, persist only safe metadata, then export Buyer Diligence after packet hashes appear."
   },
   {
+    id: "manual-aal2-qa-run-control",
+    name: "Manual AAL2 QA run control",
+    status: "workaround-active",
+    owner: "Release engineering and TrustOS",
+    recordedAt: "2026-06-21",
+    artifact: "/api/qa-evidence/run-control",
+    routes: [
+      "/qa-run-control",
+      "/api/qa-evidence/run-control",
+      "/api/qa-evidence/run-control/brief",
+      qaManualRunEvidencePacketApiRoute,
+      qaManualRunEvidencePersistenceApiRoute
+    ],
+    evidence:
+      "A no-secret run-control layer gives operators workflow-specific dispatch inputs, preflight command templates, smoke command templates, safe evidence payloads, abort conditions, and buyer-proof promotion rules before any human AAL2 token is used.",
+    limitation:
+      "Run Control prepares the first authenticated synthetic QA run; it still does not execute passkey ceremonies, mint tokens, store credentials, or claim retained authenticated evidence.",
+    workaround:
+      "Use Run Control as the mandatory mission brief before the human workflow dispatch, then persist only safe packet metadata after token disposal.",
+    nextAction:
+      "Use /qa-run-control during the first Sales Demo Session QA or Authority Reference QA human AAL2 run, then persist the packet hash through Manual QA Evidence."
+  },
+  {
     id: "manual-run-evidence-capture",
     name: "Manual AAL2 run evidence capture",
     status: "workaround-active",
@@ -421,9 +444,9 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     impact:
       "SCRIMED has the workflow and token policy, but cannot claim an authenticated CI mutation run until a fresh AAL2 operator token is used deliberately.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, explicit intake targeting, fail-closed public smoke, and no long-lived secret storage.",
+      "Manual-only GitHub workflow, short-lived JWT preflight, explicit intake targeting, Run Control mission brief, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
-      "Mint a fresh AAL2 token from the tenant-admin session, run the workflow once against a synthetic intake ID, archive the result, and delete or rotate the token secret.",
+      "Use /qa-run-control, mint a fresh AAL2 token from the tenant-admin session, run the workflow once against a synthetic intake ID, archive only safe IDs, persist the packet hash, and delete or rotate the token secret.",
     status: "manual-action-required"
   },
   {
@@ -431,9 +454,9 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     impact:
       "SCRIMED has the protected authority-reference QA harness and renewal queue, but cannot claim an authenticated authority-reference mutation run until a fresh AAL2 operator token is used deliberately.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, fail-closed public smoke, and no long-lived secret storage.",
+      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, Run Control mission brief, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
-      "Mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, then delete or rotate the token secret.",
+      "Use /qa-run-control, mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, then delete or rotate the token secret.",
     status: "manual-action-required"
   },
   {
@@ -583,7 +606,7 @@ export function getQaEvidenceLedger() {
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, token-policy readiness, and no-secret evidence capture today; remaining authenticated QA evidence requires deliberate short-lived AAL2 operator runs against synthetic targets.",
     nextRecommendedBuildStep:
-      "Use /qa-execution-readiness to run the Sales Demo Session QA and Authority Reference QA manual workflows with fresh short-lived AAL2 tokens, generate no-secret manual-run evidence packets, persist them through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
+      "Use /qa-run-control to run the Sales Demo Session QA and Authority Reference QA manual workflows with fresh short-lived AAL2 tokens, generate no-secret manual-run evidence packets, persist them through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
     updated: "2026-06-21"
   };
 }

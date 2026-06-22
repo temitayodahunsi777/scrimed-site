@@ -97,6 +97,14 @@ export default function ProductConsolePage() {
           <strong>{summary.qaExecutionReadinessWorkflowCount}</strong>
         </article>
         <article>
+          <span>QA run gates</span>
+          <strong>{summary.qaRunControlGateCount}</strong>
+        </article>
+        <article>
+          <span>QA commands</span>
+          <strong>{summary.qaRunControlCommandTemplateCount}</strong>
+        </article>
+        <article>
           <span>Clinical blocked</span>
           <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
         </article>
@@ -247,6 +255,40 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>Accepted: {stage.evidenceAccepted.join(", ")}</li>
                 <li>{stage.productionBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA run control">
+        <div className="section-heading">
+          <p className="eyebrow">AAL2 QA run control</p>
+          <h2>Run Control gives operators the exact no-secret mission brief for the first authenticated synthetic QA run.</h2>
+          <p className="section-copy">{summary.qaRunControlSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaRunControlRoute}>
+              Open QA Run Control
+            </Link>
+            <a className="secondary-action" href={summary.qaRunControlBriefRoute}>
+              Download Run-Control Brief
+            </a>
+          </div>
+        </div>
+        {summary.qaRunControlSummary.workflows.map((workflow) => (
+          <article className="module-row" key={workflow.workflowKind}>
+            <div>
+              <span>{workflow.state}</span>
+              <h2>{workflow.name}</h2>
+            </div>
+            <p>{workflow.buyerProofPromotionRule}</p>
+            <div>
+              <strong>{workflow.dispatchPath}</strong>
+              <ul className="compact-list">
+                <li>Temporary secret: {workflow.temporarySecret}</li>
+                <li>Command templates: 2</li>
+                <li>Evidence route: {workflow.evidencePacketRoute}</li>
+                <li>Persistence: {workflow.protectedPersistenceRoute}</li>
               </ul>
             </div>
           </article>

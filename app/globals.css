@@ -944,6 +944,14 @@ h3 {
   padding: 28px 0;
 }
 
+.module-row-stack {
+  display: block;
+}
+
+.module-row-stack > * + * {
+  margin-top: 22px;
+}
+
 .module-row h2 {
   font-size: 28px;
   margin-bottom: 0;
@@ -995,6 +1003,20 @@ h3 {
 .compact-list li {
   border-top: 1px solid var(--line);
   padding-top: 8px;
+}
+
+.code-block {
+  background: #f7faf8;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.55;
+  margin-top: 16px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .hub-summary {

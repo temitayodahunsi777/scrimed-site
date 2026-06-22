@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
+import { getQaRunControlSummary } from "../lib/qaRunControl";
 
 export const metadata = {
   title: "SCRIMED QA Evidence Ledger",
@@ -11,6 +12,7 @@ export const metadata = {
 export default function QaEvidencePage() {
   const ledger = getQaEvidenceLedger();
   const executionReadiness = getQaExecutionReadinessSummary();
+  const runControl = getQaRunControlSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
       ? ledger.currentDeployment.commitSha
@@ -41,6 +43,9 @@ export default function QaEvidencePage() {
           </a>
           <Link className="secondary-action" href={executionReadiness.route}>
             Execution Readiness
+          </Link>
+          <Link className="secondary-action" href={runControl.route}>
+            Run Control
           </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
@@ -84,6 +89,10 @@ export default function QaEvidencePage() {
         <article>
           <span>Execution</span>
           <strong>{executionReadiness.executionDecision}</strong>
+        </article>
+        <article>
+          <span>Run control</span>
+          <strong>{runControl.executionDecision}</strong>
         </article>
         <article>
           <span>Data boundary</span>
@@ -185,6 +194,40 @@ export default function QaEvidencePage() {
                 <li>Target: {workflow.targetInput}</li>
                 <li>Temporary secret: {workflow.temporarySecret}</li>
                 <li>Next: {workflow.nextAction}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA run control">
+        <div className="section-heading">
+          <p className="eyebrow">Run control</p>
+          <h2>Operators now have workflow-specific dispatch inputs, command templates, and safe evidence payloads before touching a token.</h2>
+          <p className="section-copy">{runControl.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={runControl.route}>
+              Open Run Control
+            </Link>
+            <a className="secondary-action" href={runControl.briefRoute}>
+              Download Run-Control Brief
+            </a>
+          </div>
+        </div>
+        {runControl.workflows.map((workflow) => (
+          <article className="module-row" key={workflow.workflowKind}>
+            <div>
+              <span>{workflow.state}</span>
+              <h2>{workflow.name}</h2>
+            </div>
+            <p>{workflow.buyerProofPromotionRule}</p>
+            <div>
+              <strong>{workflow.dispatchPath}</strong>
+              <ul className="compact-list">
+                <li>Temporary secret: {workflow.temporarySecret}</li>
+                <li>Evidence route: {workflow.evidencePacketRoute}</li>
+                <li>Persistence: {workflow.protectedPersistenceRoute}</li>
+                <li>Abort conditions: {workflow.abortConditions.length}</li>
               </ul>
             </div>
           </article>
