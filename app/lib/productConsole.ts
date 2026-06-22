@@ -127,6 +127,11 @@ import {
   qaLaunchKitProofStackStatus
 } from "./qaLaunchKit";
 import {
+  getQaHumanRunPacketSummary,
+  qaHumanRunPacketBriefProofStackStatus,
+  qaHumanRunPacketProofStackStatus
+} from "./qaHumanRunPacket";
+import {
   getQaCompletionBridgeSummary,
   qaCompletionBridgeBriefProofStackStatus,
   qaCompletionBridgeProofStackStatus
@@ -839,6 +844,7 @@ export function getProductConsoleSummary() {
   const qaExecutionReadinessSummary = getQaExecutionReadinessSummary();
   const qaRunControlSummary = getQaRunControlSummary();
   const qaLaunchKitSummary = getQaLaunchKitSummary();
+  const qaHumanRunPacketSummary = getQaHumanRunPacketSummary();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
   const qaClaimGuardSummary = getQaClaimGuardSummary();
   const qaActivationSealSummary = getQaActivationSealSummary();
@@ -1033,6 +1039,9 @@ export function getProductConsoleSummary() {
     qaLaunchKitRoute: qaLaunchKitSummary.route,
     qaLaunchKitApiRoute: qaLaunchKitSummary.apiRoute,
     qaLaunchKitBriefRoute: qaLaunchKitSummary.briefRoute,
+    qaHumanRunPacketRoute: qaHumanRunPacketSummary.route,
+    qaHumanRunPacketApiRoute: qaHumanRunPacketSummary.apiRoute,
+    qaHumanRunPacketBriefRoute: qaHumanRunPacketSummary.briefRoute,
     qaCompletionBridgeRoute: qaCompletionBridgeSummary.route,
     qaCompletionBridgeApiRoute: qaCompletionBridgeSummary.apiRoute,
     qaCompletionBridgeBriefRoute: qaCompletionBridgeSummary.briefRoute,
@@ -1074,6 +1083,11 @@ export function getProductConsoleSummary() {
     qaLaunchKitWorkflowCount: qaLaunchKitSummary.workflowCount,
     qaLaunchKitSafeCopyFieldCount: qaLaunchKitSummary.safeCopyFieldCount,
     qaLaunchKitBlockedClaimCount: qaLaunchKitSummary.blockedClaimCount,
+    qaHumanRunPacketWorkflowCount: qaHumanRunPacketSummary.workflowCount,
+    qaHumanRunPacketControlCount: qaHumanRunPacketSummary.controlCount,
+    qaHumanRunPacketHardStopControlCount: qaHumanRunPacketSummary.hardStopControlCount,
+    qaHumanRunPacketPostRunRouteCount: qaHumanRunPacketSummary.postRunRouteCount,
+    qaHumanRunPacketBlockedClaimCount: qaHumanRunPacketSummary.blockedClaimCount,
     qaCompletionBridgeCheckpointCount: qaCompletionBridgeSummary.checkpointCount,
     qaCompletionBridgeHardStopCount: qaCompletionBridgeSummary.hardStopCount,
     qaCompletionBridgeSafeFieldCount: qaCompletionBridgeSummary.safeFieldCount,
@@ -1204,6 +1218,7 @@ export function getProductConsoleSummary() {
     qaExecutionReadinessSummary,
     qaRunControlSummary,
     qaLaunchKitSummary,
+    qaHumanRunPacketSummary,
     qaCompletionBridgeSummary,
     qaClaimGuardSummary,
     qaActivationSealSummary,
@@ -1331,6 +1346,8 @@ export function getProductConsoleSummary() {
       qaRunControlBrief: qaRunControlBriefProofStackStatus,
       qaLaunchKit: qaLaunchKitProofStackStatus,
       qaLaunchKitBrief: qaLaunchKitBriefProofStackStatus,
+      qaHumanRunPacket: qaHumanRunPacketProofStackStatus,
+      qaHumanRunPacketBrief: qaHumanRunPacketBriefProofStackStatus,
       qaCompletionBridge: qaCompletionBridgeProofStackStatus,
       qaCompletionBridgeBrief: qaCompletionBridgeBriefProofStackStatus,
       qaClaimGuard: qaClaimGuardProofStackStatus,
@@ -1370,7 +1387,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-22"
   };
 }
@@ -1468,6 +1485,15 @@ export function getProductReadinessBrief() {
     `Manual AAL2 QA Launch Kit Safe Copy Fields: ${summary.qaLaunchKitSafeCopyFieldCount}`,
     `Manual AAL2 QA Launch Kit Blocked Claims: ${summary.qaLaunchKitBlockedClaimCount}`,
     summary.qaLaunchKitSummary.launchDecision,
+    `QA Human Run Packet: ${summary.qaHumanRunPacketRoute}`,
+    `QA Human Run Packet API: ${summary.qaHumanRunPacketApiRoute}`,
+    `QA Human Run Packet Brief: ${summary.qaHumanRunPacketBriefRoute}`,
+    `QA Human Run Packet Workflows: ${summary.qaHumanRunPacketWorkflowCount}`,
+    `QA Human Run Packet Controls: ${summary.qaHumanRunPacketControlCount}`,
+    `QA Human Run Packet Hard Stops: ${summary.qaHumanRunPacketHardStopControlCount}`,
+    `QA Human Run Packet Post-Run Routes: ${summary.qaHumanRunPacketPostRunRouteCount}`,
+    `QA Human Run Packet Blocked Claims: ${summary.qaHumanRunPacketBlockedClaimCount}`,
+    summary.qaHumanRunPacketSummary.decisionState,
     `QA Completion Bridge: ${summary.qaCompletionBridgeRoute}`,
     `QA Completion Bridge API: ${summary.qaCompletionBridgeApiRoute}`,
     `QA Completion Bridge Brief: ${summary.qaCompletionBridgeBriefRoute}`,

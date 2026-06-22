@@ -24,6 +24,7 @@ It includes:
 - post-run safe-copy fields
 - secret-disposal requirements
 - protected persistence routes
+- QA Human Run Packet dispatch validation
 - QA Completion Bridge validation
 - Claim Guard and Activation Seal checks
 - Proof Promotion checks
@@ -39,15 +40,16 @@ The Launch Kit does not execute passkey ceremonies, mint tokens, store credentia
 2. Confirm a fresh approved human AAL2 browser session.
 3. Select exactly one synthetic target.
 4. Create only the workflow-specific temporary masked GitHub Actions secret.
-5. Run the workflow preflight.
-6. Dispatch the manual workflow with `require_authenticated_path=true`.
-7. Copy only safe IDs and timestamps.
-8. Delete or rotate the temporary secret.
-9. Validate the no-secret candidate metadata through `/qa-completion-bridge`.
-10. Generate and persist the no-secret evidence packet through `/pilot-workspace/access` -> Manual QA Evidence only after the bridge accepts it.
-11. Open `/qa-activation-seal`.
-12. Open `/qa-proof-promotion`.
-13. Export Buyer Diligence only after the retained packet hash and audit event are visible.
+5. Open `/qa-human-run-packet` and validate the bounded dispatch candidate.
+6. Run the workflow preflight.
+7. Dispatch the manual workflow with `require_authenticated_path=true`.
+8. Copy only safe IDs and timestamps.
+9. Delete or rotate the temporary secret.
+10. Validate the no-secret candidate metadata through `/qa-completion-bridge`.
+11. Generate and persist the no-secret evidence packet through `/pilot-workspace/access` -> Manual QA Evidence only after the bridge accepts it.
+12. Open `/qa-activation-seal`.
+13. Open `/qa-proof-promotion`.
+14. Export Buyer Diligence only after the retained packet hash and audit event are visible.
 
 ## Hard Stops
 
@@ -59,4 +61,4 @@ The Launch Kit does not execute passkey ceremonies, mint tokens, store credentia
 
 ## Next Step
 
-Have an approved tenant-admin operator use `/qa-launch-kit` to run one workflow with a fresh short-lived AAL2 token, validate safe metadata through `/qa-completion-bridge`, persist only accepted metadata, then confirm `/qa-activation-seal` and `/qa-proof-promotion` before exporting Buyer Diligence.
+Have an approved tenant-admin operator use `/qa-human-run-packet` to dispatch one workflow with a fresh short-lived AAL2 token, validate safe metadata through `/qa-completion-bridge`, persist only accepted metadata, then confirm `/qa-activation-seal`, `/qa-proof-promotion`, and `/qa-claim-guard` before exporting Buyer Diligence.

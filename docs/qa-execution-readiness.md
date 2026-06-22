@@ -37,6 +37,6 @@ Not allowed yet:
 
 ## Next Step
 
-Open `/qa-launch-kit`, use its no-secret operator handoff for the first fresh human AAL2 run, delete or rotate the temporary secret, validate the candidate metadata through `/qa-completion-bridge`, persist only accepted safe metadata, then export Buyer Diligence after the packet hash appears.
+Open `/qa-launch-kit`, validate the bounded dispatch through `/qa-human-run-packet`, use the no-secret operator handoff for the first fresh human AAL2 run, delete or rotate the temporary secret, validate the candidate metadata through `/qa-completion-bridge`, persist only accepted safe metadata, then export Buyer Diligence after the packet hash appears.
 
 Before exporting, open `/qa-proof-promotion` and confirm retained-packet promotion is allowed. If the promotion state is still `pending-retained-packet`, keep buyer-facing language at activation readiness only.

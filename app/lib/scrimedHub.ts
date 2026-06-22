@@ -95,6 +95,11 @@ import {
   qaActivationSealBriefRoute,
   qaActivationSealRoute
 } from "./qaActivationSeal";
+import {
+  qaHumanRunPacketApiRoute,
+  qaHumanRunPacketBriefRoute,
+  qaHumanRunPacketRoute
+} from "./qaHumanRunPacket";
 
 export type HubModule = {
   name: string;
@@ -215,6 +220,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Release engineering, TrustOS, security, and tenant governance",
     objective: "Package the no-secret human-run AAL2 workflow handoff before retained authenticated QA proof can be claimed."
+  },
+  {
+    name: "QA Human Run Packet",
+    route: qaHumanRunPacketRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release engineering, TrustOS, security, tenant governance, and Buyer Diligence",
+    objective: "Convert launch readiness into a bounded no-secret dispatch artifact for the approved human AAL2 synthetic QA run."
   },
   {
     name: "QA Completion Bridge",
@@ -359,6 +372,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "QA Human Run Packet",
+    value: "dispatch packet ready; retained proof blocked",
+    tone: "good"
+  },
+  {
     name: "QA Completion Bridge",
     value: "no-secret pre-persistence validation ready",
     tone: "good"
@@ -443,6 +461,9 @@ export const hubRoutes = [
   "/qa-launch-kit",
   "/api/qa-evidence/launch-kit",
   "/api/qa-evidence/launch-kit/brief",
+  qaHumanRunPacketRoute,
+  qaHumanRunPacketApiRoute,
+  qaHumanRunPacketBriefRoute,
   qaCompletionBridgeRoute,
   qaCompletionBridgeApiRoute,
   qaCompletionBridgeBriefRoute,

@@ -176,7 +176,7 @@ Completed foundations:
 Next build targets:
 
 - Add finance-approved allocation methodology records, external-use approval workflows, rolling buyer-segment cohort comparison, and counsel-reviewed investor/marketing material gates once qualified finance methodology and external-use policy are approved.
-- Use `/qa-claim-guard` for every buyer or external claim while `/qa-launch-kit`, `/qa-completion-bridge`, protected persistence, `/qa-activation-seal`, and `/qa-proof-promotion` remain the required sequence for packet-backed manual QA evidence.
+- Use `/qa-human-run-packet` for the first approved human AAL2 synthetic dispatch while `/qa-completion-bridge`, protected persistence, `/qa-activation-seal`, `/qa-proof-promotion`, and `/qa-claim-guard` remain the required sequence for packet-backed manual QA evidence.
 - Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, generate the sanitized packet through `/api/qa-evidence/manual-run-packet`, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.

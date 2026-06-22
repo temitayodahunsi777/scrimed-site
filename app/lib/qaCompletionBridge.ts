@@ -188,6 +188,7 @@ export function getQaCompletionBridgeSummary() {
     completionDecisionState: "waiting-for-human-aal2-run" as QaCompletionBridgeDecisionState,
     buyerClaimStatus: "completion-bridge-ready-not-retained-authenticated-proof",
     launchKitRoute: qaLaunchKitRoute,
+    humanRunPacketRoute: "/qa-human-run-packet",
     launchKitStatus: launchKit.status,
     proofPromotionRoute: qaProofPromotionRoute,
     proofPromotionState: proofPromotion.promotionDecisionState,
@@ -211,7 +212,7 @@ export function getQaCompletionBridgeSummary() {
       "Required next: use the protected AAL2 workspace persistence route, then Proof Promotion."
     ],
     nextRecommendedBuildStep:
-      "After the approved operator completes one Launch Kit workflow, run the no-secret metadata through QA Completion Bridge, persist it through the protected Manual QA Evidence route, then confirm Proof Promotion before exporting Buyer Diligence.",
+      "After the approved operator uses /qa-human-run-packet and completes one synthetic workflow, run the no-secret metadata through QA Completion Bridge, persist it through the protected Manual QA Evidence route, then confirm Claim Guard, Activation Seal, and Proof Promotion before exporting Buyer Diligence.",
     updated: "2026-06-22"
   };
 }
@@ -231,6 +232,7 @@ export function buildQaCompletionBridgeBrief() {
     "",
     "## Routes",
     `- Launch Kit: ${summary.launchKitRoute}`,
+    `- Human Run Packet: ${summary.humanRunPacketRoute}`,
     `- Completion Bridge: ${summary.route}`,
     `- Completion Bridge API: ${summary.apiRoute}`,
     `- Manual packet route: ${summary.manualPacketRoute}`,

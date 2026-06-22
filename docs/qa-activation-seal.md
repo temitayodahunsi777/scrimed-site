@@ -10,6 +10,7 @@ It exists to prevent a common failure mode: treating a public packet preview, op
 - Public API: `/api/qa-evidence/activation-seal`
 - Downloadable brief: `/api/qa-evidence/activation-seal/brief`
 - Launch Kit: `/qa-launch-kit`
+- Human Run Packet: `/qa-human-run-packet`
 - Completion Bridge: `/qa-completion-bridge`
 - Claim Guard: `/qa-claim-guard`
 - Proof Promotion: `/qa-proof-promotion`
@@ -38,13 +39,14 @@ Public checks can validate candidate completeness only. They cannot prove protec
 ## Operating Sequence
 
 1. Use `/qa-launch-kit` before touching a short-lived AAL2 token.
-2. Complete exactly one human-run synthetic workflow.
-3. Delete or rotate the temporary token secret.
-4. Validate the no-secret candidate through `/qa-completion-bridge`.
-5. Persist the same safe metadata through protected Manual QA Evidence.
-6. Confirm `/qa-proof-promotion` sees retained packet evidence.
-7. Run `/qa-claim-guard` against buyer, investor, sales, PR, or operator language.
-8. Use `/qa-activation-seal` as the final buyer-proof posture check.
+2. Validate the bounded dispatch through `/qa-human-run-packet`.
+3. Complete exactly one human-run synthetic workflow.
+4. Delete or rotate the temporary token secret.
+5. Validate the no-secret candidate through `/qa-completion-bridge`.
+6. Persist the same safe metadata through protected Manual QA Evidence.
+7. Confirm `/qa-proof-promotion` sees retained packet evidence.
+8. Run `/qa-claim-guard` against buyer, investor, sales, PR, or operator language.
+9. Use `/qa-activation-seal` as the final buyer-proof posture check.
 
 ## Allowed Language
 

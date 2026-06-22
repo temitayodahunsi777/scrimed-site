@@ -18,11 +18,12 @@ It classifies claims into:
 - Operator page: `/qa-claim-guard`
 - Public API: `/api/qa-evidence/claim-guard`
 - Downloadable brief: `/api/qa-evidence/claim-guard/brief`
+- Human run packet: `/qa-human-run-packet`
 - Activation seal: `/qa-activation-seal`
 
 ## Current Safe Position
 
-SCRIMED may say it has a governed no-secret synthetic QA readiness path with human AAL2 gates, Completion Bridge validation, protected persistence, and Proof Promotion boundaries.
+SCRIMED may say it has a governed no-secret synthetic QA readiness path with human AAL2 gates, Human Run Packet dispatch controls, Completion Bridge validation, protected persistence, and Proof Promotion boundaries.
 
 SCRIMED may not yet say it has retained authenticated manual AAL2 QA proof unless the protected packet hash is visible and Proof Promotion allows packet-backed language.
 

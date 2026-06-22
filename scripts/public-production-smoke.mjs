@@ -254,6 +254,37 @@ function requireQaLaunchKitBoundary(label, response) {
   }
 }
 
+function requireQaHumanRunPacketBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const humanRunPacket = response.headers.get("x-scrimed-qa-human-run-packet");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (humanRunPacket !== "dispatch-ready-human-aal2-required") {
+    throw new Error(`${label} expected x-scrimed-qa-human-run-packet dispatch-ready-human-aal2-required but received ${humanRunPacket}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "dispatch-ready-not-retained-proof") {
+    throw new Error(`${label} expected x-scrimed-qa-proof dispatch-ready-not-retained-proof but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 function requireQaCompletionBridgeBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const completionBridge = response.headers.get("x-scrimed-qa-completion-bridge");
@@ -1006,6 +1037,20 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.qaHumanRunPacket !==
+    "manual-aal2-qa-human-run-packet-dispatch-ready"
+  ) {
+    throw new Error("product console missing QA human run packet proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaHumanRunPacketBrief !==
+    "manual-aal2-qa-human-run-packet-brief-no-proof-claim"
+  ) {
+    throw new Error("product console missing QA human run packet brief proof-stack posture.");
+  }
+
+  if (
     body.proofStack?.qaCompletionBridge !==
     "manual-aal2-qa-completion-bridge-no-secret-pre-persistence"
   ) {
@@ -1095,6 +1140,26 @@ async function checkProductConsole() {
 
   if (!body.qaLaunchKitBlockedClaimCount || body.qaLaunchKitBlockedClaimCount < 9) {
     throw new Error("product console expected QA launch-kit blocked-claim coverage.");
+  }
+
+  if (!body.qaHumanRunPacketWorkflowCount || body.qaHumanRunPacketWorkflowCount < 2) {
+    throw new Error("product console expected QA human run packet workflow coverage.");
+  }
+
+  if (!body.qaHumanRunPacketControlCount || body.qaHumanRunPacketControlCount < 7) {
+    throw new Error("product console expected QA human run packet control coverage.");
+  }
+
+  if (!body.qaHumanRunPacketHardStopControlCount || body.qaHumanRunPacketHardStopControlCount < 3) {
+    throw new Error("product console expected QA human run packet hard-stop coverage.");
+  }
+
+  if (!body.qaHumanRunPacketPostRunRouteCount || body.qaHumanRunPacketPostRunRouteCount < 7) {
+    throw new Error("product console expected QA human run packet post-run route coverage.");
+  }
+
+  if (!body.qaHumanRunPacketBlockedClaimCount || body.qaHumanRunPacketBlockedClaimCount < 12) {
+    throw new Error("product console expected QA human run packet blocked claim coverage.");
   }
 
   if (!body.qaCompletionBridgeCheckpointCount || body.qaCompletionBridgeCheckpointCount < 5) {
@@ -1595,6 +1660,141 @@ async function checkQaLaunchKit() {
   }
 
   console.log("pass QA launch kit");
+}
+
+async function checkQaHumanRunPacket() {
+  const result = await request("/api/qa-evidence/human-run-packet");
+  requireStatus("QA human run packet", result.response.status, 200);
+  requireContentType("QA human run packet", result.response, "application/json");
+  requireQaHumanRunPacketBoundary("QA human run packet", result.response);
+  const body = requireJson("QA human run packet", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-qa-human-run-packet") {
+    throw new Error(`QA human run packet expected scrimed-qa-human-run-packet but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-human-run-packet-ready") {
+    throw new Error(`QA human run packet expected ready status but received ${body.status}.`);
+  }
+
+  if (body.decisionState !== "dispatch-template-ready") {
+    throw new Error("QA human run packet must preserve dispatch-template-ready state.");
+  }
+
+  if (body.executionAllowedByCode !== false || body.humanAal2Required !== true) {
+    throw new Error("QA human run packet must preserve human-required/no-code-execution boundary.");
+  }
+
+  if (body.proofClaimAllowed !== false || body.buyerUseAllowed !== false) {
+    throw new Error("QA human run packet must block proof claims and buyer use before protected packet visibility.");
+  }
+
+  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
+    throw new Error("QA human run packet expected both manual workflows.");
+  }
+
+  if (!Array.isArray(body.controls) || body.controls.length < 7) {
+    throw new Error("QA human run packet expected control coverage.");
+  }
+
+  if (!body.controls.some((control) => control.state === "hard-stop")) {
+    throw new Error("QA human run packet expected hard-stop controls.");
+  }
+
+  if (!body.workflows.every((workflow) => workflow.dispatchInputs?.require_authenticated_path === true)) {
+    throw new Error("QA human run packet workflows must require authenticated path dispatch.");
+  }
+
+  if (!body.postRunRoutes?.includes("/qa-completion-bridge")) {
+    throw new Error("QA human run packet expected Completion Bridge post-run route.");
+  }
+
+  if (!body.postRunRoutes?.includes("/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets")) {
+    throw new Error("QA human run packet expected protected Manual QA Evidence post-run route.");
+  }
+
+  if (!Array.isArray(body.blockedClaims) || !body.blockedClaims.includes("live clinical care authorized")) {
+    throw new Error("QA human run packet expected live clinical care to remain blocked.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA human run packet response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA human run packet response must not contain bearer-token material.");
+  }
+
+  const rejectedSecret = await postJson("/api/qa-evidence/human-run-packet", {
+    workflowKind: "sales-demo-session-qa",
+    operatorRole: "tenant-admin",
+    protectedWorkspaceSlug: "atlas-synthetic-evaluation",
+    syntheticTargetId: "synthetic-sales-opportunity-intake-id",
+    plannedExecutionWindow: "operator-window-2026-06-22T12:00:00Z",
+    bearerToken: "Bearer eyJshould.not.persist.fake",
+    dispatchAttestation: "human-aal2-required-no-code-bypass",
+    proofBlockedAttestation: "no-retained-proof-until-protected-packet-visible",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA human run packet secret rejection", rejectedSecret.response.status, 400);
+  requireContentType("QA human run packet secret rejection", rejectedSecret.response, "application/json");
+  requireQaHumanRunPacketBoundary("QA human run packet secret rejection", rejectedSecret.response);
+  const rejectedBody = requireJson("QA human run packet secret rejection", rejectedSecret.body);
+
+  if (rejectedBody.decisionState !== "candidate-dispatch-rejected") {
+    throw new Error("QA human run packet must reject secret-like dispatch candidates.");
+  }
+
+  const acceptedCandidate = await postJson("/api/qa-evidence/human-run-packet", {
+    workflowKind: "authority-reference-qa",
+    operatorRole: "tenant-admin",
+    protectedWorkspaceSlug: "atlas-synthetic-evaluation",
+    syntheticTargetId: "atlas-synthetic-evaluation",
+    plannedExecutionWindow: "operator-window-2026-06-22T12:00:00Z",
+    dispatchAttestation: "human-aal2-required-no-code-bypass",
+    proofBlockedAttestation: "no-retained-proof-until-protected-packet-visible",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA human run packet accepted candidate", acceptedCandidate.response.status, 200);
+  requireContentType("QA human run packet accepted candidate", acceptedCandidate.response, "application/json");
+  requireQaHumanRunPacketBoundary("QA human run packet accepted candidate", acceptedCandidate.response);
+  const acceptedBody = requireJson("QA human run packet accepted candidate", acceptedCandidate.body);
+
+  if (acceptedBody.decisionState !== "candidate-dispatch-ready-human-aal2-required") {
+    throw new Error("QA human run packet accepted candidate must remain human AAL2 required.");
+  }
+
+  if (acceptedBody.executionAllowedByCode !== false || acceptedBody.proofClaimAllowed !== false) {
+    throw new Error("QA human run packet accepted candidate must not execute or allow proof claims.");
+  }
+
+  if (!/^[a-f0-9]{64}$/.test(acceptedBody.dispatchDigest)) {
+    throw new Error("QA human run packet accepted candidate expected dispatch digest.");
+  }
+
+  if (acceptedBody.workflow?.workflowKind !== "authority-reference-qa") {
+    throw new Error("QA human run packet accepted candidate expected authority-reference workflow.");
+  }
+
+  const brief = await request("/api/qa-evidence/human-run-packet/brief");
+  requireStatus("QA human run packet brief", brief.response.status, 200);
+  requireContentType("QA human run packet brief", brief.response, "text/markdown");
+  requireQaHumanRunPacketBoundary("QA human run packet brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED QA Human Run Packet")) {
+    throw new Error("QA human run packet brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("dispatch-template-ready")) {
+    throw new Error("QA human run packet brief missing dispatch-template-ready state.");
+  }
+
+  if (!brief.body.text.includes("Proof claim allowed: no")) {
+    throw new Error("QA human run packet brief must keep proof claims blocked.");
+  }
+
+  console.log("pass QA human run packet");
 }
 
 async function checkQaCompletionBridge() {
@@ -2623,6 +2823,7 @@ await checkHtml("/boundary-resolution");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
+await checkHtml("/qa-human-run-packet");
 await checkHtml("/qa-completion-bridge");
 await checkHtml("/qa-claim-guard");
 await checkHtml("/qa-activation-seal");
@@ -2640,6 +2841,7 @@ await checkQaEvidenceLedger();
 await checkQaExecutionReadiness();
 await checkQaRunControl();
 await checkQaLaunchKit();
+await checkQaHumanRunPacket();
 await checkQaCompletionBridge();
 await checkQaClaimGuard();
 await checkQaActivationSeal();

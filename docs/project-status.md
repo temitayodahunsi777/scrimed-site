@@ -2,6 +2,14 @@
 
 Updated: 2026-06-22
 
+## Latest QA Human Run Packet Release
+
+- Added `/qa-human-run-packet`, `/api/qa-evidence/human-run-packet`, and `/api/qa-evidence/human-run-packet/brief` as the no-secret dispatch packet for the first approved human AAL2 synthetic QA run.
+- Added candidate dispatch validation for workflow kind, operator role, protected workspace slug, synthetic target, planned execution window, AAL2/no-code-bypass attestation, proof-blocked attestation, and synthetic-only data boundary.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution, `/qa-evidence`, `/product`, SCRIMED Hub inventory, route catalog, and public smoke coverage with Human Run Packet visibility.
+- Added `docs/qa-human-run-packet.md` as the operator runbook between Launch Kit and Completion Bridge.
+- Preserved the boundary: Human Run Packet does not execute passkey ceremonies, mint tokens, store credentials, run workflows, persist packet hashes, authorize PHI processing, authorize live clinical care, certify security or compliance, guarantee reimbursement, approve production connectors, or claim retained authenticated proof before protected Manual QA Evidence visibility.
+
 ## Latest QA Activation Seal Release
 
 - Added `/qa-activation-seal`, `/api/qa-evidence/activation-seal`, and `/api/qa-evidence/activation-seal/brief` as the final no-secret seal check before packet-backed manual AAL2 QA proof language enters buyer diligence.

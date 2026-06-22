@@ -110,7 +110,7 @@ const qaClaimGuardRules: QaClaimGuardRule[] = [
     state: "safe-current-claim",
     appliesWhen:
       "The claim describes synthetic, no-secret, activation-ready, fail-closed, or human-required workflow readiness.",
-    requiredEvidence: "QA Evidence Ledger, Launch Kit, Completion Bridge, public smoke, and fail-closed route checks.",
+    requiredEvidence: "QA Evidence Ledger, Launch Kit, Human Run Packet, Completion Bridge, public smoke, and fail-closed route checks.",
     saferLanguage:
       "SCRIMED has a governed no-secret synthetic QA readiness path with human AAL2 gates still explicit."
   },
@@ -221,7 +221,7 @@ export function evaluateQaClaim(value: unknown): QaClaimGuardEvaluation {
       saferLanguage:
         "SCRIMED has an activation-ready no-secret human AAL2 QA path; retained authenticated QA proof will be referenced only after protected packet hash visibility.",
       nextAction:
-        "Complete Launch Kit, validate through Completion Bridge, persist protected metadata, then confirm Proof Promotion before using this claim.",
+        "Complete Launch Kit, validate dispatch through Human Run Packet, validate through Completion Bridge, persist protected metadata, then confirm Proof Promotion before using this claim.",
       boundary: qaClaimGuardBoundary
     };
   }
@@ -258,7 +258,7 @@ export function evaluateQaClaim(value: unknown): QaClaimGuardEvaluation {
     claim,
     matchedSignals: safeMatches,
     requiredEvidence: safeMatches.length > 0
-      ? ["QA Evidence Ledger", "Launch Kit", "Completion Bridge", "Proof Promotion boundary"]
+      ? ["QA Evidence Ledger", "Launch Kit", "Human Run Packet", "Completion Bridge", "Proof Promotion boundary"]
       : ["Qualified reviewer approval", "Specific evidence source mapping"],
     saferLanguage: safeMatches.length > 0
       ? claim

@@ -347,7 +347,7 @@ export function getQaRunControlSummary() {
       "Not allowed yet: SCRIMED is authorized for live clinical care, PHI processing, payer submission, production connectors, security certification, reimbursement certainty, or regional clinical deployment."
     ],
     nextRecommendedBuildStep:
-      "Use this run-control layer during the first human AAL2 run, persist the no-secret evidence packet through the protected workspace, then update Buyer Diligence only after packet hash visibility is verified.",
+      "Use this run-control layer, then /qa-human-run-packet, during the first human AAL2 run; persist the no-secret evidence packet through the protected workspace, then update Buyer Diligence only after packet hash visibility is verified.",
     updated: "2026-06-21"
   };
 }

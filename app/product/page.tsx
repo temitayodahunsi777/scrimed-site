@@ -113,6 +113,18 @@ export default function ProductConsolePage() {
           <strong>{summary.qaLaunchKitSafeCopyFieldCount}</strong>
         </article>
         <article>
+          <span>QA run packets</span>
+          <strong>{summary.qaHumanRunPacketWorkflowCount}</strong>
+        </article>
+        <article>
+          <span>QA run controls</span>
+          <strong>{summary.qaHumanRunPacketControlCount}</strong>
+        </article>
+        <article>
+          <span>Run hard stops</span>
+          <strong>{summary.qaHumanRunPacketHardStopControlCount}</strong>
+        </article>
+        <article>
           <span>QA bridge gates</span>
           <strong>{summary.qaCompletionBridgeCheckpointCount}</strong>
         </article>
@@ -369,6 +381,37 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>Pass: {phase.passSignal}</li>
                 <li>Fail closed: {phase.failClosedIf}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA human run packet">
+        <div className="section-heading">
+          <p className="eyebrow">QA human run packet</p>
+          <h2>Human Run Packet turns launch readiness into a bounded dispatch artifact.</h2>
+          <p className="section-copy">{summary.qaHumanRunPacketSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaHumanRunPacketRoute}>
+              Open Human Run Packet
+            </Link>
+            <a className="secondary-action" href={summary.qaHumanRunPacketBriefRoute}>
+              Download Packet Brief
+            </a>
+          </div>
+        </div>
+        {summary.qaHumanRunPacketSummary.controls.map((control) => (
+          <article className="module-row" key={control.control}>
+            <div>
+              <span>{control.state}</span>
+              <h2>{control.control}</h2>
+            </div>
+            <p>{control.passSignal}</p>
+            <div>
+              <strong>{control.owner}</strong>
+              <ul className="compact-list">
+                <li>Fail closed: {control.failClosedIf}</li>
               </ul>
             </div>
           </article>

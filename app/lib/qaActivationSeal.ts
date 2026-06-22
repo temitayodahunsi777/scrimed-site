@@ -316,7 +316,7 @@ export function deriveQaActivationSealDecision({
     buyerSafeClaim:
       "SCRIMED has a no-secret activation path, but the QA Activation Seal remains unsealed until protected packet evidence is visible.",
     nextAction:
-      "Complete Launch Kit, validate through Completion Bridge, persist protected no-secret metadata, confirm Proof Promotion, then run Claim Guard before buyer use.",
+      "Complete Launch Kit, validate dispatch through Human Run Packet, validate through Completion Bridge, persist protected no-secret metadata, confirm Proof Promotion, then run Claim Guard before buyer use.",
     boundary: qaActivationSealBoundary
   };
 }

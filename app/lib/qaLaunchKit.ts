@@ -261,7 +261,7 @@ export function getQaLaunchKitSummary() {
       "Never allowed from this launch kit: clinical care authority, PHI processing authority, payer submission authority, security certification, reimbursement certainty, production connector approval, or autonomous clinical action."
     ],
     nextRecommendedBuildStep:
-      "Have an approved tenant-admin operator run exactly one workflow with a fresh short-lived AAL2 token, persist only the no-secret packet metadata, then verify Proof Promotion before exporting Buyer Diligence.",
+      "Have an approved tenant-admin operator use /qa-human-run-packet to dispatch exactly one workflow with a fresh short-lived AAL2 token, persist only the no-secret packet metadata, then verify Claim Guard, Activation Seal, and Proof Promotion before exporting Buyer Diligence.",
     updated: "2026-06-22"
   };
 }

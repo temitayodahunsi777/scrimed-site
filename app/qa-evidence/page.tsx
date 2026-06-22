@@ -4,6 +4,7 @@ import { getQaActivationSealSummary } from "../lib/qaActivationSeal";
 import { getQaClaimGuardSummary } from "../lib/qaClaimGuard";
 import { getQaCompletionBridgeSummary } from "../lib/qaCompletionBridge";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
+import { getQaHumanRunPacketSummary } from "../lib/qaHumanRunPacket";
 import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
 import { getQaProofPromotionSummary } from "../lib/qaProofPromotion";
 import { getQaRunControlSummary } from "../lib/qaRunControl";
@@ -19,6 +20,7 @@ export default function QaEvidencePage() {
   const executionReadiness = getQaExecutionReadinessSummary();
   const runControl = getQaRunControlSummary();
   const launchKit = getQaLaunchKitSummary();
+  const humanRunPacket = getQaHumanRunPacketSummary();
   const completionBridge = getQaCompletionBridgeSummary();
   const claimGuard = getQaClaimGuardSummary();
   const activationSeal = getQaActivationSealSummary();
@@ -59,6 +61,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={launchKit.route}>
             Launch Kit
+          </Link>
+          <Link className="secondary-action" href={humanRunPacket.route}>
+            Human Run Packet
           </Link>
           <Link className="secondary-action" href={completionBridge.route}>
             Completion Bridge
@@ -126,6 +131,18 @@ export default function QaEvidencePage() {
         <article>
           <span>Launch phases</span>
           <strong>{launchKit.phaseCount}</strong>
+        </article>
+        <article>
+          <span>Human run packet</span>
+          <strong>{humanRunPacket.decisionState}</strong>
+        </article>
+        <article>
+          <span>Run packet controls</span>
+          <strong>{humanRunPacket.controlCount}</strong>
+        </article>
+        <article>
+          <span>Run packet stops</span>
+          <strong>{humanRunPacket.hardStopControlCount}</strong>
         </article>
         <article>
           <span>Completion bridge</span>
@@ -329,6 +346,37 @@ export default function QaEvidencePage() {
               <ul className="compact-list">
                 <li>Pass: {phase.passSignal}</li>
                 <li>Fail closed: {phase.failClosedIf}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED QA human run packet">
+        <div className="section-heading">
+          <p className="eyebrow">Human run packet</p>
+          <h2>The final dispatch packet keeps the first AAL2 run operator-controlled and proof-blocked.</h2>
+          <p className="section-copy">{humanRunPacket.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={humanRunPacket.route}>
+              Open Human Run Packet
+            </Link>
+            <a className="secondary-action" href={humanRunPacket.briefRoute}>
+              Download Packet Brief
+            </a>
+          </div>
+        </div>
+        {humanRunPacket.controls.map((control) => (
+          <article className="module-row" key={control.control}>
+            <div>
+              <span>{control.state}</span>
+              <h2>{control.control}</h2>
+            </div>
+            <p>{control.passSignal}</p>
+            <div>
+              <strong>{control.owner}</strong>
+              <ul className="compact-list">
+                <li>Fail closed: {control.failClosedIf}</li>
               </ul>
             </div>
           </article>

@@ -11,7 +11,7 @@ It provides:
 - Safe no-secret evidence payload templates.
 - Abort conditions and hard stops.
 - Buyer-proof promotion rules.
-- Links into Execution Readiness, Launch Kit, Completion Bridge, Manual QA Evidence, Claim Guard, Activation Seal, Proof Promotion, and Buyer Diligence.
+- Links into Execution Readiness, Launch Kit, Human Run Packet, Completion Bridge, Manual QA Evidence, Claim Guard, Activation Seal, Proof Promotion, and Buyer Diligence.
 
 ## Boundary
 
@@ -24,15 +24,16 @@ Run Control does not execute passkey ceremonies, mint tokens, store credentials,
 3. Select the workflow brief for Sales Demo Session QA or Authority Reference QA.
 4. Confirm a fresh human AAL2 session.
 5. Use exactly one synthetic target.
-6. Run the token preflight.
-7. Dispatch the manual GitHub workflow with authenticated path required.
-8. Copy only the safe IDs printed by the workflow.
-9. Delete or rotate the temporary secret.
-10. Validate the candidate metadata through `/qa-completion-bridge`.
-11. Persist the accepted packet through `/pilot-workspace/access` -> Manual QA Evidence.
-12. Open `/qa-activation-seal` and confirm the retained packet is not being confused with public preview evidence.
-13. Open `/qa-proof-promotion` and confirm retained-packet promotion is allowed.
-14. Export Buyer Diligence only after the retained packet hash and audit event are visible.
+6. Validate the bounded dispatch candidate through `/qa-human-run-packet`.
+7. Run the token preflight.
+8. Dispatch the manual GitHub workflow with authenticated path required.
+9. Copy only the safe IDs printed by the workflow.
+10. Delete or rotate the temporary secret.
+11. Validate the candidate metadata through `/qa-completion-bridge`.
+12. Persist the accepted packet through `/pilot-workspace/access` -> Manual QA Evidence.
+13. Open `/qa-activation-seal` and confirm the retained packet is not being confused with public preview evidence.
+14. Open `/qa-proof-promotion` and confirm retained-packet promotion is allowed.
+15. Export Buyer Diligence only after the retained packet hash and audit event are visible.
 
 ## Prohibited Content
 
@@ -40,4 +41,4 @@ Do not paste bearer tokens, refresh tokens, passwords, API keys, JWT strings, PH
 
 ## Next Step
 
-Use `/qa-launch-kit` during the first human AAL2 synthetic QA run, validate the no-secret candidate through `/qa-completion-bridge`, persist only accepted packet metadata, confirm `/qa-activation-seal` and `/qa-proof-promotion`, then update Buyer Diligence and Boundary Resolution after retained proof exists.
+Use `/qa-human-run-packet` during the first human AAL2 synthetic QA run, validate the no-secret candidate through `/qa-completion-bridge`, persist only accepted packet metadata, confirm `/qa-activation-seal`, `/qa-proof-promotion`, and `/qa-claim-guard`, then update Buyer Diligence and Boundary Resolution after retained proof exists.

@@ -13,6 +13,7 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 - Operator page: `/qa-completion-bridge`
 - Public validation API: `/api/qa-evidence/completion-bridge`
 - Downloadable brief: `/api/qa-evidence/completion-bridge/brief`
+- Human run packet: `/qa-human-run-packet`
 - Public packet generator: `/api/qa-evidence/manual-run-packet`
 - Protected persistence route: `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets`
 - Proof promotion: `/qa-proof-promotion`
@@ -21,7 +22,7 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 
 ## Operating Sequence
 
-1. Use `/qa-launch-kit` to run exactly one human AAL2 workflow against an explicit synthetic target.
+1. Use `/qa-launch-kit` and `/qa-human-run-packet` to run exactly one human AAL2 workflow against an explicit synthetic target.
 2. Delete or rotate the temporary masked token secret after the workflow completes.
 3. Copy only safe run metadata: workflow kind, run ID, run URL, timestamp, target ID, created safe object UUID, packet audit event UUID, outcome, and fixed attestations.
 4. POST the candidate metadata to `/api/qa-evidence/completion-bridge`.
@@ -42,4 +43,4 @@ It validates candidate metadata, generates a packet preview hash, and confirms t
 
 ## Next Step
 
-Use QA Claim Guard for every external or buyer-facing statement while the approved tenant-admin operator completes one Launch Kit workflow, validates the no-secret candidate through QA Completion Bridge, persists the packet through protected Manual QA Evidence, confirms QA Activation Seal posture, and confirms Proof Promotion before exporting Buyer Diligence.
+Use QA Human Run Packet for the approved dispatch and QA Claim Guard for every external or buyer-facing statement while the tenant-admin operator completes one synthetic AAL2 workflow, validates the no-secret candidate through QA Completion Bridge, persists the packet through protected Manual QA Evidence, confirms QA Activation Seal posture, and confirms Proof Promotion before exporting Buyer Diligence.
