@@ -10,6 +10,7 @@
     "integrity": "node scripts/check-generated-integrity.mjs",
     "lint": "eslint .",
     "smoke:agent-workspace": "node scripts/agent-workspace-authenticated-smoke.mjs",
+    "smoke:authority-reference-qa:preflight": "node scripts/authority-artifact-reference-qa-token-preflight.mjs",
     "smoke:authority-reference-qa": "node scripts/authority-artifact-reference-qa-smoke.mjs",
     "smoke:public": "node scripts/public-production-smoke.mjs",
     "smoke:sales-command-center": "node scripts/sales-command-center-smoke.mjs",

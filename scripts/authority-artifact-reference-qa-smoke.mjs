@@ -197,7 +197,19 @@ if (!packetResult.body.text.includes("## QA Harness")) {
   throw new Error("authenticated authority reference packet missing QA harness section.");
 }
 
+const packetAuditEventId = packetResult.body.text.match(
+  /Audit Event:\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/i
+)?.[1];
+
+if (!packetAuditEventId) {
+  throw new Error("authenticated authority reference packet did not expose the packet audit event ID.");
+}
+
 console.log("pass authenticated authority reference packet with renewal queue and QA harness");
+console.log(`safe evidence workflowKind=authority-reference-qa`);
+console.log(`safe evidence intakeId=${workspaceSlug}`);
+console.log(`safe evidence createdSessionId=${referenceId}`);
+console.log(`safe evidence packetAuditEventId=${packetAuditEventId}`);
 console.log(
   "operator action required: dispose of the short-lived SCRIMED_BEARER_TOKEN outside the application after this run."
 );

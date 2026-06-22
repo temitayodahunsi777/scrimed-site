@@ -2,6 +2,15 @@
 
 Updated: 2026-06-21
 
+## Latest Authority Reference QA Evidence Bridge Release
+
+- Added manual-only GitHub Actions workflow `.github/workflows/authority-reference-qa-smoke.yml` for protected Authority Reference QA execution against a short-lived AAL2 operator token and explicit workspace slug.
+- Added `scripts/authority-artifact-reference-qa-token-preflight.mjs` and `npm run smoke:authority-reference-qa:preflight` to validate JWT shape, AAL2 posture, session claim, expiry, minted lifetime, and workspace targeting before any authenticated request is sent.
+- Extended the Authority Reference QA smoke so a passing authenticated run prints only safe evidence fields: workflow kind, workspace target, created authority reference UUID, and packet audit event UUID.
+- Extended Manual QA Evidence capture in `/pilot-workspace/access` to support both Sales Demo Session QA and Authority Reference QA without changing the protected evidence table or storing secrets.
+- Updated `POST /api/qa-evidence/manual-run-packet`, the Product Console proof stack, and public smoke coverage with `authority-reference-qa-evidence-bridge-ready`.
+- Preserved the boundary: authenticated Authority Reference QA still requires a human-run short-lived AAL2 token. SCRIMED now provides the safe CI path, preflight, no-secret evidence bridge, and protected persistence process, but it does not store tokens, artifacts, URLs, PHI, signed approvals, legal opinions, security reports, reimbursement determinations, certification evidence, production approvals, or live clinical authority.
+
 ## Latest Protected Authority Renewal Queue And QA Harness Release
 
 - Added the protected Authority Artifact Renewal Queue as a risk-ranked operating layer inside `/pilot-workspace/access#authority-artifact-references`.

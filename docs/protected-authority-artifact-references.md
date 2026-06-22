@@ -54,6 +54,7 @@ The queue lets operators work the authority gates in priority order while preser
 Run:
 
 ```bash
+/usr/bin/env PATH=/Applications/Codex.app/Contents/Resources/cua_node/bin:$PATH npm run smoke:authority-reference-qa:preflight
 /usr/bin/env PATH=/Applications/Codex.app/Contents/Resources/cua_node/bin:$PATH npm run smoke:authority-reference-qa
 ```
 
@@ -65,10 +66,28 @@ Default behavior:
 Required authenticated run:
 
 ```bash
-SCRIMED_REQUIRE_AUTHORITY_REFERENCE_QA=1 SCRIMED_BEARER_TOKEN={short-lived-aal2-token} /usr/bin/env PATH=/Applications/Codex.app/Contents/Resources/cua_node/bin:$PATH npm run smoke:authority-reference-qa
+SCRIMED_REQUIRE_AUTHORITY_REFERENCE_QA=1 SCRIMED_WORKSPACE_SLUG=atlas-synthetic-evaluation SCRIMED_BEARER_TOKEN={short-lived-aal2-token} /usr/bin/env PATH=/Applications/Codex.app/Contents/Resources/cua_node/bin:$PATH npm run smoke:authority-reference-qa:preflight
+SCRIMED_REQUIRE_AUTHORITY_REFERENCE_QA=1 SCRIMED_WORKSPACE_SLUG=atlas-synthetic-evaluation SCRIMED_BEARER_TOKEN={short-lived-aal2-token} /usr/bin/env PATH=/Applications/Codex.app/Contents/Resources/cua_node/bin:$PATH npm run smoke:authority-reference-qa
 ```
 
 The harness records one synthetic metadata-only authority reference, verifies the renewal queue, downloads the audited packet, and reminds the operator to dispose of the short-lived token outside the application.
+
+## Manual CI Evidence Bridge
+
+The manual GitHub workflow `.github/workflows/authority-reference-qa-smoke.yml` runs the same preflight and smoke path without scheduling authenticated mutations or committing credentials.
+
+After a passing authenticated workflow run, copy only these safe values into `/pilot-workspace/access -> Manual QA Evidence`:
+
+- `workflowKind`: `authority-reference-qa`
+- `workflowRunId`: GitHub Actions run ID
+- `intakeId`: protected workspace slug
+- `createdSessionId`: created authority reference UUID printed by the smoke as `referenceId`
+- `packetAuditEventId`: authority reference packet audit event UUID printed by the smoke
+- fixed attestations: `pass`, `no-secrets-no-phi-aal2-human-run`, `temporary-token-deleted-or-rotated`, `synthetic-business-workflow-only`
+
+The protected Manual QA Evidence panel labels `createdSessionId` as `Created authority reference ID` for this workflow kind. The storage column remains generic so SCRIMED can reuse the no-secret packet ledger without another migration.
+
+Do not copy bearer tokens, refresh tokens, credentials, PHI, artifact URLs, signed artifacts, legal opinions, security reports, reimbursement determinations, certification evidence, or approval documents into the evidence panel.
 
 ## Boundaries
 
@@ -105,6 +124,7 @@ Production smoke should verify:
 - product console packet proof stack includes `aal2-audited-authority-artifact-reference-status-packet-no-artifact-storage`
 - product console proof stack includes `aal2-authority-renewal-queue-no-artifact-storage`
 - product console proof stack includes `aal2-authority-reference-qa-harness-token-boundary`
+- product console proof stack includes `authority-reference-qa-evidence-bridge-ready`
 - protected authority artifact reference API fails closed without authentication
 - protected authority artifact renewal queue API fails closed without authentication
 - protected authority artifact reference packet API fails closed without authentication

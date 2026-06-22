@@ -1,0 +1,71 @@
+name: Authority Reference QA Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Production app URL to smoke-test.
+        required: true
+        default: https://app.scrimedsolutions.com
+      workspace_slug:
+        description: Explicit protected workspace slug to verify.
+        required: true
+        default: atlas-synthetic-evaluation
+      require_authenticated_path:
+        description: Fail if SCRIMED_BEARER_TOKEN is missing.
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: authority-reference-qa-smoke
+  cancel-in-progress: false
+
+jobs:
+  authority-reference-qa:
+    name: Authority reference QA smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Preflight short-lived AAL2 token
+        env:
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}
+          SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+          SCRIMED_REQUIRE_AUTHORITY_REFERENCE_QA: ${{ inputs.require_authenticated_path && '1' || '' }}
+        run: node scripts/authority-artifact-reference-qa-token-preflight.mjs
+
+      - name: Run Authority Reference QA smoke
+        env:
+          SCRIMED_BASE_URL: ${{ inputs.base_url }}
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}
+          SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+          SCRIMED_REQUIRE_AUTHORITY_REFERENCE_QA: ${{ inputs.require_authenticated_path && '1' || '' }}
+        run: node scripts/authority-artifact-reference-qa-smoke.mjs
+
+      - name: Evidence capture reminder
+        run: |
+          {
+            echo "## SCRIMED Authority Reference QA Evidence Capture"
+            echo ""
+            echo "After a passing authenticated run, copy only these non-secret values from the smoke output into /pilot-workspace/access -> Manual QA Evidence:"
+            echo ""
+            echo "- workflowKind: authority-reference-qa"
+            echo "- workflowRunId: this GitHub Actions run ID"
+            echo "- intakeId: ${{ inputs.workspace_slug }}"
+            echo "- createdSessionId: created authority reference UUID printed by the smoke"
+            echo "- packetAuditEventId: authority reference packet audit event UUID printed by the smoke"
+            echo "- tokenDisposalAttestation: temporary-token-deleted-or-rotated"
+            echo ""
+            echo "Do not copy bearer tokens, refresh tokens, credentials, PHI, artifact URLs, signed artifacts, legal opinions, security reports, or approval documents."
+          } >> "$GITHUB_STEP_SUMMARY"

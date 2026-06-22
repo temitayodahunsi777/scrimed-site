@@ -101,6 +101,7 @@ import {
 } from "./salesDemoSessionQa";
 import {
   getQaEvidenceLedger,
+  qaAuthorityReferenceEvidenceBridgeStatus,
   qaEvidenceLedgerProofStackStatus,
   qaManualRunEvidencePersistenceStatus
 } from "./qaEvidenceLedger";
@@ -1205,6 +1206,7 @@ export function getProductConsoleSummary() {
       qaEvidenceLedger: qaEvidenceLedgerProofStackStatus,
       qaManualRunEvidencePacket: qaEvidenceLedger.manualRunEvidenceCapture.status,
       qaManualRunEvidencePersistence: qaManualRunEvidencePersistenceStatus,
+      qaAuthorityReferenceEvidenceBridge: qaAuthorityReferenceEvidenceBridgeStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,

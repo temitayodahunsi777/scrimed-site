@@ -30,7 +30,12 @@ export type QaKnownLimitation = {
   status: "contained" | "manual-action-required" | "external-review-required";
 };
 
+export type QaManualRunWorkflowKind =
+  | "sales-demo-session-qa"
+  | "authority-reference-qa";
+
 export type QaManualRunEvidenceInput = {
+  workflowKind?: QaManualRunWorkflowKind;
   workflowRunId: string;
   workflowRunUrl: string;
   executedAt: string;
@@ -38,6 +43,12 @@ export type QaManualRunEvidenceInput = {
   intakeId: string;
   createdSessionId: string;
   packetAuditEventId: string;
+  evidenceTargetLabel?: string;
+  evidenceObjectLabel?: string;
+  packetAuditEventLabel?: string;
+  evidenceRoute?: string;
+  packetRoute?: string;
+  operatorRunbook?: string;
   qaOutcome: "pass";
   operatorAttestation: "no-secrets-no-phi-aal2-human-run";
   tokenDisposalAttestation: "temporary-token-deleted-or-rotated";
@@ -69,6 +80,8 @@ export const qaManualRunEvidencePacketStatus =
   "manual-aal2-run-evidence-packet-ready";
 export const qaManualRunEvidencePersistenceStatus =
   "tenant-scoped-aal2-manual-qa-evidence-ledger";
+export const qaAuthorityReferenceEvidenceBridgeStatus =
+  "authority-reference-qa-evidence-bridge-ready";
 
 export const qaEvidenceLedgerBoundary =
   "SCRIMED QA Evidence Ledger records synthetic-only release, smoke, token-policy, fail-closed, and operator-gate evidence. It is not a clinical validation report, security certification, legal opinion, SOC report, HIPAA attestation, or authorization for live healthcare execution.";
@@ -148,21 +161,47 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
     nextAction: "Run the manual workflow once a fresh AAL2 token and safe synthetic intake target are available."
   },
   {
+    id: "authority-reference-authenticated-ci",
+    name: "Authenticated Authority Reference QA run",
+    status: "manual-gate",
+    owner: "SCRIMED operator",
+    recordedAt: "2026-06-21",
+    artifact: ".github/workflows/authority-reference-qa-smoke.yml",
+    routes: [
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet"
+    ],
+    evidence:
+      "The protected authority-reference QA script, renewal queue, packet audit path, and manual workflow wrapper are present; the first authenticated run still requires a fresh short-lived AAL2 tenant token.",
+    limitation:
+      "No long-lived bearer token should be stored in source, runtime config, docs, or unattended CI.",
+    workaround:
+      "Run the manual workflow with a temporary masked GitHub Actions secret, capture only the workflow run ID, created authority reference ID, packet audit event ID, and packet hash, then delete or rotate the secret.",
+    nextAction:
+      "Run the authority-reference QA workflow once a fresh AAL2 token is available, then persist the safe metadata through the Manual QA Evidence panel in authority-reference mode."
+  },
+  {
     id: "manual-run-evidence-capture",
     name: "Manual AAL2 run evidence capture",
     status: "workaround-active",
     owner: "Release engineering",
     recordedAt: "2026-06-18",
     artifact: qaManualRunEvidencePacketApiRoute,
-    routes: [qaManualRunEvidencePacketApiRoute, qaEvidenceLedgerRoute, salesDemoSessionQaApiRoute],
+    routes: [
+      qaManualRunEvidencePacketApiRoute,
+      qaEvidenceLedgerRoute,
+      salesDemoSessionQaApiRoute,
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue"
+    ],
     evidence:
-      "A stateless evidence packet generator validates non-secret workflow run metadata, created synthetic session ID, packet audit event ID, operator attestation, and token-disposal attestation after the manual QA workflow completes.",
+      "A stateless evidence packet generator validates non-secret workflow run metadata, created evidence object ID, packet audit event ID, operator attestation, token-disposal attestation, and workflow kind after the manual QA workflow completes.",
     limitation:
       "The packet generator does not execute the authenticated QA run by itself.",
     workaround:
       "Use it immediately after the manual workflow run to produce a sanitized packet, then persist the same non-secret run metadata through the protected tenant-scoped evidence route.",
     nextAction:
-      "After the first manual workflow pass, POST the non-secret run metadata to the packet route, then persist it through the workspace evidence route for buyer-room visibility."
+      "After the first manual workflow pass for Sales Demo Session QA or Authority Reference QA, POST the non-secret run metadata to the packet route, then persist it through the workspace evidence route for buyer-room visibility."
   },
   {
     id: "manual-run-evidence-persistence",
@@ -230,6 +269,16 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     status: "manual-action-required"
   },
   {
+    title: "First authenticated Authority Reference QA CI evidence is pending",
+    impact:
+      "SCRIMED has the protected authority-reference QA harness and renewal queue, but cannot claim an authenticated authority-reference mutation run until a fresh AAL2 operator token is used deliberately.",
+    currentControl:
+      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, fail-closed public smoke, and no long-lived secret storage.",
+    resolutionPath:
+      "Mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, then delete or rotate the token secret.",
+    status: "manual-action-required"
+  },
+  {
     title: "Managed local shell may omit npm/node from PATH",
     impact:
       "Local package scripts can fail even when the repository, CI, and Vercel build path are healthy.",
@@ -255,8 +304,14 @@ export const qaManualRunEvidenceContract = {
   route: qaManualRunEvidencePacketApiRoute,
   protectedPersistenceRoute: qaManualRunEvidencePersistenceApiRoute,
   status: qaManualRunEvidencePacketStatus,
+  authorityReferenceBridgeStatus: qaAuthorityReferenceEvidenceBridgeStatus,
+  supportedWorkflowKinds: [
+    "sales-demo-session-qa",
+    "authority-reference-qa"
+  ] satisfies QaManualRunWorkflowKind[],
   persistenceStatus: qaManualRunEvidencePersistenceStatus,
   requiredFields: [
+    "workflowKind",
     "workflowRunId",
     "workflowRunUrl",
     "executedAt",
@@ -278,7 +333,9 @@ export const qaManualRunEvidenceContract = {
   forbiddenContent:
     "Do not submit bearer tokens, refresh tokens, passwords, API keys, PHI, patient identifiers, payer member identifiers, source contracts, credentials, or legal/security conclusions.",
   persistenceBoundary:
-    "The public route validates and returns a Markdown evidence packet without storing data. The protected workspace route persists the same sanitized metadata only after AAL2 tenant governance authorization and server-side storage controls."
+    "The public route validates and returns a Markdown evidence packet without storing data. The protected workspace route persists the same sanitized metadata only after AAL2 tenant governance authorization and server-side storage controls.",
+  authorityReferencePersistence:
+    "For authority-reference QA, createdSessionId carries the created authority reference UUID and packetAuditEventId carries the authority reference packet audit event UUID. The packet labels these fields explicitly; the database column names remain generic legacy storage."
 };
 
 function getCurrentDeploymentEvidence() {
@@ -325,10 +382,10 @@ export function getQaEvidenceLedger() {
     entries: qaEvidenceEntries,
     knownLimitations: qaKnownLimitations,
     buyerSafeSummary:
-      "SCRIMED verifies release health, protected-route containment, and token-policy readiness today; the only remaining authenticated QA evidence step is a deliberate short-lived AAL2 operator run against a synthetic buyer opportunity.",
+      "SCRIMED verifies release health, protected-route containment, token-policy readiness, and no-secret evidence capture today; remaining authenticated QA evidence requires deliberate short-lived AAL2 operator runs against synthetic targets.",
     nextRecommendedBuildStep:
-      "Capture the first successful manual Sales Demo Session QA workflow run with a fresh AAL2 token, generate the manual-run evidence packet, persist it through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
-    updated: "2026-06-18"
+      "Run the Sales Demo Session QA and Authority Reference QA manual workflows with fresh short-lived AAL2 tokens, generate no-secret manual-run evidence packets, persist them through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
+    updated: "2026-06-21"
   };
 }
 
@@ -379,6 +436,17 @@ function isSafeIntakeId(value: string) {
   return /^[A-Za-z0-9][A-Za-z0-9_-]{5,127}$/.test(value);
 }
 
+function isSafeOptionalEvidenceText(value: string, maxLength = 160) {
+  return (
+    value.length === 0 ||
+    (value.length <= maxLength && /^[A-Za-z0-9][A-Za-z0-9 ._:/#()%-]*$/.test(value))
+  );
+}
+
+function isSafeOptionalRoute(value: string) {
+  return value.length === 0 || /^\/[A-Za-z0-9/_{}.[\]-]{1,220}$/.test(value);
+}
+
 function isValidWorkflowUrl(value: string) {
   return /^https:\/\/github\.com\/temitayodahunsi777\/scrimed-site\/actions\/runs\/[0-9]+$/.test(value);
 }
@@ -399,8 +467,10 @@ function isValidIsoTimestamp(value: string) {
 
 function normalizeQaManualRunEvidenceInput(value: unknown): QaManualRunEvidenceInput {
   const record = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  const workflowKind = cleanText(record.workflowKind) as QaManualRunWorkflowKind;
 
   return {
+    workflowKind: workflowKind || "sales-demo-session-qa",
     workflowRunId: cleanText(record.workflowRunId),
     workflowRunUrl: cleanText(record.workflowRunUrl),
     executedAt: cleanText(record.executedAt),
@@ -408,6 +478,12 @@ function normalizeQaManualRunEvidenceInput(value: unknown): QaManualRunEvidenceI
     intakeId: cleanText(record.intakeId),
     createdSessionId: cleanText(record.createdSessionId),
     packetAuditEventId: cleanText(record.packetAuditEventId),
+    evidenceTargetLabel: cleanText(record.evidenceTargetLabel),
+    evidenceObjectLabel: cleanText(record.evidenceObjectLabel),
+    packetAuditEventLabel: cleanText(record.packetAuditEventLabel),
+    evidenceRoute: cleanText(record.evidenceRoute),
+    packetRoute: cleanText(record.packetRoute),
+    operatorRunbook: cleanText(record.operatorRunbook),
     qaOutcome: cleanText(record.qaOutcome) as QaManualRunEvidenceInput["qaOutcome"],
     operatorAttestation: cleanText(record.operatorAttestation) as QaManualRunEvidenceInput["operatorAttestation"],
     tokenDisposalAttestation:
@@ -479,6 +555,34 @@ export function validateQaManualRunEvidenceInput(value: unknown) {
     errors.push("dataBoundary must equal synthetic-business-workflow-only.");
   }
 
+  if (!qaManualRunEvidenceContract.supportedWorkflowKinds.includes(input.workflowKind ?? "sales-demo-session-qa")) {
+    errors.push("workflowKind must be sales-demo-session-qa or authority-reference-qa.");
+  }
+
+  if (!isSafeOptionalEvidenceText(input.evidenceTargetLabel ?? "")) {
+    errors.push("evidenceTargetLabel must be bounded no-secret metadata.");
+  }
+
+  if (!isSafeOptionalEvidenceText(input.evidenceObjectLabel ?? "")) {
+    errors.push("evidenceObjectLabel must be bounded no-secret metadata.");
+  }
+
+  if (!isSafeOptionalEvidenceText(input.packetAuditEventLabel ?? "")) {
+    errors.push("packetAuditEventLabel must be bounded no-secret metadata.");
+  }
+
+  if (!isSafeOptionalRoute(input.evidenceRoute ?? "")) {
+    errors.push("evidenceRoute must be a relative SCRIMED route without URL, secret, or query content.");
+  }
+
+  if (!isSafeOptionalRoute(input.packetRoute ?? "")) {
+    errors.push("packetRoute must be a relative SCRIMED route without URL, secret, or query content.");
+  }
+
+  if (!isSafeOptionalRoute(input.operatorRunbook ?? "")) {
+    errors.push("operatorRunbook must be a relative SCRIMED route without URL, secret, or query content.");
+  }
+
   return {
     ok: errors.length === 0,
     errors,
@@ -487,10 +591,36 @@ export function validateQaManualRunEvidenceInput(value: unknown) {
 }
 
 export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) {
+  const workflowKind = input.workflowKind ?? "sales-demo-session-qa";
+  const isAuthorityReference = workflowKind === "authority-reference-qa";
+  const title = isAuthorityReference
+    ? "SCRIMED Manual Authority Reference QA Evidence Packet"
+    : "SCRIMED Manual Sales Demo Session QA Evidence Packet";
+  const evidenceTargetLabel =
+    input.evidenceTargetLabel ||
+    (isAuthorityReference ? "Authority workspace target" : "Intake target");
+  const evidenceObjectLabel =
+    input.evidenceObjectLabel ||
+    (isAuthorityReference ? "Created authority reference ID" : "Created session ID");
+  const packetAuditEventLabel =
+    input.packetAuditEventLabel ||
+    (isAuthorityReference ? "Authority reference packet audit event ID" : "Packet audit event ID");
+  const controls = isAuthorityReference
+    ? [
+        "AAL2 tenant governance session required.",
+        "Synthetic metadata-only reference recorded through protected workspace route.",
+        "Renewal queue verified after write.",
+        "Audited authority reference packet downloaded after audit event commit.",
+        "No PHI, artifact, URL, credential, signature, legal opinion, security report, or live-care authority stored.",
+        "Temporary bearer token must be deleted or rotated after the run."
+      ]
+    : salesDemoSessionQaControls;
+
   return [
-    "# SCRIMED Manual Sales Demo Session QA Evidence Packet",
+    `# ${title}`,
     "",
     `Status: ${qaManualRunEvidencePacketStatus}`,
+    `Workflow kind: ${workflowKind}`,
     `Boundary: ${qaEvidenceLedgerBoundary}`,
     "",
     "## Run Evidence",
@@ -498,9 +628,12 @@ export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) 
     `- Workflow run URL: ${input.workflowRunUrl}`,
     `- Executed at: ${input.executedAt}`,
     `- Base URL: ${input.baseUrl}`,
-    `- Intake target: ${input.intakeId}`,
-    `- Created session ID: ${input.createdSessionId}`,
-    `- Packet audit event ID: ${input.packetAuditEventId}`,
+    `- ${evidenceTargetLabel}: ${input.intakeId}`,
+    `- ${evidenceObjectLabel}: ${input.createdSessionId}`,
+    `- ${packetAuditEventLabel}: ${input.packetAuditEventId}`,
+    ...(input.evidenceRoute ? [`- Evidence route: ${input.evidenceRoute}`] : []),
+    ...(input.packetRoute ? [`- Packet route: ${input.packetRoute}`] : []),
+    ...(input.operatorRunbook ? [`- Operator runbook: ${input.operatorRunbook}`] : []),
     `- QA outcome: ${input.qaOutcome}`,
     "",
     "## Attestations",
@@ -509,11 +642,11 @@ export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) 
     `- Data boundary: ${input.dataBoundary}`,
     "",
     "## Controls",
-    ...salesDemoSessionQaControls.map((control) => `- ${control}`),
+    ...controls.map((control) => `- ${control}`),
     "",
     "## Remaining Boundaries",
     "- This packet does not contain bearer tokens, refresh tokens, passwords, credentials, PHI, patient identifiers, payer member identifiers, source contracts, or regulated healthcare records.",
-    "- This packet documents a synthetic buyer-demo QA run only. It does not authorize live clinical execution, autonomous diagnosis, payer submission, patient outreach, compliance certification, or production connector activation.",
+    "- This packet documents a synthetic QA run only. It does not authorize live clinical execution, autonomous diagnosis, payer submission, patient outreach, compliance certification, security certification, reimbursement certainty, public distribution, or production connector activation.",
     "- Durable evidence storage remains gated until approved storage, retention, access review, legal hold, incident response, regional residency, and buyer authorization controls are complete."
   ].join("\n");
 }

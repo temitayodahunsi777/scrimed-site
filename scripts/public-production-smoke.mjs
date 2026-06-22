@@ -679,6 +679,13 @@ async function checkProductConsole() {
     throw new Error("product console missing manual QA run evidence persistence posture.");
   }
 
+  if (
+    body.proofStack?.qaAuthorityReferenceEvidenceBridge !==
+    "authority-reference-qa-evidence-bridge-ready"
+  ) {
+    throw new Error("product console missing authority-reference QA evidence bridge posture.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -798,7 +805,19 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA manual run evidence packet contract expected ready status.");
   }
 
+  if (
+    contractBody.authorityReferenceBridgeStatus !==
+    "authority-reference-qa-evidence-bridge-ready"
+  ) {
+    throw new Error("QA manual run evidence packet contract missing authority-reference bridge status.");
+  }
+
+  if (!contractBody.supportedWorkflowKinds?.includes("authority-reference-qa")) {
+    throw new Error("QA manual run evidence packet contract missing authority-reference workflow kind.");
+  }
+
   const rejectedSecret = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowKind: "sales-demo-session-qa",
     workflowRunId: "123456789",
     workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
     executedAt: new Date().toISOString(),
@@ -817,6 +836,7 @@ async function checkQaEvidenceLedger() {
   requireSyntheticBoundary("QA manual run evidence packet secret rejection", rejectedSecret.response);
 
   const acceptedPacket = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowKind: "sales-demo-session-qa",
     workflowRunId: "123456789",
     workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
     executedAt: new Date().toISOString(),
@@ -832,6 +852,34 @@ async function checkQaEvidenceLedger() {
   requireStatus("QA manual run evidence packet", acceptedPacket.response.status, 200);
   requireContentType("QA manual run evidence packet", acceptedPacket.response, "text/markdown");
   requireSyntheticBoundary("QA manual run evidence packet", acceptedPacket.response);
+
+  const acceptedAuthorityPacket = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowKind: "authority-reference-qa",
+    workflowRunId: "123456790",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456790",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "atlas-synthetic-evaluation",
+    createdSessionId: "33333333-3333-4333-8333-333333333333",
+    packetAuditEventId: "44444444-4444-4444-8444-444444444444",
+    evidenceTargetLabel: "Workspace target",
+    evidenceObjectLabel: "Created authority reference ID",
+    packetAuditEventLabel: "Authority packet audit event ID",
+    evidenceRoute: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
+    packetRoute: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
+    operatorRunbook: "/docs/protected-authority-artifact-references.md",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA authority reference evidence packet", acceptedAuthorityPacket.response.status, 200);
+  requireContentType("QA authority reference evidence packet", acceptedAuthorityPacket.response, "text/markdown");
+  requireSyntheticBoundary("QA authority reference evidence packet", acceptedAuthorityPacket.response);
+
+  if (!acceptedAuthorityPacket.body.text.includes("Workflow kind: authority-reference-qa")) {
+    throw new Error("QA authority reference evidence packet missing workflow kind.");
+  }
 
   console.log("pass QA evidence ledger");
 }

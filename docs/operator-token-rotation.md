@@ -1,10 +1,10 @@
 # SCRIMED Operator Token Rotation Runbook
 
-Updated: 2026-06-18
+Updated: 2026-06-21
 
 ## Purpose
 
-Run authenticated Sales Demo Session QA and read-only Sales Command Center verification only when a human tenant-admin intentionally verifies an AAL2 browser session and targets a specific Sales Operations opportunity.
+Run authenticated Sales Demo Session QA, Authority Reference QA, and read-only Sales Command Center verification only when a human operator intentionally verifies an AAL2 browser session and targets a specific synthetic opportunity or protected workspace.
 
 This runbook exists to prevent long-lived CI credentials, wrong-opportunity QA writes, leaked bearer tokens, and ungoverned authenticated tests.
 
@@ -20,10 +20,16 @@ Applies to:
 - `scripts/sales-demo-session-qa-token-policy-selftest.mjs`
 - `scripts/sales-demo-session-qa-token-preflight.mjs`
 - `scripts/sales-demo-session-qa-smoke.mjs`
+- `scripts/authority-artifact-reference-qa-token-preflight.mjs`
+- `scripts/authority-artifact-reference-qa-smoke.mjs`
 - `scripts/sales-command-center-smoke.mjs`
 - `.github/workflows/sales-demo-session-qa-smoke.yml`
+- `.github/workflows/authority-reference-qa-smoke.yml`
 - `POST /api/sales-operations/qa/buyer-demo-sessions`
 - `GET /api/sales-operations/opportunities/{intakeId}/command-center`
+- `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue`
+- `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
+- `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`
 
 Does not authorize PHI processing, production clinical execution, autonomous care decisions, payer submission, patient outreach, customer SSO cutover, source contract storage, credential storage, legal conclusions, compliance certification, or reimbursement determinations.
 
@@ -32,6 +38,9 @@ Does not authorize PHI processing, production clinical execution, autonomous car
 - `SCRIMED_SALES_QA_BEARER_TOKEN`: fresh tenant-admin access token from an AAL2 session.
 - `SCRIMED_SALES_QA_INTAKE_ID`: explicit Sales Operations opportunity target.
 - `SCRIMED_REQUIRE_SALES_QA=1`: required when CI should fail instead of skip.
+- `SCRIMED_BEARER_TOKEN`: fresh tenant governance access token from an AAL2 protected workspace session for Authority Reference QA.
+- `SCRIMED_WORKSPACE_SLUG`: explicit protected workspace target for Authority Reference QA.
+- `SCRIMED_REQUIRE_AUTHORITY_REFERENCE_QA=1`: required when Authority Reference CI should fail instead of skip.
 
 Optional controls:
 
@@ -51,6 +60,7 @@ The token must pass local preflight before any authenticated request is sent:
 - Remaining lifetime is no more than `3900` seconds.
 - Remaining lifetime is at least `60` seconds.
 - `SCRIMED_SALES_QA_INTAKE_ID` is explicit and safe to log.
+- For Authority Reference QA, `SCRIMED_WORKSPACE_SLUG` is explicit and safe to log.
 
 The preflight does not verify the JWT signature. Signature and user verification remain the responsibility of the protected SCRIMED API through Supabase Auth before any mutation.
 
@@ -97,6 +107,7 @@ Manual evidence packet payload:
 
 ```json
 {
+  "workflowKind": "sales-demo-session-qa",
   "workflowRunId": "123456789",
   "workflowRunUrl": "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
   "executedAt": "2026-06-18T19:00:00.000Z",
@@ -108,6 +119,23 @@ Manual evidence packet payload:
   "operatorAttestation": "no-secrets-no-phi-aal2-human-run",
   "tokenDisposalAttestation": "temporary-token-deleted-or-rotated",
   "dataBoundary": "synthetic-business-workflow-only"
+}
+```
+
+Authority Reference QA uses the same evidence route with these label overrides:
+
+```json
+{
+  "workflowKind": "authority-reference-qa",
+  "intakeId": "atlas-synthetic-evaluation",
+  "createdSessionId": "33333333-3333-4333-8333-333333333333",
+  "packetAuditEventId": "44444444-4444-4444-8444-444444444444",
+  "evidenceTargetLabel": "Workspace target",
+  "evidenceObjectLabel": "Created authority reference ID",
+  "packetAuditEventLabel": "Authority packet audit event ID",
+  "evidenceRoute": "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
+  "packetRoute": "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
+  "operatorRunbook": "/docs/protected-authority-artifact-references.md"
 }
 ```
 
@@ -135,13 +163,14 @@ Persistence controls:
 
 ## GitHub Actions Policy
 
-The workflow `.github/workflows/sales-demo-session-qa-smoke.yml` is manual-only.
+The workflows `.github/workflows/sales-demo-session-qa-smoke.yml` and `.github/workflows/authority-reference-qa-smoke.yml` are manual-only.
 
 Before running it:
 
 - Create or update the repository or environment secret `SCRIMED_SALES_QA_BEARER_TOKEN` only after minting a fresh AAL2 token.
+- For Authority Reference QA, create or update `SCRIMED_BEARER_TOKEN` only after minting a fresh AAL2 protected workspace token.
 - Start the workflow immediately.
-- Supply `intake_id` explicitly in the workflow dispatch form.
+- Supply `intake_id` or `workspace_slug` explicitly in the workflow dispatch form.
 - Confirm the preflight step passes before the mutating smoke step runs.
 - Delete or overwrite the secret immediately after the workflow finishes.
 - Do not schedule this workflow.
