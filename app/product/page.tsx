@@ -105,6 +105,14 @@ export default function ProductConsolePage() {
           <strong>{summary.qaRunControlCommandTemplateCount}</strong>
         </article>
         <article>
+          <span>QA launch phases</span>
+          <strong>{summary.qaLaunchKitPhaseCount}</strong>
+        </article>
+        <article>
+          <span>QA safe fields</span>
+          <strong>{summary.qaLaunchKitSafeCopyFieldCount}</strong>
+        </article>
+        <article>
           <span>QA proof rules</span>
           <strong>{summary.qaProofPromotionRuleCount}</strong>
         </article>
@@ -301,6 +309,38 @@ export default function ProductConsolePage() {
                 <li>Command templates: 2</li>
                 <li>Evidence route: {workflow.evidencePacketRoute}</li>
                 <li>Persistence: {workflow.protectedPersistenceRoute}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA launch kit">
+        <div className="section-heading">
+          <p className="eyebrow">AAL2 QA launch kit</p>
+          <h2>Launch Kit turns the human-run AAL2 gate into one exact operator handoff.</h2>
+          <p className="section-copy">{summary.qaLaunchKitSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaLaunchKitRoute}>
+              Open Launch Kit
+            </Link>
+            <a className="secondary-action" href={summary.qaLaunchKitBriefRoute}>
+              Download Launch Kit
+            </a>
+          </div>
+        </div>
+        {summary.qaLaunchKitSummary.phases.slice(0, 5).map((phase) => (
+          <article className="module-row" key={phase.phase}>
+            <div>
+              <span>{phase.state}</span>
+              <h2>{phase.phase}</h2>
+            </div>
+            <p>{phase.operatorAction}</p>
+            <div>
+              <strong>{phase.owner}</strong>
+              <ul className="compact-list">
+                <li>Pass: {phase.passSignal}</li>
+                <li>Fail closed: {phase.failClosedIf}</li>
               </ul>
             </div>
           </article>

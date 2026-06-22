@@ -1,84 +1,82 @@
 import Link from "next/link";
-import { getQaRunControlSummary } from "../lib/qaRunControl";
+import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
 
 export const metadata = {
-  title: "SCRIMED Manual AAL2 QA Run Control",
+  title: "SCRIMED Manual AAL2 QA Launch Kit",
   description:
-    "No-secret operator run control for SCRIMED manual AAL2 synthetic QA workflows, evidence templates, buyer proof promotion, and hard-stop boundaries."
+    "No-secret human-run launch packet for SCRIMED manual AAL2 synthetic QA workflows, evidence retention, and proof promotion."
 };
 
 function JsonBlock({ value }: { value: unknown }) {
   return <pre className="code-block">{JSON.stringify(value, null, 2)}</pre>;
 }
 
-export default function QaRunControlPage() {
-  const summary = getQaRunControlSummary();
+export default function QaLaunchKitPage() {
+  const summary = getQaLaunchKitSummary();
 
   return (
     <main>
       <section className="page-hero">
-        <Link className="back-link" href="/qa-evidence">QA Evidence</Link>
-        <p className="eyebrow">Manual AAL2 QA Run Control</p>
-        <h1>SCRIMED now has a no-secret mission-control layer for the first human AAL2 QA run.</h1>
+        <Link className="back-link" href="/qa-run-control">Run Control</Link>
+        <p className="eyebrow">Manual AAL2 QA Launch Kit</p>
+        <h1>SCRIMED now has a single no-secret launch packet for the first human AAL2 QA run.</h1>
         <p className="hero-text">
-          Run Control translates execution readiness into workflow-specific dispatch inputs, preflight commands, smoke
-          commands, safe evidence templates, abort conditions, and buyer-proof promotion rules while keeping clinical,
-          PHI, security, reimbursement, and production authority blocked.
+          The Launch Kit packages dispatch inputs, command templates, safe evidence fields, secret-disposal checks,
+          packet persistence, and Proof Promotion into one operator handoff while keeping clinical, PHI, security,
+          reimbursement, connector, and production authority blocked.
         </p>
         <div className="hero-actions">
-          <a className="primary-action" href={summary.briefRoute}>Download Run-Control Brief</a>
+          <a className="primary-action" href={summary.briefRoute}>Download Launch Kit</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
-          <Link className="secondary-action" href="/qa-execution-readiness">Execution Readiness</Link>
-          <Link className="secondary-action" href="/qa-launch-kit">Launch Kit</Link>
+          <Link className="secondary-action" href="/qa-run-control">Run Control</Link>
           <Link className="secondary-action" href="/qa-proof-promotion">Proof Promotion</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
-          <Link className="secondary-action" href="/boundary-resolution">Boundary Register</Link>
         </div>
       </section>
 
-      <section className="section-band hub-summary" aria-label="Manual AAL2 QA run-control summary">
+      <section className="section-band hub-summary" aria-label="Manual AAL2 QA launch summary">
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
         </article>
         <article>
           <span>Decision</span>
-          <strong>{summary.executionDecision}</strong>
-        </article>
-        <article>
-          <span>Claim status</span>
-          <strong>{summary.buyerClaimStatus}</strong>
+          <strong>{summary.launchDecision}</strong>
         </article>
         <article>
           <span>Workflows</span>
           <strong>{summary.workflowCount}</strong>
         </article>
         <article>
-          <span>Gates</span>
-          <strong>{summary.gateCount}</strong>
+          <span>Phases</span>
+          <strong>{summary.phaseCount}</strong>
         </article>
         <article>
           <span>Hard stops</span>
-          <strong>{summary.hardStopGateCount}</strong>
+          <strong>{summary.hardStopPhaseCount}</strong>
         </article>
         <article>
-          <span>Commands</span>
-          <strong>{summary.commandTemplateCount}</strong>
+          <span>Safe fields</span>
+          <strong>{summary.safeCopyFieldCount}</strong>
         </article>
         <article>
-          <span>Rejected fields</span>
-          <strong>{summary.forbiddenEvidenceCount}</strong>
+          <span>Blocked claims</span>
+          <strong>{summary.blockedClaimCount}</strong>
+        </article>
+        <article>
+          <span>Proof state</span>
+          <strong>{summary.proofPromotionState}</strong>
         </article>
       </section>
 
       <section className="section-band split-band">
         <div>
           <p className="eyebrow">Boundary</p>
-          <h2>Operator-ready does not mean authenticated proof has been created or retained.</h2>
+          <h2>Operator-ready still means human-required, no-token-storage, and not-retained-proof.</h2>
           <p className="section-copy">{summary.boundary}</p>
         </div>
         <div className="layer-list">
-          {summary.claimRules.map((rule, index) => (
+          {summary.launchRules.map((rule, index) => (
             <div className="layer-row" key={rule}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{rule}</strong>
@@ -87,38 +85,38 @@ export default function QaRunControlPage() {
         </div>
       </section>
 
-      <section className="table-section" aria-label="Manual AAL2 QA run-control gates">
+      <section className="table-section" aria-label="Manual AAL2 QA launch phases">
         <div className="section-heading">
-          <p className="eyebrow">Run gates</p>
-          <h2>Every run has explicit pass signals, fail signals, owners, and retained boundaries.</h2>
+          <p className="eyebrow">Launch phases</p>
+          <h2>Every phase has an owner, pass signal, and fail-closed condition.</h2>
         </div>
-        {summary.gates.map((gate) => (
-          <article className="module-row" key={gate.gate}>
+        {summary.phases.map((phase) => (
+          <article className="module-row" key={phase.phase}>
             <div>
-              <span>{gate.state}</span>
-              <h2>{gate.gate}</h2>
+              <span>{phase.state}</span>
+              <h2>{phase.phase}</h2>
             </div>
-            <p>{gate.boundary}</p>
+            <p>{phase.operatorAction}</p>
             <div>
-              <strong>{gate.owner}</strong>
+              <strong>{phase.owner}</strong>
               <ul className="compact-list">
-                <li>Pass: {gate.passSignal}</li>
-                <li>Fail: {gate.failSignal}</li>
+                <li>Pass: {phase.passSignal}</li>
+                <li>Fail closed: {phase.failClosedIf}</li>
               </ul>
             </div>
           </article>
         ))}
       </section>
 
-      <section className="table-section" aria-label="Manual AAL2 QA workflow controls">
+      <section className="table-section" aria-label="Manual AAL2 QA launch workflows">
         <div className="section-heading">
-          <p className="eyebrow">Workflow controls</p>
-          <h2>Each workflow gives operators the exact no-secret fields needed before, during, and after the run.</h2>
+          <p className="eyebrow">Workflow launch packets</p>
+          <h2>Operators get exact dispatch inputs, command templates, and safe evidence payloads.</h2>
         </div>
         {summary.workflows.map((workflow) => (
           <article className="module-row module-row-stack" key={workflow.workflowKind}>
             <div>
-              <span>{workflow.state}</span>
+              <span>{workflow.workflowKind}</span>
               <h2>{workflow.name}</h2>
             </div>
             <p>{workflow.buyerProofPromotionRule}</p>
@@ -141,16 +139,16 @@ export default function QaRunControlPage() {
             </div>
             <div className="principle-grid">
               <article>
-                <span>Evidence template</span>
-                <h3>{workflow.workflowKind}</h3>
+                <span>Safe packet</span>
+                <h3>{workflow.protectedPersistenceRoute}</h3>
                 <JsonBlock value={workflow.safeEvidenceTemplate} />
               </article>
               <article>
-                <span>Operator sequence</span>
-                <h3>{workflow.operatorSequence.length} steps</h3>
+                <span>Safe copy fields</span>
+                <h3>{workflow.postRunSafeCopyFields.length} fields</h3>
                 <ul className="compact-list">
-                  {workflow.operatorSequence.map((step) => (
-                    <li key={step}>{step}</li>
+                  {workflow.postRunSafeCopyFields.map((field) => (
+                    <li key={field}>{field}</li>
                   ))}
                 </ul>
               </article>
@@ -168,16 +166,16 @@ export default function QaRunControlPage() {
         ))}
       </section>
 
-      <section className="section-band" aria-label="Manual AAL2 QA operator brief routes">
+      <section className="section-band" aria-label="Manual AAL2 QA launch blocked claims">
         <div className="section-heading">
-          <p className="eyebrow">Operator packet path</p>
-          <h2>Use these brief routes before touching a short-lived AAL2 token.</h2>
+          <p className="eyebrow">Blocked claims</p>
+          <h2>The launch kit improves execution readiness; it does not create clinical or production authority.</h2>
         </div>
         <div className="layer-list">
-          {summary.operatorBriefRoutes.map((route, index) => (
-            <div className="layer-row" key={route}>
+          {summary.blockedClaims.map((claim, index) => (
+            <div className="layer-row" key={claim}>
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{route}</strong>
+              <strong>{claim}</strong>
             </div>
           ))}
         </div>

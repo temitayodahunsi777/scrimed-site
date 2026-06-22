@@ -223,6 +223,37 @@ function requireQaRunControlBoundary(label, response) {
   }
 }
 
+function requireQaLaunchKitBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const launchKit = response.headers.get("x-scrimed-qa-launch-kit");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (launchKit !== "no-secret-human-aal2-handoff") {
+    throw new Error(`${label} expected x-scrimed-qa-launch-kit no-secret-human-aal2-handoff but received ${launchKit}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "operator-handoff-ready-not-retained-proof") {
+    throw new Error(`${label} expected x-scrimed-qa-proof operator-handoff-ready-not-retained-proof but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 function requireQaProofPromotionBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
@@ -863,6 +894,20 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.qaLaunchKit !==
+    "manual-aal2-qa-launch-kit-no-secret-human-handoff"
+  ) {
+    throw new Error("product console missing QA launch-kit proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaLaunchKitBrief !==
+    "manual-aal2-qa-launch-kit-brief-no-token-storage"
+  ) {
+    throw new Error("product console missing QA launch-kit brief proof-stack posture.");
+  }
+
+  if (
     body.proofStack?.qaProofPromotion !==
     "retained-manual-qa-proof-promotion-gate-no-secret"
   ) {
@@ -894,6 +939,22 @@ async function checkProductConsole() {
 
   if (!body.qaRunControlCommandTemplateCount || body.qaRunControlCommandTemplateCount < 4) {
     throw new Error("product console expected QA run-control command template coverage.");
+  }
+
+  if (!body.qaLaunchKitPhaseCount || body.qaLaunchKitPhaseCount < 9) {
+    throw new Error("product console expected QA launch-kit phase coverage.");
+  }
+
+  if (!body.qaLaunchKitWorkflowCount || body.qaLaunchKitWorkflowCount < 2) {
+    throw new Error("product console expected QA launch-kit workflow coverage.");
+  }
+
+  if (!body.qaLaunchKitSafeCopyFieldCount || body.qaLaunchKitSafeCopyFieldCount < 10) {
+    throw new Error("product console expected QA launch-kit safe-copy field coverage.");
+  }
+
+  if (!body.qaLaunchKitBlockedClaimCount || body.qaLaunchKitBlockedClaimCount < 9) {
+    throw new Error("product console expected QA launch-kit blocked-claim coverage.");
   }
 
   if (!body.qaProofPromotionRuleCount || body.qaProofPromotionRuleCount < 5) {
@@ -1266,6 +1327,82 @@ async function checkQaRunControl() {
   }
 
   console.log("pass QA run control");
+}
+
+async function checkQaLaunchKit() {
+  const result = await request("/api/qa-evidence/launch-kit");
+  requireStatus("QA launch kit", result.response.status, 200);
+  requireContentType("QA launch kit", result.response, "application/json");
+  requireQaLaunchKitBoundary("QA launch kit", result.response);
+  const body = requireJson("QA launch kit", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-manual-aal2-qa-launch-kit") {
+    throw new Error(`QA launch kit expected scrimed-manual-aal2-qa-launch-kit but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-launch-kit-ready") {
+    throw new Error(`QA launch kit expected ready status but received ${body.status}.`);
+  }
+
+  if (body.launchDecision !== "ready-for-human-launch-not-code-execution") {
+    throw new Error("QA launch kit must preserve human-launch decision.");
+  }
+
+  if (body.buyerClaimStatus !== "operator-handoff-ready-not-retained-authenticated-proof") {
+    throw new Error("QA launch kit must preserve not-retained authenticated proof boundary.");
+  }
+
+  if (!Array.isArray(body.phases) || body.phases.length < 9) {
+    throw new Error("QA launch kit expected launch phase coverage.");
+  }
+
+  if (!body.phases.some((phase) => phase.state === "hard-stop")) {
+    throw new Error("QA launch kit expected hard-stop phase.");
+  }
+
+  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
+    throw new Error("QA launch kit expected both manual workflows.");
+  }
+
+  if (!body.workflows.every((workflow) => workflow.dispatchInputs?.require_authenticated_path === true)) {
+    throw new Error("QA launch kit workflows must require authenticated path dispatch.");
+  }
+
+  if (!body.workflows.every((workflow) => workflow.safeEvidenceTemplate?.tokenDisposalAttestation === "temporary-token-deleted-or-rotated")) {
+    throw new Error("QA launch kit safe evidence templates must require token disposal attestation.");
+  }
+
+  if (!Array.isArray(body.blockedClaims) || !body.blockedClaims.includes("live clinical care authorized")) {
+    throw new Error("QA launch kit expected live clinical care to remain blocked.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA launch kit response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA launch kit response must not contain bearer-token material.");
+  }
+
+  const brief = await request("/api/qa-evidence/launch-kit/brief");
+  requireStatus("QA launch kit brief", brief.response.status, 200);
+  requireContentType("QA launch kit brief", brief.response, "text/markdown");
+  requireQaLaunchKitBoundary("QA launch kit brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Manual AAL2 QA Launch Kit")) {
+    throw new Error("QA launch kit brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("ready-for-human-launch-not-code-execution")) {
+    throw new Error("QA launch kit brief missing human-launch decision.");
+  }
+
+  if (!brief.body.text.includes("temporary-token-deleted-or-rotated")) {
+    throw new Error("QA launch kit brief missing token disposal attestation.");
+  }
+
+  console.log("pass QA launch kit");
 }
 
 async function checkQaProofPromotion() {
@@ -1962,6 +2099,7 @@ await checkHtml("/global-reach");
 await checkHtml("/boundary-resolution");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
+await checkHtml("/qa-launch-kit");
 await checkHtml("/qa-proof-promotion");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
@@ -1975,6 +2113,7 @@ await checkPilotDealRoomApi();
 await checkQaEvidenceLedger();
 await checkQaExecutionReadiness();
 await checkQaRunControl();
+await checkQaLaunchKit();
 await checkQaProofPromotion();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",

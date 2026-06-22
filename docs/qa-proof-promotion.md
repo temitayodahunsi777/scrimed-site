@@ -48,13 +48,14 @@ Proof Promotion does not execute AAL2 workflows, mint tokens, store credentials,
 ## Operator Path
 
 1. Open `/qa-run-control`.
-2. Complete the human AAL2 workflow with exactly one synthetic target.
-3. Delete or rotate the temporary token secret.
-4. Persist only safe metadata through `/pilot-workspace/access` -> Manual QA Evidence.
-5. Open `/qa-proof-promotion`.
-6. Confirm the state is `ready-for-buyer-diligence`.
-7. Export Buyer Diligence with only safe run metadata and packet SHA-256.
+2. Open `/qa-launch-kit`.
+3. Complete the human AAL2 workflow with exactly one synthetic target.
+4. Delete or rotate the temporary token secret.
+5. Persist only safe metadata through `/pilot-workspace/access` -> Manual QA Evidence.
+6. Open `/qa-proof-promotion`.
+7. Confirm the state is `ready-for-buyer-diligence`.
+8. Export Buyer Diligence with only safe run metadata and packet SHA-256.
 
 ## Next Step
 
-Run the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow, persist the no-secret packet, then use `/qa-proof-promotion` before releasing buyer-facing retained QA proof.
+Run the first human AAL2 Sales Demo Session QA or Authority Reference QA workflow through `/qa-launch-kit`, persist the no-secret packet, then use `/qa-proof-promotion` before releasing buyer-facing retained QA proof.

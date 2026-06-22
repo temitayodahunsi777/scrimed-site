@@ -189,6 +189,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "SCRIMED governance, qualified reviewers, trust operations, legal, privacy, security, and customer authority owners",
     objective: "Risk-rank missing, pending, due, expired, and rejected authority references and verify the path through an authenticated no-PHI QA harness before buyer or operator demos."
+  },
+  {
+    name: "Manual AAL2 QA Launch Kit",
+    route: "/qa-launch-kit",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release engineering, TrustOS, security, and tenant governance",
+    objective: "Package the no-secret human-run AAL2 workflow handoff before retained authenticated QA proof can be claimed."
   }
 ];
 
@@ -304,6 +312,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "Manual AAL2 QA Launch Kit",
+    value: "no-secret human-run handoff ready",
+    tone: "good"
+  },
+  {
     name: "Manual QA evidence packet",
     value: "no-secret capture contract active",
     tone: "good"
@@ -370,6 +383,9 @@ export const hubRoutes = [
   "/agent-workspace",
   "/pilot-evidence",
   qaEvidenceLedgerRoute,
+  "/qa-launch-kit",
+  "/api/qa-evidence/launch-kit",
+  "/api/qa-evidence/launch-kit/brief",
   "/sales-operations",
   "/pilots",
   "/demos",

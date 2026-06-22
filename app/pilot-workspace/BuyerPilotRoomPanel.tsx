@@ -206,6 +206,9 @@ export default function BuyerPilotRoomPanel({
           <h2>{room.qaProofPromotion.buyerSafeClaim}</h2>
           <p className="section-copy">{room.qaProofPromotion.buyerProofLanguage}</p>
           <div className="form-actions">
+            <Link className="secondary-action" href="/qa-launch-kit">
+              Launch Kit
+            </Link>
             <Link className="secondary-action" href={room.qaProofPromotion.route}>
               Review Promotion Rules
             </Link>

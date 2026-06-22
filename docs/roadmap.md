@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-06-21
+Updated: 2026-06-22
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -31,6 +31,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Manual AAL2 QA Evidence Activation Plan is the active no-secret runbook gate for workflow dispatch, token preflight, safe evidence fields, prohibited content, temporary-secret disposal, protected persistence, and Buyer Diligence export before authenticated QA evidence is claimed.
 - Manual AAL2 QA Execution Readiness is the active go/no-go gate for human AAL2 session confirmation, explicit synthetic target selection, token preflight, manual workflow dispatch, temporary-secret disposal, no-secret packet persistence, and Buyer Diligence export sequencing.
 - Manual AAL2 QA Run Control is the active no-secret mission-control gate for workflow-specific dispatch inputs, command templates, safe evidence payloads, abort conditions, operator sequences, and buyer-proof promotion rules before the first human AAL2 QA run.
+- Manual AAL2 QA Launch Kit is the active single operator handoff for human AAL2 confirmation, synthetic target selection, temporary secret handling, workflow dispatch, safe metadata copy, secret disposal, packet persistence, and Proof Promotion checks.
 - Manual QA Proof Promotion is the active retained-packet gate before Buyer Diligence can reference authenticated manual AAL2 QA proof; no protected packet hash means activation-ready language only.
 - Buyer Diligence QA Activation Posture is the active buyer-safe workaround for pending human AAL2 packets; exports must disclose activation workflows, safe fields, completion criteria, and remaining human gates instead of hiding missing authenticated proof.
 - Boundary Resolution Register is the active cross-system gate for clinical authority, care activation, PHI, legal, regional, reimbursement, security, QA, public-market, and production-readiness boundaries; every known boundary must show owner, control, workaround, proof route, retained gate, and prohibited claims before buyer or investor use.
@@ -111,6 +112,7 @@ Completed foundations:
 - Authority Reference QA Evidence Bridge with manual GitHub Actions dispatch, local token preflight, safe smoke output, Manual QA Evidence workflow-kind selection, protected no-secret persistence, Product Console proof-stack visibility, and public smoke coverage
 - Manual AAL2 QA Evidence Activation Plan with workflow-specific targets, safe-copy fields, prohibited-input controls, completion criteria, Buyer Diligence export sequencing, Product Console proof-stack visibility, downloadable brief, and public smoke coverage
 - Manual AAL2 QA Execution Readiness with public page, JSON API, Markdown brief, go/no-go stages, hard stops, claim rules, workflow dispatch metadata, no-secret headers, Product Console wiring, QA Evidence page visibility, and public smoke coverage
+- Manual AAL2 QA Launch Kit with public page, JSON API, Markdown brief, launch phases, workflow dispatch packets, safe evidence templates, post-run safe-copy fields, secret-disposal gates, Product Console proof-stack visibility, QA Evidence Ledger entry, Boundary Resolution routing, and public smoke coverage
 - Manual QA Proof Promotion with public page, JSON API, Markdown brief, retained-packet promotion decision, hard stops, blocked claims, Buyer Pilot Room wiring, Product Console proof-stack visibility, QA Evidence Ledger entry, Boundary Resolution routing, and public smoke coverage
 - Buyer Diligence QA Activation Posture with protected buyer-room UI visibility, QA activation workflow counts, safe-copy fields, completion criteria, dedicated export section, and explicit retained human AAL2 boundary before packets exist
 - Boundary Resolution Register with public page, JSON API, Markdown brief, Product Console proof-stack wiring, cross-system record aggregation, no-authority headers, and public smoke coverage
@@ -168,7 +170,7 @@ Completed foundations:
 Next build targets:
 
 - Add finance-approved allocation methodology records, external-use approval workflows, rolling buyer-segment cohort comparison, and counsel-reviewed investor/marketing material gates once qualified finance methodology and external-use policy are approved.
-- Use `/qa-run-control` and `/qa-proof-promotion` to run the manual Sales Demo Session QA and Authority Reference QA workflows with short-lived AAL2 operator tokens, retain only the no-secret output in `/pilot-workspace/access -> Manual QA Evidence`, confirm packet-hash promotion eligibility, and export Buyer Diligence.
+- Use `/qa-launch-kit` and `/qa-proof-promotion` to run the manual Sales Demo Session QA and Authority Reference QA workflows with short-lived AAL2 operator tokens, retain only the no-secret output in `/pilot-workspace/access -> Manual QA Evidence`, confirm packet-hash promotion eligibility, and export Buyer Diligence.
 - Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, generate the sanitized packet through `/api/qa-evidence/manual-run-packet`, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.

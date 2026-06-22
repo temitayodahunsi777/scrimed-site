@@ -1,6 +1,14 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-21
+Updated: 2026-06-22
+
+## Latest Manual AAL2 QA Launch Kit Release
+
+- Added `/qa-launch-kit`, `/api/qa-evidence/launch-kit`, and `/api/qa-evidence/launch-kit/brief` as the no-secret operator handoff for the first human AAL2 synthetic QA run.
+- Added launch phases covering human AAL2 confirmation, synthetic target selection, temporary secret handling, preflight and dispatch, safe metadata copy, secret disposal, no-secret packet persistence, Proof Promotion, and production-authority hard stops.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution, `/qa-evidence`, `/product`, `/qa-run-control`, `/qa-proof-promotion`, and Buyer Pilot Room navigation with Launch Kit visibility.
+- Added `docs/qa-launch-kit.md` as the operator runbook for using the Launch Kit before touching a short-lived AAL2 token.
+- Preserved the boundary: Launch Kit does not execute passkey ceremonies, mint tokens, store credentials, store PHI, run unattended authenticated CI, certify security or compliance, authorize live clinical care, guarantee reimbursement, approve production connectors, or claim retained authenticated QA proof before protected no-secret packet hashes are visible.
 
 ## Latest Manual QA Proof Promotion Release
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
+import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
 import { getQaProofPromotionSummary } from "../lib/qaProofPromotion";
 import { getQaRunControlSummary } from "../lib/qaRunControl";
 
@@ -14,6 +15,7 @@ export default function QaEvidencePage() {
   const ledger = getQaEvidenceLedger();
   const executionReadiness = getQaExecutionReadinessSummary();
   const runControl = getQaRunControlSummary();
+  const launchKit = getQaLaunchKitSummary();
   const proofPromotion = getQaProofPromotionSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
@@ -48,6 +50,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={runControl.route}>
             Run Control
+          </Link>
+          <Link className="secondary-action" href={launchKit.route}>
+            Launch Kit
           </Link>
           <Link className="secondary-action" href={proofPromotion.route}>
             Proof Promotion
@@ -98,6 +103,14 @@ export default function QaEvidencePage() {
         <article>
           <span>Run control</span>
           <strong>{runControl.executionDecision}</strong>
+        </article>
+        <article>
+          <span>Launch kit</span>
+          <strong>{launchKit.launchDecision}</strong>
+        </article>
+        <article>
+          <span>Launch phases</span>
+          <strong>{launchKit.phaseCount}</strong>
         </article>
         <article>
           <span>Proof promotion</span>
@@ -245,6 +258,38 @@ export default function QaEvidencePage() {
                 <li>Evidence route: {workflow.evidencePacketRoute}</li>
                 <li>Persistence: {workflow.protectedPersistenceRoute}</li>
                 <li>Abort conditions: {workflow.abortConditions.length}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA launch kit">
+        <div className="section-heading">
+          <p className="eyebrow">Launch kit</p>
+          <h2>Operators now have one no-secret handoff before running the first human AAL2 workflow.</h2>
+          <p className="section-copy">{launchKit.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={launchKit.route}>
+              Open Launch Kit
+            </Link>
+            <a className="secondary-action" href={launchKit.briefRoute}>
+              Download Launch Kit
+            </a>
+          </div>
+        </div>
+        {launchKit.phases.map((phase) => (
+          <article className="module-row" key={phase.phase}>
+            <div>
+              <span>{phase.state}</span>
+              <h2>{phase.phase}</h2>
+            </div>
+            <p>{phase.operatorAction}</p>
+            <div>
+              <strong>{phase.owner}</strong>
+              <ul className="compact-list">
+                <li>Pass: {phase.passSignal}</li>
+                <li>Fail closed: {phase.failClosedIf}</li>
               </ul>
             </div>
           </article>
