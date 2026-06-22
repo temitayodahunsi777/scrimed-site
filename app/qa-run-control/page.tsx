@@ -29,6 +29,7 @@ export default function QaRunControlPage() {
           <a className="primary-action" href={summary.briefRoute}>Download Run-Control Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/qa-execution-readiness">Execution Readiness</Link>
+          <Link className="secondary-action" href="/qa-proof-promotion">Proof Promotion</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
           <Link className="secondary-action" href="/boundary-resolution">Boundary Register</Link>
         </div>

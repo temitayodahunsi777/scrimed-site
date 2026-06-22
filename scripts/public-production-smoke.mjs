@@ -223,6 +223,37 @@ function requireQaRunControlBoundary(label, response) {
   }
 }
 
+function requireQaProofPromotionBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const proofPromotion = response.headers.get("x-scrimed-qa-proof-promotion");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "promotion-gated-retained-packet-required") {
+    throw new Error(`${label} expected x-scrimed-qa-proof promotion-gated-retained-packet-required but received ${qaProof}.`);
+  }
+
+  if (proofPromotion !== "retained-packet-required") {
+    throw new Error(`${label} expected x-scrimed-qa-proof-promotion retained-packet-required but received ${proofPromotion}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -831,6 +862,20 @@ async function checkProductConsole() {
     throw new Error("product console missing QA run-control brief proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.qaProofPromotion !==
+    "retained-manual-qa-proof-promotion-gate-no-secret"
+  ) {
+    throw new Error("product console missing QA proof-promotion proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaProofPromotionBrief !==
+    "manual-qa-proof-promotion-brief-retained-packet-required"
+  ) {
+    throw new Error("product console missing QA proof-promotion brief proof-stack posture.");
+  }
+
   if (!body.qaExecutionReadinessWorkflowCount || body.qaExecutionReadinessWorkflowCount < 2) {
     throw new Error("product console expected QA execution readiness workflow coverage.");
   }
@@ -849,6 +894,18 @@ async function checkProductConsole() {
 
   if (!body.qaRunControlCommandTemplateCount || body.qaRunControlCommandTemplateCount < 4) {
     throw new Error("product console expected QA run-control command template coverage.");
+  }
+
+  if (!body.qaProofPromotionRuleCount || body.qaProofPromotionRuleCount < 5) {
+    throw new Error("product console expected QA proof-promotion rule coverage.");
+  }
+
+  if (!body.qaProofPromotionHardStopRuleCount || body.qaProofPromotionHardStopRuleCount < 3) {
+    throw new Error("product console expected QA proof-promotion hard-stop coverage.");
+  }
+
+  if (!body.qaProofPromotionBlockedClaimCount || body.qaProofPromotionBlockedClaimCount < 8) {
+    throw new Error("product console expected QA proof-promotion blocked-claim coverage.");
   }
 
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
@@ -1209,6 +1266,70 @@ async function checkQaRunControl() {
   }
 
   console.log("pass QA run control");
+}
+
+async function checkQaProofPromotion() {
+  const result = await request("/api/qa-evidence/proof-promotion");
+  requireStatus("QA proof promotion", result.response.status, 200);
+  requireContentType("QA proof promotion", result.response, "application/json");
+  requireQaProofPromotionBoundary("QA proof promotion", result.response);
+  const body = requireJson("QA proof promotion", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-manual-qa-proof-promotion") {
+    throw new Error(`QA proof promotion expected scrimed-manual-qa-proof-promotion but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-proof-promotion-gate-ready") {
+    throw new Error(`QA proof promotion expected ready status but received ${body.status}.`);
+  }
+
+  if (body.promotionDecisionState !== "pending-retained-packet") {
+    throw new Error(`QA proof promotion expected pending-retained-packet public state but received ${body.promotionDecisionState}.`);
+  }
+
+  if (body.promotionAllowed !== false) {
+    throw new Error("QA proof promotion must not allow public/default promotion before retained packet visibility.");
+  }
+
+  if (!Array.isArray(body.rules) || body.rules.length < 5) {
+    throw new Error("QA proof promotion expected rule coverage.");
+  }
+
+  if (!Array.isArray(body.blockedClaims) || !body.blockedClaims.includes("live clinical care authorized")) {
+    throw new Error("QA proof promotion expected live clinical care to remain a blocked claim.");
+  }
+
+  if (!body.decision?.buyerProofLanguage?.includes("not retained authenticated QA proof")) {
+    throw new Error("QA proof promotion default decision must preserve not-retained proof language.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA proof promotion response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA proof promotion response must not contain bearer-token material.");
+  }
+
+  const brief = await request("/api/qa-evidence/proof-promotion/brief");
+  requireStatus("QA proof promotion brief", brief.response.status, 200);
+  requireContentType("QA proof promotion brief", brief.response, "text/markdown");
+  requireQaProofPromotionBoundary("QA proof promotion brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Manual QA Proof Promotion Brief")) {
+    throw new Error("QA proof promotion brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("pending-retained-packet")) {
+    throw new Error("QA proof promotion brief missing pending retained-packet state.");
+  }
+
+  if (!brief.body.text.includes("Retained packet hash required")) {
+    throw new Error("QA proof promotion brief missing retained packet hash rule.");
+  }
+
+  console.log("pass QA proof promotion");
 }
 
 async function checkClinicalCareActivation() {
@@ -1841,6 +1962,7 @@ await checkHtml("/global-reach");
 await checkHtml("/boundary-resolution");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
+await checkHtml("/qa-proof-promotion");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
@@ -1853,6 +1975,7 @@ await checkPilotDealRoomApi();
 await checkQaEvidenceLedger();
 await checkQaExecutionReadiness();
 await checkQaRunControl();
+await checkQaProofPromotion();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"

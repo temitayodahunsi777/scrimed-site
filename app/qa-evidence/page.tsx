@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
 import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
+import { getQaProofPromotionSummary } from "../lib/qaProofPromotion";
 import { getQaRunControlSummary } from "../lib/qaRunControl";
 
 export const metadata = {
@@ -13,6 +14,7 @@ export default function QaEvidencePage() {
   const ledger = getQaEvidenceLedger();
   const executionReadiness = getQaExecutionReadinessSummary();
   const runControl = getQaRunControlSummary();
+  const proofPromotion = getQaProofPromotionSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
       ? ledger.currentDeployment.commitSha
@@ -46,6 +48,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={runControl.route}>
             Run Control
+          </Link>
+          <Link className="secondary-action" href={proofPromotion.route}>
+            Proof Promotion
           </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
@@ -93,6 +98,18 @@ export default function QaEvidencePage() {
         <article>
           <span>Run control</span>
           <strong>{runControl.executionDecision}</strong>
+        </article>
+        <article>
+          <span>Proof promotion</span>
+          <strong>{proofPromotion.promotionDecisionState}</strong>
+        </article>
+        <article>
+          <span>Promotion rules</span>
+          <strong>{proofPromotion.ruleCount}</strong>
+        </article>
+        <article>
+          <span>Proof blocked</span>
+          <strong>{proofPromotion.blockedClaims.length}</strong>
         </article>
         <article>
           <span>Data boundary</span>
@@ -228,6 +245,52 @@ export default function QaEvidencePage() {
                 <li>Evidence route: {workflow.evidencePacketRoute}</li>
                 <li>Persistence: {workflow.protectedPersistenceRoute}</li>
                 <li>Abort conditions: {workflow.abortConditions.length}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual QA proof promotion">
+        <div className="section-heading">
+          <p className="eyebrow">Proof promotion</p>
+          <h2>SCRIMED separates activation readiness from retained authenticated QA proof.</h2>
+          <p className="section-copy">{proofPromotion.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={proofPromotion.route}>
+              Open Proof Promotion
+            </Link>
+            <a className="secondary-action" href={proofPromotion.briefRoute}>
+              Download Promotion Brief
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{proofPromotion.promotionDecisionState}</span>
+            <h2>{proofPromotion.decision.buyerSafeClaim}</h2>
+          </div>
+          <p>{proofPromotion.decision.buyerProofLanguage}</p>
+          <div>
+            <strong>{proofPromotion.decision.nextAction}</strong>
+            <ul className="compact-list">
+              <li>Promotion allowed: {proofPromotion.promotionAllowed ? "yes" : "no"}</li>
+              <li>Protected persistence: {proofPromotion.protectedPersistenceRoute}</li>
+              <li>Hard stops: {proofPromotion.hardStopRuleCount}</li>
+            </ul>
+          </div>
+        </article>
+        {proofPromotion.rules.map((rule) => (
+          <article className="module-row" key={rule.rule}>
+            <div>
+              <span>{rule.status}</span>
+              <h2>{rule.rule}</h2>
+            </div>
+            <p>{rule.beforePromotion}</p>
+            <div>
+              <strong>{rule.afterPromotion}</strong>
+              <ul className="compact-list">
+                <li>{rule.boundary}</li>
               </ul>
             </div>
           </article>

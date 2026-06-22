@@ -105,6 +105,18 @@ export default function ProductConsolePage() {
           <strong>{summary.qaRunControlCommandTemplateCount}</strong>
         </article>
         <article>
+          <span>QA proof rules</span>
+          <strong>{summary.qaProofPromotionRuleCount}</strong>
+        </article>
+        <article>
+          <span>QA hard stops</span>
+          <strong>{summary.qaProofPromotionHardStopRuleCount}</strong>
+        </article>
+        <article>
+          <span>QA blocked claims</span>
+          <strong>{summary.qaProofPromotionBlockedClaimCount}</strong>
+        </article>
+        <article>
           <span>Clinical blocked</span>
           <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
         </article>
@@ -289,6 +301,52 @@ export default function ProductConsolePage() {
                 <li>Command templates: 2</li>
                 <li>Evidence route: {workflow.evidencePacketRoute}</li>
                 <li>Persistence: {workflow.protectedPersistenceRoute}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual QA proof promotion">
+        <div className="section-heading">
+          <p className="eyebrow">Manual QA proof promotion</p>
+          <h2>Buyer proof can reference authenticated QA only after no-secret packet metadata is retained.</h2>
+          <p className="section-copy">{summary.qaProofPromotionSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaProofPromotionRoute}>
+              Open Proof Promotion
+            </Link>
+            <a className="secondary-action" href={summary.qaProofPromotionBriefRoute}>
+              Download Promotion Brief
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.qaProofPromotionSummary.promotionDecisionState}</span>
+            <h2>{summary.qaProofPromotionSummary.decision.buyerSafeClaim}</h2>
+          </div>
+          <p>{summary.qaProofPromotionSummary.decision.buyerProofLanguage}</p>
+          <div>
+            <strong>{summary.qaProofPromotionSummary.decision.nextAction}</strong>
+            <ul className="compact-list">
+              <li>Promotion allowed: {summary.qaProofPromotionSummary.promotionAllowed ? "yes" : "no"}</li>
+              <li>Hard stops: {summary.qaProofPromotionHardStopRuleCount}</li>
+              <li>Blocked claims: {summary.qaProofPromotionBlockedClaimCount}</li>
+            </ul>
+          </div>
+        </article>
+        {summary.qaProofPromotionSummary.rules.map((rule) => (
+          <article className="module-row" key={rule.rule}>
+            <div>
+              <span>{rule.status}</span>
+              <h2>{rule.rule}</h2>
+            </div>
+            <p>{rule.beforePromotion}</p>
+            <div>
+              <strong>{rule.afterPromotion}</strong>
+              <ul className="compact-list">
+                <li>{rule.boundary}</li>
               </ul>
             </div>
           </article>

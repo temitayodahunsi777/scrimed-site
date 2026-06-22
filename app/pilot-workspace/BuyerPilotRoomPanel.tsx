@@ -113,6 +113,10 @@ export default function BuyerPilotRoomPanel({
           <strong>{room.evidenceCounts.manualQaEvidencePackets}</strong>
         </article>
         <article>
+          <span>QA proof</span>
+          <strong>{room.qaProofPromotion.promotionAllowed ? "promotable" : "pending"}</strong>
+        </article>
+        <article>
           <span>QA activation</span>
           <strong>{room.qaActivationPlan.workflowCount}</strong>
         </article>
@@ -192,6 +196,37 @@ export default function BuyerPilotRoomPanel({
                 <li>Next: {workflow.nextAction}</li>
               </ul>
             </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="demo-runbook" aria-label="Manual QA proof promotion">
+        <div className="section-heading">
+          <p className="eyebrow">QA proof promotion</p>
+          <h2>{room.qaProofPromotion.buyerSafeClaim}</h2>
+          <p className="section-copy">{room.qaProofPromotion.buyerProofLanguage}</p>
+          <div className="form-actions">
+            <Link className="secondary-action" href={room.qaProofPromotion.route}>
+              Review Promotion Rules
+            </Link>
+          </div>
+        </div>
+        {[
+          `State: ${room.qaProofPromotion.state}`,
+          `Promotion allowed: ${room.qaProofPromotion.promotionAllowed ? "yes" : "no"}`,
+          `Latest run: ${room.qaProofPromotion.latestWorkflowRunId}`,
+          `Latest hash: ${room.qaProofPromotion.latestPacketHash}`,
+          `Next: ${room.qaProofPromotion.nextAction}`
+        ].map((item, index) => (
+          <article className="module-row" key={item}>
+            <div>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h2>{item}</h2>
+            </div>
+            <p>
+              Promotion remains limited to synthetic no-secret QA evidence and cannot authorize live clinical,
+              PHI, payer, connector, security-certification, or reimbursement claims.
+            </p>
           </article>
         ))}
       </div>

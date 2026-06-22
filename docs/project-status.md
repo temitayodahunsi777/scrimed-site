@@ -2,6 +2,14 @@
 
 Updated: 2026-06-21
 
+## Latest Manual QA Proof Promotion Release
+
+- Added `/qa-proof-promotion`, `/api/qa-evidence/proof-promotion`, and `/api/qa-evidence/proof-promotion/brief` as the retained-packet gate for buyer-facing manual AAL2 synthetic QA claims.
+- Added a typed promotion decision that stays `pending-retained-packet` until protected no-secret packet metadata is visible, then allows Buyer Diligence to reference only workflow run IDs, packet hashes, audit event references, attestations, and synthetic data boundaries.
+- Updated Buyer Pilot Room, Product Console, Product Readiness Brief, QA Evidence Ledger, Boundary Resolution, `/qa-evidence`, `/qa-run-control`, and public smoke coverage with Proof Promotion visibility.
+- Added `docs/qa-proof-promotion.md` as the operator runbook for moving from activation-ready language to retained QA proof language.
+- Preserved the boundary: Proof Promotion does not execute AAL2 workflows, mint tokens, store credentials, store PHI, certify security or compliance, authorize live clinical care, guarantee reimbursement, approve production connectors, or allow authenticated-proof claims before a protected packet hash is visible.
+
 ## Latest Manual AAL2 QA Run Control Release
 
 - Added `/qa-run-control`, `/api/qa-evidence/run-control`, and `/api/qa-evidence/run-control/brief` as the no-secret mission-control layer for first human AAL2 synthetic QA runs.

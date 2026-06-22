@@ -241,6 +241,7 @@ export function getBoundaryResolutionSummary() {
     proofRoutes: [
       "/qa-execution-readiness",
       "/qa-run-control",
+      "/qa-proof-promotion",
       qaActivationPlan.route,
       qaActivationPlan.briefRoute,
       workflow.workflowPath,
@@ -265,7 +266,7 @@ export function getBoundaryResolutionSummary() {
     safeWorkaround: limitation.currentControl,
     remainingGate: limitation.resolutionPath,
     owner: "QA, TrustOS, release engineering, and operator governance",
-    proofRoutes: [qaLedger.route, qaLedger.apiRoute, qaLedger.briefRoute],
+    proofRoutes: [qaLedger.route, qaLedger.apiRoute, qaLedger.briefRoute, "/qa-proof-promotion"],
     nextAction: limitation.resolutionPath,
     prohibitedClaims: universalProhibitedClaims
   }));
@@ -335,7 +336,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-run-control to execute the first human AAL2 QA workflow with the no-secret operator brief, persist the safe evidence packet, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
+      "Use /qa-run-control to execute the first human AAL2 QA workflow with the no-secret operator brief, persist the safe evidence packet, confirm /qa-proof-promotion allows only retained packet metadata, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
     records,
     updated: "2026-06-21"
   };

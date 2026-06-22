@@ -28,7 +28,8 @@ Run Control does not execute passkey ceremonies, mint tokens, store credentials,
 7. Copy only the safe IDs printed by the workflow.
 8. Delete or rotate the temporary secret.
 9. Persist the packet through `/pilot-workspace/access` -> Manual QA Evidence.
-10. Export Buyer Diligence only after the retained packet hash and audit event are visible.
+10. Open `/qa-proof-promotion` and confirm retained-packet promotion is allowed.
+11. Export Buyer Diligence only after the retained packet hash and audit event are visible.
 
 ## Prohibited Content
 
@@ -36,4 +37,4 @@ Do not paste bearer tokens, refresh tokens, passwords, API keys, JWT strings, PH
 
 ## Next Step
 
-Use `/qa-run-control` during the first human AAL2 synthetic QA run, persist only safe packet metadata, then update Buyer Diligence and Boundary Resolution after retained proof exists.
+Use `/qa-run-control` during the first human AAL2 synthetic QA run, persist only safe packet metadata, confirm `/qa-proof-promotion`, then update Buyer Diligence and Boundary Resolution after retained proof exists.

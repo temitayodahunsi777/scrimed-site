@@ -37,3 +37,5 @@ Not allowed yet:
 ## Next Step
 
 Open `/qa-run-control`, use its workflow-specific no-secret operator brief for the first fresh human AAL2 run, delete or rotate the temporary secret, persist only safe metadata, then export Buyer Diligence after the packet hash appears.
+
+Before exporting, open `/qa-proof-promotion` and confirm retained-packet promotion is allowed. If the promotion state is still `pending-retained-packet`, keep buyer-facing language at activation readiness only.

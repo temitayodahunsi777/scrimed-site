@@ -14,6 +14,11 @@ import {
   type QaEvidenceActivationWorkflow,
   type QaManualRunEvidencePacketRecord
 } from "./qaEvidenceLedger";
+import {
+  deriveQaProofPromotionDecision,
+  qaProofPromotionRoute,
+  type QaProofPromotionDecision
+} from "./qaProofPromotion";
 import type { CommandIntelligenceSnapshotRecord } from "./commandIntelligenceHub";
 
 export type BuyerPilotRoomState = "ready" | "review" | "blocked";
@@ -131,6 +136,9 @@ export type BuyerPilotRoomSummary = {
   };
   diligenceControls: BuyerPilotRoomDiligenceControl[];
   qaActivationPlan: BuyerPilotRoomQaActivationPlan;
+  qaProofPromotion: QaProofPromotionDecision & {
+    route: string;
+  };
   commandIntelligence: {
     snapshotCount: number;
     latestSnapshotId: string | null;
@@ -340,10 +348,9 @@ function buildDiligenceControls({
   commandSnapshots,
   demoSnapshots,
   hasAgentWorkspace,
-  hasManualQaEvidence,
   hasSession,
   hasTrustOps,
-  manualQaEvidencePackets,
+  qaProofPromotion,
   sessions,
   state,
   unavailableSections
@@ -352,10 +359,9 @@ function buildDiligenceControls({
   commandSnapshots: CommandIntelligenceSnapshotRecord[];
   demoSnapshots: PilotDemoReadinessSnapshotRecord[];
   hasAgentWorkspace: boolean;
-  hasManualQaEvidence: boolean;
   hasSession: boolean;
   hasTrustOps: boolean;
-  manualQaEvidencePackets: QaManualRunEvidencePacketRecord[];
+  qaProofPromotion: QaProofPromotionDecision;
   sessions: PilotSessionRecord[];
   state: BuyerPilotRoomState;
   unavailableSections: string[];
@@ -393,13 +399,11 @@ function buildDiligenceControls({
     },
     {
       domain: "Manual QA Evidence",
-      status: hasManualQaEvidence ? "ready" : "review",
+      status: qaProofPromotion.promotionAllowed ? "ready" : "review",
       buyerQuestion: "Can SCRIMED show human-run QA evidence without storing secrets in CI?",
-      evidence: hasManualQaEvidence
-        ? `${manualQaEvidencePackets.length} tenant-scoped manual QA evidence packet${manualQaEvidencePackets.length === 1 ? "" : "s"} retained or audited.`
-        : `No retained packet yet; activation plan ${activationPlan.status} covers ${activationPlan.workflowCount} human-run QA workflows.`,
+      evidence: qaProofPromotion.buyerSafeClaim,
       boundary: "Manual QA evidence contains no bearer tokens, credentials, PHI, payer member identifiers, or source contracts.",
-      workaround: `Use ${activationPlan.briefRoute}, run a human AAL2 workflow, then persist only safe metadata through the Manual QA Evidence panel.`,
+      workaround: qaProofPromotion.nextAction,
       productionGate: "Approved short-lived token policy, identity operations, and optional CI-held token process."
     },
     {
@@ -553,6 +557,11 @@ export function deriveBuyerPilotRoom({
     hasAuditEvent(auditEvents, "agent-work-order-proof-packet-downloaded");
   const commandPosture = commandSnapshotPosture(commandSnapshots, auditEvents);
   const qaActivationPlan = buyerQaActivationPlan();
+  const qaProofPromotion = deriveQaProofPromotionDecision({
+    auditEvents,
+    manualQaEvidencePackets,
+    workspaceSlug: workspace.slug
+  });
 
   const checks: BuyerPilotRoomCheck[] = [
     {
@@ -669,10 +678,9 @@ export function deriveBuyerPilotRoom({
     commandSnapshots,
     demoSnapshots,
     hasAgentWorkspace,
-    hasManualQaEvidence,
     hasSession,
     hasTrustOps,
-    manualQaEvidencePackets,
+    qaProofPromotion,
     sessions,
     state,
     unavailableSections
@@ -737,7 +745,7 @@ export function deriveBuyerPilotRoom({
         "Executive thesis and tenant workspace posture",
         "Readiness score, checks, blockers, and workaround owners",
         "Manual AAL2 QA activation plan, safe evidence fields, and pending human-run boundary",
-        "Manual QA evidence counts, workflow run IDs, and packet hashes when retained",
+        "Manual QA proof promotion state, workflow run IDs, and packet hashes when retained",
         "Demo readiness, durable synthetic session, and append-only audit evidence",
         "Command Intelligence snapshot timeline, score trend, and packet export posture",
         "Pricing path from assessment through protected pilot and operating license",
@@ -749,6 +757,7 @@ export function deriveBuyerPilotRoom({
         "Keep the tenant browser session at AAL2 before download",
         "Review the export for buyer-specific context before sending externally",
         "Use manual QA evidence capture for human-run proof instead of storing bearer tokens",
+        "Use Manual QA Proof Promotion before claiming retained authenticated QA evidence",
         "Use the QA activation plan before running Sales Demo Session QA or Authority Reference QA",
         "Escalate any live-data, PHI, payer, EHR, imaging, device, legal, or clinical request"
       ],
@@ -761,6 +770,10 @@ export function deriveBuyerPilotRoom({
     },
     diligenceControls,
     qaActivationPlan,
+    qaProofPromotion: {
+      ...qaProofPromotion,
+      route: qaProofPromotionRoute
+    },
     commandIntelligence: commandPosture,
     limitations: [
       {
@@ -995,6 +1008,25 @@ ${markdownItems(room.qaActivationPlan.completionCriteria)}
 
 Activation workflows:
 ${qaActivationWorkflowLines(room.qaActivationPlan)}
+
+## Manual QA Proof Promotion
+- Route: ${baseUrl}${room.qaProofPromotion.route}
+- State: ${room.qaProofPromotion.state}
+- Promotion allowed: ${room.qaProofPromotion.promotionAllowed ? "yes" : "no"}
+- Packet count: ${room.qaProofPromotion.packetCount}
+- Audit signal count: ${room.qaProofPromotion.auditSignalCount}
+- Latest workflow run ID: ${room.qaProofPromotion.latestWorkflowRunId}
+- Latest workflow kind: ${room.qaProofPromotion.latestWorkflowKind}
+- Latest packet hash: ${room.qaProofPromotion.latestPacketHash}
+- Buyer-safe claim: ${room.qaProofPromotion.buyerSafeClaim}
+- Buyer proof language: ${room.qaProofPromotion.buyerProofLanguage}
+- Next action: ${room.qaProofPromotion.nextAction}
+
+Required evidence before promotion:
+${markdownItems(room.qaProofPromotion.requiredEvidence)}
+
+Blocked claims:
+${markdownItems(room.qaProofPromotion.blockedClaims)}
 
 ## Legal, Privacy, Security, Safety, And Production Control Matrix
 ${diligenceControlLines(room.diligenceControls)}
