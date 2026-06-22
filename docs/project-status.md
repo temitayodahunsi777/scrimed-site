@@ -2,6 +2,14 @@
 
 Updated: 2026-06-21
 
+## Latest Boundary Resolution Register Release
+
+- Added `/boundary-resolution`, `/api/boundary-resolution`, and `/api/boundary-resolution/brief` as SCRIMED's cross-system boundary register for clinical authority, clinical care activation, PHI, legal, regional, reimbursement, security, QA, public-market, and production-readiness limits.
+- Aggregated Clinical Authority Readiness domains, Clinical Care Activation gates, Persistent Agent Workspace limitation resolutions, QA Evidence Ledger manual AAL2 gates, and Public Market Readiness limitations into one no-secret register with state, owner, control, workaround, proof routes, retained gate, next action, and prohibited claims.
+- Updated Product Console and Product Readiness Brief with boundary record counts, human AAL2 gates, external gates, safe workaround counts, and proof-stack entries.
+- Added public smoke coverage for the Boundary Resolution page, API, brief, no-authority headers, Product Console proof-stack posture, record coverage, and human AAL2 visibility.
+- Preserved the boundary: this register addresses known boundaries operationally, but it does not authorize live clinical care, PHI processing, legal approval, regional regulatory approval, reimbursement certainty, security certification, production clinical authorization, autonomous clinical decisions, patient outreach, payer submission, EHR writeback, public customer claims, or securities offering material.
+
 ## Latest Buyer Diligence QA Activation Posture Release
 
 - Added the Manual AAL2 QA Evidence Activation Plan into protected Buyer Pilot Room summaries and audited Buyer Diligence Exports.

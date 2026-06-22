@@ -27,6 +27,11 @@ import {
   globalPartnerLocalizationStatus
 } from "./globalPartnerLocalization";
 import {
+  boundaryResolutionBriefProofStackStatus,
+  boundaryResolutionProofStackStatus,
+  getBoundaryResolutionSummary
+} from "./boundaryResolution";
+import {
   clinicalAuthorityReadinessBriefStatus,
   clinicalAuthorityReadinessStatus,
   getClinicalAuthorityReadinessSummary
@@ -788,6 +793,7 @@ export function getProductConsoleSummary() {
   const deploymentProfileSummary = getDeploymentProfileSummary();
   const marketActivationSummary = getMarketActivationSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
+  const boundaryResolutionSummary = getBoundaryResolutionSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
   const sourceIntelligenceSummary = getSourceIntelligenceSummary();
@@ -960,6 +966,9 @@ export function getProductConsoleSummary() {
     globalReachRoute: globalPartnerLocalizationSummary.route,
     globalReachApiRoute: globalPartnerLocalizationSummary.apiRoute,
     globalReachBriefRoute: globalPartnerLocalizationSummary.briefRoute,
+    boundaryResolutionRoute: boundaryResolutionSummary.route,
+    boundaryResolutionApiRoute: boundaryResolutionSummary.apiRoute,
+    boundaryResolutionBriefRoute: boundaryResolutionSummary.briefRoute,
     salesAttributionRoute: salesAttributionSummary.route,
     salesAttributionApiRoute: salesAttributionSummary.apiRoute,
     attributionAnalyticsRoute: attributionAnalyticsSummary.route,
@@ -1015,6 +1024,10 @@ export function getProductConsoleSummary() {
     globalBuyerPackCount: globalPartnerLocalizationSummary.buyerPackCount,
     globalPartnerChannelCount: globalPartnerLocalizationSummary.partnerChannelCount,
     globalBoundaryResolutionCount: globalPartnerLocalizationSummary.boundaryResolutionCount,
+    boundaryResolutionRecordCount: boundaryResolutionSummary.recordCount,
+    boundaryResolutionExternalGateCount: boundaryResolutionSummary.externalGateCount,
+    boundaryResolutionHumanAal2RequiredCount: boundaryResolutionSummary.humanAal2RequiredCount,
+    boundaryResolutionSafeWorkaroundCount: boundaryResolutionSummary.safeWorkaroundCount,
     sourceIntelligenceSourceCount: sourceIntelligenceSummary.sourceCount,
     attributionCapturedFieldCount: salesAttributionSummary.capturedFields.length,
     attributionAnalyticsRecordCount: attributionAnalyticsSummary.totals.recordCount,
@@ -1090,6 +1103,7 @@ export function getProductConsoleSummary() {
     deploymentProfileSummary,
     marketActivationSummary,
     globalPartnerLocalizationSummary,
+    boundaryResolutionSummary,
     clinicalAuthorityReadinessSummary,
     salesAttributionSummary,
     attributionAnalyticsSummary,
@@ -1167,6 +1181,8 @@ export function getProductConsoleSummary() {
         protectedAuthorityArtifactReferencePacketStatus,
       protectedAuthorityArtifactReferenceQaHarness:
         protectedAuthorityArtifactReferenceQaHarnessStatus,
+      boundaryResolutionRegister: boundaryResolutionProofStackStatus,
+      boundaryResolutionBrief: boundaryResolutionBriefProofStackStatus,
       globalPartnerLocalization: globalPartnerLocalizationStatus,
       globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
@@ -1242,7 +1258,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-20"
   };
 }
@@ -1260,6 +1276,14 @@ export function getProductReadinessBrief() {
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
     "",
     "## Product Demos and Pilot Programs",
+    `Boundary Resolution Register: ${summary.boundaryResolutionRoute}`,
+    `Boundary Resolution API: ${summary.boundaryResolutionApiRoute}`,
+    `Boundary Resolution Brief: ${summary.boundaryResolutionBriefRoute}`,
+    `Boundary Resolution Records: ${summary.boundaryResolutionRecordCount}`,
+    `Boundary External Gates: ${summary.boundaryResolutionExternalGateCount}`,
+    `Boundary Human AAL2 Gates: ${summary.boundaryResolutionHumanAal2RequiredCount}`,
+    `Boundary Safe Workarounds: ${summary.boundaryResolutionSafeWorkaroundCount}`,
+    summary.boundaryResolutionSummary.addressedPosition,
     `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
     `Clinical Authority Readiness: ${summary.clinicalAuthorityReadinessRoute}`,
     `Clinical Authority API: ${summary.clinicalAuthorityReadinessApiRoute}`,

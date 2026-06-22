@@ -77,6 +77,18 @@ export default function ProductConsolePage() {
           <strong>{summary.clinicalAuthorityBoundaryResolutionCount}</strong>
         </article>
         <article>
+          <span>Boundary records</span>
+          <strong>{summary.boundaryResolutionRecordCount}</strong>
+        </article>
+        <article>
+          <span>Boundary gates</span>
+          <strong>{summary.boundaryResolutionExternalGateCount}</strong>
+        </article>
+        <article>
+          <span>AAL2 gates</span>
+          <strong>{summary.boundaryResolutionHumanAal2RequiredCount}</strong>
+        </article>
+        <article>
           <span>Clinical blocked</span>
           <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
         </article>
@@ -164,6 +176,41 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED boundary resolution register">
+        <div className="section-heading">
+          <p className="eyebrow">Boundary resolution</p>
+          <h2>Every known hard gate is tracked with a control, workaround, owner, proof route, and retained gate.</h2>
+          <p className="section-copy">{summary.boundaryResolutionSummary.addressedPosition}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.boundaryResolutionRoute}>
+              Open Boundary Register
+            </Link>
+            <a className="secondary-action" href={summary.boundaryResolutionBriefRoute}>
+              Download Boundary Brief
+            </a>
+          </div>
+        </div>
+        {summary.boundaryResolutionSummary.records
+          .filter((record) => record.state !== "active-control")
+          .slice(0, 5)
+          .map((record) => (
+            <article className="module-row" key={record.id}>
+              <div>
+                <span>{record.state}</span>
+                <h2>{record.name}</h2>
+              </div>
+              <p>{record.currentBoundary}</p>
+              <div>
+                <strong>{record.remainingGate}</strong>
+                <ul className="compact-list">
+                  <li>{record.safeWorkaround}</li>
+                  <li>Proof routes: {record.proofRoutes.join(", ")}</li>
+                </ul>
+              </div>
+            </article>
+          ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED clinical authority readiness">

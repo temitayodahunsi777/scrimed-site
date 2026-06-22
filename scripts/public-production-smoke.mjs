@@ -135,6 +135,37 @@ function requireClinicalAuthorityBoundary(label, response) {
   }
 }
 
+function requireBoundaryResolutionBoundary(label, response) {
+  const boundaryResolution = response.headers.get("x-scrimed-boundary-resolution");
+  const legalAuthority = response.headers.get("x-scrimed-legal-authority");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (boundaryResolution !== "active-control-register") {
+    throw new Error(`${label} expected x-scrimed-boundary-resolution active-control-register but received ${boundaryResolution}.`);
+  }
+
+  if (legalAuthority !== "external-approval-required") {
+    throw new Error(`${label} expected x-scrimed-legal-authority external-approval-required but received ${legalAuthority}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (reimbursementAuthority !== "no-reimbursement-guarantee") {
+    throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -168,6 +199,28 @@ async function checkProductConsole() {
     "clinical-authority-readiness-brief-no-authority-claim"
   ) {
     throw new Error("product console missing clinical authority readiness brief proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.boundaryResolutionRegister !==
+    "cross-system-boundary-resolution-register-no-authority-claim"
+  ) {
+    throw new Error("product console missing boundary resolution register proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.boundaryResolutionBrief !==
+    "boundary-resolution-brief-no-approval-claim"
+  ) {
+    throw new Error("product console missing boundary resolution brief proof-stack posture.");
+  }
+
+  if (!body.boundaryResolutionRecordCount || body.boundaryResolutionRecordCount < 25) {
+    throw new Error("product console expected boundary resolution record coverage.");
+  }
+
+  if (!body.boundaryResolutionExternalGateCount || body.boundaryResolutionExternalGateCount < 10) {
+    throw new Error("product console expected external boundary gate coverage.");
   }
 
   if (body.proofStack?.clinicalCareActivation !== "clinical-care-activation-readiness-gated") {
@@ -1391,6 +1444,64 @@ async function checkGlobalReach() {
   console.log("pass global reach");
 }
 
+async function checkBoundaryResolution() {
+  const result = await request("/api/boundary-resolution");
+  requireStatus("Boundary Resolution Register", result.response.status, 200);
+  requireContentType("Boundary Resolution Register", result.response, "application/json");
+  requireBoundaryResolutionBoundary("Boundary Resolution Register", result.response);
+  const body = requireJson("Boundary Resolution Register", result.body);
+
+  if (body.service !== "scrimed-boundary-resolution-register") {
+    throw new Error(`Boundary Resolution expected scrimed-boundary-resolution-register but received ${body.service}.`);
+  }
+
+  if (body.status !== "boundary-resolution-register-active") {
+    throw new Error(`Boundary Resolution expected active status but received ${body.status}.`);
+  }
+
+  if (
+    body.proofStackStatus !==
+    "cross-system-boundary-resolution-register-no-authority-claim"
+  ) {
+    throw new Error("Boundary Resolution missing proof-stack status.");
+  }
+
+  if (!Array.isArray(body.records) || body.records.length < 25) {
+    throw new Error("Boundary Resolution expected broad cross-system boundary coverage.");
+  }
+
+  if (!body.records.some((record) => record.state === "human-aal2-required")) {
+    throw new Error("Boundary Resolution expected human AAL2 required gates.");
+  }
+
+  if (!body.records.some((record) => record.category === "clinical-authority")) {
+    throw new Error("Boundary Resolution expected clinical authority records.");
+  }
+
+  if (!body.records.some((record) => record.category === "qa-evidence")) {
+    throw new Error("Boundary Resolution expected QA evidence records.");
+  }
+
+  if (!body.operatingRules?.some((rule) => rule.includes("Do not enter PHI"))) {
+    throw new Error("Boundary Resolution expected PHI operating rule.");
+  }
+
+  const brief = await request("/api/boundary-resolution/brief");
+  requireStatus("Boundary Resolution brief", brief.response.status, 200);
+  requireContentType("Boundary Resolution brief", brief.response, "text/markdown");
+  requireBoundaryResolutionBoundary("Boundary Resolution brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Boundary Resolution Register Brief")) {
+    throw new Error("Boundary Resolution brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("does not authorize live clinical care")) {
+    throw new Error("Boundary Resolution brief missing no-authority boundary.");
+  }
+
+  console.log("pass boundary resolution register");
+}
+
 async function checkClinicalAuthorityReadiness() {
   const result = await request("/api/clinical-authority-readiness");
   requireStatus("Clinical Authority Readiness", result.response.status, 200);
@@ -1491,10 +1602,12 @@ await checkHtml("/clinical-authority-readiness");
 await checkHtml("/clinical-care-activation");
 await checkHtml("/public-market-readiness");
 await checkHtml("/global-reach");
+await checkHtml("/boundary-resolution");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
 await checkGlobalReach();
+await checkBoundaryResolution();
 await checkProductConsole();
 await checkReadiness();
 await checkCompetitiveEdgeApi();
