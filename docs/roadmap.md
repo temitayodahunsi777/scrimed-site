@@ -1,6 +1,6 @@
 # SCRIMED Development Roadmap
 
-Updated: 2026-06-20
+Updated: 2026-06-21
 
 SCRIMED is being developed as a modular AI healthcare intelligence platform designed to modernize healthcare decision support, automation, trust monitoring, and data interoperability.
 
@@ -48,6 +48,7 @@ Execution should move through explicit gates instead of ambiguous blockers:
 - Protected Clinical Authority Owner Matrix is the active AAL2 no-PHI owner-routing gate for customer, SCRIMED, and qualified external approver roles before any signed authority, PHI processing, production connector, reimbursement claim, security certification, regional launch, production authorization, or live-care authority.
 - Protected Clinical Authority Artifact Intake Checklist is the active AAL2 no-PHI artifact-reference gate for external systems of record, qualified reviewer roles, validation timestamps, expiration cadences, prohibited content, and acceptance criteria before any signed authority review, PHI processing, production connector, reimbursement claim, security certification, regional launch, production authorization, or live-care authority.
 - Protected Authority Artifact References are the active AAL2 no-PHI metadata-status gate for externally retained authority artifacts, reviewer labels, validation timestamps, expiration dates, renewal alerts, and audited packets before any signed authority, artifact upload, PHI processing, production connector, reimbursement claim, security certification, regional launch, production authorization, public distribution, or live-care authority.
+- Protected Authority Renewal Queue and QA Harness are the active AAL2 no-PHI operating gate for risk-ranked missing, pending, due, expired, or rejected authority references, authenticated synthetic verification, packet audit verification, and token-disposal reminders before any clinical, legal, security, reimbursement, regional, connector, production, or public-distribution authority is claimed.
 - Authenticated Buyer Demo Execution Path is the active operator gate for sequencing no-PHI buyer demos, audited packet release, known workarounds, retained hard gates, and paid implementation next steps.
 - The Trust and Enterprise Readiness Center governs company-level launch gates and public claims before marketing, PR, sales, advertising, protected pilots, or production use.
 
@@ -99,6 +100,7 @@ Completed foundations:
 - Protected Clinical Authority Owner Matrix with AAL2 no-PHI customer, SCRIMED, and qualified external approver routing, audited packets, external artifact policies, and fixed no-approval/no-PHI/no-live-care boundaries
 - Protected Clinical Authority Artifact Intake Checklist with AAL2 no-PHI external system-of-record criteria, reviewer roles, validation timestamps, expiration cadences, prohibited-content rules, audited packets, and fixed no-artifact-storage/no-approval/no-PHI/no-live-care boundaries
 - Protected Authority Artifact References with AAL2 no-PHI durable metadata capture, guarded RPC writes, RLS select, reviewer labels, expiration/renewal status, audited packets, and fixed no-artifact-storage/no-approval/no-PHI/no-live-care boundaries
+- Protected Authority Renewal Queue and QA Harness with no-PHI risk-ranked renewal actions, protected route fail-closed coverage, optional short-lived AAL2 authenticated synthetic write verification, audited packet verification, and fixed token/no-artifact/no-approval/no-live-care boundaries
 - Runtime activation verification against the migrated Supabase schema and distributed Redis provider
 - Active public intake and protected session rate limiting with Upstash Redis connected and verified for distributed enforcement
 - Next.js App Router application baseline
@@ -153,6 +155,7 @@ Completed foundations:
 Next build targets:
 
 - Add finance-approved allocation methodology records, external-use approval workflows, rolling buyer-segment cohort comparison, and counsel-reviewed investor/marketing material gates once qualified finance methodology and external-use policy are approved.
+- Run `npm run smoke:authority-reference-qa` with a short-lived AAL2 operator token for the first authenticated authority-reference QA evidence packet, then retain the no-secret output in the protected QA evidence process.
 - Capture the first successful manual Sales Demo Session QA CI run after a fresh AAL2 operator token and explicit buyer opportunity target are available, generate the sanitized packet through `/api/qa-evidence/manual-run-packet`, then add the run ID, timestamp, target, created session ID, and packet audit event ID to `/qa-evidence`.
 - Convert secure evidence vault readiness into limited controlled evidence storage only after provider, BAA/DPA path, encryption/key ownership, DLP, malware scanning, retention, legal hold, deletion, access review, incident response, regional residency, support ownership, buyer authorization, and qualified review are complete.
 - Convert activation approval, buyer diligence, and vault readiness packets into approved customer SSO setup, transactional invitation delivery, retention deletion execution, workspace archive execution, and production connector setup only after signed enterprise controls.

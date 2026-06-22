@@ -19,7 +19,9 @@ function statusClass(status: string) {
     status.includes("needed") ||
     status.includes("renewal") ||
     status.includes("rejected") ||
-    status.includes("expired")
+    status.includes("expired") ||
+    status.includes("blocked") ||
+    status.includes("urgent")
   ) {
     return "status-pill status-pill-warn";
   }
@@ -168,10 +170,15 @@ export default function ProtectedAuthorityArtifactReferencePanel({
         </article>
         <article>
           <span>Renewal queue</span>
-          <strong>
-            {(workflow?.summary.renewalRequiredCount ?? 0) +
-              (workflow?.summary.rejectedOrExpiredCount ?? 0)}
-          </strong>
+          <strong>{workflow?.summary.renewalQueueItemCount ?? 0}</strong>
+        </article>
+        <article>
+          <span>Blocked renewals</span>
+          <strong>{workflow?.summary.renewalBlockedCount ?? 0}</strong>
+        </article>
+        <article>
+          <span>QA harness</span>
+          <strong>{workflow?.qaHarness.steps.length ?? 0} steps</strong>
         </article>
       </div>
 
@@ -325,6 +332,46 @@ export default function ProtectedAuthorityArtifactReferencePanel({
         ) : null}
       </div>
 
+      <div className="table-scroll" aria-label="Authority artifact renewal queue">
+        <table>
+          <thead>
+            <tr>
+              <th>Authority</th>
+              <th>Queue state</th>
+              <th>Risk</th>
+              <th>Expiration</th>
+              <th>Required action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {workflow?.renewalQueue.length ? (
+              workflow.renewalQueue.map((item) => (
+                <tr key={item.id}>
+                  <td>
+                    <strong>{item.authorityLabel}</strong>
+                    <span>{item.ownerRole}</span>
+                  </td>
+                  <td>
+                    <span className={statusClass(item.queueState)}>
+                      {item.queueState}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={statusClass(item.riskLevel)}>{item.riskLevel}</span>
+                  </td>
+                  <td>{formatDate(item.expiresAt)}</td>
+                  <td>{item.requiredAction}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5}>No renewal queue actions are currently open.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
       <div className="table-scroll">
         <table>
           <thead>
@@ -399,6 +446,14 @@ export default function ProtectedAuthorityArtifactReferencePanel({
               .map((control) => (
                 <li key={control}>{control}</li>
               ))}
+          </ul>
+        </article>
+        <article>
+          <h3>QA Harness</h3>
+          <ul>
+            {(workflow?.qaHarness.steps ?? []).slice(0, 3).map((step) => (
+              <li key={step.id}>{step.label}</li>
+            ))}
           </ul>
         </article>
       </div>

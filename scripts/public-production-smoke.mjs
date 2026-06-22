@@ -476,11 +476,29 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.protectedAuthorityArtifactReferenceRenewalQueue !==
+    "aal2-authority-renewal-queue-no-artifact-storage"
+  ) {
+    throw new Error(
+      "product console missing protected authority artifact renewal queue proof-stack posture."
+    );
+  }
+
+  if (
     body.proofStack?.protectedAuthorityArtifactReferencePackets !==
     "aal2-audited-authority-artifact-reference-status-packet-no-artifact-storage"
   ) {
     throw new Error(
       "product console missing protected authority artifact reference packet proof-stack posture."
+    );
+  }
+
+  if (
+    body.proofStack?.protectedAuthorityArtifactReferenceQaHarness !==
+    "aal2-authority-reference-qa-harness-token-boundary"
+  ) {
+    throw new Error(
+      "product console missing protected authority artifact reference QA harness proof-stack posture."
     );
   }
 
@@ -1539,6 +1557,10 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/authority-artifact-references`,
   "Authority Artifact References protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/authority-artifact-references/renewal-queue`,
+  "Authority Artifact References renewal queue protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/authority-artifact-references/packet`,

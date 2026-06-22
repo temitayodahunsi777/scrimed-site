@@ -181,6 +181,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Customer authority owners, qualified external reviewers, SCRIMED governance, legal, privacy, security, and operations",
     objective: "Record metadata-only external authority artifact reference status, reviewer labels, validation timestamps, expiration dates, and renewal alerts without storing artifacts or granting authority."
+  },
+  {
+    name: "Protected Authority Renewal Queue",
+    route: "/pilot-workspace/access#authority-artifact-references",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "SCRIMED governance, qualified reviewers, trust operations, legal, privacy, security, and customer authority owners",
+    objective: "Risk-rank missing, pending, due, expired, and rejected authority references and verify the path through an authenticated no-PHI QA harness before buyer or operator demos."
   }
 ];
 
@@ -485,6 +493,7 @@ export const hubRoutes = [
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake",
   "/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet",
   "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+  "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
   "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
   "/api/global-reach",
   "/api/global-reach/brief",

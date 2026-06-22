@@ -2,7 +2,16 @@
 
 Updated: 2026-06-21
 
-## Latest Protected Authority Artifact References Release
+## Latest Protected Authority Renewal Queue And QA Harness Release
+
+- Added the protected Authority Artifact Renewal Queue as a risk-ranked operating layer inside `/pilot-workspace/access#authority-artifact-references`.
+- Added `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue` for AAL2 tenant-scoped, no-PHI renewal queue reads derived from existing authority checklist and reference records.
+- Added `aal2-authority-renewal-queue-no-artifact-storage` and `aal2-authority-reference-qa-harness-token-boundary` to the Product Console proof stack.
+- Added `scripts/authority-artifact-reference-qa-smoke.mjs` and `npm run smoke:authority-reference-qa` so operators can verify fail-closed behavior, authenticated synthetic metadata recording, renewal queue derivation, audited packet download, and token-disposal reminders.
+- Updated the protected workspace panel and authority-reference packet so buyers and operators can see blocked, urgent, and scheduled renewal actions without storing artifacts or expanding live-care authority.
+- Preserved the boundary: the renewal queue and QA harness are operational readiness controls only. They do not store artifacts, URLs, PHI, credentials, signed approvals, legal opinions, security reports, clinical validation artifacts, reimbursement determinations, certification evidence, production approvals, or live clinical authority.
+
+## Previous Protected Authority Artifact References Release
 
 - Added Protected Authority Artifact References inside `/pilot-workspace/access#authority-artifact-references`.
 - Added `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references` and `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references` for AAL2 tenant-scoped, no-PHI, metadata-only external authority artifact reference status capture.

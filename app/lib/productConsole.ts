@@ -186,6 +186,8 @@ import {
 } from "./protectedClinicalAuthorityArtifactIntake";
 import {
   protectedAuthorityArtifactReferencePacketStatus,
+  protectedAuthorityArtifactReferenceQaHarnessStatus,
+  protectedAuthorityArtifactReferenceRenewalQueueStatus,
   protectedAuthorityArtifactReferenceStatus
 } from "./protectedAuthorityArtifactReferences";
 
@@ -942,6 +944,8 @@ export function getProductConsoleSummary() {
       "/pilot-workspace/access#authority-artifact-references",
     protectedAuthorityArtifactReferenceApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references",
+    protectedAuthorityArtifactReferenceRenewalQueueApiRoute:
+      "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
     protectedAuthorityArtifactReferencePacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
@@ -1153,8 +1157,12 @@ export function getProductConsoleSummary() {
         protectedClinicalAuthorityArtifactIntakePacketStatus,
       protectedAuthorityArtifactReferences:
         protectedAuthorityArtifactReferenceStatus,
+      protectedAuthorityArtifactReferenceRenewalQueue:
+        protectedAuthorityArtifactReferenceRenewalQueueStatus,
       protectedAuthorityArtifactReferencePackets:
         protectedAuthorityArtifactReferencePacketStatus,
+      protectedAuthorityArtifactReferenceQaHarness:
+        protectedAuthorityArtifactReferenceQaHarnessStatus,
       globalPartnerLocalization: globalPartnerLocalizationStatus,
       globalPartnerLocalizationBrief: globalPartnerLocalizationBriefStatus,
       sourceIntelligence: sourceIntelligenceSummary.status,
@@ -1374,6 +1382,7 @@ export function getProductReadinessBrief() {
     `Protected clinical authority artifact intake packet API: ${summary.protectedClinicalAuthorityArtifactIntakePacketApiRoute}`,
     `Protected authority artifact references: ${summary.protectedAuthorityArtifactReferenceRoute}`,
     `Protected authority artifact references API: ${summary.protectedAuthorityArtifactReferenceApiRoute}`,
+    `Protected authority artifact renewal queue API: ${summary.protectedAuthorityArtifactReferenceRenewalQueueApiRoute}`,
     `Protected authority artifact references packet API: ${summary.protectedAuthorityArtifactReferencePacketApiRoute}`,
     `Status: ${summary.publicMarketReadinessSummary.status}`,
     `Thesis: ${summary.publicMarketReadinessSummary.thesis}`,

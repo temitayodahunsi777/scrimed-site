@@ -120,6 +120,7 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
 - `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
+- `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue`
 - `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/enterprise-proof-packet`
@@ -499,7 +500,9 @@ Safe operating pattern:
 
 `/pilot-workspace/access` now includes Protected Authority Artifact References after the Artifact Intake Checklist. It records sanitized metadata-only references to externally retained authority artifacts with reviewer labels, validation timestamps, expiration dates, renewal alerts, and status flags.
 
-Protected workspaces expose `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, and `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`. Writes use the guarded Supabase RPC `record_protected_authority_artifact_reference`; packet downloads use the existing write-before-release proof-packet audit path with `packetType: protected-authority-artifact-references`.
+Protected workspaces expose `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, `POST /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue`, and `GET /api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`. Writes use the guarded Supabase RPC `record_protected_authority_artifact_reference`; packet downloads use the existing write-before-release proof-packet audit path with `packetType: protected-authority-artifact-references`.
+
+The renewal queue is derived from the checklist and current reference records. It risk-ranks missing, review-pending, renewal-due, expiration-due, expired, and rejected references as blocked, urgent, or scheduled actions. The authenticated QA harness verifies fail-closed behavior, synthetic metadata-only recording, renewal queue derivation, audited packet download, and token-disposal reminders without storing tokens, artifacts, URLs, PHI, source documents, signatures, legal opinions, security reports, clinical validation, reimbursement determinations, or approval artifacts.
 
 Safe operating pattern:
 

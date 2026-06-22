@@ -20,6 +20,7 @@ SCRIMED Clinical Authority Readiness is the hard-gate preparation layer for live
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`
+- `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue`
 - `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet`
 
 ## What It Adds

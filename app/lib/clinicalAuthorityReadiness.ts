@@ -491,6 +491,14 @@ export const clinicalAuthorityEvidencePacks: ClinicalAuthorityEvidencePack[] = [
     boundary: "External references only; not artifact storage, URL storage, signed approval, PHI processing, legal advice, certification, reimbursement certainty, production authorization, public distribution, or live clinical authorization."
   },
   {
+    name: "Protected authority renewal queue and QA harness",
+    purpose:
+      "AAL2-protected no-PHI renewal queue and authenticated synthetic QA path for missing, pending, due, expired, or rejected authority references.",
+    route: "/pilot-workspace/access#authority-artifact-references",
+    packetRoute: "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue",
+    boundary: "Operational readiness and QA verification only; not clinical, legal, security, reimbursement, regional, connector, production, distribution, or live-care authority."
+  },
+  {
     name: "Clinical activation dossier",
     purpose:
       "Tenant-scoped no-PHI evidence packet for clinical go-live planning, reviewer assignments, unsigned approvals, and blocked capabilities.",
