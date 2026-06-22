@@ -35,4 +35,4 @@ Do not treat a safe workaround as external approval. If a record says `human-aal
 
 ## Next Step
 
-Run the first deliberate short-lived human AAL2 QA workflow, persist the safe packet metadata through the protected workspace, then link that retained proof into Buyer Pilot Room and Boundary Resolution evidence.
+Use `/qa-execution-readiness` to run the first deliberate short-lived human AAL2 QA workflow, persist the safe packet metadata through the protected workspace, then link that retained proof into Buyer Pilot Room and Boundary Resolution evidence.

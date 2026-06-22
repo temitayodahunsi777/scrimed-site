@@ -112,6 +112,11 @@ import {
   qaManualRunEvidencePersistenceStatus
 } from "./qaEvidenceLedger";
 import {
+  getQaExecutionReadinessSummary,
+  qaExecutionReadinessBriefProofStackStatus,
+  qaExecutionReadinessProofStackStatus
+} from "./qaExecutionReadiness";
+import {
   clinicalCareActivationProofStackStatus,
   getClinicalCareActivationSummary
 } from "./clinicalCareActivation";
@@ -801,6 +806,7 @@ export function getProductConsoleSummary() {
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const salesDealRoomSummary = getSalesDealRoomSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
+  const qaExecutionReadinessSummary = getQaExecutionReadinessSummary();
   const clinicalCareActivationSummary = getClinicalCareActivationSummary();
   const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
   const productAgents = getProductAgents();
@@ -982,6 +988,9 @@ export function getProductConsoleSummary() {
     qaEvidenceBriefRoute: qaEvidenceLedger.briefRoute,
     qaEvidenceActivationPlanRoute: qaEvidenceLedger.activationPlan.route,
     qaEvidenceActivationPlanBriefRoute: qaEvidenceLedger.activationPlan.briefRoute,
+    qaExecutionReadinessRoute: qaExecutionReadinessSummary.route,
+    qaExecutionReadinessApiRoute: qaExecutionReadinessSummary.apiRoute,
+    qaExecutionReadinessBriefRoute: qaExecutionReadinessSummary.briefRoute,
     qaManualRunEvidencePacketRoute: qaEvidenceLedger.manualRunEvidenceCapture.route,
     qaManualRunEvidencePersistenceRoute:
       qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute,
@@ -999,6 +1008,10 @@ export function getProductConsoleSummary() {
     publicMarketComplianceLogCount: publicMarketReadinessSummary.complianceLogCount,
     publicMarketCustomerProofStageCount: publicMarketReadinessSummary.customerProofStageCount,
     publicMarketOperatorMetricCatalogCount: publicMarketReadinessSummary.operatorMetricCatalogCount,
+    qaExecutionReadinessWorkflowCount: qaExecutionReadinessSummary.workflowCount,
+    qaExecutionReadinessStageCount: qaExecutionReadinessSummary.stageCount,
+    qaExecutionReadinessHumanRequiredStageCount:
+      qaExecutionReadinessSummary.humanRequiredStages,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -1110,6 +1123,7 @@ export function getProductConsoleSummary() {
     trustSafetyOperationsSummary,
     sourceIntelligenceSummary,
     qaEvidenceLedger,
+    qaExecutionReadinessSummary,
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
     proofStack: {
@@ -1227,6 +1241,8 @@ export function getProductConsoleSummary() {
       qaManualRunEvidencePersistence: qaManualRunEvidencePersistenceStatus,
       qaAuthorityReferenceEvidenceBridge: qaAuthorityReferenceEvidenceBridgeStatus,
       qaEvidenceActivationPlan: qaEvidenceActivationPlanStatus,
+      qaExecutionReadiness: qaExecutionReadinessProofStackStatus,
+      qaExecutionReadinessBrief: qaExecutionReadinessBriefProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -1334,6 +1350,13 @@ export function getProductReadinessBrief() {
     `QA Evidence Brief: ${summary.qaEvidenceBriefRoute}`,
     `QA Evidence Activation Plan: ${summary.qaEvidenceActivationPlanRoute}`,
     `QA Evidence Activation Brief: ${summary.qaEvidenceActivationPlanBriefRoute}`,
+    `Manual AAL2 QA Execution Readiness: ${summary.qaExecutionReadinessRoute}`,
+    `Manual AAL2 QA Execution API: ${summary.qaExecutionReadinessApiRoute}`,
+    `Manual AAL2 QA Execution Brief: ${summary.qaExecutionReadinessBriefRoute}`,
+    `Manual AAL2 QA Execution Workflows: ${summary.qaExecutionReadinessWorkflowCount}`,
+    `Manual AAL2 QA Execution Stages: ${summary.qaExecutionReadinessStageCount}`,
+    `Manual AAL2 QA Human Required Stages: ${summary.qaExecutionReadinessHumanRequiredStageCount}`,
+    summary.qaExecutionReadinessSummary.buyerClaimStatus,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

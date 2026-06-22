@@ -238,7 +238,13 @@ export function getBoundaryResolutionSummary() {
     safeWorkaround: workflow.workaround,
     remainingGate: "Fresh human AAL2 run, temporary secret disposal, protected persistence, packet hash, and Buyer Diligence export.",
     owner: "SCRIMED operator, release engineering, and tenant governance owner",
-    proofRoutes: [qaActivationPlan.route, qaActivationPlan.briefRoute, workflow.workflowPath, workflow.persistenceTarget],
+    proofRoutes: [
+      "/qa-execution-readiness",
+      qaActivationPlan.route,
+      qaActivationPlan.briefRoute,
+      workflow.workflowPath,
+      workflow.persistenceTarget
+    ],
     nextAction: workflow.nextAction,
     prohibitedClaims: [
       ...universalProhibitedClaims,
@@ -328,7 +334,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Run the first human AAL2 QA workflow, persist the safe evidence packet, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
+      "Use /qa-execution-readiness to run the first human AAL2 QA workflow, persist the safe evidence packet, then link that retained packet to this register so Buyer Pilot Room proof moves from activation readiness to retained manual QA evidence.",
     records,
     updated: "2026-06-21"
   };

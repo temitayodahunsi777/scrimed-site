@@ -166,6 +166,32 @@ function requireBoundaryResolutionBoundary(label, response) {
   }
 }
 
+function requireQaExecutionBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (qaProof !== "activation-ready-not-retained-proof") {
+    throw new Error(`${label} expected x-scrimed-qa-proof activation-ready-not-retained-proof but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -746,6 +772,28 @@ async function checkProductConsole() {
     throw new Error("product console missing QA evidence activation plan posture.");
   }
 
+  if (
+    body.proofStack?.qaExecutionReadiness !==
+    "manual-aal2-qa-execution-go-no-go-no-secret"
+  ) {
+    throw new Error("product console missing QA execution readiness proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaExecutionReadinessBrief !==
+    "manual-aal2-qa-execution-brief-no-proof-claim"
+  ) {
+    throw new Error("product console missing QA execution readiness brief proof-stack posture.");
+  }
+
+  if (!body.qaExecutionReadinessWorkflowCount || body.qaExecutionReadinessWorkflowCount < 2) {
+    throw new Error("product console expected QA execution readiness workflow coverage.");
+  }
+
+  if (!body.qaExecutionReadinessHumanRequiredStageCount || body.qaExecutionReadinessHumanRequiredStageCount < 2) {
+    throw new Error("product console expected human-required QA execution stages.");
+  }
+
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
     throw new Error("product console missing public production smoke proof-stack posture.");
   }
@@ -973,6 +1021,57 @@ async function checkQaEvidenceLedger() {
   }
 
   console.log("pass QA evidence ledger");
+}
+
+async function checkQaExecutionReadiness() {
+  const result = await request("/api/qa-evidence/execution-readiness");
+  requireStatus("QA execution readiness", result.response.status, 200);
+  requireContentType("QA execution readiness", result.response, "application/json");
+  requireQaExecutionBoundary("QA execution readiness", result.response);
+  const body = requireJson("QA execution readiness", result.body);
+
+  if (body.service !== "scrimed-manual-aal2-qa-execution-readiness") {
+    throw new Error(`QA execution readiness expected scrimed-manual-aal2-qa-execution-readiness but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-execution-readiness-ready") {
+    throw new Error(`QA execution readiness expected ready status but received ${body.status}.`);
+  }
+
+  if (body.executionDecision !== "ready-for-human-run-not-code-bypass") {
+    throw new Error("QA execution readiness must preserve human-run decision.");
+  }
+
+  if (body.buyerClaimStatus !== "activation-ready-not-retained-authenticated-proof") {
+    throw new Error("QA execution readiness must preserve not-retained-proof claim boundary.");
+  }
+
+  if (!Array.isArray(body.dispatchWorkflows) || body.dispatchWorkflows.length < 2) {
+    throw new Error("QA execution readiness expected both manual workflows.");
+  }
+
+  if (!body.dispatchWorkflows.every((workflow) => workflow.state === "ready-for-human-aal2-run-not-executed")) {
+    throw new Error("QA execution readiness workflows must remain not executed.");
+  }
+
+  if (!body.hardStopRules?.some((rule) => rule.includes("Do not run authenticated QA without a fresh human AAL2 session"))) {
+    throw new Error("QA execution readiness missing human AAL2 hard stop.");
+  }
+
+  const brief = await request("/api/qa-evidence/execution-readiness/brief");
+  requireStatus("QA execution readiness brief", brief.response.status, 200);
+  requireContentType("QA execution readiness brief", brief.response, "text/markdown");
+  requireQaExecutionBoundary("QA execution readiness brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Manual AAL2 QA Execution Readiness Brief")) {
+    throw new Error("QA execution readiness brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("ready-for-human-run-not-code-bypass")) {
+    throw new Error("QA execution readiness brief missing human-run decision.");
+  }
+
+  console.log("pass QA execution readiness");
 }
 
 async function checkClinicalCareActivation() {
@@ -1603,6 +1702,7 @@ await checkHtml("/clinical-care-activation");
 await checkHtml("/public-market-readiness");
 await checkHtml("/global-reach");
 await checkHtml("/boundary-resolution");
+await checkHtml("/qa-execution-readiness");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
@@ -1613,6 +1713,7 @@ await checkReadiness();
 await checkCompetitiveEdgeApi();
 await checkPilotDealRoomApi();
 await checkQaEvidenceLedger();
+await checkQaExecutionReadiness();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"

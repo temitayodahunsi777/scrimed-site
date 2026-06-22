@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getQaEvidenceLedger } from "../lib/qaEvidenceLedger";
+import { getQaExecutionReadinessSummary } from "../lib/qaExecutionReadiness";
 
 export const metadata = {
   title: "SCRIMED QA Evidence Ledger",
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default function QaEvidencePage() {
   const ledger = getQaEvidenceLedger();
+  const executionReadiness = getQaExecutionReadinessSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
       ? ledger.currentDeployment.commitSha
@@ -37,6 +39,9 @@ export default function QaEvidencePage() {
           <a className="secondary-action" href={ledger.activationPlan.briefRoute}>
             Download Activation Plan
           </a>
+          <Link className="secondary-action" href={executionReadiness.route}>
+            Execution Readiness
+          </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
           </Link>
@@ -75,6 +80,10 @@ export default function QaEvidencePage() {
         <article>
           <span>Persistence</span>
           <strong>{ledger.manualRunEvidencePersistence.status}</strong>
+        </article>
+        <article>
+          <span>Execution</span>
+          <strong>{executionReadiness.executionDecision}</strong>
         </article>
         <article>
           <span>Data boundary</span>
@@ -142,6 +151,39 @@ export default function QaEvidencePage() {
                 <li>Smoke: {workflow.smokeScript}</li>
                 <li>Temporary secret: {workflow.requiredSecretName}</li>
                 <li>Persistence: {workflow.persistenceTarget}</li>
+                <li>Next: {workflow.nextAction}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA execution readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Execution readiness</p>
+          <h2>SCRIMED can guide the human AAL2 run without claiming authenticated proof before evidence is retained.</h2>
+          <p className="section-copy">{executionReadiness.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={executionReadiness.route}>
+              Open Execution Readiness
+            </Link>
+            <a className="secondary-action" href={executionReadiness.briefRoute}>
+              Download Execution Brief
+            </a>
+          </div>
+        </div>
+        {executionReadiness.dispatchWorkflows.map((workflow) => (
+          <article className="module-row" key={workflow.workflowKind}>
+            <div>
+              <span>{workflow.state}</span>
+              <h2>{workflow.name}</h2>
+            </div>
+            <p>{workflow.boundary}</p>
+            <div>
+              <strong>{workflow.dispatchPath}</strong>
+              <ul className="compact-list">
+                <li>Target: {workflow.targetInput}</li>
+                <li>Temporary secret: {workflow.temporarySecret}</li>
                 <li>Next: {workflow.nextAction}</li>
               </ul>
             </div>

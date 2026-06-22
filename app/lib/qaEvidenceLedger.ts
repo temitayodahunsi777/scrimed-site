@@ -583,7 +583,7 @@ export function getQaEvidenceLedger() {
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, token-policy readiness, and no-secret evidence capture today; remaining authenticated QA evidence requires deliberate short-lived AAL2 operator runs against synthetic targets.",
     nextRecommendedBuildStep:
-      "Run the Sales Demo Session QA and Authority Reference QA manual workflows with fresh short-lived AAL2 tokens, generate no-secret manual-run evidence packets, persist them through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
+      "Use /qa-execution-readiness to run the Sales Demo Session QA and Authority Reference QA manual workflows with fresh short-lived AAL2 tokens, generate no-secret manual-run evidence packets, persist them through the protected workspace evidence route, then export the Buyer Diligence Export with the manual QA evidence signal included.",
     updated: "2026-06-21"
   };
 }

@@ -89,6 +89,14 @@ export default function ProductConsolePage() {
           <strong>{summary.boundaryResolutionHumanAal2RequiredCount}</strong>
         </article>
         <article>
+          <span>QA run stages</span>
+          <strong>{summary.qaExecutionReadinessStageCount}</strong>
+        </article>
+        <article>
+          <span>QA workflows</span>
+          <strong>{summary.qaExecutionReadinessWorkflowCount}</strong>
+        </article>
+        <article>
           <span>Clinical blocked</span>
           <strong>{summary.clinicalCareActivationBlockedCapabilityCount}</strong>
         </article>
@@ -211,6 +219,38 @@ export default function ProductConsolePage() {
               </div>
             </article>
           ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual AAL2 QA execution readiness">
+        <div className="section-heading">
+          <p className="eyebrow">AAL2 QA execution</p>
+          <h2>Authenticated QA is now sequenced as a human-run go/no-go process, not a hidden automation shortcut.</h2>
+          <p className="section-copy">{summary.qaExecutionReadinessSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaExecutionReadinessRoute}>
+              Open QA Execution Readiness
+            </Link>
+            <a className="secondary-action" href={summary.qaExecutionReadinessBriefRoute}>
+              Download QA Execution Brief
+            </a>
+          </div>
+        </div>
+        {summary.qaExecutionReadinessSummary.executionStages.slice(0, 5).map((stage) => (
+          <article className="module-row" key={stage.stage}>
+            <div>
+              <span>{stage.state}</span>
+              <h2>{stage.stage}</h2>
+            </div>
+            <p>{stage.operatorAction}</p>
+            <div>
+              <strong>{stage.owner}</strong>
+              <ul className="compact-list">
+                <li>Accepted: {stage.evidenceAccepted.join(", ")}</li>
+                <li>{stage.productionBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED clinical authority readiness">

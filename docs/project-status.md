@@ -2,6 +2,14 @@
 
 Updated: 2026-06-21
 
+## Latest Manual AAL2 QA Execution Readiness Release
+
+- Added `/qa-execution-readiness`, `/api/qa-evidence/execution-readiness`, and `/api/qa-evidence/execution-readiness/brief` as the no-secret go/no-go layer for the remaining human AAL2 QA workflows.
+- Added execution stages for human AAL2 session confirmation, explicit synthetic target selection, token preflight, authenticated smoke, secret disposal, no-secret packet persistence, and Buyer Diligence export sequencing.
+- Added workflow readiness for Sales Demo Session QA and Authority Reference QA with dispatch path, preflight script, smoke script, target input, temporary secret name, safe evidence fields, hard stops, and retained evidence requirements.
+- Updated `/qa-evidence`, `/product`, Product Readiness Brief, Product Console proof stack, Boundary Resolution proof routes, and public smoke coverage with manual AAL2 QA execution readiness.
+- Preserved the boundary: execution readiness does not mint tokens, execute passkey ceremonies, bypass AAL2, store secrets, store PHI, run unattended authenticated CI, certify compliance, grant reimbursement certainty, authorize production connectors, authorize live clinical care, or claim authenticated proof before retained no-secret evidence exists.
+
 ## Latest Boundary Resolution Register Release
 
 - Added `/boundary-resolution`, `/api/boundary-resolution`, and `/api/boundary-resolution/brief` as SCRIMED's cross-system boundary register for clinical authority, clinical care activation, PHI, legal, regional, reimbursement, security, QA, public-market, and production-readiness limits.
