@@ -169,6 +169,18 @@ export default function ProductConsolePage() {
           <strong>{summary.qaBuyerProofReleaseSummary.releaseDecisionState}</strong>
         </article>
         <article>
+          <span>QA execution console</span>
+          <strong>{summary.qaManualExecutionConsoleSummary.consoleState}</strong>
+        </article>
+        <article>
+          <span>Console stages</span>
+          <strong>{summary.qaManualExecutionConsoleStageCount}</strong>
+        </article>
+        <article>
+          <span>Console hard stops</span>
+          <strong>{summary.qaManualExecutionConsoleHardStopCount}</strong>
+        </article>
+        <article>
           <span>Release hard stops</span>
           <strong>{summary.qaBuyerProofReleaseHardStopCount}</strong>
         </article>
@@ -264,6 +276,54 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual QA execution console">
+        <div className="section-heading">
+          <p className="eyebrow">Manual QA execution console</p>
+          <h2>AAL2 QA execution now has a protected command lane before buyer proof release.</h2>
+          <p className="section-copy">{summary.qaManualExecutionConsoleSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.qaManualExecutionConsoleRoute}>
+              Open Execution Console
+            </Link>
+            <a className="secondary-action" href={summary.qaManualExecutionConsoleBriefRoute}>
+              Download Console Brief
+            </a>
+            <Link className="secondary-action" href="/pilot-workspace/access">
+              Protected Workspace
+            </Link>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.qaManualExecutionConsoleSummary.consoleState}</span>
+            <h2>{summary.qaManualExecutionConsoleSummary.buyerSafeCurrentLanguage}</h2>
+          </div>
+          <p>{summary.qaManualExecutionConsoleSummary.decision.nextAction}</p>
+          <div>
+            <strong>Protected route: {summary.qaManualExecutionConsoleProtectedRoute}</strong>
+            <ul className="compact-list">
+              <li>Protected workspace anchor: {summary.qaManualExecutionConsoleProtectedWorkspaceRoute}</li>
+              <li>Buyer proof ready: {summary.qaManualExecutionConsoleSummary.decision.buyerProofReleaseReady ? "yes" : "no"}</li>
+            </ul>
+          </div>
+        </article>
+        {summary.qaManualExecutionConsoleSummary.decision.stages.map((stage) => (
+          <article className="module-row" key={stage.id}>
+            <div>
+              <span>{stage.status}</span>
+              <h2>{stage.name}</h2>
+            </div>
+            <p>{stage.evidence}</p>
+            <div>
+              <strong>{stage.owner}</strong>
+              <ul className="compact-list">
+                <li>{stage.action}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED QA buyer proof release">

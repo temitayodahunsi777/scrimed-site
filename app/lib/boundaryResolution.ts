@@ -242,6 +242,7 @@ export function getBoundaryResolutionSummary() {
       "/qa-execution-readiness",
       "/qa-run-control",
       "/qa-launch-kit",
+      "/qa-manual-execution-console",
       "/qa-completion-bridge",
       "/qa-claim-guard",
       "/qa-activation-seal",
@@ -276,6 +277,7 @@ export function getBoundaryResolutionSummary() {
       qaLedger.apiRoute,
       qaLedger.briefRoute,
       "/qa-launch-kit",
+      "/qa-manual-execution-console",
       "/qa-completion-bridge",
       "/qa-claim-guard",
       "/qa-activation-seal",
@@ -351,7 +353,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-human-run-packet dispatches the first human AAL2 QA workflow, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, /qa-activation-seal confirms final seal posture, /qa-proof-promotion gates retained packet language, and /qa-buyer-proof-release decides whether Buyer Diligence may reference retained proof.",
+      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-human-run-packet dispatches the first human AAL2 QA workflow, /qa-manual-execution-console coordinates protected operator state, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, /qa-activation-seal confirms final seal posture, /qa-proof-promotion gates retained packet language, and /qa-buyer-proof-release decides whether Buyer Diligence may reference retained proof.",
     records,
     updated: "2026-06-22"
   };

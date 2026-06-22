@@ -9,6 +9,7 @@ import { getQaLaunchKitSummary } from "../lib/qaLaunchKit";
 import { getQaProofPromotionSummary } from "../lib/qaProofPromotion";
 import { getQaRunControlSummary } from "../lib/qaRunControl";
 import { getQaBuyerProofReleaseSummary } from "../lib/qaBuyerProofRelease";
+import { getQaManualExecutionConsoleSummary } from "../lib/qaManualExecutionConsole";
 
 export const metadata = {
   title: "SCRIMED QA Evidence Ledger",
@@ -27,6 +28,7 @@ export default function QaEvidencePage() {
   const activationSeal = getQaActivationSealSummary();
   const proofPromotion = getQaProofPromotionSummary();
   const buyerProofRelease = getQaBuyerProofReleaseSummary();
+  const manualExecutionConsole = getQaManualExecutionConsoleSummary();
   const commitSha =
     ledger.currentDeployment.commitSha === "local-or-unset"
       ? ledger.currentDeployment.commitSha
@@ -81,6 +83,9 @@ export default function QaEvidencePage() {
           </Link>
           <Link className="secondary-action" href={buyerProofRelease.route}>
             Buyer Proof Release
+          </Link>
+          <Link className="secondary-action" href={manualExecutionConsole.route}>
+            Execution Console
           </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
@@ -190,6 +195,14 @@ export default function QaEvidencePage() {
           <strong>{buyerProofRelease.releaseDecisionState}</strong>
         </article>
         <article>
+          <span>Execution console</span>
+          <strong>{manualExecutionConsole.consoleState}</strong>
+        </article>
+        <article>
+          <span>Console stops</span>
+          <strong>{manualExecutionConsole.hardStopCount}</strong>
+        </article>
+        <article>
           <span>Release stops</span>
           <strong>{buyerProofRelease.hardStopCount}</strong>
         </article>
@@ -219,6 +232,54 @@ export default function QaEvidencePage() {
             <strong>{commitSha}</strong>
           </div>
         </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED manual QA execution console">
+        <div className="section-heading">
+          <p className="eyebrow">Manual QA execution console</p>
+          <h2>Human AAL2 execution now flows through one protected operator command lane.</h2>
+          <p className="section-copy">{manualExecutionConsole.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={manualExecutionConsole.route}>
+              Open Execution Console
+            </Link>
+            <a className="secondary-action" href={manualExecutionConsole.briefRoute}>
+              Download Console Brief
+            </a>
+            <Link className="secondary-action" href="/pilot-workspace/access">
+              Protected Workspace
+            </Link>
+          </div>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>state</span>
+            <h3>{manualExecutionConsole.consoleState}</h3>
+            <p>{manualExecutionConsole.buyerSafeCurrentLanguage}</p>
+          </article>
+          <article>
+            <span>protected route</span>
+            <h3>{manualExecutionConsole.protectedRoute}</h3>
+            <p>Reads retained packet and audit visibility before buyer proof is released.</p>
+          </article>
+          <article>
+            <span>next action</span>
+            <h3>{manualExecutionConsole.workflowCount} workflows</h3>
+            <p>{manualExecutionConsole.nextRecommendedBuildStep}</p>
+          </article>
+        </div>
+        {manualExecutionConsole.decision.stages.map((stage) => (
+          <article className="module-row" key={stage.id}>
+            <div>
+              <span>{stage.status}</span>
+              <h2>{stage.name}</h2>
+            </div>
+            <p>{stage.evidence}</p>
+            <div>
+              <strong>{stage.owner}</strong>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED manual AAL2 QA activation plan">

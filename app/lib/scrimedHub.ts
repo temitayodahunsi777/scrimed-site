@@ -103,6 +103,13 @@ import {
   qaBuyerProofReleaseRoute
 } from "./qaBuyerProofRelease";
 import {
+  getQaManualExecutionConsoleSummary,
+  qaManualExecutionConsoleApiRoute,
+  qaManualExecutionConsoleBriefRoute,
+  qaManualExecutionConsoleProtectedRoute,
+  qaManualExecutionConsoleRoute
+} from "./qaManualExecutionConsole";
+import {
   qaHumanRunPacketApiRoute,
   qaHumanRunPacketBriefRoute,
   qaHumanRunPacketRoute
@@ -267,6 +274,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "TrustOS, release engineering, tenant governance, buyer diligence, and claims governance",
     objective: "Unify retained packet visibility, Proof Promotion, Activation Seal, and Claim Guard into a protected Buyer Diligence go/no-go gate."
+  },
+  {
+    name: "Manual QA Execution Console",
+    route: qaManualExecutionConsoleRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release engineering, TrustOS, tenant governance, security, and Buyer Diligence",
+    objective: "Unify human AAL2 QA dispatch, no-secret evidence capture, retained packet visibility, audit signals, and Buyer Proof Release readiness."
   }
 ];
 
@@ -412,6 +427,11 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   {
+    name: "Manual QA Execution Console",
+    value: "protected AAL2 command lane active",
+    tone: "good"
+  },
+  {
     name: "Manual QA evidence packet",
     value: "no-secret capture contract active",
     tone: "good"
@@ -496,6 +516,9 @@ export const hubRoutes = [
   qaBuyerProofReleaseRoute,
   qaBuyerProofReleaseApiRoute,
   qaBuyerProofReleaseBriefRoute,
+  qaManualExecutionConsoleRoute,
+  qaManualExecutionConsoleApiRoute,
+  qaManualExecutionConsoleBriefRoute,
   "/sales-operations",
   "/pilots",
   "/demos",
@@ -653,6 +676,7 @@ export const hubRoutes = [
   "/api/pilot-workspaces/{workspaceSlug}/buyer-room",
   "/api/pilot-workspaces/{workspaceSlug}/buyer-room/packet",
   qaBuyerProofReleaseProtectedRoute,
+  qaManualExecutionConsoleProtectedRoute,
   "/api/pilot-workspaces/{workspaceSlug}/sessions/{sessionId}/proof-packet",
   "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions",
   "/api/pilot-workspaces/{workspaceSlug}/trustos-decisions/{decisionId}/reviews",
@@ -738,6 +762,7 @@ export function getHubSummary() {
   const qaClaimGuardSummary = getQaClaimGuardSummary();
   const qaActivationSealSummary = getQaActivationSealSummary();
   const qaBuyerProofReleaseSummary = getQaBuyerProofReleaseSummary();
+  const qaManualExecutionConsoleSummary = getQaManualExecutionConsoleSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -771,6 +796,7 @@ export function getHubSummary() {
     qaClaimGuardSummary,
     qaActivationSealSummary,
     qaBuyerProofReleaseSummary,
+    qaManualExecutionConsoleSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,

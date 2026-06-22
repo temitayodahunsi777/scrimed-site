@@ -23,6 +23,7 @@ import BuyerPilotRoomPanel from "./BuyerPilotRoomPanel";
 import ClinicalActivationApprovalsPanel from "./ClinicalActivationApprovalsPanel";
 import ClinicalActivationDossierPanel from "./ClinicalActivationDossierPanel";
 import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
+import ManualQaExecutionConsolePanel from "./ManualQaExecutionConsolePanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
@@ -4900,6 +4901,12 @@ export default function ProtectedPilotAccess({
             onRecordApproval={recordClinicalActivationApproval}
             packetBusy={clinicalApprovalPacketStatus === "downloading"}
             workflow={clinicalActivationApprovalWorkflow}
+          />
+
+          <ManualQaExecutionConsolePanel
+            packets={manualQaEvidencePackets}
+            session={session}
+            workspace={selectedWorkspace}
           />
 
           <ManualQaEvidencePanel

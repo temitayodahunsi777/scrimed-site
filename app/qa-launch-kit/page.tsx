@@ -29,6 +29,7 @@ export default function QaLaunchKitPage() {
           <a className="primary-action" href={summary.briefRoute}>Download Launch Kit</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/qa-run-control">Run Control</Link>
+          <Link className="secondary-action" href="/qa-manual-execution-console">Execution Console</Link>
           <Link className="secondary-action" href="/qa-completion-bridge">Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-claim-guard">Claim Guard</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>

@@ -27,6 +27,7 @@ export default function QaExecutionReadinessPage() {
           <a className="primary-action" href={summary.briefRoute}>Download Execution Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href={runControl.route}>Run Control</Link>
+          <Link className="secondary-action" href="/qa-manual-execution-console">Execution Console</Link>
           <Link className="secondary-action" href="/qa-evidence">QA Ledger</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
           <Link className="secondary-action" href="/boundary-resolution">Boundary Register</Link>

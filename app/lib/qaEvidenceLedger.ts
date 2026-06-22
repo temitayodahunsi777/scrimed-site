@@ -100,6 +100,12 @@ const qaBuyerProofReleaseApiRoute = "/api/qa-evidence/buyer-proof-release";
 const qaBuyerProofReleaseBriefRoute = "/api/qa-evidence/buyer-proof-release/brief";
 const qaBuyerProofReleaseProtectedRoute =
   "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/buyer-proof-release";
+const qaManualExecutionConsoleRoute = "/qa-manual-execution-console";
+const qaManualExecutionConsoleApiRoute = "/api/qa-evidence/manual-execution-console";
+const qaManualExecutionConsoleBriefRoute =
+  "/api/qa-evidence/manual-execution-console/brief";
+const qaManualExecutionConsoleProtectedRoute =
+  "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-execution-console";
 
 export const qaEvidenceLedgerStatus = "qa-evidence-ledger-active";
 export const qaEvidenceLedgerProofStackStatus =
@@ -114,6 +120,8 @@ export const qaEvidenceActivationPlanStatus =
   "manual-aal2-qa-evidence-activation-plan-ready";
 const qaBuyerProofReleaseStatus =
   "manual-aal2-qa-buyer-proof-release-gate-ready";
+const qaManualExecutionConsoleStatus =
+  "manual-aal2-qa-execution-console-ready";
 
 export const qaEvidenceLedgerBoundary =
   "SCRIMED QA Evidence Ledger records synthetic-only release, smoke, token-policy, fail-closed, and operator-gate evidence. It is not a clinical validation report, security certification, legal opinion, SOC report, HIPAA attestation, or authorization for live healthcare execution.";
@@ -423,6 +431,33 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
       "Have an approved tenant-admin or pilot-lead use /qa-human-run-packet for exactly one synthetic workflow, validate through /qa-completion-bridge, persist protected metadata, then confirm /qa-activation-seal, /qa-proof-promotion, and /qa-claim-guard."
   },
   {
+    id: "manual-aal2-qa-execution-console",
+    name: "Manual AAL2 QA execution console",
+    status: "workaround-active",
+    owner: "Release engineering, TrustOS, tenant governance, security, and Buyer Diligence",
+    recordedAt: "2026-06-22",
+    artifact: qaManualExecutionConsoleApiRoute,
+    routes: [
+      qaManualExecutionConsoleRoute,
+      qaManualExecutionConsoleApiRoute,
+      qaManualExecutionConsoleBriefRoute,
+      qaManualExecutionConsoleProtectedRoute,
+      "/pilot-workspace/access#manual-qa-execution-console",
+      "/qa-human-run-packet",
+      "/qa-completion-bridge",
+      qaManualRunEvidencePersistenceApiRoute,
+      qaBuyerProofReleaseProtectedRoute
+    ],
+    evidence:
+      "A protected Manual QA Execution Console now unifies human AAL2 run readiness, manual workflow dispatch, no-secret metadata capture, retained packet visibility, audit signals, and Buyer Proof Release readiness in one operator lane.",
+    limitation:
+      "The console coordinates execution but does not mint tokens, execute passkey ceremonies, run authenticated CI unattended, store secrets, process PHI, create retained packets by itself, or authorize production healthcare activity.",
+    workaround:
+      "Use the public route for the no-secret runbook and the protected workspace panel to read retained packet and audit visibility before any Buyer Diligence proof language is released.",
+    nextAction:
+      "Use /pilot-workspace/access#manual-qa-execution-console during the first human AAL2 synthetic QA workflow, persist safe metadata through Manual QA Evidence, then refresh Buyer Proof Release."
+  },
+  {
     id: "manual-aal2-qa-completion-bridge",
     name: "Manual AAL2 QA completion bridge",
     status: "workaround-active",
@@ -632,9 +667,9 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     impact:
       "SCRIMED has the workflow and token policy, but cannot claim an authenticated CI mutation run until a fresh AAL2 operator token is used deliberately.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, explicit intake targeting, Run Control mission brief, Launch Kit handoff, Human Run Packet dispatch validation, Completion Bridge candidate validation, Claim Guard overclaim prevention, Activation Seal final check, Proof Promotion gate, Buyer Proof Release gate, fail-closed public smoke, and no long-lived secret storage.",
+      "Manual-only GitHub workflow, short-lived JWT preflight, explicit intake targeting, Run Control mission brief, Launch Kit handoff, Human Run Packet dispatch validation, protected Manual QA Execution Console, Completion Bridge candidate validation, Claim Guard overclaim prevention, Activation Seal final check, Proof Promotion gate, Buyer Proof Release gate, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
-      "Use /qa-human-run-packet, mint a fresh AAL2 token from the tenant-admin session, run the workflow once against a synthetic intake ID, archive only safe IDs, validate them through /qa-completion-bridge, persist the packet hash, delete or rotate the token secret, then use /qa-buyer-proof-release before buyer proof claims.",
+      "Use /pilot-workspace/access#manual-qa-execution-console, mint a fresh AAL2 token from the tenant-admin session, run the workflow once against a synthetic intake ID, archive only safe IDs, validate them through /qa-completion-bridge, persist the packet hash, delete or rotate the token secret, then use /qa-buyer-proof-release before buyer proof claims.",
     status: "manual-action-required"
   },
   {
@@ -642,9 +677,9 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     impact:
       "SCRIMED has the protected authority-reference QA harness and renewal queue, but cannot claim an authenticated authority-reference mutation run until a fresh AAL2 operator token is used deliberately.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, Run Control mission brief, Launch Kit handoff, Human Run Packet dispatch validation, Completion Bridge candidate validation, Claim Guard overclaim prevention, Activation Seal final check, Proof Promotion gate, Buyer Proof Release gate, fail-closed public smoke, and no long-lived secret storage.",
+      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, Run Control mission brief, Launch Kit handoff, Human Run Packet dispatch validation, protected Manual QA Execution Console, Completion Bridge candidate validation, Claim Guard overclaim prevention, Activation Seal final check, Proof Promotion gate, Buyer Proof Release gate, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
-      "Use /qa-human-run-packet, mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, validate them through /qa-completion-bridge, delete or rotate the token secret, then use /qa-buyer-proof-release before buyer proof claims.",
+      "Use /pilot-workspace/access#manual-qa-execution-console, mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, validate them through /qa-completion-bridge, delete or rotate the token secret, then use /qa-buyer-proof-release before buyer proof claims.",
     status: "manual-action-required"
   },
   {
@@ -782,6 +817,16 @@ export function getQaEvidenceLedger() {
     salesDemoSessionQaControls,
     tokenPolicy: salesDemoSessionQaTokenPolicy,
     qaBuyerProofReleaseStatus,
+    qaManualExecutionConsoleStatus,
+    qaManualExecutionConsole: {
+      route: qaManualExecutionConsoleRoute,
+      apiRoute: qaManualExecutionConsoleApiRoute,
+      briefRoute: qaManualExecutionConsoleBriefRoute,
+      protectedRoute: qaManualExecutionConsoleProtectedRoute,
+      status: qaManualExecutionConsoleStatus,
+      boundary:
+        "The console coordinates human AAL2 synthetic QA, retained packet visibility, and Buyer Proof Release checks without storing tokens, PHI, production credentials, or clinical authority."
+    },
     activationPlan: getQaEvidenceActivationPlan(),
     manualRunEvidenceCapture: qaManualRunEvidenceContract,
     manualRunEvidencePersistence: {
@@ -795,7 +840,7 @@ export function getQaEvidenceLedger() {
     buyerSafeSummary:
       "SCRIMED verifies release health, protected-route containment, token-policy readiness, and no-secret evidence capture today; remaining authenticated QA evidence requires deliberate short-lived AAL2 operator runs against synthetic targets.",
     nextRecommendedBuildStep:
-      "Use /qa-human-run-packet to dispatch exactly one approved human AAL2 synthetic workflow, then validate through /qa-completion-bridge, persist through protected Manual QA Evidence, and confirm /qa-buyer-proof-release before Buyer Diligence export.",
+      "Use /pilot-workspace/access#manual-qa-execution-console to dispatch exactly one approved human AAL2 synthetic workflow, then validate through /qa-completion-bridge, persist through protected Manual QA Evidence, and confirm /qa-buyer-proof-release before Buyer Diligence export.",
     updated: "2026-06-22"
   };
 }

@@ -10,6 +10,8 @@ It exposes:
 - `/api/qa-evidence/buyer-proof-release`
 - `/api/qa-evidence/buyer-proof-release/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/buyer-proof-release`
+- `/qa-manual-execution-console`
+- `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-execution-console`
 
 ## Purpose
 
@@ -53,9 +55,10 @@ Buyer Proof Release does not execute AAL2 workflows, mint tokens, store credenti
 6. Confirm `/qa-activation-seal`.
 7. Confirm `/qa-proof-promotion`.
 8. Run buyer-facing language through `/qa-claim-guard`.
-9. Open `/qa-buyer-proof-release`.
-10. Run the protected route `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/buyer-proof-release`.
-11. Export Buyer Diligence only when the protected decision is `ready-for-protected-buyer-diligence-export`.
+9. Refresh `/pilot-workspace/access#manual-qa-execution-console`.
+10. Open `/qa-buyer-proof-release`.
+11. Run the protected route `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/buyer-proof-release`.
+12. Export Buyer Diligence only when the protected decision is `ready-for-protected-buyer-diligence-export`.
 
 ## Current Safe Claim
 
@@ -63,4 +66,4 @@ SCRIMED has a governed synthetic QA path and a protected Buyer Proof Release gat
 
 ## Next Step
 
-After the first approved human AAL2 run is persisted, use the protected Buyer Proof Release gate as the final release decision before exporting Buyer Diligence.
+After the first approved human AAL2 run is persisted, refresh the protected Manual QA Execution Console, then use Buyer Proof Release as the final release decision before exporting Buyer Diligence.

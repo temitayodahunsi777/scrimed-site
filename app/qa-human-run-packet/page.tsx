@@ -50,6 +50,9 @@ export default function QaHumanRunPacketPage() {
           <Link className="secondary-action" href="/qa-buyer-proof-release">
             Buyer Proof Release
           </Link>
+          <Link className="secondary-action" href="/qa-manual-execution-console">
+            Execution Console
+          </Link>
           <Link className="secondary-action" href="/pilot-workspace/access">
             Protected Workspace
           </Link>

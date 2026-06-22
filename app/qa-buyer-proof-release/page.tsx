@@ -24,6 +24,7 @@ export default function QaBuyerProofReleasePage() {
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Release Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect Public API</a>
+          <Link className="secondary-action" href="/qa-manual-execution-console">Execution Console</Link>
           <Link className="secondary-action" href="/qa-human-run-packet">Human Run Packet</Link>
           <Link className="secondary-action" href="/qa-completion-bridge">Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>

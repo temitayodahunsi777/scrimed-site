@@ -2,6 +2,14 @@
 
 Updated: 2026-06-22
 
+## Latest Manual QA Execution Console Release
+
+- Added `/qa-manual-execution-console`, `/api/qa-evidence/manual-execution-console`, `/api/qa-evidence/manual-execution-console/brief`, and `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-execution-console` as the protected command lane for human AAL2 synthetic QA execution.
+- Added protected workspace console visibility at `/pilot-workspace/access#manual-qa-execution-console` before Manual QA Evidence capture so operators can see retained packet visibility, audit signals, Buyer Proof Release state, and hard stops before proof language is used.
+- Updated Product Console, Product Readiness Brief, QA Evidence Ledger, `/qa-evidence`, `/product`, SCRIMED Hub inventory, route catalog, and QA navigation with Manual QA Execution Console visibility.
+- Added `docs/qa-manual-execution-console.md` as the operating runbook between Human Run Packet and Manual QA Evidence persistence.
+- Preserved the boundary: the console does not execute AAL2 workflows, mint tokens, store credentials, store PHI, run unattended authenticated CI, authorize public distribution, certify security or compliance, authorize live clinical care, guarantee reimbursement, approve production connectors, or grant production authority.
+
 ## Latest QA Buyer Proof Release
 
 - Added `/qa-buyer-proof-release`, `/api/qa-evidence/buyer-proof-release`, `/api/qa-evidence/buyer-proof-release/brief`, and `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/buyer-proof-release` as the protected go/no-go gate before retained manual AAL2 synthetic QA proof enters Buyer Diligence.

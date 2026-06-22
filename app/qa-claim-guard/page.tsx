@@ -23,6 +23,7 @@ export default function QaClaimGuardPage() {
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Claim Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
+          <Link className="secondary-action" href="/qa-manual-execution-console">Execution Console</Link>
           <Link className="secondary-action" href={summary.launchKitRoute}>Launch Kit</Link>
           <Link className="secondary-action" href={summary.completionBridgeRoute}>Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>

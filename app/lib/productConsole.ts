@@ -157,6 +157,11 @@ import {
   qaBuyerProofReleaseProofStackStatus
 } from "./qaBuyerProofRelease";
 import {
+  getQaManualExecutionConsoleSummary,
+  qaManualExecutionConsoleBriefProofStackStatus,
+  qaManualExecutionConsoleProofStackStatus
+} from "./qaManualExecutionConsole";
+import {
   clinicalCareActivationProofStackStatus,
   getClinicalCareActivationSummary
 } from "./clinicalCareActivation";
@@ -855,6 +860,7 @@ export function getProductConsoleSummary() {
   const qaActivationSealSummary = getQaActivationSealSummary();
   const qaProofPromotionSummary = getQaProofPromotionSummary();
   const qaBuyerProofReleaseSummary = getQaBuyerProofReleaseSummary();
+  const qaManualExecutionConsoleSummary = getQaManualExecutionConsoleSummary();
   const clinicalCareActivationSummary = getClinicalCareActivationSummary();
   const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
   const productAgents = getProductAgents();
@@ -1065,6 +1071,12 @@ export function getProductConsoleSummary() {
     qaBuyerProofReleaseBriefRoute: qaBuyerProofReleaseSummary.briefRoute,
     qaBuyerProofReleaseProtectedRoute: qaBuyerProofReleaseSummary.protectedReleaseRoute,
     qaBuyerProofReleaseBuyerPacketRoute: qaBuyerProofReleaseSummary.buyerDiligencePacketRoute,
+    qaManualExecutionConsoleRoute: qaManualExecutionConsoleSummary.route,
+    qaManualExecutionConsoleApiRoute: qaManualExecutionConsoleSummary.apiRoute,
+    qaManualExecutionConsoleBriefRoute: qaManualExecutionConsoleSummary.briefRoute,
+    qaManualExecutionConsoleProtectedRoute: qaManualExecutionConsoleSummary.protectedRoute,
+    qaManualExecutionConsoleProtectedWorkspaceRoute:
+      qaManualExecutionConsoleSummary.protectedWorkspaceRoute,
     qaManualRunEvidencePacketRoute: qaEvidenceLedger.manualRunEvidenceCapture.route,
     qaManualRunEvidencePersistenceRoute:
       qaEvidenceLedger.manualRunEvidenceCapture.protectedPersistenceRoute,
@@ -1119,6 +1131,11 @@ export function getProductConsoleSummary() {
     qaBuyerProofReleaseHardStopCount: qaBuyerProofReleaseSummary.hardStopCount,
     qaBuyerProofReleaseRequiredEvidenceCount: qaBuyerProofReleaseSummary.requiredEvidenceCount,
     qaBuyerProofReleaseBlockedClaimCount: qaBuyerProofReleaseSummary.blockedClaimCount,
+    qaManualExecutionConsoleStageCount: qaManualExecutionConsoleSummary.stageCount,
+    qaManualExecutionConsoleHardStopCount: qaManualExecutionConsoleSummary.hardStopCount,
+    qaManualExecutionConsoleWorkflowCount: qaManualExecutionConsoleSummary.workflowCount,
+    qaManualExecutionConsoleBlockedClaimCount:
+      qaManualExecutionConsoleSummary.blockedAuthorityClaimCount,
     status: "commercial-pilot-ready",
     offerCount: productOffers.length,
     serviceOfferCount: enterpriseServiceOffers.length,
@@ -1239,6 +1256,7 @@ export function getProductConsoleSummary() {
     qaActivationSealSummary,
     qaProofPromotionSummary,
     qaBuyerProofReleaseSummary,
+    qaManualExecutionConsoleSummary,
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
     proofStack: {
@@ -1374,6 +1392,8 @@ export function getProductConsoleSummary() {
       qaProofPromotionBrief: qaProofPromotionBriefProofStackStatus,
       qaBuyerProofRelease: qaBuyerProofReleaseProofStackStatus,
       qaBuyerProofReleaseBrief: qaBuyerProofReleaseBriefProofStackStatus,
+      qaManualExecutionConsole: qaManualExecutionConsoleProofStackStatus,
+      qaManualExecutionConsoleBrief: qaManualExecutionConsoleBriefProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
       trustSafetyIncidentQueue: `${trustSafetyOperationsSummary.incidentCount} incident controls`,
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
@@ -1405,7 +1425,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-22"
   };
 }
@@ -1556,6 +1576,15 @@ export function getProductReadinessBrief() {
     `QA Buyer Proof Release Blocked Claims: ${summary.qaBuyerProofReleaseBlockedClaimCount}`,
     `QA Buyer Proof Release Decision: ${summary.qaBuyerProofReleaseSummary.releaseDecisionState}`,
     summary.qaBuyerProofReleaseSummary.decision.buyerSafeClaim,
+    `Manual QA Execution Console: ${summary.qaManualExecutionConsoleRoute}`,
+    `Manual QA Execution Console API: ${summary.qaManualExecutionConsoleApiRoute}`,
+    `Manual QA Execution Console Brief: ${summary.qaManualExecutionConsoleBriefRoute}`,
+    `Protected Manual QA Execution Console: ${summary.qaManualExecutionConsoleProtectedRoute}`,
+    `Manual QA Execution Console Stages: ${summary.qaManualExecutionConsoleStageCount}`,
+    `Manual QA Execution Console Hard Stops: ${summary.qaManualExecutionConsoleHardStopCount}`,
+    `Manual QA Execution Console Workflows: ${summary.qaManualExecutionConsoleWorkflowCount}`,
+    `Manual QA Execution Console Decision: ${summary.qaManualExecutionConsoleSummary.consoleState}`,
+    summary.qaManualExecutionConsoleSummary.buyerSafeCurrentLanguage,
     `Buyer Pilot Room: ${summary.buyerPilotRoomRoute}`,
     `Competitive Edge: ${summary.competitiveEdgeRoute}`,
     ...summary.buyerPilotRoomCompetitiveEdges.map(

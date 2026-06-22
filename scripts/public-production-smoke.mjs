@@ -449,6 +449,37 @@ function requireQaBuyerProofReleaseBoundary(label, response) {
   }
 }
 
+function requireQaManualExecutionConsoleBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const executionConsole = response.headers.get("x-scrimed-qa-execution-console");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (!["public-summary-only", "brief-no-secret-no-auth-claim", "protected-state-verification"].includes(executionConsole ?? "")) {
+    throw new Error(`${label} expected manual execution console boundary header but received ${executionConsole}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (!["retained-packet-required", "retained-packet-gated"].includes(qaProof ?? "")) {
+    throw new Error(`${label} expected retained-packet manual execution proof boundary but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -1155,6 +1186,20 @@ async function checkProductConsole() {
     throw new Error("product console missing QA buyer proof release brief proof-stack posture.");
   }
 
+  if (
+    body.proofStack?.qaManualExecutionConsole !==
+    "manual-aal2-qa-execution-console-protected-operator-control"
+  ) {
+    throw new Error("product console missing QA manual execution console proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.qaManualExecutionConsoleBrief !==
+    "manual-aal2-qa-execution-console-brief-no-auth-claim"
+  ) {
+    throw new Error("product console missing QA manual execution console brief proof-stack posture.");
+  }
+
   if (!body.qaExecutionReadinessWorkflowCount || body.qaExecutionReadinessWorkflowCount < 2) {
     throw new Error("product console expected QA execution readiness workflow coverage.");
   }
@@ -1289,6 +1334,22 @@ async function checkProductConsole() {
 
   if (!body.qaBuyerProofReleaseBlockedClaimCount || body.qaBuyerProofReleaseBlockedClaimCount < 8) {
     throw new Error("product console expected QA buyer proof release blocked-claim coverage.");
+  }
+
+  if (!body.qaManualExecutionConsoleStageCount || body.qaManualExecutionConsoleStageCount < 6) {
+    throw new Error("product console expected QA manual execution console stage coverage.");
+  }
+
+  if (!body.qaManualExecutionConsoleHardStopCount || body.qaManualExecutionConsoleHardStopCount < 8) {
+    throw new Error("product console expected QA manual execution console hard-stop coverage.");
+  }
+
+  if (!body.qaManualExecutionConsoleWorkflowCount || body.qaManualExecutionConsoleWorkflowCount < 2) {
+    throw new Error("product console expected QA manual execution console workflow coverage.");
+  }
+
+  if (!body.qaManualExecutionConsoleBlockedClaimCount || body.qaManualExecutionConsoleBlockedClaimCount < 6) {
+    throw new Error("product console expected QA manual execution console blocked-claim coverage.");
   }
 
   if (body.proofStack?.publicProductionSmoke !== "no-secret-route-readiness-and-fail-closed-checks") {
@@ -2367,6 +2428,78 @@ async function checkQaBuyerProofRelease() {
   console.log("pass QA buyer proof release");
 }
 
+async function checkQaManualExecutionConsole() {
+  const result = await request("/api/qa-evidence/manual-execution-console");
+  requireStatus("QA manual execution console", result.response.status, 200);
+  requireContentType("QA manual execution console", result.response, "application/json");
+  requireQaManualExecutionConsoleBoundary("QA manual execution console", result.response);
+  const body = requireJson("QA manual execution console", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-manual-aal2-qa-execution-console") {
+    throw new Error(`QA manual execution console expected service scrimed-manual-aal2-qa-execution-console but received ${body.service}.`);
+  }
+
+  if (body.status !== "manual-aal2-qa-execution-console-ready") {
+    throw new Error(`QA manual execution console expected ready status but received ${body.status}.`);
+  }
+
+  if (body.consoleState !== "operator-aal2-run-required") {
+    throw new Error(`QA manual execution console expected operator-aal2-run-required but received ${body.consoleState}.`);
+  }
+
+  if (body.publicSummaryOnly !== true || body.protectedExecutionRequired !== true) {
+    throw new Error("QA manual execution console public API must remain summary-only and protected-execution-required.");
+  }
+
+  if (body.buyerProofReleaseReady !== false) {
+    throw new Error("QA manual execution console public API must not mark buyer proof release ready.");
+  }
+
+  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
+    throw new Error("QA manual execution console expected workflow coverage.");
+  }
+
+  if (!Array.isArray(body.stages) || body.stages.length < 6) {
+    throw new Error("QA manual execution console expected stage coverage.");
+  }
+
+  if (!Array.isArray(body.hardStops) || !body.hardStops.some((stop) => stop.includes("PHI"))) {
+    throw new Error("QA manual execution console expected PHI hard-stop coverage.");
+  }
+
+  if (!Array.isArray(body.blockedAuthorityClaims) || !body.blockedAuthorityClaims.some((claim) => claim.includes("production PHI"))) {
+    throw new Error("QA manual execution console expected production PHI blocked claim.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA manual execution console response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA manual execution console response must not contain bearer-token material.");
+  }
+
+  const brief = await request("/api/qa-evidence/manual-execution-console/brief");
+  requireStatus("QA manual execution console brief", brief.response.status, 200);
+  requireContentType("QA manual execution console brief", brief.response, "text/markdown");
+  requireQaManualExecutionConsoleBoundary("QA manual execution console brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Manual QA Execution Console Brief")) {
+    throw new Error("QA manual execution console brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("operator-aal2-run-required")) {
+    throw new Error("QA manual execution console brief missing operator AAL2 required state.");
+  }
+
+  if (!brief.body.text.includes("Protected console")) {
+    throw new Error("QA manual execution console brief missing protected console route.");
+  }
+
+  console.log("pass QA manual execution console");
+}
+
 async function checkClinicalCareActivation() {
   const result = await request("/api/clinical-care-activation");
   requireStatus("Clinical care activation", result.response.status, 200);
@@ -3004,6 +3137,7 @@ await checkHtml("/qa-claim-guard");
 await checkHtml("/qa-activation-seal");
 await checkHtml("/qa-proof-promotion");
 await checkHtml("/qa-buyer-proof-release");
+await checkHtml("/qa-manual-execution-console");
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
@@ -3023,6 +3157,7 @@ await checkQaClaimGuard();
 await checkQaActivationSeal();
 await checkQaProofPromotion();
 await checkQaBuyerProofRelease();
+await checkQaManualExecutionConsole();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"
@@ -3590,6 +3725,10 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/buyer-proof-release`,
   "QA Buyer Proof Release protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-execution-console`,
+  "QA Manual Execution Console protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,

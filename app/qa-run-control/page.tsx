@@ -30,6 +30,7 @@ export default function QaRunControlPage() {
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/qa-execution-readiness">Execution Readiness</Link>
           <Link className="secondary-action" href="/qa-launch-kit">Launch Kit</Link>
+          <Link className="secondary-action" href="/qa-manual-execution-console">Execution Console</Link>
           <Link className="secondary-action" href="/qa-completion-bridge">Completion Bridge</Link>
           <Link className="secondary-action" href="/qa-claim-guard">Claim Guard</Link>
           <Link className="secondary-action" href="/qa-activation-seal">Activation Seal</Link>
