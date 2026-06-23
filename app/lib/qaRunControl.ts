@@ -199,9 +199,9 @@ function evidenceTemplate(workflowKind: QaManualRunWorkflowKind): QaRunControlEv
 
   return {
     workflowKind,
-    workflowRunId: "<numeric-github-actions-run-id>",
+    workflowRunId: "<numeric-scrimed-manual-run-id>",
     workflowRunUrl:
-      "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/<numeric-github-actions-run-id>",
+      "https://app.scrimedsolutions.com/qa-run-control?runId=<numeric-scrimed-manual-run-id>",
     executedAt: "<iso-8601-run-timestamp>",
     baseUrl: "https://app.scrimedsolutions.com",
     intakeId: isAuthorityReference

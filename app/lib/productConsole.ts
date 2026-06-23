@@ -27,6 +27,11 @@ import {
   globalPartnerLocalizationStatus
 } from "./globalPartnerLocalization";
 import {
+  approvalsReadinessBriefStatus,
+  approvalsReadinessStatus,
+  getApprovalsReadinessSummary
+} from "./approvalsReadiness";
+import {
   boundaryResolutionBriefProofStackStatus,
   boundaryResolutionProofStackStatus,
   getBoundaryResolutionSummary
@@ -156,6 +161,18 @@ import {
   qaBuyerProofReleaseBriefProofStackStatus,
   qaBuyerProofReleaseProofStackStatus
 } from "./qaBuyerProofRelease";
+import {
+  buyerReleaseControlRunBriefProofStackStatus,
+  buyerReleaseControlRunProofStackStatus,
+  getBuyerReleaseControlRunSummary
+} from "./buyerReleaseControlRun";
+import {
+  protectedBuyerReleaseControlRunPacketProofStackStatus,
+  protectedBuyerReleaseControlRunProofStackStatus
+} from "./protectedBuyerReleaseControlRun";
+import {
+  protectedBuyerReleaseReadinessTimelineProofStackStatus
+} from "./protectedBuyerReleaseReadinessTimeline";
 import {
   getQaManualExecutionConsoleSummary,
   qaManualExecutionConsoleBriefProofStackStatus,
@@ -632,6 +649,14 @@ export const buyerActions: BuyerAction[] = [
       "Authority Readiness prepares evidence and safe workarounds; it does not grant legal approval, PHI processing authority, security certification, reimbursement certainty, regional approval, or live clinical execution."
   },
   {
+    label: "Review Approvals Readiness",
+    href: "/approvals-readiness",
+    purpose:
+      "Inspect the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates.",
+    boundary:
+      "Approvals Readiness organizes evidence and workarounds; it is not legal approval, HIPAA certification, FDA clearance, ONC certification, security certification, PHI authority, or live clinical authority."
+  },
+  {
     label: "Inspect Product Demos",
     href: "/demos",
     purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
@@ -728,11 +753,11 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
   {
     audience: "Security, privacy, and compliance reviewer",
     primaryQuestion: "Can SCRIMED pass enterprise diligence without exposing sensitive artifacts?",
-    recommendedStart: "Start with the Trust Center and protected workspace access path.",
-    route: "/trust-center",
-    supportingRoutes: ["/public-market-readiness", "/pilot-workspace/access", "/trust-safety-operations"],
+    recommendedStart: "Start with Approvals Readiness, the Trust Center, and protected workspace access path.",
+    route: "/approvals-readiness",
+    supportingRoutes: ["/trust-center", "/public-market-readiness", "/pilot-workspace/access", "/trust-safety-operations"],
     proof:
-      "Claims controls, protected provider security reviews, audit logs, review packets, and no-PHI evidence-room boundaries.",
+      "Claims controls, HIPAA/BAA readiness, security assurance tracks, protected provider security reviews, audit logs, review packets, and no-PHI evidence-room boundaries.",
     boundary:
       "Readiness metadata is not security approval, legal advice, compliance certification, executed BAA/DPA, or production authorization."
   },
@@ -843,6 +868,7 @@ export function getProductConsoleSummary() {
   const deploymentProfileSummary = getDeploymentProfileSummary();
   const marketActivationSummary = getMarketActivationSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
+  const approvalsReadinessSummary = getApprovalsReadinessSummary();
   const boundaryResolutionSummary = getBoundaryResolutionSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
@@ -860,6 +886,7 @@ export function getProductConsoleSummary() {
   const qaActivationSealSummary = getQaActivationSealSummary();
   const qaProofPromotionSummary = getQaProofPromotionSummary();
   const qaBuyerProofReleaseSummary = getQaBuyerProofReleaseSummary();
+  const buyerReleaseControlRunSummary = getBuyerReleaseControlRunSummary();
   const qaManualExecutionConsoleSummary = getQaManualExecutionConsoleSummary();
   const clinicalCareActivationSummary = getClinicalCareActivationSummary();
   const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
@@ -894,6 +921,9 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
     healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    approvalsReadinessRoute: approvalsReadinessSummary.route,
+    approvalsReadinessApiRoute: approvalsReadinessSummary.apiRoute,
+    approvalsReadinessBriefRoute: approvalsReadinessSummary.briefRoute,
     clinicalAuthorityReadinessRoute: clinicalAuthorityReadinessSummary.route,
     clinicalAuthorityReadinessApiRoute: clinicalAuthorityReadinessSummary.apiRoute,
     clinicalAuthorityReadinessBriefRoute: clinicalAuthorityReadinessSummary.briefRoute,
@@ -1071,6 +1101,15 @@ export function getProductConsoleSummary() {
     qaBuyerProofReleaseBriefRoute: qaBuyerProofReleaseSummary.briefRoute,
     qaBuyerProofReleaseProtectedRoute: qaBuyerProofReleaseSummary.protectedReleaseRoute,
     qaBuyerProofReleaseBuyerPacketRoute: qaBuyerProofReleaseSummary.buyerDiligencePacketRoute,
+    buyerReleaseControlRunRoute: buyerReleaseControlRunSummary.route,
+    buyerReleaseControlRunApiRoute: buyerReleaseControlRunSummary.apiRoute,
+    buyerReleaseControlRunBriefRoute: buyerReleaseControlRunSummary.briefRoute,
+    buyerReleaseControlRunProtectedVerifierRoute:
+      buyerReleaseControlRunSummary.protectedVerifierRoute,
+    buyerReleaseControlRunProtectedVerifierPacketRoute:
+      buyerReleaseControlRunSummary.protectedVerifierPacketRoute,
+    buyerReleaseControlRunProtectedVerifierTimelineRoute:
+      buyerReleaseControlRunSummary.protectedVerifierTimelineRoute,
     qaManualExecutionConsoleRoute: qaManualExecutionConsoleSummary.route,
     qaManualExecutionConsoleApiRoute: qaManualExecutionConsoleSummary.apiRoute,
     qaManualExecutionConsoleBriefRoute: qaManualExecutionConsoleSummary.briefRoute,
@@ -1083,6 +1122,12 @@ export function getProductConsoleSummary() {
     clinicalCareActivationStatus: clinicalCareActivationSummary.status,
     clinicalCareActivationGateCount: clinicalCareActivationSummary.gateCount,
     clinicalCareActivationBlockedCapabilityCount: clinicalCareActivationSummary.blockedCapabilities.length,
+    approvalsReadinessStatus: approvalsReadinessSummary.status,
+    approvalsReadinessTrackCount: approvalsReadinessSummary.trackCount,
+    approvalsReadinessAgentControlCount: approvalsReadinessSummary.agentControlCount,
+    approvalsReadinessExternalReviewCount: approvalsReadinessSummary.externalReviewCount,
+    approvalsReadinessBlockedBeforeApprovalCount:
+      approvalsReadinessSummary.blockedBeforeApprovalCount,
     clinicalAuthorityReadinessStatus: clinicalAuthorityReadinessSummary.status,
     clinicalAuthorityDomainCount: clinicalAuthorityReadinessSummary.authorityDomainCount,
     clinicalAuthorityBoundaryResolutionCount:
@@ -1131,6 +1176,11 @@ export function getProductConsoleSummary() {
     qaBuyerProofReleaseHardStopCount: qaBuyerProofReleaseSummary.hardStopCount,
     qaBuyerProofReleaseRequiredEvidenceCount: qaBuyerProofReleaseSummary.requiredEvidenceCount,
     qaBuyerProofReleaseBlockedClaimCount: qaBuyerProofReleaseSummary.blockedClaimCount,
+    buyerReleaseControlRunStepCount: buyerReleaseControlRunSummary.stepCount,
+    buyerReleaseControlRunProtectedRouteCount:
+      buyerReleaseControlRunSummary.protectedWriteRouteCount,
+    buyerReleaseControlRunPacketRouteCount: buyerReleaseControlRunSummary.packetRouteCount,
+    buyerReleaseControlRunHardStopCount: buyerReleaseControlRunSummary.hardStopCount,
     qaManualExecutionConsoleStageCount: qaManualExecutionConsoleSummary.stageCount,
     qaManualExecutionConsoleHardStopCount: qaManualExecutionConsoleSummary.hardStopCount,
     qaManualExecutionConsoleWorkflowCount: qaManualExecutionConsoleSummary.workflowCount,
@@ -1240,6 +1290,7 @@ export function getProductConsoleSummary() {
     deploymentProfileSummary,
     marketActivationSummary,
     globalPartnerLocalizationSummary,
+    approvalsReadinessSummary,
     boundaryResolutionSummary,
     clinicalAuthorityReadinessSummary,
     salesAttributionSummary,
@@ -1256,10 +1307,13 @@ export function getProductConsoleSummary() {
     qaActivationSealSummary,
     qaProofPromotionSummary,
     qaBuyerProofReleaseSummary,
+    buyerReleaseControlRunSummary,
     qaManualExecutionConsoleSummary,
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
     proofStack: {
+      approvalsReadiness: approvalsReadinessStatus,
+      approvalsReadinessBrief: approvalsReadinessBriefStatus,
       clinicalAuthorityReadiness: clinicalAuthorityReadinessStatus,
       clinicalAuthorityReadinessBrief: clinicalAuthorityReadinessBriefStatus,
       clinicalCareActivation: clinicalCareActivationProofStackStatus,
@@ -1392,6 +1446,13 @@ export function getProductConsoleSummary() {
       qaProofPromotionBrief: qaProofPromotionBriefProofStackStatus,
       qaBuyerProofRelease: qaBuyerProofReleaseProofStackStatus,
       qaBuyerProofReleaseBrief: qaBuyerProofReleaseBriefProofStackStatus,
+      buyerReleaseControlRun: buyerReleaseControlRunProofStackStatus,
+      buyerReleaseControlRunBrief: buyerReleaseControlRunBriefProofStackStatus,
+      protectedBuyerReleaseControlRun: protectedBuyerReleaseControlRunProofStackStatus,
+      protectedBuyerReleaseControlRunPackets:
+        protectedBuyerReleaseControlRunPacketProofStackStatus,
+      protectedBuyerReleaseReadinessTimeline:
+        protectedBuyerReleaseReadinessTimelineProofStackStatus,
       qaManualExecutionConsole: qaManualExecutionConsoleProofStackStatus,
       qaManualExecutionConsoleBrief: qaManualExecutionConsoleBriefProofStackStatus,
       publicProductionSmoke: "no-secret-route-readiness-and-fail-closed-checks",
@@ -1425,8 +1486,8 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
-    updated: "2026-06-22"
+      "Use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+    updated: "2026-06-23"
   };
 }
 
@@ -1451,6 +1512,20 @@ export function getProductReadinessBrief() {
     `Boundary Human AAL2 Gates: ${summary.boundaryResolutionHumanAal2RequiredCount}`,
     `Boundary Safe Workarounds: ${summary.boundaryResolutionSafeWorkaroundCount}`,
     summary.boundaryResolutionSummary.addressedPosition,
+    `Approvals Readiness: ${summary.approvalsReadinessRoute}`,
+    `Approvals API: ${summary.approvalsReadinessApiRoute}`,
+    `Approvals Brief: ${summary.approvalsReadinessBriefRoute}`,
+    `Approval Tracks: ${summary.approvalsReadinessTrackCount}`,
+    `Approval Agent Controls: ${summary.approvalsReadinessAgentControlCount}`,
+    `Approval External Review Tracks: ${summary.approvalsReadinessExternalReviewCount}`,
+    `Approval Blocked Tracks: ${summary.approvalsReadinessBlockedBeforeApprovalCount}`,
+    summary.approvalsReadinessSummary.boundary,
+    ...summary.approvalsReadinessSummary.tracks.map(
+      (track) => `- Approval track: ${track.name} (${track.status}) -> ${track.nextAction}`
+    ),
+    ...summary.approvalsReadinessSummary.agentControls.map(
+      (control) => `- Approval agent: ${control.agent}. Checkpoint: ${control.humanCheckpoint}`
+    ),
     `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
     `Clinical Authority Readiness: ${summary.clinicalAuthorityReadinessRoute}`,
     `Clinical Authority API: ${summary.clinicalAuthorityReadinessApiRoute}`,
@@ -1576,6 +1651,18 @@ export function getProductReadinessBrief() {
     `QA Buyer Proof Release Blocked Claims: ${summary.qaBuyerProofReleaseBlockedClaimCount}`,
     `QA Buyer Proof Release Decision: ${summary.qaBuyerProofReleaseSummary.releaseDecisionState}`,
     summary.qaBuyerProofReleaseSummary.decision.buyerSafeClaim,
+    `Buyer Release Control Runbook: ${summary.buyerReleaseControlRunRoute}`,
+    `Buyer Release Control API: ${summary.buyerReleaseControlRunApiRoute}`,
+    `Buyer Release Control Brief: ${summary.buyerReleaseControlRunBriefRoute}`,
+    `Protected Buyer Release Control Verifier: ${summary.buyerReleaseControlRunProtectedVerifierRoute}`,
+    `Protected Buyer Release Control Packet: ${summary.buyerReleaseControlRunProtectedVerifierPacketRoute}`,
+    `Protected Buyer Release Timeline: ${summary.buyerReleaseControlRunProtectedVerifierTimelineRoute}`,
+    `Buyer Release Control Steps: ${summary.buyerReleaseControlRunStepCount}`,
+    `Buyer Release Control Protected Routes: ${summary.buyerReleaseControlRunProtectedRouteCount}`,
+    `Buyer Release Control Packets: ${summary.buyerReleaseControlRunPacketRouteCount}`,
+    `Buyer Release Control Hard Stops: ${summary.buyerReleaseControlRunHardStopCount}`,
+    `Buyer Release Control Decision: ${summary.buyerReleaseControlRunSummary.executionDecision}`,
+    summary.buyerReleaseControlRunSummary.shareDecision,
     `Manual QA Execution Console: ${summary.qaManualExecutionConsoleRoute}`,
     `Manual QA Execution Console API: ${summary.qaManualExecutionConsoleApiRoute}`,
     `Manual QA Execution Console Brief: ${summary.qaManualExecutionConsoleBriefRoute}`,

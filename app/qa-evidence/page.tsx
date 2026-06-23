@@ -87,6 +87,9 @@ export default function QaEvidencePage() {
           <Link className="secondary-action" href={manualExecutionConsole.route}>
             Execution Console
           </Link>
+          <Link className="secondary-action" href={ledger.qaAal2RunEvidence.route}>
+            AAL2 Evidence Package
+          </Link>
           <Link className="secondary-action" href="/pilot-evidence">
             Pilot Evidence
           </Link>
@@ -199,6 +202,10 @@ export default function QaEvidencePage() {
           <strong>{manualExecutionConsole.consoleState}</strong>
         </article>
         <article>
+          <span>AAL2 package</span>
+          <strong>{ledger.qaAal2RunEvidence.status}</strong>
+        </article>
+        <article>
           <span>Console stops</span>
           <strong>{manualExecutionConsole.hardStopCount}</strong>
         </article>
@@ -231,6 +238,42 @@ export default function QaEvidencePage() {
             <span>sha</span>
             <strong>{commitSha}</strong>
           </div>
+        </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED AAL2 synthetic QA run evidence package">
+        <div className="section-heading">
+          <p className="eyebrow">AAL2 evidence package</p>
+          <h2>The first protected synthetic QA run now has a buyer-safe evidence dossier and go/no-go posture.</h2>
+          <p className="section-copy">{ledger.qaAal2RunEvidence.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={ledger.qaAal2RunEvidence.route}>
+              Open Evidence Package
+            </Link>
+            <a className="secondary-action" href={ledger.qaAal2RunEvidence.briefRoute}>
+              Download Evidence Brief
+            </a>
+            <Link className="secondary-action" href="/pilot-workspace/access">
+              Protected Workspace
+            </Link>
+          </div>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>status</span>
+            <h3>{ledger.qaAal2RunEvidence.status}</h3>
+            <p>Records required test categories, boundary checks, retained packet visibility, and release posture.</p>
+          </article>
+          <article>
+            <span>protected route</span>
+            <h3>{ledger.qaAal2RunEvidence.protectedRoute}</h3>
+            <p>Reads tenant-governed packet and audit state without storing secrets or touching production systems.</p>
+          </article>
+          <article>
+            <span>release rule</span>
+            <h3>NO-GO until gates pass</h3>
+            <p>Buyer proof release remains blocked until retained packet evidence, audit signals, and release criteria pass.</p>
+          </article>
         </div>
       </section>
 

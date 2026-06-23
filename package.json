@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "clean:generated": "node scripts/clean-generated-cache.mjs",
     "prebuild": "node scripts/clean-generated-cache.mjs",
     "build": "node scripts/check-generated-integrity.mjs && next build --webpack",
     "start": "next start",
@@ -12,6 +13,7 @@
     "smoke:agent-workspace": "node scripts/agent-workspace-authenticated-smoke.mjs",
     "smoke:authority-reference-qa:preflight": "node scripts/authority-artifact-reference-qa-token-preflight.mjs",
     "smoke:authority-reference-qa": "node scripts/authority-artifact-reference-qa-smoke.mjs",
+    "smoke:buyer-proof-operator-run": "node scripts/buyer-proof-release-operator-run.mjs",
     "smoke:public": "node scripts/public-production-smoke.mjs",
     "smoke:sales-command-center": "node scripts/sales-command-center-smoke.mjs",
     "smoke:sales-demo-session-qa:preflight": "node scripts/sales-demo-session-qa-token-preflight.mjs",

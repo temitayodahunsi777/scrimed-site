@@ -82,6 +82,24 @@ function initialChecks(workspaceSlug: string): VerificationCheck[] {
       audited: false
     },
     {
+      id: "buyer-release-control",
+      label: "Buyer Release Control",
+      route: `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run`,
+      expected: [200],
+      status: "pending",
+      detail: "Not run",
+      audited: false
+    },
+    {
+      id: "buyer-release-timeline",
+      label: "Buyer Release Timeline",
+      route: `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/timeline`,
+      expected: [200],
+      status: "pending",
+      detail: "Not run",
+      audited: false
+    },
+    {
       id: "tenant-access",
       label: "Tenant Access",
       route: `/api/pilot-workspaces/${workspaceSlug}/tenant-access`,

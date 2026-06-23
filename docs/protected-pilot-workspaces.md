@@ -15,6 +15,51 @@ Protected pilot workspaces retain governed synthetic evaluation evidence only. T
 
 Runtime APIs do not use a Supabase service-role key. Authorization is based on provider identity and database membership, never user-editable profile metadata.
 
+## Buyer Release Control Runbook
+
+The public no-secret runbook is available at:
+
+- `/buyer-release-control-run`
+- `/api/buyer-release-control-run`
+- `/api/buyer-release-control-run/brief`
+- `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run`
+- `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/packet`
+- `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/timeline`
+
+It is a metadata-only operator guide for the protected release-control chain. It does not perform protected writes and does not approve buyer-specific external sharing. Operators still need a fresh human AAL2 tenant-admin session inside `/pilot-workspace/access` before recording external approval references, release decisions, named reviewer signoffs, distribution lockbox metadata, release authority attestations, recipient controls, access-log reconciliation, or refreshed Buyer Diligence packets.
+
+Safe workaround: if a bearer token is unavailable in the Codex session, use the browser-protected workspace and copy only no-secret packet IDs, hashes, timestamps, and audit-event IDs into evidence records. Never paste bearer tokens, PHI, recipient lists, raw access logs, signed approvals, legal opinions, security reports, reimbursement determinations, or production connector data into SCRIMED documentation, chat, source, or packets.
+
+The protected verifier aggregates the current release-control chain into a single authenticated JSON response and an audited Markdown packet. It verifies readiness only; it does not approve release or external sharing.
+
+`/pilot-workspace/access#buyer-release-control-verifier` is the preferred operator path. It uses the active AAL2 browser session to run the verifier, load the Release Readiness Timeline, and download the audited chain packet without copying bearer tokens into scripts, chats, CI, or terminal history. Use it after release decision, named reviewer, disabled lockbox, authority, recipient, and access-log controls are reviewed, and before any Buyer Diligence Export is refreshed for qualified human review.
+
+The Release Readiness Timeline is the safe workaround for non-persistent verifier reads: browser-session reads are shown as ephemeral, while packet downloads and release-control writes remain durable append-only audit evidence.
+
+## Buyer Proof Release Operator Run
+
+`npm run smoke:buyer-proof-operator-run` is the token-boundary command-line harness for a deliberate protected Buyer Proof Release Operator Run.
+
+Required command shape:
+
+```bash
+SCRIMED_REQUIRE_BUYER_PROOF_OPERATOR_RUN=1 \
+SCRIMED_WORKSPACE_SLUG=atlas-synthetic-evaluation \
+SCRIMED_BEARER_TOKEN=<fresh-aal2-jwt> \
+npm run smoke:buyer-proof-operator-run
+```
+
+The script performs:
+
+- unauthenticated fail-closed checks for verifier, timeline, and chain-packet routes
+- local JWT claim preflight for `aal=aal2`, `session_id`, `exp`, `iat`, and short-lived token windows
+- authenticated verifier read against `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run`
+- authenticated timeline read against `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/timeline`
+- audited chain-packet download from `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/packet`
+- post-packet timeline read confirming the newest chain-packet audit event is visible
+
+Safe outputs are limited to chain state, share state, release decision, workspace slug, and packet audit event ID. The script does not print token material and must be run only with a fresh short-lived AAL2 token. If the token is expired or stale, the correct result is fail-closed `401 Unauthorized`; do not bypass this gate.
+
 ## Passkey Authentication
 
 Protected pilot access now supports enrolled-passkey sign-in and signed-in passkey registration through Supabase Auth. The product client explicitly opts into Supabase's passkey API, and tenant identity readiness can be marked as `passkey-or-magic-link`.
@@ -36,7 +81,7 @@ Operational boundaries:
 5. Configure `https://app.scrimedsolutions.com/pilot-workspace/access` as an approved Auth redirect URL. Completed on 2026-06-10.
 6. Configure invite-only production sign-in, passkeys, MFA, session lifetime, and enterprise SSO policy. Public signups are disabled; passkey-aware clients are active; enterprise SSO decisions remain pending.
 7. Provision Upstash Redis and configure its REST environment variables. Completed through the Vercel Marketplace free plan in `iad1` on 2026-06-10.
-8. Run Supabase security and performance advisors. Database/RLS findings for the protected pilot schema are clear; the remaining Auth advisor is leaked-password protection for password-based sign-in. SCRIMED product flows stay passkey or passwordless magic-link based, and password sign-in should remain disabled unless leaked-password protection is enabled in Supabase Auth.
+8. Run Supabase security and performance advisors. Database/RLS findings for the protected pilot schema are clear; the remaining Auth advisor is leaked-password protection for password-based sign-in. SCRIMED product flows stay passkey or passwordless magic-link based, and password sign-in should remain disabled unless leaked-password protection is enabled in Supabase Auth. Current advisor triage is documented in `docs/supabase-advisor-triage.md`.
 9. Verify tenant-crossing requests fail, audit rows cannot be updated or deleted, and proof packet downloads create audit events. Completed transactionally and through the authenticated production workspace on 2026-06-10.
 
 ## Protected Routes
@@ -60,6 +105,9 @@ Operational boundaries:
 - `POST /api/pilot-workspaces/{workspaceSlug}/demo-readiness`
 - `GET /api/pilot-workspaces/{workspaceSlug}/demo-readiness/{snapshotId}/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room`
+- `GET /api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run`
+- `GET /api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/timeline`
 - `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
 - `POST /api/pilot-workspaces/{workspaceSlug}/command-intelligence`
 - `GET /api/pilot-workspaces/{workspaceSlug}/command-intelligence/{snapshotId}/packet`
@@ -207,6 +255,25 @@ Safe operating pattern:
 - Download the audited recipient attestation packet only after the write-before-release audit event commits.
 - Treat recipient attestation metadata as internal diligence evidence. It is not legal approval, public release approval, external distribution approval, advertising substantiation, audited financial reporting, customer permission, clinical validation, compliance certification, reimbursement assurance, production authorization, or live clinical execution authority.
 
+## Buyer-Specific Share Readiness
+
+The protected Buyer Pilot Room now derives a buyer-specific share-readiness ladder from the workspace audit stream. It combines retained Buyer Diligence Export audit evidence with the protected release-control chain:
+
+- External approval evidence references
+- Versioned release decision
+- Named reviewer signoffs
+- Disabled distribution lockbox
+- Release authority attestations
+- Evidence-room recipient attestations
+- Evidence-room access-log reconciliation
+
+Safe operating pattern:
+
+- Use the retained Buyer Diligence Export as internal protected diligence evidence first.
+- Before sending externally, complete the release-control chain in the approved external systems of record and retain only no-PHI metadata references inside SCRIMED.
+- Keep exact approval artifacts, signatures, customer permissions, recipient lists, legal opinions, security reports, and access logs outside SCRIMED.
+- Treat `qualified-share-review-ready-not-release-approval` as review readiness only. It is not legal approval, public release approval, customer permission, advertising substantiation, securities approval, compliance certification, production authorization, or live clinical execution authority.
+
 ## Pilot Demo Readiness Command Center
 
 `/pilot-workspace/access` now includes a protected Pilot Demo Readiness Command Center. It turns the current workspace, durable synthetic sessions, append-only audit events, proof-packet release events, and tenant-session verification results into:
@@ -245,9 +312,9 @@ Demo Readiness Packet export requires a selected snapshot and commits `demo-read
 - Premium enterprise sales path from assessment through protected pilot and annual operating license.
 - Manual AAL2 QA activation posture with workflow count, safe evidence fields, completion criteria, and remaining human-run boundary when retained packets are not visible yet.
 - Known limitations with safe workarounds and production gates.
-- Audited Markdown Buyer Diligence Export with readiness, QA evidence, QA activation posture, pricing posture, legal/privacy/security/safety controls, demo and pilot proof, degraded-section disclosure, and production hard gates.
+- Audited Markdown Buyer Diligence Export with readiness, QA evidence, QA activation posture, pricing posture, legal/privacy/security/safety controls, demo and pilot proof, export-audit posture, degraded-section disclosure, and production hard gates.
 
-The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. The export route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact and preserves the legacy packet route for compatibility.
+The JSON room route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room` requires tenant membership and fresh AAL2 governance context. It now surfaces Buyer Diligence Export audit posture as first-class data: retained export count, latest audit event, latest timestamp, and next action. The export route at `GET /api/pilot-workspaces/{workspaceSlug}/buyer-room/packet` commits `buyer-pilot-room-packet-downloaded` before releasing the Markdown artifact and preserves the legacy packet route for compatibility.
 
 This closes the evidence-fragmentation gap for serious buyers: SCRIMED can now show product proof, commercial path, retained QA evidence or the controlled QA activation path, legal/privacy/security/safety posture, limitations, workarounds, and competitive edge in one tenant-scoped export without weakening the synthetic-only boundary.
 

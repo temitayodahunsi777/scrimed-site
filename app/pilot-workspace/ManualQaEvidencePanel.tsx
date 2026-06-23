@@ -279,13 +279,14 @@ export default function ManualQaEvidencePanel({
             </small>
           </label>
           <label className="form-field">
-            <span>GitHub workflow run ID</span>
+            <span>Manual QA run ID</span>
             <input
               inputMode="numeric"
               onChange={(event) => updateField("workflowRunId", event.target.value.replace(/\D/g, ""))}
               required
               value={form.workflowRunId}
             />
+            <small>Use either the GitHub Actions run ID or a SCRIMED Run Control numeric witness ID.</small>
           </label>
           <label className="form-field">
             <span>Workflow run URL</span>
@@ -294,7 +295,10 @@ export default function ManualQaEvidencePanel({
               placeholder="Auto-filled from run ID"
               value={form.workflowRunUrl}
             />
-            <small>{workflowUrl || "Enter the numeric run ID to derive the approved GitHub Actions URL."}</small>
+            <small>
+              {workflowUrl ||
+                "Enter the GitHub Actions URL, or use https://app.scrimedsolutions.com/qa-run-control?runId={numericRunId} for a local Run Control witness."}
+            </small>
           </label>
           <label className="form-field">
             <span>Executed at</span>

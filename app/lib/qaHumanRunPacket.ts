@@ -199,7 +199,7 @@ function hasForbiddenContent(value: unknown) {
 
   return [
     /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/,
-    /Bearer\s+[A-Za-z0-9._-]+/i,
+    /Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i,
     /sk-[A-Za-z0-9_-]{12,}/,
     /sbp_[A-Za-z0-9_-]{12,}/,
     /patient\s*(id|identifier|mrn)/i,

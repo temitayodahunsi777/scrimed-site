@@ -2,6 +2,8 @@
 
 Status: `manual-aal2-qa-execution-console-ready`
 
+Latest AAL2 Evidence Package: `protected-aal2-synthetic-qa-evidence-package-ready`
+
 SCRIMED Manual QA Execution Console is the protected command lane for human AAL2 synthetic QA execution, no-secret evidence capture, retained packet visibility, audit-signal review, and Buyer Proof Release readiness.
 
 Routes:
@@ -11,6 +13,10 @@ Routes:
 - `/api/qa-evidence/manual-execution-console/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-execution-console`
 - `/pilot-workspace/access#manual-qa-execution-console`
+- `/qa-aal2-run-evidence`
+- `/api/qa-evidence/aal2-run-evidence`
+- `/api/qa-evidence/aal2-run-evidence/brief`
+- `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/aal2-run-evidence`
 
 ## Purpose
 
@@ -63,6 +69,36 @@ The console does not execute passkey ceremonies, mint tokens, store credentials,
 
 SCRIMED has a protected operator console for human AAL2 synthetic QA execution. Packet-backed buyer proof remains locked until retained no-secret packet evidence and Buyer Proof Release pass.
 
+## 2026-06-22 Evidence Package Status
+
+The first protected AAL2 synthetic QA run has retained no-secret evidence in the protected workspace. SCRIMED now exposes a buyer-safe AAL2 run evidence package that records:
+
+- required test categories
+- synthetic data confirmation
+- no-PHI and no-production validation
+- human approval requirements
+- retained packet visibility
+- audit signal visibility
+- Buyer Proof Release state
+- remaining blockers
+- go/no-go recommendation
+
+Current category posture:
+
+- Boundary enforcement: control active.
+- Human approval requirements: control active.
+- Clinical summary generation: passed as a synthetic QA evidence-gate category for the retained authority-reference workflow only.
+- Missing-data handling: passed as a synthetic QA evidence-gate category for the retained authority-reference workflow only.
+- Evidence attribution and traceability: passed through retained workflow IDs, packet audit event IDs, and packet SHA-256.
+- Escalation behavior: passed through fail-closed authority-boundary posture and human review requirements.
+- Refusal behavior: passed through blocked PHI, live-care, certification, reimbursement, and production-authority claims.
+- Audit logging: append-only protected audit signal retained.
+- QA packet generation: protected packet SHA-256 retained.
+
+Current recommendation: `ready-for-protected-buyer-diligence-export`.
+
+Controlled synthetic demo posture: `GO-controlled-synthetic-demo`.
+
 ## Next Step
 
-Use the console during the first approved human AAL2 synthetic QA workflow, persist safe packet metadata, then refresh Buyer Proof Release before Buyer Diligence export.
+Use the retained packet hash and audit event only inside protected Buyer Diligence. Stop for human review before commit, push, public release, customer-specific release, production use, PHI processing, or clinical authority claims.

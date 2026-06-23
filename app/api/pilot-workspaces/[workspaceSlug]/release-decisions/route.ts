@@ -6,6 +6,7 @@ import { deriveProtectedFinanceMethodologyWorkflow } from "../../../../lib/prote
 import {
   deriveProtectedReleaseDecisionWorkflow,
   protectedReleaseDecisionBoundary,
+  protectedReleaseDecisionRequiredDomains,
   protectedReleaseDecisionWorkflowStatus,
   validateProtectedReleaseDecisionInput
 } from "../../../../lib/protectedReleaseDecisionWorkflow";
@@ -29,6 +30,9 @@ export const dynamic = "force-dynamic";
 type RouteContext = {
   params: Promise<{ workspaceSlug: string }>;
 };
+
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function statusForReleaseDecisionError(message: string) {
   if (
@@ -54,6 +58,50 @@ function statusForReleaseDecisionError(message: string) {
   }
 
   return 502;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function withServerLinkedApprovalEvidenceIds(
+  payload: unknown,
+  records: Awaited<ReturnType<typeof listProtectedExternalApprovalEvidenceReferences>>["records"]
+) {
+  if (!isRecord(payload)) return payload;
+
+  const latestRecordIds = protectedReleaseDecisionRequiredDomains
+    .map((domainId) => records.find((record) => record.domainId === domainId)?.id)
+    .filter((id): id is string => typeof id === "string" && uuidPattern.test(id));
+
+  if (latestRecordIds.length !== protectedReleaseDecisionRequiredDomains.length) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    externalApprovalEvidenceRecordIds: latestRecordIds
+  };
+}
+
+function serverEvidenceLinkageDiagnostics(
+  records: Awaited<ReturnType<typeof listProtectedExternalApprovalEvidenceReferences>>["records"],
+  error: unknown,
+  workspaceSlug: string
+) {
+  const domainCount = new Set(records.map((record) => record.domainId)).size;
+  const validIdCount = protectedReleaseDecisionRequiredDomains
+    .map((domainId) => records.find((record) => record.domainId === domainId)?.id)
+    .filter((id): id is string => typeof id === "string" && uuidPattern.test(id)).length;
+
+  return [
+    "Server evidence linkage diagnostics:",
+    `workspace ${workspaceSlug};`,
+    `records ${records.length};`,
+    `domains ${domainCount}/${protectedReleaseDecisionRequiredDomains.length};`,
+    `valid ids ${validIdCount}/${protectedReleaseDecisionRequiredDomains.length};`,
+    `read ${error ? "unavailable" : "available"}.`
+  ].join(" ");
 }
 
 async function authorizeWorkspace(request: Request, workspaceSlug: string) {
@@ -264,14 +312,28 @@ export async function POST(request: Request, { params }: RouteContext) {
     );
   }
 
-  const validation = validateProtectedReleaseDecisionInput(payload);
+  const externalRecordsResult = await listProtectedExternalApprovalEvidenceReferences(
+    authorization.context.client,
+    authorization.workspace.id
+  );
+  const payloadWithServerEvidence = externalRecordsResult.error
+    ? payload
+    : withServerLinkedApprovalEvidenceIds(payload, externalRecordsResult.records);
+  const validation = validateProtectedReleaseDecisionInput(payloadWithServerEvidence);
 
   if (!validation.ok) {
     return NextResponse.json(
       {
         service: "scrimed-protected-release-decision-workflow",
         status: "validation-failed",
-        errors: validation.errors,
+        errors: [
+          ...validation.errors,
+          serverEvidenceLinkageDiagnostics(
+            externalRecordsResult.error ? [] : externalRecordsResult.records,
+            externalRecordsResult.error,
+            authorization.workspace.slug
+          )
+        ],
         boundary: protectedReleaseDecisionBoundary
       },
       { status: 400, headers }

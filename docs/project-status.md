@@ -1,6 +1,130 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-22
+Updated: 2026-06-23
+
+## Latest Approvals Readiness Operating Ladder Release
+
+- Added `/approvals-readiness`, `/api/approvals-readiness`, and `/api/approvals-readiness/brief` as the operating ladder for public claims, HIPAA/BAA readiness, SOC 2/HITRUST assurance, FDA/CDS/SaMD classification, ONC/interoperability acceptance, state care-delivery review, and buyer-specific release gates.
+- Added approval-aware agent controls for Claim Guard, Approval Evidence Router, Regulatory Classification, Security Assurance, and Buyer Release Steward roles.
+- Wired Approvals Readiness into the Product Console, Product Readiness Brief, buyer decision paths, dashboard counters, and public smoke coverage.
+- Added `docs/approvals-readiness.md` and updated `docs/scrimed-systems-map.md` so future build work distinguishes approval preparation from approval claims.
+- Preserved the boundary: Approvals Readiness does not grant legal approval, HIPAA certification, SOC 2 certification, HITRUST certification, FDA clearance, ONC certification, reimbursement certainty, PHI processing authority, production connector approval, public customer permission, or live clinical care authority.
+
+## Latest Systems Organization And Cleanup Release
+
+- Repositioned the repository README around healthcare operations intelligence, governed synthetic pilots, workflow evidence, buyer diligence, and enterprise readiness instead of public clinical decision-making claims.
+- Added `docs/scrimed-systems-map.md` to organize SCRIMED into public operations, protected buyer release, QA evidence, clinical authority, agent/workflow, and cleanup/quality lanes.
+- Hardened `scripts/clean-generated-cache.mjs` so it removes both active `.next` output and old `.next-quarantine-*` generated artifacts.
+- Added `npm run clean:generated` as an explicit cleanup command alongside the existing prebuild/pretypecheck generated-cache cleanup.
+- Removed obsolete local `.next` and `.next-quarantine-*` generated folders from the workspace.
+- Preserved the boundary: this organization pass does not approve public release, clinical claims, PHI processing, live clinical care, security/compliance certification, reimbursement claims, production connectors, or autonomous clinical execution.
+
+## Latest Protected Buyer Release Draft Checklist Release
+
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/metadata-drafts/checklist` as the protected read-only schema precheck layer for metadata drafts.
+- Added a Draft-to-Record Checklist view to `/pilot-workspace/access#buyer-release-control-verifier` so operators can see whether each draft passes the target protected write-schema, is blocked by prerequisite record IDs, or needs draft field corrections.
+- The checklist uses existing protected validators for external approval evidence, release decisions, reviewer signoffs, distribution lockbox, release authority attestations, recipient attestations, and access-log reconciliation.
+- Added public smoke coverage to ensure the checklist API fails closed without authentication.
+- Preserved the boundary: the checklist does not write records, auto-submit drafts, approve release, bypass human review, store approval artifacts, store recipient lists, store raw logs, process PHI, certify security/compliance, approve production connectors, guarantee reimbursement, authorize live clinical care, or permit autonomous clinical execution.
+
+## Latest Protected Buyer Release Metadata Drafts Release
+
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/metadata-drafts` as the protected read-only draft guidance layer for missing buyer release-control metadata.
+- Added a Safe Metadata Drafts view to `/pilot-workspace/access#buyer-release-control-verifier` so operators can load draft-only payload fields, target protected routes, packet routes, blocked data fields, and human-review steps through the active AAL2 browser session.
+- The draft layer converts missing reconciliation items into no-PHI operator guidance only; it does not write records or submit approvals.
+- Added public smoke coverage to ensure the metadata drafts API fails closed without authentication.
+- Preserved the boundary: metadata drafts do not approve release, bypass human review, auto-submit protected records, store signed artifacts, store recipient lists, store raw logs, process PHI, certify security/compliance, approve production connectors, guarantee reimbursement, authorize live clinical care, or permit autonomous clinical execution.
+
+## Latest Protected Buyer Release Remediation Plan Release
+
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/remediation` as the protected read-only remediation layer for blocked buyer release-control gates.
+- Added a remediation plan view to `/pilot-workspace/access#buyer-release-control-verifier` so operators can load the current blocked-gate sequence through the active AAL2 browser session without copying bearer tokens.
+- The plan converts verifier gates into ordered actions, safe no-PHI metadata templates, blocked data fields, human-approval requirements, protected routes, packet routes, and explicit no-bypass decisions.
+- Added public smoke coverage to ensure the remediation API fails closed without authentication.
+- Preserved the boundary: the remediation plan does not approve release, bypass qualified human review, store signed artifacts, store recipient lists, store raw logs, store PHI, certify HIPAA/SOC/FDA/security posture, approve production connectors, guarantee reimbursement, authorize live clinical care, or permit autonomous clinical execution.
+
+## Latest Protected Buyer Release Gate Reconciliation Release
+
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/reconciliation` as the protected read-only evidence reconciliation layer for buyer release-control gates.
+- Added a Gate Reconciliation view to `/pilot-workspace/access#buyer-release-control-verifier` so operators can compare retained records, packet-audit counts, missing domains/roles/controls, latest audit signals, and safe metadata templates from the active AAL2 browser session.
+- The reconciliation layer uses existing protected workflow summaries and append-only audit events; it introduces no schema changes and no storage of approval artifacts.
+- Added public smoke coverage to ensure the reconciliation API fails closed without authentication.
+- Preserved the boundary: gate reconciliation does not approve release, bypass human review, store legal/privacy/security artifacts, store recipient lists, store raw logs, process PHI, certify security/compliance, approve production connectors, guarantee reimbursement, authorize live clinical care, or permit autonomous clinical execution.
+
+## Latest Buyer Proof Release Operator Run Release
+
+- Added `scripts/buyer-proof-release-operator-run.mjs` and `npm run smoke:buyer-proof-operator-run` as the repeatable protected Buyer Proof Release Operator Run.
+- The script verifies unauthenticated fail-closed behavior, AAL2 JWT freshness, protected verifier status, Release Readiness Timeline semantics, audited chain packet download, and post-packet timeline audit reflection.
+- The run emits only no-secret evidence fields: workspace slug, chain state, release decision, share state, packet audit event ID, and explicit no-PHI/no-live-care/no-release-approval boundary.
+- Wired the operator-run script and token-boundary posture into the public Buyer Release Control Runbook API and smoke coverage.
+- Preserved the boundary: the script does not mint, store, print, or persist bearer tokens; does not store PHI; does not create release approval; does not approve public sharing; does not authorize production connectors, reimbursement, security certification, PHI processing, live clinical care, or autonomous clinical execution.
+
+## Latest Protected Buyer Release Control Operator UI Release
+
+- Added `/pilot-workspace/access#buyer-release-control-verifier` as the authenticated operator UI for the protected Buyer Release Control verifier.
+- The panel uses the active AAL2 browser session to read `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run` and download `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/packet` without copying bearer tokens into scripts, chats, CI, or terminal history.
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/timeline` as the protected Release Readiness Timeline, derived from existing no-PHI release-control records and append-only audit events.
+- The timeline distinguishes browser-session verifier reads from durable packet audit evidence, so operators can see what is review-only, what is retained, and what still requires qualified external approval.
+- Added Buyer Release Control to the tenant-session verification checklist so operators can validate the verifier alongside durable sessions, audit, TrustOps, Manual QA Evidence, tenant access, and enterprise proof packets.
+- The audited packet path refreshes workspace audit events after download and keeps the packet type `protected-buyer-release-control-chain`.
+- Preserved the boundary: the operator UI and timeline do not bypass AAL2, store tokens, store PHI, expose raw audit metadata, approve external sharing, create customer permission, certify legal/privacy/security posture, guarantee reimbursement, approve production connectors, authorize live clinical care, or permit autonomous clinical execution.
+
+## Latest Protected Buyer Release Control Verifier Release
+
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run` as the protected chain verifier for buyer-specific release-control readiness.
+- Added `/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/packet` as the audited no-PHI Markdown packet for release-control chain evidence.
+- The verifier aggregates existing protected records and audit signals for Buyer Diligence Export audit, external approval references, release decision, named reviewer signoffs, disabled distribution lockbox, release authority attestations, recipient controls, and access-log reconciliation.
+- The packet records an append-only enterprise packet audit event with packet type `protected-buyer-release-control-chain` and keeps release authority, legal authority, privacy authority, security certification, PHI authority, reimbursement authority, production authority, and live clinical care authority explicitly blocked.
+- Wired the protected verifier into the Product Console, Product Readiness Brief, public runbook, `/product`, docs, and public fail-closed smoke coverage.
+- Preserved the boundary: the verifier and packet do not create release approval, external sharing approval, customer permission, legal/privacy/security approval, HIPAA/SOC/FDA certification, reimbursement certainty, PHI authority, production connector approval, live clinical care authority, or autonomous clinical execution authority.
+
+## Latest Buyer Release Control Runbook Release
+
+- Added `/buyer-release-control-run`, `/api/buyer-release-control-run`, and `/api/buyer-release-control-run/brief` as the no-secret operator runbook for the first buyer-specific release-control chain.
+- The runbook sequences eight controls: external approval evidence references, versioned release decision, named reviewer signoffs, disabled distribution lockbox, release authority attestations, recipient attestations, access-log reconciliation, and Buyer Diligence Export refresh.
+- Added safe payload templates, protected route references, packet route references, expected audit signals, hard stops, blocked claims, and workarounds for token/CI friction without bypassing AAL2 or qualified human release authority.
+- Wired Buyer Release Control into Product Console proof-stack status, `/product`, Product Readiness Brief, and public production smoke coverage.
+- Current posture: `buyer-release-control-runbook-ready`; share decision remains `internal-only-until-release-chain-retained`.
+- Preserved the boundary: this runbook does not execute protected writes, mint or store tokens, store recipient lists, store signed approvals, process PHI, approve public distribution, certify legal/privacy/security posture, authorize live clinical care, guarantee reimbursement, approve production connectors, or replace qualified human review.
+
+## Latest Buyer-Specific Share Readiness Release
+
+- Added a buyer-specific share-readiness layer to the protected Buyer Pilot Room summary, protected UI, diligence control matrix, and audited Buyer Diligence Export.
+- The room now evaluates eight release-control gates: retained Buyer Diligence Export audit, external approval evidence references, versioned release decision, named reviewer signoffs, disabled distribution lockbox, release authority attestations, evidence-room recipient attestations, and evidence-room access-log reconciliation.
+- The layer reports share state, release-readiness score, ready/review/blocked gate counts, latest retained audit signal, required human approvals, prohibited uses, gate evidence, and next action.
+- The current safe posture is intentionally conservative: a retained Buyer Diligence Export can support internal protected diligence preparation, but buyer-specific external sharing remains gated until qualified approvals and recipient/access controls are retained externally.
+- Preserved the boundary: buyer-specific share readiness is not public release approval, customer permission, legal approval, privacy approval, security certification, HIPAA/SOC/FDA certification, advertising substantiation, securities material approval, reimbursement certainty, PHI authority, production connector approval, live clinical care authority, or autonomous clinical execution authority.
+
+## Latest Buyer Diligence Export Audit Posture Release
+
+- Added first-class Buyer Diligence Export audit posture to the protected Buyer Pilot Room summary.
+- The protected UI and Markdown export now distinguish `pending` export readiness from `retained` packet-download audit evidence.
+- Added retained export count, latest export audit event ID, latest timestamp, latest actor, evidence text, and next action into the buyer-room data model.
+- Added `docs/supabase-advisor-triage.md` to document the current Supabase security/performance advisor posture, passwordless workaround, leaked-password-protection remediation path, and unused-index review policy.
+- Captured the first protected Buyer Diligence Export audit event through the authenticated browser session: `7de8b162-ab77-41e7-94b3-49a11172dc40`. The protected workspace now shows `1` retained Buyer Diligence Export audit and `8` append-only workspace audit events.
+- Preserved the boundary: export-audit evidence supports protected buyer diligence only. It does not authorize public release, PHI processing, live clinical care, reimbursement claims, security or compliance certification, production connector activation, or autonomous clinical execution.
+
+## Latest Protected AAL2 Synthetic QA Evidence Package Release
+
+- Added `/qa-aal2-run-evidence`, `/api/qa-evidence/aal2-run-evidence`, `/api/qa-evidence/aal2-run-evidence/brief`, and `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/aal2-run-evidence` as the buyer-safe evidence package for the first protected AAL2 synthetic QA run.
+- Added a typed evidence dossier for required categories: clinical summary generation, missing-data handling, evidence attribution and traceability, escalation behavior, refusal behavior, boundary enforcement, human approval requirements, audit logging, and QA packet generation.
+- Wired the package into `/qa-evidence`, the QA Evidence Ledger API, downloadable QA brief, public smoke coverage, and protected route fail-closed coverage.
+- Updated `docs/qa-human-run-packet.md`, `docs/qa-buyer-proof-release.md`, `docs/qa-manual-execution-console.md`, `docs/boundary-resolution.md`, `docs/project-status.md`, and `docs/roadmap.md` with the first evidence-package status.
+- Current milestone: `protected-aal2-synthetic-qa-evidence-package-ready`.
+- AAL2 execution status: `retained-evidence-visible-release-review-required`; Authority Reference QA workflow `20260622133928` is retained with packet hash `1691df702a114a940330fd892eebae2ebeabb0e2f8a052f483a18bb7ce0543ae`.
+- Manual QA audit event: `1feb64fd-d1d4-443c-84c4-d07847bda7d8`; source authority packet audit event: `b902a4fe-63ed-4c78-8206-f5ebd4c7c251`.
+- Buyer-proof release status: `ready-for-protected-buyer-diligence-export`; controlled synthetic demo status remains `GO-controlled-synthetic-demo`; live clinical care remains `NO-GO-live-clinical-care`.
+- Readiness percentage: 100% for retained protected AAL2 run proof, 100% for protected buyer-diligence release gating, and 0% for production clinical care authority, PHI processing authority, reimbursement certainty, security certification, or public-release approval.
+- Outstanding actions: use the retained Buyer Diligence Export only with bounded retained proof fields, stop for human review before commit/push/release approval, and obtain qualified external approvals before any production, PHI, clinical, reimbursement, connector, certification, customer-specific, or public-release claim.
+- Preserved the boundary: this package does not execute AAL2 workflows, mint tokens, store credentials, store PHI, touch production systems, trigger live patient workflows, perform autonomous clinical action, certify HIPAA/SOC/FDA/security status, guarantee reimbursement, approve connectors, approve buyer proof release, or authorize live clinical care.
+
+## Latest Protected AAL2 Manual Evidence Persistence Fix
+
+- Accepted SCRIMED Run Control witness URLs as no-secret evidence sources when browser or CI secret placement blocks GitHub Actions execution.
+- Fixed the Manual QA Evidence Postgres guard so safe operator wording such as "bearer token" is not mistaken for an actual credential; actual JWT and long bearer credential patterns remain blocked.
+- Fixed the packet hash path by schema-qualifying `extensions.digest` under the empty `security definer` search path.
+- Verified protected persistence through `/pilot-workspace/access` with retained workflow `20260622133928`, packet hash `1691df702a114a940330fd892eebae2ebeabb0e2f8a052f483a18bb7ce0543ae`, and audit event `1feb64fd-d1d4-443c-84c4-d07847bda7d8`.
+- Preserved all known boundaries: no PHI, no live patient data, no autonomous clinical execution, no live clinical care authority, no reimbursement certainty, no HIPAA/SOC/FDA/security certification claim, no production connector approval, and no public release approval.
 
 ## Latest Manual QA Execution Console Release
 

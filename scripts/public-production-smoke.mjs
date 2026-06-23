@@ -166,6 +166,42 @@ function requireBoundaryResolutionBoundary(label, response) {
   }
 }
 
+function requireApprovalsReadinessBoundary(label, response) {
+  const approvalsReadiness = response.headers.get("x-scrimed-approvals-readiness");
+  const legalAuthority = response.headers.get("x-scrimed-legal-authority");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const regulatoryAuthority = response.headers.get("x-scrimed-regulatory-authority");
+  const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (!["operating-ladder-active", "brief-no-approval-claim"].includes(approvalsReadiness ?? "")) {
+    throw new Error(`${label} expected approvals readiness boundary header but received ${approvalsReadiness}.`);
+  }
+
+  if (legalAuthority !== "external-approval-required") {
+    throw new Error(`${label} expected x-scrimed-legal-authority external-approval-required but received ${legalAuthority}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (regulatoryAuthority !== "external-review-required") {
+    throw new Error(`${label} expected x-scrimed-regulatory-authority external-review-required but received ${regulatoryAuthority}.`);
+  }
+
+  if (reimbursementAuthority !== "no-reimbursement-guarantee") {
+    throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 function requireQaExecutionBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
@@ -449,6 +485,32 @@ function requireQaBuyerProofReleaseBoundary(label, response) {
   }
 }
 
+function requireBuyerReleaseControlRunBoundary(label, response) {
+  const buyerShare = response.headers.get("x-scrimed-buyer-share");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const releaseAuthority = response.headers.get("x-scrimed-release-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (buyerShare !== "runbook-ready-protected-aal2-required") {
+    throw new Error(`${label} expected x-scrimed-buyer-share runbook-ready-protected-aal2-required but received ${buyerShare}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (releaseAuthority !== "not-release-approval") {
+    throw new Error(`${label} expected x-scrimed-release-authority not-release-approval but received ${releaseAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 function requireQaManualExecutionConsoleBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const executionConsole = response.headers.get("x-scrimed-qa-execution-console");
@@ -480,6 +542,37 @@ function requireQaManualExecutionConsoleBoundary(label, response) {
   }
 }
 
+function requireQaAal2RunEvidenceBoundary(label, response) {
+  const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
+  const evidence = response.headers.get("x-scrimed-qa-evidence");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const qaProof = response.headers.get("x-scrimed-qa-proof");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (aal2Execution !== "human-required-not-code-bypass") {
+    throw new Error(`${label} expected x-scrimed-aal2-execution human-required-not-code-bypass but received ${aal2Execution}.`);
+  }
+
+  if (!["aal2-run-evidence-package", "aal2-run-evidence-brief", "aal2-run-evidence-protected-state"].includes(evidence ?? "")) {
+    throw new Error(`${label} expected AAL2 run evidence boundary header but received ${evidence}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (!["no-buyer-proof-release-without-retained-packet", "retained-packet-gated"].includes(qaProof ?? "")) {
+    throw new Error(`${label} expected retained-packet AAL2 evidence proof boundary but received ${qaProof}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+}
+
 async function checkHtml(path) {
   const result = await request(path);
   requireStatus(path, result.response.status, 200);
@@ -499,6 +592,28 @@ async function checkProductConsole() {
 
   if (body.proofStack?.passkeyTenantAuthentication !== "passkey-or-magic-link-plus-aal2") {
     throw new Error("product console missing passkey tenant authentication proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.approvalsReadiness !==
+    "approvals-readiness-operating-ladder-active"
+  ) {
+    throw new Error("product console missing approvals readiness proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.approvalsReadinessBrief !==
+    "approvals-readiness-brief-no-approval-claim"
+  ) {
+    throw new Error("product console missing approvals readiness brief proof-stack posture.");
+  }
+
+  if (!body.approvalsReadinessTrackCount || body.approvalsReadinessTrackCount < 7) {
+    throw new Error("product console expected approvals readiness track coverage.");
+  }
+
+  if (!body.approvalsReadinessAgentControlCount || body.approvalsReadinessAgentControlCount < 5) {
+    throw new Error("product console expected approvals readiness agent-control coverage.");
   }
 
   if (
@@ -1187,6 +1302,41 @@ async function checkProductConsole() {
   }
 
   if (
+    body.proofStack?.buyerReleaseControlRun !==
+    "metadata-only-buyer-release-control-runbook-no-release-approval"
+  ) {
+    throw new Error("product console missing buyer release-control runbook proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.buyerReleaseControlRunBrief !==
+    "buyer-release-control-runbook-brief-no-secret-no-approval"
+  ) {
+    throw new Error("product console missing buyer release-control brief proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedBuyerReleaseControlRun !==
+    "aal2-protected-buyer-release-control-chain-verifier-no-release-approval"
+  ) {
+    throw new Error("product console missing protected buyer release-control verifier proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedBuyerReleaseControlRunPackets !==
+    "aal2-audited-buyer-release-control-chain-packet-no-release-approval"
+  ) {
+    throw new Error("product console missing protected buyer release-control packet proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.protectedBuyerReleaseReadinessTimeline !==
+    "aal2-protected-buyer-release-readiness-timeline-no-release-approval"
+  ) {
+    throw new Error("product console missing protected buyer release-readiness timeline proof-stack posture.");
+  }
+
+  if (
     body.proofStack?.qaManualExecutionConsole !==
     "manual-aal2-qa-execution-console-protected-operator-control"
   ) {
@@ -1334,6 +1484,22 @@ async function checkProductConsole() {
 
   if (!body.qaBuyerProofReleaseBlockedClaimCount || body.qaBuyerProofReleaseBlockedClaimCount < 8) {
     throw new Error("product console expected QA buyer proof release blocked-claim coverage.");
+  }
+
+  if (!body.buyerReleaseControlRunStepCount || body.buyerReleaseControlRunStepCount < 8) {
+    throw new Error("product console expected buyer release-control step coverage.");
+  }
+
+  if (!body.buyerReleaseControlRunProtectedRouteCount || body.buyerReleaseControlRunProtectedRouteCount < 8) {
+    throw new Error("product console expected buyer release-control protected route coverage.");
+  }
+
+  if (!body.buyerReleaseControlRunPacketRouteCount || body.buyerReleaseControlRunPacketRouteCount < 8) {
+    throw new Error("product console expected buyer release-control packet route coverage.");
+  }
+
+  if (!body.buyerReleaseControlRunHardStopCount || body.buyerReleaseControlRunHardStopCount < 35) {
+    throw new Error("product console expected buyer release-control hard-stop coverage.");
   }
 
   if (!body.qaManualExecutionConsoleStageCount || body.qaManualExecutionConsoleStageCount < 6) {
@@ -1552,8 +1718,8 @@ async function checkQaEvidenceLedger() {
 
   const acceptedAuthorityPacket = await postJson("/api/qa-evidence/manual-run-packet", {
     workflowKind: "authority-reference-qa",
-    workflowRunId: "123456790",
-    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456790",
+    workflowRunId: "202606221321",
+    workflowRunUrl: "https://app.scrimedsolutions.com/qa-run-control?runId=202606221321",
     executedAt: new Date().toISOString(),
     baseUrl: "https://app.scrimedsolutions.com",
     intakeId: "atlas-synthetic-evaluation",
@@ -2428,6 +2594,103 @@ async function checkQaBuyerProofRelease() {
   console.log("pass QA buyer proof release");
 }
 
+async function checkBuyerReleaseControlRun() {
+  const result = await request("/api/buyer-release-control-run");
+  requireStatus("Buyer release-control runbook", result.response.status, 200);
+  requireContentType("Buyer release-control runbook", result.response, "application/json");
+  requireBuyerReleaseControlRunBoundary("Buyer release-control runbook", result.response);
+  const body = requireJson("Buyer release-control runbook", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-buyer-release-control-runbook") {
+    throw new Error(`Buyer release-control runbook expected service scrimed-buyer-release-control-runbook but received ${body.service}.`);
+  }
+
+  if (body.status !== "buyer-release-control-runbook-ready") {
+    throw new Error(`Buyer release-control runbook expected ready status but received ${body.status}.`);
+  }
+
+  if (body.executionDecision !== "runbook-ready-protected-aal2-required") {
+    throw new Error(`Buyer release-control runbook expected protected AAL2 execution decision but received ${body.executionDecision}.`);
+  }
+
+  if (body.shareDecision !== "internal-only-until-release-chain-retained") {
+    throw new Error(`Buyer release-control runbook expected internal-only share decision but received ${body.shareDecision}.`);
+  }
+
+  if (body.protectedVerifierRoute !== "/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run") {
+    throw new Error("Buyer release-control runbook expected protected verifier route.");
+  }
+
+  if (body.protectedVerifierPacketRoute !== "/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/packet") {
+    throw new Error("Buyer release-control runbook expected protected verifier packet route.");
+  }
+
+  if (body.protectedVerifierTimelineRoute !== "/api/pilot-workspaces/{workspaceSlug}/buyer-release-control-run/timeline") {
+    throw new Error("Buyer release-control runbook expected protected verifier timeline route.");
+  }
+  if (body.operatorRunScript !== "scripts/buyer-proof-release-operator-run.mjs") {
+    throw new Error("Buyer release-control runbook expected buyer proof operator run script.");
+  }
+  if (
+    body.operatorRunStatus !==
+    "aal2-buyer-proof-release-operator-run-script-token-boundary"
+  ) {
+    throw new Error("Buyer release-control runbook expected buyer proof operator run token boundary.");
+  }
+
+  if (!Array.isArray(body.steps) || body.steps.length < 8) {
+    throw new Error("Buyer release-control runbook expected release-control step coverage.");
+  }
+
+  if (!Array.isArray(body.requiredExternalApprovalDomains) || body.requiredExternalApprovalDomains.length < 7) {
+    throw new Error("Buyer release-control runbook expected external approval domain coverage.");
+  }
+
+  if (!Array.isArray(body.requiredReviewerRoles) || body.requiredReviewerRoles.length < 7) {
+    throw new Error("Buyer release-control runbook expected reviewer role coverage.");
+  }
+
+  if (!Array.isArray(body.requiredReleaseAuthorityDomains) || body.requiredReleaseAuthorityDomains.length < 7) {
+    throw new Error("Buyer release-control runbook expected release authority domain coverage.");
+  }
+
+  if (!Array.isArray(body.blockedClaims) || !body.blockedClaims.some((claim) => claim.includes("production PHI"))) {
+    throw new Error("Buyer release-control runbook expected production PHI blocked claim.");
+  }
+
+  if (!Array.isArray(body.workarounds) || !body.workarounds.some((workaround) => workaround.includes("bearer token"))) {
+    throw new Error("Buyer release-control runbook expected bearer-token workaround guidance.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("Buyer release-control runbook response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("Buyer release-control runbook response must not contain bearer-token material.");
+  }
+
+  const brief = await request("/api/buyer-release-control-run/brief");
+  requireStatus("Buyer release-control runbook brief", brief.response.status, 200);
+  requireContentType("Buyer release-control runbook brief", brief.response, "text/markdown");
+  requireBuyerReleaseControlRunBoundary("Buyer release-control runbook brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Buyer Release Control Runbook")) {
+    throw new Error("Buyer release-control runbook brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not release approval")) {
+    throw new Error("Buyer release-control runbook brief missing not-release-approval boundary.");
+  }
+
+  if (!brief.body.text.includes("protected AAL2 run")) {
+    throw new Error("Buyer release-control runbook brief missing protected AAL2 run boundary.");
+  }
+
+  console.log("pass Buyer release-control runbook");
+}
+
 async function checkQaManualExecutionConsole() {
   const result = await request("/api/qa-evidence/manual-execution-console");
   requireStatus("QA manual execution console", result.response.status, 200);
@@ -2498,6 +2761,98 @@ async function checkQaManualExecutionConsole() {
   }
 
   console.log("pass QA manual execution console");
+}
+
+async function checkQaAal2RunEvidence() {
+  const result = await request("/api/qa-evidence/aal2-run-evidence");
+  requireStatus("QA AAL2 run evidence", result.response.status, 200);
+  requireContentType("QA AAL2 run evidence", result.response, "application/json");
+  requireQaAal2RunEvidenceBoundary("QA AAL2 run evidence", result.response);
+  const body = requireJson("QA AAL2 run evidence", result.body);
+  const serialized = JSON.stringify(body);
+
+  if (body.service !== "scrimed-aal2-synthetic-qa-run-evidence") {
+    throw new Error(`QA AAL2 run evidence expected service scrimed-aal2-synthetic-qa-run-evidence but received ${body.service}.`);
+  }
+
+  if (body.status !== "protected-aal2-synthetic-qa-evidence-package-ready") {
+    throw new Error(`QA AAL2 run evidence expected package-ready status but received ${body.status}.`);
+  }
+
+  if (body.runState !== "protected-aal2-human-run-required") {
+    throw new Error(`QA AAL2 run evidence expected protected-aal2-human-run-required but received ${body.runState}.`);
+  }
+
+  if (body.recommendation !== "NO-GO-buyer-proof-release") {
+    throw new Error(`QA AAL2 run evidence expected NO-GO buyer proof release but received ${body.recommendation}.`);
+  }
+
+  if (body.buyerProofReleaseAllowed !== false || body.protectedHumanRunRequired !== true) {
+    throw new Error("QA AAL2 run evidence public API must require protected human run and block buyer proof release.");
+  }
+
+  if (body.syntheticDataConfirmed !== true || body.phiEnteredSystem !== false) {
+    throw new Error("QA AAL2 run evidence must confirm synthetic-only and no-PHI posture.");
+  }
+
+  if (body.productionSystemsTouched !== false || body.livePatientWorkflowTriggered !== false || body.autonomousClinicalActionPerformed !== false) {
+    throw new Error("QA AAL2 run evidence must not touch production, live patient workflows, or autonomous clinical action.");
+  }
+
+  if (!Array.isArray(body.categories) || body.categories.length < 9) {
+    throw new Error("QA AAL2 run evidence expected all required test categories.");
+  }
+
+  for (const requiredCategory of [
+    "Clinical summary generation",
+    "Missing-data handling",
+    "Evidence attribution and traceability",
+    "Escalation behavior",
+    "Refusal behavior",
+    "Boundary enforcement",
+    "Human approval requirements",
+    "Audit logging",
+    "QA packet generation"
+  ]) {
+    if (!body.categories.some((category) => category.name === requiredCategory)) {
+      throw new Error(`QA AAL2 run evidence missing category ${requiredCategory}.`);
+    }
+  }
+
+  if (!Array.isArray(body.boundaryChecks) || !body.boundaryChecks.some((check) => check.check === "No PHI entered system")) {
+    throw new Error("QA AAL2 run evidence expected no-PHI boundary check.");
+  }
+
+  if (!Array.isArray(body.remainingBlockers) || !body.remainingBlockers.some((blocker) => blocker.includes("Fresh human AAL2"))) {
+    throw new Error("QA AAL2 run evidence expected human AAL2 blocker.");
+  }
+
+  if (/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(serialized)) {
+    throw new Error("QA AAL2 run evidence response must not contain JWT-like material.");
+  }
+
+  if (/Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i.test(serialized)) {
+    throw new Error("QA AAL2 run evidence response must not contain bearer-token material.");
+  }
+
+  const brief = await request("/api/qa-evidence/aal2-run-evidence/brief");
+  requireStatus("QA AAL2 run evidence brief", brief.response.status, 200);
+  requireContentType("QA AAL2 run evidence brief", brief.response, "text/markdown");
+  requireQaAal2RunEvidenceBoundary("QA AAL2 run evidence brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED AAL2 Synthetic QA Run Evidence Package")) {
+    throw new Error("QA AAL2 run evidence brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("NO-GO-buyer-proof-release")) {
+    throw new Error("QA AAL2 run evidence brief missing NO-GO recommendation.");
+  }
+
+  if (!brief.body.text.includes("Clinical summary generation")) {
+    throw new Error("QA AAL2 run evidence brief missing clinical summary category.");
+  }
+
+  console.log("pass QA AAL2 run evidence");
 }
 
 async function checkClinicalCareActivation() {
@@ -3027,6 +3382,77 @@ async function checkBoundaryResolution() {
   console.log("pass boundary resolution register");
 }
 
+async function checkApprovalsReadiness() {
+  const result = await request("/api/approvals-readiness");
+  requireStatus("Approvals Readiness", result.response.status, 200);
+  requireContentType("Approvals Readiness", result.response, "application/json");
+  requireApprovalsReadinessBoundary("Approvals Readiness", result.response);
+  const body = requireJson("Approvals Readiness", result.body);
+
+  if (body.service !== "scrimed-approvals-readiness") {
+    throw new Error(`Approvals Readiness expected scrimed-approvals-readiness but received ${body.service}.`);
+  }
+
+  if (body.status !== "approvals-readiness-operating-ladder-active") {
+    throw new Error(`Approvals Readiness expected operating ladder status but received ${body.status}.`);
+  }
+
+  if (body.authorizationStatus !== "public-operations-only-no-regulated-approval") {
+    throw new Error("Approvals Readiness must preserve no-regulated-approval authorization status.");
+  }
+
+  if (body.phiAuthority !== "not-authorized-production-phi") {
+    throw new Error("Approvals Readiness must keep PHI authority blocked.");
+  }
+
+  if (body.securityCertification !== "not-security-certified") {
+    throw new Error("Approvals Readiness must preserve not-security-certified posture.");
+  }
+
+  if (body.regulatoryAuthority !== "external-review-required") {
+    throw new Error("Approvals Readiness must keep regulatory authority externally reviewed.");
+  }
+
+  if (!Array.isArray(body.tracks) || body.tracks.length < 7) {
+    throw new Error("Approvals Readiness expected at least seven approval tracks.");
+  }
+
+  if (!body.tracks.some((track) => track.key === "fda-cds-samd-classification")) {
+    throw new Error("Approvals Readiness expected FDA/CDS/SaMD classification track.");
+  }
+
+  if (!body.tracks.some((track) => track.key === "hipaa-baa-security-rule")) {
+    throw new Error("Approvals Readiness expected HIPAA/BAA track.");
+  }
+
+  if (!Array.isArray(body.agentControls) || body.agentControls.length < 5) {
+    throw new Error("Approvals Readiness expected approval-aware agent controls.");
+  }
+
+  if (!Array.isArray(body.processes) || body.processes.length < 5) {
+    throw new Error("Approvals Readiness expected approval processes.");
+  }
+
+  const brief = await request("/api/approvals-readiness/brief");
+  requireStatus("Approvals Readiness brief", brief.response.status, 200);
+  requireContentType("Approvals Readiness brief", brief.response, "text/markdown");
+  requireApprovalsReadinessBoundary("Approvals Readiness brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Approvals Readiness Brief")) {
+    throw new Error("Approvals Readiness brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not legal advice")) {
+    throw new Error("Approvals Readiness brief missing legal boundary.");
+  }
+
+  if (!brief.body.text.includes("FDA clearance")) {
+    throw new Error("Approvals Readiness brief missing FDA boundary.");
+  }
+
+  console.log("pass approvals readiness");
+}
+
 async function checkClinicalAuthorityReadiness() {
   const result = await request("/api/clinical-authority-readiness");
   requireStatus("Clinical Authority Readiness", result.response.status, 200);
@@ -3128,6 +3554,7 @@ await checkHtml("/clinical-care-activation");
 await checkHtml("/public-market-readiness");
 await checkHtml("/global-reach");
 await checkHtml("/boundary-resolution");
+await checkHtml("/approvals-readiness");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
@@ -3137,7 +3564,10 @@ await checkHtml("/qa-claim-guard");
 await checkHtml("/qa-activation-seal");
 await checkHtml("/qa-proof-promotion");
 await checkHtml("/qa-buyer-proof-release");
+await checkHtml("/buyer-release-control-run");
 await checkHtml("/qa-manual-execution-console");
+await checkHtml("/qa-aal2-run-evidence");
+await checkApprovalsReadiness();
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
 await checkPublicMarketReadiness();
@@ -3157,7 +3587,9 @@ await checkQaClaimGuard();
 await checkQaActivationSeal();
 await checkQaProofPromotion();
 await checkQaBuyerProofRelease();
+await checkBuyerReleaseControlRun();
 await checkQaManualExecutionConsole();
+await checkQaAal2RunEvidence();
 await checkSalesProtectedFailClosed(
   "/api/sales-operations/opportunities/smoke-test/deal-room-packet",
   "Sales deal-room packet protected API"
@@ -3719,6 +4151,34 @@ await checkProtectedFailClosed(
   "Buyer Diligence Export protected API"
 );
 await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run`,
+  "Protected Buyer Release Control verifier protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/packet`,
+  "Protected Buyer Release Control packet protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/timeline`,
+  "Protected Buyer Release Timeline protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/remediation`,
+  "Protected Buyer Release Remediation Plan protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/reconciliation`,
+  "Protected Buyer Release Gate Reconciliation protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/metadata-drafts`,
+  "Protected Buyer Release Metadata Drafts protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/buyer-release-control-run/metadata-drafts/checklist`,
+  "Protected Buyer Release Draft Checklist protected API"
+);
+await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-run-packets`,
   "Manual QA evidence persistence protected API"
 );
@@ -3729,6 +4189,10 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/manual-execution-console`,
   "QA Manual Execution Console protected API"
+);
+await checkProtectedFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/aal2-run-evidence`,
+  "QA AAL2 Run Evidence protected API"
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,

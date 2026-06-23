@@ -1,4 +1,9 @@
-import type { QaManualRunEvidencePacketRecord } from "./qaEvidenceLedger";
+import {
+  isValidQaManualRunEvidenceRunId,
+  isValidQaManualRunEvidenceWorkflowUrl,
+  qaManualRunEvidenceWorkflowUrlRequirement,
+  type QaManualRunEvidencePacketRecord
+} from "./qaEvidenceLedger";
 import {
   qaClaimGuardRoute,
   qaClaimGuardStatus
@@ -197,7 +202,7 @@ function hasSecretLikeContent(value: unknown) {
 
   return [
     /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/,
-    /Bearer\s+[A-Za-z0-9._-]+/i,
+    /Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i,
     /sk-[A-Za-z0-9_-]{12,}/,
     /sbp_[A-Za-z0-9_-]{12,}/,
     /patient\s*(id|identifier|mrn)/i,
@@ -258,12 +263,12 @@ function missingCandidateEvidence(value: unknown) {
     missing.push("packetSha256 valid SHA-256");
   }
 
-  if (!/^[0-9]{6,32}$/.test(readString(record, "workflowRunId"))) {
-    missing.push("workflowRunId numeric GitHub run ID");
+  if (!isValidQaManualRunEvidenceRunId(readString(record, "workflowRunId"))) {
+    missing.push("workflowRunId numeric SCRIMED manual QA run ID");
   }
 
-  if (!/^https:\/\/github\.com\/temitayodahunsi777\/scrimed-site\/actions\/runs\/[0-9]+$/.test(readString(record, "workflowRunUrl"))) {
-    missing.push("workflowRunUrl SCRIMED GitHub Actions run URL");
+  if (!isValidQaManualRunEvidenceWorkflowUrl(readString(record, "workflowRunUrl"))) {
+    missing.push(qaManualRunEvidenceWorkflowUrlRequirement());
   }
 
   return Array.from(new Set(missing));

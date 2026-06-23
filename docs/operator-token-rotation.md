@@ -116,8 +116,8 @@ Manual evidence packet payload:
 ```json
 {
   "workflowKind": "sales-demo-session-qa",
-  "workflowRunId": "123456789",
-  "workflowRunUrl": "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
+  "workflowRunId": "202606221321",
+  "workflowRunUrl": "https://app.scrimedsolutions.com/qa-run-control?runId=202606221321",
   "executedAt": "2026-06-18T19:00:00.000Z",
   "baseUrl": "https://app.scrimedsolutions.com",
   "intakeId": "synthetic-intake-target",

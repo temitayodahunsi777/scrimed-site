@@ -89,6 +89,61 @@ export type BuyerPilotRoomQaActivationPlan = {
   >;
 };
 
+export type BuyerPilotRoomExportAudit = {
+  status: "retained" | "pending";
+  eventCount: number;
+  latestEventId: string | null;
+  latestEventAt: string | null;
+  latestActorUserId: string | null;
+  evidence: string;
+  nextAction: string;
+};
+
+export type BuyerSpecificReleaseShareState =
+  | "export-required-before-share-review"
+  | "internal-only-export-retained"
+  | "qualified-release-review-in-progress"
+  | "qualified-share-review-ready-not-release-approval";
+
+export type BuyerSpecificReleaseSignal = {
+  label: string;
+  eventType: string;
+  packetType: string | null;
+  eventCount: number;
+  packetCount: number;
+  latestEventId: string | null;
+  latestEventAt: string | null;
+  latestStatus: string | null;
+};
+
+export type BuyerSpecificReleaseGate = {
+  id: string;
+  label: string;
+  status: BuyerPilotRoomState;
+  evidence: string;
+  signal: BuyerSpecificReleaseSignal;
+  requiredBeforeExternalShare: string;
+  boundary: string;
+  nextAction: string;
+};
+
+export type BuyerSpecificReleaseReadiness = {
+  status: BuyerPilotRoomState;
+  shareState: BuyerSpecificReleaseShareState;
+  score: number;
+  readyGates: number;
+  reviewGates: number;
+  blockedGates: number;
+  gateCount: number;
+  latestSignalAt: string | null;
+  latestSignalId: string | null;
+  allowedUse: string;
+  prohibitedUses: string[];
+  requiredHumanApprovals: string[];
+  gates: BuyerSpecificReleaseGate[];
+  nextAction: string;
+};
+
 export type BuyerPilotRoomSummary = {
   state: BuyerPilotRoomState;
   score: number;
@@ -108,6 +163,7 @@ export type BuyerPilotRoomSummary = {
     demoSnapshots: number;
     commandSnapshots: number;
     commandPacketExports: number;
+    buyerDiligenceExports: number;
     manualQaEvidencePackets: number;
     unavailableSections: number;
   };
@@ -134,6 +190,8 @@ export type BuyerPilotRoomSummary = {
     requiredHumanActions: string[];
     withheldItems: string[];
   };
+  exportAudit: BuyerPilotRoomExportAudit;
+  buyerSpecificRelease: BuyerSpecificReleaseReadiness;
   diligenceControls: BuyerPilotRoomDiligenceControl[];
   qaActivationPlan: BuyerPilotRoomQaActivationPlan;
   qaProofPromotion: QaProofPromotionDecision & {
@@ -257,6 +315,552 @@ function commandSnapshotPosture(
         : packetExports === 0
           ? "Download the latest Command Intelligence packet after operator review."
           : "Use the latest command packet and buyer export together in diligence follow-up."
+  };
+}
+
+function buyerDiligenceExportAudit(
+  auditEvents: PilotAuditEventRecord[]
+): BuyerPilotRoomExportAudit {
+  const events = auditEvents.filter(
+    (event) => event.eventType === "buyer-pilot-room-packet-downloaded"
+  );
+  const latest = events[0] ?? null;
+
+  if (!latest) {
+    return {
+      status: "pending",
+      eventCount: 0,
+      latestEventId: null,
+      latestEventAt: null,
+      latestActorUserId: null,
+      evidence: "No Buyer Diligence Export download audit event is retained yet.",
+      nextAction:
+        "Download the Buyer Diligence Export from the protected AAL2 workspace after operator review."
+    };
+  }
+
+  return {
+    status: "retained",
+    eventCount: events.length,
+    latestEventId: latest.id,
+    latestEventAt: latest.createdAt,
+    latestActorUserId: latest.actorUserId,
+    evidence: `${events.length} Buyer Diligence Export audit event${events.length === 1 ? "" : "s"} retained; latest event ${latest.id}.`,
+    nextAction:
+      "Use the latest audited export for protected buyer diligence only and keep all production, PHI, clinical, reimbursement, certification, connector, and public-release gates closed."
+  };
+}
+
+const buyerReleaseApprovalDomains = [
+  "finance-methodology-policy",
+  "counsel-external-use-review",
+  "executive-release-review",
+  "privacy-security-review",
+  "clinical-governance-boundary-review",
+  "marketing-claims-review",
+  "buyer-permission-review"
+] as const;
+
+const buyerReleaseReviewerRoles = [
+  "finance-reviewer",
+  "qualified-counsel",
+  "executive-sponsor",
+  "privacy-security-owner",
+  "clinical-governance-owner",
+  "marketing-claims-owner",
+  "buyer-permission-owner"
+] as const;
+
+const buyerReleaseAuthorityDomains = [
+  "qualified-counsel",
+  "customer-permission-owner",
+  "executive-sponsor",
+  "privacy-security-owner",
+  "finance-owner",
+  "clinical-governance-owner",
+  "marketing-claims-owner"
+] as const;
+
+function latestAuditEvent(events: PilotAuditEventRecord[]) {
+  return [...events].sort(
+    (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt)
+  )[0] ?? null;
+}
+
+function auditEventsByType(events: PilotAuditEventRecord[], eventType: string) {
+  return events.filter((event) => event.eventType === eventType);
+}
+
+function auditEventsByPacketType(events: PilotAuditEventRecord[], packetType: string) {
+  return events.filter(
+    (event) =>
+      event.eventType === "enterprise-proof-packet-downloaded" &&
+      event.eventMetadata.packetType === packetType
+  );
+}
+
+function metadataString(metadata: Record<string, unknown>, key: string) {
+  const value = metadata[key];
+  return typeof value === "string" ? value : null;
+}
+
+function metadataStringArray(metadata: Record<string, unknown>, key: string) {
+  const value = metadata[key];
+  if (!Array.isArray(value)) return [];
+
+  return value.filter((item): item is string => typeof item === "string");
+}
+
+function distinctKnownValues<const T extends readonly string[]>(
+  events: PilotAuditEventRecord[],
+  metadataKey: string,
+  knownValues: T
+) {
+  const allowed = new Set<string>(knownValues);
+  const values = events
+    .flatMap((event) => {
+      const scalar = metadataString(event.eventMetadata, metadataKey);
+      if (scalar) return [scalar];
+      return metadataStringArray(event.eventMetadata, metadataKey);
+    })
+    .filter((value) => allowed.has(value));
+
+  return new Set(values);
+}
+
+function releaseSignal({
+  auditEvents,
+  eventType,
+  label,
+  packetType,
+  statusField
+}: {
+  auditEvents: PilotAuditEventRecord[];
+  eventType: string;
+  label: string;
+  packetType: string | null;
+  statusField?: string;
+}): BuyerSpecificReleaseSignal {
+  const events = auditEventsByType(auditEvents, eventType);
+  const packets = packetType ? auditEventsByPacketType(auditEvents, packetType) : [];
+  const latest = latestAuditEvent([...events, ...packets]);
+
+  return {
+    label,
+    eventType,
+    packetType,
+    eventCount: events.length,
+    packetCount: packets.length,
+    latestEventId: latest?.id ?? null,
+    latestEventAt: latest?.createdAt ?? null,
+    latestStatus:
+      latest && statusField ? metadataString(latest.eventMetadata, statusField) : null
+  };
+}
+
+function releaseGateStatus({
+  hasRecord,
+  hasPacket,
+  missingCount,
+  readyStatus,
+  latestStatus
+}: {
+  hasRecord: boolean;
+  hasPacket: boolean;
+  missingCount?: number;
+  readyStatus?: string;
+  latestStatus?: string | null;
+}): BuyerPilotRoomState {
+  if (readyStatus && latestStatus === readyStatus && (missingCount ?? 0) === 0) {
+    return "ready";
+  }
+
+  if (!readyStatus && hasRecord && (missingCount ?? 0) === 0) {
+    return "ready";
+  }
+
+  if (hasRecord || hasPacket) return "review";
+
+  return "review";
+}
+
+function deriveBuyerSpecificReleaseReadiness(
+  auditEvents: PilotAuditEventRecord[],
+  exportAudit: BuyerPilotRoomExportAudit
+): BuyerSpecificReleaseReadiness {
+  const externalEvidenceEvents = auditEventsByType(
+    auditEvents,
+    "protected-external-approval-evidence-recorded"
+  );
+  const linkedApprovalDomains = distinctKnownValues(
+    externalEvidenceEvents,
+    "domainId",
+    buyerReleaseApprovalDomains
+  );
+  const missingApprovalDomainCount =
+    buyerReleaseApprovalDomains.length - linkedApprovalDomains.size;
+
+  const releaseDecisionSignal = releaseSignal({
+    auditEvents,
+    eventType: "protected-release-decision-recorded",
+    label: "Protected release decision",
+    packetType: "protected-release-decision-claim-registry",
+    statusField: "decisionStatus"
+  });
+  const latestReleaseDecision = latestAuditEvent(
+    auditEventsByType(auditEvents, "protected-release-decision-recorded")
+  );
+  const missingReleaseDecisionDomains = latestReleaseDecision
+    ? metadataStringArray(latestReleaseDecision.eventMetadata, "missingApprovalDomains")
+        .length
+    : buyerReleaseApprovalDomains.length;
+
+  const reviewerSignal = releaseSignal({
+    auditEvents,
+    eventType: "protected-named-reviewer-signoff-recorded",
+    label: "Named reviewer signoff",
+    packetType: "protected-named-reviewer-signoffs",
+    statusField: "signoffStatus"
+  });
+  const reviewerEvents = auditEventsByType(
+    auditEvents,
+    "protected-named-reviewer-signoff-recorded"
+  );
+  const linkedReviewerRoles = distinctKnownValues(
+    reviewerEvents,
+    "reviewerRole",
+    buyerReleaseReviewerRoles
+  );
+  const latestReviewerEvent = latestAuditEvent(reviewerEvents);
+  const missingReviewerRoleCount = latestReviewerEvent
+    ? metadataStringArray(latestReviewerEvent.eventMetadata, "missingReviewerRoles").length
+    : buyerReleaseReviewerRoles.length - linkedReviewerRoles.size;
+
+  const lockboxSignal = releaseSignal({
+    auditEvents,
+    eventType: "protected-distribution-lockbox-recorded",
+    label: "Distribution lockbox",
+    packetType: "protected-distribution-lockbox",
+    statusField: "lockboxStatus"
+  });
+
+  const releaseAuthoritySignal = releaseSignal({
+    auditEvents,
+    eventType: "protected-release-authority-attestation-recorded",
+    label: "Release authority attestation",
+    packetType: "protected-release-authority-attestations",
+    statusField: "attestationStatus"
+  });
+  const releaseAuthorityEvents = auditEventsByType(
+    auditEvents,
+    "protected-release-authority-attestation-recorded"
+  );
+  const linkedAuthorityDomains = distinctKnownValues(
+    releaseAuthorityEvents,
+    "authorityDomain",
+    buyerReleaseAuthorityDomains
+  );
+  const latestReleaseAuthority = latestAuditEvent(releaseAuthorityEvents);
+  const missingReleaseAuthorityCount = latestReleaseAuthority
+    ? metadataStringArray(latestReleaseAuthority.eventMetadata, "missingAuthorityDomains")
+        .length
+    : buyerReleaseAuthorityDomains.length - linkedAuthorityDomains.size;
+
+  const recipientSignal = releaseSignal({
+    auditEvents,
+    eventType: "protected-evidence-room-recipient-attestation-recorded",
+    label: "Evidence-room recipient attestation",
+    packetType: "protected-evidence-room-recipient-attestations",
+    statusField: "attestationStatus"
+  });
+  const latestRecipient = latestAuditEvent(
+    auditEventsByType(auditEvents, "protected-evidence-room-recipient-attestation-recorded")
+  );
+  const missingRecipientControlCount = latestRecipient
+    ? metadataStringArray(latestRecipient.eventMetadata, "missingRecipientControls").length
+    : 1;
+
+  const accessLogSignal = releaseSignal({
+    auditEvents,
+    eventType: "protected-evidence-room-access-log-reconciliation-recorded",
+    label: "Evidence-room access-log reconciliation",
+    packetType: "protected-evidence-room-access-log-reconciliation",
+    statusField: "reconciliationStatus"
+  });
+  const latestAccessLog = latestAuditEvent(
+    auditEventsByType(auditEvents, "protected-evidence-room-access-log-reconciliation-recorded")
+  );
+  const missingAccessLogControlCount = latestAccessLog
+    ? metadataStringArray(latestAccessLog.eventMetadata, "missingAccessLogControls").length
+    : 1;
+
+  const exportSignal: BuyerSpecificReleaseSignal = {
+    label: "Buyer Diligence Export",
+    eventType: "buyer-pilot-room-packet-downloaded",
+    packetType: "buyer-pilot-room-packet",
+    eventCount: exportAudit.eventCount,
+    packetCount: exportAudit.eventCount,
+    latestEventId: exportAudit.latestEventId,
+    latestEventAt: exportAudit.latestEventAt,
+    latestStatus: exportAudit.status
+  };
+
+  const gates: BuyerSpecificReleaseGate[] = [
+    {
+      id: "buyer-export-retained",
+      label: "Retained Buyer Diligence Export audit",
+      status: exportAudit.status === "retained" ? "ready" : "blocked",
+      evidence: exportAudit.evidence,
+      signal: exportSignal,
+      requiredBeforeExternalShare:
+        "An audited export must exist before any buyer-specific release review can begin.",
+      boundary:
+        "A retained export is internal proof only; it does not approve external distribution.",
+      nextAction: exportAudit.nextAction
+    },
+    {
+      id: "external-approval-evidence",
+      label: "External approval evidence references",
+      status:
+        missingApprovalDomainCount === 0
+          ? "ready"
+          : externalEvidenceEvents.length > 0 ||
+              auditEventsByPacketType(
+                auditEvents,
+                "protected-external-approval-evidence-links"
+              ).length > 0
+            ? "review"
+            : "review",
+      evidence: `${linkedApprovalDomains.size}/${buyerReleaseApprovalDomains.length} required approval-domain metadata references linked.`,
+      signal: releaseSignal({
+        auditEvents,
+        eventType: "protected-external-approval-evidence-recorded",
+        label: "External approval evidence",
+        packetType: "protected-external-approval-evidence-links",
+        statusField: "referenceStatus"
+      }),
+      requiredBeforeExternalShare:
+        "Finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission references must be retained externally and linked as no-PHI metadata.",
+      boundary:
+        "Approval evidence references are metadata only and are not legal, privacy, security, clinical, customer, or release approval.",
+      nextAction:
+        missingApprovalDomainCount === 0
+          ? "Review linked approval evidence references against the buyer-specific channel and claim version."
+          : `Link ${missingApprovalDomainCount} missing approval domain${missingApprovalDomainCount === 1 ? "" : "s"} before external sharing.`
+    },
+    {
+      id: "release-decision",
+      label: "Versioned release decision",
+      status: releaseGateStatus({
+        hasRecord: releaseDecisionSignal.eventCount > 0,
+        hasPacket: releaseDecisionSignal.packetCount > 0,
+        latestStatus: releaseDecisionSignal.latestStatus,
+        missingCount: missingReleaseDecisionDomains,
+        readyStatus: "ready-for-qualified-release-review-not-release-authority"
+      }),
+      evidence:
+        releaseDecisionSignal.latestStatus === null
+          ? "No protected release decision status is visible yet."
+          : `Latest release decision status: ${releaseDecisionSignal.latestStatus}; missing approval domains: ${missingReleaseDecisionDomains}.`,
+      signal: releaseDecisionSignal,
+      requiredBeforeExternalShare:
+        "A versioned claim registry decision must match the audience, channel, claim category, and buyer-specific scope.",
+      boundary:
+        "Release decision readiness is not public release, customer-reference approval, advertising substantiation, securities approval, or production authority.",
+      nextAction:
+        releaseDecisionSignal.latestStatus === "ready-for-qualified-release-review-not-release-authority" &&
+        missingReleaseDecisionDomains === 0
+          ? "Route the versioned claim decision to reviewer signoff and controlled distribution checks."
+          : "Record a buyer-diligence release decision after all approval-domain references are linked."
+    },
+    {
+      id: "named-reviewer-signoffs",
+      label: "Named reviewer signoffs",
+      status: releaseGateStatus({
+        hasRecord: reviewerSignal.eventCount > 0,
+        hasPacket: reviewerSignal.packetCount > 0,
+        latestStatus: reviewerSignal.latestStatus,
+        missingCount: missingReviewerRoleCount,
+        readyStatus: "all-domain-signoff-metadata-complete-not-release-authority"
+      }),
+      evidence:
+        reviewerSignal.latestStatus === null
+          ? `${linkedReviewerRoles.size}/${buyerReleaseReviewerRoles.length} reviewer-role metadata signoffs linked.`
+          : `Latest signoff status: ${reviewerSignal.latestStatus}; missing reviewer roles: ${missingReviewerRoleCount}.`,
+      signal: reviewerSignal,
+      requiredBeforeExternalShare:
+        "Finance, counsel, executive, privacy/security, clinical-governance, marketing-claims, and buyer-permission reviewers must be represented as externally retained signoff metadata.",
+      boundary:
+        "Named signoffs are no-PHI metadata references and are not signatures, legal opinions, customer approvals, or release authority.",
+      nextAction:
+        missingReviewerRoleCount === 0
+          ? "Move signoff metadata into a disabled-by-default distribution lockbox review."
+          : `Retain and link ${missingReviewerRoleCount} missing reviewer role${missingReviewerRoleCount === 1 ? "" : "s"} before distribution review.`
+    },
+    {
+      id: "distribution-lockbox",
+      label: "Disabled distribution lockbox",
+      status: releaseGateStatus({
+        hasRecord: lockboxSignal.eventCount > 0,
+        hasPacket: lockboxSignal.packetCount > 0,
+        latestStatus: lockboxSignal.latestStatus,
+        readyStatus: "ready-for-external-distribution-lockbox-review-not-release-authority"
+      }),
+      evidence:
+        lockboxSignal.latestStatus === null
+          ? "No disabled distribution lockbox status is visible yet."
+          : `Latest distribution lockbox status: ${lockboxSignal.latestStatus}.`,
+      signal: lockboxSignal,
+      requiredBeforeExternalShare:
+        "The buyer-specific packet, channel, audience, revocation plan, and manifest must be staged in a disabled distribution lockbox.",
+      boundary:
+        "The lockbox remains disabled and does not approve, enable, publish, email, or distribute artifacts.",
+      nextAction:
+        lockboxSignal.latestStatus === "ready-for-external-distribution-lockbox-review-not-release-authority"
+          ? "Route disabled lockbox metadata to release-authority attestation."
+          : "Create a disabled distribution lockbox after reviewer signoff metadata is complete."
+    },
+    {
+      id: "release-authority-attestations",
+      label: "Release authority attestations",
+      status: releaseGateStatus({
+        hasRecord: releaseAuthoritySignal.eventCount > 0,
+        hasPacket: releaseAuthoritySignal.packetCount > 0,
+        latestStatus: releaseAuthoritySignal.latestStatus,
+        missingCount: missingReleaseAuthorityCount,
+        readyStatus: "all-release-authority-metadata-complete-not-release-approval"
+      }),
+      evidence:
+        releaseAuthoritySignal.latestStatus === null
+          ? `${linkedAuthorityDomains.size}/${buyerReleaseAuthorityDomains.length} authority-domain metadata attestations linked.`
+          : `Latest release authority status: ${releaseAuthoritySignal.latestStatus}; missing authority domains: ${missingReleaseAuthorityCount}.`,
+      signal: releaseAuthoritySignal,
+      requiredBeforeExternalShare:
+        "Counsel, customer permission, executive, privacy/security, finance, clinical-governance, and marketing-claims authority metadata must be externally retained.",
+      boundary:
+        "Release authority attestations are disabled-by-default metadata and are not external release approval.",
+      nextAction:
+        missingReleaseAuthorityCount === 0
+          ? "Proceed to recipient attestation with exact recipient lists retained outside SCRIMED."
+          : `Retain ${missingReleaseAuthorityCount} missing authority-domain attestation${missingReleaseAuthorityCount === 1 ? "" : "s"} before recipient controls.`
+    },
+    {
+      id: "recipient-attestations",
+      label: "Evidence-room recipient attestations",
+      status: releaseGateStatus({
+        hasRecord: recipientSignal.eventCount > 0,
+        hasPacket: recipientSignal.packetCount > 0,
+        latestStatus: recipientSignal.latestStatus,
+        missingCount: missingRecipientControlCount,
+        readyStatus: "recipient-metadata-complete-not-export-approval"
+      }),
+      evidence:
+        recipientSignal.latestStatus === null
+          ? "No buyer evidence-room recipient attestation status is visible yet."
+          : `Latest recipient attestation status: ${recipientSignal.latestStatus}; missing recipient controls: ${missingRecipientControlCount}.`,
+      signal: recipientSignal,
+      requiredBeforeExternalShare:
+        "Recipient segment, access window, packet reference, evidence-room reference, revocation path, and release-authority link must be externally controlled.",
+      boundary:
+        "SCRIMED stores no exact recipient lists, recipient emails, access grants, or recipient identifiers in this workspace.",
+      nextAction:
+        missingRecipientControlCount === 0
+          ? "Reconcile evidence-room access logs through metadata-only access-log review."
+          : "Record recipient-scope metadata while keeping exact recipient lists in the approved external evidence room."
+    },
+    {
+      id: "access-log-reconciliation",
+      label: "Evidence-room access-log reconciliation",
+      status: releaseGateStatus({
+        hasRecord: accessLogSignal.eventCount > 0,
+        hasPacket: accessLogSignal.packetCount > 0,
+        latestStatus: accessLogSignal.latestStatus,
+        missingCount: missingAccessLogControlCount,
+        readyStatus: "access-log-reconciliation-complete-not-export-approval"
+      }),
+      evidence:
+        accessLogSignal.latestStatus === null
+          ? "No external evidence-room access-log reconciliation status is visible yet."
+          : `Latest access-log reconciliation status: ${accessLogSignal.latestStatus}; missing access-log controls: ${missingAccessLogControlCount}.`,
+      signal: accessLogSignal,
+      requiredBeforeExternalShare:
+        "External access-log reference, recipient link, access-window reconciliation, revocation review, anomaly escalation, and export-disabled controls must be reviewed.",
+      boundary:
+        "SCRIMED stores no raw access logs, URLs, IP addresses, device identifiers, recipient identifiers, or access grants.",
+      nextAction:
+        missingAccessLogControlCount === 0
+          ? "Pause for explicit qualified human release review; this still is not release approval."
+          : "Complete external access-log reconciliation metadata before any buyer-specific sharing."
+    }
+  ];
+
+  const readyGates = gates.filter((gate) => gate.status === "ready").length;
+  const reviewGates = gates.filter((gate) => gate.status === "review").length;
+  const blockedGates = gates.filter((gate) => gate.status === "blocked").length;
+  const status = rollupState(
+    gates.map((gate) => ({
+      id: gate.id,
+      label: gate.label,
+      state: gate.status,
+      evidence: gate.evidence,
+      action: gate.nextAction
+    }))
+  );
+  const hasAnyReleaseEvidence = gates.some(
+    (gate) => gate.id !== "buyer-export-retained" && gate.signal.eventCount + gate.signal.packetCount > 0
+  );
+  const allGatesReady = readyGates === gates.length;
+  const latestSignal = latestAuditEvent(
+    gates
+      .flatMap((gate) => [gate.signal.latestEventId])
+      .filter((id): id is string => Boolean(id))
+      .flatMap((id) => auditEvents.filter((event) => event.id === id))
+  );
+
+  const shareState: BuyerSpecificReleaseShareState =
+    exportAudit.status !== "retained"
+      ? "export-required-before-share-review"
+      : allGatesReady
+        ? "qualified-share-review-ready-not-release-approval"
+        : hasAnyReleaseEvidence
+          ? "qualified-release-review-in-progress"
+          : "internal-only-export-retained";
+
+  return {
+    status,
+    shareState,
+    score: Math.round((readyGates / gates.length) * 100),
+    readyGates,
+    reviewGates,
+    blockedGates,
+    gateCount: gates.length,
+    latestSignalAt: latestSignal?.createdAt ?? exportAudit.latestEventAt,
+    latestSignalId: latestSignal?.id ?? exportAudit.latestEventId,
+    allowedUse:
+      "Internal SCRIMED and protected buyer-diligence preparation with synthetic-only, no-PHI, human-reviewed evidence.",
+    prohibitedUses: [
+      "Public release, website claim, PR, advertising, investor material, customer reference, or case-study release without qualified approval.",
+      "PHI processing, live patient data, payer member data, production credentials, EHR writeback, patient outreach, payer submission, or live clinical care.",
+      "HIPAA, SOC 2, FDA, security-certification, reimbursement, revenue, savings, clinical-outcome, or production connector guarantees."
+    ],
+    requiredHumanApprovals: [
+      "Buyer-specific scope and audience review",
+      "Qualified counsel external-use review",
+      "Privacy and security review",
+      "Clinical-governance boundary review",
+      "Finance and unit-economics methodology review",
+      "Marketing, PR, sales, and advertising claims review",
+      "Customer or buyer permission review where buyer-specific proof is referenced",
+      "Executive release-owner approval in the approved external system"
+    ],
+    gates,
+    nextAction:
+      shareState === "export-required-before-share-review"
+        ? "Download a Buyer Diligence Export from the protected AAL2 workspace after operator review."
+        : shareState === "qualified-share-review-ready-not-release-approval"
+          ? "Pause for explicit qualified human release review in the approved external channel; SCRIMED still stores no release approval artifact."
+          : gates.find((gate) => gate.status !== "ready")?.nextAction ??
+            "Keep external sharing disabled until the buyer-specific release chain is reviewed."
   };
 }
 
@@ -543,7 +1147,8 @@ export function deriveBuyerPilotRoom({
   const hasEnterprisePacket = hasAuditEvent(auditEvents, "enterprise-proof-packet-downloaded");
   const hasDemoSnapshot = demoSnapshots.length > 0;
   const hasDemoPacket = hasAuditEvent(auditEvents, "demo-readiness-packet-downloaded");
-  const hasBuyerPacket = hasAuditEvent(auditEvents, "buyer-pilot-room-packet-downloaded");
+  const exportAudit = buyerDiligenceExportAudit(auditEvents);
+  const buyerSpecificRelease = deriveBuyerSpecificReleaseReadiness(auditEvents, exportAudit);
   const hasManualQaEvidence =
     manualQaEvidencePackets.length > 0 ||
     hasAuditEvent(auditEvents, "manual-qa-evidence-packet-recorded");
@@ -636,13 +1241,16 @@ export function deriveBuyerPilotRoom({
     {
       id: "buyer-room-packet",
       label: "Buyer room packet release",
-      state: hasBuyerPacket ? "ready" : "review",
-      evidence: hasBuyerPacket
-        ? "A buyer-room packet download audit event exists."
-        : "No buyer-room packet download audit event exists yet.",
-      action: hasBuyerPacket
-        ? "Use the most recent packet as buyer-diligence follow-up."
-        : "Download the Buyer Diligence Export after this room is reviewed."
+      state: exportAudit.status === "retained" ? "ready" : "review",
+      evidence: exportAudit.evidence,
+      action: exportAudit.nextAction
+    },
+    {
+      id: "buyer-specific-share-readiness",
+      label: "Buyer-specific share readiness",
+      state: buyerSpecificRelease.status,
+      evidence: `${buyerSpecificRelease.readyGates}/${buyerSpecificRelease.gateCount} release-readiness gate${buyerSpecificRelease.gateCount === 1 ? "" : "s"} ready; share state ${buyerSpecificRelease.shareState}.`,
+      action: buyerSpecificRelease.nextAction
     },
     {
       id: "command-intelligence-timeline",
@@ -673,18 +1281,33 @@ export function deriveBuyerPilotRoom({
   const blocked = checks.filter((check) => check.state === "blocked").length;
   const state = rollupState(checks);
   const score = Math.round((passed / checks.length) * 100);
-  const diligenceControls = buildDiligenceControls({
-    auditEvents,
-    commandSnapshots,
-    demoSnapshots,
-    hasAgentWorkspace,
-    hasSession,
-    hasTrustOps,
-    qaProofPromotion,
-    sessions,
-    state,
-    unavailableSections
-  });
+  const diligenceControls: BuyerPilotRoomDiligenceControl[] = [
+    ...buildDiligenceControls({
+      auditEvents,
+      commandSnapshots,
+      demoSnapshots,
+      hasAgentWorkspace,
+      hasSession,
+      hasTrustOps,
+      qaProofPromotion,
+      sessions,
+      state,
+      unavailableSections
+    }),
+    {
+      domain: "Buyer-Specific Release Readiness",
+      status: buyerSpecificRelease.status,
+      buyerQuestion:
+        "Can SCRIMED safely share this protected proof packet with a named buyer or investor?",
+      evidence: `${buyerSpecificRelease.readyGates}/${buyerSpecificRelease.gateCount} release-readiness gates are ready; current share state is ${buyerSpecificRelease.shareState}.`,
+      boundary:
+        "This is a readiness ladder only. It is not legal approval, public release approval, customer permission, advertising substantiation, securities approval, compliance certification, or production authority.",
+      workaround:
+        "Use the retained Buyer Diligence Export internally, then complete buyer-specific approval references, release decision, reviewer signoff, lockbox, authority attestation, recipient attestation, and access-log reconciliation before external sharing.",
+      productionGate:
+        "Explicit qualified human approvals retained in approved external systems with exact audience, channel, claim version, recipient scope, revocation plan, and access-log review."
+    }
+  ];
 
   return {
     state,
@@ -706,6 +1329,7 @@ export function deriveBuyerPilotRoom({
       demoSnapshots: demoSnapshots.length,
       commandSnapshots: commandSnapshots.length,
       commandPacketExports: commandPosture.packetExports,
+      buyerDiligenceExports: exportAudit.eventCount,
       manualQaEvidencePackets: manualQaEvidencePackets.length,
       unavailableSections: unavailableSections.length
     },
@@ -768,6 +1392,8 @@ export function deriveBuyerPilotRoom({
         "Production launch approval, autonomous clinical action, or live connector authorization"
       ]
     },
+    exportAudit,
+    buyerSpecificRelease,
     diligenceControls,
     qaActivationPlan,
     qaProofPromotion: {
@@ -814,7 +1440,7 @@ export function deriveBuyerPilotRoom({
     ],
     unavailableSections,
     boundary: buyerPilotRoomBoundary,
-    updatedAt: "2026-06-18"
+    updatedAt: "2026-06-22"
   };
 }
 
@@ -862,6 +1488,15 @@ function diligenceControlLines(controls: BuyerPilotRoomDiligenceControl[]) {
     .map(
       (control) =>
         `- ${control.domain}: ${control.status}. Buyer question: ${control.buyerQuestion} Evidence: ${control.evidence} Boundary: ${control.boundary} Workaround: ${control.workaround} Gate: ${control.productionGate}`
+    )
+    .join("\n");
+}
+
+function buyerSpecificReleaseGateLines(readiness: BuyerSpecificReleaseReadiness) {
+  return readiness.gates
+    .map(
+      (gate) =>
+        `- ${gate.label}: ${gate.status}. Evidence: ${gate.evidence} Required before share: ${gate.requiredBeforeExternalShare} Boundary: ${gate.boundary} Latest signal: ${gate.signal.latestEventId ?? "not available"} at ${gate.signal.latestEventAt ?? "not available"}; status ${gate.signal.latestStatus ?? "not available"}; events ${gate.signal.eventCount}; packets ${gate.signal.packetCount}. Next: ${gate.nextAction}`
     )
     .join("\n");
 }
@@ -957,6 +1592,7 @@ ${markdownItems(room.diligenceExport.withheldItems)}
 - Demo readiness snapshots: ${room.evidenceCounts.demoSnapshots}
 - Command Intelligence snapshots: ${room.evidenceCounts.commandSnapshots}
 - Command Intelligence packet exports: ${room.evidenceCounts.commandPacketExports}
+- Buyer Diligence Export audits: ${room.evidenceCounts.buyerDiligenceExports}
 - Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
 - Degraded evidence sections: ${room.evidenceCounts.unavailableSections}
 - Latest demo snapshot: ${
@@ -974,6 +1610,7 @@ ${checkLines(room.checks)}
 - Demo readiness snapshots: ${room.evidenceCounts.demoSnapshots}
 - Command Intelligence snapshots: ${room.evidenceCounts.commandSnapshots}
 - Command Intelligence packet exports: ${room.evidenceCounts.commandPacketExports}
+- Buyer Diligence Export audits: ${room.evidenceCounts.buyerDiligenceExports}
 - Manual QA evidence packets: ${room.evidenceCounts.manualQaEvidencePackets}
 - Manual AAL2 QA activation plan: ${room.qaActivationPlan.status}
 - QA activation workflows: ${room.qaActivationPlan.workflowCount}
@@ -995,6 +1632,35 @@ ${checkLines(room.checks)}
 - Trend: ${room.commandIntelligence.trend}
 - Packet exports: ${room.commandIntelligence.packetExports}
 - Next action: ${room.commandIntelligence.nextAction}
+
+## Buyer Diligence Export Audit
+- Status: ${room.exportAudit.status}
+- Retained export audit events: ${room.exportAudit.eventCount}
+- Latest audit event ID: ${room.exportAudit.latestEventId ?? "not available"}
+- Latest audit event timestamp: ${room.exportAudit.latestEventAt ?? "not available"}
+- Latest audit actor: ${room.exportAudit.latestActorUserId ?? "not available"}
+- Evidence: ${room.exportAudit.evidence}
+- Next action: ${room.exportAudit.nextAction}
+
+## Buyer-Specific Share Readiness
+- Status: ${room.buyerSpecificRelease.status}
+- Share state: ${room.buyerSpecificRelease.shareState}
+- Score: ${room.buyerSpecificRelease.score}%
+- Ready gates: ${room.buyerSpecificRelease.readyGates}/${room.buyerSpecificRelease.gateCount}
+- Review gates: ${room.buyerSpecificRelease.reviewGates}
+- Blocked gates: ${room.buyerSpecificRelease.blockedGates}
+- Latest release-readiness signal: ${room.buyerSpecificRelease.latestSignalId ?? "not available"} at ${room.buyerSpecificRelease.latestSignalAt ?? "not available"}
+- Allowed use: ${room.buyerSpecificRelease.allowedUse}
+- Next action: ${room.buyerSpecificRelease.nextAction}
+
+Required human approvals:
+${markdownItems(room.buyerSpecificRelease.requiredHumanApprovals)}
+
+Prohibited uses:
+${markdownItems(room.buyerSpecificRelease.prohibitedUses)}
+
+Release-readiness gates:
+${buyerSpecificReleaseGateLines(room.buyerSpecificRelease)}
 
 ## Manual AAL2 QA Activation Plan
 - Status: ${room.qaActivationPlan.status}

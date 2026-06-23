@@ -77,6 +77,18 @@ export default function ProductConsolePage() {
           <strong>{summary.clinicalAuthorityBoundaryResolutionCount}</strong>
         </article>
         <article>
+          <span>Approval tracks</span>
+          <strong>{summary.approvalsReadinessTrackCount}</strong>
+        </article>
+        <article>
+          <span>Approval agents</span>
+          <strong>{summary.approvalsReadinessAgentControlCount}</strong>
+        </article>
+        <article>
+          <span>Approval blocked</span>
+          <strong>{summary.approvalsReadinessBlockedBeforeApprovalCount}</strong>
+        </article>
+        <article>
           <span>Boundary records</span>
           <strong>{summary.boundaryResolutionRecordCount}</strong>
         </article>
@@ -366,6 +378,57 @@ export default function ProductConsolePage() {
             <p>{criterion.evidence}</p>
             <div>
               <strong>{criterion.nextAction}</strong>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED buyer release-control runbook">
+        <div className="section-heading">
+          <p className="eyebrow">Buyer release control</p>
+          <h2>Buyer-specific sharing now has an operator-ready release-control runbook.</h2>
+          <p className="section-copy">{summary.buyerReleaseControlRunSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.buyerReleaseControlRunRoute}>
+              Open Release Control
+            </Link>
+            <a className="secondary-action" href={summary.buyerReleaseControlRunBriefRoute}>
+              Download Runbook
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{summary.buyerReleaseControlRunSummary.status}</span>
+            <h2>{summary.buyerReleaseControlRunSummary.shareDecision}</h2>
+          </div>
+          <p>{summary.buyerReleaseControlRunSummary.nextRecommendedAction}</p>
+          <div>
+            <strong>{summary.buyerReleaseControlRunSummary.executionDecision}</strong>
+            <ul className="compact-list">
+              <li>Steps: {summary.buyerReleaseControlRunStepCount}</li>
+              <li>Protected routes: {summary.buyerReleaseControlRunProtectedRouteCount}</li>
+              <li>Packet routes: {summary.buyerReleaseControlRunPacketRouteCount}</li>
+              <li>Verifier: {summary.buyerReleaseControlRunProtectedVerifierRoute}</li>
+              <li>Verifier packet: {summary.buyerReleaseControlRunProtectedVerifierPacketRoute}</li>
+              <li>Timeline: {summary.buyerReleaseControlRunProtectedVerifierTimelineRoute}</li>
+              <li>Hard stops: {summary.buyerReleaseControlRunHardStopCount}</li>
+            </ul>
+          </div>
+        </article>
+        {summary.buyerReleaseControlRunSummary.steps.slice(0, 4).map((step) => (
+          <article className="module-row" key={step.id}>
+            <div>
+              <span>{step.state}</span>
+              <h2>{step.label}</h2>
+            </div>
+            <p>{step.boundary}</p>
+            <div>
+              <strong>{step.protectedRoute}</strong>
+              <ul className="compact-list">
+                <li>Packet: {step.packetRoute}</li>
+                <li>{step.expectedAuditSignal}</li>
+              </ul>
             </div>
           </article>
         ))}

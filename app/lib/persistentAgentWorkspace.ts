@@ -340,7 +340,7 @@ export const agentWorkspaceGovernanceStatuses: AgentWorkspaceGovernanceStatus[] 
   "closed"
 ];
 
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const persistentAgentWorkspaceBoundary =
   "Persistent Agent Workspace v1 coordinates tenant-scoped synthetic work orders, saved state contracts, Trust Cards, audit timelines, reviewer checkpoints, and proof packets. It does not authorize live PHI ingestion, autonomous clinical decisions, payer submission, patient outreach, medical-record mutation, or production connector execution.";

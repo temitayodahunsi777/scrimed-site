@@ -81,10 +81,11 @@ Before dispatching the workflow, review the QA Evidence Activation Plan:
 - `/api/qa-evidence/activation-plan`
 - `/api/qa-evidence/activation-plan/brief`
 
-After a passing authenticated workflow run, copy only these safe values into `/pilot-workspace/access -> Manual QA Evidence`:
+After a passing authenticated workflow run, or a protected local Run Control witness when GitHub secret placement is blocked, copy only these safe values into `/pilot-workspace/access -> Manual QA Evidence`:
 
 - `workflowKind`: `authority-reference-qa`
-- `workflowRunId`: GitHub Actions run ID
+- `workflowRunId`: numeric GitHub Actions run ID or numeric SCRIMED Run Control witness ID
+- `workflowRunUrl`: GitHub Actions run URL or `https://app.scrimedsolutions.com/qa-run-control?runId={numericRunId}`
 - `intakeId`: protected workspace slug
 - `createdSessionId`: created authority reference UUID printed by the smoke as `referenceId`
 - `packetAuditEventId`: authority reference packet audit event UUID printed by the smoke

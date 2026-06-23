@@ -2,6 +2,10 @@
 
 Status: `manual-aal2-qa-human-run-packet-ready`
 
+Latest AAL2 Evidence Package: `retained-evidence-visible-release-review-required`
+
+Buyer Proof Recommendation: `GO-protected-buyer-proof-release`
+
 SCRIMED QA Human Run Packet is the no-secret dispatch artifact for the first approved human AAL2 synthetic QA workflow.
 
 Routes:
@@ -47,8 +51,41 @@ It does not execute passkey ceremonies, mint tokens, store credentials, persist 
 
 ## Boundary
 
-The packet is a dispatch artifact, not retained authenticated proof. Packet-backed buyer language remains blocked until protected Manual QA Evidence shows packet SHA-256 and append-only audit visibility.
+The packet is the dispatch artifact. The first Authority Reference QA run now has retained no-secret protected evidence, but packet-backed buyer language must stay bounded to the retained workflow run ID, packet SHA-256, audit event reference, synthetic-only boundary, and blocked production-authority claims.
+
+## 2026-06-22 Protected AAL2 Synthetic QA Evidence Update
+
+Test scope:
+
+- Clinical summary generation
+- Missing-data handling
+- Evidence attribution and traceability
+- Escalation behavior
+- Refusal behavior
+- Boundary enforcement
+- Human approval requirements
+- Audit logging
+- QA packet generation
+
+Synthetic data confirmation: active. No PHI, live patient data, payer member data, medical records, imaging, claims, production credentials, or production connector data were entered.
+
+Execution result:
+
+- Workflow kind: `authority-reference-qa`
+- Workspace: `scrimed-atlas-protected-pilot`
+- Run Control witness: `20260622133928`
+- Created authority reference ID: `3bd89df0-2b2e-42b5-8666-f382a3f153db`
+- Source packet audit event ID: `b902a4fe-63ed-4c78-8206-f5ebd4c7c251`
+- Manual QA evidence audit event ID: `1feb64fd-d1d4-443c-84c4-d07847bda7d8`
+- Packet SHA-256: `1691df702a114a940330fd892eebae2ebeabb0e2f8a052f483a18bb7ce0543ae`
+- Boundary enforcement: passed for the protected synthetic workflow.
+- Human approval requirements: passed through protected AAL2 browser-session evidence capture.
+- Clinical summary generation, missing-data handling, evidence attribution, escalation, refusal, audit logging, and QA packet generation: passed as synthetic QA evidence-gate categories for the retained authority-reference workflow only. This is not clinical validation or live-care authority.
+
+Reviewer note: the first retained protected AAL2 evidence packet is visible and Buyer Proof Release passed for bounded buyer diligence. Production clinical care, PHI processing, reimbursement certainty, security certification, public claims, and connector approval remain separately gated.
+
+GO / NO-GO: `GO-protected-buyer-proof-release`; `GO-controlled-synthetic-demo`; `NO-GO-live-clinical-care`.
 
 ## Next Step
 
-Have an approved tenant-admin or pilot-lead run exactly one synthetic workflow with this packet, persist the no-secret metadata through the protected workspace, refresh the Manual QA Execution Console, then export Buyer Diligence only after `/qa-buyer-proof-release` permits it.
+Export Buyer Diligence from the protected workspace only with bounded retained evidence fields, then stop for human review before any public, clinical, legal, security, reimbursement, production, or customer-specific authority claim.

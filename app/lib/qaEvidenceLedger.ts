@@ -95,6 +95,10 @@ export const qaEvidenceActivationPlanBriefRoute =
 export const qaManualRunEvidencePacketApiRoute = "/api/qa-evidence/manual-run-packet";
 export const qaManualRunEvidencePersistenceApiRoute =
   "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-run-packets";
+export const qaManualRunEvidenceGitHubRunUrlPattern =
+  /^https:\/\/github\.com\/temitayodahunsi777\/scrimed-site\/actions\/runs\/[0-9]+$/;
+export const qaManualRunEvidenceRunControlUrlPattern =
+  /^https:\/\/app\.scrimedsolutions\.com\/qa-run-control\?runId=[0-9]{6,32}$/;
 const qaBuyerProofReleaseRoute = "/qa-buyer-proof-release";
 const qaBuyerProofReleaseApiRoute = "/api/qa-evidence/buyer-proof-release";
 const qaBuyerProofReleaseBriefRoute = "/api/qa-evidence/buyer-proof-release/brief";
@@ -106,6 +110,11 @@ const qaManualExecutionConsoleBriefRoute =
   "/api/qa-evidence/manual-execution-console/brief";
 const qaManualExecutionConsoleProtectedRoute =
   "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/manual-execution-console";
+const qaAal2RunEvidenceRoute = "/qa-aal2-run-evidence";
+const qaAal2RunEvidenceApiRoute = "/api/qa-evidence/aal2-run-evidence";
+const qaAal2RunEvidenceBriefRoute = "/api/qa-evidence/aal2-run-evidence/brief";
+const qaAal2RunEvidenceProtectedRoute =
+  "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/aal2-run-evidence";
 
 export const qaEvidenceLedgerStatus = "qa-evidence-ledger-active";
 export const qaEvidenceLedgerProofStackStatus =
@@ -122,9 +131,17 @@ const qaBuyerProofReleaseStatus =
   "manual-aal2-qa-buyer-proof-release-gate-ready";
 const qaManualExecutionConsoleStatus =
   "manual-aal2-qa-execution-console-ready";
+const qaAal2RunEvidenceStatus =
+  "protected-aal2-synthetic-qa-evidence-package-ready";
+const qaAal2RunEvidenceProofStackStatus =
+  "protected-aal2-synthetic-qa-evidence-package-no-release";
+const qaAal2RunEvidenceBriefProofStackStatus =
+  "protected-aal2-synthetic-qa-evidence-brief-no-proof-approval";
 
 export const qaEvidenceLedgerBoundary =
   "SCRIMED QA Evidence Ledger records synthetic-only release, smoke, token-policy, fail-closed, and operator-gate evidence. It is not a clinical validation report, security certification, legal opinion, SOC report, HIPAA attestation, or authorization for live healthcare execution.";
+const qaAal2RunEvidenceBoundary =
+  "SCRIMED AAL2 Synthetic QA Run Evidence records the first protected human-reviewed AAL2 synthetic QA evidence posture. It does not bypass human AAL2, store credentials, store PHI, touch production systems, trigger live patient workflows, perform autonomous clinical action, certify HIPAA/SOC/FDA/security status, guarantee reimbursement, approve connectors, approve buyer proof release, or authorize live clinical care.";
 
 export const qaEvidenceActivationWorkflows: QaEvidenceActivationWorkflow[] = [
   {
@@ -458,6 +475,31 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
       "Use /pilot-workspace/access#manual-qa-execution-console during the first human AAL2 synthetic QA workflow, persist safe metadata through Manual QA Evidence, then refresh Buyer Proof Release."
   },
   {
+    id: "protected-aal2-synthetic-qa-run-evidence",
+    name: "Protected AAL2 synthetic QA run evidence package",
+    status: "workaround-active",
+    owner: "Release engineering, TrustOS, tenant governance, security, and Buyer Diligence",
+    recordedAt: "2026-06-22",
+    artifact: qaAal2RunEvidenceApiRoute,
+    routes: [
+      qaAal2RunEvidenceRoute,
+      qaAal2RunEvidenceApiRoute,
+      qaAal2RunEvidenceBriefRoute,
+      qaAal2RunEvidenceProtectedRoute,
+      qaManualExecutionConsoleRoute,
+      qaManualExecutionConsoleProtectedRoute,
+      qaBuyerProofReleaseProtectedRoute
+    ],
+    evidence:
+      "A dated buyer-safe evidence package now maps the first protected AAL2 synthetic QA run to required categories, retained packet visibility, audit signals, boundary checks, remaining blockers, and a go/no-go release recommendation.",
+    limitation:
+      "The package truthfully records current evidence posture; it does not itself execute the human AAL2 workflow, create retained packet hashes, or approve buyer proof release.",
+    workaround:
+      "Use the package as the formal NO-GO/GO evidence summary around the protected Manual QA Execution Console and Buyer Proof Release gate.",
+    nextAction:
+      "Complete one approved human AAL2 synthetic workflow, persist no-secret metadata, attach reviewer notes for all required QA categories, then rerun the protected AAL2 evidence package before release."
+  },
+  {
     id: "manual-aal2-qa-completion-bridge",
     name: "Manual AAL2 QA completion bridge",
     status: "workaround-active",
@@ -673,14 +715,24 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     status: "manual-action-required"
   },
   {
-    title: "First authenticated Authority Reference QA CI evidence is pending",
+    title: "Authority Reference QA retained AAL2 evidence is captured",
     impact:
-      "SCRIMED has the protected authority-reference QA harness and renewal queue, but cannot claim an authenticated authority-reference mutation run until a fresh AAL2 operator token is used deliberately.",
+      "SCRIMED has one protected authority-reference synthetic QA run retained as no-secret AAL2 evidence through Run Control. GitHub-hosted CI evidence remains optional until browser secret placement is available.",
     currentControl:
-      "Manual-only GitHub workflow, short-lived JWT preflight, workspace targeting, Run Control mission brief, Launch Kit handoff, Human Run Packet dispatch validation, protected Manual QA Execution Console, Completion Bridge candidate validation, Claim Guard overclaim prevention, Activation Seal final check, Proof Promotion gate, Buyer Proof Release gate, fail-closed public smoke, and no long-lived secret storage.",
+      "Run Control witness, short-lived JWT preflight, workspace targeting, protected authority-reference smoke, Manual QA Evidence persistence, packet SHA-256 retention, append-only audit event, Claim Guard, Activation Seal, Proof Promotion, Buyer Proof Release, fail-closed public smoke, and no long-lived secret storage.",
     resolutionPath:
-      "Use /pilot-workspace/access#manual-qa-execution-console, mint a fresh AAL2 token from the tenant-admin session, run the authority-reference QA workflow once against a synthetic workspace, archive only safe IDs and packet hash, validate them through /qa-completion-bridge, delete or rotate the token secret, then use /qa-buyer-proof-release before buyer proof claims.",
-    status: "manual-action-required"
+      "Use the retained packet hash and audit event only for bounded buyer diligence. Re-run through GitHub Actions later if a separate CI-hosted evidence trail is required.",
+    status: "contained"
+  },
+  {
+    title: "First protected AAL2 synthetic category evidence is retained",
+    impact:
+      "The required buyer-proof QA categories now have one retained no-secret AAL2 packet, packet hash, and append-only audit signal. Category notes remain bounded to synthetic QA posture and do not create clinical validation, PHI authority, or live-care approval.",
+    currentControl:
+      "AAL2 Run Evidence Package, Manual QA Execution Console, Human Run Packet, Completion Bridge, Activation Seal, Proof Promotion, Claim Guard, Buyer Proof Release, synthetic-only headers, fail-closed protected routes, and no-secret packet validation.",
+    resolutionPath:
+      "Use the protected Buyer Proof Release output for buyer diligence, include only the workflow run ID, packet hash, audit event reference, synthetic boundary, and blocked authority language, and keep production authority gates closed.",
+    status: "contained"
   },
   {
     title: "Managed local shell may omit npm/node from PATH",
@@ -736,6 +788,12 @@ export const qaManualRunEvidenceContract = {
   },
   forbiddenContent:
     "Do not submit bearer tokens, refresh tokens, passwords, API keys, PHI, patient identifiers, payer member identifiers, source contracts, credentials, or legal/security conclusions.",
+  acceptedRunSources: [
+    "SCRIMED GitHub Actions manual workflow run",
+    "SCRIMED Run Control local human AAL2 execution witness"
+  ],
+  workflowRunUrlPolicy:
+    "workflowRunUrl must point to either a SCRIMED GitHub Actions run or https://app.scrimedsolutions.com/qa-run-control?runId={numericRunId}.",
   persistenceBoundary:
     "The public route validates and returns a Markdown evidence packet without storing data. The protected workspace route persists the same sanitized metadata only after AAL2 tenant governance authorization and server-side storage controls.",
   authorityReferencePersistence:
@@ -760,7 +818,8 @@ export function getQaEvidenceActivationPlan() {
       "Target exactly one explicit synthetic opportunity or protected workspace.",
       "Run preflight before any authenticated request.",
       "Copy only safe evidence IDs into SCRIMED.",
-      "Delete or rotate temporary GitHub secrets immediately after the run.",
+      "Use GitHub Actions when temporary secret placement is available; use SCRIMED Run Control as the local human AAL2 witness when browser or CI secret placement is blocked.",
+      "Delete or rotate temporary GitHub secrets or local clipboard token material immediately after the run.",
       "Persist evidence only through the protected Manual QA Evidence route.",
       "Export Buyer Diligence only after safe metadata is retained and packet hashes are visible."
     ],
@@ -818,6 +877,17 @@ export function getQaEvidenceLedger() {
     tokenPolicy: salesDemoSessionQaTokenPolicy,
     qaBuyerProofReleaseStatus,
     qaManualExecutionConsoleStatus,
+    qaAal2RunEvidenceStatus,
+    qaAal2RunEvidence: {
+      route: qaAal2RunEvidenceRoute,
+      apiRoute: qaAal2RunEvidenceApiRoute,
+      briefRoute: qaAal2RunEvidenceBriefRoute,
+      protectedRoute: qaAal2RunEvidenceProtectedRoute,
+      status: qaAal2RunEvidenceStatus,
+      proofStackStatus: qaAal2RunEvidenceProofStackStatus,
+      briefProofStackStatus: qaAal2RunEvidenceBriefProofStackStatus,
+      boundary: qaAal2RunEvidenceBoundary
+    },
     qaManualExecutionConsole: {
       route: qaManualExecutionConsoleRoute,
       apiRoute: qaManualExecutionConsoleApiRoute,
@@ -878,14 +948,14 @@ function hasForbiddenContent(value: unknown) {
     /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/,
     /sk-[A-Za-z0-9_-]{12,}/,
     /sbp_[A-Za-z0-9_-]{12,}/,
-    /Bearer\s+[A-Za-z0-9._-]+/i,
+    /Bearer\s+(eyJ[A-Za-z0-9._-]+|[A-Za-z0-9._-]{20,})/i,
     /patient\s*(id|identifier|mrn)/i,
     /member\s*(id|identifier)/i
   ].some((pattern) => pattern.test(text));
 }
 
 function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
 function isSafeIntakeId(value: string) {
@@ -903,8 +973,19 @@ function isSafeOptionalRoute(value: string) {
   return value.length === 0 || /^\/[A-Za-z0-9/_{}.[\]-]{1,220}$/.test(value);
 }
 
-function isValidWorkflowUrl(value: string) {
-  return /^https:\/\/github\.com\/temitayodahunsi777\/scrimed-site\/actions\/runs\/[0-9]+$/.test(value);
+export function isValidQaManualRunEvidenceRunId(value: string) {
+  return /^[0-9]{6,32}$/.test(value);
+}
+
+export function isValidQaManualRunEvidenceWorkflowUrl(value: string) {
+  return (
+    qaManualRunEvidenceGitHubRunUrlPattern.test(value) ||
+    qaManualRunEvidenceRunControlUrlPattern.test(value)
+  );
+}
+
+export function qaManualRunEvidenceWorkflowUrlRequirement() {
+  return "workflowRunUrl must point to a SCRIMED GitHub Actions run or SCRIMED Run Control URL.";
 }
 
 function isValidBaseUrl(value: string) {
@@ -964,12 +1045,12 @@ export function validateQaManualRunEvidenceInput(value: unknown) {
     errors.push("Body appears to contain secret-like, bearer-token-like, or regulated identifier content.");
   }
 
-  if (!/^[0-9]{6,32}$/.test(input.workflowRunId)) {
-    errors.push("workflowRunId must be the numeric GitHub Actions run ID.");
+  if (!isValidQaManualRunEvidenceRunId(input.workflowRunId)) {
+    errors.push("workflowRunId must be a numeric SCRIMED manual QA run ID.");
   }
 
-  if (!isValidWorkflowUrl(input.workflowRunUrl)) {
-    errors.push("workflowRunUrl must point to the SCRIMED GitHub Actions run URL.");
+  if (!isValidQaManualRunEvidenceWorkflowUrl(input.workflowRunUrl)) {
+    errors.push(qaManualRunEvidenceWorkflowUrlRequirement());
   }
 
   if (!isValidIsoTimestamp(input.executedAt)) {
@@ -1068,7 +1149,7 @@ export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) 
         "Renewal queue verified after write.",
         "Audited authority reference packet downloaded after audit event commit.",
         "No PHI, artifact, URL, credential, signature, legal opinion, security report, or live-care authority stored.",
-        "Temporary bearer token must be deleted or rotated after the run."
+        "Temporary session access material must be deleted or rotated after the run."
       ]
     : salesDemoSessionQaControls;
 
@@ -1101,7 +1182,7 @@ export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) 
     ...controls.map((control) => `- ${control}`),
     "",
     "## Remaining Boundaries",
-    "- This packet does not contain bearer tokens, refresh tokens, passwords, credentials, PHI, patient identifiers, payer member identifiers, source contracts, or regulated healthcare records.",
+    "- This packet does not contain access tokens, refresh tokens, passwords, credentials, PHI, patient identifiers, payer member identifiers, source contracts, or regulated healthcare records.",
     "- This packet documents a synthetic QA run only. It does not authorize live clinical execution, autonomous diagnosis, payer submission, patient outreach, compliance certification, security certification, reimbursement certainty, public distribution, or production connector activation.",
     "- Durable evidence storage remains gated until approved storage, retention, access review, legal hold, incident response, regional residency, and buyer authorization controls are complete."
   ].join("\n");
@@ -1205,6 +1286,14 @@ export function buildQaEvidenceBrief() {
     `- Workflow count: ${ledger.activationPlan.workflowCount}`,
     `- Completion criteria: ${ledger.activationPlan.completionCriteria.join("; ")}`,
     `- Boundary: ${ledger.activationPlan.unresolvedBoundary}`,
+    "",
+    "## Protected AAL2 Synthetic QA Run Evidence Package",
+    `- Status: ${ledger.qaAal2RunEvidence.status}`,
+    `- Route: ${ledger.qaAal2RunEvidence.route}`,
+    `- API: ${ledger.qaAal2RunEvidence.apiRoute}`,
+    `- Brief: ${ledger.qaAal2RunEvidence.briefRoute}`,
+    `- Protected route: ${ledger.qaAal2RunEvidence.protectedRoute}`,
+    `- Boundary: ${ledger.qaAal2RunEvidence.boundary}`,
     "",
     "## Next Recommended Build Step",
     ledger.nextRecommendedBuildStep

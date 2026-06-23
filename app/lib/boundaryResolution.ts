@@ -242,6 +242,8 @@ export function getBoundaryResolutionSummary() {
       "/qa-execution-readiness",
       "/qa-run-control",
       "/qa-launch-kit",
+      qaLedger.qaAal2RunEvidence.route,
+      qaLedger.qaAal2RunEvidence.apiRoute,
       "/qa-manual-execution-console",
       "/qa-completion-bridge",
       "/qa-claim-guard",
@@ -276,6 +278,9 @@ export function getBoundaryResolutionSummary() {
       qaLedger.route,
       qaLedger.apiRoute,
       qaLedger.briefRoute,
+      qaLedger.qaAal2RunEvidence.route,
+      qaLedger.qaAal2RunEvidence.apiRoute,
+      qaLedger.qaAal2RunEvidence.protectedRoute,
       "/qa-launch-kit",
       "/qa-manual-execution-console",
       "/qa-completion-bridge",
@@ -353,7 +358,7 @@ export function getBoundaryResolutionSummary() {
       "Escalate high-risk clinical, legal, privacy, security, payer, public-claims, or production connector requests to the retained owner instead of improvising."
     ],
     nextRecommendedBuildStep:
-      "Use /qa-claim-guard to keep buyer and external language inside current evidence while /qa-human-run-packet dispatches the first human AAL2 QA workflow, /qa-manual-execution-console coordinates protected operator state, /qa-completion-bridge validates candidate metadata, protected persistence records the safe evidence packet, /qa-activation-seal confirms final seal posture, /qa-proof-promotion gates retained packet language, and /qa-buyer-proof-release decides whether Buyer Diligence may reference retained proof.",
+      "Use /qa-aal2-run-evidence as the buyer-safe evidence package, /qa-claim-guard to keep buyer and external language inside current evidence, /qa-human-run-packet to dispatch the first human AAL2 QA workflow, /qa-manual-execution-console to coordinate protected operator state, /qa-completion-bridge to validate candidate metadata, protected persistence to record the safe evidence packet, /qa-activation-seal to confirm final seal posture, /qa-proof-promotion to gate retained packet language, and /qa-buyer-proof-release to decide whether Buyer Diligence may reference retained proof.",
     records,
     updated: "2026-06-22"
   };

@@ -1,12 +1,12 @@
 # SCRIMED AI Platform
 
-SCRIMED is an AI-driven healthcare intelligence platform designed to support clinical decision-making, workflow automation, and population health insights through advanced artificial intelligence systems.
+SCRIMED is an AI-driven healthcare operations intelligence platform for governed synthetic pilots, evidence-backed workflow coordination, buyer diligence, and enterprise readiness.
 
 Official website: https://www.scrimedsolutions.com
 
-The mission of SCRIMED is to help modernize healthcare operations, improve patient outcomes, and reduce systemic inefficiencies by building trustworthy, scalable AI infrastructure for the healthcare ecosystem.
+The mission of SCRIMED is to help modernize healthcare operations, improve decision visibility, and reduce systemic inefficiencies by building trustworthy, scalable AI infrastructure for the healthcare ecosystem.
 
-Current product boundary: this repository presents SCRIMED as a governed synthetic pilot and enterprise evaluation product. It does not execute live clinical care, autonomous diagnosis, payer submission, patient outreach, or production medical-record workflows.
+Current product boundary: this repository presents SCRIMED as a governed synthetic pilot and enterprise evaluation product. Public positioning must remain operations-first: workflow intelligence, evidence organization, audit readiness, buyer diligence, and controlled synthetic evaluation. It does not execute live clinical care, autonomous diagnosis, treatment recommendation, payer submission, patient outreach, or production medical-record workflows.
 
 Enterprise readiness boundary: `/trust-center` and `/claims` expose accountable legal, security, privacy, brand, governance, marketing, PR, sales, advertising, and claims-control readiness. These surfaces are operational registers, not legal advice, certification, regulatory approval, or authorization for live clinical execution.
 
@@ -18,13 +18,15 @@ Global reach boundary: `/global-reach`, `/api/global-reach`, and `/api/global-re
 
 Clinical authority boundary: `/clinical-authority-readiness`, `/api/clinical-authority-readiness`, `/api/clinical-authority-readiness/brief`, `/pilot-workspace/access#clinical-authority-evidence-room`, `/pilot-workspace/access#clinical-authority-owner-matrix`, `/pilot-workspace/access#clinical-authority-artifact-intake`, `/pilot-workspace/access#authority-artifact-references`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix/packet`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake`, `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-artifact-intake/packet`, `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references`, `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/renewal-queue`, and `/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet` expose hard-gate preparation and protected no-PHI evidence, owner routing, external artifact intake criteria, metadata-only external reference status, renewal queue actions, and authenticated QA verification for live clinical care authority, PHI processing, legal approval, regional regulatory approval, reimbursement review, security certification, connector acceptance, and production clinical authorization. This is readiness only. It is not legal advice, privacy advice, reimbursement advice, security certification, clinical validation, regional regulatory approval, PHI processing authority, production authorization, artifact storage, signed approval, or live clinical-care authority.
 
+Approvals readiness boundary: `/approvals-readiness`, `/api/approvals-readiness`, and `/api/approvals-readiness/brief` organize the operating ladder for public claims, HIPAA/BAA readiness, SOC 2/HITRUST assurance, FDA/CDS/SaMD classification, ONC/interoperability acceptance, state care-delivery review, and buyer-specific release gates. This is approval preparation only. It is not legal approval, HIPAA certification, SOC 2 certification, HITRUST certification, FDA clearance, ONC certification, reimbursement certainty, PHI processing authority, production connector approval, public customer permission, or live clinical-care authority.
+
 ---
 
 ## Core Vision
 
-Healthcare systems today operate with fragmented data, administrative overload, and limited decision support. SCRIMED aims to serve as an intelligence layer that sits above existing healthcare infrastructure and enables organizations to:
+Healthcare systems today operate with fragmented data, administrative overload, and limited operational visibility. SCRIMED aims to serve as an intelligence layer that sits above existing healthcare infrastructure and enables organizations to:
 
-- Improve clinical decision support
+- Improve operational decision visibility
 - Automate operational workflows
 - Enhance healthcare accessibility
 - Reduce administrative burden on clinicians
@@ -36,14 +38,14 @@ Healthcare systems today operate with fragmented data, administrative overload, 
 
 SCRIMED is being designed as a modular AI platform consisting of several core components:
 
-### Clinical Copilot
-AI-assisted support for clinicians that helps summarize patient data, generate insights, and assist with documentation.
+### Clinical Operations Copilot
+AI-assisted synthetic-pilot support that helps organize operational evidence, prepare documentation workflows, and route human review without creating diagnosis, treatment, or live-care authority.
 
 ### DocuTwin
 Automated medical documentation generation from structured and conversational inputs.
 
 ### CarePath AI
-Patient intake, triage support, and care navigation optimization.
+Synthetic care-navigation and operational pathway optimization for enterprise evaluation. It does not triage patients or authorize clinical action.
 
 ### TrialCore
 AI-assisted clinical trial discovery and patient matching.
@@ -157,6 +159,7 @@ Core enterprise evaluation surfaces:
 - `/pilots` - structured sellable programs with measurable decision criteria and governance gates
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
 - `/clinical-authority-readiness` - hard-gate readiness for live clinical care authority, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production clinical authorization
+- `/approvals-readiness` - operating ladder for public claims, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer release gates
 - `/pilot-workspace/access#clinical-authority-evidence-room` - AAL2 protected no-PHI clinical authority evidence assembly for reviewer owners, retained gates, audit history, expiration posture, and readiness packet export
 - `/pilot-workspace/access#clinical-authority-owner-matrix` - AAL2 protected no-PHI approver routing for customer, SCRIMED, and qualified external authority owners
 - `/pilot-workspace/access#clinical-authority-artifact-intake` - AAL2 protected no-PHI checklist for external artifact systems, reviewer roles, validation timestamps, expiration cadences, and prohibited-content controls
@@ -185,6 +188,8 @@ Core APIs:
 - `/api/commercial/pricing`
 - `/api/clinical-authority-readiness`
 - `/api/clinical-authority-readiness/brief`
+- `/api/approvals-readiness`
+- `/api/approvals-readiness/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`

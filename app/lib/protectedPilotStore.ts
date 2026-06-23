@@ -3155,6 +3155,37 @@ export async function recordBuyerPilotRoomPacketDownload(
   };
 }
 
+export async function recordProtectedBuyerReleaseControlRunPacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-buyer-release-control-chain",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      releaseAuthority: "not-release-approval",
+      shareAuthority: "qualified-human-review-required",
+      legalAuthority: "not-legal-approval",
+      privacyAuthority: "not-privacy-approval",
+      securityCertification: "not-security-certified",
+      clinicalGoLiveAuthority: "not-authorized-live-care",
+      phiAuthority: "not-authorized-production-phi",
+      reimbursementAuthority: "no-reimbursement-guarantee",
+      productionAuthority: "not-production-authorized"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordClinicalActivationDossierPacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,

@@ -29,6 +29,7 @@ import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
 import ProtectedAuthorityArtifactReferencePanel from "./ProtectedAuthorityArtifactReferencePanel";
+import ProtectedBuyerReleaseControlRunPanel from "./ProtectedBuyerReleaseControlRunPanel";
 import ProtectedClinicalAuthorityArtifactIntakePanel from "./ProtectedClinicalAuthorityArtifactIntakePanel";
 import ProtectedClinicalAuthorityEvidenceRoomPanel from "./ProtectedClinicalAuthorityEvidenceRoomPanel";
 import ProtectedClinicalAuthorityOwnerMatrixPanel from "./ProtectedClinicalAuthorityOwnerMatrixPanel";
@@ -4818,6 +4819,13 @@ export default function ProtectedPilotAccess({
             }
             recipientWorkflow={protectedEvidenceRoomRecipientAttestationWorkflow}
             workflow={protectedEvidenceRoomAccessLogReconciliationWorkflow}
+          />
+
+          <ProtectedBuyerReleaseControlRunPanel
+            key={`buyer-release-control-${selectedWorkspace.slug}`}
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
           />
 
           <ProtectedEvidenceRoomProviderAdapterPanel

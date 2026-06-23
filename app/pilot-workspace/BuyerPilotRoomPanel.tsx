@@ -109,6 +109,20 @@ export default function BuyerPilotRoomPanel({
           <strong>{room.evidenceCounts.commandSnapshots}</strong>
         </article>
         <article>
+          <span>Buyer exports</span>
+          <strong>{room.evidenceCounts.buyerDiligenceExports}</strong>
+        </article>
+        <article>
+          <span>Share gates</span>
+          <strong>
+            {room.buyerSpecificRelease.readyGates}/{room.buyerSpecificRelease.gateCount}
+          </strong>
+        </article>
+        <article>
+          <span>Share state</span>
+          <strong>{room.buyerSpecificRelease.status}</strong>
+        </article>
+        <article>
           <span>Manual QA</span>
           <strong>{room.evidenceCounts.manualQaEvidencePackets}</strong>
         </article>
@@ -124,6 +138,73 @@ export default function BuyerPilotRoomPanel({
           <span>Controls</span>
           <strong>{room.diligenceControls.length}</strong>
         </article>
+      </div>
+
+      <div className="demo-runbook" aria-label="Buyer diligence export audit posture">
+        <div className="section-heading">
+          <p className="eyebrow">Export audit posture</p>
+          <h2>Keep buyer proof release tied to retained packet-download evidence.</h2>
+          <p className="section-copy">{room.exportAudit.evidence}</p>
+        </div>
+        {[
+          `Status: ${room.exportAudit.status}`,
+          `Retained exports: ${room.exportAudit.eventCount}`,
+          `Latest audit event: ${room.exportAudit.latestEventId ?? "not available"}`,
+          `Latest timestamp: ${room.exportAudit.latestEventAt ?? "not available"}`,
+          `Next: ${room.exportAudit.nextAction}`
+        ].map((item, index) => (
+          <article className="module-row" key={item}>
+            <div>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h2>{item}</h2>
+            </div>
+            <p>
+              Export audit evidence remains synthetic-only and tenant-scoped. It supports protected buyer
+              diligence, not public release, PHI processing, clinical care authority, certification, or
+              reimbursement claims.
+            </p>
+          </article>
+        ))}
+      </div>
+
+      <div className="demo-runbook" aria-label="Buyer-specific share readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Buyer-specific share readiness</p>
+          <h2>Keep protected proof internal until the release-control ladder is complete.</h2>
+          <p className="section-copy">
+            {room.buyerSpecificRelease.readyGates}/{room.buyerSpecificRelease.gateCount} gates ready;
+            share state is {room.buyerSpecificRelease.shareState}. {room.buyerSpecificRelease.nextAction}
+          </p>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{room.buyerSpecificRelease.shareState}</span>
+            <h2>{room.buyerSpecificRelease.allowedUse}</h2>
+          </div>
+          <strong className={stateClass(room.buyerSpecificRelease.status)}>
+            {stateLabel(room.buyerSpecificRelease.status)}
+          </strong>
+          <p>
+            External sharing still requires buyer-specific scope, qualified human approvals, external authority
+            references, recipient controls, and access-log reconciliation. This room does not approve public release,
+            PHI processing, live clinical care, reimbursement claims, certification claims, or production connectors.
+          </p>
+        </article>
+        {room.buyerSpecificRelease.gates.map((gate) => (
+          <article className="module-row" key={gate.id}>
+            <div>
+              <span>{gate.signal.latestEventAt ?? "pending signal"}</span>
+              <h2>{gate.label}</h2>
+            </div>
+            <strong className={stateClass(gate.status)}>{stateLabel(gate.status)}</strong>
+            <p>{gate.evidence}</p>
+            <p>{gate.requiredBeforeExternalShare}</p>
+            <div>
+              <strong>{gate.signal.latestEventId ?? "No retained audit signal yet"}</strong>
+              <p>{gate.nextAction}</p>
+            </div>
+          </article>
+        ))}
       </div>
 
       <div className="demo-runbook" aria-label="Command Intelligence buyer timeline">

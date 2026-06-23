@@ -67,7 +67,7 @@ const completionCheckpoints: QaCompletionBridgeCheckpoint[] = [
     checkpoint: "No-secret candidate validation",
     state: "validated-by-bridge",
     owner: "TrustOS and release engineering",
-    evidenceRequired: "Safe metadata only, accepted attestations, valid GitHub run URL, ISO timestamp, and UUID evidence object IDs.",
+    evidenceRequired: "Safe metadata only, accepted attestations, valid GitHub Actions or SCRIMED Run Control URL, ISO timestamp, and UUID evidence object IDs.",
     passSignal: "The public bridge returns ready-for-protected-persistence and a packet preview SHA-256.",
     failClosedIf: "The payload contains bearer/JWT-like material, PHI, payer member data, credentials, invalid attestations, or unsupported workflow kind."
   },
