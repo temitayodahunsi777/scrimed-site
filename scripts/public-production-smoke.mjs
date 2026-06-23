@@ -202,6 +202,42 @@ function requireApprovalsReadinessBoundary(label, response) {
   }
 }
 
+function requireReleaseContinuityBoundary(label, response) {
+  const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const releaseAuthority = response.headers.get("x-scrimed-release-authority");
+  const releaseContinuity = response.headers.get("x-scrimed-release-continuity");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+  const tokenHandling = response.headers.get("x-scrimed-token-handling");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (approvalAuthority !== "external-review-required") {
+    throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (releaseAuthority !== "not-release-approval") {
+    throw new Error(`${label} expected x-scrimed-release-authority not-release-approval but received ${releaseAuthority}.`);
+  }
+
+  if (!["live-checkpointed-aal2-boundary", "brief-operator-boundary"].includes(releaseContinuity ?? "")) {
+    throw new Error(`${label} expected release continuity boundary header but received ${releaseContinuity}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+
+  if (tokenHandling !== "no-token-values-exposed-or-retained") {
+    throw new Error(`${label} expected x-scrimed-token-handling no-token-values-exposed-or-retained but received ${tokenHandling}.`);
+  }
+}
+
 function requireQaExecutionBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
@@ -592,6 +628,32 @@ async function checkProductConsole() {
 
   if (body.proofStack?.passkeyTenantAuthentication !== "passkey-or-magic-link-plus-aal2") {
     throw new Error("product console missing passkey tenant authentication proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.releaseContinuity !==
+    "release-continuity-checkpointed-aal2-boundary"
+  ) {
+    throw new Error("product console missing release continuity proof-stack posture.");
+  }
+
+  if (
+    body.proofStack?.releaseContinuityBrief !==
+    "release-continuity-brief-operator-ready"
+  ) {
+    throw new Error("product console missing release continuity brief proof-stack posture.");
+  }
+
+  if (!body.releaseContinuityGateCount || body.releaseContinuityGateCount < 5) {
+    throw new Error("product console expected release continuity gate coverage.");
+  }
+
+  if (!body.releaseContinuityPassedCheckCount || body.releaseContinuityPassedCheckCount < 4) {
+    throw new Error("product console expected release continuity passed-check coverage.");
+  }
+
+  if (!body.releaseContinuityOperatorRequiredGateCount) {
+    throw new Error("product console expected release continuity AAL2 operator gate coverage.");
   }
 
   if (
@@ -3453,6 +3515,73 @@ async function checkApprovalsReadiness() {
   console.log("pass approvals readiness");
 }
 
+async function checkReleaseContinuity() {
+  const result = await request("/api/release-continuity");
+  requireStatus("Release Continuity", result.response.status, 200);
+  requireContentType("Release Continuity", result.response, "application/json");
+  requireReleaseContinuityBoundary("Release Continuity", result.response);
+  const body = requireJson("Release Continuity", result.body);
+
+  if (body.service !== "scrimed-release-continuity") {
+    throw new Error(`Release Continuity expected scrimed-release-continuity but received ${body.service}.`);
+  }
+
+  if (body.status !== "release-continuity-checkpointed-aal2-boundary") {
+    throw new Error(`Release Continuity expected checkpointed status but received ${body.status}.`);
+  }
+
+  if (body.authorizationStatus !== "public-release-evidence-only-protected-aal2-required") {
+    throw new Error("Release Continuity must preserve protected AAL2 authorization boundary.");
+  }
+
+  if (body.tokenHandling !== "no-token-values-exposed-or-retained") {
+    throw new Error("Release Continuity must preserve no-token exposure boundary.");
+  }
+
+  if (body.phiAuthority !== "not-authorized-production-phi") {
+    throw new Error("Release Continuity must keep PHI authority blocked.");
+  }
+
+  if (body.releaseAuthority !== "not-release-approval") {
+    throw new Error("Release Continuity must not create release authority.");
+  }
+
+  if (!Array.isArray(body.gates) || body.gates.length < 5) {
+    throw new Error("Release Continuity expected at least five gates.");
+  }
+
+  if (!body.gates.some((gate) => gate.key === "protected-aal2-happy-path")) {
+    throw new Error("Release Continuity expected protected AAL2 happy-path gate.");
+  }
+
+  if (!body.gates.some((gate) => gate.key === "secret-handling")) {
+    throw new Error("Release Continuity expected secret-handling gate.");
+  }
+
+  if (!Array.isArray(body.checks) || body.checks.length < 6) {
+    throw new Error("Release Continuity expected release checks.");
+  }
+
+  const brief = await request("/api/release-continuity/brief");
+  requireStatus("Release Continuity brief", brief.response.status, 200);
+  requireContentType("Release Continuity brief", brief.response, "text/markdown");
+  requireReleaseContinuityBoundary("Release Continuity brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Release Continuity Brief")) {
+    throw new Error("Release Continuity brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not release approval")) {
+    throw new Error("Release Continuity brief missing release boundary.");
+  }
+
+  if (!brief.body.text.includes("does not mint tokens")) {
+    throw new Error("Release Continuity brief missing token boundary.");
+  }
+
+  console.log("pass release continuity");
+}
+
 async function checkClinicalAuthorityReadiness() {
   const result = await request("/api/clinical-authority-readiness");
   requireStatus("Clinical Authority Readiness", result.response.status, 200);
@@ -3555,6 +3684,7 @@ await checkHtml("/public-market-readiness");
 await checkHtml("/global-reach");
 await checkHtml("/boundary-resolution");
 await checkHtml("/approvals-readiness");
+await checkHtml("/release-continuity");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
@@ -3567,6 +3697,7 @@ await checkHtml("/qa-buyer-proof-release");
 await checkHtml("/buyer-release-control-run");
 await checkHtml("/qa-manual-execution-console");
 await checkHtml("/qa-aal2-run-evidence");
+await checkReleaseContinuity();
 await checkApprovalsReadiness();
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();

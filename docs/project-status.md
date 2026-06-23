@@ -2,6 +2,14 @@
 
 Updated: 2026-06-23
 
+## Latest Release Continuity Boundary Release
+
+- Added `/release-continuity`, `/api/release-continuity`, and `/api/release-continuity/brief` as the operating lane for production-domain smoke, source-control checkpointing, protected fail-closed checks, human AAL2 operator proof, and no-secret token-handling workarounds.
+- Wired Release Continuity into the Product Console, Product Readiness Brief, buyer decision paths, dashboard counters, proof-stack status, README, systems map, and public smoke coverage.
+- Captured the current baseline as production domain `https://app.scrimedsolutions.com`, deployment `dpl_EjfSCM5YKpWhHKDAa6FGmNDPnJ7K`, commit `6219f3616e71d163edd047e4d55074cc5089e2b8`, and tag `scrimed-code-pt2-approvals-readiness-20260623`.
+- Reclassified the remaining authenticated terminal gap as an intentional human AAL2 operator boundary: use `/pilot-workspace/access` with an active AAL2 browser session where possible, or use a fresh short-lived `SCRIMED_BEARER_TOKEN` for one deliberate CLI smoke run and dispose of it immediately after recording only no-secret evidence fields.
+- Preserved the boundary: Release Continuity does not mint tokens, store secrets, bypass AAL2, approve buyer release, authorize PHI processing, certify security or compliance, grant legal approval, approve production connectors, guarantee reimbursement, or authorize live clinical care.
+
 ## Latest Approvals Readiness Operating Ladder Release
 
 - Added `/approvals-readiness`, `/api/approvals-readiness`, and `/api/approvals-readiness/brief` as the operating ladder for public claims, HIPAA/BAA readiness, SOC 2/HITRUST assurance, FDA/CDS/SaMD classification, ONC/interoperability acceptance, state care-delivery review, and buyer-specific release gates.

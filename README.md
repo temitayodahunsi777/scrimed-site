@@ -20,6 +20,8 @@ Clinical authority boundary: `/clinical-authority-readiness`, `/api/clinical-aut
 
 Approvals readiness boundary: `/approvals-readiness`, `/api/approvals-readiness`, and `/api/approvals-readiness/brief` organize the operating ladder for public claims, HIPAA/BAA readiness, SOC 2/HITRUST assurance, FDA/CDS/SaMD classification, ONC/interoperability acceptance, state care-delivery review, and buyer-specific release gates. This is approval preparation only. It is not legal approval, HIPAA certification, SOC 2 certification, HITRUST certification, FDA clearance, ONC certification, reimbursement certainty, PHI processing authority, production connector approval, public customer permission, or live clinical-care authority.
 
+Release continuity boundary: `/release-continuity`, `/api/release-continuity`, and `/api/release-continuity/brief` tie production deployment proof, source-control checkpoints, public smoke, protected fail-closed checks, and the human AAL2 operator boundary into one operating lane. This is release evidence only. It does not mint tokens, store secrets, bypass AAL2, approve buyer release, authorize PHI processing, certify security or compliance, grant legal approval, or authorize live clinical care.
+
 ---
 
 ## Core Vision
@@ -115,6 +117,7 @@ Current focus areas include:
 - clinical authority readiness with hard-gate preparation for live care, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production authorization
 - protected clinical authority evidence rooms with AAL2 no-PHI reviewer owners, retained authority gates, expiration posture, audit history, and audited authority evidence packets
 - protected clinical authority owner matrices with customer, SCRIMED, and qualified external approver routing for every hard gate
+- release continuity with production-domain smoke, GitHub commit/tag checkpointing, no-secret AAL2 operator workarounds, and protected fail-closed route proof
 
 ---
 
@@ -160,6 +163,7 @@ Core enterprise evaluation surfaces:
 - `/pricing` - pricing tiers, sales motion, value metrics, and commercial guardrails
 - `/clinical-authority-readiness` - hard-gate readiness for live clinical care authority, PHI, legal approval, regional approval, reimbursement, security certification, connectors, and production clinical authorization
 - `/approvals-readiness` - operating ladder for public claims, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer release gates
+- `/release-continuity` - production/source checkpoint, public smoke, protected fail-closed checks, AAL2 operator boundary, and no-secret workaround lane
 - `/pilot-workspace/access#clinical-authority-evidence-room` - AAL2 protected no-PHI clinical authority evidence assembly for reviewer owners, retained gates, audit history, expiration posture, and readiness packet export
 - `/pilot-workspace/access#clinical-authority-owner-matrix` - AAL2 protected no-PHI approver routing for customer, SCRIMED, and qualified external authority owners
 - `/pilot-workspace/access#clinical-authority-artifact-intake` - AAL2 protected no-PHI checklist for external artifact systems, reviewer roles, validation timestamps, expiration cadences, and prohibited-content controls
@@ -190,6 +194,8 @@ Core APIs:
 - `/api/clinical-authority-readiness/brief`
 - `/api/approvals-readiness`
 - `/api/approvals-readiness/brief`
+- `/api/release-continuity`
+- `/api/release-continuity/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`

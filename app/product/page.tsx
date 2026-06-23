@@ -89,6 +89,18 @@ export default function ProductConsolePage() {
           <strong>{summary.approvalsReadinessBlockedBeforeApprovalCount}</strong>
         </article>
         <article>
+          <span>Release gates</span>
+          <strong>{summary.releaseContinuityGateCount}</strong>
+        </article>
+        <article>
+          <span>Release checks</span>
+          <strong>{summary.releaseContinuityPassedCheckCount}/{summary.releaseContinuityCheckCount}</strong>
+        </article>
+        <article>
+          <span>AAL2 operator gate</span>
+          <strong>{summary.releaseContinuityOperatorRequiredGateCount}</strong>
+        </article>
+        <article>
           <span>Boundary records</span>
           <strong>{summary.boundaryResolutionRecordCount}</strong>
         </article>

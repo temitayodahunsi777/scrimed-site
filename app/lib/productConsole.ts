@@ -32,6 +32,11 @@ import {
   getApprovalsReadinessSummary
 } from "./approvalsReadiness";
 import {
+  getReleaseContinuitySummary,
+  releaseContinuityBriefProofStackStatus,
+  releaseContinuityProofStackStatus
+} from "./releaseContinuity";
+import {
   boundaryResolutionBriefProofStackStatus,
   boundaryResolutionProofStackStatus,
   getBoundaryResolutionSummary
@@ -657,6 +662,14 @@ export const buyerActions: BuyerAction[] = [
       "Approvals Readiness organizes evidence and workarounds; it is not legal approval, HIPAA certification, FDA clearance, ONC certification, security certification, PHI authority, or live clinical authority."
   },
   {
+    label: "Review Release Continuity",
+    href: "/release-continuity",
+    purpose:
+      "Inspect the live production checkpoint, GitHub release marker, public smoke posture, protected AAL2 boundary, and operator workaround path.",
+    boundary:
+      "Release Continuity proves operational readiness and source alignment; it does not mint tokens, bypass AAL2, approve buyer release, certify compliance, authorize PHI, or authorize live clinical care."
+  },
+  {
     label: "Inspect Product Demos",
     href: "/demos",
     purpose: "Review executable buyer demos with guided steps, proof routes, outcomes, and explicit production exclusions.",
@@ -760,6 +773,17 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
       "Claims controls, HIPAA/BAA readiness, security assurance tracks, protected provider security reviews, audit logs, review packets, and no-PHI evidence-room boundaries.",
     boundary:
       "Readiness metadata is not security approval, legal advice, compliance certification, executed BAA/DPA, or production authorization."
+  },
+  {
+    audience: "Founder or release operator",
+    primaryQuestion: "Is the production release checkpointed, smoke-tested, and safely bounded for protected proof?",
+    recommendedStart: "Start with Release Continuity, then run protected workspace checks from the browser AAL2 session.",
+    route: "/release-continuity",
+    supportingRoutes: ["/product", "/pilot-workspace/access", "/buyer-release-control-run", "/qa-run-control"],
+    proof:
+      "Production domain, source-control baseline, smoke checks, fail-closed protected routes, token-handling boundary, and AAL2 operator workaround.",
+    boundary:
+      "Release continuity is operational evidence only; protected happy-path proof still requires an approved human AAL2 session and no token storage."
   },
   {
     audience: "Investor or board reviewer",
@@ -869,6 +893,7 @@ export function getProductConsoleSummary() {
   const marketActivationSummary = getMarketActivationSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
   const approvalsReadinessSummary = getApprovalsReadinessSummary();
+  const releaseContinuitySummary = getReleaseContinuitySummary();
   const boundaryResolutionSummary = getBoundaryResolutionSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
@@ -921,6 +946,9 @@ export function getProductConsoleSummary() {
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
     healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    releaseContinuityRoute: releaseContinuitySummary.route,
+    releaseContinuityApiRoute: releaseContinuitySummary.apiRoute,
+    releaseContinuityBriefRoute: releaseContinuitySummary.briefRoute,
     approvalsReadinessRoute: approvalsReadinessSummary.route,
     approvalsReadinessApiRoute: approvalsReadinessSummary.apiRoute,
     approvalsReadinessBriefRoute: approvalsReadinessSummary.briefRoute,
@@ -1122,6 +1150,12 @@ export function getProductConsoleSummary() {
     clinicalCareActivationStatus: clinicalCareActivationSummary.status,
     clinicalCareActivationGateCount: clinicalCareActivationSummary.gateCount,
     clinicalCareActivationBlockedCapabilityCount: clinicalCareActivationSummary.blockedCapabilities.length,
+    releaseContinuityGateCount: releaseContinuitySummary.gateCount,
+    releaseContinuityResolvedGateCount: releaseContinuitySummary.resolvedGateCount,
+    releaseContinuityOperatorRequiredGateCount:
+      releaseContinuitySummary.operatorRequiredGateCount,
+    releaseContinuityCheckCount: releaseContinuitySummary.checkCount,
+    releaseContinuityPassedCheckCount: releaseContinuitySummary.passedCheckCount,
     approvalsReadinessStatus: approvalsReadinessSummary.status,
     approvalsReadinessTrackCount: approvalsReadinessSummary.trackCount,
     approvalsReadinessAgentControlCount: approvalsReadinessSummary.agentControlCount,
@@ -1290,6 +1324,7 @@ export function getProductConsoleSummary() {
     deploymentProfileSummary,
     marketActivationSummary,
     globalPartnerLocalizationSummary,
+    releaseContinuitySummary,
     approvalsReadinessSummary,
     boundaryResolutionSummary,
     clinicalAuthorityReadinessSummary,
@@ -1312,6 +1347,8 @@ export function getProductConsoleSummary() {
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
     proofStack: {
+      releaseContinuity: releaseContinuityProofStackStatus,
+      releaseContinuityBrief: releaseContinuityBriefProofStackStatus,
       approvalsReadiness: approvalsReadinessStatus,
       approvalsReadinessBrief: approvalsReadinessBriefStatus,
       clinicalAuthorityReadiness: clinicalAuthorityReadinessStatus,
@@ -1486,7 +1523,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Release Continuity to keep production, GitHub, smoke checks, and AAL2 operator boundaries checkpointed after every deploy; use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-23"
   };
 }
@@ -1504,6 +1541,18 @@ export function getProductReadinessBrief() {
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
     "",
     "## Product Demos and Pilot Programs",
+    `Release Continuity: ${summary.releaseContinuityRoute}`,
+    `Release Continuity API: ${summary.releaseContinuityApiRoute}`,
+    `Release Continuity Brief: ${summary.releaseContinuityBriefRoute}`,
+    `Release Continuity Gates: ${summary.releaseContinuityGateCount}`,
+    `Release Continuity Resolved Gates: ${summary.releaseContinuityResolvedGateCount}`,
+    `Release Continuity AAL2 Operator Gates: ${summary.releaseContinuityOperatorRequiredGateCount}`,
+    `Release Continuity Checks: ${summary.releaseContinuityCheckCount}`,
+    `Release Continuity Passed Checks: ${summary.releaseContinuityPassedCheckCount}`,
+    summary.releaseContinuitySummary.boundary,
+    ...summary.releaseContinuitySummary.gates.map(
+      (gate) => `- Release continuity gate: ${gate.name} (${gate.status}) -> ${gate.workaround}`
+    ),
     `Boundary Resolution Register: ${summary.boundaryResolutionRoute}`,
     `Boundary Resolution API: ${summary.boundaryResolutionApiRoute}`,
     `Boundary Resolution Brief: ${summary.boundaryResolutionBriefRoute}`,
