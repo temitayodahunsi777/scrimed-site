@@ -117,6 +117,22 @@ export default function ProductConsolePage() {
           <strong>{summary.navigationAuditSmokeCoveredHtmlRouteCount}</strong>
         </article>
         <article>
+          <span>Reliability controls</span>
+          <strong>{summary.serviceReliabilityControlCount}</strong>
+        </article>
+        <article>
+          <span>Reliability gates</span>
+          <strong>{summary.serviceReliabilityOpenGateCount}</strong>
+        </article>
+        <article>
+          <span>Fault classes</span>
+          <strong>{summary.serviceReliabilityFaultClassCount}</strong>
+        </article>
+        <article>
+          <span>Efficiency fixes</span>
+          <strong>{summary.serviceReliabilityEfficiencyImprovementCount}</strong>
+        </article>
+        <article>
           <span>Boundary records</span>
           <strong>{summary.boundaryResolutionRecordCount}</strong>
         </article>
@@ -316,6 +332,42 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED service reliability">
+        <div className="section-heading">
+          <p className="eyebrow">Service reliability</p>
+          <h2>Every product/service barrier now has an owner, mitigation, proof route, and retained boundary.</h2>
+          <p className="section-copy">{summary.serviceReliabilitySummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.serviceReliabilityRoute}>
+              Open Service Reliability
+            </Link>
+            <a className="secondary-action" href={summary.serviceReliabilityBriefRoute}>
+              Download Reliability Brief
+            </a>
+            <Link className="secondary-action" href={summary.navigationAuditRoute}>
+              Audit Navigation
+            </Link>
+          </div>
+        </div>
+        {summary.serviceReliabilitySummary.productServiceControls.slice(0, 6).map((control) => (
+          <article className="module-row" key={control.name}>
+            <div>
+              <span>{control.status}</span>
+              <h2>{control.name}</h2>
+            </div>
+            <p>{control.barrier}</p>
+            <div>
+              <strong>{control.mitigation}</strong>
+              <ul className="compact-list">
+                <li>Owner: {control.owner}</li>
+                <li>Proof routes: {control.proofRoutes.join(", ")}</li>
+                <li>{control.retainedBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED manual QA execution console">

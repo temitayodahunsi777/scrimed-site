@@ -12,13 +12,14 @@ Surfaces:
 - `/product`
 - `/hub`
 - `/release-continuity`
+- `/service-reliability`
 
 Current source totals:
 
-- Page routes: 101
-- API route patterns: 241
+- Page routes: 102
+- API route patterns: 243
 - Navigation groups: 8
-- Public smoke HTML routes: 25
+- Public smoke HTML routes: 26
 
 Boundaries:
 

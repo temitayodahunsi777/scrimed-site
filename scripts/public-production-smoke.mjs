@@ -288,6 +288,45 @@ function requireNavigationAuditBoundary(label, response) {
   }
 }
 
+function requireServiceReliabilityBoundary(label, response) {
+  const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const financialAuthority = response.headers.get("x-scrimed-financial-authority");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const releaseAuthority = response.headers.get("x-scrimed-release-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+  const serviceReliability = response.headers.get("x-scrimed-service-reliability");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (approvalAuthority !== "external-review-required") {
+    throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (financialAuthority !== "not-audited-financial-report") {
+    throw new Error(`${label} expected x-scrimed-financial-authority not-audited-financial-report but received ${financialAuthority}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (releaseAuthority !== "not-release-approval") {
+    throw new Error(`${label} expected x-scrimed-release-authority not-release-approval but received ${releaseAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+
+  if (![
+    "service-reliability-hardening-active",
+    "service-reliability-brief-ready"
+  ].includes(serviceReliability ?? "")) {
+    throw new Error(`${label} expected service reliability boundary header but received ${serviceReliability}.`);
+  }
+}
+
 function requireQaExecutionBoundary(label, response) {
   const aal2Execution = response.headers.get("x-scrimed-aal2-execution");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
@@ -714,11 +753,11 @@ async function checkProductConsole() {
     throw new Error("product console missing navigation audit brief proof-stack posture.");
   }
 
-  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 101) {
+  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 102) {
     throw new Error("product console expected navigation audit page route coverage.");
   }
 
-  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 241) {
+  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 243) {
     throw new Error("product console expected navigation audit API route coverage.");
   }
 
@@ -726,8 +765,32 @@ async function checkProductConsole() {
     throw new Error("product console expected navigation group coverage.");
   }
 
-  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 25) {
+  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 26) {
     throw new Error("product console expected smoke-covered HTML route coverage.");
+  }
+
+  if (body.proofStack?.serviceReliability !== "service-reliability-hardening-active") {
+    throw new Error("product console missing service reliability proof-stack posture.");
+  }
+
+  if (body.proofStack?.serviceReliabilityBrief !== "service-reliability-brief-ready") {
+    throw new Error("product console missing service reliability brief proof-stack posture.");
+  }
+
+  if (!body.serviceReliabilityControlCount || body.serviceReliabilityControlCount < 10) {
+    throw new Error("product console expected service reliability control coverage.");
+  }
+
+  if (!body.serviceReliabilityFaultClassCount || body.serviceReliabilityFaultClassCount < 8) {
+    throw new Error("product console expected service reliability fault-class coverage.");
+  }
+
+  if (!body.serviceReliabilityEfficiencyImprovementCount || body.serviceReliabilityEfficiencyImprovementCount < 6) {
+    throw new Error("product console expected service reliability efficiency coverage.");
+  }
+
+  if (!body.serviceReliabilityOpenGateCount || body.serviceReliabilityOpenGateCount < 4) {
+    throw new Error("product console expected service reliability open-gate coverage.");
   }
 
   if (
@@ -3691,8 +3754,16 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /navigation in page route inventory.");
   }
 
+  if (!body.pageRouteInventory.includes("/service-reliability")) {
+    throw new Error("Navigation Audit expected /service-reliability in page route inventory.");
+  }
+
   if (!Array.isArray(body.smokeCoveredHtmlRoutes) || !body.smokeCoveredHtmlRoutes.includes("/navigation")) {
     throw new Error("Navigation Audit expected /navigation in smoke-covered HTML routes.");
+  }
+
+  if (!body.smokeCoveredHtmlRoutes.includes("/service-reliability")) {
+    throw new Error("Navigation Audit expected /service-reliability in smoke-covered HTML routes.");
   }
 
   if (!Array.isArray(body.bottlenecks) || !body.bottlenecks.some((bottleneck) => bottleneck.status === "operator-required")) {
@@ -3724,6 +3795,80 @@ async function checkNavigationAudit() {
   }
 
   console.log("pass navigation audit");
+}
+
+async function checkServiceReliability() {
+  const result = await request("/api/service-reliability");
+  requireStatus("Service Reliability", result.response.status, 200);
+  requireContentType("Service Reliability", result.response, "application/json");
+  requireServiceReliabilityBoundary("Service Reliability", result.response);
+  const body = requireJson("Service Reliability", result.body);
+
+  if (body.service !== "scrimed-service-reliability") {
+    throw new Error(`Service Reliability expected scrimed-service-reliability but received ${body.service}.`);
+  }
+
+  if (body.status !== "service-reliability-hardening-active") {
+    throw new Error(`Service Reliability expected active status but received ${body.status}.`);
+  }
+
+  if (body.authority?.releaseAuthority !== "not-release-approval") {
+    throw new Error("Service Reliability must not create release authority.");
+  }
+
+  if (body.authority?.phiAuthority !== "not-authorized-production-phi") {
+    throw new Error("Service Reliability must keep PHI authority blocked.");
+  }
+
+  if (!Array.isArray(body.productServiceControls) || body.productServiceControls.length < 10) {
+    throw new Error("Service Reliability expected product/service control coverage.");
+  }
+
+  if (!Array.isArray(body.faultClasses) || body.faultClasses.length < 8) {
+    throw new Error("Service Reliability expected fault-class coverage.");
+  }
+
+  if (!Array.isArray(body.efficiencyImprovements) || body.efficiencyImprovements.length < 6) {
+    throw new Error("Service Reliability expected efficiency-improvement coverage.");
+  }
+
+  if (!body.operatorRequiredControlCount) {
+    throw new Error("Service Reliability expected an operator-required control.");
+  }
+
+  if (!body.externalReviewControlCount) {
+    throw new Error("Service Reliability expected external-review controls.");
+  }
+
+  if (!body.protectedGateControlCount) {
+    throw new Error("Service Reliability expected protected-gated controls.");
+  }
+
+  const sourcePageRouteCount = await countRouteFiles("app", "page.tsx");
+  const sourceApiRoutePatternCount = await countRouteFiles("app/api", "route.ts");
+
+  if (body.sourceAlignment?.pageRouteCount !== sourcePageRouteCount) {
+    throw new Error(`Service Reliability page route count mismatch. API reported ${body.sourceAlignment?.pageRouteCount}; source has ${sourcePageRouteCount}.`);
+  }
+
+  if (body.sourceAlignment?.apiRoutePatternCount !== sourceApiRoutePatternCount) {
+    throw new Error(`Service Reliability API route count mismatch. API reported ${body.sourceAlignment?.apiRoutePatternCount}; source has ${sourceApiRoutePatternCount}.`);
+  }
+
+  const brief = await request("/api/service-reliability/brief");
+  requireStatus("Service Reliability brief", brief.response.status, 200);
+  requireContentType("Service Reliability brief", brief.response, "text/markdown");
+  requireServiceReliabilityBoundary("Service Reliability brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Service Reliability Brief")) {
+    throw new Error("Service Reliability brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not release approval")) {
+    throw new Error("Service Reliability brief missing release boundary.");
+  }
+
+  console.log("pass service reliability");
 }
 
 async function checkClinicalAuthorityReadiness() {
@@ -3830,6 +3975,7 @@ await checkHtml("/boundary-resolution");
 await checkHtml("/approvals-readiness");
 await checkHtml("/release-continuity");
 await checkHtml("/navigation");
+await checkHtml("/service-reliability");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
@@ -3844,6 +3990,7 @@ await checkHtml("/qa-manual-execution-console");
 await checkHtml("/qa-aal2-run-evidence");
 await checkReleaseContinuity();
 await checkNavigationAudit();
+await checkServiceReliability();
 await checkApprovalsReadiness();
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();

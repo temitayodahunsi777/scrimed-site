@@ -27,7 +27,7 @@ export type NavigationBottleneck = {
 export const navigationAuditProofStackStatus = "route-navigation-audit-active";
 export const navigationAuditBriefProofStackStatus = "route-navigation-audit-brief-ready";
 export const navigationAuditUpdatedAt = "2026-06-23";
-export const expectedApiRoutePatternCount = 241;
+export const expectedApiRoutePatternCount = 243;
 
 export const navigationAuditBoundary =
   "SCRIMED Navigation Audit organizes page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained approval boundaries into one operating map. It is an audit and navigation control surface only. It does not certify that every protected workflow has been executed, bypass AAL2, approve public release, authorize PHI processing, grant legal or clinical authority, certify security/compliance, or approve production connectors.";
@@ -106,6 +106,7 @@ export const pageRouteInventory = [
   "/release-continuity",
   "/sales-attribution",
   "/sales-operations",
+  "/service-reliability",
   "/source-intelligence",
   "/strategic-intelligence",
   "/synthetic",
@@ -150,6 +151,7 @@ export const smokeCoveredHtmlRoutes = [
   "/boundary-resolution",
   "/approvals-readiness",
   "/release-continuity",
+  "/service-reliability",
   "/qa-execution-readiness",
   "/qa-run-control",
   "/qa-launch-kit",
@@ -169,7 +171,7 @@ export const navigationGroups: NavigationGroup[] = [
     name: "Executive command",
     purpose: "Give founders, buyers, operators, and reviewers a short path into the active operating surfaces.",
     owner: "Founder + Product Console",
-    routes: ["/", "/hub", "/product", "/navigation", "/pilot-evidence"],
+    routes: ["/", "/hub", "/product", "/navigation", "/service-reliability", "/pilot-evidence"],
     auditStatus: "linked",
     evidence: "Homepage, Hub, Product Console, and this audit route cross-link the highest-signal operating lanes.",
     retainedBoundary: "Navigation links are operating guidance, not proof of protected execution."
@@ -202,7 +204,8 @@ export const navigationGroups: NavigationGroup[] = [
       "/clinical-authority-readiness",
       "/clinical-care-activation",
       "/public-market-readiness",
-      "/release-continuity"
+      "/release-continuity",
+      "/service-reliability"
     ],
     auditStatus: "smoke-covered",
     evidence: "Public smoke checks HTML, JSON APIs, Markdown briefs, boundary headers, and Product Console proof-stack posture for these lanes.",
@@ -305,6 +308,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/trust-os",
       "/trust-safety-operations",
       "/claims",
+      "/service-reliability",
       "/market-activation",
       "/global-reach",
       "/sales-attribution",

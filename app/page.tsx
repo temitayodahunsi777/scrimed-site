@@ -58,6 +58,11 @@ const homepageDecisionPaths = [
     summary: "Review page inventory, API route count, route groups, smoke coverage, protected fail-closed checks, and retained AAL2 boundaries."
   },
   {
+    audience: "Reliability and execution owners",
+    route: "/service-reliability",
+    summary: "Review product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries."
+  },
+  {
     audience: "Security and compliance",
     route: "/trust-center",
     summary: "Review claims controls, privacy posture, protected workspaces, auditability, and diligence gates."
@@ -98,6 +103,7 @@ const readinessSignals = [
   { label: "Pricing", value: "/api/commercial/pricing" },
   { label: "Authority", value: "/api/clinical-authority-readiness" },
   { label: "Navigation", value: "/api/navigation-audit" },
+  { label: "Reliability", value: "/api/service-reliability" },
   { label: "Global", value: "/api/global-reach" },
   { label: "Operations", value: "/api/operations/readiness" },
   { label: "Trust Center", value: "/api/enterprise-readiness" },
@@ -150,6 +156,7 @@ export default function Home() {
             <Link href="/clinical-authority-readiness">Authority</Link>
             <Link href="/global-reach">Global</Link>
             <Link href="/navigation">Navigation</Link>
+            <Link href="/service-reliability">Reliability</Link>
             <Link href="/trust-center">Trust Center</Link>
             <Link href="/pilot">Pilot</Link>
             <Link href="/hub">Hub</Link>
@@ -173,6 +180,7 @@ export default function Home() {
               <Link className="secondary-action" href="/clinical-authority-readiness">Review Authority Readiness</Link>
               <Link className="secondary-action" href="/global-reach">Review Global Reach</Link>
               <Link className="secondary-action" href="/navigation">Audit Navigation</Link>
+              <Link className="secondary-action" href="/service-reliability">Review Reliability</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
               <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
               <Link className="secondary-action" href="/trust-os">Run TrustOS Decision</Link>
@@ -224,6 +232,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Navigation audit route inventory active
+              </div>
+              <div>
+                <span className="trace-dot" /> Service reliability controls and fault classes mapped
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Global buyer and partner packs active

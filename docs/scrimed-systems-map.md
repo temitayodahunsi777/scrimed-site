@@ -12,6 +12,7 @@ Primary surfaces:
 
 - `/product`
 - `/navigation`
+- `/service-reliability`
 - `/release-continuity`
 - `/buyer-release-control-run`
 - `/qa-evidence`
@@ -26,6 +27,26 @@ Rules:
 - Public copy can describe workflow intelligence, evidence organization, synthetic evaluation, audit readiness, and buyer diligence.
 - Public copy must not claim diagnosis, treatment recommendation, live clinical care authority, PHI processing authority, HIPAA/SOC/FDA certification, reimbursement certainty, or production connector approval.
 - Public APIs must fail closed for tenant-scoped proof, packet, or approval surfaces.
+
+## Service Reliability Lane
+
+Purpose: keep product/service controls, known fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries in one hardening map.
+
+Primary surfaces:
+
+- `/service-reliability`
+- `/api/service-reliability`
+- `/api/service-reliability/brief`
+- `/product`
+- `/hub`
+- `/navigation`
+- `/release-continuity`
+
+Rules:
+
+- Service Reliability can expose barriers, mitigations, owners, proof routes, source alignment, open gates, and fault classes.
+- It must not claim release approval, legal approval, HIPAA/SOC/FDA/ONC/security certification, PHI authority, public customer proof, reimbursement assurance, production connector approval, or live clinical care authority.
+- Newly discovered faults or bottlenecks should be added here before buyer language or public release claims expand.
 
 ## Navigation Audit Lane
 

@@ -59,6 +59,7 @@ import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getGlobalPartnerLocalizationSummary } from "./globalPartnerLocalization";
 import { getClinicalAuthorityReadinessSummary } from "./clinicalAuthorityReadiness";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
+import { getServiceReliabilitySummary } from "./serviceReliability";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
 import {
   buyerDemoExecutionBriefApiRoute,
@@ -290,6 +291,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Product Console, Release Steward, TrustOS, and operations",
     objective: "Keep page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review boundaries in one navigable route map."
+  },
+  {
+    name: "Service Reliability",
+    route: "/service-reliability",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Product Console, Release Steward, TrustOS, operations, and qualified reviewers",
+    objective: "Map product and service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries into one hardening lane."
   }
 ];
 
@@ -298,6 +307,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Quality gates", value: "active", tone: "good" },
   { name: "Repository", value: "main baseline documented", tone: "good" },
   { name: "Navigation audit", value: "route inventory active", tone: "good" },
+  { name: "Service reliability", value: "controls and fault classes mapped", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
@@ -506,6 +516,12 @@ export const hubRoutes = [
   "/healthcare-intelligence-os",
   "/agent-workspace",
   "/pilot-evidence",
+  "/navigation",
+  "/api/navigation-audit",
+  "/api/navigation-audit/brief",
+  "/service-reliability",
+  "/api/service-reliability",
+  "/api/service-reliability/brief",
   qaEvidenceLedgerRoute,
   "/qa-launch-kit",
   "/api/qa-evidence/launch-kit",
@@ -766,6 +782,7 @@ export function getHubSummary() {
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
+  const serviceReliabilitySummary = getServiceReliabilitySummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
   const qaClaimGuardSummary = getQaClaimGuardSummary();
@@ -800,6 +817,7 @@ export function getHubSummary() {
     globalPartnerLocalizationSummary,
     clinicalAuthorityReadinessSummary,
     trustSafetyOperationsSummary,
+    serviceReliabilitySummary,
     qaEvidenceLedger,
     qaCompletionBridgeSummary,
     qaClaimGuardSummary,

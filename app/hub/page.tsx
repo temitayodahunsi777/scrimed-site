@@ -23,6 +23,11 @@ const consoleViews = [
     summary: "Review page route inventory, API route pattern counts, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review boundaries."
   },
   {
+    name: "Service Reliability",
+    href: "/service-reliability",
+    summary: "Review product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained authority boundaries."
+  },
+  {
     name: "Pilot Deal Room",
     href: "/pilot-deal-room",
     summary: "Review the organized buyer path from public product proof to sales opportunity, protected Buyer Pilot Room, audited packet, and paid synthetic pilot."
@@ -336,6 +341,14 @@ export default function HubPage() {
         <article>
           <span>Authority fixes</span>
           <strong>{summary.clinicalAuthorityReadinessSummary.containedWithWorkaroundCount}</strong>
+        </article>
+        <article>
+          <span>Reliability controls</span>
+          <strong>{summary.serviceReliabilitySummary.controlCount}</strong>
+        </article>
+        <article>
+          <span>Fault classes</span>
+          <strong>{summary.serviceReliabilitySummary.faultClassCount}</strong>
         </article>
       </section>
 

@@ -2,6 +2,13 @@
 
 Updated: 2026-06-23
 
+## Latest Service Reliability Release
+
+- Added `/service-reliability`, `/api/service-reliability`, and `/api/service-reliability/brief` as the product/service hardening lane for controls, fault classes, efficiency improvements, owners, proof routes, and retained authority boundaries.
+- Wired Service Reliability into the homepage, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, and public smoke coverage.
+- Added `docs/service-reliability.md` so future barriers, bottlenecks, and newly discovered fault classes have a clear operator routine before claims expand.
+- Preserved the boundary: Service Reliability does not approve release, certify security/compliance, grant legal approval, authorize PHI processing, bypass AAL2, approve production connectors, authorize public customer proof, guarantee reimbursement, or authorize live clinical care.
+
 ## Latest Navigation Audit Release
 
 - Added `/navigation`, `/api/navigation-audit`, and `/api/navigation-audit/brief` as the route-control lane for page route inventory, API route pattern counts, navigation groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks.
