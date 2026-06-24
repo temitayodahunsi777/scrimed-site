@@ -26,8 +26,8 @@ export type NavigationBottleneck = {
 
 export const navigationAuditProofStackStatus = "route-navigation-audit-active";
 export const navigationAuditBriefProofStackStatus = "route-navigation-audit-brief-ready";
-export const navigationAuditUpdatedAt = "2026-06-23";
-export const expectedApiRoutePatternCount = 243;
+export const navigationAuditUpdatedAt = "2026-06-24";
+export const expectedApiRoutePatternCount = 245;
 
 export const navigationAuditBoundary =
   "SCRIMED Navigation Audit organizes page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained approval boundaries into one operating map. It is an audit and navigation control surface only. It does not certify that every protected workflow has been executed, bypass AAL2, approve public release, authorize PHI processing, grant legal or clinical authority, certify security/compliance, or approve production connectors.";
@@ -43,6 +43,7 @@ export const pageRouteInventory = [
   "/audit",
   "/boundary-resolution",
   "/buyer-release-control-run",
+  "/capital-vitality",
   "/claims",
   "/clinical-authority-readiness",
   "/clinical-care-activation",
@@ -152,6 +153,7 @@ export const smokeCoveredHtmlRoutes = [
   "/approvals-readiness",
   "/release-continuity",
   "/service-reliability",
+  "/capital-vitality",
   "/qa-execution-readiness",
   "/qa-run-control",
   "/qa-launch-kit",
@@ -171,7 +173,7 @@ export const navigationGroups: NavigationGroup[] = [
     name: "Executive command",
     purpose: "Give founders, buyers, operators, and reviewers a short path into the active operating surfaces.",
     owner: "Founder + Product Console",
-    routes: ["/", "/hub", "/product", "/navigation", "/service-reliability", "/pilot-evidence"],
+    routes: ["/", "/hub", "/product", "/navigation", "/service-reliability", "/capital-vitality", "/pilot-evidence"],
     auditStatus: "linked",
     evidence: "Homepage, Hub, Product Console, and this audit route cross-link the highest-signal operating lanes.",
     retainedBoundary: "Navigation links are operating guidance, not proof of protected execution."
@@ -188,6 +190,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/pilots",
       "/pilots/[slug]",
       "/pilot",
+      "/capital-vitality",
       "/sales-operations"
     ],
     auditStatus: "smoke-covered",
@@ -204,6 +207,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/clinical-authority-readiness",
       "/clinical-care-activation",
       "/public-market-readiness",
+      "/capital-vitality",
       "/release-continuity",
       "/service-reliability"
     ],
@@ -362,6 +366,15 @@ export const navigationBottlenecks: NavigationBottleneck[] = [
     impact: "Navigation can show approval tracks, but SCRIMED cannot self-certify legal, security, HIPAA, FDA, ONC, reimbursement, or clinical-use authority.",
     workaround: "Keep approval routes claims-controlled, attach only qualified external evidence, and preserve no-authority headers until formal approval exists.",
     owner: "Founder + qualified external reviewers"
+  },
+  {
+    name: "Capital and securities boundaries",
+    status: "external-review-required",
+    impact:
+      "Revenue, moat, investor, and funding readiness can be mistaken for securities offering material, audited financial reporting, valuation assurance, or investment advice.",
+    workaround:
+      "Use /capital-vitality for readiness-only proof, keep no-securities/no-advice headers visible, and route fundraising, valuation, legal, tax, and investor-solicitation materials through qualified counsel.",
+    owner: "Founder + qualified counsel + finance reviewers"
   },
   {
     name: "Local shell runtime path",

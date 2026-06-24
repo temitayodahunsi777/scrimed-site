@@ -1,6 +1,13 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-23
+Updated: 2026-06-24
+
+## Latest Capital Vitality Release
+
+- Added `/capital-vitality`, `/api/capital-vitality`, and `/api/capital-vitality/brief` as the governed growth lane for revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates.
+- Wired Capital Vitality into the homepage, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, and public smoke coverage.
+- Added `docs/capital-vitality.md` so revenue, funding, and investor materials have an operating routine before claims expand.
+- Preserved the boundary: Capital Vitality is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, customer revenue guarantee, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.
 
 ## Latest Service Reliability Release
 

@@ -63,6 +63,11 @@ const homepageDecisionPaths = [
     summary: "Review product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries."
   },
   {
+    audience: "Revenue, board, and funding reviewers",
+    route: "/capital-vitality",
+    summary: "Review revenue capabilities, competitive moat evidence, investor milestones, funding workstreams, and retained external-review gates."
+  },
+  {
     audience: "Security and compliance",
     route: "/trust-center",
     summary: "Review claims controls, privacy posture, protected workspaces, auditability, and diligence gates."
@@ -84,8 +89,8 @@ const homepageDecisionPaths = [
   },
   {
     audience: "Investors and board reviewers",
-    route: "/public-market-readiness",
-    summary: "Review KPI discipline, unit economics, customer proof, model-efficiency controls, and investor narrative."
+    route: "/capital-vitality",
+    summary: "Review capital vitality, KPI discipline, unit economics, moat proof, customer proof, and investor narrative without securities or valuation claims."
   },
   {
     audience: "Enterprise pilot sponsors",
@@ -104,6 +109,7 @@ const readinessSignals = [
   { label: "Authority", value: "/api/clinical-authority-readiness" },
   { label: "Navigation", value: "/api/navigation-audit" },
   { label: "Reliability", value: "/api/service-reliability" },
+  { label: "Capital", value: "/api/capital-vitality" },
   { label: "Global", value: "/api/global-reach" },
   { label: "Operations", value: "/api/operations/readiness" },
   { label: "Trust Center", value: "/api/enterprise-readiness" },
@@ -157,6 +163,7 @@ export default function Home() {
             <Link href="/global-reach">Global</Link>
             <Link href="/navigation">Navigation</Link>
             <Link href="/service-reliability">Reliability</Link>
+            <Link href="/capital-vitality">Capital</Link>
             <Link href="/trust-center">Trust Center</Link>
             <Link href="/pilot">Pilot</Link>
             <Link href="/hub">Hub</Link>
@@ -181,6 +188,7 @@ export default function Home() {
               <Link className="secondary-action" href="/global-reach">Review Global Reach</Link>
               <Link className="secondary-action" href="/navigation">Audit Navigation</Link>
               <Link className="secondary-action" href="/service-reliability">Review Reliability</Link>
+              <Link className="secondary-action" href="/capital-vitality">Review Capital Vitality</Link>
               <Link className="secondary-action" href="/evaluation">Run Evaluation</Link>
               <Link className="secondary-action" href="/trust-center">Review Trust Center</Link>
               <Link className="secondary-action" href="/trust-os">Run TrustOS Decision</Link>
@@ -235,6 +243,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="trace-dot" /> Service reliability controls and fault classes mapped
+              </div>
+              <div>
+                <span className="trace-dot trace-dot-alt" /> Capital vitality lane packages revenue, moat, and funding readiness
               </div>
               <div>
                 <span className="trace-dot trace-dot-alt" /> Global buyer and partner packs active

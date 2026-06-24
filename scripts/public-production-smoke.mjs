@@ -106,6 +106,60 @@ function requirePublicMarketBoundary(label, response) {
   }
 }
 
+function requireCapitalVitalityBoundary(label, response) {
+  const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const capitalVitality = response.headers.get("x-scrimed-capital-vitality");
+  const financialAuthority = response.headers.get("x-scrimed-financial-authority");
+  const investmentAdvice = response.headers.get("x-scrimed-investment-advice");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const securitiesAuthority = response.headers.get("x-scrimed-securities-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+  const valuationAuthority = response.headers.get("x-scrimed-valuation-authority");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (approvalAuthority !== "external-review-required") {
+    throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (![
+    "capital-vitality-revenue-funding-readiness-active",
+    "capital-vitality-brief-ready-no-securities-offer"
+  ].includes(capitalVitality ?? "")) {
+    throw new Error(`${label} expected capital vitality boundary header but received ${capitalVitality}.`);
+  }
+
+  if (financialAuthority !== "not-audited-financial-report") {
+    throw new Error(`${label} expected x-scrimed-financial-authority not-audited-financial-report but received ${financialAuthority}.`);
+  }
+
+  if (investmentAdvice !== "not-investment-advice") {
+    throw new Error(`${label} expected x-scrimed-investment-advice not-investment-advice but received ${investmentAdvice}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (reimbursementAuthority !== "no-reimbursement-guarantee") {
+    throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (securitiesAuthority !== "not-securities-offering-material") {
+    throw new Error(`${label} expected x-scrimed-securities-authority not-securities-offering-material but received ${securitiesAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+
+  if (valuationAuthority !== "not-valuation-assurance") {
+    throw new Error(`${label} expected x-scrimed-valuation-authority not-valuation-assurance but received ${valuationAuthority}.`);
+  }
+}
+
 function requireGlobalReachBoundary(label, response) {
   const globalAuthority = response.headers.get("x-scrimed-global-authority");
 
@@ -753,11 +807,11 @@ async function checkProductConsole() {
     throw new Error("product console missing navigation audit brief proof-stack posture.");
   }
 
-  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 102) {
+  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 103) {
     throw new Error("product console expected navigation audit page route coverage.");
   }
 
-  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 243) {
+  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 245) {
     throw new Error("product console expected navigation audit API route coverage.");
   }
 
@@ -765,7 +819,7 @@ async function checkProductConsole() {
     throw new Error("product console expected navigation group coverage.");
   }
 
-  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 26) {
+  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 27) {
     throw new Error("product console expected smoke-covered HTML route coverage.");
   }
 
@@ -791,6 +845,34 @@ async function checkProductConsole() {
 
   if (!body.serviceReliabilityOpenGateCount || body.serviceReliabilityOpenGateCount < 4) {
     throw new Error("product console expected service reliability open-gate coverage.");
+  }
+
+  if (body.proofStack?.capitalVitality !== "capital-vitality-revenue-funding-readiness-active") {
+    throw new Error("product console missing capital vitality proof-stack posture.");
+  }
+
+  if (body.proofStack?.capitalVitalityBrief !== "capital-vitality-brief-ready-no-securities-offer") {
+    throw new Error("product console missing capital vitality brief proof-stack posture.");
+  }
+
+  if (!body.capitalVitalityRevenueCapabilityCount || body.capitalVitalityRevenueCapabilityCount < 8) {
+    throw new Error("product console expected capital vitality revenue capability coverage.");
+  }
+
+  if (!body.capitalVitalityMoatSignalCount || body.capitalVitalityMoatSignalCount < 8) {
+    throw new Error("product console expected capital vitality moat signal coverage.");
+  }
+
+  if (!body.capitalVitalityInvestorMilestoneCount || body.capitalVitalityInvestorMilestoneCount < 8) {
+    throw new Error("product console expected capital vitality investor milestone coverage.");
+  }
+
+  if (!body.capitalVitalityFundingWorkstreamCount || body.capitalVitalityFundingWorkstreamCount < 8) {
+    throw new Error("product console expected capital vitality funding workstream coverage.");
+  }
+
+  if (!body.capitalVitalityRetainedExternalReviewCount || body.capitalVitalityRetainedExternalReviewCount < 4) {
+    throw new Error("product console expected capital vitality external review coverage.");
   }
 
   if (
@@ -3758,12 +3840,20 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /service-reliability in page route inventory.");
   }
 
+  if (!body.pageRouteInventory.includes("/capital-vitality")) {
+    throw new Error("Navigation Audit expected /capital-vitality in page route inventory.");
+  }
+
   if (!Array.isArray(body.smokeCoveredHtmlRoutes) || !body.smokeCoveredHtmlRoutes.includes("/navigation")) {
     throw new Error("Navigation Audit expected /navigation in smoke-covered HTML routes.");
   }
 
   if (!body.smokeCoveredHtmlRoutes.includes("/service-reliability")) {
     throw new Error("Navigation Audit expected /service-reliability in smoke-covered HTML routes.");
+  }
+
+  if (!body.smokeCoveredHtmlRoutes.includes("/capital-vitality")) {
+    throw new Error("Navigation Audit expected /capital-vitality in smoke-covered HTML routes.");
   }
 
   if (!Array.isArray(body.bottlenecks) || !body.bottlenecks.some((bottleneck) => bottleneck.status === "operator-required")) {
@@ -3871,6 +3961,92 @@ async function checkServiceReliability() {
   console.log("pass service reliability");
 }
 
+async function checkCapitalVitality() {
+  const result = await request("/api/capital-vitality");
+  requireStatus("Capital Vitality", result.response.status, 200);
+  requireContentType("Capital Vitality", result.response, "application/json");
+  requireCapitalVitalityBoundary("Capital Vitality", result.response);
+  const body = requireJson("Capital Vitality", result.body);
+
+  if (body.service !== "scrimed-capital-vitality") {
+    throw new Error(`Capital Vitality expected scrimed-capital-vitality but received ${body.service}.`);
+  }
+
+  if (body.status !== "capital-vitality-revenue-funding-readiness-active") {
+    throw new Error(`Capital Vitality expected active status but received ${body.status}.`);
+  }
+
+  if (body.fundingVitalityPosture !== "investor-ready-readiness-materials-no-securities-offer") {
+    throw new Error("Capital Vitality must preserve no-securities funding posture.");
+  }
+
+  if (body.authority?.securitiesAuthority !== "not-securities-offering-material") {
+    throw new Error("Capital Vitality must not create securities offering material.");
+  }
+
+  if (body.authority?.investmentAdvice !== "not-investment-advice") {
+    throw new Error("Capital Vitality must not create investment advice.");
+  }
+
+  if (body.authority?.valuationAuthority !== "not-valuation-assurance") {
+    throw new Error("Capital Vitality must not create valuation assurance.");
+  }
+
+  if (body.authority?.financialAuthority !== "not-audited-financial-report") {
+    throw new Error("Capital Vitality must not create audited financial reporting.");
+  }
+
+  if (!Array.isArray(body.revenueCapabilities) || body.revenueCapabilities.length < 8) {
+    throw new Error("Capital Vitality expected revenue capability coverage.");
+  }
+
+  if (!Array.isArray(body.competitiveMoatSignals) || body.competitiveMoatSignals.length < 8) {
+    throw new Error("Capital Vitality expected competitive moat signal coverage.");
+  }
+
+  if (!Array.isArray(body.investorReadinessMilestones) || body.investorReadinessMilestones.length < 8) {
+    throw new Error("Capital Vitality expected investor readiness milestone coverage.");
+  }
+
+  if (!Array.isArray(body.fundingVitalityWorkstreams) || body.fundingVitalityWorkstreams.length < 8) {
+    throw new Error("Capital Vitality expected funding workstream coverage.");
+  }
+
+  if (!body.proofRouteCount || body.proofRouteCount < 20) {
+    throw new Error("Capital Vitality expected proof-route coverage.");
+  }
+
+  const sourcePageRouteCount = await countRouteFiles("app", "page.tsx");
+  const sourceApiRoutePatternCount = await countRouteFiles("app/api", "route.ts");
+
+  if (body.sourceAlignment?.pageRouteCount !== sourcePageRouteCount) {
+    throw new Error(`Capital Vitality page route count mismatch. API reported ${body.sourceAlignment?.pageRouteCount}; source has ${sourcePageRouteCount}.`);
+  }
+
+  if (body.sourceAlignment?.apiRoutePatternCount !== sourceApiRoutePatternCount) {
+    throw new Error(`Capital Vitality API route count mismatch. API reported ${body.sourceAlignment?.apiRoutePatternCount}; source has ${sourceApiRoutePatternCount}.`);
+  }
+
+  const brief = await request("/api/capital-vitality/brief");
+  requireStatus("Capital Vitality brief", brief.response.status, 200);
+  requireContentType("Capital Vitality brief", brief.response, "text/markdown");
+  requireCapitalVitalityBoundary("Capital Vitality brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Capital Vitality Brief")) {
+    throw new Error("Capital Vitality brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not investment advice")) {
+    throw new Error("Capital Vitality brief missing investment advice boundary.");
+  }
+
+  if (!brief.body.text.includes("not securities offering material")) {
+    throw new Error("Capital Vitality brief missing securities boundary.");
+  }
+
+  console.log("pass capital vitality");
+}
+
 async function checkClinicalAuthorityReadiness() {
   const result = await request("/api/clinical-authority-readiness");
   requireStatus("Clinical Authority Readiness", result.response.status, 200);
@@ -3976,6 +4152,7 @@ await checkHtml("/approvals-readiness");
 await checkHtml("/release-continuity");
 await checkHtml("/navigation");
 await checkHtml("/service-reliability");
+await checkHtml("/capital-vitality");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
@@ -3991,6 +4168,7 @@ await checkHtml("/qa-aal2-run-evidence");
 await checkReleaseContinuity();
 await checkNavigationAudit();
 await checkServiceReliability();
+await checkCapitalVitality();
 await checkApprovalsReadiness();
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();

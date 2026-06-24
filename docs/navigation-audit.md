@@ -1,6 +1,6 @@
 # SCRIMED Navigation Audit
 
-Updated: 2026-06-23
+Updated: 2026-06-24
 
 SCRIMED Navigation Audit is the public route-control lane for page inventory, API route pattern count, smoke coverage, protected fail-closed checks, and retained approval boundaries.
 
@@ -13,18 +13,20 @@ Surfaces:
 - `/hub`
 - `/release-continuity`
 - `/service-reliability`
+- `/capital-vitality`
 
 Current source totals:
 
-- Page routes: 102
-- API route patterns: 243
+- Page routes: 103
+- API route patterns: 245
 - Navigation groups: 8
-- Public smoke HTML routes: 26
+- Public smoke HTML routes: 27
 
 Boundaries:
 
 - Navigation Audit is not release approval.
 - Navigation Audit is not legal, HIPAA, SOC 2, HITRUST, FDA, ONC, reimbursement, security, or clinical certification.
+- Navigation Audit does not create investment advice, securities offering material, audited financial reporting, valuation assurance, or revenue guarantees.
 - Navigation Audit does not authorize PHI processing, production connectors, public customer proof, external distribution, or live clinical care.
 - Protected happy-path evidence still requires an active human AAL2 session or a deliberate one-time short-lived operator token run with no token retention.
 

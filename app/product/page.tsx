@@ -133,6 +133,30 @@ export default function ProductConsolePage() {
           <strong>{summary.serviceReliabilityEfficiencyImprovementCount}</strong>
         </article>
         <article>
+          <span>Capital revenue</span>
+          <strong>{summary.capitalVitalityRevenueCapabilityCount}</strong>
+        </article>
+        <article>
+          <span>Packaged revenue</span>
+          <strong>{summary.capitalVitalityPackagedRevenueCapabilityCount}</strong>
+        </article>
+        <article>
+          <span>Moat signals</span>
+          <strong>{summary.capitalVitalityMoatSignalCount}</strong>
+        </article>
+        <article>
+          <span>Investor milestones</span>
+          <strong>{summary.capitalVitalityInvestorMilestoneCount}</strong>
+        </article>
+        <article>
+          <span>Funding streams</span>
+          <strong>{summary.capitalVitalityFundingWorkstreamCount}</strong>
+        </article>
+        <article>
+          <span>Capital review gates</span>
+          <strong>{summary.capitalVitalityRetainedExternalReviewCount}</strong>
+        </article>
+        <article>
           <span>Boundary records</span>
           <strong>{summary.boundaryResolutionRecordCount}</strong>
         </article>
@@ -332,6 +356,59 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED capital vitality">
+        <div className="section-heading">
+          <p className="eyebrow">Capital vitality</p>
+          <h2>Revenue capabilities, moat evidence, investor milestones, and funding workstreams are now one governed growth lane.</h2>
+          <p className="section-copy">{summary.capitalVitalitySummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.capitalVitalityRoute}>
+              Open Capital Vitality
+            </Link>
+            <a className="secondary-action" href={summary.capitalVitalityBriefRoute}>
+              Download Capital Brief
+            </a>
+            <Link className="secondary-action" href={summary.publicMarketReadinessRoute}>
+              Public Market Readiness
+            </Link>
+          </div>
+        </div>
+        {summary.capitalVitalitySummary.revenueCapabilities.slice(0, 5).map((capability) => (
+          <article className="module-row" key={capability.name}>
+            <div>
+              <span>{capability.status}</span>
+              <h2>{capability.name}</h2>
+            </div>
+            <p>{capability.revenueMotion}</p>
+            <div>
+              <strong>{capability.buyer}</strong>
+              <ul className="compact-list">
+                <li>{capability.priceLogic}</li>
+                <li>{capability.limitation}</li>
+                <li>Proof routes: {capability.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.capitalVitalitySummary.fundingVitalityWorkstreams.slice(0, 4).map((workstream) => (
+          <article className="module-row" key={workstream.name}>
+            <div>
+              <span>{workstream.status}</span>
+              <h2>{workstream.name}</h2>
+            </div>
+            <p>{workstream.capability}</p>
+            <div>
+              <strong>{workstream.owner}</strong>
+              <ul className="compact-list">
+                <li>Proof: {workstream.proof}</li>
+                <li>{workstream.limitation}</li>
+                <li>Next: {workstream.nextAction}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED service reliability">

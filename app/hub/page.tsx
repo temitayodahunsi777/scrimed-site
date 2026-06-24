@@ -28,6 +28,11 @@ const consoleViews = [
     summary: "Review product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained authority boundaries."
   },
   {
+    name: "Capital Vitality",
+    href: "/capital-vitality",
+    summary: "Review revenue capabilities, competitive moat evidence, investor milestones, funding workstreams, and retained external-review gates."
+  },
+  {
     name: "Pilot Deal Room",
     href: "/pilot-deal-room",
     summary: "Review the organized buyer path from public product proof to sales opportunity, protected Buyer Pilot Room, audited packet, and paid synthetic pilot."
@@ -349,6 +354,22 @@ export default function HubPage() {
         <article>
           <span>Fault classes</span>
           <strong>{summary.serviceReliabilitySummary.faultClassCount}</strong>
+        </article>
+        <article>
+          <span>Revenue capabilities</span>
+          <strong>{summary.capitalVitalitySummary.revenueCapabilityCount}</strong>
+        </article>
+        <article>
+          <span>Moat signals</span>
+          <strong>{summary.capitalVitalitySummary.moatSignalCount}</strong>
+        </article>
+        <article>
+          <span>Investor milestones</span>
+          <strong>{summary.capitalVitalitySummary.investorMilestoneCount}</strong>
+        </article>
+        <article>
+          <span>Funding workstreams</span>
+          <strong>{summary.capitalVitalitySummary.fundingWorkstreamCount}</strong>
         </article>
       </section>
 

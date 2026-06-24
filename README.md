@@ -26,6 +26,8 @@ Navigation audit boundary: `/navigation`, `/api/navigation-audit`, and `/api/nav
 
 Service reliability boundary: `/service-reliability`, `/api/service-reliability`, and `/api/service-reliability/brief` map product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries. This is reliability hardening only. It does not approve release, certify security/compliance, grant legal approval, authorize PHI processing, bypass AAL2, approve production connectors, authorize public customer proof, guarantee reimbursement, or authorize live clinical care.
 
+Capital vitality boundary: `/capital-vitality`, `/api/capital-vitality`, and `/api/capital-vitality/brief` organize revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates. This is growth readiness only. It is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, customer revenue guarantee, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.
+
 ---
 
 ## Core Vision
@@ -124,6 +126,7 @@ Current focus areas include:
 - release continuity with production-domain smoke, GitHub commit/tag checkpointing, no-secret AAL2 operator workarounds, and protected fail-closed route proof
 - navigation audit with page route inventory, API route pattern counts, route groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks
 - service reliability with product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries
+- capital vitality with revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates
 
 ---
 
@@ -171,6 +174,7 @@ Core enterprise evaluation surfaces:
 - `/approvals-readiness` - operating ladder for public claims, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer release gates
 - `/release-continuity` - production/source checkpoint, public smoke, protected fail-closed checks, AAL2 operator boundary, and no-secret workaround lane
 - `/service-reliability` - product/service reliability controls, known fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries
+- `/capital-vitality` - revenue capability, competitive moat, investor-readiness, funding workstream, proof-route, and external-review gate map
 - `/pilot-workspace/access#clinical-authority-evidence-room` - AAL2 protected no-PHI clinical authority evidence assembly for reviewer owners, retained gates, audit history, expiration posture, and readiness packet export
 - `/pilot-workspace/access#clinical-authority-owner-matrix` - AAL2 protected no-PHI approver routing for customer, SCRIMED, and qualified external authority owners
 - `/pilot-workspace/access#clinical-authority-artifact-intake` - AAL2 protected no-PHI checklist for external artifact systems, reviewer roles, validation timestamps, expiration cadences, and prohibited-content controls
@@ -205,6 +209,8 @@ Core APIs:
 - `/api/release-continuity/brief`
 - `/api/service-reliability`
 - `/api/service-reliability/brief`
+- `/api/capital-vitality`
+- `/api/capital-vitality/brief`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-evidence-room/packet`
 - `/api/pilot-workspaces/{workspaceSlug}/clinical-authority-owner-matrix`

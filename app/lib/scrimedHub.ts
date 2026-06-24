@@ -59,6 +59,7 @@ import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getGlobalPartnerLocalizationSummary } from "./globalPartnerLocalization";
 import { getClinicalAuthorityReadinessSummary } from "./clinicalAuthorityReadiness";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
+import { getCapitalVitalitySummary } from "./capitalVitality";
 import { getServiceReliabilitySummary } from "./serviceReliability";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
 import {
@@ -299,6 +300,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Product Console, Release Steward, TrustOS, operations, and qualified reviewers",
     objective: "Map product and service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries into one hardening lane."
+  },
+  {
+    name: "Capital Vitality",
+    route: "/capital-vitality",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Founder, Product Console, Sales Operations, Finance, and qualified reviewers",
+    objective: "Map revenue capabilities, competitive moat evidence, investor milestones, funding workstreams, proof routes, and retained external-review gates into one governed growth lane."
   }
 ];
 
@@ -308,6 +317,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Repository", value: "main baseline documented", tone: "good" },
   { name: "Navigation audit", value: "route inventory active", tone: "good" },
   { name: "Service reliability", value: "controls and fault classes mapped", tone: "good" },
+  { name: "Capital vitality", value: "revenue, moat, and funding readiness mapped", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
@@ -522,6 +532,9 @@ export const hubRoutes = [
   "/service-reliability",
   "/api/service-reliability",
   "/api/service-reliability/brief",
+  "/capital-vitality",
+  "/api/capital-vitality",
+  "/api/capital-vitality/brief",
   qaEvidenceLedgerRoute,
   "/qa-launch-kit",
   "/api/qa-evidence/launch-kit",
@@ -782,6 +795,7 @@ export function getHubSummary() {
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
+  const capitalVitalitySummary = getCapitalVitalitySummary();
   const serviceReliabilitySummary = getServiceReliabilitySummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
@@ -817,6 +831,7 @@ export function getHubSummary() {
     globalPartnerLocalizationSummary,
     clinicalAuthorityReadinessSummary,
     trustSafetyOperationsSummary,
+    capitalVitalitySummary,
     serviceReliabilitySummary,
     qaEvidenceLedger,
     qaCompletionBridgeSummary,
@@ -847,6 +862,6 @@ export function getHubSummary() {
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-22"
+    updated: "2026-06-24"
   };
 }

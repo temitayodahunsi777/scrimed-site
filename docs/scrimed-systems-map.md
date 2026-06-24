@@ -1,6 +1,6 @@
 # SCRIMED Systems Map
 
-Updated: 2026-06-23
+Updated: 2026-06-24
 
 This map organizes SCRIMED's current build into operating lanes. It is the first place to check before adding a new route, agent, proof packet, or buyer-facing claim.
 
@@ -13,6 +13,7 @@ Primary surfaces:
 - `/product`
 - `/navigation`
 - `/service-reliability`
+- `/capital-vitality`
 - `/release-continuity`
 - `/buyer-release-control-run`
 - `/qa-evidence`
@@ -27,6 +28,27 @@ Rules:
 - Public copy can describe workflow intelligence, evidence organization, synthetic evaluation, audit readiness, and buyer diligence.
 - Public copy must not claim diagnosis, treatment recommendation, live clinical care authority, PHI processing authority, HIPAA/SOC/FDA certification, reimbursement certainty, or production connector approval.
 - Public APIs must fail closed for tenant-scoped proof, packet, or approval surfaces.
+
+## Capital Vitality Lane
+
+Purpose: keep revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates in one governed growth map.
+
+Primary surfaces:
+
+- `/capital-vitality`
+- `/api/capital-vitality`
+- `/api/capital-vitality/brief`
+- `/product`
+- `/hub`
+- `/public-market-readiness`
+- `/pricing`
+- `/pilot-deal-room`
+
+Rules:
+
+- Capital Vitality can expose packaged revenue paths, moat evidence, investor diligence milestones, funding workstreams, and proof routes.
+- It must not claim investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, customer revenue guarantee, security certification, regulatory approval, PHI authority, production connector authority, or live clinical authority.
+- Funding, valuation, securities, legal, tax, audited-financial, and investor-solicitation materials require qualified external review before use.
 
 ## Service Reliability Lane
 
