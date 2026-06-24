@@ -1005,6 +1005,14 @@ h3 {
   padding-top: 8px;
 }
 
+.route-inventory-list {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.route-inventory-list li {
+  overflow-wrap: anywhere;
+}
+
 .code-block {
   background: #f7faf8;
   border: 1px solid var(--line);

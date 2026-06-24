@@ -18,6 +18,11 @@ const consoleViews = [
     summary: "Review SCRIMED Atlas Pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
   },
   {
+    name: "Navigation Audit",
+    href: "/navigation",
+    summary: "Review page route inventory, API route pattern counts, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review boundaries."
+  },
+  {
     name: "Pilot Deal Room",
     href: "/pilot-deal-room",
     summary: "Review the organized buyer path from public product proof to sales opportunity, protected Buyer Pilot Room, audited packet, and paid synthetic pilot."

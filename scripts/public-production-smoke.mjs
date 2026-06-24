@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 
+import { readdir } from "node:fs/promises";
+
 const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.com").replace(/\/$/, "");
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG ?? "atlas-synthetic-evaluation";
 
 function endpoint(path) {
   return `${baseUrl}${path}`;
+}
+
+async function countRouteFiles(root, fileName) {
+  const entries = await readdir(root, { recursive: true, withFileTypes: true });
+
+  return entries.filter((entry) => entry.isFile() && entry.name === fileName).length;
 }
 
 async function readResponse(response) {
@@ -235,6 +243,48 @@ function requireReleaseContinuityBoundary(label, response) {
 
   if (tokenHandling !== "no-token-values-exposed-or-retained") {
     throw new Error(`${label} expected x-scrimed-token-handling no-token-values-exposed-or-retained but received ${tokenHandling}.`);
+  }
+}
+
+function requireNavigationAuditBoundary(label, response) {
+  const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const functionAudit = response.headers.get("x-scrimed-function-audit");
+  const navigationAudit = response.headers.get("x-scrimed-navigation-audit");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const releaseAuthority = response.headers.get("x-scrimed-release-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (approvalAuthority !== "external-review-required") {
+    throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (![
+    "typecheck-build-smoke-plus-protected-fail-closed",
+    "brief-typecheck-build-smoke-plus-protected-fail-closed"
+  ].includes(functionAudit ?? "")) {
+    throw new Error(`${label} expected function audit boundary header but received ${functionAudit}.`);
+  }
+
+  if (![
+    "route-navigation-audit-active",
+    "route-navigation-audit-brief-ready"
+  ].includes(navigationAudit ?? "")) {
+    throw new Error(`${label} expected navigation audit boundary header but received ${navigationAudit}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (releaseAuthority !== "not-release-approval") {
+    throw new Error(`${label} expected x-scrimed-release-authority not-release-approval but received ${releaseAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
   }
 }
 
@@ -654,6 +704,30 @@ async function checkProductConsole() {
 
   if (!body.releaseContinuityOperatorRequiredGateCount) {
     throw new Error("product console expected release continuity AAL2 operator gate coverage.");
+  }
+
+  if (body.proofStack?.navigationAudit !== "route-navigation-audit-active") {
+    throw new Error("product console missing navigation audit proof-stack posture.");
+  }
+
+  if (body.proofStack?.navigationAuditBrief !== "route-navigation-audit-brief-ready") {
+    throw new Error("product console missing navigation audit brief proof-stack posture.");
+  }
+
+  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 101) {
+    throw new Error("product console expected navigation audit page route coverage.");
+  }
+
+  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 241) {
+    throw new Error("product console expected navigation audit API route coverage.");
+  }
+
+  if (!body.navigationAuditGroupCount || body.navigationAuditGroupCount < 8) {
+    throw new Error("product console expected navigation group coverage.");
+  }
+
+  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 25) {
+    throw new Error("product console expected smoke-covered HTML route coverage.");
   }
 
   if (
@@ -3582,6 +3656,76 @@ async function checkReleaseContinuity() {
   console.log("pass release continuity");
 }
 
+async function checkNavigationAudit() {
+  const result = await request("/api/navigation-audit");
+  requireStatus("Navigation Audit", result.response.status, 200);
+  requireContentType("Navigation Audit", result.response, "application/json");
+  requireNavigationAuditBoundary("Navigation Audit", result.response);
+  const body = requireJson("Navigation Audit", result.body);
+
+  if (body.service !== "scrimed-navigation-audit") {
+    throw new Error(`Navigation Audit expected scrimed-navigation-audit but received ${body.service}.`);
+  }
+
+  if (body.status !== "route-navigation-audit-active") {
+    throw new Error(`Navigation Audit expected active status but received ${body.status}.`);
+  }
+
+  if (body.coverage?.protectedCoverageStatus !== "fail-closed-publicly-aal2-required-for-happy-path") {
+    throw new Error("Navigation Audit must preserve protected fail-closed and AAL2 boundary status.");
+  }
+
+  if (body.coverage?.releaseAuthority !== "not-release-approval") {
+    throw new Error("Navigation Audit must not create release authority.");
+  }
+
+  if (body.coverage?.phiAuthority !== "not-authorized-production-phi") {
+    throw new Error("Navigation Audit must keep PHI authority blocked.");
+  }
+
+  if (!Array.isArray(body.groups) || body.groups.length < 8) {
+    throw new Error("Navigation Audit expected at least eight route groups.");
+  }
+
+  if (!Array.isArray(body.pageRouteInventory) || !body.pageRouteInventory.includes("/navigation")) {
+    throw new Error("Navigation Audit expected /navigation in page route inventory.");
+  }
+
+  if (!Array.isArray(body.smokeCoveredHtmlRoutes) || !body.smokeCoveredHtmlRoutes.includes("/navigation")) {
+    throw new Error("Navigation Audit expected /navigation in smoke-covered HTML routes.");
+  }
+
+  if (!Array.isArray(body.bottlenecks) || !body.bottlenecks.some((bottleneck) => bottleneck.status === "operator-required")) {
+    throw new Error("Navigation Audit expected an operator-required AAL2 bottleneck.");
+  }
+
+  const sourcePageRouteCount = await countRouteFiles("app", "page.tsx");
+  const sourceApiRoutePatternCount = await countRouteFiles("app/api", "route.ts");
+
+  if (body.sourceTotals?.pageRouteCount !== sourcePageRouteCount) {
+    throw new Error(`Navigation Audit page route count mismatch. API reported ${body.sourceTotals?.pageRouteCount}; source has ${sourcePageRouteCount}.`);
+  }
+
+  if (body.sourceTotals?.apiRoutePatternCount !== sourceApiRoutePatternCount) {
+    throw new Error(`Navigation Audit API route count mismatch. API reported ${body.sourceTotals?.apiRoutePatternCount}; source has ${sourceApiRoutePatternCount}.`);
+  }
+
+  const brief = await request("/api/navigation-audit/brief");
+  requireStatus("Navigation Audit brief", brief.response.status, 200);
+  requireContentType("Navigation Audit brief", brief.response, "text/markdown");
+  requireNavigationAuditBoundary("Navigation Audit brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Navigation Audit Brief")) {
+    throw new Error("Navigation Audit brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not release approval")) {
+    throw new Error("Navigation Audit brief missing release boundary.");
+  }
+
+  console.log("pass navigation audit");
+}
+
 async function checkClinicalAuthorityReadiness() {
   const result = await request("/api/clinical-authority-readiness");
   requireStatus("Clinical Authority Readiness", result.response.status, 200);
@@ -3685,6 +3829,7 @@ await checkHtml("/global-reach");
 await checkHtml("/boundary-resolution");
 await checkHtml("/approvals-readiness");
 await checkHtml("/release-continuity");
+await checkHtml("/navigation");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
@@ -3698,6 +3843,7 @@ await checkHtml("/buyer-release-control-run");
 await checkHtml("/qa-manual-execution-console");
 await checkHtml("/qa-aal2-run-evidence");
 await checkReleaseContinuity();
+await checkNavigationAudit();
 await checkApprovalsReadiness();
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();

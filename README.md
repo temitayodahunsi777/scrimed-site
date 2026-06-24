@@ -22,6 +22,8 @@ Approvals readiness boundary: `/approvals-readiness`, `/api/approvals-readiness`
 
 Release continuity boundary: `/release-continuity`, `/api/release-continuity`, and `/api/release-continuity/brief` tie production deployment proof, source-control checkpoints, public smoke, protected fail-closed checks, and the human AAL2 operator boundary into one operating lane. This is release evidence only. It does not mint tokens, store secrets, bypass AAL2, approve buyer release, authorize PHI processing, certify security or compliance, grant legal approval, or authorize live clinical care.
 
+Navigation audit boundary: `/navigation`, `/api/navigation-audit`, and `/api/navigation-audit/brief` organize page route inventory, API route pattern counts, route groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks. This is route-control evidence only. It does not approve release, certify every protected workflow execution, bypass AAL2, authorize PHI processing, certify security/compliance, grant legal approval, approve production connectors, or authorize live clinical care.
+
 ---
 
 ## Core Vision
@@ -118,6 +120,7 @@ Current focus areas include:
 - protected clinical authority evidence rooms with AAL2 no-PHI reviewer owners, retained authority gates, expiration posture, audit history, and audited authority evidence packets
 - protected clinical authority owner matrices with customer, SCRIMED, and qualified external approver routing for every hard gate
 - release continuity with production-domain smoke, GitHub commit/tag checkpointing, no-secret AAL2 operator workarounds, and protected fail-closed route proof
+- navigation audit with page route inventory, API route pattern counts, route groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks
 
 ---
 

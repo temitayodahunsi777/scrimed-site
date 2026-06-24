@@ -282,6 +282,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Release engineering, TrustOS, tenant governance, security, and Buyer Diligence",
     objective: "Unify human AAL2 QA dispatch, no-secret evidence capture, retained packet visibility, audit signals, and Buyer Proof Release readiness."
+  },
+  {
+    name: "Navigation Audit",
+    route: "/navigation",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Product Console, Release Steward, TrustOS, and operations",
+    objective: "Keep page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review boundaries in one navigable route map."
   }
 ];
 
@@ -289,6 +297,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Quality gates", value: "active", tone: "good" },
   { name: "Repository", value: "main baseline documented", tone: "good" },
+  { name: "Navigation audit", value: "route inventory active", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },

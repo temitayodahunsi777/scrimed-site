@@ -101,6 +101,22 @@ export default function ProductConsolePage() {
           <strong>{summary.releaseContinuityOperatorRequiredGateCount}</strong>
         </article>
         <article>
+          <span>Navigation pages</span>
+          <strong>{summary.navigationAuditPageRouteCount}</strong>
+        </article>
+        <article>
+          <span>API route patterns</span>
+          <strong>{summary.navigationAuditApiRoutePatternCount}</strong>
+        </article>
+        <article>
+          <span>Navigation groups</span>
+          <strong>{summary.navigationAuditGroupCount}</strong>
+        </article>
+        <article>
+          <span>Smoke HTML routes</span>
+          <strong>{summary.navigationAuditSmokeCoveredHtmlRouteCount}</strong>
+        </article>
+        <article>
           <span>Boundary records</span>
           <strong>{summary.boundaryResolutionRecordCount}</strong>
         </article>

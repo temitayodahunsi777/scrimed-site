@@ -11,6 +11,7 @@ Purpose: explain SCRIMED as healthcare operations intelligence, governed synthet
 Primary surfaces:
 
 - `/product`
+- `/navigation`
 - `/release-continuity`
 - `/buyer-release-control-run`
 - `/qa-evidence`
@@ -25,6 +26,25 @@ Rules:
 - Public copy can describe workflow intelligence, evidence organization, synthetic evaluation, audit readiness, and buyer diligence.
 - Public copy must not claim diagnosis, treatment recommendation, live clinical care authority, PHI processing authority, HIPAA/SOC/FDA certification, reimbursement certainty, or production connector approval.
 - Public APIs must fail closed for tenant-scoped proof, packet, or approval surfaces.
+
+## Navigation Audit Lane
+
+Purpose: keep the page route inventory, API route pattern count, navigation groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks in one operating map.
+
+Primary surfaces:
+
+- `/navigation`
+- `/api/navigation-audit`
+- `/api/navigation-audit/brief`
+- `/product`
+- `/hub`
+- `/release-continuity`
+
+Rules:
+
+- Navigation Audit can expose route groups, source counts, smoke scope, protected fail-closed posture, and known bottlenecks.
+- It must not claim that every protected happy path has executed, bypass AAL2, store token values, store PHI, approve release, certify compliance, approve production connectors, or authorize live clinical care.
+- Add new buyer-critical routes to the relevant navigation group and public smoke coverage before treating them as externally ready.
 
 ## Release Continuity Lane
 

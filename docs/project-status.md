@@ -2,6 +2,13 @@
 
 Updated: 2026-06-23
 
+## Latest Navigation Audit Release
+
+- Added `/navigation`, `/api/navigation-audit`, and `/api/navigation-audit/brief` as the route-control lane for page route inventory, API route pattern counts, navigation groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks.
+- Wired Navigation Audit into the homepage, Hub, Product Console, Product Readiness Brief, proof-stack status, README, systems map, and public smoke coverage.
+- Added `docs/navigation-audit.md` so future route additions have a clear operator routine before release.
+- Preserved the boundary: Navigation Audit does not approve release, certify protected workflow execution, bypass AAL2, authorize PHI processing, certify security/compliance, grant legal approval, approve production connectors, or authorize live clinical care.
+
 ## Latest Release Continuity Boundary Release
 
 - Added `/release-continuity`, `/api/release-continuity`, and `/api/release-continuity/brief` as the operating lane for production-domain smoke, source-control checkpointing, protected fail-closed checks, human AAL2 operator proof, and no-secret token-handling workarounds.
