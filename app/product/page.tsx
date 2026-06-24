@@ -157,6 +157,30 @@ export default function ProductConsolePage() {
           <strong>{summary.capitalVitalityRetainedExternalReviewCount}</strong>
         </article>
         <article>
+          <span>Growth plays</span>
+          <strong>{summary.growthEnginePlayCount}</strong>
+        </article>
+        <article>
+          <span>Execute-now plays</span>
+          <strong>{summary.growthEngineExecuteNowPlayCount}</strong>
+        </article>
+        <article>
+          <span>Growth lanes</span>
+          <strong>{summary.growthEngineConversionLaneCount}</strong>
+        </article>
+        <article>
+          <span>Revenue proof steps</span>
+          <strong>{summary.growthEngineProofLadderStepCount}</strong>
+        </article>
+        <article>
+          <span>Growth bottlenecks</span>
+          <strong>{summary.growthEngineBottleneckCount}</strong>
+        </article>
+        <article>
+          <span>Growth proof routes</span>
+          <strong>{summary.growthEngineProofRouteCount}</strong>
+        </article>
+        <article>
           <span>Boundary records</span>
           <strong>{summary.boundaryResolutionRecordCount}</strong>
         </article>
@@ -356,6 +380,43 @@ export default function ProductConsolePage() {
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED commercial growth engine">
+        <div className="section-heading">
+          <p className="eyebrow">Commercial growth engine</p>
+          <h2>Growth execution now has prioritized plays, conversion lanes, revenue proof steps, and retained gates.</h2>
+          <p className="section-copy">{summary.growthEngineSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.growthEngineRoute}>
+              Open Growth Engine
+            </Link>
+            <a className="secondary-action" href={summary.growthEngineBriefRoute}>
+              Download Growth Brief
+            </a>
+            <Link className="secondary-action" href={summary.capitalVitalityRoute}>
+              Capital Vitality
+            </Link>
+          </div>
+        </div>
+        {summary.growthEngineSummary.growthPlays.slice(0, 4).map((play) => (
+          <article className="module-row" key={play.name}>
+            <div>
+              <span>{play.status}</span>
+              <h2>{play.name}</h2>
+            </div>
+            <p>{play.revenueMotion}</p>
+            <div>
+              <strong>{play.primaryOffer}</strong>
+              <ul className="compact-list">
+                <li>{play.buyerSegment}</li>
+                <li>{play.blockedBoundary}</li>
+                <li>Next: {play.nextAction}</li>
+                <li>Proof routes: {play.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="SCRIMED capital vitality">

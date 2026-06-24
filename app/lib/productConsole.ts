@@ -52,6 +52,11 @@ import {
   getCapitalVitalitySummary
 } from "./capitalVitality";
 import {
+  getGrowthEngineSummary,
+  growthEngineBriefProofStackStatus,
+  growthEngineProofStackStatus
+} from "./growthEngine";
+import {
   boundaryResolutionBriefProofStackStatus,
   boundaryResolutionProofStackStatus,
   getBoundaryResolutionSummary
@@ -623,6 +628,14 @@ export const buyerActions: BuyerAction[] = [
       "Capital Vitality is readiness material only; it is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, or revenue guarantee."
   },
   {
+    label: "Open Growth Engine",
+    href: "/growth-engine",
+    purpose:
+      "Prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes.",
+    boundary:
+      "Commercial Growth Engine is execution readiness only; it is not a revenue guarantee, investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, or customer permission."
+  },
+  {
     label: "Review Pilot Evidence",
     href: "/pilot-evidence",
     purpose: "Inspect the enterprise evidence dashboard tying SCRIMED offers, AgentOS, Atlas, TrustOS, protected workspaces, demos, pilots, readiness, and measurable outcomes together.",
@@ -934,6 +947,7 @@ export function getProductConsoleSummary() {
   const navigationAuditSummary = getNavigationAuditSummary();
   const serviceReliabilitySummary = getServiceReliabilitySummary();
   const capitalVitalitySummary = getCapitalVitalitySummary();
+  const growthEngineSummary = getGrowthEngineSummary();
   const boundaryResolutionSummary = getBoundaryResolutionSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
@@ -998,6 +1012,9 @@ export function getProductConsoleSummary() {
     capitalVitalityRoute: capitalVitalitySummary.route,
     capitalVitalityApiRoute: capitalVitalitySummary.apiRoute,
     capitalVitalityBriefRoute: capitalVitalitySummary.briefRoute,
+    growthEngineRoute: growthEngineSummary.route,
+    growthEngineApiRoute: growthEngineSummary.apiRoute,
+    growthEngineBriefRoute: growthEngineSummary.briefRoute,
     approvalsReadinessRoute: approvalsReadinessSummary.route,
     approvalsReadinessApiRoute: approvalsReadinessSummary.apiRoute,
     approvalsReadinessBriefRoute: approvalsReadinessSummary.briefRoute,
@@ -1244,6 +1261,12 @@ export function getProductConsoleSummary() {
       capitalVitalitySummary.activeFundingWorkstreamCount,
     capitalVitalityRetainedExternalReviewCount:
       capitalVitalitySummary.retainedExternalReviewCount,
+    growthEnginePlayCount: growthEngineSummary.growthPlayCount,
+    growthEngineExecuteNowPlayCount: growthEngineSummary.executeNowPlayCount,
+    growthEngineConversionLaneCount: growthEngineSummary.conversionLaneCount,
+    growthEngineProofLadderStepCount: growthEngineSummary.proofLadderStepCount,
+    growthEngineBottleneckCount: growthEngineSummary.growthBottleneckCount,
+    growthEngineProofRouteCount: growthEngineSummary.proofRouteCount,
     approvalsReadinessStatus: approvalsReadinessSummary.status,
     approvalsReadinessTrackCount: approvalsReadinessSummary.trackCount,
     approvalsReadinessAgentControlCount: approvalsReadinessSummary.agentControlCount,
@@ -1437,6 +1460,7 @@ export function getProductConsoleSummary() {
     qaManualExecutionConsoleSummary,
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
+    growthEngineSummary,
     proofStack: {
       releaseContinuity: releaseContinuityProofStackStatus,
       releaseContinuityBrief: releaseContinuityBriefProofStackStatus,
@@ -1446,6 +1470,8 @@ export function getProductConsoleSummary() {
       serviceReliabilityBrief: serviceReliabilityBriefProofStackStatus,
       capitalVitality: capitalVitalityProofStackStatus,
       capitalVitalityBrief: capitalVitalityBriefProofStackStatus,
+      growthEngine: growthEngineProofStackStatus,
+      growthEngineBrief: growthEngineBriefProofStackStatus,
       approvalsReadiness: approvalsReadinessStatus,
       approvalsReadinessBrief: approvalsReadinessBriefStatus,
       clinicalAuthorityReadiness: clinicalAuthorityReadinessStatus,
@@ -1620,7 +1646,7 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Capital Vitality to keep revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, and external-review gates visible without crossing securities, valuation, legal, reimbursement, PHI, security, or live-care boundaries; use Service Reliability to keep product and service controls, fault classes, efficiency improvements, owners, proof routes, open gates, and retained approval boundaries visible before claims expand; use Navigation Audit to keep the page route inventory, API route count, navigation groups, smoke scope, protected fail-closed checks, and retained AAL2 or external-review boundaries visible before each release; use Release Continuity to keep production, GitHub, smoke checks, and AAL2 operator boundaries checkpointed after every deploy; use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+      "Use Growth Engine to prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes without crossing revenue guarantee, securities, valuation, legal, tax, reimbursement, PHI, security, connector, or live-care boundaries; use Capital Vitality to keep revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, and external-review gates visible without crossing securities, valuation, legal, reimbursement, PHI, security, or live-care boundaries; use Service Reliability to keep product and service controls, fault classes, efficiency improvements, owners, proof routes, open gates, and retained approval boundaries visible before claims expand; use Navigation Audit to keep the page route inventory, API route count, navigation groups, smoke scope, protected fail-closed checks, and retained AAL2 or external-review boundaries visible before each release; use Release Continuity to keep production, GitHub, smoke checks, and AAL2 operator boundaries checkpointed after every deploy; use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-24"
   };
 }
@@ -1638,6 +1664,20 @@ export function getProductReadinessBrief() {
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
     "",
     "## Product Demos and Pilot Programs",
+    `Growth Engine: ${summary.growthEngineRoute}`,
+    `Growth Engine API: ${summary.growthEngineApiRoute}`,
+    `Growth Engine Brief: ${summary.growthEngineBriefRoute}`,
+    `Growth Plays: ${summary.growthEnginePlayCount}`,
+    `Growth Conversion Lanes: ${summary.growthEngineConversionLaneCount}`,
+    `Growth Proof Ladder Steps: ${summary.growthEngineProofLadderStepCount}`,
+    `Growth Bottlenecks: ${summary.growthEngineBottleneckCount}`,
+    summary.growthEngineSummary.boundary,
+    ...summary.growthEngineSummary.growthPlays.map(
+      (play) => `- Growth play: ${play.name} (${play.status}) -> ${play.nextAction}`
+    ),
+    ...summary.growthEngineSummary.revenueProofLadder.map(
+      (step) => `- Revenue proof step: ${step.stage} (${step.status}) -> ${step.retainedGate}`
+    ),
     `Capital Vitality: ${summary.capitalVitalityRoute}`,
     `Capital Vitality API: ${summary.capitalVitalityApiRoute}`,
     `Capital Vitality Brief: ${summary.capitalVitalityBriefRoute}`,

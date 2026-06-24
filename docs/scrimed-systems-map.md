@@ -14,6 +14,7 @@ Primary surfaces:
 - `/navigation`
 - `/service-reliability`
 - `/capital-vitality`
+- `/growth-engine`
 - `/release-continuity`
 - `/buyer-release-control-run`
 - `/qa-evidence`
@@ -28,6 +29,28 @@ Rules:
 - Public copy can describe workflow intelligence, evidence organization, synthetic evaluation, audit readiness, and buyer diligence.
 - Public copy must not claim diagnosis, treatment recommendation, live clinical care authority, PHI processing authority, HIPAA/SOC/FDA certification, reimbursement certainty, or production connector approval.
 - Public APIs must fail closed for tenant-scoped proof, packet, or approval surfaces.
+
+## Commercial Growth Engine Lane
+
+Purpose: keep buyer segments, sellable offers, revenue motions, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes in one execution map.
+
+Primary surfaces:
+
+- `/growth-engine`
+- `/api/growth-engine`
+- `/api/growth-engine/brief`
+- `/product`
+- `/hub`
+- `/capital-vitality`
+- `/pilot-deal-room`
+- `/pricing`
+- `/pilot`
+
+Rules:
+
+- Growth Engine can expose prioritized plays, buyer triggers, conversion events, disqualifiers, proof ladders, bottlenecks, owners, and next actions.
+- It must not claim customer revenue guarantees, investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, procurement approval, customer permission, security certification, regulatory approval, PHI authority, production connector authority, or live clinical authority.
+- Buyer-specific proof, fundraising materials, valuation claims, customer references, and regulated authority claims require retained external review before use.
 
 ## Capital Vitality Lane
 

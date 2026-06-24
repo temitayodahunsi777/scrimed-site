@@ -33,6 +33,11 @@ const consoleViews = [
     summary: "Review revenue capabilities, competitive moat evidence, investor milestones, funding workstreams, and retained external-review gates."
   },
   {
+    name: "Growth Engine",
+    href: "/growth-engine",
+    summary: "Prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes."
+  },
+  {
     name: "Pilot Deal Room",
     href: "/pilot-deal-room",
     summary: "Review the organized buyer path from public product proof to sales opportunity, protected Buyer Pilot Room, audited packet, and paid synthetic pilot."
@@ -370,6 +375,22 @@ export default function HubPage() {
         <article>
           <span>Funding workstreams</span>
           <strong>{summary.capitalVitalitySummary.fundingWorkstreamCount}</strong>
+        </article>
+        <article>
+          <span>Growth plays</span>
+          <strong>{summary.growthEngineSummary.growthPlayCount}</strong>
+        </article>
+        <article>
+          <span>Conversion lanes</span>
+          <strong>{summary.growthEngineSummary.conversionLaneCount}</strong>
+        </article>
+        <article>
+          <span>Revenue proof steps</span>
+          <strong>{summary.growthEngineSummary.proofLadderStepCount}</strong>
+        </article>
+        <article>
+          <span>Growth bottlenecks</span>
+          <strong>{summary.growthEngineSummary.growthBottleneckCount}</strong>
         </article>
       </section>
 

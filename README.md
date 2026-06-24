@@ -28,6 +28,8 @@ Service reliability boundary: `/service-reliability`, `/api/service-reliability`
 
 Capital vitality boundary: `/capital-vitality`, `/api/capital-vitality`, and `/api/capital-vitality/brief` organize revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates. This is growth readiness only. It is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, customer revenue guarantee, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.
 
+Commercial growth engine boundary: `/growth-engine`, `/api/growth-engine`, and `/api/growth-engine/brief` organize buyer segments, sellable offers, revenue motions, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes. This is growth execution readiness only. It is not a customer revenue guarantee, investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, procurement approval, customer permission, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.
+
 ---
 
 ## Core Vision
@@ -127,6 +129,7 @@ Current focus areas include:
 - navigation audit with page route inventory, API route pattern counts, route groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks
 - service reliability with product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries
 - capital vitality with revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates
+- commercial growth engine with buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes
 
 ---
 
@@ -175,6 +178,7 @@ Core enterprise evaluation surfaces:
 - `/release-continuity` - production/source checkpoint, public smoke, protected fail-closed checks, AAL2 operator boundary, and no-secret workaround lane
 - `/service-reliability` - product/service reliability controls, known fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries
 - `/capital-vitality` - revenue capability, competitive moat, investor-readiness, funding workstream, proof-route, and external-review gate map
+- `/growth-engine` - buyer segment, sellable offer, conversion lane, revenue proof step, bottleneck, owner, and proof-route execution map
 - `/pilot-workspace/access#clinical-authority-evidence-room` - AAL2 protected no-PHI clinical authority evidence assembly for reviewer owners, retained gates, audit history, expiration posture, and readiness packet export
 - `/pilot-workspace/access#clinical-authority-owner-matrix` - AAL2 protected no-PHI approver routing for customer, SCRIMED, and qualified external authority owners
 - `/pilot-workspace/access#clinical-authority-artifact-intake` - AAL2 protected no-PHI checklist for external artifact systems, reviewer roles, validation timestamps, expiration cadences, and prohibited-content controls

@@ -2,6 +2,13 @@
 
 Updated: 2026-06-24
 
+## Latest Commercial Growth Engine Release
+
+- Added `/growth-engine`, `/api/growth-engine`, and `/api/growth-engine/brief` as the execution lane for buyer segments, sellable offers, revenue motions, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes.
+- Wired Growth Engine into the homepage, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, and public smoke coverage.
+- Added `docs/growth-engine.md` so founder-led assessment outreach, synthetic pilot pipeline, governance audit packaging, protected buyer diligence, and strategic partner work stay tied to proof routes and retained gates.
+- Preserved the boundary: Growth Engine is not a customer revenue guarantee, investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, procurement approval, customer permission, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.
+
 ## Latest Capital Vitality Release
 
 - Added `/capital-vitality`, `/api/capital-vitality`, and `/api/capital-vitality/brief` as the governed growth lane for revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, proof routes, and retained external-review gates.

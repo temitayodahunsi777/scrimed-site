@@ -27,7 +27,7 @@ export type NavigationBottleneck = {
 export const navigationAuditProofStackStatus = "route-navigation-audit-active";
 export const navigationAuditBriefProofStackStatus = "route-navigation-audit-brief-ready";
 export const navigationAuditUpdatedAt = "2026-06-24";
-export const expectedApiRoutePatternCount = 245;
+export const expectedApiRoutePatternCount = 247;
 
 export const navigationAuditBoundary =
   "SCRIMED Navigation Audit organizes page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained approval boundaries into one operating map. It is an audit and navigation control surface only. It does not certify that every protected workflow has been executed, bypass AAL2, approve public release, authorize PHI processing, grant legal or clinical authority, certify security/compliance, or approve production connectors.";
@@ -57,6 +57,7 @@ export const pageRouteInventory = [
   "/fixtures/change-review",
   "/global-reach",
   "/governance-packs",
+  "/growth-engine",
   "/healthcare-intelligence-os",
   "/hub",
   "/hub/events",
@@ -154,6 +155,7 @@ export const smokeCoveredHtmlRoutes = [
   "/release-continuity",
   "/service-reliability",
   "/capital-vitality",
+  "/growth-engine",
   "/qa-execution-readiness",
   "/qa-run-control",
   "/qa-launch-kit",
@@ -173,7 +175,16 @@ export const navigationGroups: NavigationGroup[] = [
     name: "Executive command",
     purpose: "Give founders, buyers, operators, and reviewers a short path into the active operating surfaces.",
     owner: "Founder + Product Console",
-    routes: ["/", "/hub", "/product", "/navigation", "/service-reliability", "/capital-vitality", "/pilot-evidence"],
+    routes: [
+      "/",
+      "/hub",
+      "/product",
+      "/navigation",
+      "/service-reliability",
+      "/capital-vitality",
+      "/growth-engine",
+      "/pilot-evidence"
+    ],
     auditStatus: "linked",
     evidence: "Homepage, Hub, Product Console, and this audit route cross-link the highest-signal operating lanes.",
     retainedBoundary: "Navigation links are operating guidance, not proof of protected execution."
@@ -191,6 +202,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/pilots/[slug]",
       "/pilot",
       "/capital-vitality",
+      "/growth-engine",
       "/sales-operations"
     ],
     auditStatus: "smoke-covered",
@@ -208,6 +220,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/clinical-care-activation",
       "/public-market-readiness",
       "/capital-vitality",
+      "/growth-engine",
       "/release-continuity",
       "/service-reliability"
     ],
@@ -375,6 +388,15 @@ export const navigationBottlenecks: NavigationBottleneck[] = [
     workaround:
       "Use /capital-vitality for readiness-only proof, keep no-securities/no-advice headers visible, and route fundraising, valuation, legal, tax, and investor-solicitation materials through qualified counsel.",
     owner: "Founder + qualified counsel + finance reviewers"
+  },
+  {
+    name: "Growth execution concentration",
+    status: "operator-required",
+    impact:
+      "Proof depth can diffuse commercial focus unless buyer segments, sellable offers, conversion lanes, and next actions stay prioritized.",
+    workaround:
+      "Use /growth-engine to keep founder-led assessment outreach, synthetic pilot pipeline, governance audit packaging, and protected diligence upgrades in one operating lane.",
+    owner: "Founder + Product Console + Sales Operations"
   },
   {
     name: "Local shell runtime path",

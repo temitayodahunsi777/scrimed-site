@@ -14,13 +14,14 @@ Surfaces:
 - `/release-continuity`
 - `/service-reliability`
 - `/capital-vitality`
+- `/growth-engine`
 
 Current source totals:
 
-- Page routes: 103
-- API route patterns: 245
+- Page routes: 104
+- API route patterns: 247
 - Navigation groups: 8
-- Public smoke HTML routes: 27
+- Public smoke HTML routes: 28
 
 Boundaries:
 

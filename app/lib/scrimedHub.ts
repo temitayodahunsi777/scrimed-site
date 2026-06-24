@@ -60,6 +60,7 @@ import { getGlobalPartnerLocalizationSummary } from "./globalPartnerLocalization
 import { getClinicalAuthorityReadinessSummary } from "./clinicalAuthorityReadiness";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getCapitalVitalitySummary } from "./capitalVitality";
+import { getGrowthEngineSummary } from "./growthEngine";
 import { getServiceReliabilitySummary } from "./serviceReliability";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
 import {
@@ -308,6 +309,14 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Founder, Product Console, Sales Operations, Finance, and qualified reviewers",
     objective: "Map revenue capabilities, competitive moat evidence, investor milestones, funding workstreams, proof routes, and retained external-review gates into one governed growth lane."
+  },
+  {
+    name: "Commercial Growth Engine",
+    route: "/growth-engine",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Founder, Product Console, Sales Operations, and Buyer Diligence",
+    objective: "Prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes without overclaiming."
   }
 ];
 
@@ -318,6 +327,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Navigation audit", value: "route inventory active", tone: "good" },
   { name: "Service reliability", value: "controls and fault classes mapped", tone: "good" },
   { name: "Capital vitality", value: "revenue, moat, and funding readiness mapped", tone: "good" },
+  { name: "Growth engine", value: "buyer motion and revenue proof prioritized", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
@@ -503,6 +513,9 @@ export const hubRoutes = [
   "/hub/events",
   "/pilot",
   "/pilot-deal-room",
+  "/growth-engine",
+  "/api/growth-engine",
+  "/api/growth-engine/brief",
   "/api/sales-operations/opportunities/{intakeId}/workspace-provisioning",
   "/api/sales-operations/opportunities/{intakeId}/workspace-provisioning/packet",
   "/api/sales-operations/opportunities/{intakeId}/tenant-lifecycle",
@@ -796,6 +809,7 @@ export function getHubSummary() {
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const capitalVitalitySummary = getCapitalVitalitySummary();
+  const growthEngineSummary = getGrowthEngineSummary();
   const serviceReliabilitySummary = getServiceReliabilitySummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
@@ -832,6 +846,7 @@ export function getHubSummary() {
     clinicalAuthorityReadinessSummary,
     trustSafetyOperationsSummary,
     capitalVitalitySummary,
+    growthEngineSummary,
     serviceReliabilitySummary,
     qaEvidenceLedger,
     qaCompletionBridgeSummary,

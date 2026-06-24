@@ -160,6 +160,65 @@ function requireCapitalVitalityBoundary(label, response) {
   }
 }
 
+function requireGrowthEngineBoundary(label, response) {
+  const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const financialAuthority = response.headers.get("x-scrimed-financial-authority");
+  const growthEngine = response.headers.get("x-scrimed-growth-engine");
+  const investmentAdvice = response.headers.get("x-scrimed-investment-advice");
+  const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const revenueAuthority = response.headers.get("x-scrimed-revenue-authority");
+  const securitiesAuthority = response.headers.get("x-scrimed-securities-authority");
+  const securityCertification = response.headers.get("x-scrimed-security-certification");
+  const valuationAuthority = response.headers.get("x-scrimed-valuation-authority");
+
+  requireSyntheticBoundary(label, response);
+  requireNoClinicalCareAuthority(label, response);
+
+  if (approvalAuthority !== "external-review-required") {
+    throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (![
+    "commercial-growth-engine-active",
+    "commercial-growth-engine-brief-ready-no-revenue-guarantee"
+  ].includes(growthEngine ?? "")) {
+    throw new Error(`${label} expected growth engine boundary header but received ${growthEngine}.`);
+  }
+
+  if (financialAuthority !== "not-audited-financial-report") {
+    throw new Error(`${label} expected x-scrimed-financial-authority not-audited-financial-report but received ${financialAuthority}.`);
+  }
+
+  if (investmentAdvice !== "not-investment-advice") {
+    throw new Error(`${label} expected x-scrimed-investment-advice not-investment-advice but received ${investmentAdvice}.`);
+  }
+
+  if (phiAuthority !== "not-authorized-production-phi") {
+    throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
+  }
+
+  if (reimbursementAuthority !== "no-reimbursement-guarantee") {
+    throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (revenueAuthority !== "not-revenue-guarantee") {
+    throw new Error(`${label} expected x-scrimed-revenue-authority not-revenue-guarantee but received ${revenueAuthority}.`);
+  }
+
+  if (securitiesAuthority !== "not-securities-offering-material") {
+    throw new Error(`${label} expected x-scrimed-securities-authority not-securities-offering-material but received ${securitiesAuthority}.`);
+  }
+
+  if (securityCertification !== "not-security-certified") {
+    throw new Error(`${label} expected x-scrimed-security-certification not-security-certified but received ${securityCertification}.`);
+  }
+
+  if (valuationAuthority !== "not-valuation-assurance") {
+    throw new Error(`${label} expected x-scrimed-valuation-authority not-valuation-assurance but received ${valuationAuthority}.`);
+  }
+}
+
 function requireGlobalReachBoundary(label, response) {
   const globalAuthority = response.headers.get("x-scrimed-global-authority");
 
@@ -807,11 +866,11 @@ async function checkProductConsole() {
     throw new Error("product console missing navigation audit brief proof-stack posture.");
   }
 
-  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 103) {
+  if (!body.navigationAuditPageRouteCount || body.navigationAuditPageRouteCount < 104) {
     throw new Error("product console expected navigation audit page route coverage.");
   }
 
-  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 245) {
+  if (!body.navigationAuditApiRoutePatternCount || body.navigationAuditApiRoutePatternCount < 247) {
     throw new Error("product console expected navigation audit API route coverage.");
   }
 
@@ -819,7 +878,7 @@ async function checkProductConsole() {
     throw new Error("product console expected navigation group coverage.");
   }
 
-  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 27) {
+  if (!body.navigationAuditSmokeCoveredHtmlRouteCount || body.navigationAuditSmokeCoveredHtmlRouteCount < 28) {
     throw new Error("product console expected smoke-covered HTML route coverage.");
   }
 
@@ -873,6 +932,34 @@ async function checkProductConsole() {
 
   if (!body.capitalVitalityRetainedExternalReviewCount || body.capitalVitalityRetainedExternalReviewCount < 4) {
     throw new Error("product console expected capital vitality external review coverage.");
+  }
+
+  if (body.proofStack?.growthEngine !== "commercial-growth-engine-active") {
+    throw new Error("product console missing growth engine proof-stack posture.");
+  }
+
+  if (body.proofStack?.growthEngineBrief !== "commercial-growth-engine-brief-ready-no-revenue-guarantee") {
+    throw new Error("product console missing growth engine brief proof-stack posture.");
+  }
+
+  if (!body.growthEnginePlayCount || body.growthEnginePlayCount < 6) {
+    throw new Error("product console expected growth engine play coverage.");
+  }
+
+  if (!body.growthEngineExecuteNowPlayCount || body.growthEngineExecuteNowPlayCount < 2) {
+    throw new Error("product console expected execute-now growth play coverage.");
+  }
+
+  if (!body.growthEngineConversionLaneCount || body.growthEngineConversionLaneCount < 4) {
+    throw new Error("product console expected growth conversion lane coverage.");
+  }
+
+  if (!body.growthEngineProofLadderStepCount || body.growthEngineProofLadderStepCount < 5) {
+    throw new Error("product console expected growth proof ladder coverage.");
+  }
+
+  if (!body.growthEngineBottleneckCount || body.growthEngineBottleneckCount < 4) {
+    throw new Error("product console expected growth bottleneck coverage.");
   }
 
   if (
@@ -3844,6 +3931,10 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /capital-vitality in page route inventory.");
   }
 
+  if (!body.pageRouteInventory.includes("/growth-engine")) {
+    throw new Error("Navigation Audit expected /growth-engine in page route inventory.");
+  }
+
   if (!Array.isArray(body.smokeCoveredHtmlRoutes) || !body.smokeCoveredHtmlRoutes.includes("/navigation")) {
     throw new Error("Navigation Audit expected /navigation in smoke-covered HTML routes.");
   }
@@ -3854,6 +3945,10 @@ async function checkNavigationAudit() {
 
   if (!body.smokeCoveredHtmlRoutes.includes("/capital-vitality")) {
     throw new Error("Navigation Audit expected /capital-vitality in smoke-covered HTML routes.");
+  }
+
+  if (!body.smokeCoveredHtmlRoutes.includes("/growth-engine")) {
+    throw new Error("Navigation Audit expected /growth-engine in smoke-covered HTML routes.");
   }
 
   if (!Array.isArray(body.bottlenecks) || !body.bottlenecks.some((bottleneck) => bottleneck.status === "operator-required")) {
@@ -4047,6 +4142,85 @@ async function checkCapitalVitality() {
   console.log("pass capital vitality");
 }
 
+async function checkGrowthEngine() {
+  const result = await request("/api/growth-engine");
+  requireStatus("Growth Engine", result.response.status, 200);
+  requireContentType("Growth Engine", result.response, "application/json");
+  requireGrowthEngineBoundary("Growth Engine", result.response);
+  const body = requireJson("Growth Engine", result.body);
+
+  if (body.service !== "scrimed-commercial-growth-engine") {
+    throw new Error(`Growth Engine expected scrimed-commercial-growth-engine but received ${body.service}.`);
+  }
+
+  if (body.status !== "commercial-growth-engine-active") {
+    throw new Error(`Growth Engine expected active status but received ${body.status}.`);
+  }
+
+  if (body.authority?.revenueAuthority !== "not-revenue-guarantee") {
+    throw new Error("Growth Engine must not create revenue guarantees.");
+  }
+
+  if (body.authority?.securitiesAuthority !== "not-securities-offering-material") {
+    throw new Error("Growth Engine must not create securities offering material.");
+  }
+
+  if (body.authority?.investmentAdvice !== "not-investment-advice") {
+    throw new Error("Growth Engine must not create investment advice.");
+  }
+
+  if (body.authority?.phiAuthority !== "not-authorized-production-phi") {
+    throw new Error("Growth Engine must keep PHI authority blocked.");
+  }
+
+  if (!Array.isArray(body.growthPlays) || body.growthPlays.length < 6) {
+    throw new Error("Growth Engine expected growth play coverage.");
+  }
+
+  if (!Array.isArray(body.conversionLanes) || body.conversionLanes.length < 4) {
+    throw new Error("Growth Engine expected conversion lane coverage.");
+  }
+
+  if (!Array.isArray(body.revenueProofLadder) || body.revenueProofLadder.length < 5) {
+    throw new Error("Growth Engine expected revenue proof ladder coverage.");
+  }
+
+  if (!Array.isArray(body.growthBottlenecks) || body.growthBottlenecks.length < 4) {
+    throw new Error("Growth Engine expected bottleneck coverage.");
+  }
+
+  if (!body.proofRouteCount || body.proofRouteCount < 15) {
+    throw new Error("Growth Engine expected proof-route coverage.");
+  }
+
+  if (!body.sourceCounts?.pricingTierCount || body.sourceCounts.pricingTierCount < 6) {
+    throw new Error("Growth Engine expected pricing tier source alignment.");
+  }
+
+  if (!body.sourceCounts?.capitalRevenueCapabilityCount || body.sourceCounts.capitalRevenueCapabilityCount < 8) {
+    throw new Error("Growth Engine expected capital revenue capability source alignment.");
+  }
+
+  const brief = await request("/api/growth-engine/brief");
+  requireStatus("Growth Engine brief", brief.response.status, 200);
+  requireContentType("Growth Engine brief", brief.response, "text/markdown");
+  requireGrowthEngineBoundary("Growth Engine brief", brief.response);
+
+  if (!brief.body.text.includes("SCRIMED Commercial Growth Engine Brief")) {
+    throw new Error("Growth Engine brief missing heading.");
+  }
+
+  if (!brief.body.text.includes("not a revenue guarantee")) {
+    throw new Error("Growth Engine brief missing revenue guarantee boundary.");
+  }
+
+  if (!brief.body.text.includes("investment advice")) {
+    throw new Error("Growth Engine brief missing investment advice boundary.");
+  }
+
+  console.log("pass growth engine");
+}
+
 async function checkClinicalAuthorityReadiness() {
   const result = await request("/api/clinical-authority-readiness");
   requireStatus("Clinical Authority Readiness", result.response.status, 200);
@@ -4153,6 +4327,7 @@ await checkHtml("/release-continuity");
 await checkHtml("/navigation");
 await checkHtml("/service-reliability");
 await checkHtml("/capital-vitality");
+await checkHtml("/growth-engine");
 await checkHtml("/qa-execution-readiness");
 await checkHtml("/qa-run-control");
 await checkHtml("/qa-launch-kit");
@@ -4169,6 +4344,7 @@ await checkReleaseContinuity();
 await checkNavigationAudit();
 await checkServiceReliability();
 await checkCapitalVitality();
+await checkGrowthEngine();
 await checkApprovalsReadiness();
 await checkClinicalAuthorityReadiness();
 await checkClinicalCareActivation();
