@@ -1,4 +1,4 @@
-export const scrimedWorkBrowserVerificationVersion = "scrimed-work-browser-verification-v2026-07-13";
+export const scrimedWorkBrowserVerificationVersion = "scrimed-work-browser-verification-v2026-07-13.2";
 
 export const scrimedWorkBrowserVerificationBoundary =
   "Synthetic metadata only. The verifier uses the active AAL2 browser session without exporting its bearer token, rejects PHI and credentials, performs no clinical or payer action, and cancels every created verification session.";
@@ -8,6 +8,8 @@ export type ScrimedWorkBrowserVerificationCheckId =
   | "unauthenticated-fail-closed"
   | "durable-create"
   | "idempotent-create"
+  | "durable-read"
+  | "verification-evidence"
   | "plan-transition"
   | "transition-replay"
   | "invalid-resume-denied"
@@ -47,6 +49,18 @@ export const scrimedWorkBrowserVerificationChecks: ScrimedWorkBrowserVerificatio
     label: "Create Replay",
     purpose: "Prove the same idempotency key reuses the durable create decision.",
     mutation: true
+  },
+  {
+    id: "durable-read",
+    label: "Authoritative Session Read",
+    purpose: "Retrieve the created session through AAL2 tenant scope without mutation credentials.",
+    mutation: false
+  },
+  {
+    id: "verification-evidence",
+    label: "Verification Evidence",
+    purpose: "Evaluate the durable session and prove pending human review blocks completion eligibility.",
+    mutation: false
   },
   {
     id: "plan-transition",
@@ -91,7 +105,7 @@ export function buildScrimedWorkBrowserVerificationPayload(workspaceSlug: string
     requestedAutonomy: "recommend" as const,
     riskLevel: "moderate" as const,
     definitionOfDone: {
-      goal: "Persist, replay, transition, evidence, and cancel one synthetic SCRIMED Work verification session.",
+      goal: "Persist, replay, retrieve, verify, transition, evidence, and cancel one synthetic SCRIMED Work verification session.",
       allowedScope: ["synthetic metadata", "durable audit evidence", "bounded cancellation cleanup"],
       prohibitedActions: [
         "live PHI",
@@ -103,11 +117,18 @@ export function buildScrimedWorkBrowserVerificationPayload(workspaceSlug: string
         "EHR writeback"
       ],
       requiredEvidence: ["AAL2 tenant session", "durable lifecycle record", "idempotency evidence"],
-      successCriteria: ["session persisted", "replays verified", "invalid transition denied", "session cancelled"],
+      successCriteria: [
+        "session persisted",
+        "authoritative read verified",
+        "human review gate verified",
+        "replays verified",
+        "invalid transition denied",
+        "session cancelled"
+      ],
       stoppingConditions: ["PHI detected", "authorization denied", "durable store unavailable", "timeout"],
       timeoutMs: 120000,
-      maximumSteps: 9,
-      maximumToolCalls: 9,
+      maximumSteps: 11,
+      maximumToolCalls: 11,
       maximumEstimatedCostUsd: 0,
       humanApprovalRequired: true,
       rollbackPlan: "Cancel the synthetic session, preserve append-only evidence, and distribute no artifact.",
@@ -115,6 +136,8 @@ export function buildScrimedWorkBrowserVerificationPayload(workspaceSlug: string
         "schema validity",
         "authorization",
         "tenant isolation",
+        "authoritative read",
+        "human review gate",
         "idempotency",
         "lifecycle denial",
         "cancellation"

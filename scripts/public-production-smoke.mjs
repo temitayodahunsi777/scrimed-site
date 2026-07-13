@@ -12460,6 +12460,44 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work production hardening must not approve production or canary readiness by default.");
   }
 
+  const fixtureSession = await request("/api/scrimed-work/sessions/work_session_care_coordination_synthetic");
+  requireStatus("SCRIMED Work synthetic session read", fixtureSession.response.status, 200);
+  requireScrimedWorkBoundary("SCRIMED Work synthetic session read", fixtureSession.response);
+  const fixtureSessionEnvelope = requireJson("SCRIMED Work synthetic session read", fixtureSession.body);
+
+  if (fixtureSessionEnvelope.data?.id !== "work_session_care_coordination_synthetic") {
+    throw new Error("SCRIMED Work synthetic session read expected the named public fixture.");
+  }
+
+  const fixtureVerification = await postJson(
+    "/api/scrimed-work/sessions/work_session_care_coordination_synthetic/verify",
+    {}
+  );
+  requireStatus("SCRIMED Work synthetic session verification", fixtureVerification.response.status, 200);
+  requireScrimedWorkBoundary("SCRIMED Work synthetic session verification", fixtureVerification.response);
+  const fixtureVerificationEnvelope = requireJson(
+    "SCRIMED Work synthetic session verification",
+    fixtureVerification.body
+  );
+
+  if (
+    fixtureVerificationEnvelope.data?.eligibleForCompletion !== false ||
+    !fixtureVerificationEnvelope.data?.failedCriteria?.includes("human-approval-state")
+  ) {
+    throw new Error("SCRIMED Work verification must hold the human-review gate before completion.");
+  }
+
+  const protectedRead = await request("/api/scrimed-work/sessions/work_session_unknown_protected");
+  requireStatus("SCRIMED Work protected session read", protectedRead.response.status, [401, 503]);
+  requireScrimedWorkBoundary("SCRIMED Work protected session read", protectedRead.response);
+
+  const protectedVerification = await postJson(
+    "/api/scrimed-work/sessions/work_session_unknown_protected/verify",
+    {}
+  );
+  requireStatus("SCRIMED Work protected session verification", protectedVerification.response.status, [401, 503]);
+  requireScrimedWorkBoundary("SCRIMED Work protected session verification", protectedVerification.response);
+
   const routeModel = await postJson("/api/scrimed-work/route-model", {
     taskType: "synthetic executive work routing",
     risk: "moderate",

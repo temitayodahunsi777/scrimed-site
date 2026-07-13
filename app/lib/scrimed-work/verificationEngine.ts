@@ -1,4 +1,5 @@
 import { containsPhiRisk } from "./schemas";
+import { hasSatisfiedRequiredHumanApproval } from "./sessionLifecycle";
 import type { DefinitionOfDoneContract, VerificationResult, WorkArtifact, WorkSession } from "./types";
 
 export type VerificationInput = {
@@ -53,7 +54,7 @@ export function verifyScrimedWorkResult(input: VerificationInput): VerificationR
   if (input.session.plannedSteps.length > contract.maximumSteps) failures.push("step-budget");
   if (input.session.valueTelemetry.estimatedModelCostUsd > contract.maximumEstimatedCostUsd) failures.push("cost-budget");
   if (!input.session.rollbackMetadata.rollbackAvailable) failures.push("rollback-readiness");
-  if (input.session.riskLevel === "high" && input.session.approvalCheckpoints.every((checkpoint) => checkpoint.status !== "approved")) {
+  if (!hasSatisfiedRequiredHumanApproval(input.session)) {
     failures.push("human-approval-state");
   }
 

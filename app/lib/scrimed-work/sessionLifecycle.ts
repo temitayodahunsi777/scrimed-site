@@ -38,6 +38,15 @@ export type WorkSessionTransitionDecision = {
 
 type TransitionActor = Pick<ActorIdentity, "actorId" | "role">;
 
+export function hasSatisfiedRequiredHumanApproval(session: WorkSession) {
+  const approvalRequired = session.riskLevel === "high" || session.definitionOfDone.humanApprovalRequired;
+
+  return (
+    !approvalRequired ||
+    session.approvalCheckpoints.some((checkpoint) => checkpoint.status === "approved")
+  );
+}
+
 const terminalStatuses = new Set<WorkSessionStatus>(["completed", "cancelled", "rolled_back"]);
 
 const allowedActions: Record<WorkSessionStatus, WorkSessionTransitionAction[]> = {

@@ -209,6 +209,39 @@ if (idempotentBody.data?.durableStore?.idempotentReplay !== true) {
 
 console.log(`pass authenticated SCRIMED Work idempotency reuse: ${idempotentBody.data.durableStore.eventId}`);
 
+const protectedReadHeaders = {
+  Authorization: `Bearer ${bearerToken}`,
+  "x-scrimed-workspace-slug": workspaceSlug
+};
+const readResult = await request(`/api/scrimed-work/sessions/${sessionId}`, {
+  headers: protectedReadHeaders
+});
+requireStatus("authenticated SCRIMED Work durable session read", readResult.response.status, 200, readResult.body);
+const readBody = requireJson("authenticated SCRIMED Work durable session read", readResult.body);
+
+if (readBody.data?.id !== sessionId) {
+  throw new Error("authenticated SCRIMED Work durable session read did not return the authoritative session.");
+}
+
+console.log(`pass authenticated SCRIMED Work durable session read: ${sessionId}`);
+
+const verificationResult = await request(`/api/scrimed-work/sessions/${sessionId}/verify`, {
+  headers: protectedReadHeaders,
+  method: "POST"
+});
+requireStatus("authenticated SCRIMED Work durable session verification", verificationResult.response.status, 200, verificationResult.body);
+const verificationBody = requireJson("authenticated SCRIMED Work durable session verification", verificationResult.body);
+
+if (
+  verificationBody.data?.allPass !== false ||
+  verificationBody.data?.eligibleForCompletion !== false ||
+  !verificationBody.data?.failedCriteria?.includes("human-approval-state")
+) {
+  throw new Error("authenticated SCRIMED Work verification did not preserve the pending human-review completion gate.");
+}
+
+console.log("pass authenticated SCRIMED Work verification evidence: human review gate held");
+
 const transitionResult = await request(`/api/scrimed-work/sessions/${sessionId}/plan`, {
   body: JSON.stringify({ workspaceSlug }),
   headers: {

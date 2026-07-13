@@ -121,6 +121,10 @@ export default function ScrimedWorkBrowserVerificationPanel({
       "idempotency-key": createIdempotencyKey,
       "x-scrimed-workspace-slug": workspace.slug
     };
+    const protectedReadHeaders = {
+      Authorization: `Bearer ${session.access_token}`,
+      "x-scrimed-workspace-slug": workspace.slug
+    };
 
     const record = (id: ScrimedWorkBrowserVerificationCheckId, status: ScrimedWorkBrowserCheckStatus, detail: string) => {
       working = working.map((result) => (result.id === id ? { ...result, status, detail } : result));
@@ -212,6 +216,38 @@ export default function ScrimedWorkBrowserVerificationPanel({
               replayResponse.status === 200 && replayStore?.idempotentReplay === true
                 ? "200 prior create decision reused"
                 : safeFailureDetail(replayResponse, replayBody)
+            );
+
+            const readResponse = await boundedFetch(`/api/scrimed-work/sessions/${createdSessionId}`, {
+              headers: protectedReadHeaders
+            });
+            const readBody = await readJson(readResponse);
+            const readSession = nestedRecord(readBody, "data");
+            record(
+              "durable-read",
+              readResponse.status === 200 && readSession?.id === createdSessionId ? "pass" : "fail",
+              readResponse.status === 200 && readSession?.id === createdSessionId
+                ? "200 authoritative tenant-scoped session retrieved"
+                : safeFailureDetail(readResponse, readBody)
+            );
+
+            const verificationResponse = await boundedFetch(`/api/scrimed-work/sessions/${createdSessionId}/verify`, {
+              method: "POST",
+              headers: protectedReadHeaders
+            });
+            const verificationBody = await readJson(verificationResponse);
+            const verification = nestedRecord(verificationBody, "data");
+            const failedCriteria = Array.isArray(verification?.failedCriteria) ? verification.failedCriteria : [];
+            const reviewGateHeld =
+              verification?.allPass === false &&
+              verification?.eligibleForCompletion === false &&
+              failedCriteria.includes("human-approval-state");
+            record(
+              "verification-evidence",
+              verificationResponse.status === 200 && reviewGateHeld ? "pass" : "fail",
+              verificationResponse.status === 200 && reviewGateHeld
+                ? "200 verification evaluated; pending human review blocks completion"
+                : safeFailureDetail(verificationResponse, verificationBody)
             );
 
             const planIdempotencyKey = `scrimed-work-browser-plan-${suffix}`;

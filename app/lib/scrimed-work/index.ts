@@ -31,6 +31,7 @@ import {
   getWorkSessionLifecycleSnapshot
 } from "./sessionLifecycle";
 import { getScrimedWorkTools } from "./toolRegistry";
+import { verifyScrimedWorkResult } from "./verificationEngine";
 import { listWorkSessions, getWorkSession, buildTransitionedWorkSession, buildWorkSessionFromContract } from "./workSessionStore";
 import { scrimedWorkspaces } from "./workspaceRegistry";
 import { simulateVoiceWorkflow } from "./voiceWorkflow";
@@ -176,7 +177,7 @@ export function getScrimedWorkSummary() {
     },
     productionHardening: getScrimedWorkProductionHardeningGate(),
     nextProductionHardeningStep:
-      "Apply both ordered SCRIMED Work Supabase migrations in a non-production project, run authenticated AAL2 lifecycle smoke, then canary one no-PHI protected workspace before enabling buyer-facing mutations."
+      "Confirm all three SCRIMED Work migrations and RLS/advisor evidence in the target environment, run the expanded AAL2 read/verify/lifecycle smoke, then canary one no-PHI protected workspace before enabling buyer-facing mutations."
   };
 }
 
@@ -259,7 +260,14 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
   }
 }
 
-export async function buildWriteAuthorizationDecision(request: Request, action: string, payload?: unknown) {
+type ProtectedAccessMode = "read" | "write";
+
+async function buildProtectedAuthorizationDecision(
+  request: Request,
+  action: string,
+  payload: unknown,
+  accessMode: ProtectedAccessMode
+) {
   const authorization = request.headers.get("authorization") ?? "";
   const idempotencyKey = request.headers.get("idempotency-key") ?? "";
   const flags = getScrimedWorkFeatureFlags();
@@ -272,7 +280,7 @@ export async function buildWriteAuthorizationDecision(request: Request, action: 
     };
   }
 
-  if (process.env.SCRIMED_WORK_PROTECTED_WRITES_ENABLED !== "true") {
+  if (accessMode === "write" && process.env.SCRIMED_WORK_PROTECTED_WRITES_ENABLED !== "true") {
     return {
       allowed: false as const,
       status: 503,
@@ -291,7 +299,9 @@ export async function buildWriteAuthorizationDecision(request: Request, action: 
       status: 503,
       error: errorEnvelope(
         "scrimed_work_durable_store_disabled",
-        "SCRIMED Work protected writes require SCRIMED_WORK_DURABLE_STORE_ENABLED=true and the approved Supabase migration before mutation routes can run.",
+        accessMode === "write"
+          ? "SCRIMED Work protected writes require SCRIMED_WORK_DURABLE_STORE_ENABLED=true and the approved Supabase migration before mutation routes can run."
+          : "SCRIMED Work protected reads require SCRIMED_WORK_DURABLE_STORE_ENABLED=true and the approved Supabase migration before authoritative records can be retrieved.",
         action,
         false
       )
@@ -312,14 +322,14 @@ export async function buildWriteAuthorizationDecision(request: Request, action: 
       status: 400,
       error: errorEnvelope(
         "scrimed_work_sensitive_payload_blocked",
-        "SCRIMED Work protected writes reject token-like fields, credentials, PHI, and direct identifiers.",
+        "SCRIMED Work protected access rejects token-like fields, credentials, PHI, and direct identifiers.",
         action,
         false
       )
     };
   }
 
-  if (!idempotencyKey || idempotencyKey.length < 8) {
+  if (accessMode === "write" && (!idempotencyKey || idempotencyKey.length < 8)) {
     return {
       allowed: false as const,
       status: 428,
@@ -374,13 +384,21 @@ export async function buildWriteAuthorizationDecision(request: Request, action: 
       client: context.client,
       user: context.user,
       workspaceSlug,
-      idempotencyKey,
+      idempotencyKey: accessMode === "write" ? idempotencyKey : "read-only-protected-access",
       workspaceId: membership.workspaceId,
       tenantId: membership.tenantId,
       memberRole: membership.memberRole,
       actorRole: membership.actorRole
     } satisfies ScrimedWorkDurableStoreContext
   };
+}
+
+export function buildWriteAuthorizationDecision(request: Request, action: string, payload?: unknown) {
+  return buildProtectedAuthorizationDecision(request, action, payload, "write");
+}
+
+export function buildReadAuthorizationDecision(request: Request, action: string, payload?: unknown) {
+  return buildProtectedAuthorizationDecision(request, action, payload, "read");
 }
 
 export async function guardedCreateSession(request: Request) {
@@ -441,7 +459,7 @@ export async function guardedCreateSession(request: Request) {
   };
 }
 
-async function resolveWorkSessionForProtectedWrite(context: ScrimedWorkDurableStoreContext, sessionId: string): Promise<{
+async function resolveProtectedWorkSession(context: ScrimedWorkDurableStoreContext, sessionId: string): Promise<{
   session: WorkSession | null;
   failure: ReturnType<typeof scrimedWorkDurableStoreRpcFailure> | null;
 }> {
@@ -458,10 +476,10 @@ async function resolveWorkSessionForProtectedWrite(context: ScrimedWorkDurableSt
 }
 
 export async function guardedGetProtectedWorkSession(request: Request, sessionId: string) {
-  const auth = await buildWriteAuthorizationDecision(request, `read-protected-${sessionId}`, { sessionId });
+  const auth = await buildReadAuthorizationDecision(request, `read-protected-${sessionId}`, { sessionId });
   if (!auth.allowed) return auth;
 
-  const resolved = await resolveWorkSessionForProtectedWrite(auth.context, sessionId);
+  const resolved = await resolveProtectedWorkSession(auth.context, sessionId);
   if (!resolved.session && resolved.failure) {
     return {
       allowed: false as const,
@@ -486,6 +504,17 @@ export async function guardedGetProtectedWorkSession(request: Request, sessionId
   return { allowed: true as const, status: 200, data: { session: resolved.session } };
 }
 
+export async function guardedVerifyProtectedWorkSession(request: Request, sessionId: string) {
+  const session = await guardedGetProtectedWorkSession(request, sessionId);
+  if (!session.allowed) return session;
+
+  return {
+    allowed: true as const,
+    status: 200,
+    data: verifyScrimedWorkResult({ session: session.data.session })
+  };
+}
+
 export async function guardedTransitionSession(
   request: Request,
   sessionId: string,
@@ -495,7 +524,7 @@ export async function guardedTransitionSession(
   const auth = await buildWriteAuthorizationDecision(request, `${action}-${sessionId}`, { sessionId, action, reason });
   if (!auth.allowed) return auth;
 
-  const resolved = await resolveWorkSessionForProtectedWrite(auth.context, sessionId);
+  const resolved = await resolveProtectedWorkSession(auth.context, sessionId);
 
   if (!resolved.session && resolved.failure) {
     return {
@@ -623,7 +652,7 @@ export async function guardedCreateArtifact(request: Request) {
   const auth = await buildWriteAuthorizationDecision(request, "artifact-create", body.payload);
   if (!auth.allowed) return auth;
 
-  const resolved = await resolveWorkSessionForProtectedWrite(auth.context, parsed.value.sessionId);
+  const resolved = await resolveProtectedWorkSession(auth.context, parsed.value.sessionId);
 
   if (!resolved.session && resolved.failure) {
     return {

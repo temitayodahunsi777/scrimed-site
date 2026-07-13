@@ -98,7 +98,7 @@ Protected writes return fail-closed by default unless all of the following are t
 - a tenant member bearer token is supplied
 - the bearer token verifies as AAL2 with a bound session id
 - the operator has `tenant-admin`, `pilot-lead`, or `reviewer` membership for the supplied workspace
-- an `idempotency-key` header is present
+- an `idempotency-key` header is present for mutations; authenticated durable reads do not accept mutation authority from that header
 - `x-scrimed-workspace-slug`, `workspaceSlug`, or `SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG` identifies the tenant workspace
 
 The ordered local migrations are:
@@ -111,7 +111,7 @@ On 2026-07-13, the connected `scrimed-protected-pilot` Supabase project was veri
 
 ## Session Lifecycle
 
-Protected transition routes never trust or populate the public in-memory session map. Every protected read or mutation re-reads the record through the tenant-scoped durable RPC before evaluating the action. The application and database enforce the same progression:
+Protected transition routes never trust or populate the public in-memory session map. Every protected read, verification request, or mutation re-reads the record through the tenant-scoped durable RPC before evaluating the action. Read and verification routes require AAL2 identity, authorized tenant membership, workspace scope, sensitive-payload screening, and the durable-store flag; they do not require mutation idempotency or the protected-write feature flag. The application and database enforce the same progression:
 
 ```text
 draft -> planning -> active or awaiting_approval -> verifying -> completed
@@ -132,7 +132,7 @@ draft -> planning -> active or awaiting_approval -> verifying -> completed
 
 ### AAL2 browser-session verification
 
-The protected pilot access surface includes a bounded nine-check SCRIMED Work verifier. It uses the active tenant AAL2 browser session directly and never exports the bearer token to a terminal, CI log, page field, download, or audit record. The verifier proves unauthenticated fail-closed behavior, durable create and replay, lifecycle transition and replay, invalid-transition denial, artifact metadata persistence, and cancellation cleanup.
+The protected pilot access surface includes a bounded eleven-check SCRIMED Work verifier. It uses the active tenant AAL2 browser session directly and never exports the bearer token to a terminal, CI log, page field, download, or audit record. The verifier proves unauthenticated fail-closed behavior, durable create and replay, authoritative tenant-scoped read, verification evidence with the human-review completion gate held, lifecycle transition and replay, invalid-transition denial, artifact metadata persistence, and cancellation cleanup.
 
 Every run is synthetic metadata only. It stops when routes, durable storage, authorization, or operator flags are unavailable; it does not downgrade to an unapproved provider or in-memory success path. A created verification session is cancelled in a `finally` cleanup path while its append-only evidence remains available for review.
 
@@ -193,7 +193,7 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 ## Known Limitations
 
-- Read-only public views remain synthetic. Protected write routes now have a durable Supabase RPC adapter, but still fail closed until both migrations, the runtime token, an AAL2 bearer token, an idempotency key, the workspace slug, and feature flags are present.
+- Read-only public views remain synthetic. Protected durable reads and verification require an AAL2 bearer session, authorized workspace membership, workspace scope, and the durable-store flag. Protected writes additionally require the server runtime token, mutation idempotency key, protected-write flag, and reviewed migration evidence.
 - The existing membership model has tenant-admin, pilot-lead, reviewer, and observer roles but no verified clinician credential binding. High-risk clinical approval therefore remains blocked rather than treating a generic reviewer as a clinician.
 - Live database migration application and authenticated smoke must be run by an approved operator; this implementation did not touch production data.
 - Provider adapters do not call external models and require future secret-managed configuration, legal/privacy review, and budget controls.
@@ -203,4 +203,4 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 ## Next Production-Hardening Step
 
-Apply all three SCRIMED Work migrations in order in each approved non-production Supabase project, run `npm run smoke:scrimed-work:strict` with a fresh authorized AAL2 token, review Supabase advisors/RLS posture, then canary one no-PHI protected workspace before enabling buyer-facing protected mutations. Add an externally reviewed clinician-identity binding before any high-risk clinical approval path is considered.
+Confirm all three SCRIMED Work migrations, RLS/grant posture, and advisor evidence independently in each target environment. Then run the expanded eleven-check browser verifier and `npm run smoke:scrimed-work:strict` with a fresh authorized AAL2 session before canarying one no-PHI protected workspace. Add an externally reviewed clinician-identity binding before any high-risk clinical approval path is considered, and keep buyer-facing mutations disabled until canary evidence is reviewed.

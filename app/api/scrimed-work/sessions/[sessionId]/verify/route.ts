@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getWorkSession,
+  guardedVerifyProtectedWorkSession,
   scrimedWorkHeaders,
   verifyScrimedWorkResult,
   wrapWorkData
@@ -9,24 +10,29 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
   const session = getWorkSession(sessionId);
 
-  if (!session) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: { code: "scrimed_work_session_not_found", message: "Session not found.", retryable: false },
-        meta: { requestId: "req_scrimed_work_verify_missing", traceId: "trace_scrimed_work_verify_missing", timestamp: "2026-07-09T00:00:00.000Z" }
-      },
-      { status: 404, headers: scrimedWorkHeaders() }
-    );
+  if (session) {
+    return NextResponse.json(wrapWorkData(verifyScrimedWorkResult({ session }), sessionId), {
+      headers: scrimedWorkHeaders({ "X-SCRIMED-Verification-Authority": "public-synthetic-fixture" })
+    });
   }
 
-  return NextResponse.json(wrapWorkData(verifyScrimedWorkResult({ session }), sessionId), {
-    headers: scrimedWorkHeaders({ "X-SCRIMED-Verification-Authority": "metadata-only" })
+  const result = await guardedVerifyProtectedWorkSession(request, sessionId);
+
+  if (!result.allowed) {
+    return NextResponse.json(result.error, {
+      status: result.status,
+      headers: scrimedWorkHeaders({ "X-SCRIMED-Verification-Authority": "fail-closed" })
+    });
+  }
+
+  return NextResponse.json(wrapWorkData(result.data, sessionId), {
+    status: result.status,
+    headers: scrimedWorkHeaders({ "X-SCRIMED-Verification-Authority": "authorized-aal2-durable-read" })
   });
 }

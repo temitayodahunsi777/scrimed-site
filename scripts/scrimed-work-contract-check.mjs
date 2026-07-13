@@ -122,6 +122,7 @@ for (const expected of [
   "fetchScrimedWorkSessionFromDurableStore",
   "recordScrimedWorkArtifactInDurableStore",
   "buildWriteAuthorizationDecision",
+  "buildReadAuthorizationDecision",
   "SCRIMED_WORK_PROTECTED_WRITES_ENABLED",
   "routeScrimedWorkModel",
   "selectedModel",
@@ -161,6 +162,7 @@ for (const expected of [
   "scrimed-work-lifecycle-v2026-07-13",
   "evaluateWorkSessionTransition",
   "applyWorkSessionTransition",
+  "hasSatisfiedRequiredHumanApproval",
   "separation-of-duties-required",
   "idempotent_replay_candidate",
   "resolveScrimedWorkMembership"
@@ -193,6 +195,27 @@ for (const route of [
   requireIncludes(route, files[route], route.endsWith("sessions/route.ts") ? "guardedCreateSession" : "guardedTransitionSession");
   requireIncludes(route, files[route], "fail-closed");
 }
+
+requireIncludes(
+  "app/api/scrimed-work/sessions/[sessionId]/route.ts",
+  files["app/api/scrimed-work/sessions/[sessionId]/route.ts"],
+  "guardedGetProtectedWorkSession"
+);
+requireIncludes(
+  "app/api/scrimed-work/sessions/[sessionId]/route.ts",
+  files["app/api/scrimed-work/sessions/[sessionId]/route.ts"],
+  "authorized-aal2-durable-read"
+);
+requireIncludes(
+  "app/api/scrimed-work/sessions/[sessionId]/verify/route.ts",
+  files["app/api/scrimed-work/sessions/[sessionId]/verify/route.ts"],
+  "guardedVerifyProtectedWorkSession"
+);
+requireIncludes(
+  "app/api/scrimed-work/sessions/[sessionId]/verify/route.ts",
+  files["app/api/scrimed-work/sessions/[sessionId]/verify/route.ts"],
+  "fail-closed"
+);
 
 requireIncludes(
   "app/api/scrimed-work/artifacts/route.ts",
@@ -248,6 +271,7 @@ for (const expected of [
 
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:lifecycle");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedGetProtectedWorkSession");
+requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedVerifyProtectedWorkSession");
 requireNotIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "saveWorkSession(");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_MIGRATIONS_VERIFIED");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_MIGRATION_EVIDENCE_ID");
@@ -324,6 +348,9 @@ for (const expected of [
   "Run SCRIMED Work Verification",
   "scrimed-work-browser-verification",
   "session.access_token",
+  "durable-read",
+  "verification-evidence",
+  "pending human review blocks completion",
   "Cancellation cleanup could not be confirmed",
   "Keep SCRIMED Work release promotion blocked"
 ]) {
@@ -337,6 +364,9 @@ for (const expected of [
   "idempotency-key",
   "pass unauthenticated SCRIMED Work session create fail-closed",
   "authenticated SCRIMED Work token preflight",
+  "durable session read",
+  "verification evidence",
+  "human review gate held",
   "transition idempotency",
   "invalid lifecycle transition fail-closed",
   "artifact create"

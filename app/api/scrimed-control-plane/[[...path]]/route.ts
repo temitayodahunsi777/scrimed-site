@@ -96,7 +96,7 @@ async function authorizeMetadataPost(request: Request, action: string, payload: 
   return { ok: true as const, context: decision.context };
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const parts = await pathParts(context);
   const endpoint = parts.join("/");
   const summary = getControlPlaneSummary();
@@ -113,8 +113,25 @@ export async function GET(_request: Request, context: RouteContext) {
   }
   if (endpoint === "sessions") return json({ sessions: summary.sessions }, "control-plane-sessions");
   if (parts[0] === "sessions" && parts.length === 2) {
-    const result = getSessionOrError(parts[1]);
-    return NextResponse.json(result.body, { status: result.status, headers: controlPlaneHeaders() });
+    const fixture = getSessionOrError(parts[1]);
+    if (fixture.ok) {
+      return NextResponse.json(fixture.body, {
+        status: fixture.status,
+        headers: controlPlaneHeaders({ "X-SCRIMED-Control-Plane-Read": "public-synthetic-fixture" })
+      });
+    }
+
+    const protectedSession = await guardedGetProtectedWorkSession(request, parts[1]);
+    if (!protectedSession.allowed) {
+      return NextResponse.json(protectedSession.error, {
+        status: protectedSession.status,
+        headers: controlPlaneHeaders({ "X-SCRIMED-Control-Plane-Decision": "fail-closed" })
+      });
+    }
+
+    return json(protectedSession.data.session, parts[1], 200, {
+      "X-SCRIMED-Control-Plane-Read": "authorized-aal2-durable-read"
+    });
   }
   if (endpoint === "agents") return json({ agents: controlPlaneAgentRegistry }, "control-plane-agents");
   if (endpoint === "skills") return json({ skills: controlPlaneSkillRegistry }, "control-plane-skills");

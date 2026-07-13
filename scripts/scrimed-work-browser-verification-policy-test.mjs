@@ -22,8 +22,10 @@ assert.ok(payload.definitionOfDone.prohibitedActions.includes("payer submission"
 assert.ok(payload.definitionOfDone.prohibitedActions.includes("EHR writeback"));
 assert.ok(!/patient[_ -]?(name|email|phone|address)|member[_ -]?id/i.test(serialized));
 
-assert.equal(scrimedWorkBrowserVerificationChecks.length, 9);
+assert.equal(scrimedWorkBrowserVerificationChecks.length, 11);
 assert.equal(scrimedWorkBrowserVerificationChecks.at(1)?.id, "unauthenticated-fail-closed");
+assert.ok(scrimedWorkBrowserVerificationChecks.some((check) => check.id === "durable-read" && check.mutation === false));
+assert.ok(scrimedWorkBrowserVerificationChecks.some((check) => check.id === "verification-evidence" && check.mutation === false));
 assert.equal(scrimedWorkBrowserVerificationChecks.at(-1)?.id, "cancellation-cleanup");
 assert.match(scrimedWorkBrowserVerificationBoundary, /without exporting its bearer token/i);
 
@@ -40,7 +42,7 @@ assert.equal(
 );
 assert.equal(
   isScrimedWorkBrowserVerificationComplete(
-    scrimedWorkBrowserVerificationChecks.map((_, index) => ({ status: index === 8 ? "blocked" : "pass" }))
+    scrimedWorkBrowserVerificationChecks.map((_, index) => ({ status: index === 10 ? "blocked" : "pass" }))
   ),
   false
 );

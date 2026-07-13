@@ -1,6 +1,16 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-28
+Updated: 2026-07-13
+
+## Latest SCRIMED Work Durable Read and Verification Release
+
+- Connected `GET /api/scrimed-work/sessions/[sessionId]` and `POST /api/scrimed-work/sessions/[sessionId]/verify` to the authoritative tenant-scoped durable store for non-fixture sessions.
+- Separated protected read authorization from mutation authorization: durable reads still require the feature-enabled durable store, an AAL2 session, authorized tenant membership, workspace scope, and sensitive-data screening, while mutation idempotency and the protected-write toggle remain write-only controls.
+- Preserved mandatory approval for all high-risk work and extended the Definition-of-Done human-review requirement across every other risk tier; pending review prevents verification from reporting completion eligibility.
+- Expanded the protected pilot browser verifier from nine to eleven checks with authoritative durable read and verification-evidence checks, while retaining cancellation cleanup and no bearer-token export.
+- Extended authenticated and public smoke coverage for durable retrieval, verification evidence, fixture compatibility, unknown-session fail-closed behavior, and the human-review completion gate.
+- Passed the direct-Node quality runner, including generated integrity, workspace hygiene, the complete nonsecret suite, TypeScript, ESLint, and the 445-page Next.js production build. No production deployment or clinical authority was granted.
+- Preserved retained boundaries: no live PHI, autonomous clinical care, diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, final imaging interpretation, production connector approval, certification claim, or customer go-live authority.
 
 ## Latest Known Limit Resolution Queue Release
 

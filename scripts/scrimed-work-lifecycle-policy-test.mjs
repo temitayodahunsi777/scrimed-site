@@ -4,7 +4,8 @@ import assert from "node:assert/strict";
 import {
   applyWorkSessionTransition,
   evaluateWorkSessionTransition,
-  getWorkSessionLifecycleSnapshot
+  getWorkSessionLifecycleSnapshot,
+  hasSatisfiedRequiredHumanApproval
 } from "../app/lib/scrimed-work/sessionLifecycle.ts";
 
 function sessionFixture(status = "draft", overrides = {}) {
@@ -165,6 +166,19 @@ const verifying = sessionFixture("verifying", {
     }
   ]
 });
+assert.equal(hasSatisfiedRequiredHumanApproval(sessionFixture("verifying")), false);
+assert.equal(hasSatisfiedRequiredHumanApproval(verifying), true);
+assert.equal(
+  hasSatisfiedRequiredHumanApproval(sessionFixture("verifying", { humanApprovalRequired: false })),
+  true
+);
+assert.equal(
+  hasSatisfiedRequiredHumanApproval(
+    sessionFixture("verifying", { riskLevel: "high", humanApprovalRequired: false })
+  ),
+  false
+);
+
 const blockedCompletion = evaluateWorkSessionTransition({ session: verifying, action: "complete" });
 assert.equal(blockedCompletion.code, "verification-required");
 const allowedCompletion = evaluateWorkSessionTransition({
