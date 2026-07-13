@@ -16,37 +16,81 @@ function isSha(value) {
 
 export function evaluateReleaseProvenance(input) {
   const production = input.vercelEnvironment === "production";
-  const mustBeClean = input.strict || input.ci || production;
+  const vercelBuild = input.deploymentAware
+    && (input.vercelEnvironment === "preview" || production);
+  const githubBuild = input.githubActions && !vercelBuild;
+  const requireLocalGit = input.strict || githubBuild;
+  const localSourceReady = input.gitAvailable
+    && input.dirtyEntryCount === 0
+    && isSha(input.headSha);
+  const vercelSourceReady = vercelBuild
+    && isSha(input.vercelGitCommitSha)
+    && typeof input.vercelGitCommitRef === "string"
+    && input.vercelGitCommitRef.length > 0;
+  const effectiveSha = localSourceReady
+    ? input.headSha
+    : vercelSourceReady
+      ? input.vercelGitCommitSha
+      : null;
   const checks = [
     {
       id: "git-repository-present",
-      required: mustBeClean,
+      required: requireLocalGit,
       passed: input.gitAvailable,
-      detail: input.gitAvailable ? "Git metadata is available." : "Git metadata is unavailable."
+      detail: input.gitAvailable
+        ? "Git metadata is available."
+        : vercelBuild
+          ? "Local Git metadata is not required when Vercel supplies immutable deployment provenance."
+          : "Git metadata is unavailable."
     },
     {
       id: "working-tree-clean",
-      required: mustBeClean,
+      required: requireLocalGit,
       passed: input.gitAvailable && input.dirtyEntryCount === 0,
       detail: input.dirtyEntryCount === 0
         ? "Working tree is clean."
+        : vercelBuild
+          ? "Working-tree inspection is delegated to the source-controlled Vercel deployment."
         : `Working tree contains ${input.dirtyEntryCount} modified or untracked entries.`
     },
     {
       id: "head-sha-valid",
-      required: mustBeClean,
+      required: requireLocalGit,
       passed: isSha(input.headSha),
       detail: isSha(input.headSha) ? "HEAD is an immutable Git SHA." : "HEAD SHA is unavailable or invalid."
     },
     {
       id: "github-sha-matches-head",
-      required: input.ci,
-      passed: !input.ci || (isSha(input.githubSha) && input.githubSha === input.headSha),
-      detail: !input.ci
-        ? "Not evaluated outside CI."
+      required: githubBuild,
+      passed: !githubBuild || (isSha(input.githubSha) && input.githubSha === input.headSha),
+      detail: !githubBuild
+        ? "Not evaluated outside GitHub Actions."
         : input.githubSha === input.headSha
           ? "GitHub workflow SHA matches HEAD."
           : "GitHub workflow SHA does not match HEAD."
+    },
+    {
+      id: "vercel-commit-sha-valid",
+      required: vercelBuild,
+      passed: !vercelBuild || isSha(input.vercelGitCommitSha),
+      detail: !vercelBuild
+        ? "Not evaluated outside a deployment-aware Vercel build."
+        : isSha(input.vercelGitCommitSha)
+          ? "Vercel supplied an immutable commit SHA."
+          : "VERCEL_GIT_COMMIT_SHA is unavailable or invalid."
+    },
+    {
+      id: "vercel-commit-ref-present",
+      required: vercelBuild,
+      passed: !vercelBuild || (
+        typeof input.vercelGitCommitRef === "string"
+        && input.vercelGitCommitRef.length > 0
+      ),
+      detail: !vercelBuild
+        ? "Not evaluated outside a deployment-aware Vercel build."
+        : typeof input.vercelGitCommitRef === "string" && input.vercelGitCommitRef.length > 0
+          ? "Vercel supplied the source branch reference."
+          : "VERCEL_GIT_COMMIT_REF is unavailable."
     },
     {
       id: "production-attestation-enabled",
@@ -94,7 +138,7 @@ export function evaluateReleaseProvenance(input) {
     }
   ];
   const failedRequiredChecks = checks.filter((check) => check.required && !check.passed);
-  const sourceReady = input.gitAvailable && input.dirtyEntryCount === 0 && isSha(input.headSha);
+  const sourceReady = vercelBuild ? vercelSourceReady : localSourceReady;
   const releasePromotionAllowed = sourceReady && failedRequiredChecks.length === 0;
 
   return {
@@ -106,8 +150,17 @@ export function evaluateReleaseProvenance(input) {
         : "release-provenance-observed-drift",
     allowed: failedRequiredChecks.length === 0,
     releasePromotionAllowed,
-    mode: production ? "vercel-production" : input.ci ? "ci" : input.strict ? "local-strict" : "local-report-only",
-    headFingerprint: isSha(input.headSha) ? input.headSha.slice(0, 12) : "unavailable",
+    mode: production
+      ? "vercel-production"
+      : vercelBuild
+        ? "vercel-preview"
+        : githubBuild
+          ? "github-actions"
+          : input.strict
+            ? "local-strict"
+            : "local-report-only",
+    sourceKind: vercelBuild ? "vercel-attested" : "local-git",
+    headFingerprint: isSha(effectiveSha) ? effectiveSha.slice(0, 12) : "unavailable",
     dirtyEntryCount: input.dirtyEntryCount,
     checks,
     failedRequiredChecks: failedRequiredChecks.map((check) => check.id),
@@ -137,6 +190,8 @@ function runSelfTest() {
   const base = {
     strict: true,
     ci: false,
+    githubActions: false,
+    deploymentAware: false,
     gitAvailable: true,
     headSha: "a".repeat(40),
     dirtyEntryCount: 0,
@@ -152,6 +207,11 @@ function runSelfTest() {
   const productionMissingApproval = evaluateReleaseProvenance({
     ...base,
     strict: false,
+    ci: true,
+    deploymentAware: true,
+    gitAvailable: false,
+    headSha: null,
+    dirtyEntryCount: -1,
     vercelEnvironment: "production",
     vercelGitCommitSha: base.headSha,
     vercelGitCommitRef: "main"
@@ -159,11 +219,40 @@ function runSelfTest() {
   const productionApproved = evaluateReleaseProvenance({
     ...base,
     strict: false,
+    ci: true,
+    deploymentAware: true,
+    gitAvailable: false,
+    headSha: null,
+    dirtyEntryCount: -1,
     vercelEnvironment: "production",
     provenanceEnforced: true,
     approvedReleaseSha: base.headSha,
     vercelGitCommitSha: base.headSha,
     vercelGitCommitRef: "main"
+  });
+  const previewAttested = evaluateReleaseProvenance({
+    ...base,
+    strict: false,
+    ci: true,
+    deploymentAware: true,
+    gitAvailable: false,
+    headSha: null,
+    dirtyEntryCount: -1,
+    vercelEnvironment: "preview",
+    vercelGitCommitSha: base.headSha,
+    vercelGitCommitRef: "agent/release"
+  });
+  const previewMissingSha = evaluateReleaseProvenance({
+    ...base,
+    strict: false,
+    ci: true,
+    deploymentAware: true,
+    gitAvailable: false,
+    headSha: null,
+    dirtyEntryCount: -1,
+    vercelEnvironment: "preview",
+    vercelGitCommitSha: null,
+    vercelGitCommitRef: "agent/release"
   });
 
   if (
@@ -174,6 +263,10 @@ function runSelfTest() {
     || productionMissingApproval.allowed
     || !productionApproved.allowed
     || !productionApproved.releasePromotionAllowed
+    || !previewAttested.allowed
+    || !previewAttested.releasePromotionAllowed
+    || previewMissingSha.allowed
+    || previewMissingSha.releasePromotionAllowed
   ) {
     throw new Error("Release provenance self-test failed.");
   }
@@ -191,6 +284,8 @@ const report = evaluateReleaseProvenance({
   ...repository,
   strict: args.has("--strict"),
   ci: process.env.CI === "true" || process.env.CI === "1",
+  githubActions: process.env.GITHUB_ACTIONS === "true",
+  deploymentAware: args.has("--deployment-aware"),
   githubSha: process.env.GITHUB_SHA ?? null,
   vercelEnvironment: process.env.VERCEL_ENV ?? null,
   provenanceEnforced: process.env.SCRIMED_RELEASE_PROVENANCE_ENFORCED === "true",
@@ -203,7 +298,7 @@ if (args.has("--json")) {
   console.log(JSON.stringify(report, null, 2));
 } else {
   console.log(`${report.releasePromotionAllowed ? "pass" : report.allowed ? "report" : "blocked"} SCRIMED release provenance: ${report.status}`);
-  console.log(`mode=${report.mode} head_fingerprint=${report.headFingerprint} dirty_entries=${report.dirtyEntryCount}`);
+  console.log(`mode=${report.mode} source=${report.sourceKind} head_fingerprint=${report.headFingerprint} dirty_entries=${report.dirtyEntryCount}`);
   for (const check of report.checks.filter((item) => item.required)) {
     console.log(`${check.passed ? "pass" : "fail"} ${check.id}: ${check.detail}`);
   }

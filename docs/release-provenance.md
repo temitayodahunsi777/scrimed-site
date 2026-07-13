@@ -7,6 +7,8 @@ SCRIMED production promotion must be bound to one clean, immutable, reviewed Git
 - `npm run release:provenance` reports local provenance without blocking development.
 - `npm run release:provenance:strict` fails when modified or untracked files exist, Git metadata is unavailable, or CI's SHA differs from `HEAD`.
 - CI runs strict provenance before quality and build gates.
+- Vercel preview builds use Vercel's immutable commit SHA and branch reference because deployment sandboxes intentionally omit `.git` metadata.
+- Missing or malformed Vercel commit provenance fails the preview build closed; provider attestation never substitutes for local strict or GitHub Actions checks.
 - Vercel production builds require `SCRIMED_RELEASE_PROVENANCE_ENFORCED=true`.
 - `SCRIMED_APPROVED_RELEASE_SHA` must be the exact full SHA approved by the release steward.
 - Vercel's commit SHA must match the approved SHA and target `main`.
@@ -27,7 +29,7 @@ The production environment values are non-secret release controls, but only a na
 
 ## Failure Behavior
 
-Missing Git evidence, a dirty source tree, SHA mismatch, a non-main production source, or a missing production attestation fails closed. The preflight does not print secrets or changed filenames.
+Missing required Git evidence, a dirty source tree, missing Vercel source attestation, SHA mismatch, a non-main production source, or a missing production attestation fails closed. The preflight does not print secrets or changed filenames.
 
 ## Boundary
 

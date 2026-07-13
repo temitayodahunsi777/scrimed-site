@@ -24,6 +24,8 @@ for (const expected of [
   "evaluateReleaseProvenance",
   "working-tree-clean",
   "github-sha-matches-head",
+  "vercel-commit-sha-valid",
+  "vercel-commit-ref-present",
   "production-attestation-enabled",
   "vercel-sha-matches-approved-release",
   "production-main-branch-only",
@@ -32,6 +34,7 @@ for (const expected of [
   "SCRIMED_RELEASE_PROVENANCE_ENFORCED",
   "SCRIMED_APPROVED_RELEASE_SHA",
   "productionMutationPerformed: false",
+  'sourceKind: vercelBuild ? "vercel-attested" : "local-git"',
   "--self-test"
 ]) {
   requireIncludes("scripts/release-provenance-preflight.mjs", expected);
