@@ -33,6 +33,18 @@ Manual workflow dispatch supports:
 
 Scheduled runs use the defaults. If the secret is present, the authenticated path runs. If the secret is absent during scheduled runs, the script still validates fail-closed unauthenticated behavior and skips authenticated mutations.
 
+## Runner And Concurrency Guard
+
+The workflow uses a separate concurrency key per event type and ref:
+
+- `schedule` runs do not share the same pending slot with `workflow_dispatch` runs.
+- Manual dispatches on the same ref still serialize, so two authenticated mutation smokes do not run over each other.
+- `cancel-in-progress` remains false so an active governance smoke is not interrupted mid-evidence run.
+
+The job also emits a no-secret context summary when a runner starts. It prints event name, base URL, workspace slug, whether authenticated smoke is required, and whether a bearer token is present. It never prints the token value.
+
+If a scheduled run is marked cancelled before any steps execute and the job has `runner_id: 0`, treat it as a GitHub runner scheduling cancellation. Rerun failed jobs first; if the rerun reaches a runner, use the emitted no-secret context and smoke logs to decide whether a source change is needed.
+
 ## What The Smoke Validates
 
 - Unauthenticated work-order, governance-ledger, and TrustOps incident access fails closed.

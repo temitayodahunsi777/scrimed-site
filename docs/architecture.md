@@ -11,6 +11,11 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Official public website context: https://www.scrimedsolutions.com through Wix
 - Public platform surface: `/`, `/platform`, `/trust`
 - Healthcare Intelligence OS foundation: `/healthcare-intelligence-os`, `/api/healthcare-intelligence-os`, and `/api/healthcare-intelligence-os/brief`
+- Clinical Data Fabric control plane: `/api/clinical-data-fabric` and `/api/clinical-data-fabric/brief` for governed source contracts, semantic normalization, provenance, and health-graph projection without live PHI authority
+- Clinical Data Governance policy engine: `/api/clinical-data-governance` and `/api/clinical-data-governance/brief` for metadata-only role, purpose, data class, consent, review, residency, destination, model, and connector policy decisions
+- Clinical Context Gateway: `/api/clinical-context-gateway` and `/api/clinical-context-gateway/brief` for governed semantic context envelopes that block raw schemas, raw connector payloads, credentials, PHI, record mutation, payer submission, patient outreach, and autonomous clinical authority
+- SCRIMED OS Upgrade Batch: `/api/scrimed-os/upgrade-batch` and `/api/scrimed-os/upgrade-batch/brief` for synthetic runtime optimization, prompt evolution, judge ensemble, human oversight, agent lab, token economics, knowledge fabric, model regression, and research-preview metadata with production behavior disabled
+- Boundary Release Approval Matrix: `/boundary-release-approvals`, `/api/boundary-release-approvals`, and `/api/boundary-release-approvals/brief` for fail-closed approval paths across live PHI, clinical decision support, autonomous clinical action, EHR writeback, payer submission, research/outcomes learning, certification claims, global operation, and customer go-live
 - Clinical Care Activation Readiness: `/clinical-care-activation`, `/api/clinical-care-activation`, and `/api/clinical-care-activation/brief` for hard-gate tracking before live clinical care
 - Persistent Agent Workspace v1: `/agent-workspace`, `/api/agent-workspace`, `/api/agent-workspace/brief`, `/api/agent-workspace/proof-packet`, `/api/agent-workspaces/[workspaceSlug]/work-orders`, `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]`, and `/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet`
 - Protected Command Intelligence Hub: `/pilot-workspace/access`, `/api/pilot-workspaces/[workspaceSlug]/command-intelligence`, and `/api/pilot-workspaces/[workspaceSlug]/command-intelligence/[snapshotId]/packet`
@@ -43,7 +48,7 @@ The current `scrimed-site` application is a Next.js App Router platform surface 
 - Workflow promotion review: `/workflows/promotion-review` and `/api/workflows/promotion-review`
 - Governed execution API contracts: `/workflows/contracts`, `/workflows/contracts/[slug]`, `/api/workflows/contracts`, and `/api/workflows/contracts/[slug]`
 - Identity and access readiness: `/workflows/identity-access` and `/api/workflows/identity-access`
-- Execution-attempt readiness: `/workflows/execution-attempts` and `/api/workflows/execution-attempts`
+- Execution-attempt readiness and durable store: `/workflows/execution-attempts`, `/api/workflows/execution-attempts`, `/api/workflows/execution-attempts/envelope`, `/api/workflows/execution-attempts/durable-store`, `/api/workflows/execution-attempts/durable-store/record`, `/api/workflows/execution-attempts/durable-store/replay`, and `/api/workflows/execution-attempts/durable-store/review-disposition`
 - Governed execution implementation readiness: `/workflows/implementation-readiness`, `/workflows/implementation-readiness/[slug]`, `/api/workflows/implementation-readiness`, and `/api/workflows/governed-execution/[slug]`
 - Denied execution audit boundaries: `/workflows/execution-audit`, `/workflows/execution-audit/[slug]`, `/api/workflows/execution-audit`, and `/api/workflows/execution-audit/[slug]`
 - Audit persistence readiness: `/workflows/audit-persistence` and `/api/workflows/audit-persistence`
@@ -232,7 +237,7 @@ Active gates:
 - Workflow result validation and synthetic-only promotion review for staged module workflows
 - Governed execution API contracts for staged workflows before implementation
 - Identity and access readiness before production authentication, tenant boundaries, roles, patient context, service auth, consent, break-glass access, and regional identity controls are implemented
-- Execution-attempt readiness before idempotent, durable, replay-safe workflow attempts are implemented
+- Execution-attempt durable-store migration and protected APIs before idempotent, replay-safe workflow attempts can move beyond no-PHI metadata review
 - Deny-by-default governed execution endpoints before production execution
 - Denied execution audit boundaries before durable audit logging
 - Audit persistence readiness before storage, retention, access, encryption, incident response, residency, and alerting are implemented

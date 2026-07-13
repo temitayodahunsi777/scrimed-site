@@ -5,6 +5,7 @@ import {
   getPilotProgramBySlug,
   getPilotPrograms
 } from "../../lib/demoPilotPrograms";
+import { getPilotDemoCommercialReadinessSummary } from "../../lib/pilotDemoCommercialReadiness";
 
 export function generateStaticParams() {
   return getPilotPrograms().map((pilot) => ({ slug: pilot.slug }));
@@ -23,6 +24,11 @@ export default async function PilotProgramDetailPage({
   }
 
   const demos = getDemosForPilot(pilot);
+  const commercialReadiness = getPilotDemoCommercialReadinessSummary();
+  const pilotPriceBand = commercialReadiness.pilotPriceBands.find((band) => band.slug === pilot.slug);
+  const matchingDemoPaths = commercialReadiness.demoOfferPaths.filter(
+    (path) => path.recommendedPilotSlug === pilot.slug
+  );
 
   return (
     <main>
@@ -50,12 +56,17 @@ export default async function PilotProgramDetailPage({
           <span>Decision metrics</span>
           <strong>{pilot.successMetrics.length}</strong>
         </article>
+        <article>
+          <span>Commercial path</span>
+          <strong>{matchingDemoPaths.length} demos</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
         <div>
           <p className="eyebrow">Target buyer</p>
           <h2>{pilot.buyer}</h2>
+          <p className="section-copy">{pilotPriceBand?.engagementModel ?? pilot.engagementModel}</p>
           <Link className="primary-action" href={pilot.requestRoute}>Request this pilot</Link>
         </div>
         <div className="layer-list">
@@ -67,6 +78,34 @@ export default async function PilotProgramDetailPage({
           ))}
         </div>
       </section>
+
+      {matchingDemoPaths.length > 0 ? (
+        <section className="table-section" aria-label="Recommended demo entry paths">
+          <div className="section-heading">
+            <p className="eyebrow">Best demo entry paths</p>
+            <h2>Use these demos to make the pilot conversation faster and easier for the buyer.</h2>
+          </div>
+          {matchingDemoPaths.map((path) => (
+            <article className="module-row" key={path.slug}>
+              <div>
+                <span>{path.recommendedOffer}</span>
+                <h2>{path.name}</h2>
+              </div>
+              <p>{path.buyerFit}</p>
+              <div>
+                <strong>{path.pricingBand}</strong>
+                <ul className="compact-list">
+                  <li>{path.retainedBoundary}</li>
+                  <li>{path.objectionHandling[0]}</li>
+                </ul>
+                <Link className="module-link" href={path.demoRoute}>
+                  Open demo
+                </Link>
+              </div>
+            </article>
+          ))}
+        </section>
+      ) : null}
 
       <section className="table-section" aria-label="Included product demos">
         <div className="section-heading">
@@ -153,6 +192,11 @@ export default async function PilotProgramDetailPage({
             <span>Commercial</span>
             <strong>Review pricing strategy</strong>
             <p>Inspect expansion paths from evaluation into protected pilot and enterprise license.</p>
+          </Link>
+          <Link className="action-card" href="/pilot-demo-commercial-readiness">
+            <span>Accelerator</span>
+            <strong>Review market alignment</strong>
+            <p>Inspect benchmark context, price bands, and demo-to-pilot routing.</p>
           </Link>
         </div>
       </section>

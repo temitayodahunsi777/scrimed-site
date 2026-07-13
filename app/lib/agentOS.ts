@@ -1,6 +1,7 @@
 import { agentWorkflows } from "./agentWorkflows";
 import { workflowExecutions } from "./workflowExecutions";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
+import { buildAgentRuntimeContextBridge } from "./scrimedStrategicExecutionLayer";
 
 export type AgentOSStatus = "foundation-online" | "synthetic-runtime-ready" | "production-gated";
 export type AgentRole = "planner" | "router" | "specialist" | "trustqa" | "governance";
@@ -128,6 +129,17 @@ export type AgentOSTaskPlan = {
   status: TaskPlanStatus;
   mode: ExecutionMode;
   template: TaskExecutionTemplate;
+  preRunContextManifest: {
+    required: true;
+    status: string;
+    manifestHash: string;
+    schemaVersion: string;
+    selectedModuleIds: string[];
+    validatorIds: string[];
+    activeTaskReminderIds: string[];
+    omittedContextIds: string[];
+    failClosed: string;
+  };
   plannerAgent: string;
   routerAgent: string;
   specialistAgents: string[];
@@ -672,6 +684,7 @@ export function buildAgentOSTaskPlan(request: AgentOSTaskRequest): AgentOSTaskPl
   const template =
     taskExecutionEngine.find((candidate) => candidate.slug === request.taskType) ?? taskExecutionEngine[0];
   const productionRequested = request.mode === "production-request";
+  const preRunContext = buildAgentRuntimeContextBridge();
   const now = new Date().toISOString();
 
   return {
@@ -679,6 +692,17 @@ export function buildAgentOSTaskPlan(request: AgentOSTaskRequest): AgentOSTaskPl
     status: productionRequested ? "denied-production-request" : "synthetic-plan-created",
     mode: request.mode,
     template,
+    preRunContextManifest: {
+      required: true,
+      status: preRunContext.status,
+      manifestHash: preRunContext.manifestHash,
+      schemaVersion: preRunContext.contextManifestSchema,
+      selectedModuleIds: preRunContext.selectedModuleIds,
+      validatorIds: preRunContext.validatorIds,
+      activeTaskReminderIds: preRunContext.activeTaskReminderIds,
+      omittedContextIds: preRunContext.omittedContextIds,
+      failClosed: preRunContext.failClosed
+    },
     plannerAgent: "Planner Agent",
     routerAgent: "Router Agent",
     specialistAgents: template.specialistAgents,
@@ -709,6 +733,7 @@ export function getAgentOSSummary() {
   const foundationAgents = agentOSControlPlane.filter((agent) => agent.status === "foundation-online").length;
   const syntheticReadyAgents = agentOSControlPlane.filter((agent) => agent.status === "synthetic-runtime-ready").length;
   const interoperabilityConformance = getInteroperabilityConformanceEvaluationSummary();
+  const agentRuntimeContextBridge = buildAgentRuntimeContextBridge();
 
   return {
     service: "scrimed-agentos-v1",
@@ -724,6 +749,7 @@ export function getAgentOSSummary() {
     specialistAgentRegistry: agentWorkflows,
     workflowExecutionRegistry: workflowExecutions,
     memoryFabric,
+    agentRuntimeContextBridge,
     trustQaVerificationLayer,
     humanApprovalCheckpoints,
     auditChannels,

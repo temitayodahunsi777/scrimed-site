@@ -26,6 +26,20 @@ import {
 } from "./workflowExecutionAudit";
 import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import { getIdentityAccessReadinessSummary } from "./identityAccessReadiness";
+import {
+  executionAttemptEnvelopeApiRoute,
+  executionAttemptEnvelopeBriefRoute,
+  executionAttemptEnvelopeRoute,
+  getExecutionAttemptEnvelopeSummary
+} from "./executionAttemptEnvelope";
+import {
+  executionAttemptDurableStoreApiRoute,
+  executionAttemptDurableStoreBriefRoute,
+  executionAttemptDurableStoreRecordRoute,
+  executionAttemptDurableStoreReplayRoute,
+  executionAttemptDurableStoreReviewDispositionRoute,
+  getExecutionAttemptDurableStoreSummary
+} from "./executionAttemptDurableStore";
 import { getExecutionAttemptReadinessSummary } from "./executionAttemptReadiness";
 import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import {
@@ -57,11 +71,135 @@ import {
 } from "./enterpriseReadiness";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getGlobalPartnerLocalizationSummary } from "./globalPartnerLocalization";
+import { getGlobalCertificationReadinessSummary } from "./globalCertificationReadiness";
+import {
+  getHealthRecordsSafetyExchangeSummary,
+  healthRecordsSafetyExchangeApiRoute,
+  healthRecordsSafetyExchangeBriefRoute,
+  healthRecordsSafetyExchangeExtractRoute,
+  healthRecordsSafetyExchangeRoute
+} from "./healthRecordsSafetyExchange";
+import {
+  clinicalContextGatewayApiRoute,
+  clinicalContextGatewayBriefRoute,
+  clinicalContextGatewayRoute
+} from "./clinicalContextGateway";
+import {
+  clinicalDataGovernanceApiRoute,
+  clinicalDataGovernanceBriefRoute,
+  clinicalDataGovernanceRoute
+} from "./clinicalDataGovernance";
+import {
+  clinicalDataFabricApiRoute,
+  clinicalDataFabricBriefRoute,
+  clinicalDataFabricRoute
+} from "./clinicalDataFabric";
+import {
+  continuousReviewAuditApiRoute,
+  continuousReviewAuditBriefRoute,
+  continuousReviewAuditRoute,
+  getContinuousReviewAuditSummary
+} from "./continuousReviewAudit";
 import { getClinicalAuthorityReadinessSummary } from "./clinicalAuthorityReadiness";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getCapitalVitalitySummary } from "./capitalVitality";
 import { getGrowthEngineSummary } from "./growthEngine";
+import {
+  companyAssessmentApiRoute,
+  companyAssessmentBriefRoute,
+  companyAssessmentRoute,
+  getCompanyAssessmentSummary
+} from "./companyAssessment";
+import {
+  clinicalProductionReadinessApiRoute,
+  clinicalProductionReadinessBriefRoute,
+  clinicalProductionReadinessRoute,
+  getClinicalProductionReadinessSummary
+} from "./clinicalProductionReadiness";
+import {
+  getProductServicePortfolioSummary,
+  productServicePortfolioApiRoute,
+  productServicePortfolioBriefRoute,
+  productServicePortfolioRoute
+} from "./productServicePortfolio";
+import {
+  getPilotDemoCommercialReadinessSummary,
+  pilotDemoCommercialReadinessApiRoute,
+  pilotDemoCommercialReadinessBriefRoute,
+  pilotDemoCommercialReadinessRoute
+} from "./pilotDemoCommercialReadiness";
+import {
+  getServiceDeliverySummary,
+  serviceDeliveryApiRoute,
+  serviceDeliveryBriefRoute,
+  serviceDeliveryRoute
+} from "./serviceDelivery";
+import {
+  clientOnboardingCommunicationsApiRoute,
+  clientOnboardingCommunicationsBriefRoute,
+  clientOnboardingCommunicationsRoute,
+  getClientOnboardingCommunicationsSummary
+} from "./clientOnboardingCommunications";
+import {
+  enterpriseBusinessOpsApiRoute,
+  enterpriseBusinessOpsBriefRoute,
+  enterpriseBusinessOpsRoute,
+  getEnterpriseBusinessOpsSummary
+} from "./enterpriseBusinessOperations";
+import {
+  enterpriseScalabilityOperationsApiRoute,
+  enterpriseScalabilityOperationsBriefRoute,
+  enterpriseScalabilityOperationsRoute,
+  getEnterpriseScalabilityOperationsSummary
+} from "./enterpriseScalabilityOperations";
+import {
+  getPlatformPowerSummary,
+  platformPowerApiRoute,
+  platformPowerBriefRoute,
+  platformPowerRoute
+} from "./platformPowerOperations";
+import {
+  productionArchitectureApiRoute,
+  productionArchitectureBriefRoute,
+  productionArchitectureRoute
+} from "./productionArchitecture";
+import {
+  getLimitationsWorkaroundSummary,
+  limitationsWorkaroundApiRoute,
+  limitationsWorkaroundBriefRoute,
+  limitationsWorkaroundRoute
+} from "./limitationsWorkaroundOperations";
+import {
+  getInvestorAudienceReadinessSummary,
+  investorAudienceReadinessApiRoute,
+  investorAudienceReadinessBriefRoute,
+  investorAudienceReadinessRoute
+} from "./investorAudienceReadiness";
+import {
+  getLaunchReadinessSummary,
+  launchReadinessApiRoute,
+  launchReadinessBriefRoute,
+  launchReadinessRoute
+} from "./launchReadinessOperations";
+import {
+  competitiveDefenseApiRoute,
+  competitiveDefenseBriefRoute,
+  competitiveDefenseRoute,
+  getCompetitiveDefenseSummary
+} from "./competitiveDefense";
 import { getServiceReliabilitySummary } from "./serviceReliability";
+import {
+  getOperationalEfficiencySummary,
+  operationalEfficiencyApiRoute,
+  operationalEfficiencyBriefRoute,
+  operationalEfficiencyRoute
+} from "./operationalEfficiency";
+import {
+  getScrimedAutomationAutopilotSummary,
+  scrimedAutomationAutopilotApiRoute,
+  scrimedAutomationAutopilotBriefRoute,
+  scrimedAutomationAutopilotRoute
+} from "./scrimedAutomationAutopilot";
 import { getSalesDealRoomSummary } from "./salesDealRoom";
 import {
   buyerDemoExecutionBriefApiRoute,
@@ -117,6 +255,7 @@ import {
   qaHumanRunPacketBriefRoute,
   qaHumanRunPacketRoute
 } from "./qaHumanRunPacket";
+import { getScrimedOperatingCommandCenterSummary } from "./scrimedOperatingCommandCenter";
 
 export type HubModule = {
   name: string;
@@ -175,6 +314,60 @@ export const hubModules: HubModule[] = [
     objective: "Monitor drift, regressions, runtime traces, cost, latency, and safety signals."
   },
   {
+    name: "SCRIMED Operating Command Center",
+    route: "/scrimed-operating-command",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Executive Operating Council, Product Console, AgentOS, TrustOS, Platform Reliability, and Revenue Operations",
+    objective:
+      "Convert strategy into owner-bound operating lanes for systems, agents, infrastructure, workflows, services, products, UI, proof routes, KPIs, and retained gates."
+  },
+  {
+    name: "SCRIMED Production Architecture",
+    route: productionArchitectureRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Principal engineering, healthcare AI architecture, TrustOS, ClinSecOps, and platform reliability",
+    objective:
+      "Bind Agent Runtime, Context Engine, Trust Engine v2, Model Router, Evaluation Engine, ClinSecOps, and Workflow Engine into one no-PHI production architecture contract."
+  },
+  {
+    name: "Execution Attempt Envelope",
+    route: executionAttemptEnvelopeRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Workflow Runtime, AgentOS, TrustOS, Model Router, ClinSecOps, and platform reliability",
+    objective:
+      "Create metadata-only execution-attempt envelopes with idempotency, replay metadata, model-route telemetry, human review gates, audit traces, failure recovery, and no-PHI scorecards before protected execution authority."
+  },
+  {
+    name: "Execution Attempt Durable Store",
+    route: executionAttemptEnvelopeRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Workflow Runtime, AgentOS, TrustOS, ClinSecOps, MLOps, and platform reliability",
+    objective:
+      "Persist tenant-scoped no-PHI execution-attempt metadata with idempotency TTL, locking, replay lookup, immutable events, regional retention, and human review disposition APIs."
+  },
+  {
+    name: "Company Operating Assessment",
+    route: companyAssessmentRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Executive Operating Council, Product Console, TrustOS, Revenue Operations, Legal Ops, Finance, and Delivery",
+    objective:
+      "Assess SCRIMED as a whole across product, services, revenue, margins, approvals, security, AI, health records, launch, investors, operations, limitations, teams, and hard stops."
+  },
+  {
+    name: "Clinical Production Readiness Task Ledger",
+    route: clinicalProductionReadinessRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Clinical production readiness owner, clinical governance, legal, privacy, security, regulatory counsel, and release stewardship",
+    objective:
+      "Track the tasks required before live clinical production while maximizing current no-PHI demos, paid readiness services, synthetic pilots, and diligence packets."
+  },
+  {
     name: "Global Reach",
     route: "/global-reach",
     phase: "staged",
@@ -183,12 +376,38 @@ export const hubModules: HubModule[] = [
     objective: "Map regions, buyer packs, partner channels, procurement paths, and retained approval gates."
   },
   {
+    name: "Global Certification Readiness",
+    route: "/global-certification-readiness",
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Legal, security, privacy, clinical governance, AI governance, and regional counsel",
+    objective: "Prepare domestic and global approval, certification, AI governance, privacy, medical-device, cyber, and procurement evidence without claiming approval early."
+  },
+  {
+    name: "Continuous Review and Innovation Control Plane",
+    route: continuousReviewAuditRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "TrustOS, QA, security, claims governance, and Internal Research Team",
+    objective:
+      "Run 24/7 agent-assisted review, evidence attribution, claims guard, security drift, QA regression, incident learning, and internal innovation research without autonomous remediation or public quantum claims."
+  },
+  {
     name: "Clinical Authority Readiness",
     route: "/clinical-authority-readiness",
     phase: "foundation",
     status: "active-concept",
     owner: "Clinical governance, legal, privacy, security, and operations",
     objective: "Prepare hard gates for live care, PHI, legal, regional, reimbursement, security certification, and production authorization."
+  },
+  {
+    name: "Health Records Safety Exchange",
+    route: healthRecordsSafetyExchangeRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Interoperability, TrustOS, clinical governance, privacy, and security",
+    objective:
+      "Prepare no-PHI health-record extraction, source attribution, patient-safety lint, interoperability mapping, and retained live-data workarounds."
   },
   {
     name: "Protected Clinical Authority Evidence Room",
@@ -303,6 +522,24 @@ export const hubModules: HubModule[] = [
     objective: "Map product and service controls, fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries into one hardening lane."
   },
   {
+    name: "Operational Efficiency",
+    route: operationalEfficiencyRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release Steward, Revenue Operations, TrustOps, Finance, Legal Ops, and Product Console",
+    objective:
+      "Resolve cross-system gaps, inefficiencies, bottlenecks, fault classes, hard stops, proof-route gaps, and margin/control drag through owned operating sprints."
+  },
+  {
+    name: "Automation Autopilot",
+    route: scrimedAutomationAutopilotRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release Steward, TrustOS, AgentOS, Revenue Operations, Security, and Product Console",
+    objective:
+      "Score safe autonomy lanes, reduce bottlenecks, recommend reversible no-PHI automation, route human approvals, and keep production authority blocked."
+  },
+  {
     name: "Capital Vitality",
     route: "/capital-vitality",
     phase: "foundation",
@@ -317,6 +554,105 @@ export const hubModules: HubModule[] = [
     status: "active-concept",
     owner: "Founder, Product Console, Sales Operations, and Buyer Diligence",
     objective: "Prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes without overclaiming."
+  },
+  {
+    name: "Launch Readiness",
+    route: launchReadinessRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Release Steward, Domain/DNS administrator, Product Console, Customer Operations, Legal Ops, and TrustOS",
+    objective:
+      "Classify sandbox DNS failures separately from production health, require strict branded-domain launch gates, and keep product, service, protected proof, and authority hard stops visible."
+  },
+  {
+    name: "Competitive Defense",
+    route: competitiveDefenseRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Founder, Product Strategy, Legal Ops, Privacy, Security, TrustOS, and Release Steward",
+    objective:
+      "Translate competitor pressure, weakness relief, legal/privacy/cyber controls, and infiltration-deterrence hard stops into one claims-safe hardening lane."
+  },
+  {
+    name: "Investor and Audience Readiness",
+    route: investorAudienceReadinessRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Founder, Capital Operations, Product Console, FaithCore, Legal Ops, Finance, and Claim Guard",
+    objective:
+      "Turn weaknesses into owned relief tracks and package investor, clinic, buyer, and partner audiences with proof routes, next moves, and retained review gates."
+  },
+  {
+    name: "Product and Services Portfolio",
+    route: productServicePortfolioRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Product Console, Revenue Operations, Deal Desk, Legal Ops, Finance, TrustOps, and Delivery",
+    objective:
+      "Package SCRIMED offers, service tiers, delivery playbooks, proof routes, qualification gates, margin controls, and retained boundaries into one sellable portfolio."
+  },
+  {
+    name: "Pilot Demo Commercial Accelerator",
+    route: pilotDemoCommercialReadinessRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Revenue Operations, Product Console, Deal Desk, Sales Engineering, Finance, and Buyer Diligence",
+    objective:
+      "Map every public demo into a recommended pilot package, price band, proof assets, no-PHI intake route, market benchmark, margin rule, and retained boundary before custom work expands."
+  },
+  {
+    name: "Service Delivery Workbench",
+    route: serviceDeliveryRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Delivery Lead, Product Console, Revenue Operations, Customer Operations, TrustOps, Legal Ops, Finance, and Clinical Governance",
+    objective:
+      "Convert packaged offers into scoped work orders, acceptance criteria, artifacts, buyer handoffs, margin protections, and retained no-SLA/no-PHI/no-live-care authority gates."
+  },
+  {
+    name: "Client Onboarding and Communications",
+    route: clientOnboardingCommunicationsRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Revenue Operations, Sales Engineering, Product Console, TrustOps, Legal Ops, Finance, and Customer Operations",
+    objective:
+      "Convert buyer interest into human-reviewed email, calendar-ready meetings, demos, pilots, presentations, follow-up SLAs, handoffs, and retained communication boundaries."
+  },
+  {
+    name: "Enterprise Business Operations",
+    route: enterpriseBusinessOpsRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Founder, legal, finance, accounting, tax, revenue operations, and qualified reviewers",
+    objective:
+      "Strengthen enterprise revenue capability, profit-margin discipline, legal/accounting/tax review, deal-desk controls, billing readiness, and blocked business claims before commitments expand."
+  },
+  {
+    name: "Enterprise Scalability Operations",
+    route: enterpriseScalabilityOperationsRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Platform, service reliability, TrustOps, customer operations, finance, legal ops, and tenant governance",
+    objective:
+      "Prepare enterprise capacity, tenant scale, queues, observability, SLO readiness, support load, incident/change operations, global deployment, and cost controls without creating unsupported SLAs or managed-service claims."
+  },
+  {
+    name: "Platform Power Operations",
+    route: platformPowerRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Platform engineering, Product Console, AgentOS, TrustOS, AI platform, service reliability, security, finance, and design systems",
+    objective:
+      "Upgrade API, UI, and AI platform power through API contracts, role-based command surfaces, model-route readiness, agent approvals, eval loops, evidence retrieval, and cost controls without claiming live autonomous AI or trillion-scale equivalence."
+  },
+  {
+    name: "Limitations and Workaround Operations",
+    route: limitationsWorkaroundRoute,
+    phase: "foundation",
+    status: "active-concept",
+    owner: "Boundary owners, Operational Efficiency, Product Console, TrustOS, legal, finance, security, and clinical governance",
+    objective:
+      "Resolve blocked requests, boundaries, and repeated issues through safe workaround packets, escalation owners, proof routes, expiration rules, and graduation gates without creating authority."
   }
 ];
 
@@ -324,10 +660,24 @@ export const hubSignals: HubSignal[] = [
   { name: "Deployment", value: "Vercel success", tone: "good" },
   { name: "Quality gates", value: "active", tone: "good" },
   { name: "Repository", value: "main baseline documented", tone: "good" },
+  { name: "Company assessment", value: "whole-company cockpit active", tone: "good" },
+  { name: "Clinical production", value: "task ledger active, not production ready", tone: "watch" },
   { name: "Navigation audit", value: "route inventory active", tone: "good" },
+  { name: "Launch readiness", value: "strict domain gate and DNS fallback classified", tone: "good" },
+  { name: "Competitive defense", value: "legal privacy cyber hardening active", tone: "good" },
   { name: "Service reliability", value: "controls and fault classes mapped", tone: "good" },
+  { name: "Operational efficiency", value: "gaps and bottlenecks routed", tone: "good" },
   { name: "Capital vitality", value: "revenue, moat, and funding readiness mapped", tone: "good" },
   { name: "Growth engine", value: "buyer motion and revenue proof prioritized", tone: "good" },
+  { name: "Demo accelerator", value: "demo-to-pilot pricing paths active", tone: "good" },
+  { name: "Offerings", value: "product and services portfolio packaged", tone: "good" },
+  { name: "Service delivery", value: "work orders, acceptance gates, and handoffs active", tone: "good" },
+  { name: "Client onboarding", value: "email, calendar, demo, pilot, and handoff controls active", tone: "good" },
+  { name: "Enterprise business ops", value: "legal, finance, revenue, and margin controls active", tone: "good" },
+  { name: "Enterprise scalability", value: "capacity, tenant, SLO, support, region, and cost controls active", tone: "good" },
+  { name: "Platform power", value: "API, UI, AI, eval, evidence, and model-route controls active", tone: "good" },
+  { name: "Execution envelopes", value: "idempotency, replay, telemetry, and no-PHI scorecards active", tone: "good" },
+  { name: "Workarounds", value: "safe packets, owners, proof routes, and graduation gates active", tone: "good" },
   { name: "Operating context", value: "mission codified", tone: "good" },
   { name: "Official website", value: "scrimedsolutions.com", tone: "good" },
   { name: "Pilot intake", value: "CRM handoff ready", tone: "good" },
@@ -360,6 +710,7 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   { name: "Commercial model", value: "pricing and sales motion ready", tone: "good" },
+  { name: "Investor audiences", value: "weakness relief and audience packets active", tone: "good" },
   { name: "Healthcare Intelligence OS", value: "phase architecture foundation defined", tone: "good" },
   { name: "Sales attribution", value: "CRM-safe source tracking active", tone: "good" },
   { name: "Attribution analytics", value: "source-to-pilot cohorts active", tone: "good" },
@@ -385,6 +736,16 @@ export const hubSignals: HubSignal[] = [
     tone: "good"
   },
   { name: "Global reach", value: "region and buyer localization packs active", tone: "good" },
+  {
+    name: "Global certification readiness",
+    value: "approval and certification evidence gates active",
+    tone: "good"
+  },
+  {
+    name: "Continuous review and audit",
+    value: "24/7 agent-assisted loops and internal innovation tracks active",
+    tone: "good"
+  },
   { name: "Source intelligence", value: "public platform signals encoded", tone: "good" },
   { name: "Persistent Agent Workspace", value: "work-order proof layer active", tone: "good" },
   { name: "Pilot evidence", value: "enterprise proof dashboard active", tone: "good" },
@@ -410,7 +771,7 @@ export const hubSignals: HubSignal[] = [
   { name: "Promotion review", value: "synthetic staging approved", tone: "good" },
   { name: "Execution contracts", value: "contract-only APIs defined", tone: "good" },
   { name: "Identity and access", value: "decision register active", tone: "watch" },
-  { name: "Execution attempts", value: "idempotency model pending", tone: "watch" },
+  { name: "Execution attempts", value: "metadata envelopes active; durable store pending", tone: "good" },
   { name: "Runtime safety", value: "shutdown controls pending", tone: "watch" },
   { name: "Execution deny stubs", value: "locked endpoints online", tone: "good" },
   { name: "Execution audit", value: "metadata boundary defined", tone: "good" },
@@ -511,11 +872,53 @@ export const hubRoutes = [
   "/hub",
   "/hub/readiness",
   "/hub/events",
+  companyAssessmentRoute,
+  companyAssessmentApiRoute,
+  companyAssessmentBriefRoute,
+  clinicalProductionReadinessRoute,
+  clinicalProductionReadinessApiRoute,
+  clinicalProductionReadinessBriefRoute,
+  pilotDemoCommercialReadinessRoute,
+  pilotDemoCommercialReadinessApiRoute,
+  pilotDemoCommercialReadinessBriefRoute,
   "/pilot",
   "/pilot-deal-room",
   "/growth-engine",
   "/api/growth-engine",
   "/api/growth-engine/brief",
+  investorAudienceReadinessRoute,
+  investorAudienceReadinessApiRoute,
+  investorAudienceReadinessBriefRoute,
+  launchReadinessRoute,
+  launchReadinessApiRoute,
+  launchReadinessBriefRoute,
+  competitiveDefenseRoute,
+  competitiveDefenseApiRoute,
+  competitiveDefenseBriefRoute,
+  productServicePortfolioRoute,
+  productServicePortfolioApiRoute,
+  productServicePortfolioBriefRoute,
+  serviceDeliveryRoute,
+  serviceDeliveryApiRoute,
+  serviceDeliveryBriefRoute,
+  clientOnboardingCommunicationsRoute,
+  clientOnboardingCommunicationsApiRoute,
+  clientOnboardingCommunicationsBriefRoute,
+  enterpriseBusinessOpsRoute,
+  enterpriseBusinessOpsApiRoute,
+  enterpriseBusinessOpsBriefRoute,
+  enterpriseScalabilityOperationsRoute,
+  enterpriseScalabilityOperationsApiRoute,
+  enterpriseScalabilityOperationsBriefRoute,
+  platformPowerRoute,
+  platformPowerApiRoute,
+  platformPowerBriefRoute,
+  productionArchitectureRoute,
+  productionArchitectureApiRoute,
+  productionArchitectureBriefRoute,
+  limitationsWorkaroundRoute,
+  limitationsWorkaroundApiRoute,
+  limitationsWorkaroundBriefRoute,
   "/api/sales-operations/opportunities/{intakeId}/workspace-provisioning",
   "/api/sales-operations/opportunities/{intakeId}/workspace-provisioning/packet",
   "/api/sales-operations/opportunities/{intakeId}/tenant-lifecycle",
@@ -536,7 +939,15 @@ export const hubRoutes = [
   "/pilot-workspace",
   "/pilot-workspace/access",
   "/competitive-edge",
+  competitiveDefenseRoute,
+  competitiveDefenseApiRoute,
+  competitiveDefenseBriefRoute,
+  "/competitive-intelligence",
   "/healthcare-intelligence-os",
+  clinicalDataFabricRoute,
+  clinicalDataGovernanceRoute,
+  clinicalContextGatewayRoute,
+  healthRecordsSafetyExchangeRoute,
   "/agent-workspace",
   "/pilot-evidence",
   "/navigation",
@@ -545,6 +956,12 @@ export const hubRoutes = [
   "/service-reliability",
   "/api/service-reliability",
   "/api/service-reliability/brief",
+  operationalEfficiencyRoute,
+  operationalEfficiencyApiRoute,
+  operationalEfficiencyBriefRoute,
+  scrimedAutomationAutopilotRoute,
+  scrimedAutomationAutopilotApiRoute,
+  scrimedAutomationAutopilotBriefRoute,
   "/capital-vitality",
   "/api/capital-vitality",
   "/api/capital-vitality/brief",
@@ -581,6 +998,10 @@ export const hubRoutes = [
   "/pilot-workspace/access#clinical-authority-artifact-intake",
   "/pilot-workspace/access#authority-artifact-references",
   "/global-reach",
+  "/global-certification-readiness",
+  continuousReviewAuditRoute,
+  continuousReviewAuditApiRoute,
+  continuousReviewAuditBriefRoute,
   "/sales-attribution",
   "/attribution-analytics",
   "/source-intelligence",
@@ -608,6 +1029,13 @@ export const hubRoutes = [
   "/workflows/contracts",
   "/workflows/identity-access",
   "/workflows/execution-attempts",
+  executionAttemptEnvelopeApiRoute,
+  executionAttemptEnvelopeBriefRoute,
+  executionAttemptDurableStoreApiRoute,
+  executionAttemptDurableStoreBriefRoute,
+  executionAttemptDurableStoreRecordRoute,
+  executionAttemptDurableStoreReplayRoute,
+  executionAttemptDurableStoreReviewDispositionRoute,
   "/workflows/runtime-safety",
   "/workflows/execution-audit",
   "/workflows/audit-persistence",
@@ -649,6 +1077,15 @@ export const hubRoutes = [
   "/api/pilot-deal-room",
   "/api/healthcare-intelligence-os",
   "/api/healthcare-intelligence-os/brief",
+  clinicalDataFabricApiRoute,
+  clinicalDataFabricBriefRoute,
+  clinicalDataGovernanceApiRoute,
+  clinicalDataGovernanceBriefRoute,
+  clinicalContextGatewayApiRoute,
+  clinicalContextGatewayBriefRoute,
+  healthRecordsSafetyExchangeApiRoute,
+  healthRecordsSafetyExchangeBriefRoute,
+  healthRecordsSafetyExchangeExtractRoute,
   "/api/agent-workspace",
   "/api/agent-workspace/brief",
   "/api/agent-workspace/proof-packet",
@@ -683,6 +1120,7 @@ export const hubRoutes = [
   "/api/demos",
   "/api/commercial/pricing",
   "/api/competitive-edge",
+  "/api/competitive-intelligence",
   "/api/market-activation",
   "/api/clinical-authority-readiness",
   "/api/clinical-authority-readiness/brief",
@@ -697,6 +1135,10 @@ export const hubRoutes = [
   "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
   "/api/global-reach",
   "/api/global-reach/brief",
+  "/api/global-certification-readiness",
+  "/api/global-certification-readiness/brief",
+  continuousReviewAuditApiRoute,
+  continuousReviewAuditBriefRoute,
   "/api/sales-attribution",
   "/api/attribution-analytics",
   "/api/sales-operations/attribution-analytics",
@@ -741,6 +1183,13 @@ export const hubRoutes = [
   ...workflowExecutionContracts.map((contract) => contract.apiRoute),
   "/api/workflows/identity-access",
   "/api/workflows/execution-attempts",
+  executionAttemptEnvelopeApiRoute,
+  executionAttemptEnvelopeBriefRoute,
+  executionAttemptDurableStoreApiRoute,
+  executionAttemptDurableStoreBriefRoute,
+  executionAttemptDurableStoreRecordRoute,
+  executionAttemptDurableStoreReplayRoute,
+  executionAttemptDurableStoreReviewDispositionRoute,
   "/api/workflows/runtime-safety",
   "/api/workflows/execution-audit",
   ...workflowExecutionAuditBoundaries.map((boundary) => boundary.apiRoute),
@@ -789,6 +1238,8 @@ export function getHubSummary() {
   const workflowExecutionAuditSummary = getWorkflowExecutionAuditSummary();
   const auditPersistenceReadinessSummary = getAuditPersistenceReadinessSummary();
   const identityAccessReadinessSummary = getIdentityAccessReadinessSummary();
+  const executionAttemptEnvelopeSummary = getExecutionAttemptEnvelopeSummary();
+  const executionAttemptDurableStoreSummary = getExecutionAttemptDurableStoreSummary();
   const executionAttemptReadinessSummary = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadinessSummary = getRuntimeSafetyReadinessSummary();
   const pilotIntakeSummary = getPilotIntakeSummary();
@@ -806,17 +1257,36 @@ export function getHubSummary() {
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const attributionAnalyticsSummary = getAttributionAnalyticsSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
+  const globalCertificationReadinessSummary = getGlobalCertificationReadinessSummary();
+  const healthRecordsSafetyExchangeSummary = getHealthRecordsSafetyExchangeSummary();
+  const continuousReviewAuditSummary = getContinuousReviewAuditSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const trustSafetyOperationsSummary = getTrustSafetyOperationsSummary();
   const capitalVitalitySummary = getCapitalVitalitySummary();
   const growthEngineSummary = getGrowthEngineSummary();
+  const companyAssessmentSummary = getCompanyAssessmentSummary();
+  const clinicalProductionReadinessSummary = getClinicalProductionReadinessSummary();
+  const pilotDemoCommercialReadinessSummary = getPilotDemoCommercialReadinessSummary();
+  const investorAudienceReadinessSummary = getInvestorAudienceReadinessSummary();
+  const launchReadinessSummary = getLaunchReadinessSummary();
+  const competitiveDefenseSummary = getCompetitiveDefenseSummary();
+  const productServicePortfolioSummary = getProductServicePortfolioSummary();
+  const serviceDeliverySummary = getServiceDeliverySummary();
+  const clientOnboardingCommunicationsSummary = getClientOnboardingCommunicationsSummary();
+  const enterpriseBusinessOpsSummary = getEnterpriseBusinessOpsSummary();
+  const enterpriseScalabilityOperationsSummary = getEnterpriseScalabilityOperationsSummary();
+  const platformPowerSummary = getPlatformPowerSummary();
+  const limitationsWorkaroundSummary = getLimitationsWorkaroundSummary();
   const serviceReliabilitySummary = getServiceReliabilitySummary();
+  const operationalEfficiencySummary = getOperationalEfficiencySummary();
+  const automationAutopilotSummary = getScrimedAutomationAutopilotSummary();
   const qaEvidenceLedger = getQaEvidenceLedger();
   const qaCompletionBridgeSummary = getQaCompletionBridgeSummary();
   const qaClaimGuardSummary = getQaClaimGuardSummary();
   const qaActivationSealSummary = getQaActivationSealSummary();
   const qaBuyerProofReleaseSummary = getQaBuyerProofReleaseSummary();
   const qaManualExecutionConsoleSummary = getQaManualExecutionConsoleSummary();
+  const operatingCommandCenterSummary = getScrimedOperatingCommandCenterSummary();
 
   return {
     service: "scrimed-os-hub",
@@ -843,17 +1313,36 @@ export function getHubSummary() {
     enterpriseReadinessSummary,
     attributionAnalyticsSummary,
     globalPartnerLocalizationSummary,
+    globalCertificationReadinessSummary,
+    healthRecordsSafetyExchangeSummary,
+    continuousReviewAuditSummary,
     clinicalAuthorityReadinessSummary,
     trustSafetyOperationsSummary,
     capitalVitalitySummary,
     growthEngineSummary,
+    companyAssessmentSummary,
+    clinicalProductionReadinessSummary,
+    pilotDemoCommercialReadinessSummary,
+    investorAudienceReadinessSummary,
+    launchReadinessSummary,
+    competitiveDefenseSummary,
+    productServicePortfolioSummary,
+    serviceDeliverySummary,
+    clientOnboardingCommunicationsSummary,
+    enterpriseBusinessOpsSummary,
+    enterpriseScalabilityOperationsSummary,
+    platformPowerSummary,
+    limitationsWorkaroundSummary,
     serviceReliabilitySummary,
+    operationalEfficiencySummary,
+    automationAutopilotSummary,
     qaEvidenceLedger,
     qaCompletionBridgeSummary,
     qaClaimGuardSummary,
     qaActivationSealSummary,
     qaBuyerProofReleaseSummary,
     qaManualExecutionConsoleSummary,
+    operatingCommandCenterSummary,
     agentEvaluationWorkspaceSummary,
     agentOSSummary,
     atlasIntelligenceCoreSummary,
@@ -872,11 +1361,13 @@ export function getHubSummary() {
     workflowExecutionAuditSummary,
     auditPersistenceReadinessSummary,
     identityAccessReadinessSummary,
+    executionAttemptEnvelopeSummary,
+    executionAttemptDurableStoreSummary,
     executionAttemptReadinessSummary,
     runtimeSafetyReadinessSummary,
     integrationFixtureValidation,
     syntheticValidation,
     modules: hubModules,
-    updated: "2026-06-24"
+    updated: "2026-06-27"
   };
 }

@@ -379,7 +379,8 @@ export const pilotPrograms: PilotProgram[] = [
     status: "sellable-now",
     duration: "30 days",
     buyer: "Healthcare operators selecting the first high-value workflow for governed AI transformation",
-    engagementModel: "Recommended fixed-fee range: $15k-$35k",
+    engagementModel:
+      "Recommended fixed-fee range: $25k-$75k; mission-clinic access path $12.5k-$25k for one no-PHI workflow with capped artifacts",
     objective:
       "Convert one to three fragmented workflows into a prioritized operating map, measurable value hypothesis, and governed pilot decision.",
     demoSlugs: ["carepath-access-operations", "docutwin-documentation-review", "agentos-governance-evaluation"],
@@ -424,7 +425,8 @@ export const pilotPrograms: PilotProgram[] = [
     status: "sellable-now",
     duration: "60 days",
     buyer: "Enterprise healthcare teams validating workflow value, trust, and human-review design before integration",
-    engagementModel: "Recommended fixed-fee range: $35k-$95k",
+    engagementModel:
+      "Recommended synthetic-pilot range: $125k-$350k; $350k-$500k when multiple workflows, custom diligence, or executive proof packets expand scope",
     objective:
       "Run a selected workflow through deterministic synthetic evidence, AgentOS orchestration, TrustQA, observability, and executive review.",
     demoSlugs: ["carepath-access-operations", "docutwin-documentation-review", "trialcore-research-operations"],
@@ -469,7 +471,8 @@ export const pilotPrograms: PilotProgram[] = [
     status: "protected-pilot",
     duration: "90 days",
     buyer: "Health systems, payers, governments, and enterprise operators preparing controlled deployment",
-    engagementModel: "Recommended protected-pilot range: $150k-$400k",
+    engagementModel:
+      "Recommended protected-pilot range: $400k-$1.25M; $1.25M-$2M+ for multi-site, sandbox-planning, or buyer-specific protected diligence scope",
     objective:
       "Design the tenant, governance, interoperability, audit, runtime safety, and value model required for a controlled enterprise deployment.",
     demoSlugs: ["atlas-interoperability-readiness", "agentos-governance-evaluation", "carepath-access-operations"],
@@ -514,7 +517,8 @@ export const pilotPrograms: PilotProgram[] = [
     status: "sellable-now",
     duration: "45-60 days",
     buyer: "CIO, compliance, security, clinical governance, and integration leadership teams",
-    engagementModel: "Custom fixed-fee assessment based on organizations, workflows, and standards scope",
+    engagementModel:
+      "Recommended readiness range: $75k-$225k based on organizations, workflows, standards scope, and review depth",
     objective:
       "Create an actionable AI asset, governance, interoperability, and production-readiness register before healthcare AI deployment.",
     demoSlugs: ["atlas-interoperability-readiness", "agentos-governance-evaluation"],
@@ -734,15 +738,15 @@ export function getDemoPilotProgramSummary() {
       ],
       proofSignals: investorReadinessSignals,
       demoToPilotConversionPath:
-        "Demo Center -> Pilot Programs -> no-PHI buyer intake -> protected tenant workspace -> audited onboarding packet -> activation proof packet -> enterprise assessment decision",
+        "Demo Center -> Pilot Demo Commercial Readiness -> Pilot Programs -> no-PHI buyer intake -> protected tenant workspace -> audited onboarding packet -> activation proof packet -> enterprise assessment decision",
       currentBoundary: demoPilotBoundary,
       nextDiligenceStep:
-        "Use protected pilot onboarding packets, activation proof packets, and session proof packets to support enterprise security, privacy, legal, and budget review."
+        "Use /pilot-demo-commercial-readiness before buyer calls so each demo resolves to one pilot package, price band, proof asset list, intake route, and retained boundary; then use protected pilot onboarding packets, activation proof packets, and session proof packets to support enterprise security, privacy, legal, and budget review."
     },
     downloadableArtifacts: {
       demoBriefPattern: "/api/demos/{slug}/brief",
       pilotProposalPattern: "/api/pilots/{slug}/proposal"
     },
-    updated: "2026-06-14"
+    updated: "2026-06-26"
   };
 }

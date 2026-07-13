@@ -1,6 +1,299 @@
 # SCRIMED Project Status
 
-Updated: 2026-06-24
+Updated: 2026-06-28
+
+## Latest Known Limit Resolution Queue Release
+
+- Expanded `/limitations-workarounds`, `/api/limitations-workarounds`, and `/api/limitations-workarounds/brief` with a Known Limit Resolution Queue for current build, smoke, identity, network, toolchain, and release-hygiene blockers.
+- Added six owned work orders covering AAL2 durable-store token smoke, durable-store protected writes feature flag, sandbox DNS/network limits, Supabase password-auth posture, local Next.js SWC fallback, and dirty-worktree release hygiene.
+- Each work order carries current impact, immediate workaround, durable resolution, owner, next proof command, fail-closed check, graduation gate, proof routes, and hard stops.
+- Surfaced resolution-work-order counts, unresolved blocker counts, status breakdown, and a known-blocker metric through the API and page so operators can see what remains blocked without weakening boundaries.
+- Preserved retained boundaries: this queue does not authorize PHI processing, live clinical care, AAL2 bypass, production connectors, public API SLAs, security certification, legal/accounting/tax advice, buyer release, revenue guarantees, profit-margin guarantees, or production clinical use.
+
+## Latest Execution Attempt Durable Store Release
+
+- Added `/api/workflows/execution-attempts/durable-store`, `/brief`, `/record`, `/replay`, and `/review-disposition` as the migration-ready tenant-scoped no-PHI execution-attempt persistence layer.
+- Added `app/lib/executionAttemptDurableStore.ts` with architecture-before-code sections, threat model, migration plan, rollout plan, request validators, Supabase RPC helpers, healthcare AI OS priority mapping, and contract validation.
+- Added `supabase/migrations/20260627191852_execution_attempt_durable_store.sql` with private attempt, event, and review-disposition tables; deny-all RLS; guarded RPCs; idempotency conflict detection; metadata-only replay; and human-review disposition recording.
+- Added `supabase/migrations/20260627214607_execution_attempt_durable_store_rpc_hardening.sql` so private durable-store RPCs stay internal while authenticated public wrappers remain the only callable route.
+- Added `supabase/migrations/20260627222843_execution_attempt_durable_store_advisor_alignment.sql` to align public wrappers with Supabase advisor guidance and add covering indexes for durable-store foreign keys.
+- Applied the live Supabase durable-store migrations as `20260628012714_execution_attempt_durable_store`, `20260628015534_execution_attempt_durable_store_rpc_hardening`, and `20260628023647_execution_attempt_durable_store_advisor_alignment`, then verified tables, RLS, deny policies, no direct table grants, public security-invoker RPC wrappers, guarded private implementation RPCs, and foreign-key index coverage. Supabase security advisor now leaves only the existing leaked-password-protection Auth warning; protected writes remain feature-flagged off until authenticated AAL2 smoke passes.
+- Added `scripts/execution-attempt-durable-store-authenticated-smoke.mjs` for post-migration AAL2 record, idempotency, replay, and review-disposition verification.
+- Added `npm run smoke:aal2:token`, `npm run smoke:aal2:durable-store`, `npm run smoke:aal2:durable-store:strict`, a redacted AAL2 token preflight helper, and `docs/aal2-durable-store-smoke.md` so authorized tenant-admin, pilot-lead, or reviewer sessions can run local strict smoke without committing or logging bearer tokens.
+- Upgraded `/workflows/execution-attempts`, Production Architecture, Product Console, Quality Gates, Hub, Navigation Audit, README, and public smoke coverage with durable-store evidence.
+- Preserved retained boundaries: durable records are metadata-only and no-PHI. They do not authorize live clinical production, PHI, autonomous workflow execution, production connectors, patient outreach, payer submission, EHR writeback, final billing, production model routing, certification claims, or customer go-live.
+
+## Latest Execution Attempt Envelope Release
+
+- Added `/api/workflows/execution-attempts/envelope` and `/api/workflows/execution-attempts/envelope/brief` as the no-PHI execution-attempt envelope contract for deterministic idempotency, replay metadata, model-route telemetry, human review gates, audit traces, failure recovery, and no-PHI scorecards.
+- Upgraded `/workflows/execution-attempts` from a readiness-only page into an operator-visible envelope surface while preserving protected workflow execution as blocked.
+- Wired envelope status, counts, release decision, route telemetry, replay readiness, scorecards, and proof-stack posture into Production Architecture, Product Console, Hub, Quality Gates, Navigation Audit, README, systems map, docs, and public smoke coverage.
+- Added deterministic scorecards for idempotency and replay, no-PHI boundary, model-route telemetry, human review, audit linkage, protected-capability denial, failure recovery, and context fingerprinting.
+- Preserved retained boundaries: this release does not persist live attempts, authorize PHI processing, approve production model routing, grant live clinical care authority, submit payer or claim actions, write to EHRs, contact patients, approve production connectors, certify compliance, or enable autonomous protected workflow execution.
+
+## Latest Production Architecture Contract Release
+
+- Added `/production-architecture`, `/api/production-architecture`, and `/api/production-architecture/brief` as the production-grade architecture contract across Agent Runtime, Context Engine, Trust Engine v2, Model Router, Evaluation Engine, ClinSecOps, and Workflow Engine.
+- Added a vendor-neutral SCRIMED Intelligence Layer provider mesh for OpenAI, Claude, Gemini, Llama, Mistral, Qwen, Z.ai GLM, DeepSeek, and future models, all routed through review-gated model policies with production PHI routing blocked.
+- Added executable validation invariants for required layers, blocked autonomy, PHI-safe context domains, vendor-neutral provider mesh, reviewer-gated trust controls, adversarial and missing-data evaluation coverage, human-approved reversible workflows, and ClinSecOps controls.
+- Wired the architecture layer into persistent navigation, Hub, Navigation Audit, Product Console, Product Readiness Brief, docs, and public smoke coverage.
+- Preserved retained boundaries: this release does not authorize PHI processing, live patient data, autonomous diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, claim submission, production model routing, certification claims, production connector approval, or clinical production use.
+
+## Latest Healthcare Intelligence OS Clinical Workflow Automation Release
+
+- Expanded `/healthcare-intelligence-os`, `/api/healthcare-intelligence-os`, and `/api/healthcare-intelligence-os/brief` with a clinical workflow automation layer for medical capability planning, clinical awareness, patient safety, patient-engagement analysis, interoperability, operations optimization, and clinician administrative burden reduction.
+- Added eight workflow automation tracks: pre-visit chart prep and gap review, documentation draft and clerical reduction, after-visit follow-up readiness, referral/prior-auth documentation workbench, medication reconciliation safety review, care-gap/population engagement analysis, discharge transition workflow optimization, and clinician inbox/admin triage.
+- Each track now retains buyer, clinical awareness, automation scope, patient-safety controls, patient-engagement signals, interoperability bindings, burden-reduction motions, operations optimization levers, proof routes, blocked actions, live-use requirements, and retained boundary.
+- Surfaced workflow counts, patient-safety controls, engagement signals, interoperability bindings, burden-reduction motions, optimization levers, and blocked actions on Healthcare Intelligence OS, Product Console, and the Product Readiness Brief.
+- Strengthened public smoke coverage so Product Console and `/api/healthcare-intelligence-os` fail verification if workflow tracks, safety controls, patient-engagement analysis, interoperability bindings, clinician-burden reduction, blocked patient outreach, blocked EHR filing, or no-PHI/no-live-care headers disappear.
+- Preserved retained boundaries: this release does not authorize PHI processing, live chart pulls, patient matching, patient outreach, diagnosis, treatment, prescribing, emergency triage, EHR filing, EHR writeback, order entry, payer submission, clinical-risk prediction, reimbursement guarantees, security certification, regulatory approval, or autonomous clinical execution.
+
+## Latest Strategic Execution Scorecard Release
+
+- Expanded `/strategic-intelligence` and `/api/strategic-intelligence` with eight Strategic Execution Scorecards, one for each execution command lane.
+- Each scorecard now tracks score state, evidence state, strategic signal, current proof, missing proof, leading indicator, lagging indicator, next checkpoint, escalation path, promotion criteria, demotion triggers, and retained boundary.
+- Surfaced scorecard totals, proof-ready counts, external-review state, and missing-proof counts on `/strategic-intelligence`, Product Console, and the Product Readiness Brief.
+- Strengthened public smoke coverage so Product Console and `/api/strategic-intelligence` fail verification if scorecards, no-PHI active state, clinical/global external-review state, promotion criteria, demotion triggers, or PHI-upload blockers disappear.
+- Preserved retained boundaries: this release does not authorize PHI processing, production connectors, clinical validation, live clinical care, security/certification claims, public API SLAs, customer proof release, investor/legal/accounting/tax commitments, revenue guarantees, or profit guarantees.
+
+## Latest Strategic Execution Command Plan Release
+
+- Expanded `/strategic-intelligence` and `/api/strategic-intelligence` with a Strategic Execution Command Plan that turns strategy into this-week, 30-day, 60-day, and 90-day operating lanes.
+- Added eight command lanes: Customer-Facing Conversion, No-PHI Proof Engine, Deal Desk and Margin, Buyer Proof Release, Interoperability and Health Records, Enterprise Operating Layer, Capital and Partner Diligence, and Clinical and Global Approval Runway.
+- Each command now retains horizon, priority, execution move, commercial outcome, operating cadence, owners, proof routes, required proof, dependencies, decision gates, blocked expansion, revenue motion, success metric, next action, and retained boundary.
+- Surfaced command counts on `/strategic-intelligence`, Product Console, and the Product Readiness Brief so leadership can inspect the operating queue from the main executive surfaces.
+- Strengthened public smoke coverage so `/api/strategic-intelligence` and Product Console fail verification if the command plan, critical commands, proof-route coverage, or blocked PHI/production expansion controls disappear.
+- Preserved retained boundaries: this release does not authorize PHI processing, production connectors, clinical validation, live clinical care, public API SLAs, managed-service commitments, legal/accounting/tax advice, securities material, valuation assurance, customer proof release, revenue guarantee, or profit assurance.
+
+## Latest Competitive Target Audience Strategy Release
+
+- Expanded `/competitive-intelligence` and `/api/competitive-intelligence` with target-audience strategy records that map competitor pressure to buyer role, pain, SCRIMED counter-position, offer motion, proof routes, sales message, conversion trigger, follow-through, retained boundary, and blocked claims.
+- Added audience plays for health system executives, CMIO and documentation leaders, revenue-cycle and payer operations, CIO/CTO/security/procurement, independent/community/faith-based clinics, investors and strategics, global/public-sector partners, AI innovation leaders, patient-access operations, and clinical governance committees.
+- Added Freed and Qventus to the public competitor source register so clinic-simple buying motions and hospital operations automation pressure are represented alongside ambient AI, platform incumbents, payer, RCM, safety-agent, and healthcare data platforms.
+- Surfaced audience strategy counts on `/competitive-intelligence`, `/competitive-edge`, `/api/competitive-edge`, Product Console, and the Product Readiness Brief.
+- Strengthened public smoke coverage so Competitive Market Intelligence, Competitive Edge, and Product Console fail verification if target-audience strategy, proof routes, clinic/investor/health-system plays, or future-innovation blocked claims disappear.
+- Preserved retained boundaries: this release does not copy competitor products, assert partnerships, approve PHI processing, certify security or compliance, authorize production connectors, provide investment/securities/legal/tax/accounting advice, claim public quantum capability, guarantee revenue or savings, or authorize live clinical care.
+
+## Latest Missing Capability Closure Release
+
+- Expanded `/company-assessment`, `/api/company-assessment`, and `/api/company-assessment/brief` with a missing capability closure register so weak points are paired with current workaround, permanent build, owner, proof route, success metric, blocked-until condition, and retained boundary.
+- Added ten closures across production tenant/SSO activation, live connector authority, clinical validation and regulated claims, external security/compliance evidence, buyer proof release automation, support/SLA readiness, evidence vault governance, model eval/red-team benchmarking, revenue operations automation, and investor KPI/data-room discipline.
+- Surfaced missing closure counts on `/company-assessment` and Product Console so leadership can see the gap-closure workload from the main operating surfaces.
+- Strengthened public smoke coverage so Product Console and `/api/company-assessment` fail verification if closure counts, critical closures, workaround/build/block fields, or the Markdown closure section disappear.
+- Preserved retained boundaries: this release does not authorize production tenancy, customer SSO, automated invitations, PHI processing, live connectors, EHR writeback, payer submission, clinical validation, regulated approval, security certification, vendor-risk approval, contractual SLA, managed service coverage, evidence vault storage approval, production model routing, audited financial reporting, securities material, valuation assurance, revenue guarantee, profit guarantee, or live clinical care.
+
+## Latest Strategic Execution Portfolio Release
+
+- Expanded `/strategic-intelligence` and `/api/strategic-intelligence` from source-informed strategy into an execution portfolio with eight strategic bets and six decision gates.
+- Added governed bets for buyer conversion compression, proof-before-production risk, trust-as-procurement advantage, interoperability sidecar wedge, enterprise operating-layer licensing, capital and partner proof rooms, global approval runway, and clinical production gate discipline.
+- Added decision gates for no-PHI proof, protected buyer proof release, deal desk and margin review, clinical production and connectors, platform scale and SLA language, and public claims or investor materials.
+- Wired execution-bet and decision-gate counts into Product Console and the readiness brief so strategy is visible from the main operating surface.
+- Strengthened public smoke coverage so `/strategic-intelligence`, `/api/strategic-intelligence`, and Product Console fail verification if strategic bets lose proof metrics, gates lose allow/block conditions, or the recommended execution sequence disappears.
+- Preserved retained boundaries: this release does not create legal advice, accounting/tax advice, securities material, investment advice, valuation assurance, audited financial reporting, certification, security assurance, PHI authority, production connector approval, public API SLA, contractual uptime, managed-service coverage, regional approval, customer proof authority, revenue guarantee, profit-margin guarantee, or live clinical care authorization.
+
+## Latest Discrepancy Fault And Bottleneck Triage Release
+
+- Expanded `/operational-efficiency`, `/api/operational-efficiency`, and `/api/operational-efficiency/brief` with a first-class discrepancy and fault triage queue for recurring errors, mismatched signals, release drift, protected auth discrepancies, claims overreach, buyer handoff stalls, scale/support overcommitment, live-data slips, agent autonomy overreach, and finance margin leakage.
+- Added eight triage items with severity, signal, discrepancy, immediate containment, root-cause probe, permanent control, owner, proof routes, promotion trigger, and retained boundary so defects can be contained before release, buyer use, or investor messaging.
+- Surfaced the triage queue on `/operational-efficiency` and exposed the triage count in Product Console so leadership can see whether fault-control coverage exists from the main operating surface.
+- Strengthened public smoke coverage so Product Console and `/api/operational-efficiency` fail verification if the triage queue disappears, loses critical entries, or omits containment/root-cause/permanent-control fields.
+- Preserved retained boundaries: this release does not authorize autonomous production remediation, AAL2 bypass, PHI processing, live clinical care, production connectors, customer proof release, public API SLA, contractual uptime, managed service coverage, legal/accounting/tax advice, certification, security assurance, revenue guarantees, profit-margin guarantees, or production model routing.
+
+## Latest Whole-Company Audit And Revenue Edge Release
+
+- Expanded `/company-assessment`, `/api/company-assessment`, and `/api/company-assessment/brief` from a readiness cockpit into a whole-company audit surface with structured findings, revenue builders, competitive edge amplifiers, and improvement priorities.
+- Added eight audit findings covering commercial clarity, no-PHI proof, trust boundaries, enterprise business discipline, interoperability, agentic review, investor readiness, and cybersecurity/privacy deterrence.
+- Added eight revenue builders so current safe capabilities convert into paid motions: no-PHI assessments, synthetic pilots, trust diligence, interoperability readiness, governed review retainers, enterprise operating-layer licensing, investor or clinic readiness packets, and launch/scale readiness.
+- Added eight competitive edge amplifiers to make SCRIMED's buyer story clearer against ambient AI, agentic automation, payer intelligence, point solutions, and large incumbents: proof before production risk, healthcare intelligence operating layer, TrustOS/Claim Guard/Boundary Matrix, no-PHI evaluation, interoperability-aware readiness, human-gated agents, packaged product plus services, and mission-aware clinic plus enterprise paths.
+- Wired the counts into Product Console and public smoke coverage so the company audit, revenue builders, edge amplifiers, and priority fixes remain API-visible and release-tested.
+- Preserved retained boundaries: this release does not create legal/accounting/tax advice, audited financials, securities material, solicitation, valuation assurance, customer permission, certification, security assurance, PHI authority, connector approval, live clinical care, contractual SLA, ROI guarantee, revenue guarantee, or profit-margin guarantee.
+
+## Latest Boundary Escalation Matrix Release
+
+- Added a deterministic Boundary Escalation Matrix to `/limitations-workarounds`, `/api/limitations-workarounds`, and `/api/limitations-workarounds/brief` so high-risk requests have a known triage path before anyone improvises external language.
+- Encoded eight escalation patterns covering PHI/live data, live clinical care, production connectors/writeback, security certification, API/SLA/scale, autonomous agent execution, legal/finance/investor claims, and regional/global approval.
+- Each escalation now carries severity, immediate decision, buyer-safe response, required owner, escalation path, proof routes, decision SLA, hard stops, and graduation evidence.
+- Wired the escalation count into Product Console and public smoke coverage so SCRIMED fails verification if the boundary matrix disappears or loses PHI/autonomous-agent escalation coverage.
+- Preserved retained boundaries: this release does not authorize PHI, live clinical care, production connectors, clinical decisions, autonomous protected actions, security certification, public API SLA, contractual uptime, legal/accounting/tax advice, audited financials, securities material, regional approval, buyer release, revenue guarantees, profit guarantees, or public quantum capability claims.
+
+## Latest Trust Reliability Safety Messaging Release
+
+- Reframed trust, reliability, and safety as strategic reasons to buy SCRIMED, not only operational restrictions.
+- Added homepage buyer proof cards that position SCRIMED around proof before production risk, inspectable boundaries, reliability discipline, and safety-first evaluation.
+- Added Trust Center "Trust is a buying advantage" signals for executives, security/privacy/compliance reviewers, clinical operators, procurement/finance teams, and investors.
+- Added approved, evidence-bounded claims for buyer trust proof, reliability operating discipline, and safety-first evaluation while keeping certification, uptime, zero-error, live-care, PHI, ROI, and production-readiness claims prohibited.
+- Added buyer-confidence messaging to Limitations Workarounds so hard boundaries become safe commercial paths with owners, proof routes, escalation triggers, and graduation gates.
+- Preserved retained boundaries: this release does not create HIPAA compliance certification, SOC 2, HITRUST, ISO certification, FDA clearance, clinical validation, PHI processing authority, production connector approval, managed 24/7 SOC/MDR coverage, contractual SLA, revenue guarantee, ROI guarantee, securities material, or live clinical care authorization.
+
+## Latest Buyer-Centric Advertising Copy Release
+
+- Repositioned `https://app.scrimedsolutions.com` as the customer, client, and investor-facing buying front door instead of a primarily internal operating map.
+- Updated homepage, navigation, Product, Offerings, Demos, Pilots, Pricing, Demo-to-Pilot Accelerator, and Client Onboarding copy to lead with buyer pain, product proof, package options, price bands, next actions, and purchase intent.
+- Promoted the visible path from free no-PHI demos into assessments, synthetic pilots, protected enterprise pilots, annual licenses, strategic partnerships, investor readiness, and trust diligence.
+- Preserved retained boundaries: advertising copy does not create signed quotes, contracts, procurement approval, securities material, investment advice, valuation assurance, audited financial reporting, PHI authority, production connector approval, security certification, clinical production approval, ROI guarantees, revenue guarantees, reimbursement guarantees, or live clinical care authorization.
+
+## Latest Pilot Demo Commercial Readiness Release
+
+- Added `/pilot-demo-commercial-readiness`, `/api/pilot-demo-commercial-readiness`, and `/api/pilot-demo-commercial-readiness/brief` as the demo-to-pilot accelerator for seamless buyer demos, pilot package selection, market-aligned price bands, proof assets, no-PHI intake routes, and margin controls.
+- Encoded five demo offer paths, six conversion steps, six pricing-tier alignment decisions, seven market benchmark references, hard stops, and next actions so every demo resolves to one recommended pilot path before custom buyer work expands.
+- Updated Demo Center, demo detail pages, Pilot Programs, pilot detail pages, Pricing, Offerings, Product, Hub, Product Console, Navigation Audit, README, systems map, and public smoke coverage so the accelerator is visible from buyer, operator, pricing, and product surfaces.
+- Rebalanced commercial pricing guidance around free public demos, no-cost qualified standard demos, paid readiness assessments, synthetic pilots, protected pilots, enterprise licenses, and strategic operating-layer packages while preserving price-floor, discount, and scope boundaries.
+- Preserved the boundary: Pilot Demo Commercial Readiness is commercial readiness and pricing guidance only. It is not a signed quote, contract, procurement approval, customer permission, legal/accounting/tax advice, audited financial reporting, securities material, investment advice, valuation assurance, revenue guarantee, profit guarantee, ROI guarantee, reimbursement guarantee, PHI authority, production connector approval, security certification, or live clinical care authorization.
+
+## Latest Clinical Production Readiness Tracker Release
+
+- Added `/clinical-production-readiness`, `/api/clinical-production-readiness`, and `/api/clinical-production-readiness/brief` as the tracked task ledger for the work required before live clinical production, PHI/ePHI scope, production EHR or payer connectivity, patient-impacting AI, regulated clinical claims, customer go-live, and global clinical deployment.
+- Encoded 22 required tasks, 5 go-live gates, 10 current capability motions, 10 official source references, critical/high/medium priorities, owner fields, completion criteria, dependencies, missing evidence, current safe use, retained boundaries, and no-authority headers.
+- Wired Clinical Production Readiness into persistent navigation, homepage actions, Hub modules/signals, Product Console metrics and proof stack, Product page, Navigation Audit inventory and smoke coverage, README, systems map, docs, and public smoke coverage.
+- Added `docs/clinical-production-readiness.md` so SCRIMED has a durable checklist for what must be complete while current no-PHI demos, paid readiness services, synthetic pilots, diligence packets, AI governance reviews, health-record sandbox planning, and investor or clinic readiness conversations continue.
+- Preserved the boundary: Clinical Production Readiness is tracking and preparation only. It is not legal advice, medical advice, regulatory approval, HIPAA compliance, security certification, FDA clearance, ONC certification, EU AI Act conformity, GDPR assurance, PHI authority, connector approval, customer permission, launch approval, reimbursement assurance, revenue guarantee, profit guarantee, securities material, investment advice, valuation assurance, or live clinical care authorization.
+
+## Latest Company Operating Assessment Release
+
+- Added `/company-assessment`, `/api/company-assessment`, and `/api/company-assessment/brief` as the whole-company cockpit for SCRIMED posture, readiness score, product/service strength, revenue and margin controls, legal/accounting/tax gates, certification readiness, cybersecurity posture, AI platform power, health-record safety, launch, investor readiness, team lanes, and hard stops.
+- Encoded twelve company dimensions, twelve strengths, eight weakness relief items, ten upgrade workstreams, five operating team lanes, fourteen hard stops, source alignment counts, no-authority headers, and a priority sequence for routing company decisions.
+- Wired Company Assessment into persistent navigation, homepage actions, Hub modules/signals, Product Console proof stack, Product page, Navigation Audit, README, systems map, docs, and public smoke coverage.
+- Added `docs/company-assessment.md` so whole-company review has a repeatable operating routine before launch, buyer, investor, service, platform, approval, protected proof, or clinical-adjacent decisions expand.
+- Preserved the boundary: Company Assessment is strategic and operational readiness material only. It is not legal advice, accounting advice, tax advice, audited financial reporting, investment advice, securities material, solicitation, valuation assurance, certification, security assurance, PHI authority, connector approval, customer permission, launch approval, contractual SLA, revenue guarantee, profit-margin guarantee, reimbursement assurance, or live clinical care authorization.
+
+## Latest Service Delivery Workbench Release
+
+- Added `/service-delivery`, `/api/service-delivery`, and `/api/service-delivery/brief` as the concrete service-delivery control plane for scoped work orders, delivery phases, acceptance criteria, artifacts, buyer handoffs, margin protections, package bindings, and retained authority gates.
+- Encoded seven delivery offers, seven delivery phases, eight work-order templates, seven artifacts, eight activation gates, package bindings, hard stops, no-authority headers, and no-PHI/no-SLA/no-contract/no-live-care boundaries.
+- Wired Service Delivery into persistent navigation, homepage actions, Hub, Product Console, Product page, Offerings, Navigation Audit, README, systems map, docs, and public smoke coverage.
+- Added `docs/service-delivery.md` so paid services, scoped delivery, buyer handoffs, and acceptance criteria have a single operating routine before custom commitments expand.
+- Preserved the boundary: Service Delivery is product and services execution control only. It is not a statement of work, contract approval, legal/accounting/tax advice, audited financial reporting, contractual SLA, uptime guarantee, managed-service commitment, customer permission, revenue guarantee, profit-margin guarantee, PHI processing authority, production connector approval, clinical validation, compliance certification, security certification, EHR writeback approval, payer submission approval, or live clinical care authorization.
+
+## Latest Competitive Defense, Legal Privacy Cyber, And Infiltration Hardening Release
+
+- Added `/competitive-defense`, `/api/competitive-defense`, and `/api/competitive-defense/brief` as the competitor-aware hardening lane for SCRIMED strengths, weakness relief, legal/privacy/cybersecurity controls, and infiltration deterrence.
+- Expanded public competitor coverage to include ambient clinical intelligence leaders, AI agent workforce platforms, revenue-cycle and payer platforms, safety-first healthcare agents, and large platform incumbents.
+- Encoded ten competitor threat profiles, six strength-hardening tracks, eight legal/privacy/cyber controls, six infiltration-deterrence layers, four external review gates, no-authority fields, and hard stops for public APIs, protected workspaces, agent tools, health-record paths, claims, and build/dependency pipelines.
+- Wired Competitive Defense into persistent navigation, homepage actions, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, docs, and public smoke coverage.
+- Preserved the boundary: Competitive Defense is strategic readiness evidence only. It does not copy competitor products, provide legal advice, authorize PHI processing, certify security or compliance, authorize penetration testing, assert competitor partnerships, guarantee protection from attack, approve customer release, or authorize live clinical care.
+
+## Latest Launch Readiness And Sandbox DNS Workaround Release
+
+- Added `/launch-readiness`, `/api/launch-readiness`, and `/api/launch-readiness/brief` as the launch go/no-go control plane for launch structure, product readiness, service readiness, functional verification, strict branded-domain smoke, sandbox DNS classification, fallback continuity, protected proof boundaries, and hard stops.
+- Added `scripts/launch-domain-preflight.mjs` and `npm run smoke:launch-domain-preflight` to classify `app.scrimedsolutions.com` DNS failures separately from application health and test fallback reachability without weakening the strict production smoke gate.
+- Encoded ten launch tracks, three DNS controls, five service paths, five launch risks, proof routes, source alignment, strict fallback-only boundaries, and no-authority headers for sandbox bypass, DNS, launch approval, SLA, PHI, clinical care, connectors, security certification, customer release, legal, accounting, tax, revenue, and profit.
+- Wired Launch Readiness into persistent navigation, homepage actions, Hub, Product Console, Product Readiness Brief, Operations, Navigation Audit, README, systems map, docs, and public smoke coverage.
+- Preserved the boundary: Launch Readiness is operating-readiness evidence only. It does not bypass sandbox restrictions, override DNS, approve production clinical use, authorize PHI processing, certify security or compliance, create a contractual SLA, approve production connectors, approve customer release, provide legal/accounting/tax advice, guarantee revenue or profit, convert fallback-only evidence into launch approval, or replace qualified human launch review.
+
+## Latest Investor And Audience Readiness Release
+
+- Added `/investor-audience-readiness`, `/api/investor-audience-readiness`, and `/api/investor-audience-readiness/brief` as the readiness lane for weakness relief, competitive edge, sellable value, and audience-specific investment or clinic packets.
+- Encoded ten weakness relief tracks, eight competitive edge signals, ten audience packets, eight readiness gates, blocked claims, proof routes, qualified-review owners, and official SEC/IRS-oriented routing references.
+- Added distinct packets for angel investors, large corporate strategic investors, private investors, faith-based clinics, health system executives, payers/revenue-cycle buyers, public-sector/community funders, clinician advisors, global partners, and transformation sponsors.
+- Wired Investor Audience Readiness into persistent navigation, homepage actions, Hub, Product Console, Product page, Navigation Audit, README, systems docs, and public smoke coverage.
+- Preserved the boundary: Investor and Audience Readiness is readiness material only. It is not investment advice, securities offering material, solicitation, audited financial reporting, valuation assurance, legal advice, tax advice, accounting advice, nonprofit tax advice, donor advice, faith-based endorsement, customer revenue guarantee, profit guarantee, reimbursement assurance, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.
+
+## Latest Limitations And Workaround Operations Release
+
+- Added `/limitations-workarounds`, `/api/limitations-workarounds`, and `/api/limitations-workarounds/brief` as the operator layer for resolving issues, hard boundaries, blocked requests, bottlenecks, and unsupported claims through safe workaround packets.
+- Encoded eleven limitation tracks, eight workaround packets, six review cadences, four metrics, blocked claims, proof routes, hard stops, escalation triggers, expiration rules, and graduation gates.
+- Wired Limitations Workarounds into persistent navigation, homepage actions, Hub, Product Console, Product page, Boundary Resolution, Operational Efficiency, Navigation Audit, README, systems docs, and public smoke coverage.
+- Added reusable packets for synthetic no-PHI proof, external evidence references, human-reviewed communications, AAL2 protected proof, API contract readiness, model-route registers, deal desk exceptions, and global regional packs.
+- Preserved the boundary: Limitations and Workaround Operations is containment only. It does not authorize PHI, live clinical care, production connectors, public API SLAs, autonomous remediation, live autonomous AI, production model routing, legal/accounting/tax advice, audited financial reporting, security certification, accessibility certification, regulatory approval, buyer release, public quantum capability claims, revenue guarantees, or profit-margin guarantees.
+
+## Latest Platform Power Operations Release
+
+- Added `/platform-power`, `/api/platform-power`, and `/api/platform-power/brief` as the API, UI, and AI platform-power control plane for API contracts, tenant-safe auth posture, rate limits, idempotency, operator-grade UI, AI model-route readiness, agent approvals, eval loops, evidence retrieval, accessibility readiness, and platform cost controls.
+- Encoded nine platform pillars, twelve controls, seven workstreams, six operating cadences, seven bottlenecks, blocked API/UI/AI claims, proof routes, hard stops, and no-live-AI/no-public-API-SLA/no-PHI/no-model-routing/no-scale-equivalence headers.
+- Wired Platform Power into persistent navigation, homepage actions, Hub, Product Console, Product page, Boundary Resolution, Operational Efficiency, Navigation Audit, README, systems map, and public smoke coverage.
+- Expanded Operational Efficiency with an API, UI, and AI platform-power sprint so contract-backed APIs, role-based UI command paths, model-route registers, agent approvals, evals, evidence retrieval, and cost telemetry have owners before enterprise claims expand.
+- Preserved the boundary: Platform Power Operations is enterprise platform readiness only. It is not a public API SLA, production API marketplace launch, live autonomous AI authority, production model-routing approval, PHI processing authority, EHR access approval, production connector approval, model-safety certification, security certification, accessibility certification, clinical validation, contractual uptime guarantee, managed service commitment, or proof of trillion-dollar-company-equivalent capacity.
+
+## Latest Enterprise Scalability Operations Release
+
+- Added `/enterprise-scalability`, `/api/enterprise-scalability`, and `/api/enterprise-scalability/brief` as the enterprise scale control plane for capacity planning, tenant isolation, queueing, observability, SLO readiness, incident/change operations, support load, multi-region and residency readiness, disaster recovery planning, and usage-cost governance.
+- Encoded nine scale domains, ten operating controls, six workstreams, six operating cadences, six bottlenecks, blocked scale claims, proof routes, hard stops, and no-SLA/no-managed-service/no-PHI/no-connector headers.
+- Wired Enterprise Scalability into persistent navigation, homepage actions, Hub, Product Console, Product page, Boundary Resolution, Operational Efficiency, Navigation Audit, README, systems map, and public smoke coverage.
+- Expanded Operational Efficiency with an enterprise scalability and support readiness sprint so support tiers, SLO/SLA language, regional hosting, incidents, tenant growth, and cost thresholds have owners before commitments expand.
+- Preserved the boundary: Enterprise Scalability Operations is readiness and operating-design material only. It is not a contractual SLA, uptime guarantee, managed service commitment, 24/7 production support commitment, SOC/MDR coverage, security certification, production hosting approval, data-residency approval, PHI authority, production connector approval, customer-specific tenancy approval, revenue guarantee, profit-margin guarantee, legal/accounting/tax advice, or live clinical care authorization.
+
+## Latest Client Onboarding And Communications Release
+
+- Added `/client-onboarding`, `/api/client-onboarding`, and `/api/client-onboarding/brief` as the buyer onboarding and communications control plane for discovery, demos, follow-up, pilot scoping, diligence review, kickoff, renewal, and expansion.
+- Encoded eight onboarding stages, nine communication templates, six calendar-ready packets, five meeting cadences, five presentation packets, eight communication controls, and six handoffs.
+- Added human-send, calendar-safe-field, no-PHI, presentation-claim, CRM/source-logging, follow-up-SLA, and handoff-before-commitment controls so buyer communications can move faster without crossing authority boundaries.
+- Wired Client Onboarding into persistent navigation, homepage actions, Hub, Product Console, Boundary Resolution, Operational Efficiency, Navigation Audit, README, systems map, and public smoke coverage.
+- Preserved the boundary: Client Onboarding drafts and routes communication artifacts only. It does not send email, create calendar invites, bind contracts, approve procurement, approve BAA/security posture, store PHI, process live clinical records, create customer permission, provide legal/accounting/tax advice, certify compliance, approve production connectors, guarantee revenue or ROI, or authorize live clinical care.
+
+## Latest Product And Services Portfolio Release
+
+- Added `/offerings`, `/api/offerings`, and `/api/offerings/brief` as the canonical SCRIMED product/service packaging layer for offers, packages, delivery playbooks, qualification gates, proof routes, margin controls, and retained boundaries.
+- Encoded ten offers across workflow intelligence, health-records safety, interoperability readiness, TrustOS governance, synthetic pilots, clinical operations blueprints, enterprise proof/deal-room activation, global certification readiness, continuous review/innovation retainers, and enterprise operating-layer licensing.
+- Added five packages for assessment, readiness sprint, synthetic pilot, enterprise activation, and continuous review retainer paths so buyers can understand what to buy and SCRIMED can protect scope and margins.
+- Added eight margin controls and six boundary resolutions covering custom SOW leakage, data-boundary price floors, paid diligence, license/services separation, ROI/reimbursement overclaim, certification overclaim, and continuous-review autonomy limits.
+- Wired Product and Services Portfolio into persistent navigation, Hub, Product Console, Product page, Boundary Resolution, Operational Efficiency, Navigation Audit, README, systems map, and public smoke coverage.
+- Preserved the boundary: Product and Services Portfolio is packaging readiness only. It does not provide legal/accounting/tax advice, audited financial reporting, securities material, customer permission, revenue or profit guarantees, reimbursement assurance, clinical validation, certification, PHI processing authority, production connector approval, EHR writeback, payer submission, or live clinical care authorization.
+
+## Latest Health Records Safety Exchange Release
+
+- Added `/health-records`, `/api/health-records`, `/api/health-records/brief`, and `/api/health-records/extract` as the no-PHI health-record extraction, interoperability, source-attribution, patient-safety, and live-data workaround layer.
+- Encoded five record capabilities across FHIR intake, HL7 v2 extraction, C-CDA/document extraction, DICOM metadata routing, and payer/prior-authorization context with blocked actions, safety controls, standards, proof routes, and workarounds.
+- Added a synthetic extraction evaluator that accepts only `syntheticOnly=true` requests and blocks PHI, patient identifiers, production endpoint signals, patient matching, writeback, payer submission, diagnosis, treatment, triage, prescribing, outreach, and production sync.
+- Expanded the Interoperability registry with USCDI, TEFCA, and CMS prior-authorization API readiness entries alongside the existing FHIR, SMART, HL7 v2, DICOM, X12, C-CDA, IHE, NCPDP, device, and terminology controls.
+- Wired Health Records Safety Exchange into global navigation, role journeys, limitation controls, Interoperability, Hub, Product Console proof stack, Boundary Resolution, Operational Efficiency, Navigation Audit, README, systems map, docs, and public smoke.
+- Preserved the boundary: Health Records Safety Exchange does not authorize live PHI ingestion, production EHR/HIE/payer/imaging/device connectors, patient matching, diagnosis, treatment, emergency triage, order entry, prescribing, patient outreach, payer submission, EHR writeback, record mutation, clinical validation, or live-care authority.
+
+## Latest Seamless Navigation Release
+
+- Added a persistent app-wide navigation shell and footer across SCRIMED so Product, Pilot, Proof, Limitations, buyer motion, trust, operations, and build surfaces remain reachable from every page.
+- Added grouped navigation sections for Command, Buy, Trust, Operate, and Build plus role-based journey shortcuts for healthcare buyers, security/compliance reviewers, release operators, founders/sales/board reviewers, and global partners.
+- Promoted limitation controls into navigation itself through Boundary Resolution, Operational Efficiency, Approvals Readiness, Clinical Authority, and Global Certification links.
+- Expanded `/navigation`, `/api/navigation-audit`, and `/api/navigation-audit/brief` to report site navigation sections, role journeys, limitation controls, and app-wide navigation boundaries.
+- Tightened public smoke so the root page must include the persistent navigation shell and Navigation Audit must expose role journeys and limitation-control links.
+- Preserved the boundary: seamless navigation is route guidance only. It does not approve release, bypass AAL2, authorize PHI processing, certify security/compliance, grant legal/accounting/tax advice, approve production connectors, guarantee revenue or profit, approve buyer release, or authorize live clinical care.
+
+## Latest Operational Efficiency Release
+
+- Added `/operational-efficiency`, `/api/operational-efficiency`, and `/api/operational-efficiency/brief` as the cross-system gap, inefficiency, bottleneck, hard-stop, owner, proof-route, and resolution-sprint control plane.
+- Aggregated release-continuity gates, navigation-audit bottlenecks, service-reliability controls and fault classes, growth bottlenecks, enterprise margin controls, enterprise operating controls, continuous-review controls, and boundary-register coverage into one typed efficiency register.
+- Added five execution sprints for release and route preflight, commercial throughput, client onboarding and communication cadence, continuous defect-to-control loops, and enterprise margin/control discipline.
+- Wired Operational Efficiency into the homepage, Hub, Product Console, Navigation Audit, README, systems map, and public smoke coverage.
+- Added `docs/operational-efficiency.md` so future gaps, inefficiencies, repeated defects, and execution bottlenecks have an owned operating routine before public claims, buyer commitments, or production changes expand.
+- Preserved the boundary: Operational Efficiency does not authorize autonomous production remediation, bypass AAL2, process PHI, approve live clinical care, certify security or compliance, send email, create calendar invites, approve contracts, provide legal/accounting/tax advice, approve production connectors, guarantee revenue, guarantee profit margin, approve buyer release, or replace qualified human review.
+
+## Latest Limitations And Boundary Control Expansion
+
+- Expanded `/boundary-resolution`, `/api/boundary-resolution`, and `/api/boundary-resolution/brief` from the original clinical/QA/public-market register into the central limitation control plane for global certification readiness, continuous review/audit/innovation, and enterprise-growth operations.
+- Added boundary records for global approval/certification tracks, continuous review agents, audit controls, internal research/quantum limits, legal/finance/accounting/tax authority, revenue/ROI/profit-margin claims, investor/securities/valuation language, and global partner/public-sector claims.
+- Added limitation-control, autonomy, financial, quantum, revenue, and securities boundary headers to the Boundary Resolution API and Markdown brief.
+- Tightened public smoke coverage so missing global-certification, continuous-review, enterprise-growth, quantum, revenue, or 24/7 review-agent limitations fail the production smoke suite.
+- Preserved the boundary: this register addresses limitations operationally only. It does not authorize live clinical care, PHI processing, legal/accounting/tax advice, certification, audited financial reporting, securities material, revenue or profit guarantees, managed 24/7 SOC/MDR coverage, public quantum capability claims, autonomous production remediation, production connectors, or customer release authority.
+
+## Latest Enterprise Business Operations Release
+
+- Added `/enterprise-business-ops`, `/api/enterprise-business-ops`, and `/api/enterprise-business-ops/brief` as the enterprise business control plane for revenue capability, profit-margin discipline, deal desk, legal operations, finance/accounting controls, tax-awareness routing, contract authority, billing readiness, and audit evidence.
+- Encoded official-source anchors from DOJ corporate compliance guidance, COSO internal control, AICPA SOC services, and OECD transfer pricing guidance, plus internal SCRIMED Capital Vitality, Growth Engine, and Public Market Readiness signals.
+- Added nine revenue capabilities, ten margin controls, eleven legal/finance/accounting/tax/revenue-ops roles, ten enterprise controls, eight operating cadences, ten profit levers, and sixteen blocked business claims.
+- Wired Enterprise Business Ops into the homepage, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, and public smoke coverage.
+- Preserved the boundary: Enterprise Business Ops is not legal advice, accounting advice, tax advice, audited financial reporting, securities offering material, investment advice, valuation assurance, contract approval, revenue guarantee, profit-margin guarantee, reimbursement assurance, customer permission, certification, PHI authority, production connector approval, or live clinical care authority.
+
+## Latest Continuous Review, Audit, and Innovation Release
+
+- Added `/continuous-review-audit`, `/api/continuous-review-audit`, and `/api/continuous-review-audit/brief` as the 24/7 agent-assisted review and innovation lane for accuracy sampling, evidence attribution, claims boundaries, security drift, QA regression, incident learning, and future research assignment.
+- Encoded seven review agents, eight operating loops, six audit controls, five innovation research tracks, four internal research teams, official-source references, blocked claims, and no-authority headers for continuous mistake reduction without autonomous production remediation.
+- Assigned quantum-safe and post-quantum readiness to an internal-only research track focused on dependency inventory, vendor posture, key lifecycle, buyer questions, and no-public-claim controls.
+- Wired Continuous Review and Audit into the homepage, Trust Safety Operations, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, and public smoke coverage.
+- Preserved the boundary: Continuous Review and Audit is not managed 24/7 SOC/MDR coverage, autonomous production remediation, legal advice, security certification, regulatory approval, PHI processing authority, clinical care authority, public quantum capability claim, product commitment, investment advice, or permission to bypass human review.
+
+## Latest Global Certification Readiness Release
+
+- Added `/global-certification-readiness`, `/api/global-certification-readiness`, and `/api/global-certification-readiness/brief` as the domestic and global approval/certification readiness lane for HIPAA/BAA, FDA CDS/SaMD, SOC 2, HITRUST, ISO 27001, ISO 42001, EU AI Act, GDPR, NHS DTAC, MHRA, Australia Essential Eight, and regional buyer gates.
+- Encoded official-source evidence implications, approval tracks, certification gates, regional packs, roadmap phases, owners, proof routes, blocked claims, and no-authority headers so SCRIMED can prepare for future domestic and global operation without claiming approval early.
+- Wired Global Certification Readiness into the homepage, Approvals Readiness, Hub, Product Console, Product Readiness Brief, Navigation Audit, README, systems map, and public smoke coverage.
+- Added `docs/global-certification-readiness.md` so future assurance work has a single evidence checklist before buyer, regulator, auditor, or regional counsel review.
+- Preserved the boundary: Global Certification Readiness is not legal advice, HIPAA compliance certification, SOC 2/HITRUST/ISO certification, FDA clearance, ONC certification, EU AI Act conformity, GDPR compliance assurance, NHS approval, MHRA approval, Australian cyber certification, PHI authority, procurement approval, reimbursement assurance, production authorization, or live clinical care authority.
+
+## Latest Competitive Market Intelligence Release
+
+- Added `/competitive-intelligence` and `/api/competitive-intelligence` as the competitor-informed build lane for public market signals, original SCRIMED product patterns, proof metrics, API and connector posture, payer/revenue workflows, sales language, and no-copy boundaries.
+- Wired Competitive Market Intelligence into the homepage, Competitive Edge, Strategic Intelligence, Hub route catalog, Product Console buyer actions, Navigation Audit, README, docs, and public smoke coverage.
+- Added `docs/competitive-market-intelligence.md` so competitor analysis remains tied to build patterns, owners, next actions, and retained gates.
+- Preserved the boundary: Competitive Market Intelligence does not copy third-party code, proprietary workflows, private APIs, branding, datasets, model weights, customer proof, security certifications, regulatory approvals, partnerships, or live clinical authority.
 
 ## Latest Commercial Growth Engine Release
 

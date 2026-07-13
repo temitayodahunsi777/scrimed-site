@@ -3678,6 +3678,31 @@ export async function recordProtectedExternalApprovalEvidencePacketDownload(
   };
 }
 
+export async function recordProtectedBoundaryReleaseEvidenceIntakePacketDownload(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  eventMetadata: Record<string, unknown>
+) {
+  const { data, error } = await client.rpc("record_enterprise_proof_packet_download", {
+    p_workspace_slug: workspaceSlug,
+    p_event_metadata: {
+      ...eventMetadata,
+      packetType: "protected-boundary-release-evidence-intake",
+      format: "text/markdown",
+      syntheticOnly: true,
+      noPhiOnly: true,
+      metadataOnly: true,
+      rawEvidenceStoredInScrimed: false,
+      releaseAuthority: "not-authorized-boundary-release"
+    }
+  });
+
+  return {
+    eventId: typeof data === "string" ? data : null,
+    error
+  };
+}
+
 export async function recordProtectedReleaseDecisionPacketDownload(
   client: SupabaseClient,
   workspaceSlug: string,

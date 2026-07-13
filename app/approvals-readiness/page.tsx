@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getApprovalsReadinessSummary } from "../lib/approvalsReadiness";
+import { getGlobalCertificationReadinessSummary } from "../lib/globalCertificationReadiness";
 
 export const metadata = {
   title: "SCRIMED Approvals Readiness",
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default function ApprovalsReadinessPage() {
   const summary = getApprovalsReadinessSummary();
+  const globalCertificationSummary = getGlobalCertificationReadinessSummary();
 
   return (
     <main>
@@ -23,6 +25,7 @@ export default function ApprovalsReadinessPage() {
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Approvals Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
+          <Link className="secondary-action" href={globalCertificationSummary.route}>Global Certifications</Link>
           <Link className="secondary-action" href="/clinical-authority-readiness">Clinical Authority</Link>
           <Link className="secondary-action" href="/buyer-release-control-run">Buyer Release</Link>
           <Link className="secondary-action" href="/trust-center">Trust Center</Link>
@@ -62,6 +65,28 @@ export default function ApprovalsReadinessPage() {
           <span>Processes</span>
           <strong>{summary.processCount}</strong>
         </article>
+      </section>
+
+      <section className="section-band split-band">
+        <div>
+          <p className="eyebrow">Global extension</p>
+          <h2>Domestic approval preparation now rolls into global certification readiness.</h2>
+          <p className="section-copy">{globalCertificationSummary.boundary}</p>
+        </div>
+        <div className="layer-list">
+          <div className="layer-row">
+            <span>01</span>
+            <strong>{globalCertificationSummary.trackCount} tracks across HIPAA, FDA, SOC 2, ISO, EU, UK, and Australia.</strong>
+          </div>
+          <div className="layer-row">
+            <span>02</span>
+            <strong>{globalCertificationSummary.gateCount} hard gates retain authority until evidence and review are complete.</strong>
+          </div>
+          <div className="layer-row">
+            <span>03</span>
+            <strong>{globalCertificationSummary.regionalPackCount} regional packs keep global sales localized and claims-controlled.</strong>
+          </div>
+        </div>
       </section>
 
       <section className="section-band split-band">

@@ -4,7 +4,7 @@ import { getBoundaryResolutionSummary } from "../lib/boundaryResolution";
 export const metadata = {
   title: "SCRIMED Boundary Resolution Register",
   description:
-    "A cross-system register for SCRIMED clinical, PHI, legal, regional, reimbursement, security, QA, public-market, and production-readiness boundaries."
+    "A cross-system register for SCRIMED clinical, PHI, legal, regional, reimbursement, security, QA, certification, continuous review, enterprise, and production-readiness boundaries."
 };
 
 export default function BoundaryResolutionPage() {
@@ -21,11 +21,13 @@ export default function BoundaryResolutionPage() {
         <h1>SCRIMED addresses known boundaries with controls, workarounds, owners, and hard gates.</h1>
         <p className="hero-text">
           This register unifies clinical authority, PHI, legal, regional, reimbursement, security certification,
-          QA evidence, public-market, and production-readiness boundaries without pretending external approvals are complete.
+          QA evidence, global certification, continuous review, innovation, enterprise finance, public-market,
+          and production-readiness boundaries without pretending external approvals are complete.
         </p>
         <div className="hero-actions">
           <a className="primary-action" href={summary.briefRoute}>Download Boundary Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
+          <Link className="secondary-action" href="/boundary-release-approvals">Approval Matrix</Link>
           <Link className="secondary-action" href="/clinical-authority-readiness">Clinical Authority</Link>
           <Link className="secondary-action" href="/qa-evidence">QA Evidence</Link>
           <Link className="secondary-action" href="/pilot-workspace/access">Protected Workspace</Link>
@@ -61,6 +63,10 @@ export default function BoundaryResolutionPage() {
           <span>Blocked</span>
           <strong>{summary.blockedBeforeApprovalCount}</strong>
         </article>
+        <article>
+          <span>Categories</span>
+          <strong>{categoryEntries.length}</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
@@ -82,7 +88,7 @@ export default function BoundaryResolutionPage() {
       <section className="table-section" aria-label="Boundary categories">
         <div className="section-heading">
           <p className="eyebrow">Coverage</p>
-          <h2>Boundary coverage spans product, clinical, trust, QA, commercial, and investor-readiness systems.</h2>
+          <h2>Boundary coverage spans product, clinical, trust, QA, global approval, audit, commercial, finance, and investor-readiness systems.</h2>
           <p className="section-copy">{summary.addressedPosition}</p>
         </div>
         {categoryEntries.map(([category, count]) => (

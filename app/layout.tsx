@@ -1,9 +1,11 @@
 import "./globals.css";
+import { SiteFooter } from "./components/SiteFooter";
+import { SiteNavigation } from "./components/SiteNavigation";
 
 export const metadata = {
-  title: "SCRIMED | Healthcare Intelligence Platform",
+  title: "SCRIMED | Governed Healthcare AI Pilots",
   description:
-    "SCRIMED is an AI-native healthcare intelligence platform for clinical workflows, automation, interoperability, and trust monitoring."
+    "SCRIMED helps healthcare leaders buy governed AI workflow assessments, no-PHI demos, synthetic pilots, protected enterprise pilots, and investor-ready proof."
 };
 
 export default function RootLayout({
@@ -13,7 +15,13 @@ export default function RootLayout({
 }) {
   return (
     <html data-scroll-behavior="smooth" lang="en">
-      <body>{children}</body>
+      <body>
+        <SiteNavigation />
+        <div id="main-content">
+          {children}
+        </div>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

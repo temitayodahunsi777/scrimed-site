@@ -15,10 +15,14 @@ export default function TrustSafetyOperationsPage() {
       <section className="page-hero trust-hero">
         <Link className="back-link" href="/trust-center">Trust Center</Link>
         <p className="eyebrow">Trust & Safety Operations</p>
-        <h1>SCRIMED agents must monitor, audit, fix, improve, and escalate around the clock.</h1>
-        <p className="hero-text">{summary.boundary}</p>
+        <h1>SCRIMED gives buyers a reliability and safety operating model they can inspect before scale.</h1>
+        <p className="hero-text">
+          TrustOps turns monitoring, auditing, incident response, claims control, human review, and improvement loops into
+          buyer-visible evidence while keeping live clinical, PHI, and managed-coverage claims gated.
+        </p>
         <div className="hero-actions">
           <a className="primary-action" href={summary.apiRoute}>Inspect API</a>
+          <Link className="secondary-action" href="/continuous-review-audit">Open 24/7 Review Loop</Link>
           <Link className="secondary-action" href="/claims">Claims Register</Link>
           <Link className="secondary-action" href="/audit">Audit Layer</Link>
           <Link className="secondary-action" href="/observability">Observability</Link>
@@ -78,6 +82,35 @@ export default function TrustSafetyOperationsPage() {
           <span>Legal-hold watch</span>
           <strong>{summary.legalHoldWatchCount}</strong>
         </article>
+      </section>
+
+      <section className="section-band split-band" aria-label="Trust safety buyer value">
+        <div>
+          <p className="eyebrow">Reliability buyers can inspect</p>
+          <h2>Trust, reliability, and safety are packaged into the SCRIMED buying story.</h2>
+          <p className="section-copy">
+            Buyers can see how SCRIMED detects risk, blocks unsafe claims, preserves evidence, routes owners, and improves
+            the product. That reduces diligence friction without pretending the product is already clinically production-ready.
+          </p>
+        </div>
+        <div className="layer-list">
+          <div className="layer-row">
+            <span>01</span>
+            <strong>{summary.agentCount} trust agents watch PHI, claims, security, clinical safety, agent actions, and improvement signals.</strong>
+          </div>
+          <div className="layer-row">
+            <span>02</span>
+            <strong>{summary.incidentCount} incident patterns show containment, remediation, buyer impact, and remaining production boundaries.</strong>
+          </div>
+          <div className="layer-row">
+            <span>03</span>
+            <strong>{summary.loopStageCount} loop stages convert detection into triage, containment, fixes, and learning.</strong>
+          </div>
+          <div className="layer-row">
+            <span>04</span>
+            <strong>{summary.remainingLimitations.length} retained limitations keep managed 24/7 coverage, PHI, legal, and clinical authority honest.</strong>
+          </div>
+        </div>
       </section>
 
       <section className="section-band split-band">

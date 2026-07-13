@@ -1,4 +1,5 @@
 name: Authority Reference QA Smoke
+run-name: Authority Reference QA Smoke (${{ github.event_name }})
 
 on:
   workflow_dispatch:
@@ -21,13 +22,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: authority-reference-qa-smoke
+  group: authority-reference-qa-smoke-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   authority-reference-qa:
     name: Authority reference QA smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout

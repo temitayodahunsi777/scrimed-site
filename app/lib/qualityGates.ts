@@ -6,6 +6,8 @@ import { getWorkflowExecutionResultSummary } from "./workflowExecutionResults";
 import { getWorkflowExecutionAuditSummary } from "./workflowExecutionAudit";
 import { getAuditPersistenceReadinessSummary } from "./auditPersistenceReadiness";
 import { getIdentityAccessReadinessSummary } from "./identityAccessReadiness";
+import { getExecutionAttemptEnvelopeSummary } from "./executionAttemptEnvelope";
+import { getExecutionAttemptDurableStoreSummary } from "./executionAttemptDurableStore";
 import { getExecutionAttemptReadinessSummary } from "./executionAttemptReadiness";
 import { getRuntimeSafetyReadinessSummary } from "./runtimeSafetyReadiness";
 import { getWorkflowResultValidationResults } from "./workflowResultValidation";
@@ -65,6 +67,12 @@ export const qualityGates: QualityGate[] = [
     route: "/trust-os",
     state: "active",
     role: "Deterministic request governance plus an AAL2-protected tenant Decision Ledger with append-only decisions, Clinical Trace, reviewer dispositions, outcome signals, and audited governance packets."
+  },
+  {
+    name: "Production architecture contract",
+    route: "/production-architecture",
+    state: "active",
+    role: "Typed, testable architecture contract across Agent Runtime, Context Engine, Trust Engine v2, Model Router, Evaluation Engine, ClinSecOps, and deterministic Workflow Engine."
   },
   {
     name: "Enterprise readiness and claims control",
@@ -140,11 +148,18 @@ export const qualityGates: QualityGate[] = [
     replacement: "Deny-by-default governed execution endpoints remain the active replacement until production identity and access are approved."
   },
   {
-    name: "Execution attempt readiness",
+    name: "Execution attempt envelope and replay contract",
     route: "/workflows/execution-attempts",
-    state: "planned",
-    role: "Decision register for attempt identity, idempotency, durable attempt state, concurrency, retry, failure quarantine, runtime-safety handoff, privacy boundaries, and regional attempt compliance.",
-    replacement: "Deny-by-default governed execution endpoints remain the active replacement until execution attempts can be deduplicated, persisted, audited, and safely replayed."
+    state: "active",
+    role: "Metadata-only execution-attempt envelopes with deterministic idempotency, replay metadata, model-route telemetry, human review gates, audit linkage, failure recovery, and no-PHI scorecards.",
+    replacement: "Protected workflow execution remains blocked until durable attempt storage, customer authority, connector approval, PHI controls, and production review workflow are approved."
+  },
+  {
+    name: "Execution attempt durable store",
+    route: "/api/workflows/execution-attempts/durable-store",
+    state: "active",
+    role: "Tenant-scoped, no-PHI durable attempt metadata, idempotency TTL, locking, replay lookup, regional retention, immutable events, and protected human-review disposition APIs.",
+    replacement: "Protected workflow execution remains blocked until the migration is applied, authenticated AAL2 smoke passes, model/tool registries are approved, customer authorization exists, and production connectors are approved."
   },
   {
     name: "Runtime safety readiness",
@@ -224,6 +239,8 @@ export function getQualityGateSummary() {
   const workflowExecutionAudit = getWorkflowExecutionAuditSummary();
   const auditPersistenceReadiness = getAuditPersistenceReadinessSummary();
   const identityAccessReadiness = getIdentityAccessReadinessSummary();
+  const executionAttemptEnvelope = getExecutionAttemptEnvelopeSummary();
+  const executionAttemptDurableStore = getExecutionAttemptDurableStoreSummary();
   const executionAttemptReadiness = getExecutionAttemptReadinessSummary();
   const runtimeSafetyReadiness = getRuntimeSafetyReadinessSummary();
   const interoperability = getInteroperabilitySummary();
@@ -248,6 +265,8 @@ export function getQualityGateSummary() {
       workflowExecutionContracts.status === "contract-ready" &&
       workflowImplementationReadiness.status === "deny-stub-ready" &&
       workflowExecutionAudit.status === "audit-boundary-ready" &&
+      executionAttemptEnvelope.releaseDecision === "pass-for-synthetic-contract" &&
+      executionAttemptDurableStore.validation.status === "pass" &&
       interoperability.status === "standards-control-plane-defined" &&
       interoperabilityEvaluations.status === "synthetic-conformance-evaluations-ready" &&
       demoPilotPrograms.status === "buyer-ready-synthetic-evaluations" &&
@@ -271,6 +290,8 @@ export function getQualityGateSummary() {
     workflowExecutionAudit,
     auditPersistenceReadiness,
     identityAccessReadiness,
+    executionAttemptEnvelope,
+    executionAttemptDurableStore,
     executionAttemptReadiness,
     runtimeSafetyReadiness,
     interoperability,
@@ -281,6 +302,6 @@ export function getQualityGateSummary() {
     salesOperations,
     trustOS,
     qaEvidenceLedger,
-    updated: "2026-06-18"
+    updated: "2026-06-27"
   };
 }

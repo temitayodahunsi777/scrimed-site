@@ -1,4 +1,5 @@
 name: Agent Workspace And TrustOps Governance Smoke
+run-name: Agent Workspace And TrustOps Governance Smoke (${{ github.event_name }})
 
 on:
   workflow_dispatch:
@@ -23,13 +24,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: agent-workspace-trustops-governance-smoke
+  group: agent-workspace-trustops-governance-smoke-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   governance-smoke:
     name: Production governance smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -39,6 +41,23 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
+
+      - name: Report no-secret smoke context
+        env:
+          SCRIMED_BASE_URL: ${{ inputs.base_url || 'https://app.scrimedsolutions.com' }}
+          SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug || 'atlas-synthetic-evaluation' }}
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}
+          SCRIMED_REQUIRE_AUTHENTICATED_SMOKE: ${{ github.event_name == 'workflow_dispatch' && inputs.require_authenticated_path && '1' || '' }}
+        run: |
+          echo "event_name=${{ github.event_name }}"
+          echo "base_url=${SCRIMED_BASE_URL}"
+          echo "workspace_slug=${SCRIMED_WORKSPACE_SLUG}"
+          echo "authenticated_required=${SCRIMED_REQUIRE_AUTHENTICATED_SMOKE:-0}"
+          if [ -n "${SCRIMED_BEARER_TOKEN:-}" ]; then
+            echo "bearer_token_present=true"
+          else
+            echo "bearer_token_present=false"
+          fi
 
       - name: Run Agent Workspace governance smoke
         env:

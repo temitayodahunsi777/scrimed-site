@@ -5,7 +5,9 @@ export type InteroperabilityStandardKind =
   | "imaging"
   | "pharmacy"
   | "device"
-  | "terminology";
+  | "terminology"
+  | "network"
+  | "data-set";
 
 export type InteroperabilityStandardStatus =
   | "registry-defined"
@@ -77,6 +79,36 @@ export const interoperabilityStandards: InteroperabilityStandard[] = [
     sourceUrls: ["https://hl7.org/fhir/smart-app-launch/"]
   },
   {
+    slug: "uscdi",
+    acronym: "USCDI",
+    name: "United States Core Data for Interoperability",
+    steward: "Office of the National Coordinator for Health IT",
+    kind: "data-set",
+    status: "profile-selection-required",
+    implementationTarget:
+      "Map synthetic extraction targets to USCDI data classes before SCRIMED represents health-record coverage for U.S. buyers.",
+    versionsAndProfiles: ["Current ONC USCDI version", "US Core-aligned profiles", "deployment-approved data classes"],
+    capabilities: ["common clinical data classes", "EHI export planning", "FHIR profile scoping", "buyer data-coverage review"],
+    conformanceEvidence: ["data-class inventory", "FHIR profile mapping", "missing-field register", "provenance and source attribution"],
+    requiredControls: ["version pinning", "minimum necessary scope", "data-quality review", "source-system provenance", "no PHI in public routes"],
+    sourceUrls: ["https://www.healthit.gov/isa/united-states-core-data-interoperability-uscdi"]
+  },
+  {
+    slug: "tefca",
+    acronym: "TEFCA",
+    name: "Trusted Exchange Framework and Common Agreement",
+    steward: "Office of the National Coordinator for Health IT",
+    kind: "network",
+    status: "registry-defined",
+    implementationTarget:
+      "Treat nationwide exchange as a governance and participant-path readiness track, not a direct SCRIMED live-exchange claim.",
+    versionsAndProfiles: ["Common Agreement", "QHIN/participant path", "FHIR roadmap monitored", "purpose-of-use policy"],
+    capabilities: ["nationwide exchange governance", "participant routing", "purpose-of-use controls", "audit and exchange policy alignment"],
+    conformanceEvidence: ["participant authority", "customer exchange pathway", "privacy/security policy", "audit and consent evidence"],
+    requiredControls: ["customer authority", "purpose-of-use", "consent policy", "exchange participant review", "no direct QHIN claim"],
+    sourceUrls: ["https://healthit.gov/policy/tefca/"]
+  },
+  {
     slug: "hl7-v2",
     acronym: "HL7 v2",
     name: "HL7 Version 2 Messaging",
@@ -120,6 +152,23 @@ export const interoperabilityStandards: InteroperabilityStandard[] = [
     conformanceEvidence: ["licensed implementation guide", "trading-partner agreement", "synthetic transaction tests", "acknowledgement validation"],
     requiredControls: ["payer-specific validation", "trading-partner approval", "financial audit trace", "no final reimbursement decision", "human exception review"],
     sourceUrls: ["https://x12.org/"]
+  },
+  {
+    slug: "cms-prior-authorization-apis",
+    acronym: "CMS APIs",
+    name: "CMS Interoperability and Prior Authorization API Readiness",
+    steward: "Centers for Medicare & Medicaid Services",
+    kind: "administrative",
+    status: "profile-selection-required",
+    implementationTarget:
+      "Prepare payer, provider, and prior-authorization workflows for API-based evidence packets while retaining payer/trading-partner approval and no-guarantee reimbursement boundaries.",
+    versionsAndProfiles: ["Patient Access API", "Provider Access API", "Payer-to-Payer API", "Prior Authorization API", "deployment-specific payer policy"],
+    capabilities: ["coverage and prior-authorization context", "payer evidence packets", "missing-documentation review", "status and decision metadata"],
+    conformanceEvidence: ["payer API scope", "synthetic prior-auth fixture", "human RCM review", "policy-source attribution", "audit trail"],
+    requiredControls: ["payer-specific validation", "no autonomous submission", "no reimbursement guarantee", "coding review", "legal and customer approval"],
+    sourceUrls: [
+      "https://www.cms.gov/initiatives/burden-reduction/overview/interoperability/policies-regulations/cms-interoperability-prior-authorization-final-rule-cms-0057-f"
+    ]
   },
   {
     slug: "c-cda",

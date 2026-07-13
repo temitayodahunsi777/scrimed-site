@@ -62,6 +62,34 @@ export default function TrustCenterPage() {
         </article>
       </section>
 
+      <section className="table-section" aria-label="Trust reliability and safety buyer proof">
+        <div className="section-heading">
+          <p className="eyebrow">Trust is a buying advantage</p>
+          <h2>SCRIMED sells confidence by showing what is proven, what is gated, and who owns the next review.</h2>
+          <p className="section-copy">
+            Serious healthcare buyers do not only buy features. They buy lower diligence friction, safer evaluation paths,
+            accountable owners, and a vendor that can say no before risk crosses the line.
+          </p>
+        </div>
+        {summary.trustDividendSignals.map((signal) => (
+          <article className="module-row" key={signal.audience}>
+            <div>
+              <span>{signal.audience}</span>
+              <h2>{signal.concern}</h2>
+            </div>
+            <p>{signal.scrimedAnswer}</p>
+            <div>
+              <Link className="module-link" href={signal.proofRoute}>
+                Inspect proof route
+              </Link>
+              <ul className="compact-list">
+                <li>{signal.boundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
       <section className="section-band split-band">
         <div>
           <p className="eyebrow">24/7 trust operations</p>

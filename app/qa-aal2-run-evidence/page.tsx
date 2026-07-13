@@ -28,6 +28,12 @@ export default function QaAal2RunEvidencePage() {
           <a className="secondary-action" href={evidence.routes.api}>
             Inspect API
           </a>
+          <a className="secondary-action" href={evidence.routes.smokeReadinessBrief}>
+            Smoke Readiness Brief
+          </a>
+          <a className="secondary-action" href={evidence.routes.smokeReadinessApi}>
+            Smoke Readiness API
+          </a>
           <Link className="secondary-action" href={evidence.routes.manualExecutionConsole}>
             Execution Console
           </Link>
@@ -73,6 +79,14 @@ export default function QaAal2RunEvidencePage() {
           <span>PHI entered</span>
           <strong>{evidence.phiEnteredSystem ? "yes" : "no"}</strong>
         </article>
+        <article>
+          <span>Smoke preflight</span>
+          <strong>{evidence.smokeReadiness.status}</strong>
+        </article>
+        <article>
+          <span>Strict smoke</span>
+          <strong>{evidence.smokeReadiness.strictAttemptReady ? "ready" : "human token required"}</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
@@ -98,6 +112,61 @@ export default function QaAal2RunEvidencePage() {
             <span>packet</span>
             <strong>{evidence.latestPacketHash}</strong>
           </div>
+        </div>
+      </section>
+
+      <section className="table-section" aria-label="AAL2 smoke readiness gates">
+        <div className="section-heading">
+          <p className="eyebrow">AAL2 smoke readiness</p>
+          <h2>Strict protected smoke is prepared, but remains blocked until a fresh human AAL2 token and target feature flag are present.</h2>
+        </div>
+        {evidence.smokeReadiness.gates.map((gate) => (
+          <article className="module-row" key={gate.id}>
+            <div>
+              <span>{gate.status}</span>
+              <h2>{gate.name}</h2>
+            </div>
+            <p>{gate.evidence}</p>
+            <div>
+              <strong>{gate.nextAction}</strong>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-band" aria-label="AAL2 smoke readiness commands">
+        <div className="section-heading">
+          <p className="eyebrow">Operator commands</p>
+          <h2>Use only the no-secret preflight and short-lived local token handoff path for strict AAL2 smoke.</h2>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>safe commands</span>
+            <h3>{evidence.smokeReadiness.commands.length}</h3>
+            <ul className="compact-list">
+              {evidence.smokeReadiness.commands.map((command) => (
+                <li key={command}>{command}</li>
+              ))}
+            </ul>
+          </article>
+          <article>
+            <span>guardrails</span>
+            <h3>{evidence.smokeReadiness.guardrails.length}</h3>
+            <ul className="compact-list">
+              {evidence.smokeReadiness.guardrails.map((guardrail) => (
+                <li key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
+          </article>
+          <article>
+            <span>fail-closed modes</span>
+            <h3>{evidence.smokeReadiness.failureModes.length}</h3>
+            <ul className="compact-list">
+              {evidence.smokeReadiness.failureModes.map((failureMode) => (
+                <li key={failureMode}>{failureMode}</li>
+              ))}
+            </ul>
+          </article>
         </div>
       </section>
 

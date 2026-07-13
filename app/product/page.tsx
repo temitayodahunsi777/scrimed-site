@@ -8,17 +8,63 @@ export default function ProductConsolePage() {
     <main>
       <section className="page-hero">
         <Link className="back-link" href="/hub">Hub</Link>
-        <p className="eyebrow">SCRIMED Product Console</p>
-        <h1>SCRIMED Product Console packages a sellable healthcare operating-system pilot.</h1>
+        <p className="eyebrow">SCRIMED product proof for serious healthcare buyers</p>
+        <h1>See what SCRIMED can sell, prove, and pilot for your organization.</h1>
         <p className="hero-text">
-          This console turns SCRIMED from a readiness foundation into a commercial product surface: buyer offers, workflow demos, proof routes, deployment stages, and production safety boundaries.
+          Start here when your team wants to understand the product, compare offers, inspect proof, choose a demo, and move toward a governed pilot without handing over PHI or accepting unsupported clinical claims.
         </p>
+        <div className="hero-actions">
+          <Link className="primary-action" href={summary.pilotDemoCommercialReadinessRoute}>
+            Find Your Pilot Path
+          </Link>
+          <Link className="secondary-action" href="/offerings">
+            See Offers
+          </Link>
+          <Link className="secondary-action" href="/demos">
+            Watch Demos
+          </Link>
+          <a className="secondary-action" href={summary.pilotDemoCommercialReadinessBriefRoute}>
+            Download Buyer Brief
+          </a>
+        </div>
       </section>
 
       <section className="section-band hub-summary" aria-label="SCRIMED product summary">
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
+        </article>
+        <article>
+          <span>Company score</span>
+          <strong>{summary.companyAssessmentOverallScore}</strong>
+        </article>
+        <article>
+          <span>Company dimensions</span>
+          <strong>{summary.companyAssessmentDimensionCount}</strong>
+        </article>
+        <article>
+          <span>Company workstreams</span>
+          <strong>{summary.companyAssessmentUpgradeWorkstreamCount}</strong>
+        </article>
+        <article>
+          <span>Company hard stops</span>
+          <strong>{summary.companyAssessmentHardStopCount}</strong>
+        </article>
+        <article>
+          <span>Clinical production</span>
+          <strong>{summary.clinicalProductionReady ? "ready" : "not ready"}</strong>
+        </article>
+        <article>
+          <span>Clinical tasks</span>
+          <strong>{summary.clinicalProductionTaskCount}</strong>
+        </article>
+        <article>
+          <span>Critical open</span>
+          <strong>{summary.clinicalProductionCriticalOpenTaskCount}</strong>
+        </article>
+        <article>
+          <span>Current motions</span>
+          <strong>{summary.clinicalProductionCurrentCapabilityMotionCount}</strong>
         </article>
         <article>
           <span>Ops blockers</span>
@@ -47,6 +93,22 @@ export default function ProductConsolePage() {
         <article>
           <span>Pilot programs</span>
           <strong>{summary.pilotProgramCount}</strong>
+        </article>
+        <article>
+          <span>Demo paths</span>
+          <strong>{summary.pilotDemoCommercialReadinessDemoPathCount}</strong>
+        </article>
+        <article>
+          <span>Market benchmarks</span>
+          <strong>{summary.pilotDemoCommercialReadinessMarketBenchmarkCount}</strong>
+        </article>
+        <article>
+          <span>Pricing alignments</span>
+          <strong>{summary.pilotDemoCommercialReadinessPricingAlignmentCount}</strong>
+        </article>
+        <article>
+          <span>Path score</span>
+          <strong>{summary.pilotDemoCommercialReadinessStandardPathScore}%</strong>
         </article>
         <article>
           <span>Protected workspace</span>
@@ -117,6 +179,38 @@ export default function ProductConsolePage() {
           <strong>{summary.navigationAuditSmokeCoveredHtmlRouteCount}</strong>
         </article>
         <article>
+          <span>Launch tracks</span>
+          <strong>{summary.launchReadinessTrackCount}</strong>
+        </article>
+        <article>
+          <span>DNS controls</span>
+          <strong>{summary.launchReadinessDnsControlCount}</strong>
+        </article>
+        <article>
+          <span>Service paths</span>
+          <strong>{summary.launchReadinessServicePathCount}</strong>
+        </article>
+        <article>
+          <span>Launch hard stops</span>
+          <strong>{summary.launchReadinessHardStopCount}</strong>
+        </article>
+        <article>
+          <span>Threat profiles</span>
+          <strong>{summary.competitiveDefenseThreatProfileCount}</strong>
+        </article>
+        <article>
+          <span>Cyber controls</span>
+          <strong>{summary.competitiveDefenseLegalPrivacyCyberControlCount}</strong>
+        </article>
+        <article>
+          <span>Defense layers</span>
+          <strong>{summary.competitiveDefenseInfiltrationDeterrenceLayerCount}</strong>
+        </article>
+        <article>
+          <span>Defense hard stops</span>
+          <strong>{summary.competitiveDefenseHardStopCount}</strong>
+        </article>
+        <article>
           <span>Reliability controls</span>
           <strong>{summary.serviceReliabilityControlCount}</strong>
         </article>
@@ -131,6 +225,134 @@ export default function ProductConsolePage() {
         <article>
           <span>Efficiency fixes</span>
           <strong>{summary.serviceReliabilityEfficiencyImprovementCount}</strong>
+        </article>
+        <article>
+          <span>Autonomy lanes</span>
+          <strong>{summary.automationAutopilotCapabilityCount}</strong>
+        </article>
+        <article>
+          <span>Auto readiness</span>
+          <strong>{summary.automationAutopilotAverageReadinessScore}</strong>
+        </article>
+        <article>
+          <span>Autonomy blocked</span>
+          <strong>{summary.automationAutopilotProductionAuthorityBlockedCount}</strong>
+        </article>
+        <article>
+          <span>Workarounds</span>
+          <strong>{summary.automationAutopilotBottleneckWorkaroundCount}</strong>
+        </article>
+        <article>
+          <span>Problem queue</span>
+          <strong>{summary.strategicProblemResolutionProblemCount}</strong>
+        </article>
+        <article>
+          <span>Critical problems</span>
+          <strong>{summary.strategicProblemResolutionCriticalProblemCount}</strong>
+        </article>
+        <article>
+          <span>Priority score</span>
+          <strong>{summary.strategicProblemResolutionAveragePriorityScore}</strong>
+        </article>
+        <article>
+          <span>Review problems</span>
+          <strong>{summary.strategicProblemResolutionHumanReviewRequiredCount}</strong>
+        </article>
+        <article>
+          <span>Optimization lanes</span>
+          <strong>{summary.healthcareOptimizationCommandLaneCount}</strong>
+        </article>
+        <article>
+          <span>Agent capabilities</span>
+          <strong>{summary.healthcareOptimizationCommandAgentCapabilityCount}</strong>
+        </article>
+        <article>
+          <span>Interop standards</span>
+          <strong>{summary.healthcareOptimizationCommandInteroperableStandardCount}</strong>
+        </article>
+        <article>
+          <span>Outcome metrics</span>
+          <strong>{summary.healthcareOptimizationCommandMeasurableOutcomeCount}</strong>
+        </article>
+        <article>
+          <span>Value metrics</span>
+          <strong>{summary.healthcareValueRealizationMetricCount}</strong>
+        </article>
+        <article>
+          <span>Value packages</span>
+          <strong>{summary.healthcareValueRealizationPackageCount}</strong>
+        </article>
+        <article>
+          <span>ROI controls</span>
+          <strong>{summary.healthcareValueRealizationRiskControlCount}</strong>
+        </article>
+        <article>
+          <span>Evidence score</span>
+          <strong>{summary.healthcareValueRealizationAverageEvidenceScore}</strong>
+        </article>
+        <article>
+          <span>Pilot packets</span>
+          <strong>{summary.pilotValueEvidencePacketCount}</strong>
+        </article>
+        <article>
+          <span>Evidence artifacts</span>
+          <strong>{summary.pilotValueEvidenceArtifactCount}</strong>
+        </article>
+        <article>
+          <span>Claim controls</span>
+          <strong>{summary.pilotValueEvidenceClaimControlCount}</strong>
+        </article>
+        <article>
+          <span>Packet review</span>
+          <strong>{summary.pilotValueEvidenceReviewerCheckpointCount}</strong>
+        </article>
+        <article>
+          <span>Activation plans</span>
+          <strong>{summary.pilotActivationPlannerPlanCount}</strong>
+        </article>
+        <article>
+          <span>Activation steps</span>
+          <strong>{summary.pilotActivationPlannerStepCount}</strong>
+        </article>
+        <article>
+          <span>Activation blockers</span>
+          <strong>{summary.pilotActivationPlannerBlockerCount}</strong>
+        </article>
+        <article>
+          <span>Activation handoffs</span>
+          <strong>{summary.pilotActivationPlannerHandoffCount}</strong>
+        </article>
+        <article>
+          <span>Handoff packets</span>
+          <strong>{summary.pilotHandoffCommandPacketCount}</strong>
+        </article>
+        <article>
+          <span>Handoff checks</span>
+          <strong>{summary.pilotHandoffCommandChecklistCount}</strong>
+        </article>
+        <article>
+          <span>Handoff risks</span>
+          <strong>{summary.pilotHandoffCommandRiskControlCount}</strong>
+        </article>
+        <article>
+          <span>Handoff stops</span>
+          <strong>{summary.pilotHandoffCommandHardStopCount}</strong>
+        </article>
+        <article>
+          <span>Success reviews</span>
+          <strong>{summary.pilotSuccessReviewCommandReviewPlanCount}</strong>
+        </article>
+        <article>
+          <span>Evidence gaps</span>
+          <strong>{summary.pilotSuccessReviewCommandEvidenceGapCount}</strong>
+        </article>
+        <article>
+          <span>Expansion items</span>
+          <strong>{summary.pilotSuccessReviewCommandExpansionReadinessCount}</strong>
+        </article>
+        <article>
+          <span>Blocked claims</span>
+          <strong>{summary.pilotSuccessReviewCommandBlockedClaimCount}</strong>
         </article>
         <article>
           <span>Capital revenue</span>
@@ -179,6 +401,122 @@ export default function ProductConsolePage() {
         <article>
           <span>Growth proof routes</span>
           <strong>{summary.growthEngineProofRouteCount}</strong>
+        </article>
+        <article>
+          <span>Weakness tracks</span>
+          <strong>{summary.investorAudienceWeaknessTrackCount}</strong>
+        </article>
+        <article>
+          <span>Investor packets</span>
+          <strong>{summary.investorAudiencePacketCount}</strong>
+        </article>
+        <article>
+          <span>Ready packets</span>
+          <strong>{summary.investorAudienceReadyNowPacketCount}</strong>
+        </article>
+        <article>
+          <span>Audience gates</span>
+          <strong>{summary.investorAudienceReadinessGateCount}</strong>
+        </article>
+        <article>
+          <span>Portfolio offers</span>
+          <strong>{summary.productServicePortfolioOfferCount}</strong>
+        </article>
+        <article>
+          <span>Portfolio packages</span>
+          <strong>{summary.productServicePortfolioPackageCount}</strong>
+        </article>
+        <article>
+          <span>Portfolio controls</span>
+          <strong>{summary.productServicePortfolioMarginControlCount}</strong>
+        </article>
+        <article>
+          <span>Portfolio proof</span>
+          <strong>{summary.productServicePortfolioProofRouteCount}</strong>
+        </article>
+        <article>
+          <span>Delivery offers</span>
+          <strong>{summary.serviceDeliveryOfferCount}</strong>
+        </article>
+        <article>
+          <span>Delivery phases</span>
+          <strong>{summary.serviceDeliveryPhaseCount}</strong>
+        </article>
+        <article>
+          <span>Work orders</span>
+          <strong>{summary.serviceDeliveryWorkOrderTemplateCount}</strong>
+        </article>
+        <article>
+          <span>Delivery gates</span>
+          <strong>{summary.serviceDeliveryActivationGateCount}</strong>
+        </article>
+        <article>
+          <span>Delivery hard stops</span>
+          <strong>{summary.serviceDeliveryHardStopCount}</strong>
+        </article>
+        <article>
+          <span>Onboarding stages</span>
+          <strong>{summary.clientOnboardingStageCount}</strong>
+        </article>
+        <article>
+          <span>Comms templates</span>
+          <strong>{summary.clientOnboardingTemplateCount}</strong>
+        </article>
+        <article>
+          <span>Calendar packets</span>
+          <strong>{summary.clientOnboardingCalendarPacketCount}</strong>
+        </article>
+        <article>
+          <span>Client handoffs</span>
+          <strong>{summary.clientOnboardingHandoffCount}</strong>
+        </article>
+        <article>
+          <span>Scale domains</span>
+          <strong>{summary.enterpriseScalabilityDomainCount}</strong>
+        </article>
+        <article>
+          <span>Scale controls</span>
+          <strong>{summary.enterpriseScalabilityControlCount}</strong>
+        </article>
+        <article>
+          <span>Scale workstreams</span>
+          <strong>{summary.enterpriseScalabilityWorkstreamCount}</strong>
+        </article>
+        <article>
+          <span>Scale bottlenecks</span>
+          <strong>{summary.enterpriseScalabilityOpenBottleneckCount}</strong>
+        </article>
+        <article>
+          <span>Platform pillars</span>
+          <strong>{summary.platformPowerPillarCount}</strong>
+        </article>
+        <article>
+          <span>Platform controls</span>
+          <strong>{summary.platformPowerControlCount}</strong>
+        </article>
+        <article>
+          <span>AI/UI/API workstreams</span>
+          <strong>{summary.platformPowerWorkstreamCount}</strong>
+        </article>
+        <article>
+          <span>Platform bottlenecks</span>
+          <strong>{summary.platformPowerOpenBottleneckCount}</strong>
+        </article>
+        <article>
+          <span>Workaround tracks</span>
+          <strong>{summary.limitationsWorkaroundTrackCount}</strong>
+        </article>
+        <article>
+          <span>Workaround packets</span>
+          <strong>{summary.limitationsWorkaroundPacketCount}</strong>
+        </article>
+        <article>
+          <span>Open workaround risks</span>
+          <strong>{summary.limitationsWorkaroundOpenRiskCount}</strong>
+        </article>
+        <article>
+          <span>Workaround stops</span>
+          <strong>{summary.limitationsWorkaroundHardStopCount}</strong>
         </article>
         <article>
           <span>Boundary records</span>
@@ -301,6 +639,30 @@ export default function ProductConsolePage() {
           <strong>{summary.strategicIntelligencePatternCount}</strong>
         </article>
         <article>
+          <span>Command lanes</span>
+          <strong>{summary.operatingCommandCenterLaneCount}</strong>
+        </article>
+        <article>
+          <span>P0 command</span>
+          <strong>{summary.operatingCommandCenterP0LaneCount}</strong>
+        </article>
+        <article>
+          <span>Review-gated lanes</span>
+          <strong>{summary.operatingCommandCenterHighControlLaneCount}</strong>
+        </article>
+        <article>
+          <span>Command packets</span>
+          <strong>{summary.operatingCommandCenterEvidencePacketCount}</strong>
+        </article>
+        <article>
+          <span>Protected packets</span>
+          <strong>{summary.operatingCommandCenterProtectedEvidencePacketCount}</strong>
+        </article>
+        <article>
+          <span>Boundary packets</span>
+          <strong>{summary.operatingCommandCenterBoundaryReleaseEvidencePacketCount}</strong>
+        </article>
+        <article>
           <span>Deployment profiles</span>
           <strong>{summary.deploymentProfileCount}</strong>
         </article>
@@ -323,6 +685,22 @@ export default function ProductConsolePage() {
         <article>
           <span>Partner paths</span>
           <strong>{summary.globalPartnerChannelCount}</strong>
+        </article>
+        <article>
+          <span>Global command</span>
+          <strong>{summary.globalEnterpriseCommandRegionCount}</strong>
+        </article>
+        <article>
+          <span>Global sales</span>
+          <strong>{summary.globalEnterpriseCommandSalesPlaybookCount}</strong>
+        </article>
+        <article>
+          <span>Global interop</span>
+          <strong>{summary.globalEnterpriseCommandInteroperabilityLaneCount}</strong>
+        </article>
+        <article>
+          <span>Global comms</span>
+          <strong>{summary.globalEnterpriseCommandCommunicationLaneCount}</strong>
         </article>
         <article>
           <span>Source signals</span>
@@ -382,6 +760,684 @@ export default function ProductConsolePage() {
         </article>
       </section>
 
+      <section className="table-section" aria-label="SCRIMED operating command center">
+        <div className="section-heading">
+          <p className="eyebrow">Operating command</p>
+          <h2>Product, service, agent, infrastructure, and UI work now rolls through owner-bound command lanes.</h2>
+          <p className="section-copy">{summary.operatingCommandCenterSummary.boundary}</p>
+          <p className="section-copy">{summary.operatingCommandCenterNextBuildStep}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.operatingCommandCenterRoute}>
+              Open Command Center
+            </Link>
+            <a className="secondary-action" href={summary.operatingCommandCenterBriefRoute}>
+              Download Command Brief
+            </a>
+          </div>
+        </div>
+        {summary.operatingCommandCenterSummary.lanes.slice(0, 6).map((lane) => (
+          <article className="module-row" key={lane.id}>
+            <div>
+              <span>{lane.priority}</span>
+              <h2>{lane.title}</h2>
+            </div>
+            <p>{lane.nextSafeAction}</p>
+            <div>
+              <strong>{lane.owner}</strong>
+              <ul className="compact-list">
+                <li>Status: {lane.status}</li>
+                <li>Mode: {lane.safeAutomationMode}</li>
+                <li>Human review required: {lane.humanReviewRequired ? "yes" : "no"}</li>
+                <li>Proof routes: {lane.proofRoutes.join(", ")}</li>
+                <li>Blocked: {lane.blockedActions.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.operatingCommandCenterSummary.evidencePackets.slice(0, 6).map((packet) => (
+          <article className="module-row" key={packet.packetId}>
+            <div>
+              <span>{packet.releaseStage}</span>
+              <h2>{packet.packetId}</h2>
+            </div>
+            <p>{packet.safeOutput}</p>
+            <div>
+              <strong>{packet.evidenceState}</strong>
+              <ul className="compact-list">
+                <li>Lane: {packet.laneId}</li>
+                <li>Missing evidence: {packet.missingEvidence.length ? packet.missingEvidence.join(", ") : "none"}</li>
+                <li>AAL2 required: {packet.aal2Required ? "yes" : "no"}</li>
+                <li>Boundary release required: {packet.boundaryReleaseRequired ? "yes" : "no"}</li>
+                <li>Hash: {packet.packetHash}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED automation autopilot">
+        <div className="section-heading">
+          <p className="eyebrow">Automation Autopilot</p>
+          <h2>Safe autonomy is scored, gated, and blocked before any production authority is considered.</h2>
+          <p className="section-copy">{summary.automationAutopilotSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.automationAutopilotRoute}>
+              Open Automation Autopilot
+            </Link>
+            <a className="secondary-action" href={summary.automationAutopilotBriefRoute}>
+              Download Autopilot Brief
+            </a>
+            <Link className="secondary-action" href="/scrimed-agent-governance">
+              Review Agent Governance
+            </Link>
+          </div>
+        </div>
+        {summary.automationAutopilotSummary.capabilities.slice(0, 6).map((capability) => (
+          <article className="module-row" key={capability.id}>
+            <div>
+              <span>{capability.mode}</span>
+              <h2>{capability.name}</h2>
+            </div>
+            <p>{capability.bottleneckReduced}</p>
+            <div>
+              <strong>{capability.owner}</strong>
+              <ul className="compact-list">
+                <li>Domain: {capability.domain}</li>
+                <li>Readiness: {capability.readinessScore}</li>
+                <li>Human review required: {capability.humanReviewRequired ? "yes" : "no"}</li>
+                <li>Production authority: blocked</li>
+                <li>Next: {capability.nextAutomationStep}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.automationAutopilotSummary.bottleneckWorkarounds.map((workaround) => (
+          <article className="module-row" key={workaround.id}>
+            <div>
+              <span>{workaround.owner}</span>
+              <h2>{workaround.bottleneck}</h2>
+            </div>
+            <p>{workaround.safeWorkaround}</p>
+            <div>
+              <strong>{workaround.automationAssist}</strong>
+              <ul className="compact-list">
+                <li>Current limit: {workaround.currentLimit}</li>
+                <li>Escalation: {workaround.escalationTrigger}</li>
+                <li>Proof route: {workaround.proofRoute}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED strategic problem resolution">
+        <div className="section-heading">
+          <p className="eyebrow">Strategic problem resolution</p>
+          <h2>Every weakness now becomes an owner-bound problem record, safe workaround, proof route, and next action.</h2>
+          <p className="section-copy">{summary.strategicProblemResolutionSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.strategicProblemResolutionRoute}>
+              Open Problem Resolution
+            </Link>
+            <a className="secondary-action" href={summary.strategicProblemResolutionBriefRoute}>
+              Download Resolution Brief
+            </a>
+            <Link className="secondary-action" href={summary.limitationsWorkaroundRoute}>
+              Review Workarounds
+            </Link>
+          </div>
+        </div>
+        {summary.strategicProblemResolutionSummary.topProblems.map((problem) => (
+          <article className="module-row" key={problem.id}>
+            <div>
+              <span>{problem.severity}</span>
+              <h2>{problem.title}</h2>
+            </div>
+            <p>{problem.safeWorkaround}</p>
+            <div>
+              <strong>{problem.owner}</strong>
+              <ul className="compact-list">
+                <li>Status: {problem.status}</li>
+                <li>Priority: {problem.priorityScore}</li>
+                <li>Human review: {problem.status === "human-review-required" ? "required" : "tracked"}</li>
+                <li>Next: {problem.nextAction}</li>
+                <li>Proof routes: {problem.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED healthcare optimization command">
+        <div className="section-heading">
+          <p className="eyebrow">Healthcare optimization command</p>
+          <h2>Clinical workflow, patient engagement, hospital operations, agents, innovation, and interoperability now share one governed execution map.</h2>
+          <p className="section-copy">{summary.healthcareOptimizationCommandSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.healthcareOptimizationCommandRoute}>
+              Open Optimization Command
+            </Link>
+            <a className="secondary-action" href={summary.healthcareOptimizationCommandBriefRoute}>
+              Download Optimization Brief
+            </a>
+            <Link className="secondary-action" href="/enterprise-healthcare-infrastructure">
+              Infrastructure
+            </Link>
+          </div>
+        </div>
+        {summary.healthcareOptimizationCommandSummary.topLanes.map((lane) => (
+          <article className="module-row" key={lane.id}>
+            <div>
+              <span>{lane.domain}</span>
+              <h2>{lane.name}</h2>
+            </div>
+            <p>{lane.optimizationThesis}</p>
+            <div>
+              <strong>Priority {lane.priorityScore} - {lane.readiness}</strong>
+              <ul className="compact-list">
+                <li>Mode: {lane.safeAutomationMode}</li>
+                <li>Commercial motion: {lane.commercialMotion}</li>
+                <li>Next: {lane.nextBuildStep}</li>
+                <li>Proof routes: {lane.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED healthcare value realization">
+        <div className="section-heading">
+          <p className="eyebrow">Healthcare value realization</p>
+          <h2>Buyer-ready metrics and proof packages translate optimization work into measurable, reviewable value evidence.</h2>
+          <p className="section-copy">{summary.healthcareValueRealizationSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.healthcareValueRealizationRoute}>
+              Open Value Realization
+            </Link>
+            <a className="secondary-action" href={summary.healthcareValueRealizationBriefRoute}>
+              Download Value Brief
+            </a>
+            <Link className="secondary-action" href="/pilot-demo-commercial-readiness">
+              Pilot Readiness
+            </Link>
+          </div>
+        </div>
+        {summary.healthcareValueRealizationSummary.topPackages.map((valuePackage) => (
+          <article className="module-row" key={valuePackage.id}>
+            <div>
+              <span>{valuePackage.buyerAudience}</span>
+              <h2>{valuePackage.name}</h2>
+            </div>
+            <p>{valuePackage.valueThesis}</p>
+            <div>
+              <strong>{valuePackage.commercialMotion}</strong>
+              <ul className="compact-list">
+                <li>Artifact: {valuePackage.pilotArtifact}</li>
+                <li>Boundary: {valuePackage.retainedBoundary}</li>
+                <li>Metrics: {valuePackage.includedMetrics.join(", ")}</li>
+                <li>Proof routes: {valuePackage.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED pilot value evidence">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot value evidence</p>
+          <h2>Buyer-ready evidence packets translate value metrics into acceptance criteria, reviewer gates, and safe commercial next steps.</h2>
+          <p className="section-copy">{summary.pilotValueEvidenceSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.pilotValueEvidenceRoute}>
+              Open Evidence Packets
+            </Link>
+            <a className="secondary-action" href={summary.pilotValueEvidenceBriefRoute}>
+              Download Evidence Brief
+            </a>
+            <Link className="secondary-action" href="/healthcare-value-realization">
+              Value Realization
+            </Link>
+          </div>
+        </div>
+        {summary.pilotValueEvidenceSummary.topPackets.map((packet) => (
+          <article className="module-row" key={packet.id}>
+            <div>
+              <span>{packet.pilotWindow}</span>
+              <h2>{packet.name}</h2>
+            </div>
+            <p>{packet.packetPurpose}</p>
+            <div>
+              <strong>{packet.buyerSegment}</strong>
+              <ul className="compact-list">
+                <li>Review gate: {packet.humanReviewGate}</li>
+                <li>Commercial next step: {packet.commercialNextStep}</li>
+                <li>Boundary: {packet.retainedBoundary}</li>
+                <li>Acceptance: {packet.acceptanceCriteria.join(" ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED pilot activation planner">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot activation planner</p>
+          <h2>Evidence packets now flow into owner-bound activation plans, blocker workarounds, and human-reviewed handoffs.</h2>
+          <p className="section-copy">{summary.pilotActivationPlannerSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.pilotActivationPlannerRoute}>
+              Open Activation Planner
+            </Link>
+            <a className="secondary-action" href={summary.pilotActivationPlannerBriefRoute}>
+              Download Activation Brief
+            </a>
+            <Link className="secondary-action" href={summary.pilotValueEvidenceRoute}>
+              Evidence Packets
+            </Link>
+          </div>
+        </div>
+        {summary.pilotActivationPlannerSummary.topPlans.map((plan) => (
+          <article className="module-row" key={plan.id}>
+            <div>
+              <span>{plan.buyerSegment}</span>
+              <h2>{plan.name}</h2>
+            </div>
+            <p>{plan.activationThesis}</p>
+            <div>
+              <strong>{plan.handoffOwner}</strong>
+              <ul className="compact-list">
+                <li>Source: {plan.sourcePacket}</li>
+                <li>Next: {plan.nextAction}</li>
+                <li>Boundary: {plan.retainedBoundary}</li>
+                <li>Success: {plan.successCriteria.join(" ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED pilot handoff command">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot handoff command</p>
+          <h2>Activation plans now become owner-bound handoff packets with hard stops before any external send.</h2>
+          <p className="section-copy">{summary.pilotHandoffCommandSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.pilotHandoffCommandRoute}>
+              Open Handoff Command
+            </Link>
+            <a className="secondary-action" href={summary.pilotHandoffCommandBriefRoute}>
+              Download Handoff Brief
+            </a>
+            <Link className="secondary-action" href={summary.pilotActivationPlannerRoute}>
+              Activation Planner
+            </Link>
+          </div>
+        </div>
+        {summary.pilotHandoffCommandSummary.topPackets.map((packet) => (
+          <article className="module-row" key={packet.id}>
+            <div>
+              <span>{packet.audience}</span>
+              <h2>{packet.title}</h2>
+            </div>
+            <p>{packet.purpose}</p>
+            <div>
+              <strong>{packet.status}</strong>
+              <ul className="compact-list">
+                <li>Review gate: {packet.reviewGate}</li>
+                <li>Delivery: {packet.deliveryChannel}</li>
+                <li>Blocked: {packet.blockedUse}</li>
+                <li>Proof routes: {packet.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED pilot success review command">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot success review command</p>
+          <h2>Handoff packets become 30/60/90-day success reviews, evidence-gap controls, and claims-safe expansion paths.</h2>
+          <p className="section-copy">{summary.pilotSuccessReviewCommandSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.pilotSuccessReviewCommandRoute}>
+              Open Success Review
+            </Link>
+            <a className="secondary-action" href={summary.pilotSuccessReviewCommandBriefRoute}>
+              Download Success Brief
+            </a>
+            <Link className="secondary-action" href={summary.pilotHandoffCommandRoute}>
+              Handoff Command
+            </Link>
+          </div>
+        </div>
+        {summary.pilotSuccessReviewCommandSummary.topReviewPlans.map((plan) => (
+          <article className="module-row" key={plan.id}>
+            <div>
+              <span>{plan.window} - {plan.domain}</span>
+              <h2>{plan.name}</h2>
+            </div>
+            <p>{plan.reviewQuestion}</p>
+            <div>
+              <strong>{plan.status}</strong>
+              <ul className="compact-list">
+                <li>Reviewer: {plan.reviewerRole}</li>
+                <li>Safe output: {plan.claimSafeOutput}</li>
+                <li>Blocked: {plan.blockedClaim}</li>
+                <li>Proof routes: {plan.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-band split-band" aria-label="Company assessment posture">
+        <div>
+          <p className="eyebrow">Company assessment</p>
+          <h2>{summary.companyAssessmentSummary.readinessBand}</h2>
+          <p className="section-copy">{summary.companyAssessmentSummary.recommendedCompanyPosture}</p>
+        </div>
+        <div className="layer-list">
+          {summary.companyAssessmentSummary.prioritySequence.map((step, index) => (
+            <div className="layer-row" key={step}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{step}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-band split-band" aria-label="Clinical production readiness posture">
+        <div>
+          <p className="eyebrow">Clinical production readiness</p>
+          <h2>{summary.clinicalProductionReady ? "clinical-production-ready" : "not-clinical-production-ready"}</h2>
+          <p className="section-copy">{summary.clinicalProductionReadinessSummary.nextCompanyMove}</p>
+          <p className="section-copy">{summary.clinicalProductionReadinessSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.clinicalProductionReadinessRoute}>
+              Open task ledger
+            </Link>
+            <a className="secondary-action" href={summary.clinicalProductionReadinessBriefRoute}>
+              Download ledger
+            </a>
+          </div>
+        </div>
+        <div className="layer-list">
+          {summary.clinicalProductionReadinessSummary.nextTasks.map((task, index) => (
+            <div className="layer-row" key={task.id}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{task.id}: {task.task}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="table-section" aria-label="Pilot demo commercial readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot demo accelerator</p>
+          <h2>Demos now map directly to pilot packages, price bands, proof assets, and no-PHI intake routes.</h2>
+          <p className="section-copy">{summary.pilotDemoCommercialReadinessSummary.recommendedMarketPosition}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.pilotDemoCommercialReadinessRoute}>
+              Open Accelerator
+            </Link>
+            <a className="secondary-action" href={summary.pilotDemoCommercialReadinessBriefRoute}>
+              Download Accelerator Brief
+            </a>
+            <Link className="secondary-action" href={summary.pricingRoute}>
+              Pricing
+            </Link>
+          </div>
+        </div>
+        {summary.pilotDemoCommercialReadinessSummary.demoOfferPaths.slice(0, 5).map((path) => (
+          <article className="module-row" key={path.slug}>
+            <div>
+              <span>{path.recommendedOffer}</span>
+              <h2>{path.name}</h2>
+            </div>
+            <p>{path.buyerFit}</p>
+            <div>
+              <strong>{path.pricingBand}</strong>
+              <ul className="compact-list">
+                <li>Pilot: {path.recommendedPilotName}</li>
+                <li>{path.retainedBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED launch readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Launch readiness</p>
+          <h2>Launch structure now separates sandbox DNS false negatives from branded-domain go/no-go proof.</h2>
+          <p className="section-copy">{summary.launchReadinessSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.launchReadinessRoute}>
+              Open Launch Readiness
+            </Link>
+            <a className="secondary-action" href={summary.launchReadinessBriefRoute}>
+              Download Launch Brief
+            </a>
+            <Link className="secondary-action" href={summary.releaseContinuityRoute}>
+              Release Continuity
+            </Link>
+          </div>
+        </div>
+        {summary.launchReadinessSummary.launchDnsControls.map((control) => (
+          <article className="module-row" key={control.name}>
+            <div>
+              <span>{control.status}</span>
+              <h2>{control.name}</h2>
+            </div>
+            <p>{control.issue}</p>
+            <div>
+              <strong>{control.launchRule}</strong>
+              <ul className="compact-list">
+                <li>Command: {control.command}</li>
+                <li>Pass: {control.passCondition}</li>
+                <li>{control.retainedBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.launchReadinessSummary.launchReadinessTracks.slice(0, 5).map((track) => (
+          <article className="module-row" key={track.name}>
+            <div>
+              <span>{track.status}</span>
+              <h2>{track.name}</h2>
+            </div>
+            <p>{track.launchQuestion}</p>
+            <div>
+              <strong>{track.owner}</strong>
+              <ul className="compact-list">
+                <li>Gate: {track.goNoGoGate}</li>
+                <li>Workaround: {track.workaround}</li>
+                <li>Hard stop: {track.hardStop}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED competitive defense">
+        <div className="section-heading">
+          <p className="eyebrow">Competitive defense</p>
+          <h2>Competitor pressure now feeds legal, privacy, cybersecurity, and infiltration-deterrence hardening.</h2>
+          <p className="section-copy">{summary.competitiveDefenseSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.competitiveDefenseRoute}>
+              Open Competitive Defense
+            </Link>
+            <a className="secondary-action" href={summary.competitiveDefenseBriefRoute}>
+              Download Defense Brief
+            </a>
+            <Link className="secondary-action" href="/claims">
+              Claims Register
+            </Link>
+          </div>
+        </div>
+        {summary.competitiveDefenseSummary.threatProfiles.slice(0, 5).map((profile) => (
+          <article className="module-row" key={profile.competitor}>
+            <div>
+              <span>{profile.category}</span>
+              <h2>{profile.competitor}</h2>
+            </div>
+            <p>{profile.scrimedWeaknessExposed}</p>
+            <div>
+              <strong>{profile.counterPosition}</strong>
+              <ul className="compact-list">
+                <li>Hardening: {profile.hardeningMove}</li>
+                <li>Boundary: {profile.legalPrivacyCyberBoundary}</li>
+                <li>Proof: {profile.proofRoute}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.competitiveDefenseSummary.legalPrivacyCyberControls.slice(0, 5).map((control) => (
+          <article className="module-row" key={control.control}>
+            <div>
+              <span>{control.status}</span>
+              <h2>{control.control}</h2>
+            </div>
+            <p>{control.riskReduced}</p>
+            <div>
+              <strong>{control.deterrenceMechanism}</strong>
+              <ul className="compact-list">
+                <li>Owner: {control.owner}</li>
+                <li>Evidence: {control.evidenceRoute}</li>
+                <li>{control.retainedBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED service delivery workbench">
+        <div className="section-heading">
+          <p className="eyebrow">Service delivery</p>
+          <h2>Packaged offers now resolve into work orders, acceptance criteria, artifacts, and retained gates.</h2>
+          <p className="section-copy">{summary.serviceDeliverySummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.serviceDeliveryRoute}>
+              Open Service Delivery
+            </Link>
+            <a className="secondary-action" href={summary.serviceDeliveryBriefRoute}>
+              Download Delivery Brief
+            </a>
+            <Link className="secondary-action" href={summary.productServicePortfolioRoute}>
+              Offerings Portfolio
+            </Link>
+          </div>
+        </div>
+        {summary.serviceDeliverySummary.serviceDeliveryOffers.slice(0, 4).map((offer) => (
+          <article className="module-row" key={offer.slug}>
+            <div>
+              <span>{offer.status}</span>
+              <h2>{offer.name}</h2>
+            </div>
+            <p>{offer.buyerPromise}</p>
+            <div>
+              <strong>{offer.serviceOwner}</strong>
+              <ul className="compact-list">
+                <li>Window: {offer.deliveryWindow}</li>
+                <li>Acceptance: {offer.acceptanceCriteria.join(", ")}</li>
+                <li>Margin: {offer.marginProtection.join(", ")}</li>
+                <li>{offer.retainedBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.serviceDeliverySummary.serviceDeliveryWorkOrderTemplates.slice(0, 3).map((template) => (
+          <article className="module-row" key={template.slug}>
+            <div>
+              <span>{template.status}</span>
+              <h2>{template.title}</h2>
+            </div>
+            <p>{template.tasks.join(" ")}</p>
+            <div>
+              <strong>{template.outputArtifact}</strong>
+              <ul className="compact-list">
+                <li>Owner: {template.owner}</li>
+                <li>Hard stops: {template.hardStops.join(", ")}</li>
+                <li>Proof: {template.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED client onboarding and communications">
+        <div className="section-heading">
+          <p className="eyebrow">Client onboarding and communications</p>
+          <h2>Buyer meetings, demos, pilots, decks, emails, calendar agendas, and handoffs now share one controlled path.</h2>
+          <p className="section-copy">{summary.clientOnboardingCommunicationsSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.clientOnboardingCommunicationsRoute}>
+              Open Client Onboarding
+            </Link>
+            <a className="secondary-action" href={summary.clientOnboardingCommunicationsBriefRoute}>
+              Download Onboarding Brief
+            </a>
+            <Link className="secondary-action" href="/demos">
+              Demo Center
+            </Link>
+          </div>
+        </div>
+        {summary.clientOnboardingCommunicationsSummary.clientOnboardingStages.slice(0, 5).map((stage) => (
+          <article className="module-row" key={stage.slug}>
+            <div>
+              <span>{stage.status}</span>
+              <h2>{stage.name}</h2>
+            </div>
+            <p>{stage.objective}</p>
+            <div>
+              <strong>{stage.owner}</strong>
+              <ul className="compact-list">
+                <li>Buyer outputs: {stage.buyerOutputs.join(", ")}</li>
+                <li>Internal outputs: {stage.internalOutputs.join(", ")}</li>
+                <li>Hard stops: {stage.hardStops.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED product and services portfolio">
+        <div className="section-heading">
+          <p className="eyebrow">Product and services portfolio</p>
+          <h2>Sellable packages now connect offer scope, proof routes, delivery gates, and margin controls.</h2>
+          <p className="section-copy">{summary.productServicePortfolioSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.productServicePortfolioRoute}>
+              Open Offerings
+            </Link>
+            <a className="secondary-action" href={summary.productServicePortfolioBriefRoute}>
+              Download Portfolio Brief
+            </a>
+            <Link className="secondary-action" href={summary.enterpriseBusinessOpsRoute}>
+              Business Ops
+            </Link>
+          </div>
+        </div>
+        {summary.productServicePortfolioSummary.productServicePackages.slice(0, 4).map((pack) => (
+          <article className="module-row" key={pack.slug}>
+            <div>
+              <span>{pack.status}</span>
+              <h2>{pack.name}</h2>
+            </div>
+            <p>{pack.bestFor}</p>
+            <div>
+              <strong>{pack.commercialModel}</strong>
+              <ul className="compact-list">
+                <li>Window: {pack.deliveryWindow}</li>
+                <li>Includes: {pack.includedOffers.join(", ")}</li>
+                <li>Expansion: {pack.expansionPath}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="SCRIMED commercial growth engine">
         <div className="section-heading">
           <p className="eyebrow">Commercial growth engine</p>
@@ -413,6 +1469,43 @@ export default function ProductConsolePage() {
                 <li>{play.blockedBoundary}</li>
                 <li>Next: {play.nextAction}</li>
                 <li>Proof routes: {play.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED investor and audience readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Investor and audience readiness</p>
+          <h2>Weaknesses, competitive edge, and sellable value now route into audience-specific packets.</h2>
+          <p className="section-copy">{summary.investorAudienceReadinessSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.investorAudienceReadinessRoute}>
+              Open Investor Readiness
+            </Link>
+            <a className="secondary-action" href={summary.investorAudienceReadinessBriefRoute}>
+              Download Audience Brief
+            </a>
+            <Link className="secondary-action" href={summary.enterpriseBusinessOpsRoute}>
+              Business Ops
+            </Link>
+          </div>
+        </div>
+        {summary.investorAudienceReadinessSummary.investorAudiencePackets.slice(0, 5).map((packet) => (
+          <article className="module-row" key={packet.audience}>
+            <div>
+              <span>{packet.readinessStatus}</span>
+              <h2>{packet.audience}</h2>
+            </div>
+            <p>{packet.pitchAngle}</p>
+            <div>
+              <strong>{packet.sellableValue}</strong>
+              <ul className="compact-list">
+                <li>Packet: {packet.diligencePacket.join(", ")}</li>
+                <li>Review: {packet.requiredReview}</li>
+                <li>Next: {packet.nextMove}</li>
+                <li>Blocked: {packet.blockedClaims.join(", ")}</li>
               </ul>
             </div>
           </article>
@@ -502,6 +1595,162 @@ export default function ProductConsolePage() {
                 <li>Owner: {control.owner}</li>
                 <li>Proof routes: {control.proofRoutes.join(", ")}</li>
                 <li>{control.retainedBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED enterprise scalability operations">
+        <div className="section-heading">
+          <p className="eyebrow">Enterprise scalability</p>
+          <h2>Capacity, tenant scale, SLO readiness, incident/change operations, support load, region, and cost controls now share one lane.</h2>
+          <p className="section-copy">{summary.enterpriseScalabilityOperationsSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.enterpriseScalabilityOperationsRoute}>
+              Open Enterprise Scale
+            </Link>
+            <a className="secondary-action" href={summary.enterpriseScalabilityOperationsBriefRoute}>
+              Download Scale Brief
+            </a>
+            <Link className="secondary-action" href={summary.enterpriseBusinessOpsRoute}>
+              Business Ops
+            </Link>
+          </div>
+        </div>
+        {summary.enterpriseScalabilityOperationsSummary.domains.slice(0, 5).map((domain) => (
+          <article className="module-row" key={domain.slug}>
+            <div>
+              <span>{domain.status}</span>
+              <h2>{domain.name}</h2>
+            </div>
+            <p>{domain.scaleQuestion}</p>
+            <div>
+              <strong>{domain.owner}</strong>
+              <ul className="compact-list">
+                <li>Control: {domain.operatingControl}</li>
+                <li>Boundary: {domain.retainedBoundary}</li>
+                <li>Proof routes: {domain.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.enterpriseScalabilityOperationsSummary.bottlenecks.slice(0, 3).map((bottleneck) => (
+          <article className="module-row" key={bottleneck.slug}>
+            <div>
+              <span>{bottleneck.status}</span>
+              <h2>{bottleneck.name}</h2>
+            </div>
+            <p>{bottleneck.impact}</p>
+            <div>
+              <strong>{bottleneck.owner}</strong>
+              <ul className="compact-list">
+                <li>Workaround: {bottleneck.workaround}</li>
+                <li>Gate: {bottleneck.graduationGate}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED API UI AI platform power operations">
+        <div className="section-heading">
+          <p className="eyebrow">API, UI, and AI platform power</p>
+          <h2>API contracts, operator UI, model-route readiness, agent approvals, evals, evidence, and cost controls now share one lane.</h2>
+          <p className="section-copy">{summary.platformPowerSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.platformPowerRoute}>
+              Open Platform Power
+            </Link>
+            <a className="secondary-action" href={summary.platformPowerBriefRoute}>
+              Download Platform Brief
+            </a>
+            <Link className="secondary-action" href="/agents">
+              AgentOS
+            </Link>
+          </div>
+        </div>
+        {summary.platformPowerSummary.pillars.slice(0, 5).map((pillar) => (
+          <article className="module-row" key={pillar.slug}>
+            <div>
+              <span>{pillar.status}</span>
+              <h2>{pillar.name}</h2>
+            </div>
+            <p>{pillar.ambition}</p>
+            <div>
+              <strong>{pillar.owner}</strong>
+              <ul className="compact-list">
+                <li>Control: {pillar.operatingControl}</li>
+                <li>Boundary: {pillar.retainedBoundary}</li>
+                <li>Proof routes: {pillar.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.platformPowerSummary.bottlenecks.slice(0, 3).map((bottleneck) => (
+          <article className="module-row" key={bottleneck.slug}>
+            <div>
+              <span>{bottleneck.status}</span>
+              <h2>{bottleneck.name}</h2>
+            </div>
+            <p>{bottleneck.impact}</p>
+            <div>
+              <strong>{bottleneck.owner}</strong>
+              <ul className="compact-list">
+                <li>Workaround: {bottleneck.workaround}</li>
+                <li>Gate: {bottleneck.graduationGate}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED limitations and workaround operations">
+        <div className="section-heading">
+          <p className="eyebrow">Limitations and workarounds</p>
+          <h2>Blocked requests now resolve to safe packets, escalation owners, proof routes, and graduation gates.</h2>
+          <p className="section-copy">{summary.limitationsWorkaroundSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.limitationsWorkaroundRoute}>
+              Open Workarounds
+            </Link>
+            <a className="secondary-action" href={summary.limitationsWorkaroundBriefRoute}>
+              Download Workaround Brief
+            </a>
+            <Link className="secondary-action" href={summary.boundaryResolutionRoute}>
+              Boundary Register
+            </Link>
+          </div>
+        </div>
+        {summary.limitationsWorkaroundSummary.tracks.slice(0, 6).map((track) => (
+          <article className="module-row" key={track.slug}>
+            <div>
+              <span>{track.severity} / {track.state}</span>
+              <h2>{track.title}</h2>
+            </div>
+            <p>{track.riskIfIgnored}</p>
+            <div>
+              <strong>{track.owner}</strong>
+              <ul className="compact-list">
+                <li>Workaround: {track.safeWorkaround}</li>
+                <li>Gate: {track.graduationGate}</li>
+                <li>Proof routes: {track.proofRoutes.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.limitationsWorkaroundSummary.packets.slice(0, 4).map((packet) => (
+          <article className="module-row" key={packet.slug}>
+            <div>
+              <span>packet</span>
+              <h2>{packet.name}</h2>
+            </div>
+            <p>{packet.usedWhen}</p>
+            <div>
+              <strong>{packet.owner}</strong>
+              <ul className="compact-list">
+                <li>Output: {packet.output}</li>
+                <li>Expiry: {packet.expiryRule}</li>
               </ul>
             </div>
           </article>
@@ -1061,6 +2310,58 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>{pack.competitiveEdge}</li>
                 <li>Disqualifiers: {pack.disqualifiers.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED global enterprise command">
+        <div className="section-heading">
+          <p className="eyebrow">Global enterprise command</p>
+          <h2>International viability, sales, interoperability, and communication now share one governed execution layer.</h2>
+          <p className="section-copy">{summary.globalEnterpriseCommandSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.globalEnterpriseCommandRoute}>
+              Open Global Command
+            </Link>
+            <a className="secondary-action" href={summary.globalEnterpriseCommandBriefRoute}>
+              Download Global Command Brief
+            </a>
+            <Link className="secondary-action" href="/client-onboarding">
+              Review Communications
+            </Link>
+          </div>
+        </div>
+        {summary.globalEnterpriseCommandSummary.scorecards.map((scorecard) => (
+          <article className="module-row" key={scorecard.category}>
+            <div>
+              <span>{scorecard.owner}</span>
+              <h2>{scorecard.category}</h2>
+            </div>
+            <p>{scorecard.evidence}</p>
+            <div>
+              <strong>Score {scorecard.score}</strong>
+              <ul className="compact-list">
+                <li>Risk: {scorecard.risk}</li>
+                <li>Next: {scorecard.nextAction}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        {summary.globalEnterpriseCommandSummary.regionalCommands.slice(0, 5).map((command) => (
+          <article className="module-row" key={command.slug}>
+            <div>
+              <span>{command.tier}</span>
+              <h2>{command.region}</h2>
+            </div>
+            <p>{command.nextAction}</p>
+            <div>
+              <strong>Readiness {command.readinessScore}</strong>
+              <ul className="compact-list">
+                <li>Sales motion: {command.salesMotion}</li>
+                <li>Retained gates: {command.retainedGates.join(", ")}</li>
+                <li>Proof: {command.proofRoutes.join(", ")}</li>
               </ul>
             </div>
           </article>

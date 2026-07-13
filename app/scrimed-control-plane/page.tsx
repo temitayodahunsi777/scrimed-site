@@ -1,0 +1,202 @@
+import Link from "next/link";
+import { getControlPlaneSummary } from "../lib/scrimed-control-plane";
+
+export const metadata = {
+  title: "SCRIMED Intelligence Control Plane",
+  description: "Synthetic/no-PHI executive mission control for governed healthcare agents, verification, approvals, cross-platform release evidence, capital intelligence, compute resilience, learning, and outcomes."
+};
+
+export default function ScrimedControlPlanePage() {
+  const summary = getControlPlaneSummary();
+
+  return (
+    <main>
+      <section className="page-hero">
+        <Link className="back-link" href="/product">Product Console</Link>
+        <p className="eyebrow">SCRIMED Intelligence Control Plane</p>
+        <h1>Executive mission control for governed healthcare intelligence.</h1>
+        <p className="hero-text">
+          One synthetic, verification-first view across work sessions, agents, skills, workflows, context,
+          model policy, approvals, benchmarks, artifacts, capital intelligence, compute resilience, learning,
+          outcomes, cross-platform release evidence, and audit history.
+        </p>
+        <div className="hero-actions" aria-label="Control-plane resources">
+          <Link href="/api/scrimed-control-plane">Inspect API</Link>
+          <Link href="/api/scrimed-control-plane/brief">Download Brief</Link>
+          <Link href="/scrimed-work">Open SCRIMED Work</Link>
+        </div>
+      </section>
+
+      <section className="section-band hub-summary" aria-label="Control-plane status">
+        <article><span>Status</span><strong>{summary.status}</strong></article>
+        <article><span>Sessions</span><strong>{summary.sessions.length}</strong></article>
+        <article><span>Agents</span><strong>{summary.agents.length}</strong></article>
+        <article><span>Skills</span><strong>{summary.skills.length}</strong></article>
+        <article><span>Workflows</span><strong>{summary.workflows.length}</strong></article>
+        <article><span>Semantic definitions</span><strong>{summary.ontology.length}</strong></article>
+        <article><span>Trust score</span><strong>{summary.verification.trustScore.total}</strong></article>
+        <article><span>Consequential actions</span><strong>{summary.featureFlags.consequentialActionsEnabled ? "enabled" : "disabled"}</strong></article>
+      </section>
+
+      <section className="section-band split-band" aria-label="Governance boundary">
+        <div>
+          <p className="eyebrow">Governance Before Autonomy</p>
+          <h2>Definition of Done, evidence, verification, and human approval determine completion.</h2>
+        </div>
+        <div>
+          <p>{summary.boundary}</p>
+          <ul className="compact-list">
+            <li>Runtime authority: {summary.architecture.runtimeAuthority}</li>
+            <li>Mutation authority: {summary.architecture.mutationAuthority}</li>
+            <li>Agent narrative accepted as proof: {summary.governance.agentNarrativeIsProof ? "yes" : "no"}</li>
+            <li>Hidden chain-of-thought stored: {summary.governance.rawPromptsOrChainOfThoughtStored ? "yes" : "no"}</li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="table-section" aria-label="Workspace and session control">
+        <div className="section-heading"><p className="eyebrow">Workspace + Active Sessions</p><h2>Persistent work remains scoped, cancellable, auditable, and rollback-aware.</h2></div>
+        {summary.sessions.map((session) => (
+          <article className="module-row" key={session.id}>
+            <div><span>{session.statusHistory.at(-1)?.status}</span><h2>{session.title}</h2></div>
+            <p>{session.objective}</p>
+            <div><strong>Contract</strong><ul className="compact-list"><li>Maximum steps: {session.definitionOfDone.maximumSteps}</li><li>Maximum tools: {session.definitionOfDone.maximumToolCalls}</li><li>Human approval: {session.definitionOfDone.humanApprovalRequired ? "required" : "conditional"}</li></ul></div>
+            <div><strong>Recovery</strong><ul className="compact-list"><li>Cancellable: {session.cancellationState.cancellable ? "yes" : "no"}</li><li>Rollback: {session.rollbackMetadata.rollbackAvailable ? "available" : "blocked"}</li><li>Risk: {session.riskLevel}</li></ul></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Agent and skill registries">
+        <div className="section-heading"><p className="eyebrow">Agent OS + Skills Registry</p><h2>Least-privilege identities expose declared scope, tools, schemas, evaluations, and owners.</h2></div>
+        {summary.agents.map((agent) => (
+          <article className="module-row" key={agent.id}>
+            <div><span>{agent.activationStatus}</span><h2>{agent.id}</h2></div>
+            <p>{agent.purpose}</p>
+            <div><strong>Scope</strong><ul className="compact-list"><li>{agent.allowedDomains.join(", ")}</li><li>Risk ceiling: {agent.riskCeiling}</li><li>Model class: {agent.defaultModelClass}</li></ul></div>
+            <div><strong>Governance</strong><ul className="compact-list"><li>Owner: {agent.owner}</li><li>Human review: {agent.requiresHumanReview ? "required" : "policy-dependent"}</li><li>Audit: {agent.auditHash}</li></ul></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Workflow catalog">
+        <div className="section-heading"><p className="eyebrow">Workflow Engine</p><h2>Reusable task graphs stop at verification and human gates before consequential action.</h2></div>
+        {summary.workflows.map((workflow) => (
+          <article className="module-row" key={workflow.id}>
+            <div><span>{workflow.domain}</span><h2>{workflow.title}</h2></div>
+            <p>{workflow.definitionOfDone.goal}</p>
+            <div><strong>Agents</strong><p>{workflow.participatingAgents.join(", ")}</p></div>
+            <div><strong>Boundary</strong><p>External actions enabled: {workflow.externalActionsEnabled ? "yes" : "no"}</p></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Context and model routing">
+        <div className="section-heading"><p className="eyebrow">Context Fabric + Multi-Model Router</p><h2>Cited context is ranked as untrusted data; policy selects a model class without making a provider call.</h2></div>
+        {summary.context.records.map((record) => (
+          <article className="module-row" key={record.id}>
+            <div><span>{record.trustTier}</span><h2>{record.sourceTitle}</h2></div>
+            <p>{record.excerpt}</p>
+            <div><strong>Ranking</strong><ul className="compact-list"><li>Unified: {record.unifiedScore}</li><li>Ontology: {record.ontologyScore}</li><li>Graph: {record.graphScore}</li><li>Freshness: {record.freshnessScore}</li></ul></div>
+            <div><strong>Citation</strong><p>{record.citation}</p></div>
+          </article>
+        ))}
+        <article className="module-row">
+          <div><span>{summary.modelRoute.policyProfile}</span><h2>Model routing explanation</h2></div>
+          <p>{summary.modelRoute.routingReason}</p>
+          <div><strong>Selection</strong><ul className="compact-list"><li>Provider class: {summary.modelRoute.providerClass}</li><li>Model: {summary.modelRoute.selectedModelProfile}</li><li>Human review: {summary.modelRoute.requiresHumanReview ? "required" : "policy-dependent"}</li></ul></div>
+          <div><strong>Execution</strong><p>Provider calls executed: {summary.modelRoute.providerCallsExecuted ? "yes" : "no"}</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Verification and reasoning observatory">
+        <div className="section-heading"><p className="eyebrow">Verification + Reasoning Observatory</p><h2>Operational evidence is visible without exposing hidden chain-of-thought.</h2></div>
+        <article className="module-row">
+          <div><span>{summary.verification.allPass ? "pass" : "review-required"}</span><h2>Verification result</h2></div>
+          <p>{summary.verification.recommendedAction}</p>
+          <div><strong>Trust</strong><ul className="compact-list"><li>Total: {summary.verification.trustScore.total}</li><li>Evidence coverage: {summary.verification.trustScore.evidenceCoverage}</li><li>Policy compliance: {summary.verification.trustScore.policyCompliance}</li></ul></div>
+          <div><strong>Failed checks</strong><p>{summary.verification.failedChecks.join(", ") || "none"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.reasoningObservatory.pauseRequired ? "paused" : "within-scope"}</span><h2>Objective drift monitor</h2></div>
+          <p>{summary.reasoningObservatory.recommendedAction}</p>
+          <div><strong>Current step</strong><p>{summary.reasoningObservatory.currentStep}</p></div>
+          <div><strong>Drift flags</strong><p>{summary.reasoningObservatory.objectiveDriftFlags.join(", ") || "none"}</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="ConsequenceBench and artifacts">
+        <div className="section-heading"><p className="eyebrow">ConsequenceBench + Artifacts</p><h2>High-consequence, worst-group, edge-case, lineage, and staleness evidence outrank generic leaderboard scores.</h2></div>
+        <article className="module-row">
+          <div><span>{summary.consequenceBench.evaluationStatus}</span><h2>Consequence-weighted benchmark</h2></div>
+          <p>{summary.consequenceBench.boundary}</p>
+          <div><strong>Coverage</strong><ul className="compact-list"><li>Cases: {summary.consequenceBench.caseCount}</li><li>High-consequence performance: {summary.consequenceBench.highConsequencePerformance}</li><li>Worst-group performance: {summary.consequenceBench.worstGroupPerformance}</li></ul></div>
+          <div><strong>Distribution shift</strong><p>{summary.consequenceBench.distributionShiftPerformance}</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.artifacts.staleness.stale ? "stale" : "current-metadata"}</span><h2>Artifact lineage</h2></div>
+          <p>{summary.artifacts.staleness.recommendedAction}</p>
+          <div><strong>Artifacts</strong><p>{summary.artifacts.sample.length}</p></div>
+          <div><strong>External use</strong><p>{summary.artifacts.staleness.externalUseAllowed ? "allowed" : "human approval required"}</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Capital and compute resilience">
+        <div className="section-heading"><p className="eyebrow">Capital Intelligence + Compute Resilience</p><h2>Internal opportunity analysis and infrastructure resilience stay evidence-led and approval-gated.</h2></div>
+        <article className="module-row"><div><span>{summary.capitalIntelligence.status}</span><h2>Capital Intelligence Copilot</h2></div><p>{summary.capitalIntelligence.boundary}</p><div><strong>Profiles</strong><p>{summary.capitalIntelligence.profiles.length}</p></div><div><strong>Outbound</strong><p>{summary.capitalIntelligence.outboundPolicy.outboundAllowed ? "enabled" : "disabled; CEO approval required"}</p></div></article>
+        {summary.computeResilience.profiles.map((profile) => (
+          <article className="module-row" key={profile.profileId}><div><span>{profile.readiness}</span><h2>{profile.deploymentProfile}</h2></div><p>Compute resilience score: {profile.computeResilienceScore}</p><div><strong>Fallback</strong><p>Policy reevaluation: {profile.fallbackRequiresPolicyReevaluation ? "required" : "not required"}</p></div><div><strong>Migration</strong><p>Silent protected migration: {profile.silentProtectedWorkloadMigrationAllowed ? "allowed" : "blocked"}</p></div></article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Approval achievement">
+        <div className="section-heading"><p className="eyebrow">Approval Achievement</p><h2>Evidence, dependencies, owners, expiry, and authority stay explicit before scope expands.</h2></div>
+        <article className="module-row">
+          <div><span>{summary.approvalAchievement.status}</span><h2>Approval critical path</h2></div>
+          <p>{summary.approvalAchievement.retainedBoundary}</p>
+          <div><strong>Completed scope</strong><ul className="compact-list"><li>Automated technical gates: {summary.approvalAchievement.achievedTechnicalGateCount}</li><li>Human/external approvals: {summary.approvalAchievement.humanOrExternalApprovalsAchieved}</li></ul></div>
+          <div><strong>Next candidate</strong><p>{summary.approvalAchievement.nextApprovalCandidate.title}</p></div>
+        </article>
+        {summary.approvalAchievement.nodes.map((approval) => (
+          <article className="module-row" key={approval.id}>
+            <div><span>{approval.status}</span><h2>{approval.title}</h2></div>
+            <p>{approval.commercialValue}</p>
+            <div><strong>Missing evidence</strong><p>{approval.missingEvidence.join(", ") || "none within automated technical scope"}</p></div>
+            <div><strong>Next action</strong><p>{approval.nextAction}</p></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Cross-platform release evidence">
+        <div className="section-heading"><p className="eyebrow">Cross-Platform Evidence</p><h2>GitHub, Vercel, Supabase, Wix, and Figma evidence is reconciled before release claims expand.</h2></div>
+        <article className="module-row">
+          <div><span>{summary.platformEvidence.status}</span><h2>Release evidence decision</h2></div>
+          <p>{summary.platformEvidence.boundary}</p>
+          <div><strong>Current blockers</strong><p>{summary.platformEvidence.summary.blockedProviderCount}</p></div>
+          <div><strong>Production promotion</strong><p>{summary.platformEvidence.summary.productionPromotionAllowed ? "allowed" : "blocked"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.platformEvidence.immediateCorrection.safeReplacement.eyebrow}</span><h2>{summary.platformEvidence.immediateCorrection.safeReplacement.heading}</h2></div>
+          <p>{summary.platformEvidence.immediateCorrection.safeReplacement.body}</p>
+          <div><strong>Primary action</strong><p>{summary.platformEvidence.immediateCorrection.safeReplacement.primaryAction}</p></div>
+          <div><strong>Public disclosure</strong><p>{summary.platformEvidence.immediateCorrection.safeReplacement.disclosure}</p></div>
+        </article>
+        {summary.platformEvidence.records.map((record) => (
+          <article className="module-row" key={record.id}>
+            <div><span>{record.status} · {record.freshness}</span><h2>{record.provider} · {record.controlDomain}</h2></div>
+            <p>{record.summary}</p>
+            <div><strong>Remediation</strong><p>{record.remediationStatus}: {record.remediationEvidence.join(", ")}</p></div>
+            <div><strong>Next action</strong><p>{record.nextAction}</p></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Voice learning outcomes and audit">
+        <div className="section-heading"><p className="eyebrow">Voice + Learning + Outcomes + Audit</p><h2>Simulation, reviewed corrections, baseline-first value measurement, and immutable evidence close the loop.</h2></div>
+        <article className="module-row"><div><span>simulation-only</span><h2>Voice workflow</h2></div><p>{summary.voiceSimulation.retainedBoundary}</p><div><strong>States</strong><p>{summary.voiceSimulation.states.join(" → ")}</p></div><div><strong>Raw audio stored</strong><p>{summary.voiceSimulation.rawAudioStored ? "yes" : "no"}</p></div></article>
+        <article className="module-row"><div><span>review-gated</span><h2>Learning proposals</h2></div><p>Memory records validated facts and decisions; learning proposals change behavior only through tests, approval, and normal deployment.</p><div><strong>Proposals</strong><p>{summary.learningProposals.length}</p></div><div><strong>Self-deployment</strong><p>{summary.governance.learningSelfDeploymentAllowed ? "allowed" : "blocked"}</p></div></article>
+        <article className="module-row"><div><span>{summary.outcomes.status}</span><h2>Outcome and value intelligence</h2></div><p>{summary.outcomes.boundary}</p><div><strong>Metrics</strong><p>{summary.outcomes.metrics.length}</p></div><div><strong>Post values present</strong><p>{summary.outcomes.postImplementationValuesPresent ? "yes" : "no"}</p></div></article>
+        <article className="module-row"><div><span>metadata-only</span><h2>Audit history</h2></div><p>Initiator, objective, model, context, tools, policy, approvals, verification, cost, latency, state, and rollback remain traceable without raw PHI, secrets, prompts, or chain-of-thought.</p><div><strong>Events</strong><p>{summary.auditHistory.length}</p></div><div><strong>Audit hash</strong><p>{summary.auditHistory[0]?.auditHash}</p></div></article>
+      </section>
+    </main>
+  );
+}

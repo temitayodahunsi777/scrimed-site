@@ -133,6 +133,9 @@ Operational boundaries:
 - `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
 - `POST /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence`
 - `GET /api/pilot-workspaces/{workspaceSlug}/external-approval-evidence/packet`
+- `GET /api/pilot-workspaces/{workspaceSlug}/boundary-release-evidence-intake`
+- `POST /api/pilot-workspaces/{workspaceSlug}/boundary-release-evidence-intake`
+- `GET /api/pilot-workspaces/{workspaceSlug}/boundary-release-evidence-intake/packet`
 - `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions`
 - `POST /api/pilot-workspaces/{workspaceSlug}/release-decisions`
 - `GET /api/pilot-workspaces/{workspaceSlug}/release-decisions/packet`
@@ -189,6 +192,25 @@ Safe operating pattern:
 - Record only non-secret reference metadata in SCRIMED.
 - Download the audited linkage packet for diligence after the write-before-release audit event commits.
 - Treat `ready-for-qualified-release-review-not-release-authority` as a review posture only, never as approval to release claims, securities materials, customer references, clinical workflows, or production access.
+
+## Boundary Release Evidence Intake
+
+`GET /api/pilot-workspaces/{workspaceSlug}/boundary-release-evidence-intake` and `POST /api/pilot-workspaces/{workspaceSlug}/boundary-release-evidence-intake` bridge the public Boundary Release Approval Matrix work queue into the protected External Approval Evidence Linkage store.
+
+The route is AAL2 protected and tenant isolated. It accepts only metadata for a known work item ID and current work item hash, plus an approved external system, non-secret locator, owner label, human review status, and the fixed `boundary-release-evidence-intake-no-phi` attestation. The actual evidence stays in the external evidence room, counsel channel, security GRC, customer procurement portal, board materials, finance workbook, or another approved secure channel.
+
+The route rejects raw evidence, PHI, payer member data, source clinical records, source contracts, credentials, bearer tokens, signed agreements, legal opinions, raw connector payloads, and any request that attempts to mark boundary release or clinical authority as approved. Successful intake records are still only metadata references. They do not relieve preserved boundaries and do not authorize production PHI, live care, payer submission, EHR writeback, connector activation, certification claims, public distribution, or customer go-live.
+
+`GET /api/pilot-workspaces/{workspaceSlug}/boundary-release-evidence-intake/packet` produces a text/markdown diligence packet only after AAL2 authorization, workspace authorization, rate limiting, and proof-packet audit persistence succeed. It includes work item metadata, linked external reference metadata, unavailable sections, and the current hard-stop authorities. It does not include raw evidence or grant release authority.
+
+Smoke commands:
+
+```bash
+npm run smoke:boundary-release-evidence-intake:authenticated
+SCRIMED_BEARER_TOKEN=<fresh-aal2-jwt> npm run smoke:boundary-release-evidence-intake:strict
+```
+
+The non-strict command always verifies unauthenticated fail-closed behavior, then skips the authenticated write when no token is present. The strict command is for a deliberate short-lived AAL2 operator run only. Neither command prints token material.
 
 ## Release Decision Workflow
 

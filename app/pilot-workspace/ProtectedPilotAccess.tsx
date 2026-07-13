@@ -27,6 +27,7 @@ import ManualQaExecutionConsolePanel from "./ManualQaExecutionConsolePanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
+import ScrimedWorkBrowserVerificationPanel from "./ScrimedWorkBrowserVerificationPanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
 import ProtectedAuthorityArtifactReferencePanel from "./ProtectedAuthorityArtifactReferencePanel";
 import ProtectedBuyerReleaseControlRunPanel from "./ProtectedBuyerReleaseControlRunPanel";
@@ -4944,6 +4945,13 @@ export default function ProtectedPilotAccess({
           />
 
           <TenantAccessAdministrationPanel session={session} workspace={selectedWorkspace} />
+
+          <ScrimedWorkBrowserVerificationPanel
+            key={`scrimed-work-verification-${selectedWorkspace.id}`}
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
+          />
 
           <PilotWorkspaceVerificationPanel
             key={selectedWorkspace.id}

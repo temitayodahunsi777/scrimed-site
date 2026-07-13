@@ -497,11 +497,304 @@ function buildDicomwebEvaluation() {
   });
 }
 
+function buildHl7V2EventEvaluation() {
+  const contractSlug = "hl7-event-feed";
+  const contract = getIntegrationContractBySlug(contractSlug);
+  const fixture = getIntegrationFixtureBySlug(contractSlug);
+  const validation = validateIntegrationFixtureBySlug(contractSlug);
+  const segmentTypes = asStringArray(fixture?.request.samplePayload.segmentTypes);
+  const requiredSegments = ["MSH", "EVN", "PID", "PV1"];
+
+  return buildEvaluation({
+    slug: "hl7-v2-adt-event-feed",
+    name: "HL7 v2 ADT / Order / Result Event Test Kit",
+    route: "/interoperability/evaluations/hl7-v2-adt-event-feed",
+    apiRoute: "/api/interoperability/evaluations/hl7-v2-adt-event-feed",
+    standardIds: ["hl7-v2", "clinical-terminology"],
+    contractSlug,
+    contractRoute: contract?.route ?? `/contracts/${contractSlug}`,
+    fixtureRoute: fixture?.route ?? `/integrations/fixtures/${contractSlug}`,
+    agentOwner: "Interoperability Agent",
+    targetProfile: "Deployment-selected HL7 v2 ADT, ORM, and ORU message profiles",
+    checks: [
+      createCheck(
+        "hl7-fixture-present",
+        "Synthetic HL7 event fixture present",
+        "fixture",
+        "synthetic",
+        Boolean(fixture),
+        fixture?.request.fixtureId ?? "missing fixture",
+        "A deterministic event fixture must remain bound to the HL7 connector contract."
+      ),
+      createCheck(
+        "hl7-synthetic-only",
+        "Synthetic-only event assertion",
+        "privacy",
+        "synthetic",
+        fixture?.request.syntheticOnly === true,
+        `syntheticOnly=${String(fixture?.request.syntheticOnly)}`,
+        "The test kit must reject production messages and patient identifiers."
+      ),
+      createCheck(
+        "hl7-message-family",
+        "ADT message family declared",
+        "structure",
+        "synthetic",
+        typeof fixture?.request.samplePayload.messageType === "string" &&
+          String(fixture.request.samplePayload.messageType).startsWith("ADT_"),
+        `messageType=${String(fixture?.request.samplePayload.messageType)}`,
+        "The fixture declares an administrative event without authorizing a live interface-engine channel."
+      ),
+      createCheck(
+        "hl7-required-segments",
+        "Required segment coverage",
+        "profile",
+        "synthetic",
+        requiredSegments.every((segment) => segmentTypes.includes(segment)),
+        segmentTypes.join(", "),
+        "The synthetic message carries the core header, event, patient-reference, and visit segments needed for routing tests."
+      ),
+      createCheck(
+        "hl7-replay-and-timestamp",
+        "Replay and timestamp controls",
+        "reliability",
+        "synthetic",
+        Boolean(
+          fixture?.request.guardrails.some((guardrail) => /replay/i.test(guardrail)) &&
+          fixture.request.guardrails.some((guardrail) => /timestamp/i.test(guardrail))
+        ),
+        fixture?.request.guardrails.join("; ") ?? "missing fixture",
+        "Event replay and original source time must stay explicit to prevent silent workflow-state drift."
+      ),
+      createCheck(
+        "hl7-fixture-validation",
+        "Deterministic fixture validation",
+        "quality",
+        "synthetic",
+        validation?.status === "pass",
+        validation ? `${validation.passed}/${validation.checks.length} checks passed` : "validation unavailable",
+        "Required signals, safeguards, traces, prohibited actions, and live-review gates must pass."
+      ),
+      createCheck(
+        "hl7-version-profile",
+        "Version and message-profile selection",
+        "conformance",
+        "live-readiness",
+        false,
+        "Trading-partner artifact required",
+        "Pin the sending system version, trigger events, segment cardinality, Z-segments, vocabulary, and acknowledgement profile."
+      ),
+      createCheck(
+        "hl7-engine-acceptance",
+        "Integration-engine ACK/NACK acceptance",
+        "reliability",
+        "live-readiness",
+        false,
+        "Partner testing required",
+        "Test ACK/NACK, dead-letter, retry, ordering, duplicate, timeout, and replay behavior with the approved interface engine."
+      ),
+      createCheck(
+        "hl7-identity-consent-audit",
+        "Identity, purpose, and durable audit",
+        "governance",
+        "live-readiness",
+        false,
+        "Production controls not approved",
+        "Approve tenant isolation, patient-context authorization, purpose-of-use, retention, and durable event audit before live routing."
+      )
+    ],
+    requiredEvidence: [
+      {
+        label: "Synthetic HL7 event fixture",
+        status: "available",
+        route: fixture?.route,
+        detail: "Deterministic ADT event metadata with required segments, replay controls, and no-writeback boundaries."
+      },
+      {
+        label: "Integration fixture validation",
+        status: "available",
+        route: "/integrations/fixture-validation",
+        detail: `${validation?.passed ?? 0} deterministic checks currently pass.`
+      },
+      {
+        label: "Deployment message profile",
+        status: "required-before-live",
+        detail: "Version-pinned events, segments, Z-segments, code sets, acknowledgements, and error behavior."
+      },
+      {
+        label: "Interface-engine acceptance report",
+        status: "required-before-live",
+        detail: "ACK/NACK, retry, duplicate, order, dead-letter, replay, security, and monitoring evidence."
+      }
+    ],
+    liveBlockers: [
+      "Deployment-specific HL7 v2 version and message-profile selection",
+      "Approved interface-engine channel, network route, and endpoint identity",
+      "ACK/NACK, retry, duplicate, ordering, dead-letter, and replay acceptance testing",
+      "Patient-context authorization, purpose-of-use, retention, and durable audit",
+      "Integration architecture, privacy, security, workflow-owner, and clinical governance approval"
+    ],
+    sourceUrls: [
+      "https://www.hl7.org/implement/standards/product_section.cfm?section=13",
+      "https://profiles.ihe.net/"
+    ]
+  });
+}
+
+function buildX12PayerEvaluation() {
+  const contractSlug = "claims-utilization-dataset";
+  const contract = getIntegrationContractBySlug(contractSlug);
+  const fixture = getIntegrationFixtureBySlug(contractSlug);
+  const validation = validateIntegrationFixtureBySlug(contractSlug);
+  const lineCount = Number(fixture?.request.samplePayload.lineCount ?? 0);
+
+  return buildEvaluation({
+    slug: "x12-payer-rcm-evidence",
+    name: "X12 Payer / RCM Evidence Test Kit",
+    route: "/interoperability/evaluations/x12-payer-rcm-evidence",
+    apiRoute: "/api/interoperability/evaluations/x12-payer-rcm-evidence",
+    standardIds: ["x12", "clinical-terminology"],
+    contractSlug,
+    contractRoute: contract?.route ?? `/contracts/${contractSlug}`,
+    fixtureRoute: fixture?.route ?? `/integrations/fixtures/${contractSlug}`,
+    agentOwner: "Revenue Cycle Agent",
+    targetProfile: "Trading-partner-selected X12 eligibility, authorization, claim, remittance, and acknowledgement guides",
+    checks: [
+      createCheck(
+        "x12-fixture-present",
+        "Synthetic payer fixture present",
+        "fixture",
+        "synthetic",
+        Boolean(fixture),
+        fixture?.request.fixtureId ?? "missing fixture",
+        "A deterministic payer-data fixture must remain bound to the claims and utilization contract."
+      ),
+      createCheck(
+        "x12-synthetic-only",
+        "Synthetic-only payer assertion",
+        "privacy",
+        "synthetic",
+        fixture?.request.syntheticOnly === true,
+        `syntheticOnly=${String(fixture?.request.syntheticOnly)}`,
+        "The test kit cannot accept live member, subscriber, policy, claim, or payer credentials."
+      ),
+      createCheck(
+        "x12-structured-lines",
+        "Structured line metadata",
+        "structure",
+        "synthetic",
+        Number.isFinite(lineCount) && lineCount > 0,
+        `lineCount=${lineCount}`,
+        "Synthetic line-level metadata supports deterministic completeness and denial-risk checks."
+      ),
+      createCheck(
+        "x12-lineage-and-partition",
+        "Lineage and access partitioning",
+        "governance",
+        "synthetic",
+        Boolean(
+          fixture?.request.guardrails.some((guardrail) => /lineage/i.test(guardrail)) &&
+          fixture.request.guardrails.some((guardrail) => /partition/i.test(guardrail))
+        ),
+        fixture?.request.guardrails.join("; ") ?? "missing fixture",
+        "Payer evidence must preserve source lineage and role-scoped access."
+      ),
+      createCheck(
+        "x12-no-final-reimbursement",
+        "Final reimbursement prohibited",
+        "financial-safety",
+        "synthetic",
+        Boolean(
+          fixture?.expectedResponse.prohibitedActions.some((action) =>
+            /final reimbursement/i.test(action)
+          )
+        ),
+        fixture?.expectedResponse.prohibitedActions.join("; ") ?? "missing fixture",
+        "SCRIMED may prepare or validate evidence but cannot determine reimbursement or submit a transaction."
+      ),
+      createCheck(
+        "x12-fixture-validation",
+        "Deterministic fixture validation",
+        "quality",
+        "synthetic",
+        validation?.status === "pass",
+        validation ? `${validation.passed}/${validation.checks.length} checks passed` : "validation unavailable",
+        "Required claims signals, safeguards, lineage, trace, and prohibited actions must pass."
+      ),
+      createCheck(
+        "x12-version-guide",
+        "Transaction version and guide selection",
+        "conformance",
+        "live-readiness",
+        false,
+        "Licensed guide and partner decision required",
+        "Select transaction sets, implementation guides, companion guides, code sets, and version pins with the trading partner."
+      ),
+      createCheck(
+        "x12-partner-acknowledgement",
+        "Trading-partner acknowledgement testing",
+        "reliability",
+        "live-readiness",
+        false,
+        "Clearinghouse or payer acceptance required",
+        "Test envelope validation, acknowledgements, rejection paths, duplicates, retries, balancing, and reconciliation."
+      ),
+      createCheck(
+        "x12-human-submission-gate",
+        "Human submission authority",
+        "governance",
+        "live-readiness",
+        false,
+        "Payer submission remains disabled",
+        "A named authorized operator, approved workflow, contract, audit trail, and explicit release gate are required before any payer-facing action."
+      )
+    ],
+    requiredEvidence: [
+      {
+        label: "Synthetic payer and claims fixture",
+        status: "available",
+        route: fixture?.route,
+        detail: "Line-level metadata, lineage, denial signal, and no-final-reimbursement boundary."
+      },
+      {
+        label: "Integration fixture validation",
+        status: "available",
+        route: "/integrations/fixture-validation",
+        detail: `${validation?.passed ?? 0} deterministic checks currently pass.`
+      },
+      {
+        label: "Trading-partner implementation profile",
+        status: "required-before-live",
+        detail: "Licensed implementation guide, companion guide, transaction scope, version, code sets, and endpoint rules."
+      },
+      {
+        label: "Payer or clearinghouse acceptance report",
+        status: "required-before-live",
+        detail: "Envelope, acknowledgement, rejection, duplicate, retry, balancing, security, and reconciliation evidence."
+      }
+    ],
+    liveBlockers: [
+      "Trading-partner agreement and licensed implementation or companion guides",
+      "Transaction set, version, endpoint, code-set, and acknowledgement selection",
+      "Payer or clearinghouse conformance, rejection, duplicate, retry, and reconciliation testing",
+      "Authorized operator, least-privilege identity, audit, retention, and release workflow",
+      "Revenue-cycle, compliance, privacy, security, legal, and payer-owner approval",
+      "Payer submission remains disabled until separately authorized"
+    ],
+    sourceUrls: [
+      "https://x12.org/products/health-care",
+      "https://x12.org/resources"
+    ]
+  });
+}
+
 export function getInteroperabilityConformanceEvaluations() {
   return [
     buildFhirR4UsCoreEvaluation(),
     buildSmartAppLaunchEvaluation(),
-    buildDicomwebEvaluation()
+    buildDicomwebEvaluation(),
+    buildHl7V2EventEvaluation(),
+    buildX12PayerEvaluation()
   ];
 }
 
@@ -540,6 +833,6 @@ export function getInteroperabilityConformanceEvaluationSummary() {
       0
     ),
     evaluations,
-    updated: "2026-06-09"
+    updated: "2026-07-10"
   };
 }

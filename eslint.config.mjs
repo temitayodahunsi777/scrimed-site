@@ -10,6 +10,7 @@ export default defineConfig([
     ".next-quarantine-*/**",
     "out/**",
     "node_modules/**",
+    "node_modules 2/**",
     "next-env.d.ts"
   ])
 ]);

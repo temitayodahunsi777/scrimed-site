@@ -1,26 +1,39 @@
 import Link from "next/link";
 import { getCommercialStrategySummary } from "../lib/commercialStrategy";
+import { getPilotDemoCommercialReadinessSummary } from "../lib/pilotDemoCommercialReadiness";
 
 export const metadata = {
-  title: "SCRIMED Pricing and Sales Strategy",
+  title: "SCRIMED Pricing | Healthcare AI Pilots",
   description:
-    "SCRIMED pricing tiers, enterprise sales motion, value metrics, and guarded commercial strategy for healthcare AI operating-system evaluations and pilots."
+    "Review SCRIMED pricing for healthcare AI assessments, synthetic pilots, protected enterprise pilots, annual operating licenses, and strategic partnerships."
 };
 
 export default function PricingPage() {
   const summary = getCommercialStrategySummary();
+  const pilotDemoReadiness = getPilotDemoCommercialReadinessSummary();
 
   return (
     <main>
       <section className="page-hero">
         <Link className="back-link" href="/product">Product Console</Link>
-        <p className="eyebrow">Pricing and sales strategy</p>
-        <h1>Sell SCRIMED as a governed healthcare intelligence operating layer, not a generic AI tool.</h1>
+        <p className="eyebrow">Pricing built for enterprise healthcare decisions</p>
+        <h1>Start free, pilot with proof, then expand only when the value is clear.</h1>
         <p className="hero-text">
-          The recommended commercial model starts with public product preview, moves qualified buyers into paid
-          assessments and synthetic pilots, then expands into protected pilots, annual enterprise licenses, and
-          strategic platform partnerships.
+          SCRIMED is priced to be easy to evaluate and serious to buy: free public demos, paid workflow
+          assessments, synthetic pilots, protected enterprise pilots, annual operating licenses, and strategic
+          partnerships for organizations ready to scale.
         </p>
+        <div className="hero-actions" aria-label="Pricing actions">
+          <Link className="primary-action" href="/pilot-demo-commercial-readiness">
+            Find My Price Band
+          </Link>
+          <Link className="secondary-action" href="/demos">
+            Watch Demos
+          </Link>
+          <Link className="secondary-action" href="/pilots">
+            Compare Pilots
+          </Link>
+        </div>
       </section>
 
       <section className="section-band hub-summary" aria-label="SCRIMED pricing summary">
@@ -39,6 +52,10 @@ export default function PricingPage() {
         <article>
           <span>API</span>
           <strong>{summary.apiRoute}</strong>
+        </article>
+        <article>
+          <span>Benchmarks</span>
+          <strong>{pilotDemoReadiness.marketBenchmarkCount}</strong>
         </article>
       </section>
 
@@ -81,7 +98,7 @@ export default function PricingPage() {
       <section className="table-section" aria-label="SCRIMED pricing tiers">
         <div className="section-heading">
           <p className="eyebrow">Pricing tiers</p>
-          <h2>Start with paid evaluation value, then expand through governed enterprise deployment.</h2>
+          <h2>Pick the buying motion that matches your readiness, urgency, and governance burden.</h2>
         </div>
         {summary.pricingTiers.map((tier) => (
           <article className="module-row" key={tier.name}>
@@ -103,10 +120,52 @@ export default function PricingPage() {
         ))}
       </section>
 
+      <section className="table-section" aria-label="Pricing alignment decisions">
+        <div className="section-heading">
+          <p className="eyebrow">Market alignment</p>
+          <h2>Use competitor prices as context, then defend SCRIMED&apos;s premium through enterprise proof and governance.</h2>
+          <p className="section-copy">{pilotDemoReadiness.currentPricingDecision}</p>
+        </div>
+        {summary.pricingAlignmentDecisions.map((decision) => (
+          <article className="module-row" key={decision.lane}>
+            <div>
+              <span>decision</span>
+              <h2>{decision.lane}</h2>
+            </div>
+            <p>{decision.decision}</p>
+            <div>
+              <strong>{decision.rationale}</strong>
+              <ul className="compact-list">
+                <li>{decision.marginProtection}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-band" aria-label="Market pricing benchmarks">
+        <div className="section-heading">
+          <p className="eyebrow">Current market context</p>
+          <h2>SCRIMED is not priced as a commodity monthly scribe seat.</h2>
+        </div>
+        <div className="principle-grid">
+          {summary.marketPricingBenchmarks.map((benchmark) => (
+            <article key={benchmark.segment}>
+              <span>{benchmark.segment}</span>
+              <h3>{benchmark.publicSignal}</h3>
+              <p>{benchmark.scrimedImplication}</p>
+              <ul className="compact-list">
+                <li>{benchmark.source}</li>
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="section-band" aria-label="SCRIMED sales motion">
         <div className="section-heading">
           <p className="eyebrow">Sales motion</p>
-          <h2>Move buyers from website interest to governed enterprise commitment.</h2>
+          <h2>Move from website interest to a funded pilot without custom-scope confusion.</h2>
         </div>
         <div className="principle-grid">
           {summary.salesMotion.map((step) => (

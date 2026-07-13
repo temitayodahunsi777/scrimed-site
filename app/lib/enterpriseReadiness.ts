@@ -55,6 +55,14 @@ export type PublicClaim = {
   prohibitedVariant: string;
 };
 
+export type TrustDividendSignal = {
+  audience: string;
+  concern: string;
+  scrimedAnswer: string;
+  proofRoute: string;
+  boundary: string;
+};
+
 export const enterpriseReadinessBoundary =
   "This center is an operational readiness and claims-control register for SCRIMED's governed synthetic evaluation product. It is not legal advice, a compliance certification, a regulatory determination, or authorization for live clinical execution.";
 
@@ -624,8 +632,8 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
         name: "Testimonials, endorsements, and results",
         state: "external-review-required",
         owner: "Legal, communications, and customer success",
-        currentEvidence: "No unapproved testimonials or endorsements are used.",
-        requiredAction: "Verify typicality, material connections, written permissions, result context, and required disclosures.",
+        currentEvidence: "The July 11 public-site audit found a named Wix testimonial without authorization evidence in the SCRIMED release graph; removal or substantiation is required.",
+        requiredAction: "Remove the testimonial or verify typicality, material connections, written permission, result context, and required disclosures before republication.",
         launchGate: "Required before publishing any endorsement."
       },
       {
@@ -633,8 +641,8 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
         name: "Targeting, tracking, and landing-page controls",
         state: "decision-required",
         owner: "Privacy, marketing, and security",
-        currentEvidence: "Public intake prohibits PHI and paid advertising has not been represented as active.",
-        requiredAction: "Approve targeting exclusions, sensitive-data policy, tracking consent, rate limiting, bot protection, landing-page review, and lead retention.",
+        currentEvidence: "The product app prohibits PHI. The July 11 Wix form audit found three enabled marketing forms without a schema-level no-PHI disclosure; the healthcare-oriented Voice Intake Assistant was disabled, while two general free-text contact forms remain open remediation items.",
+        requiredAction: "Add explicit no-patient-information language to every remaining Wix collection surface, approve targeting exclusions, sensitive-data policy, tracking consent, rate limiting, bot protection, landing-page review, and lead retention.",
         launchGate: "Required before paid campaigns."
       }
     ],
@@ -649,6 +657,54 @@ export const enterpriseReadinessDomains: ReadinessDomain[] = [
       "Launching paid traffic before public intake abuse controls are approved."
     ],
     sourceUrls: [sources.ftcHealthClaims, sources.ftcHealthBreach, sources.fdaCds]
+  }
+];
+
+export const trustDividendSignals: TrustDividendSignal[] = [
+  {
+    audience: "Healthcare executives",
+    concern: "AI projects stall when value, ownership, and risk are unclear.",
+    scrimedAnswer:
+      "SCRIMED packages demos, pilot paths, price bands, owners, proof routes, and limitations so executives can sponsor a finite evaluation instead of an open-ended experiment.",
+    proofRoute: "/pilot-demo-commercial-readiness",
+    boundary:
+      "Executive confidence is pilot readiness, not procurement approval, production authorization, or guaranteed financial outcome."
+  },
+  {
+    audience: "Security, privacy, and compliance reviewers",
+    concern: "Healthcare AI vendors often blur demos, PHI, security posture, and compliance status.",
+    scrimedAnswer:
+      "SCRIMED separates no-PHI demos, protected pilot evidence, TrustOps incidents, claims control, external review gates, and certification limits before buyer diligence begins.",
+    proofRoute: "/trust-center",
+    boundary:
+      "Readiness evidence is not HIPAA compliance certification, SOC 2, HITRUST, ISO certification, legal advice, or security approval."
+  },
+  {
+    audience: "Clinical and operations leaders",
+    concern: "Automation can create patient-safety risk if it looks clinical before governance is ready.",
+    scrimedAnswer:
+      "SCRIMED keeps current product language operational, synthetic, review-gated, and non-diagnostic while clinical authority, PHI, connector, and live-care gates remain explicit.",
+    proofRoute: "/clinical-production-readiness",
+    boundary:
+      "Operational intelligence is not diagnosis, treatment guidance, patient outreach, EHR writeback, payer submission, or live clinical decision support."
+  },
+  {
+    audience: "Procurement and finance teams",
+    concern: "Custom AI pilots become expensive, vague, and hard to evaluate.",
+    scrimedAnswer:
+      "SCRIMED aligns each buying motion to a defined assessment, synthetic pilot, protected enterprise pilot, or governance review with delivery artifacts and margin-aware boundaries.",
+    proofRoute: "/pricing",
+    boundary:
+      "Pricing posture is not a binding quote, contract, revenue guarantee, ROI guarantee, reimbursement guarantee, or audited financial report."
+  },
+  {
+    audience: "Investors and strategic partners",
+    concern: "Trust claims need to be defensible before capital, partnership, or clinic adoption conversations expand.",
+    scrimedAnswer:
+      "SCRIMED shows sellable offers, product proof, audience packets, competitive defense, limitations, and hard stops so the diligence story is credible without becoming securities material.",
+    proofRoute: "/investor-audience-readiness",
+    boundary:
+      "Investor readiness is not investment advice, securities offering material, solicitation, valuation assurance, or legal or tax advice."
   }
 ];
 
@@ -697,6 +753,33 @@ export const publicClaimsRegister: PublicClaim[] = [
     evidenceRoute: "/workflows",
     requiredQualifier: "Buyer validation and workflow-specific measurement are required.",
     prohibitedVariant: "SCRIMED eliminates healthcare workflow friction."
+  },
+  {
+    id: "claim-buyer-trust-proof",
+    claim: "SCRIMED helps healthcare buyers evaluate AI with visible proof routes, accountable owners, limitations, and escalation gates.",
+    state: "approved-current-boundary",
+    channels: ["website", "sales", "marketing", "PR", "advertising"],
+    evidenceRoute: "/trust-center",
+    requiredQualifier: "This is current-boundary evaluation evidence and does not replace customer diligence or external review.",
+    prohibitedVariant: "SCRIMED is fully approved, certified, or risk-free for enterprise healthcare deployment."
+  },
+  {
+    id: "claim-reliability-operating-discipline",
+    claim: "SCRIMED uses build checks, smoke checks, audit trails, incident queues, and human review loops to improve demo and pilot reliability.",
+    state: "approved-current-boundary",
+    channels: ["website", "sales", "marketing", "PR", "advertising"],
+    evidenceRoute: "/trust-safety-operations",
+    requiredQualifier: "Reliability controls support current demos and pilots; they are not a contractual SLA or managed 24/7 production service.",
+    prohibitedVariant: "SCRIMED guarantees uptime, accuracy, security, or error-free operation."
+  },
+  {
+    id: "claim-safety-first-evaluation",
+    claim: "SCRIMED is designed for safety-first healthcare AI evaluation through no-PHI demos, human review, blocked unsafe actions, and explicit clinical-production gates.",
+    state: "approved-current-boundary",
+    channels: ["website", "sales", "marketing", "PR", "advertising"],
+    evidenceRoute: "/limitations-workarounds",
+    requiredQualifier: "Safety-first evaluation is not live clinical authorization, medical advice, regulatory clearance, or PHI processing authority.",
+    prohibitedVariant: "SCRIMED is clinically validated, cleared, or authorized for autonomous live care."
   },
   {
     id: "claim-time-saved",
@@ -799,7 +882,9 @@ export function getEnterpriseReadinessSummary() {
       prohibited: publicClaimsRegister.filter((claim) => claim.state === "prohibited").length,
       total: publicClaimsRegister.length
     },
-    updated: "2026-06-15"
+    trustDividendSignals,
+    trustDividendSignalCount: trustDividendSignals.length,
+    updated: "2026-06-27"
   };
 }
 
@@ -820,6 +905,16 @@ export function getEnterpriseDiligenceBrief() {
     `- Active controls: ${summary.activeControls}`,
     `- Decisions required: ${summary.decisionsRequired}`,
     `- External reviews required: ${summary.externalReviewsRequired}`,
+    `- Trust dividend signals: ${summary.trustDividendSignalCount}`,
+    "",
+    "## Trust Dividend",
+    "",
+    "SCRIMED sells trust, reliability, and safety by turning evaluation risk into visible evidence, owner routing, claims control, limitation management, and human-review gates.",
+    "",
+    ...summary.trustDividendSignals.map(
+      (signal) =>
+        `- ${signal.audience}: concern: ${signal.concern} SCRIMED answer: ${signal.scrimedAnswer} Proof route: ${signal.proofRoute} Boundary: ${signal.boundary}`
+    ),
     "",
     "## Readiness Domains",
     ""

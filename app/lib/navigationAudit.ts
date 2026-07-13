@@ -1,3 +1,9 @@
+import {
+  limitationControlLinks,
+  siteNavigationJourneys,
+  siteNavigationSections
+} from "./siteNavigation";
+
 export type NavigationAuditStatus =
   | "linked"
   | "smoke-covered"
@@ -26,8 +32,8 @@ export type NavigationBottleneck = {
 
 export const navigationAuditProofStackStatus = "route-navigation-audit-active";
 export const navigationAuditBriefProofStackStatus = "route-navigation-audit-brief-ready";
-export const navigationAuditUpdatedAt = "2026-06-24";
-export const expectedApiRoutePatternCount = 247;
+export const navigationAuditUpdatedAt = "2026-06-26";
+export const expectedApiRoutePatternCount = 434;
 
 export const navigationAuditBoundary =
   "SCRIMED Navigation Audit organizes page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained approval boundaries into one operating map. It is an audit and navigation control surface only. It does not certify that every protected workflow has been executed, bypass AAL2, approve public release, authorize PHI processing, grant legal or clinical authority, certify security/compliance, or approve production connectors.";
@@ -41,22 +47,44 @@ export const pageRouteInventory = [
   "/atlas",
   "/attribution-analytics",
   "/audit",
+  "/boundary-release-approvals",
   "/boundary-resolution",
   "/buyer-release-control-run",
   "/capital-vitality",
   "/claims",
+  "/client-onboarding",
   "/clinical-authority-readiness",
   "/clinical-care-activation",
+  "/clinical-production-readiness",
+  "/clinical-robustness-lab",
+  "/company-assessment",
   "/competitive-edge",
+  "/competitive-defense",
+  "/competitive-intelligence",
+  "/scrimed-market-execution",
+  "/scrimed-execution-focus",
+  "/continuous-review-audit",
   "/contracts/[slug]",
   "/demos",
   "/demos/[slug]",
   "/deployment-profiles",
+  "/enterprise-business-ops",
+  "/enterprise-healthcare-infrastructure",
+  "/enterprise-scalability",
   "/evaluation",
   "/faithcore",
   "/fixtures/change-review",
+  "/global-certification-readiness",
+  "/global-enterprise-command",
   "/global-reach",
   "/governance-packs",
+  "/health-records",
+  "/healthcare-optimization-command",
+  "/healthcare-value-realization",
+  "/pilot-activation-planner",
+  "/pilot-handoff-command",
+  "/pilot-success-review-command",
+  "/pilot-value-evidence",
   "/growth-engine",
   "/healthcare-intelligence-os",
   "/hub",
@@ -70,6 +98,10 @@ export const pageRouteInventory = [
   "/interoperability/[slug]",
   "/interoperability/evaluations",
   "/interoperability/evaluations/[slug]",
+  "/investor-audience-readiness",
+  "/investor-readiness",
+  "/launch-readiness",
+  "/limitations-workarounds",
   "/market-activation",
   "/memory",
   "/modules/carepath-ai",
@@ -79,9 +111,13 @@ export const pageRouteInventory = [
   "/modules/watchtower",
   "/navigation",
   "/observability",
+  "/omega-audit",
   "/operating-context",
+  "/operational-efficiency",
   "/operations",
+  "/offerings",
   "/pilot",
+  "/pilot-demo-commercial-readiness",
   "/pilot-deal-room",
   "/pilot-evidence",
   "/pilot-workspace",
@@ -89,7 +125,9 @@ export const pageRouteInventory = [
   "/pilots",
   "/pilots/[slug]",
   "/platform",
+  "/platform-power",
   "/pricing",
+  "/production-architecture",
   "/product",
   "/public-market-readiness",
   "/qa-aal2-run-evidence",
@@ -106,10 +144,37 @@ export const pageRouteInventory = [
   "/qa-run-control",
   "/quality",
   "/release-continuity",
+  "/deployment-drift-guard",
+  "/risk-register",
   "/sales-attribution",
   "/sales-operations",
+  "/scrimed-agent-governance",
+  "/scrimed-ai-infrastructure-watchtower",
+  "/scrimed-automation-autopilot",
+  "/scrimed-build-roadmap",
+  "/scrimed-clinical-benchmark-suite",
+  "/scrimed-cyber-defense",
+  "/scrimed-enterprise-acceleration",
+  "/scrimed-governance-learning-loop",
+  "/scrimed-guided-execution",
+  "/scrimed-hybrid-retrieval",
+  "/scrimed-intelligence-platform",
+  "/scrimed-intelligence-safety-stack",
+  "/scrimed-llmops-observability",
+  "/scrimed-modules",
+  "/scrimed-operating-command",
+  "/scrimed-work",
+  "/scrimed-control-plane",
+  "/scrimed-os",
+  "/scrimed-patient-context-gateway",
+  "/scrimed-proof-packet-studio",
+  "/scrimed-reasoning-stability",
+  "/scrimed-trustops",
+  "/scrimed-upgrade-implementation-plan",
+  "/service-delivery",
   "/service-reliability",
   "/source-intelligence",
+  "/strategic-problem-resolution",
   "/strategic-intelligence",
   "/synthetic",
   "/synthetic/[slug]",
@@ -140,22 +205,54 @@ export const pageRouteInventory = [
 ];
 
 export const smokeCoveredHtmlRoutes = [
+  "/company-assessment",
+  "/clinical-production-readiness",
+  "/pilot-demo-commercial-readiness",
   "/navigation",
   "/pilot-workspace/access",
   "/sales-operations",
   "/competitive-edge",
+  "/competitive-defense",
+  "/competitive-intelligence",
+  "/scrimed-market-execution",
+  "/scrimed-execution-focus",
+  "/continuous-review-audit",
+  "/enterprise-business-ops",
+  "/enterprise-healthcare-infrastructure",
+  "/enterprise-scalability",
+  "/platform-power",
+  "/production-architecture",
   "/pilot-deal-room",
   "/qa-evidence",
   "/clinical-authority-readiness",
   "/clinical-care-activation",
   "/public-market-readiness",
+  "/global-enterprise-command",
   "/global-reach",
+  "/global-certification-readiness",
+  "/health-records",
+  "/healthcare-optimization-command",
+  "/healthcare-value-realization",
+  "/pilot-activation-planner",
+  "/pilot-handoff-command",
+  "/pilot-success-review-command",
+  "/pilot-value-evidence",
+  "/scrimed-work",
+  "/offerings",
+  "/client-onboarding",
+  "/boundary-release-approvals",
   "/boundary-resolution",
+  "/limitations-workarounds",
   "/approvals-readiness",
   "/release-continuity",
+  "/deployment-drift-guard",
+  "/service-delivery",
   "/service-reliability",
+  "/operational-efficiency",
   "/capital-vitality",
   "/growth-engine",
+  "/investor-audience-readiness",
+  "/launch-readiness",
   "/qa-execution-readiness",
   "/qa-run-control",
   "/qa-launch-kit",
@@ -167,7 +264,22 @@ export const smokeCoveredHtmlRoutes = [
   "/qa-buyer-proof-release",
   "/buyer-release-control-run",
   "/qa-manual-execution-console",
-  "/qa-aal2-run-evidence"
+  "/qa-aal2-run-evidence",
+  "/scrimed-intelligence-platform",
+  "/scrimed-agent-governance",
+  "/scrimed-reasoning-stability",
+  "/scrimed-clinical-benchmark-suite",
+  "/scrimed-automation-autopilot",
+  "/scrimed-enterprise-acceleration",
+  "/scrimed-governance-learning-loop",
+  "/scrimed-guided-execution",
+  "/scrimed-proof-packet-studio",
+  "/scrimed-cyber-defense",
+  "/scrimed-hybrid-retrieval",
+  "/scrimed-llmops-observability",
+  "/scrimed-ai-infrastructure-watchtower",
+  "/scrimed-patient-context-gateway",
+  "/strategic-problem-resolution"
 ];
 
 export const navigationGroups: NavigationGroup[] = [
@@ -178,11 +290,57 @@ export const navigationGroups: NavigationGroup[] = [
     routes: [
       "/",
       "/hub",
+      "/company-assessment",
+      "/clinical-production-readiness",
+      "/pilot-demo-commercial-readiness",
       "/product",
+      "/offerings",
+      "/service-delivery",
+      "/client-onboarding",
+      "/competitive-defense",
+      "/competitive-intelligence",
+      "/global-enterprise-command",
+      "/global-certification-readiness",
+      "/continuous-review-audit",
+      "/enterprise-business-ops",
+      "/enterprise-healthcare-infrastructure",
+      "/enterprise-scalability",
+      "/platform-power",
+      "/limitations-workarounds",
+      "/launch-readiness",
       "/navigation",
+      "/deployment-drift-guard",
       "/service-reliability",
+      "/operational-efficiency",
       "/capital-vitality",
       "/growth-engine",
+      "/investor-audience-readiness",
+      "/scrimed-intelligence-platform",
+      "/scrimed-intelligence-safety-stack",
+      "/scrimed-operating-command",
+      "/scrimed-work",
+      "/scrimed-control-plane",
+      "/scrimed-automation-autopilot",
+      "/strategic-problem-resolution",
+      "/healthcare-optimization-command",
+      "/healthcare-value-realization",
+      "/pilot-activation-planner",
+      "/pilot-handoff-command",
+      "/pilot-success-review-command",
+      "/pilot-value-evidence",
+      "/scrimed-upgrade-implementation-plan",
+      "/scrimed-agent-governance",
+      "/scrimed-reasoning-stability",
+      "/scrimed-clinical-benchmark-suite",
+      "/scrimed-enterprise-acceleration",
+      "/scrimed-governance-learning-loop",
+      "/scrimed-guided-execution",
+      "/scrimed-proof-packet-studio",
+      "/scrimed-cyber-defense",
+      "/scrimed-hybrid-retrieval",
+      "/scrimed-llmops-observability",
+      "/scrimed-ai-infrastructure-watchtower",
+      "/scrimed-patient-context-gateway",
       "/pilot-evidence"
     ],
     auditStatus: "linked",
@@ -195,19 +353,43 @@ export const navigationGroups: NavigationGroup[] = [
     owner: "Sales operations + Buyer Diligence",
     routes: [
       "/pilot-deal-room",
+      "/offerings",
+      "/service-delivery",
+      "/client-onboarding",
+      "/launch-readiness",
+      "/competitive-defense",
       "/pricing",
+      "/pilot-demo-commercial-readiness",
       "/demos",
       "/demos/[slug]",
       "/pilots",
       "/pilots/[slug]",
       "/pilot",
+      "/competitive-intelligence",
       "/capital-vitality",
       "/growth-engine",
-      "/sales-operations"
+      "/company-assessment",
+      "/clinical-production-readiness",
+      "/pilot-demo-commercial-readiness",
+      "/enterprise-business-ops",
+      "/enterprise-healthcare-infrastructure",
+      "/enterprise-scalability",
+      "/platform-power",
+      "/limitations-workarounds",
+      "/scrimed-automation-autopilot",
+      "/operational-efficiency",
+      "/sales-operations",
+      "/scrimed-proof-packet-studio",
+      "/scrimed-cyber-defense",
+      "/healthcare-value-realization",
+      "/pilot-activation-planner",
+      "/pilot-handoff-command",
+      "/pilot-success-review-command",
+      "/pilot-value-evidence"
     ],
     auditStatus: "smoke-covered",
-    evidence: "Public smoke covers the Deal Room and Sales Operations route; dynamic demo and pilot detail pages compile in the App Router build.",
-    retainedBoundary: "Commercial routes cannot claim customer permission, production activation, or external distribution approval."
+    evidence: "Public smoke covers the Deal Room, Client Onboarding, and Sales Operations route; dynamic demo and pilot detail pages compile in the App Router build.",
+    retainedBoundary: "Commercial routes cannot claim customer permission, production activation, autonomous email send, calendar invite creation, or external distribution approval."
   },
   {
     name: "Approval and authority readiness",
@@ -215,14 +397,38 @@ export const navigationGroups: NavigationGroup[] = [
     owner: "Legal, security, clinical governance, and release stewardship",
     routes: [
       "/approvals-readiness",
+      "/company-assessment",
+      "/clinical-production-readiness",
+      "/competitive-defense",
+      "/global-certification-readiness",
+      "/continuous-review-audit",
+      "/boundary-release-approvals",
       "/boundary-resolution",
+      "/limitations-workarounds",
+      "/launch-readiness",
       "/clinical-authority-readiness",
       "/clinical-care-activation",
+      "/health-records",
       "/public-market-readiness",
       "/capital-vitality",
       "/growth-engine",
+      "/enterprise-business-ops",
+      "/enterprise-scalability",
+      "/platform-power",
+      "/limitations-workarounds",
+      "/client-onboarding",
+      "/service-delivery",
       "/release-continuity",
-      "/service-reliability"
+      "/deployment-drift-guard",
+      "/launch-readiness",
+      "/service-reliability",
+      "/operational-efficiency",
+      "/strategic-problem-resolution",
+      "/healthcare-value-realization",
+      "/pilot-activation-planner",
+      "/pilot-handoff-command",
+      "/pilot-success-review-command",
+      "/pilot-value-evidence"
     ],
     auditStatus: "smoke-covered",
     evidence: "Public smoke checks HTML, JSON APIs, Markdown briefs, boundary headers, and Product Console proof-stack posture for these lanes.",
@@ -251,6 +457,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/qa-evidence",
       "/qa-execution-readiness",
       "/qa-run-control",
+      "/continuous-review-audit",
       "/qa-launch-kit",
       "/qa-human-run-packet",
       "/qa-completion-bridge",
@@ -269,6 +476,16 @@ export const navigationGroups: NavigationGroup[] = [
     owner: "AgentOS + Workflow Runtime",
     routes: [
       "/agents",
+      "/competitive-defense",
+      "/platform-power",
+      "/production-architecture",
+      "/scrimed-intelligence-platform",
+      "/scrimed-operating-command",
+      "/scrimed-work",
+      "/scrimed-control-plane",
+      "/scrimed-automation-autopilot",
+      "/limitations-workarounds",
+      "/launch-readiness",
       "/agents/[slug]",
       "/agent-workspace",
       "/evaluation",
@@ -297,6 +514,8 @@ export const navigationGroups: NavigationGroup[] = [
     owner: "Interoperability control plane + Validation Trust Lab",
     routes: [
       "/interoperability",
+      "/enterprise-healthcare-infrastructure",
+      "/health-records",
       "/interoperability/[slug]",
       "/interoperability/evaluations",
       "/interoperability/evaluations/[slug]",
@@ -322,11 +541,31 @@ export const navigationGroups: NavigationGroup[] = [
       "/trust-center",
       "/trust-center/[slug]",
       "/trust",
+      "/company-assessment",
+      "/clinical-production-readiness",
+      "/pilot-demo-commercial-readiness",
       "/trust-os",
       "/trust-safety-operations",
       "/claims",
+      "/limitations-workarounds",
+      "/launch-readiness",
+      "/competitive-defense",
+      "/competitive-intelligence",
+      "/continuous-review-audit",
+      "/enterprise-business-ops",
+  "/enterprise-scalability",
+  "/platform-power",
+  "/production-architecture",
+  "/workflows/execution-attempts",
+  "/limitations-workarounds",
+      "/offerings",
+      "/client-onboarding",
+      "/service-delivery",
       "/service-reliability",
+      "/operational-efficiency",
+      "/scrimed-automation-autopilot",
       "/market-activation",
+      "/global-certification-readiness",
       "/global-reach",
       "/sales-attribution",
       "/attribution-analytics",
@@ -335,7 +574,12 @@ export const navigationGroups: NavigationGroup[] = [
       "/operations",
       "/quality",
       "/operating-context",
+      "/health-records",
+      "/healthcare-optimization-command",
       "/healthcare-intelligence-os",
+      "/production-architecture",
+      "/scrimed-intelligence-platform",
+      "/scrimed-operating-command",
       "/platform",
       "/governance-packs",
       "/faithcore",
@@ -353,11 +597,56 @@ export const navigationGroups: NavigationGroup[] = [
 
 export const navigationBottlenecks: NavigationBottleneck[] = [
   {
+    name: "Whole-company operating fragmentation",
+    status: "contained",
+    impact:
+      "Product, service, launch, revenue, legal, certification, cybersecurity, AI, health-record, investor, and scale decisions can fragment when teams inspect only one lane at a time.",
+    workaround:
+      "Use /company-assessment as the top-level operating cockpit before routing into Product Console, Offerings, Service Delivery, Enterprise Business Ops, Platform Power, Health Records, Launch Readiness, Approvals, Global Certification, Continuous Review, Workarounds, or protected proof release.",
+    owner: "Executive Operating Council + Product Console + TrustOS"
+  },
+  {
+    name: "Clinical production readiness incompleteness",
+    status: "external-review-required",
+    impact:
+      "Current no-PHI pilots, demos, diligence packets, and readiness services are usable now, but clinical production requires a separate task ledger, qualified external review, customer authority, and live-data controls.",
+    workaround:
+      "Use /clinical-production-readiness before PHI, live-care, connector, clinical AI, certification, customer go-live, or global production language expands; use current capability motions for safe revenue while the task ledger remains incomplete.",
+    owner: "Clinical production readiness owner + qualified external reviewers"
+  },
+  {
+    name: "Demo-to-pilot pricing friction",
+    status: "contained",
+    impact:
+      "Buyers can stall when public demos, pilot programs, price bands, proof assets, intake steps, and custom diligence boundaries are not tied together before a call.",
+    workaround:
+      "Use /pilot-demo-commercial-readiness before demo, pilot, or pricing conversations so each buyer path has one demo, one recommended pilot, one price band, one proof list, one no-PHI intake route, and one hard-stop boundary.",
+    owner: "Revenue Operations + Product Console + Deal Desk"
+  },
+  {
+    name: "Service delivery scope drift",
+    status: "contained",
+    impact:
+      "Sellable offers can become low-margin custom work or unsupported commitments if scope, acceptance criteria, artifacts, and authority gates are not attached before kickoff.",
+    workaround:
+      "Use /service-delivery to bind every package to no-PHI intake, scope matrix, work-order templates, buyer handoff, margin controls, release gates, and no-SLA/no-contract/no-live-care boundaries.",
+    owner: "Delivery Lead + Product Console + Revenue Operations"
+  },
+  {
     name: "Route sprawl",
     status: "resolved",
     impact: "High-value pages and proof routes were harder to discover as the App Router surface grew.",
     workaround: "Use /navigation as the source-indexed route map and wire it through Homepage, Hub, Product Console, API, brief, README, systems map, and smoke coverage.",
     owner: "Product Console + Release Steward"
+  },
+  {
+    name: "Deployment drift",
+    status: "contained",
+    impact:
+      "A reviewed local build can pass while the live production target still serves an older deployment or returns 404 for new buyer-critical routes.",
+    workaround:
+      "Use /deployment-drift-guard, /api/deployment-drift-guard, and npm run smoke:deployment-drift-guard against local and production targets before buyer, investor, launch, or proof-packet promotion.",
+    owner: "Release Steward + Platform Engineering"
   },
   {
     name: "Protected happy-path proof",
@@ -376,8 +665,8 @@ export const navigationBottlenecks: NavigationBottleneck[] = [
   {
     name: "External approvals and certifications",
     status: "external-review-required",
-    impact: "Navigation can show approval tracks, but SCRIMED cannot self-certify legal, security, HIPAA, FDA, ONC, reimbursement, or clinical-use authority.",
-    workaround: "Keep approval routes claims-controlled, attach only qualified external evidence, and preserve no-authority headers until formal approval exists.",
+    impact: "Navigation can show approval and certification tracks, but SCRIMED cannot self-certify legal, security, HIPAA, FDA, ONC, EU AI Act, GDPR, NHS, MHRA, Australia, reimbursement, procurement, or clinical-use authority.",
+    workaround: "Keep approval and certification routes claims-controlled, attach only qualified external evidence, and preserve no-authority headers until formal approval exists.",
     owner: "Founder + qualified external reviewers"
   },
   {
@@ -399,11 +688,65 @@ export const navigationBottlenecks: NavigationBottleneck[] = [
     owner: "Founder + Product Console + Sales Operations"
   },
   {
+    name: "Enterprise legal and finance operating depth",
+    status: "external-review-required",
+    impact:
+      "Enterprise revenue, margins, contracts, accounting, tax, investor, and board materials can create risk if authority is informal or claims outrun qualified review.",
+    workaround:
+      "Use /enterprise-business-ops to route deal desk, price floors, margin controls, legal/accounting/tax roles, billing readiness, and blocked business claims through named owners before commitments expand.",
+    owner: "Founder + qualified counsel + finance/accounting/tax reviewers"
+  },
+  {
+    name: "Enterprise scalability commitment boundaries",
+    status: "external-review-required",
+    impact:
+      "Capacity, SLO, support, region, residency, disaster recovery, and managed-service language can become accidental commitments if not routed before buyer use.",
+    workaround:
+      "Use /enterprise-scalability to attach capacity assumptions, tenant owners, support-tier review, no-SLA language, regional gates, cost thresholds, and qualified contract review before commitments expand.",
+    owner: "Platform + service reliability + customer operations + legal ops"
+  },
+  {
+    name: "API UI AI platform power authority boundaries",
+    status: "external-review-required",
+    impact:
+      "API contracts, UI improvements, live AI, model routing, agent tool use, accessibility, and scale-positioning language can become unsupported enterprise claims if they are not routed through proof and authority controls.",
+    workaround:
+      "Use /platform-power to attach API owners, UI role journeys, model-route registers, agent approval triggers, eval evidence, cost owners, and no-live-AI/no-PHI/no-SLA boundaries before claims expand.",
+    owner: "Platform engineering + Product Console + TrustOS + security + finance"
+  },
+  {
+    name: "Limitations workaround drift",
+    status: "contained",
+    impact:
+      "Safe alternatives can turn into informal permission when workaround packets do not have expiration rules, escalation triggers, and graduation gates.",
+    workaround:
+      "Use /limitations-workarounds to attach every repeated issue to a packet, owner, proof route, cadence, hard stop, and promotion path before buyer or release language expands.",
+    owner: "Boundary owner + Operational Efficiency + Product Console"
+  },
+  {
+    name: "Autonomy expansion pressure",
+    status: "contained",
+    impact:
+      "Automation can accelerate SCRIMED, but unsafely expanding it could imply production remediation, patient outreach, payer submission, EHR writeback, credential mutation, clinical authority, or customer go-live.",
+    workaround:
+      "Use /scrimed-automation-autopilot to classify every automation lane as manual-only, recommendation-only, review-gated automation, or synthetic autopilot before action authority expands.",
+    owner: "TrustOS + Platform Engineering + Release Steward"
+  },
+  {
     name: "Local shell runtime path",
     status: "contained",
     impact: "The managed local shell may omit node/npm from PATH even though the bundled runtime works.",
     workaround: "Use the bundled Node path for local checks and keep npm lifecycle scripts documented through Release Continuity and Operations readiness.",
     owner: "Release Steward"
+  },
+  {
+    name: "Sandbox DNS resolution",
+    status: "contained",
+    impact:
+      "Restricted local sandbox execution can return ENOTFOUND for app.scrimedsolutions.com even when the branded production domain passes from approved network access.",
+    workaround:
+      "Use /launch-readiness and the launch-domain preflight to classify sandbox DNS separately, require strict branded-domain smoke from approved network access before launch, and treat fallback Vercel URL success as continuity-only evidence.",
+    owner: "Release Steward + Domain/DNS administrator"
   }
 ];
 
@@ -444,6 +787,9 @@ export function getNavigationAuditSummary() {
     },
     coverage: {
       navigationGroupCount: navigationGroups.length,
+      siteNavigationSectionCount: siteNavigationSections.length,
+      roleJourneyCount: siteNavigationJourneys.length,
+      limitationControlCount: limitationControlLinks.length,
       auditedNavigationRouteCount: auditedNavigationRoutes.length,
       smokeCoveredHtmlRouteCount: smokeCoveredHtmlRoutes.length,
       missingInventoryLinkCount: missingInventoryLinks.length,
@@ -463,6 +809,9 @@ export function getNavigationAuditSummary() {
     operatorRequiredBottleneckCount,
     externalReviewBottleneckCount,
     groups: navigationGroups,
+    siteNavigationSections,
+    roleJourneys: siteNavigationJourneys,
+    limitationControls: limitationControlLinks,
     bottlenecks: navigationBottlenecks,
     pageRouteInventory,
     smokeCoveredHtmlRoutes,
@@ -470,7 +819,13 @@ export function getNavigationAuditSummary() {
     missingInventoryLinks,
     nextOperatorActions: [
       "Use /navigation before each release to check route inventory, source counts, smoke scope, and retained limitations.",
+      "Use /launch-readiness before public launch, buyer campaigns, investor packet release, or board review to separate sandbox DNS false negatives from real production-domain launch gates.",
+      "Use /competitive-defense before public competitor comparisons, security claims, privacy claims, investor packets, sales decks, or launch expansion to keep no-copy, no-PHI, no-certification, no-partnership, and qualified-review gates explicit.",
+      "Use the persistent site navigation to move buyers, operators, reviewers, and global partners into their role-specific paths from every page.",
       "Add new high-value routes to the right navigation group and public smoke when they become buyer-critical.",
+      "Use /platform-power before API, UI, AI, model-route, agent-tool, accessibility, or scale-equivalence claims expand.",
+      "Use /limitations-workarounds when a request is blocked so the safe path, escalation owner, proof route, and graduation gate are explicit.",
+      "Use /investor-audience-readiness when preparing angel, corporate strategic, private investor, faith-based clinic, public-sector, payer, health-system, clinician, global partner, or transformation-sponsor conversations.",
       "Keep protected routes fail-closed publicly and run happy-path proof only through an active human AAL2 session.",
       "Keep approval, PHI, clinical-care, connector, release, and security-certification claims gated until qualified external evidence exists."
     ],
@@ -489,6 +844,9 @@ export function buildNavigationAuditBrief() {
     `API route pattern count: ${summary.sourceTotals.apiRoutePatternCount}`,
     `Dynamic page route count: ${summary.sourceTotals.dynamicPageRouteCount}`,
     `Navigation groups: ${summary.coverage.navigationGroupCount}`,
+    `Site navigation sections: ${summary.coverage.siteNavigationSectionCount}`,
+    `Role journeys: ${summary.coverage.roleJourneyCount}`,
+    `Limitation controls: ${summary.coverage.limitationControlCount}`,
     `Audited navigation routes: ${summary.coverage.auditedNavigationRouteCount}`,
     `Smoke-covered HTML routes: ${summary.coverage.smokeCoveredHtmlRouteCount}`,
     `Protected coverage: ${summary.coverage.protectedCoverageStatus}`,
@@ -507,6 +865,18 @@ export function buildNavigationAuditBrief() {
     ...summary.groups.map(
       (group) =>
         `- ${group.name} (${group.auditStatus}): ${group.purpose} Routes: ${group.routes.join(", ")} Boundary: ${group.retainedBoundary}`
+    ),
+    "",
+    "## Role Journeys",
+    ...summary.roleJourneys.map(
+      (journey) =>
+        `- ${journey.audience}: start at ${journey.route}; sequence ${journey.sequence.join(" -> ")}. Outcome: ${journey.outcome} Boundary: ${journey.boundary}`
+    ),
+    "",
+    "## Limitation Controls",
+    ...summary.limitationControls.map(
+      (link) =>
+        `- ${link.label}: ${link.href}. ${link.description} Boundary: ${link.boundary ?? "review required"}`
     ),
     "",
     "## Bottlenecks",

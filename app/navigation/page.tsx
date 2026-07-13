@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { getNavigationAuditSummary } from "../lib/navigationAudit";
+import {
+  limitationControlLinks,
+  siteNavigationJourneys,
+  siteNavigationSections
+} from "../lib/siteNavigation";
 
 export const metadata = {
   title: "SCRIMED Navigation Audit",
@@ -52,6 +57,18 @@ export default function NavigationAuditPage() {
           <strong>{summary.coverage.navigationGroupCount}</strong>
         </article>
         <article>
+          <span>Site nav sections</span>
+          <strong>{summary.coverage.siteNavigationSectionCount}</strong>
+        </article>
+        <article>
+          <span>Role journeys</span>
+          <strong>{summary.coverage.roleJourneyCount}</strong>
+        </article>
+        <article>
+          <span>Limit controls</span>
+          <strong>{summary.coverage.limitationControlCount}</strong>
+        </article>
+        <article>
           <span>Audited links</span>
           <strong>{summary.coverage.auditedNavigationRouteCount}</strong>
         </article>
@@ -79,6 +96,76 @@ export default function NavigationAuditPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Seamless site navigation">
+        <div className="section-heading">
+          <p className="eyebrow">App-Wide Navigation</p>
+          <h2>Persistent route groups keep every page one click from the next useful operating surface.</h2>
+        </div>
+        {siteNavigationSections.map((section) => (
+          <article className="module-row" key={section.label}>
+            <div>
+              <span>navigation group</span>
+              <h2>{section.label}</h2>
+            </div>
+            <p>{section.intent}</p>
+            <div>
+              <strong>{section.links.length} shortcuts</strong>
+              <ul className="compact-list">
+                {section.links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href}>{link.label}</Link>: {link.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Role-based navigation journeys">
+        <div className="section-heading">
+          <p className="eyebrow">Role Journeys</p>
+          <h2>Buyers, reviewers, operators, and partners get routed by intent instead of by org chart.</h2>
+        </div>
+        {siteNavigationJourneys.map((journey) => (
+          <article className="module-row" key={journey.audience}>
+            <div>
+              <span>{journey.start}</span>
+              <h2>{journey.audience}</h2>
+            </div>
+            <p>{journey.outcome}</p>
+            <div>
+              <strong>Boundary: {journey.boundary}</strong>
+              <ul className="compact-list">
+                <li>Start: <Link href={journey.route}>{journey.route}</Link></li>
+                <li>Limit control: <Link href={journey.limitationRoute}>{journey.limitationRoute}</Link></li>
+                <li>Sequence: {journey.sequence.join(" -> ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Navigation limitation controls">
+        <div className="section-heading">
+          <p className="eyebrow">Limitations</p>
+          <h2>Every navigation path keeps a visible route back to the limits, hard stops, and authority gaps.</h2>
+        </div>
+        {limitationControlLinks.map((link) => (
+          <article className="module-row" key={link.href}>
+            <div>
+              <span>control route</span>
+              <h2>{link.label}</h2>
+            </div>
+            <p>{link.description}</p>
+            <div>
+              <strong>{link.boundary}</strong>
+              <Link className="module-link" href={link.href}>Open control</Link>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Navigation groups">

@@ -46,6 +46,20 @@ export type CommercialGuardrail = {
   detail: string;
 };
 
+export type MarketPricingBenchmark = {
+  segment: string;
+  publicSignal: string;
+  source: string;
+  scrimedImplication: string;
+};
+
+export type PricingAlignmentDecision = {
+  lane: string;
+  decision: string;
+  rationale: string;
+  marginProtection: string;
+};
+
 export type PremiumPricingPrinciple = {
   principle: string;
   policy: string;
@@ -55,6 +69,75 @@ export type PremiumPricingPrinciple = {
 
 export const commercialBoundary =
   "SCRIMED pricing and sales motions currently sell governed synthetic evaluations, readiness assessments, and protected enterprise pilots. Pricing does not imply live clinical execution, autonomous diagnosis, payer submission, reimbursement guarantees, or production medical-record processing.";
+
+export const marketPricingBenchmarks: MarketPricingBenchmark[] = [
+  {
+    segment: "Individual AI scribe subscriptions",
+    publicSignal:
+      "Freed, Tali, and Heidi show free or low monthly clinician entry points for narrow documentation workflows.",
+    source: "Public competitor pricing pages and plan pages",
+    scrimedImplication:
+      "SCRIMED should not compete as a low-cost per-seat scribe; free demos are the entry point, while paid work is enterprise workflow, governance, interoperability, and proof packaging."
+  },
+  {
+    segment: "Enterprise clinical AI assistants",
+    publicSignal:
+      "Suki, Ambience, Abridge, and similar vendors lead with workflow breadth, EHR adjacency, specialty support, and sales-led enterprise pricing.",
+    source: "Public enterprise product pages and case-study positioning",
+    scrimedImplication:
+      "SCRIMED pilot pricing should scale by workflow family, departments, governance burden, proof depth, implementation complexity, and protected controls."
+  },
+  {
+    segment: "Healthcare integration infrastructure",
+    publicSignal:
+      "Redox-style integration platforms use custom pricing because EHR connectivity, uptime, security, data exchange, and trading-partner requirements drive cost.",
+    source: "Public healthcare integration product and pricing-positioning pages",
+    scrimedImplication:
+      "Connector and production data-exchange work must remain outside standard demo and synthetic-pilot prices until separately reviewed and priced."
+  },
+  {
+    segment: "Health-system-owned AI infrastructure",
+    publicSignal:
+      "The 2026 Berta open-source scribe paper reports commercial AI scribes at $99-$600 per physician per month and internal operating costs below $30 per physician per month.",
+    source: "Berta arXiv paper",
+    scrimedImplication:
+      "SCRIMED must defend enterprise price through proof, governance, safety, workflow redesign, interoperability readiness, and margin-transparent implementation."
+  }
+];
+
+export const pricingAlignmentDecisions: PricingAlignmentDecision[] = [
+  {
+    lane: "Public demos",
+    decision: "Keep free, no-PHI, no-account public demos and qualified standard guided demos.",
+    rationale: "Market leaders reduce friction with trials or low-cost entry before enterprise review.",
+    marginProtection: "Custom prep, questionnaires, buyer-specific proof packets, and diligence release work move into paid scope."
+  },
+  {
+    lane: "Assessments",
+    decision:
+      "Use $25k-$75k as the standard assessment band, with a $12.5k-$25k mission-clinic access path and $75k-$150k enterprise assessment band.",
+    rationale: "This stays approachable for early buyers without pricing SCRIMED like a commodity seat subscription.",
+    marginProtection: "Cap workflow count, meetings, artifacts, and review cycles; discount only by reducing scope."
+  },
+  {
+    lane: "Synthetic pilots",
+    decision: "Use $125k-$350k as the standard 45-90 day synthetic pilot band and $350k-$500k for expanded proof scope.",
+    rationale: "Enterprise pilots should be materially above individual scribe subscriptions while staying below production integration commitments.",
+    marginProtection: "Separate custom packets, protected workspaces, integration planning, legal/security diligence, and implementation labor."
+  },
+  {
+    lane: "Protected enterprise pilots",
+    decision: "Use $400k-$1.25M as the standard 90-180 day protected pilot band and $1.25M-$2M+ for multi-site or heavy diligence scope.",
+    rationale: "Protected pilots carry security, privacy, tenant, evidence-room, support, and connector-readiness costs.",
+    marginProtection: "Separate annual license, services, support, model usage, evidence-room release, connector work, and change orders."
+  },
+  {
+    lane: "Enterprise operating license",
+    decision: "Use $1.5M-$6M annual for initial enterprise layer and $6M-$12M+ for multi-department or multi-region expansion.",
+    rationale: "This aligns with infrastructure-level value while giving buyers a believable expansion ladder after pilots prove value.",
+    marginProtection: "Keep implementation, support, connector, usage, and continuous review retainers out of the base license unless explicitly priced."
+  }
+];
 
 export const productAccessRoutes: ProductAccessRoute[] = [
   {
@@ -135,7 +218,8 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Workflow Intelligence Assessment",
     status: "sellable-now",
-    recommendedDisplayPrice: "Starts at $50k; typical range $75k-$150k fixed fee",
+    recommendedDisplayPrice:
+      "Standard $25k-$75k; mission-clinic access path $12.5k-$25k for one no-PHI workflow; enterprise assessment $75k-$150k",
     buyer: "Hospitals, clinics, payers, and transformation teams validating workflow opportunity before a pilot",
     entryCriteria: [
       "Executive or operational sponsor identified",
@@ -160,7 +244,8 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Synthetic Pilot Evaluation",
     status: "sellable-now",
-    recommendedDisplayPrice: "Starts at $150k; typical range $200k-$500k for 45-90 days",
+    recommendedDisplayPrice:
+      "Standard $125k-$350k for 45-90 days; $350k-$500k when multiple workflows, diligence, or executive proof packets expand scope",
     buyer: "Enterprise buyers who want to evaluate SCRIMED against synthetic workflows before live integration",
     entryCriteria: [
       "Named sponsor and review team",
@@ -186,7 +271,8 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Protected Enterprise Pilot",
     status: "protected-pilot",
-    recommendedDisplayPrice: "Starts at $750k; typical range $1M-$2.5M for 90-180 days",
+    recommendedDisplayPrice:
+      "Standard $400k-$1.25M for 90-180 days; $1.25M-$2M+ for multi-site, protected diligence, sandbox planning, or expanded scope",
     buyer: "Health systems, payers, public-sector programs, and enterprise operators preparing controlled deployment",
     entryCriteria: [
       "Security, privacy, compliance, and legal review underway",
@@ -213,7 +299,8 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Enterprise Operating License",
     status: "enterprise-license",
-    recommendedDisplayPrice: "Annual platform license starts at $2.5M; enterprise range $3M-$12M+",
+    recommendedDisplayPrice:
+      "Initial annual operating layer $1.5M-$6M; multi-department or multi-region expansion $6M-$12M+",
     buyer: "Large hospitals, payers, government health agencies, and multi-site healthcare organizations",
     entryCriteria: [
       "Protected pilot validated",
@@ -239,7 +326,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Strategic Platform Partnership",
     status: "strategic",
-    recommendedDisplayPrice: "Multi-year partnerships start at $10M; national or ecosystem programs $25M+",
+    recommendedDisplayPrice: "Multi-year partnerships $8M-$25M+, sales-led, region-aware, and external-review-gated",
     buyer: "Governments, national health systems, major payers, strategic hospital networks, and global partners",
     entryCriteria: [
       "Multi-organization mandate",
@@ -423,6 +510,8 @@ export function getCommercialStrategySummary() {
     salesMotion,
     valueMetrics,
     commercialGuardrails,
-    updated: "2026-06-15"
+    marketPricingBenchmarks,
+    pricingAlignmentDecisions,
+    updated: "2026-06-26"
   };
 }

@@ -13,12 +13,19 @@ import { getQualityGateSummary } from "./qualityGates";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "./interoperabilityConformanceEvaluations";
 import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
+import {
+  getPilotDemoCommercialReadinessSummary,
+  pilotDemoCommercialReadinessBriefStatus,
+  pilotDemoCommercialReadinessStatus
+} from "./pilotDemoCommercialReadiness";
 import { getEnterpriseReadinessSummary } from "./enterpriseReadiness";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
 import { getSalesOperationsSummary } from "./salesOperations";
 import { getTrustOSSummary } from "./trustOS";
 import { getPersistentAgentWorkspaceSummary } from "./persistentAgentWorkspace";
+import { getScrimedOperatingCommandCenterSummary } from "./scrimedOperatingCommandCenter";
 import { getStrategicPlatformIntelligenceSummary } from "./strategicPlatformIntelligence";
+import { getCompetitiveMarketIntelligenceSummary } from "./competitiveMarketIntelligence";
 import { getDeploymentProfileSummary } from "./deploymentProfiles";
 import { getMarketActivationSummary } from "./marketActivation";
 import {
@@ -27,10 +34,32 @@ import {
   globalPartnerLocalizationStatus
 } from "./globalPartnerLocalization";
 import {
+  getGlobalEnterpriseCommandSummary,
+  globalEnterpriseCommandBriefStatus,
+  globalEnterpriseCommandStatus
+} from "./globalEnterpriseCommand";
+import {
   approvalsReadinessBriefStatus,
   approvalsReadinessStatus,
   getApprovalsReadinessSummary
 } from "./approvalsReadiness";
+import {
+  getGlobalCertificationReadinessSummary,
+  globalCertificationReadinessBriefStatus,
+  globalCertificationReadinessStatus
+} from "./globalCertificationReadiness";
+import { getHealthcareIntelligenceOSSummary } from "./healthcareIntelligenceOS";
+import {
+  getHealthRecordsSafetyExchangeSummary,
+  healthRecordsSafetyExchangeBriefStatus,
+  healthRecordsSafetyExchangeExtractionStatus,
+  healthRecordsSafetyExchangeStatus
+} from "./healthRecordsSafetyExchange";
+import {
+  continuousReviewAuditBriefStatus,
+  continuousReviewAuditStatus,
+  getContinuousReviewAuditSummary
+} from "./continuousReviewAudit";
 import {
   getReleaseContinuitySummary,
   releaseContinuityBriefProofStackStatus,
@@ -47,6 +76,71 @@ import {
   serviceReliabilityProofStackStatus
 } from "./serviceReliability";
 import {
+  getOperationalEfficiencySummary,
+  operationalEfficiencyBriefStatus,
+  operationalEfficiencyStatus
+} from "./operationalEfficiency";
+import {
+  getScrimedAutomationAutopilotSummary,
+  scrimedAutomationAutopilotBriefStatus,
+  scrimedAutomationAutopilotStatus
+} from "./scrimedAutomationAutopilot";
+import {
+  getStrategicProblemResolutionSummary,
+  strategicProblemResolutionBriefStatus,
+  strategicProblemResolutionStatus
+} from "./strategicProblemResolution";
+import {
+  getHealthcareOptimizationCommandSummary,
+  healthcareOptimizationCommandBriefStatus,
+  healthcareOptimizationCommandStatus
+} from "./healthcareOptimizationCommand";
+import {
+  getHealthcareValueRealizationSummary,
+  healthcareValueRealizationBriefStatus,
+  healthcareValueRealizationStatus
+} from "./healthcareValueRealization";
+import {
+  getPilotValueEvidenceSummary,
+  pilotValueEvidenceBriefStatus,
+  pilotValueEvidenceStatus
+} from "./pilotValueEvidence";
+import {
+  getPilotActivationPlannerSummary,
+  pilotActivationPlannerBriefStatus,
+  pilotActivationPlannerStatus
+} from "./pilotActivationPlanner";
+import {
+  getPilotHandoffCommandSummary,
+  pilotHandoffCommandBriefStatus,
+  pilotHandoffCommandStatus
+} from "./pilotHandoffCommand";
+import {
+  getPilotSuccessReviewCommandSummary,
+  pilotSuccessReviewCommandBriefStatus,
+  pilotSuccessReviewCommandStatus
+} from "./pilotSuccessReviewCommand";
+import {
+  getLimitationsWorkaroundSummary,
+  limitationsWorkaroundBriefStatus,
+  limitationsWorkaroundStatus
+} from "./limitationsWorkaroundOperations";
+import {
+  getInvestorAudienceReadinessSummary,
+  investorAudienceReadinessBriefStatus,
+  investorAudienceReadinessStatus
+} from "./investorAudienceReadiness";
+import {
+  getLaunchReadinessSummary,
+  launchReadinessBriefStatus,
+  launchReadinessStatus
+} from "./launchReadinessOperations";
+import {
+  competitiveDefenseBriefStatus,
+  competitiveDefenseStatus,
+  getCompetitiveDefenseSummary
+} from "./competitiveDefense";
+import {
   capitalVitalityBriefProofStackStatus,
   capitalVitalityProofStackStatus,
   getCapitalVitalitySummary
@@ -56,6 +150,61 @@ import {
   growthEngineBriefProofStackStatus,
   growthEngineProofStackStatus
 } from "./growthEngine";
+import {
+  companyAssessmentBriefStatus,
+  companyAssessmentStatus,
+  getCompanyAssessmentSummary
+} from "./companyAssessment";
+import {
+  clinicalProductionReadinessBriefStatus,
+  clinicalProductionReadinessStatus,
+  getClinicalProductionReadinessSummary
+} from "./clinicalProductionReadiness";
+import {
+  getProductServicePortfolioSummary,
+  productServicePortfolioBriefStatus,
+  productServicePortfolioStatus
+} from "./productServicePortfolio";
+import {
+  getServiceDeliverySummary,
+  serviceDeliveryBriefStatus,
+  serviceDeliveryStatus
+} from "./serviceDelivery";
+import {
+  clientOnboardingCommunicationsBriefStatus,
+  clientOnboardingCommunicationsStatus,
+  getClientOnboardingCommunicationsSummary
+} from "./clientOnboardingCommunications";
+import {
+  enterpriseBusinessOpsBriefStatus,
+  enterpriseBusinessOpsStatus,
+  getEnterpriseBusinessOpsSummary
+} from "./enterpriseBusinessOperations";
+import {
+  enterpriseScalabilityOperationsBriefStatus,
+  enterpriseScalabilityOperationsStatus,
+  getEnterpriseScalabilityOperationsSummary
+} from "./enterpriseScalabilityOperations";
+import {
+  getPlatformPowerSummary,
+  platformPowerBriefStatus,
+  platformPowerStatus
+} from "./platformPowerOperations";
+import {
+  getProductionArchitectureSummary,
+  productionArchitectureBriefStatus,
+  productionArchitectureStatus
+} from "./productionArchitecture";
+import {
+  executionAttemptEnvelopeBriefStatus,
+  executionAttemptEnvelopeStatus,
+  getExecutionAttemptEnvelopeSummary
+} from "./executionAttemptEnvelope";
+import {
+  executionAttemptDurableStoreBriefStatus,
+  executionAttemptDurableStoreStatus,
+  getExecutionAttemptDurableStoreSummary
+} from "./executionAttemptDurableStore";
 import {
   boundaryResolutionBriefProofStackStatus,
   boundaryResolutionProofStackStatus,
@@ -606,6 +755,14 @@ export const evidenceMetrics: EvidenceMetric[] = [
 
 export const buyerActions: BuyerAction[] = [
   {
+    label: "Review Launch Readiness",
+    href: "/launch-readiness",
+    purpose:
+      "Verify launch structure, sandbox DNS classification, strict branded-domain gates, product/service readiness, protected proof boundaries, and go/no-go hard stops.",
+    boundary:
+      "Launch Readiness is operating evidence only; it does not bypass sandbox DNS, approve launch, create SLAs, authorize PHI, certify compliance, approve connectors, approve customer release, or authorize live clinical care."
+  },
+  {
     label: "Audit Navigation",
     href: "/navigation",
     purpose: "Review page route inventory, API route pattern counts, route groups, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review bottlenecks.",
@@ -618,6 +775,22 @@ export const buyerActions: BuyerAction[] = [
       "Review product and service controls, known fault classes, efficiency improvements, owners, proof routes, and retained approval boundaries.",
     boundary:
       "Service Reliability strengthens operating discipline only; it is not approval, certification, PHI authority, buyer release authority, or live clinical authorization."
+  },
+  {
+    label: "Resolve Bottlenecks",
+    href: "/operational-efficiency",
+    purpose:
+      "Review cross-system gaps, inefficiencies, bottlenecks, fault classes, hard stops, owners, proof routes, and resolution sprints.",
+    boundary:
+      "Operational Efficiency improves execution discipline only; it does not authorize autonomous remediation, AAL2 bypass, PHI processing, legal/accounting/tax advice, certification, revenue guarantees, profit guarantees, or live clinical care."
+  },
+  {
+    label: "Open Workarounds",
+    href: "/limitations-workarounds",
+    purpose:
+      "Use safe workaround packets, owners, escalation triggers, proof routes, expiration rules, and graduation gates when issues, boundaries, or limitations block execution.",
+    boundary:
+      "Limitations Workarounds is containment only; it does not authorize PHI, live care, legal/accounting/tax advice, certification, public API SLAs, autonomous remediation, live AI, revenue guarantees, profit guarantees, or buyer release."
   },
   {
     label: "Review Capital Vitality",
@@ -634,6 +807,62 @@ export const buyerActions: BuyerAction[] = [
       "Prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes.",
     boundary:
       "Commercial Growth Engine is execution readiness only; it is not a revenue guarantee, investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, or customer permission."
+  },
+  {
+    label: "Open Investor Readiness",
+    href: "/investor-audience-readiness",
+    purpose:
+      "Route weaknesses, competitive edge, sellable value, and angel, corporate strategic, private investor, faith-based clinic, health-system, payer, public-sector, clinician, global partner, and transformation-sponsor packets.",
+    boundary:
+      "Investor and Audience Readiness is operating-readiness only; it is not investment advice, securities offering material, solicitation, audited financial reporting, valuation assurance, legal advice, tax advice, donor advice, customer permission, or approval."
+  },
+  {
+    label: "Open Offerings Portfolio",
+    href: "/offerings",
+    purpose:
+      "Package product and services offers, delivery paths, proof routes, qualification gates, margin controls, and retained boundaries before pricing, pilots, diligence, or implementation work expands.",
+    boundary:
+      "Product and Services Portfolio is packaging readiness only; it does not approve contracts, PHI processing, production connectors, legal/accounting/tax conclusions, revenue, profit, reimbursement, certification, or live clinical authority."
+  },
+  {
+    label: "Open Service Delivery",
+    href: "/service-delivery",
+    purpose:
+      "Convert packaged offers into scoped work orders, acceptance criteria, delivery artifacts, buyer handoffs, margin protections, and retained authority gates.",
+    boundary:
+      "Service Delivery Workbench is execution control only; it is not a statement of work, contract approval, SLA, managed-service commitment, PHI authority, production connector approval, customer permission, revenue guarantee, profit guarantee, or live clinical authority."
+  },
+  {
+    label: "Open Client Onboarding",
+    href: "/client-onboarding",
+    purpose:
+      "Use human-reviewed email, calendar-ready agendas, demo scripts, pilot workshop notes, presentation packets, meeting cadences, follow-up SLAs, and handoffs for every buyer path.",
+    boundary:
+      "Client Onboarding drafts and routes communications only; it does not send email, create calendar invites, approve contracts, approve procurement, process PHI, certify security, or authorize live clinical care."
+  },
+  {
+    label: "Open Business Ops",
+    href: "/enterprise-business-ops",
+    purpose:
+      "Review revenue capability, profit-margin discipline, deal desk, legal operations, finance/accounting controls, tax-awareness routing, contract authority, and audit evidence.",
+    boundary:
+      "Enterprise Business Operations is operating readiness only; it is not legal advice, accounting advice, tax advice, audited financial reporting, securities material, contract approval, revenue guarantee, profit-margin guarantee, or customer permission."
+  },
+  {
+    label: "Review Enterprise Scale",
+    href: "/enterprise-scalability",
+    purpose:
+      "Review capacity planning, tenant scale, queueing, observability, SLO readiness, support load, incident/change operations, global deployment, and cost controls.",
+    boundary:
+      "Enterprise Scalability Operations is readiness only; it is not a contractual SLA, managed service commitment, production support guarantee, security certification, PHI authority, production connector approval, revenue guarantee, or profit-margin guarantee."
+  },
+  {
+    label: "Open Platform Power",
+    href: "/platform-power",
+    purpose:
+      "Review API contracts, UI command paths, AI model-route readiness, agent approval, eval loops, evidence retrieval, and platform cost controls.",
+    boundary:
+      "Platform Power Operations is readiness only; it is not public API SLA authority, live autonomous AI authority, production model-routing approval, PHI authority, accessibility certification, security certification, or trillion-scale equivalence proof."
   },
   {
     label: "Review Pilot Evidence",
@@ -688,6 +917,22 @@ export const buyerActions: BuyerAction[] = [
       "Competitive positioning does not imply third-party partnership, certified compliance, live clinical execution, or production connector authorization."
   },
   {
+    label: "Review Competitive Market Intelligence",
+    href: "/competitive-intelligence",
+    purpose:
+      "Inspect public competitor patterns translated into SCRIMED-specific product build paths, proof metrics, API posture, payer workflows, and no-copy guardrails.",
+    boundary:
+      "Competitive market intelligence uses public signals as strategy input only; it does not copy proprietary products, assert partnerships, certify compliance, or authorize live clinical execution."
+  },
+  {
+    label: "Review Competitive Defense",
+    href: "/competitive-defense",
+    purpose:
+      "Review competitor threat profiles, weakness relief, claims-safe counter-positioning, legal/privacy/cyber controls, and infiltration-deterrence hard stops.",
+    boundary:
+      "Competitive Defense is readiness only; it does not provide legal advice, authorize PHI, certify security, approve penetration testing, assert competitor partnerships, guarantee protection, or authorize live clinical care."
+  },
+  {
     label: "Review Public Market Readiness",
     href: "/public-market-readiness",
     purpose:
@@ -710,6 +955,22 @@ export const buyerActions: BuyerAction[] = [
       "Inspect the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates.",
     boundary:
       "Approvals Readiness organizes evidence and workarounds; it is not legal approval, HIPAA certification, FDA clearance, ONC certification, security certification, PHI authority, or live clinical authority."
+  },
+  {
+    label: "Review Global Certification Readiness",
+    href: "/global-certification-readiness",
+    purpose:
+      "Inspect domestic and global approval preparation across HIPAA/BAA, FDA CDS/SaMD, SOC 2, HITRUST, ISO 27001, ISO 42001, EU AI Act, GDPR, NHS DTAC, MHRA, Australia Essential Eight, and regional buyer gates.",
+    boundary:
+      "Global Certification Readiness organizes future evidence work only; it is not legal advice, certification, conformity, regulatory approval, PHI authority, public-sector approval, reimbursement assurance, or production clinical authority."
+  },
+  {
+    label: "Open Continuous Review & Audit Loop",
+    href: "/continuous-review-audit",
+    purpose:
+      "Inspect 24/7 agent-assisted accuracy review, evidence attribution, claims guard, security drift, QA regression, incident learning, and internal innovation research loops.",
+    boundary:
+      "Continuous Review and Audit improves accuracy and future readiness; it is not managed SOC/MDR coverage, autonomous production remediation, legal advice, certification, PHI authority, live-care authority, or a public quantum capability claim."
   },
   {
     label: "Review Release Continuity",
@@ -803,6 +1064,17 @@ export const buyerActions: BuyerAction[] = [
 
 export const buyerDecisionPaths: BuyerDecisionPath[] = [
   {
+    audience: "Launch owner or executive sponsor",
+    primaryQuestion: "Is SCRIMED structurally, product-wise, service-wise, and functionally ready to launch without confusing sandbox DNS with app failure?",
+    recommendedStart: "Start with Launch Readiness, then inspect Product Console, Release Continuity, Operations, and Navigation Audit.",
+    route: "/launch-readiness",
+    supportingRoutes: ["/product", "/release-continuity", "/operations", "/navigation", "/service-reliability", "/limitations-workarounds", "/pilot-workspace/access"],
+    proof:
+      "Strict branded-domain gate, sandbox DNS classifier, fallback continuity rule, launch tracks, service paths, source/build alignment, product packaging, protected proof boundaries, and hard stops.",
+    boundary:
+      "Launch readiness does not approve launch, bypass sandbox restrictions, create contractual SLAs, authorize PHI, approve connectors, certify compliance, approve customer release, or authorize live clinical care."
+  },
+  {
     audience: "Healthcare executive buyer",
     primaryQuestion: "Can SCRIMED turn fragmented workflows into governed operational intelligence?",
     recommendedStart: "Start with the Product Console and Pilot Evidence Dashboard.",
@@ -825,6 +1097,50 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
       "Readiness metadata is not security approval, legal advice, compliance certification, executed BAA/DPA, or production authorization."
   },
   {
+    audience: "Legal, privacy, cyber, and competitor-defense reviewer",
+    primaryQuestion: "Can SCRIMED harden against competitors and infiltrations without creating legal, privacy, or cybersecurity overclaims?",
+    recommendedStart: "Start with Competitive Defense, then inspect Claims, Trust Center, Global Certification Readiness, Health Records, Platform Power, and TrustOS.",
+    route: "/competitive-defense",
+    supportingRoutes: ["/claims", "/trust-center", "/global-certification-readiness", "/health-records", "/platform-power", "/trust-os", "/release-continuity"],
+    proof:
+      "Competitor threat profiles, weakness relief tracks, legal/privacy/cyber controls, infiltration-deterrence layers, external review gates, no-copy boundaries, no-PHI gates, and no-certification hard stops.",
+    boundary:
+      "Competitive defense is readiness only; it is not legal advice, privacy approval, security certification, penetration-test authorization, competitor partnership, protection guarantee, PHI authority, or live-care authority."
+  },
+  {
+    audience: "QA, audit, and innovation owner",
+    primaryQuestion: "How does SCRIMED keep reviewing accuracy, reducing mistakes, and researching future infrastructure around the clock?",
+    recommendedStart: "Start with Continuous Review and Audit, then inspect QA Evidence, Source Intelligence, and Trust Safety Operations.",
+    route: "/continuous-review-audit",
+    supportingRoutes: ["/qa-evidence", "/source-intelligence", "/trust-safety-operations", "/global-certification-readiness", "/service-reliability"],
+    proof:
+      "Continuous review agents, source-backed loops, audit hard stops, smoke-oriented regression design, incident learning, and internal-only innovation assignments.",
+    boundary:
+      "Agent-assisted review does not replace qualified human approval, managed SOC/MDR coverage, legal review, clinical review, certification, or production remediation authority."
+  },
+  {
+    audience: "Operational efficiency and bottleneck owner",
+    primaryQuestion: "Which gaps, inefficiencies, bottlenecks, and hard stops should SCRIMED resolve first?",
+    recommendedStart: "Start with Operational Efficiency and Limitations Workarounds, then inspect Service Reliability, Navigation Audit, Growth Engine, and Enterprise Business Ops.",
+    route: "/operational-efficiency",
+    supportingRoutes: ["/limitations-workarounds", "/service-reliability", "/enterprise-scalability", "/navigation", "/release-continuity", "/growth-engine", "/enterprise-business-ops", "/continuous-review-audit", "/boundary-resolution"],
+    proof:
+      "Cross-system gap records, safe workaround packets, open-bottleneck pressure, proof-route density, hard-stop visibility, owners, and resolution sprints.",
+    boundary:
+      "Operational efficiency routing is execution discipline only; it is not autonomous remediation, AAL2 bypass, PHI authority, certification, legal/accounting/tax advice, revenue guarantee, profit guarantee, buyer release approval, or clinical authority."
+  },
+  {
+    audience: "Boundary, limitation, or workaround owner",
+    primaryQuestion: "A request is blocked. What can SCRIMED safely do today?",
+    recommendedStart: "Start with Limitations Workarounds, then inspect Boundary Resolution, Operational Efficiency, Platform Power, and Client Onboarding.",
+    route: "/limitations-workarounds",
+    supportingRoutes: ["/boundary-resolution", "/operational-efficiency", "/platform-power", "/client-onboarding", "/health-records", "/qa-claim-guard"],
+    proof:
+      "Issue tracks, workaround packets, escalation triggers, expiration rules, proof routes, hard stops, blocked claims, and graduation gates.",
+    boundary:
+      "Workaround ownership is containment only; it does not create approval, certification, PHI authority, clinical authority, legal/finance advice, live AI authority, public SLA, or buyer release."
+  },
+  {
     audience: "Founder or release operator",
     primaryQuestion: "Is the production release checkpointed, smoke-tested, and safely bounded for protected proof?",
     recommendedStart: "Start with Service Reliability, Navigation Audit, and Release Continuity, then run protected workspace checks from the browser AAL2 session.",
@@ -837,14 +1153,58 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
   },
   {
     audience: "Investor or board reviewer",
-    primaryQuestion: "Is SCRIMED building defensible healthcare intelligence infrastructure with operating discipline?",
-    recommendedStart: "Start with Capital Vitality, Public Market Readiness, and Competitive Edge.",
-    route: "/capital-vitality",
-    supportingRoutes: ["/public-market-readiness", "/competitive-edge", "/market-activation", "/pilot-deal-room"],
+    primaryQuestion: "Is SCRIMED building defensible healthcare intelligence infrastructure with a clear audience-specific capital story?",
+    recommendedStart: "Start with Investor Audience Readiness, then inspect Capital Vitality, Enterprise Business Ops, Public Market Readiness, and Competitive Edge.",
+    route: "/investor-audience-readiness",
+    supportingRoutes: ["/capital-vitality", "/enterprise-business-ops", "/public-market-readiness", "/competitive-edge", "/market-activation", "/pilot-deal-room"],
     proof:
-      "Revenue capability map, moat evidence, investor milestones, funding workstreams, KPI stack, unit economics, customer proof ladder, margin discipline, model-efficiency controls, and buyer-room evidence.",
+      "Weakness relief tracks, audience packets, revenue capability map, margin controls, legal/finance/accounting/tax roles, enterprise controls, moat evidence, investor milestones, KPI stack, unit economics, model-efficiency controls, and buyer-room evidence.",
     boundary:
-      "Investor materials are operating-readiness evidence, not audited financial reporting, securities offering material, valuation assurance, or investment advice."
+      "Investor materials are operating-readiness evidence, not audited financial reporting, securities offering material, solicitation, valuation assurance, legal advice, tax advice, or investment advice."
+  },
+  {
+    audience: "Faith-based clinic investor or mission-led clinic sponsor",
+    primaryQuestion: "Can SCRIMED support clinic stewardship, access, and workflow capacity without overclaiming nonprofit, donor, or clinical authority?",
+    recommendedStart: "Start with Investor Audience Readiness, then inspect FaithCore, Client Onboarding, Market Activation, and Health Records.",
+    route: "/investor-audience-readiness",
+    supportingRoutes: ["/faithcore", "/client-onboarding", "/market-activation", "/health-records", "/limitations-workarounds", "/qa-claim-guard"],
+    proof:
+      "Mission-fit packet, no-PHI clinic workflow assessment, stewardship value map, nonprofit/tax review checklist, communication templates, and blocked-claim controls.",
+    boundary:
+      "Faith-based clinic readiness is not donor advice, tax advice, charitable approval, religious endorsement, PHI authority, production connector approval, reimbursement assurance, or live clinical authority."
+  },
+  {
+    audience: "Legal, finance, and enterprise operators",
+    primaryQuestion: "Can SCRIMED manage enterprise deals, margins, contracts, tax/accounting review, and cash discipline at scale?",
+    recommendedStart: "Start with Enterprise Business Ops and Enterprise Scalability, then inspect Growth Engine, Sales Operations, and Public Market Readiness.",
+    route: "/enterprise-business-ops",
+    supportingRoutes: ["/enterprise-scalability", "/growth-engine", "/sales-operations", "/public-market-readiness", "/capital-vitality", "/pilot-deal-room"],
+    proof:
+      "Deal desk, quote-to-contract approvals, price floors, revenue-recognition triage, billing controls, legal review roles, tax-awareness routing, margin controls, operating cadences, and blocked claims.",
+    boundary:
+      "Business operations evidence is not legal advice, accounting advice, tax advice, audited financial reporting, contract approval, revenue guarantee, profit-margin guarantee, securities material, or customer permission."
+  },
+  {
+    audience: "Enterprise scale, support, and platform operators",
+    primaryQuestion: "Can SCRIMED scale tenants, support, reliability evidence, incident response, regional deployment, and cost controls without overcommitting?",
+    recommendedStart: "Start with Enterprise Scalability and Platform Power, then inspect Service Reliability, Release Continuity, Client Onboarding, and Enterprise Business Ops.",
+    route: "/enterprise-scalability",
+    supportingRoutes: ["/platform-power", "/service-reliability", "/release-continuity", "/client-onboarding", "/enterprise-business-ops", "/operational-efficiency", "/global-certification-readiness"],
+    proof:
+      "Capacity domains, scale controls, API contract readiness, UI command paths, AI model-route controls, workstreams, cadences, bottlenecks, SLO/SLA guardrails, support tier review, region gates, and cost/margin controls.",
+    boundary:
+      "Enterprise scale readiness is not a contractual SLA, uptime guarantee, managed service commitment, production support guarantee, security certification, PHI authority, production connector approval, revenue guarantee, or profit-margin guarantee."
+  },
+  {
+    audience: "API, UI, and AI platform operators",
+    primaryQuestion: "Can SCRIMED make its API, UI, and AI platform feel enterprise-grade without overclaiming live authority?",
+    recommendedStart: "Start with Platform Power, then inspect AgentOS, TrustOS, Navigation Audit, Service Reliability, and Continuous Review.",
+    route: "/platform-power",
+    supportingRoutes: ["/agents", "/trust-os", "/navigation", "/service-reliability", "/continuous-review-audit", "/boundary-resolution", "/enterprise-scalability"],
+    proof:
+      "API contract register, role-based UI command paths, model-route readiness, agent approval controls, eval/red-team loops, evidence retrieval, and platform cost/latency controls.",
+    boundary:
+      "Platform power readiness is not public API SLA approval, live autonomous AI approval, production model routing, PHI processing, EHR access, accessibility certification, security certification, or trillion-dollar-scale equivalence."
   },
   {
     audience: "Clinical transformation operator",
@@ -859,14 +1219,14 @@ export const buyerDecisionPaths: BuyerDecisionPath[] = [
   },
   {
     audience: "Global buyer or channel partner",
-    primaryQuestion: "Which region, buyer pack, partner channel, and procurement path should SCRIMED use?",
-    recommendedStart: "Start with Global Reach and Deployment Profiles.",
-    route: "/global-reach",
-    supportingRoutes: ["/deployment-profiles", "/market-activation", "/pilot-deal-room", "/trust-center"],
+    primaryQuestion: "Which approvals, certifications, region, buyer pack, and procurement path must SCRIMED prepare for?",
+    recommendedStart: "Start with Global Certification Readiness, Global Reach, and Deployment Profiles.",
+    route: "/global-certification-readiness",
+    supportingRoutes: ["/global-reach", "/deployment-profiles", "/market-activation", "/pilot-deal-room", "/trust-center"],
     proof:
-      "Region focus, buyer localization packs, partner channel paths, procurement questions, competitive edge, and retained approval gates.",
+      "Domestic and global approval tracks, official-source evidence implications, region focus, buyer localization packs, partner channel paths, procurement questions, and retained approval gates.",
     boundary:
-      "Global Reach is localization and go-to-market readiness; it is not legal advice, regional regulatory approval, procurement approval, compliance certification, or production clinical authority."
+      "Global Certification Readiness and Global Reach are preparation layers only; they are not legal advice, regional regulatory approval, procurement approval, compliance certification, conformity, PHI authority, or production clinical authority."
   }
 ];
 
@@ -933,21 +1293,53 @@ export function getProductConsoleSummary() {
   const interoperabilitySummary = getInteroperabilitySummary();
   const interoperabilityConformanceSummary = getInteroperabilityConformanceEvaluationSummary();
   const demoPilotProgramSummary = getDemoPilotProgramSummary();
+  const pilotDemoCommercialReadinessSummary = getPilotDemoCommercialReadinessSummary();
   const enterpriseReadinessSummary = getEnterpriseReadinessSummary();
   const protectedPilotWorkspaceSummary = getProtectedPilotWorkspaceSummary();
   const salesOperationsSummary = getSalesOperationsSummary();
   const trustOSSummary = getTrustOSSummary();
   const persistentAgentWorkspaceSummary = getPersistentAgentWorkspaceSummary();
+  const operatingCommandCenterSummary = getScrimedOperatingCommandCenterSummary();
   const strategicPlatformIntelligenceSummary = getStrategicPlatformIntelligenceSummary();
+  const competitiveMarketIntelligenceSummary = getCompetitiveMarketIntelligenceSummary();
   const deploymentProfileSummary = getDeploymentProfileSummary();
   const marketActivationSummary = getMarketActivationSummary();
   const globalPartnerLocalizationSummary = getGlobalPartnerLocalizationSummary();
+  const globalEnterpriseCommandSummary = getGlobalEnterpriseCommandSummary();
   const approvalsReadinessSummary = getApprovalsReadinessSummary();
+  const globalCertificationReadinessSummary = getGlobalCertificationReadinessSummary();
+  const healthcareIntelligenceOSSummary = getHealthcareIntelligenceOSSummary();
+  const healthRecordsSafetyExchangeSummary = getHealthRecordsSafetyExchangeSummary();
+  const continuousReviewAuditSummary = getContinuousReviewAuditSummary();
   const releaseContinuitySummary = getReleaseContinuitySummary();
   const navigationAuditSummary = getNavigationAuditSummary();
   const serviceReliabilitySummary = getServiceReliabilitySummary();
+  const operationalEfficiencySummary = getOperationalEfficiencySummary();
+  const automationAutopilotSummary = getScrimedAutomationAutopilotSummary();
+  const strategicProblemResolutionSummary = getStrategicProblemResolutionSummary();
+  const healthcareOptimizationCommandSummary = getHealthcareOptimizationCommandSummary();
+  const healthcareValueRealizationSummary = getHealthcareValueRealizationSummary();
+  const pilotValueEvidenceSummary = getPilotValueEvidenceSummary();
+  const pilotActivationPlannerSummary = getPilotActivationPlannerSummary();
+  const pilotHandoffCommandSummary = getPilotHandoffCommandSummary();
+  const pilotSuccessReviewCommandSummary = getPilotSuccessReviewCommandSummary();
+  const limitationsWorkaroundSummary = getLimitationsWorkaroundSummary();
+  const investorAudienceReadinessSummary = getInvestorAudienceReadinessSummary();
+  const launchReadinessSummary = getLaunchReadinessSummary();
+  const competitiveDefenseSummary = getCompetitiveDefenseSummary();
   const capitalVitalitySummary = getCapitalVitalitySummary();
   const growthEngineSummary = getGrowthEngineSummary();
+  const companyAssessmentSummary = getCompanyAssessmentSummary();
+  const clinicalProductionReadinessSummary = getClinicalProductionReadinessSummary();
+  const productServicePortfolioSummary = getProductServicePortfolioSummary();
+  const serviceDeliverySummary = getServiceDeliverySummary();
+  const clientOnboardingCommunicationsSummary = getClientOnboardingCommunicationsSummary();
+  const enterpriseBusinessOpsSummary = getEnterpriseBusinessOpsSummary();
+  const enterpriseScalabilityOperationsSummary = getEnterpriseScalabilityOperationsSummary();
+  const platformPowerSummary = getPlatformPowerSummary();
+  const productionArchitectureSummary = getProductionArchitectureSummary();
+  const executionAttemptEnvelopeSummary = getExecutionAttemptEnvelopeSummary();
+  const executionAttemptDurableStoreSummary = getExecutionAttemptDurableStoreSummary();
   const boundaryResolutionSummary = getBoundaryResolutionSummary();
   const clinicalAuthorityReadinessSummary = getClinicalAuthorityReadinessSummary();
   const salesAttributionSummary = getSalesAttributionSummary();
@@ -997,9 +1389,18 @@ export function getProductConsoleSummary() {
     demoApiRoute: demoPilotProgramSummary.demoApiRoute,
     pilotProgramRoute: demoPilotProgramSummary.pilotRoute,
     pilotProgramApiRoute: demoPilotProgramSummary.pilotApiRoute,
+    pilotDemoCommercialReadinessRoute: pilotDemoCommercialReadinessSummary.route,
+    pilotDemoCommercialReadinessApiRoute: pilotDemoCommercialReadinessSummary.apiRoute,
+    pilotDemoCommercialReadinessBriefRoute: pilotDemoCommercialReadinessSummary.briefRoute,
     protectedPilotWorkspaceRoute: protectedPilotWorkspaceSummary.route,
     salesOperationsRoute: salesOperationsSummary.route,
-    healthcareIntelligenceOSRoute: "/healthcare-intelligence-os",
+    healthcareIntelligenceOSRoute: healthcareIntelligenceOSSummary.route,
+    healthcareIntelligenceOSApiRoute: healthcareIntelligenceOSSummary.apiRoute,
+    healthcareIntelligenceOSBriefRoute: "/api/healthcare-intelligence-os/brief",
+    healthRecordsSafetyExchangeRoute: healthRecordsSafetyExchangeSummary.route,
+    healthRecordsSafetyExchangeApiRoute: healthRecordsSafetyExchangeSummary.apiRoute,
+    healthRecordsSafetyExchangeBriefRoute: healthRecordsSafetyExchangeSummary.briefRoute,
+    healthRecordsSafetyExchangeExtractRoute: healthRecordsSafetyExchangeSummary.extractRoute,
     releaseContinuityRoute: releaseContinuitySummary.route,
     releaseContinuityApiRoute: releaseContinuitySummary.apiRoute,
     releaseContinuityBriefRoute: releaseContinuitySummary.briefRoute,
@@ -1009,15 +1410,205 @@ export function getProductConsoleSummary() {
     serviceReliabilityRoute: serviceReliabilitySummary.route,
     serviceReliabilityApiRoute: serviceReliabilitySummary.apiRoute,
     serviceReliabilityBriefRoute: serviceReliabilitySummary.briefRoute,
+    operationalEfficiencyRoute: operationalEfficiencySummary.route,
+    operationalEfficiencyApiRoute: operationalEfficiencySummary.apiRoute,
+    operationalEfficiencyBriefRoute: operationalEfficiencySummary.briefRoute,
+    automationAutopilotSummary,
+    automationAutopilotRoute: automationAutopilotSummary.route,
+    automationAutopilotApiRoute: automationAutopilotSummary.apiRoute,
+    automationAutopilotBriefRoute: automationAutopilotSummary.briefRoute,
+    automationAutopilotCapabilityCount: automationAutopilotSummary.capabilityCount,
+    automationAutopilotAverageReadinessScore:
+      automationAutopilotSummary.averageReadinessScore,
+    automationAutopilotSyntheticAutopilotCount:
+      automationAutopilotSummary.syntheticAutopilotCount,
+    automationAutopilotReviewGatedCount: automationAutopilotSummary.reviewGatedCount,
+    automationAutopilotReviewRequiredCount:
+      automationAutopilotSummary.reviewRequiredCount,
+    automationAutopilotProductionAuthorityBlockedCount:
+      automationAutopilotSummary.productionAuthorityBlockedCount,
+    automationAutopilotBottleneckWorkaroundCount:
+      automationAutopilotSummary.bottleneckWorkaroundCount,
+    strategicProblemResolutionSummary,
+    strategicProblemResolutionRoute: strategicProblemResolutionSummary.route,
+    strategicProblemResolutionApiRoute: strategicProblemResolutionSummary.apiRoute,
+    strategicProblemResolutionBriefRoute: strategicProblemResolutionSummary.briefRoute,
+    strategicProblemResolutionProblemCount: strategicProblemResolutionSummary.problemCount,
+    strategicProblemResolutionCriticalProblemCount:
+      strategicProblemResolutionSummary.criticalProblemCount,
+    strategicProblemResolutionHighProblemCount:
+      strategicProblemResolutionSummary.highProblemCount,
+    strategicProblemResolutionAveragePriorityScore:
+      strategicProblemResolutionSummary.averagePriorityScore,
+    strategicProblemResolutionHumanReviewRequiredCount:
+      strategicProblemResolutionSummary.humanReviewRequiredCount,
+    strategicProblemResolutionExternalApprovalRequiredCount:
+      strategicProblemResolutionSummary.externalApprovalRequiredCount,
+    strategicProblemResolutionProofRouteCount:
+      strategicProblemResolutionSummary.proofRouteCount,
+    healthcareOptimizationCommandSummary,
+    healthcareOptimizationCommandRoute: healthcareOptimizationCommandSummary.route,
+    healthcareOptimizationCommandApiRoute: healthcareOptimizationCommandSummary.apiRoute,
+    healthcareOptimizationCommandBriefRoute: healthcareOptimizationCommandSummary.briefRoute,
+    healthcareOptimizationCommandLaneCount: healthcareOptimizationCommandSummary.laneCount,
+    healthcareOptimizationCommandPlaybookCount:
+      healthcareOptimizationCommandSummary.playbookCount,
+    healthcareOptimizationCommandInnovationTrackCount:
+      healthcareOptimizationCommandSummary.innovationTrackCount,
+    healthcareOptimizationCommandAveragePriorityScore:
+      healthcareOptimizationCommandSummary.averagePriorityScore,
+    healthcareOptimizationCommandAgentCapabilityCount:
+      healthcareOptimizationCommandSummary.agentCapabilityCount,
+    healthcareOptimizationCommandInteroperableStandardCount:
+      healthcareOptimizationCommandSummary.interoperableStandardCount,
+    healthcareOptimizationCommandMeasurableOutcomeCount:
+      healthcareOptimizationCommandSummary.measurableOutcomeCount,
+    healthcareOptimizationCommandHumanReviewRequiredCount:
+      healthcareOptimizationCommandSummary.humanReviewRequiredCount,
+    healthcareOptimizationCommandProofRouteCount:
+      healthcareOptimizationCommandSummary.proofRouteCount,
+    healthcareValueRealizationSummary,
+    healthcareValueRealizationRoute: healthcareValueRealizationSummary.route,
+    healthcareValueRealizationApiRoute: healthcareValueRealizationSummary.apiRoute,
+    healthcareValueRealizationBriefRoute: healthcareValueRealizationSummary.briefRoute,
+    healthcareValueRealizationMetricCount: healthcareValueRealizationSummary.metricCount,
+    healthcareValueRealizationPackageCount: healthcareValueRealizationSummary.packageCount,
+    healthcareValueRealizationRiskControlCount:
+      healthcareValueRealizationSummary.riskControlCount,
+    healthcareValueRealizationAverageEvidenceScore:
+      healthcareValueRealizationSummary.averageEvidenceScore,
+    healthcareValueRealizationHumanReviewRequiredCount:
+      healthcareValueRealizationSummary.humanReviewRequiredCount,
+    healthcareValueRealizationProofRouteCount:
+      healthcareValueRealizationSummary.proofRouteCount,
+    pilotValueEvidenceSummary,
+    pilotValueEvidenceRoute: pilotValueEvidenceSummary.route,
+    pilotValueEvidenceApiRoute: pilotValueEvidenceSummary.apiRoute,
+    pilotValueEvidenceBriefRoute: pilotValueEvidenceSummary.briefRoute,
+    pilotValueEvidenceArtifactCount: pilotValueEvidenceSummary.artifactCount,
+    pilotValueEvidencePacketCount: pilotValueEvidenceSummary.packetCount,
+    pilotValueEvidenceReviewerCheckpointCount:
+      pilotValueEvidenceSummary.reviewerCheckpointCount,
+    pilotValueEvidenceClaimControlCount: pilotValueEvidenceSummary.claimControlCount,
+    pilotValueEvidenceAverageEvidenceScore:
+      pilotValueEvidenceSummary.averageEvidenceScore,
+    pilotValueEvidenceHumanReviewRequiredCount:
+      pilotValueEvidenceSummary.humanReviewRequiredCount,
+    pilotValueEvidenceProofRouteCount: pilotValueEvidenceSummary.proofRouteCount,
+    pilotActivationPlannerSummary,
+    pilotActivationPlannerRoute: pilotActivationPlannerSummary.route,
+    pilotActivationPlannerApiRoute: pilotActivationPlannerSummary.apiRoute,
+    pilotActivationPlannerBriefRoute: pilotActivationPlannerSummary.briefRoute,
+    pilotActivationPlannerStepCount: pilotActivationPlannerSummary.stepCount,
+    pilotActivationPlannerPlanCount: pilotActivationPlannerSummary.planCount,
+    pilotActivationPlannerBlockerCount: pilotActivationPlannerSummary.blockerCount,
+    pilotActivationPlannerHandoffCount: pilotActivationPlannerSummary.handoffCount,
+    pilotActivationPlannerExternalApprovalRequiredCount:
+      pilotActivationPlannerSummary.externalApprovalRequiredCount,
+    pilotActivationPlannerBlockedBeforeLiveCount:
+      pilotActivationPlannerSummary.blockedBeforeLiveCount,
+    pilotActivationPlannerHumanReviewRequiredCount:
+      pilotActivationPlannerSummary.humanReviewRequiredCount,
+    pilotActivationPlannerProofRouteCount:
+      pilotActivationPlannerSummary.proofRouteCount,
+    pilotHandoffCommandSummary,
+    pilotHandoffCommandRoute: pilotHandoffCommandSummary.route,
+    pilotHandoffCommandApiRoute: pilotHandoffCommandSummary.apiRoute,
+    pilotHandoffCommandBriefRoute: pilotHandoffCommandSummary.briefRoute,
+    pilotHandoffCommandPacketCount: pilotHandoffCommandSummary.packetCount,
+    pilotHandoffCommandChecklistCount: pilotHandoffCommandSummary.checklistCount,
+    pilotHandoffCommandRiskControlCount: pilotHandoffCommandSummary.riskControlCount,
+    pilotHandoffCommandReviewRequiredPacketCount:
+      pilotHandoffCommandSummary.reviewRequiredPacketCount,
+    pilotHandoffCommandExternalApprovalRequiredPacketCount:
+      pilotHandoffCommandSummary.externalApprovalRequiredPacketCount,
+    pilotHandoffCommandBlockedBeforeSendPacketCount:
+      pilotHandoffCommandSummary.blockedBeforeSendPacketCount,
+    pilotHandoffCommandHardStopCount: pilotHandoffCommandSummary.hardStopCount,
+    pilotHandoffCommandProofRouteCount: pilotHandoffCommandSummary.proofRouteCount,
+    pilotSuccessReviewCommandSummary,
+    pilotSuccessReviewCommandRoute: pilotSuccessReviewCommandSummary.route,
+    pilotSuccessReviewCommandApiRoute: pilotSuccessReviewCommandSummary.apiRoute,
+    pilotSuccessReviewCommandBriefRoute: pilotSuccessReviewCommandSummary.briefRoute,
+    pilotSuccessReviewCommandReviewPlanCount:
+      pilotSuccessReviewCommandSummary.reviewPlanCount,
+    pilotSuccessReviewCommandEvidenceGapCount:
+      pilotSuccessReviewCommandSummary.evidenceGapCount,
+    pilotSuccessReviewCommandExpansionReadinessCount:
+      pilotSuccessReviewCommandSummary.expansionReadinessCount,
+    pilotSuccessReviewCommandBlockedClaimCount:
+      pilotSuccessReviewCommandSummary.blockedClaimCount,
+    pilotSuccessReviewCommandBlockedBeforeClaimCount:
+      pilotSuccessReviewCommandSummary.blockedBeforeClaimCount,
+    pilotSuccessReviewCommandExternalApprovalRequiredCount:
+      pilotSuccessReviewCommandSummary.externalApprovalRequiredCount,
+    pilotSuccessReviewCommandProofRouteCount:
+      pilotSuccessReviewCommandSummary.proofRouteCount,
+    limitationsWorkaroundRoute: limitationsWorkaroundSummary.route,
+    limitationsWorkaroundApiRoute: limitationsWorkaroundSummary.apiRoute,
+    limitationsWorkaroundBriefRoute: limitationsWorkaroundSummary.briefRoute,
+    launchReadinessRoute: launchReadinessSummary.route,
+    launchReadinessApiRoute: launchReadinessSummary.apiRoute,
+    launchReadinessBriefRoute: launchReadinessSummary.briefRoute,
+    competitiveMarketIntelligenceRoute: competitiveMarketIntelligenceSummary.route,
+    competitiveMarketIntelligenceApiRoute: competitiveMarketIntelligenceSummary.apiRoute,
+    competitiveDefenseRoute: competitiveDefenseSummary.route,
+    competitiveDefenseApiRoute: competitiveDefenseSummary.apiRoute,
+    competitiveDefenseBriefRoute: competitiveDefenseSummary.briefRoute,
+    investorAudienceReadinessRoute: investorAudienceReadinessSummary.route,
+    investorAudienceReadinessApiRoute: investorAudienceReadinessSummary.apiRoute,
+    investorAudienceReadinessBriefRoute: investorAudienceReadinessSummary.briefRoute,
     capitalVitalityRoute: capitalVitalitySummary.route,
     capitalVitalityApiRoute: capitalVitalitySummary.apiRoute,
     capitalVitalityBriefRoute: capitalVitalitySummary.briefRoute,
     growthEngineRoute: growthEngineSummary.route,
     growthEngineApiRoute: growthEngineSummary.apiRoute,
     growthEngineBriefRoute: growthEngineSummary.briefRoute,
+    companyAssessmentRoute: companyAssessmentSummary.route,
+    companyAssessmentApiRoute: companyAssessmentSummary.apiRoute,
+    companyAssessmentBriefRoute: companyAssessmentSummary.briefRoute,
+    clinicalProductionReadinessRoute: clinicalProductionReadinessSummary.route,
+    clinicalProductionReadinessApiRoute: clinicalProductionReadinessSummary.apiRoute,
+    clinicalProductionReadinessBriefRoute: clinicalProductionReadinessSummary.briefRoute,
+    productServicePortfolioRoute: productServicePortfolioSummary.route,
+    productServicePortfolioApiRoute: productServicePortfolioSummary.apiRoute,
+    productServicePortfolioBriefRoute: productServicePortfolioSummary.briefRoute,
+    serviceDeliveryRoute: serviceDeliverySummary.route,
+    serviceDeliveryApiRoute: serviceDeliverySummary.apiRoute,
+    serviceDeliveryBriefRoute: serviceDeliverySummary.briefRoute,
+    clientOnboardingCommunicationsRoute: clientOnboardingCommunicationsSummary.route,
+    clientOnboardingCommunicationsApiRoute: clientOnboardingCommunicationsSummary.apiRoute,
+    clientOnboardingCommunicationsBriefRoute: clientOnboardingCommunicationsSummary.briefRoute,
+    enterpriseBusinessOpsRoute: enterpriseBusinessOpsSummary.route,
+    enterpriseBusinessOpsApiRoute: enterpriseBusinessOpsSummary.apiRoute,
+    enterpriseBusinessOpsBriefRoute: enterpriseBusinessOpsSummary.briefRoute,
+    enterpriseScalabilityOperationsRoute: enterpriseScalabilityOperationsSummary.route,
+    enterpriseScalabilityOperationsApiRoute: enterpriseScalabilityOperationsSummary.apiRoute,
+    enterpriseScalabilityOperationsBriefRoute: enterpriseScalabilityOperationsSummary.briefRoute,
+    platformPowerRoute: platformPowerSummary.route,
+    platformPowerApiRoute: platformPowerSummary.apiRoute,
+    platformPowerBriefRoute: platformPowerSummary.briefRoute,
+    productionArchitectureRoute: productionArchitectureSummary.route,
+    productionArchitectureApiRoute: productionArchitectureSummary.apiRoute,
+    productionArchitectureBriefRoute: productionArchitectureSummary.briefRoute,
+    executionAttemptEnvelopeRoute: executionAttemptEnvelopeSummary.route,
+    executionAttemptEnvelopeApiRoute: executionAttemptEnvelopeSummary.apiRoute,
+    executionAttemptEnvelopeBriefRoute: executionAttemptEnvelopeSummary.briefRoute,
+    executionAttemptDurableStoreApiRoute: executionAttemptDurableStoreSummary.apiRoute,
+    executionAttemptDurableStoreBriefRoute: executionAttemptDurableStoreSummary.briefRoute,
+    executionAttemptDurableStoreRecordRoute: executionAttemptDurableStoreSummary.recordRoute,
+    executionAttemptDurableStoreReplayRoute: executionAttemptDurableStoreSummary.replayRoute,
+    executionAttemptDurableStoreReviewDispositionRoute:
+      executionAttemptDurableStoreSummary.reviewDispositionRoute,
     approvalsReadinessRoute: approvalsReadinessSummary.route,
     approvalsReadinessApiRoute: approvalsReadinessSummary.apiRoute,
     approvalsReadinessBriefRoute: approvalsReadinessSummary.briefRoute,
+    globalCertificationReadinessRoute: globalCertificationReadinessSummary.route,
+    globalCertificationReadinessApiRoute: globalCertificationReadinessSummary.apiRoute,
+    globalCertificationReadinessBriefRoute: globalCertificationReadinessSummary.briefRoute,
+    continuousReviewAuditRoute: continuousReviewAuditSummary.route,
+    continuousReviewAuditApiRoute: continuousReviewAuditSummary.apiRoute,
+    continuousReviewAuditBriefRoute: continuousReviewAuditSummary.briefRoute,
     clinicalAuthorityReadinessRoute: clinicalAuthorityReadinessSummary.route,
     clinicalAuthorityReadinessApiRoute: clinicalAuthorityReadinessSummary.apiRoute,
     clinicalAuthorityReadinessBriefRoute: clinicalAuthorityReadinessSummary.briefRoute,
@@ -1141,6 +1732,25 @@ export function getProductConsoleSummary() {
     protectedAuthorityArtifactReferencePacketApiRoute:
       "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet",
     persistentAgentWorkspaceRoute: persistentAgentWorkspaceSummary.route,
+    operatingCommandCenterSummary,
+    operatingCommandCenterRoute: operatingCommandCenterSummary.apiRoute.replace("/api", ""),
+    operatingCommandCenterApiRoute: operatingCommandCenterSummary.apiRoute,
+    operatingCommandCenterBriefRoute: operatingCommandCenterSummary.briefRoute,
+    operatingCommandCenterLaneCount: operatingCommandCenterSummary.laneCount,
+    operatingCommandCenterP0LaneCount: operatingCommandCenterSummary.p0LaneCount,
+    operatingCommandCenterHighControlLaneCount:
+      operatingCommandCenterSummary.highControlLaneCount,
+    operatingCommandCenterEvidencePacketCount:
+      operatingCommandCenterSummary.evidencePacketCount,
+    operatingCommandCenterProtectedEvidencePacketCount:
+      operatingCommandCenterSummary.protectedOperatorEvidencePacketCount,
+    operatingCommandCenterBoundaryReleaseEvidencePacketCount:
+      operatingCommandCenterSummary.boundaryReleaseEvidencePacketCount,
+    operatingCommandCenterSyntheticCompleteEvidencePacketCount:
+      operatingCommandCenterSummary.syntheticCompleteEvidencePacketCount,
+    operatingCommandCenterValidationStatus: operatingCommandCenterSummary.validation.status,
+    operatingCommandCenterNextBuildStep:
+      operatingCommandCenterSummary.recommendedNextBuildStep,
     strategicIntelligenceRoute: strategicPlatformIntelligenceSummary.route,
     strategicIntelligenceApiRoute: strategicPlatformIntelligenceSummary.apiRoute,
     deploymentProfilesRoute: deploymentProfileSummary.route,
@@ -1150,6 +1760,23 @@ export function getProductConsoleSummary() {
     globalReachRoute: globalPartnerLocalizationSummary.route,
     globalReachApiRoute: globalPartnerLocalizationSummary.apiRoute,
     globalReachBriefRoute: globalPartnerLocalizationSummary.briefRoute,
+    globalEnterpriseCommandSummary,
+    globalEnterpriseCommandRoute: globalEnterpriseCommandSummary.route,
+    globalEnterpriseCommandApiRoute: globalEnterpriseCommandSummary.apiRoute,
+    globalEnterpriseCommandBriefRoute: globalEnterpriseCommandSummary.briefRoute,
+    globalEnterpriseCommandRegionCount: globalEnterpriseCommandSummary.regionCommandCount,
+    globalEnterpriseCommandLaunchRegionCount:
+      globalEnterpriseCommandSummary.launchRegionCommandCount,
+    globalEnterpriseCommandStrategicRegionCount:
+      globalEnterpriseCommandSummary.strategicRegionCommandCount,
+    globalEnterpriseCommandSalesPlaybookCount:
+      globalEnterpriseCommandSummary.salesPlaybookCount,
+    globalEnterpriseCommandInteroperabilityLaneCount:
+      globalEnterpriseCommandSummary.interoperabilityLaneCount,
+    globalEnterpriseCommandCommunicationLaneCount:
+      globalEnterpriseCommandSummary.communicationLaneCount,
+    globalEnterpriseCommandAverageReadinessScore:
+      globalEnterpriseCommandSummary.averageRegionReadinessScore,
     boundaryResolutionRoute: boundaryResolutionSummary.route,
     boundaryResolutionApiRoute: boundaryResolutionSummary.apiRoute,
     boundaryResolutionBriefRoute: boundaryResolutionSummary.briefRoute,
@@ -1244,6 +1871,95 @@ export function getProductConsoleSummary() {
       serviceReliabilitySummary.externalReviewControlCount,
     serviceReliabilityProtectedGateControlCount:
       serviceReliabilitySummary.protectedGateControlCount,
+    operationalEfficiencyRecordCount: operationalEfficiencySummary.recordCount,
+    operationalEfficiencyOpenBottleneckCount: operationalEfficiencySummary.openBottleneckCount,
+    operationalEfficiencySprintCount: operationalEfficiencySummary.sprintCount,
+    operationalEfficiencyHardStopCount: operationalEfficiencySummary.hardStopCount,
+    operationalEfficiencyProofRouteCount: operationalEfficiencySummary.proofRouteCount,
+    operationalEfficiencyOwnerCount: operationalEfficiencySummary.ownerCount,
+    operationalEfficiencyMetricCount: operationalEfficiencySummary.metricCount,
+    operationalEfficiencyDiscrepancyFaultTriageCount:
+      operationalEfficiencySummary.discrepancyFaultTriageCount,
+    limitationsWorkaroundTrackCount: limitationsWorkaroundSummary.trackCount,
+    limitationsWorkaroundPacketCount: limitationsWorkaroundSummary.packetCount,
+    limitationsWorkaroundBoundaryEscalationCount:
+      limitationsWorkaroundSummary.boundaryEscalationCount,
+    limitationsResolutionWorkOrderCount:
+      limitationsWorkaroundSummary.resolutionWorkOrderCount,
+    limitationsUnresolvedResolutionWorkOrderCount:
+      limitationsWorkaroundSummary.unresolvedResolutionWorkOrderCount,
+    limitationsWorkaroundExecutionLedgerCount:
+      limitationsWorkaroundSummary.executionLedgerCount,
+    limitationsWorkaroundResolvedExecutionLedgerCount:
+      limitationsWorkaroundSummary.resolvedExecutionLedgerCount,
+    limitationsWorkaroundOpenRiskCount: limitationsWorkaroundSummary.openRiskCount,
+    limitationsWorkaroundCriticalTrackCount: limitationsWorkaroundSummary.criticalTrackCount,
+    limitationsWorkaroundHardStopCount: limitationsWorkaroundSummary.hardStopCount,
+    limitationsWorkaroundProofRouteCount: limitationsWorkaroundSummary.proofRouteCount,
+    launchReadinessTrackCount: launchReadinessSummary.launchTrackCount,
+    launchReadinessReadyTrackCount: launchReadinessSummary.readyTrackCount,
+    launchReadinessContainedTrackCount: launchReadinessSummary.containedTrackCount,
+    launchReadinessOperatorRequiredTrackCount: launchReadinessSummary.operatorRequiredTrackCount,
+    launchReadinessExternalReviewTrackCount:
+      launchReadinessSummary.externalReviewRequiredTrackCount,
+    launchReadinessDnsControlCount: launchReadinessSummary.dnsControlCount,
+    launchReadinessServicePathCount: launchReadinessSummary.servicePathCount,
+    launchReadinessRiskCount: launchReadinessSummary.riskCount,
+    launchReadinessHighRiskCount: launchReadinessSummary.highRiskCount,
+    launchReadinessHardStopCount: launchReadinessSummary.hardStopCount,
+    competitiveMarketSourceCount: competitiveMarketIntelligenceSummary.sourceCount,
+    competitiveMarketBuildPatternCount: competitiveMarketIntelligenceSummary.patternCount,
+    competitiveMarketInitiativeCount: competitiveMarketIntelligenceSummary.initiativeCount,
+    competitiveTargetAudienceStrategyCount:
+      competitiveMarketIntelligenceSummary.targetAudienceStrategyCount,
+    competitiveTargetAudienceSegmentCount:
+      competitiveMarketIntelligenceSummary.targetAudienceSegmentCount,
+    competitiveTargetAudienceProofRouteCount:
+      competitiveMarketIntelligenceSummary.targetAudienceProofRouteCount,
+    competitiveTargetAudienceBlockedClaimCount:
+      competitiveMarketIntelligenceSummary.targetAudienceBlockedClaimCount,
+    competitiveDefenseThreatProfileCount: competitiveDefenseSummary.competitorThreatProfileCount,
+    competitiveDefenseStrengthHardeningTrackCount:
+      competitiveDefenseSummary.strengthHardeningTrackCount,
+    competitiveDefenseLegalPrivacyCyberControlCount:
+      competitiveDefenseSummary.legalPrivacyCyberControlCount,
+    competitiveDefenseInfiltrationDeterrenceLayerCount:
+      competitiveDefenseSummary.infiltrationDeterrenceLayerCount,
+    competitiveDefenseExternalReviewGateCount: competitiveDefenseSummary.externalReviewGateCount,
+    competitiveDefenseHardenNowCount: competitiveDefenseSummary.hardenNowCount,
+    competitiveDefenseExternalReviewRequiredCount:
+      competitiveDefenseSummary.externalReviewRequiredCount,
+    competitiveDefenseHardStopCount: competitiveDefenseSummary.hardStopCount,
+    investorAudienceWeaknessTrackCount: investorAudienceReadinessSummary.weaknessTrackCount,
+    investorAudienceHighWeaknessCount: investorAudienceReadinessSummary.highWeaknessCount,
+    investorAudienceCompetitiveEdgeSignalCount:
+      investorAudienceReadinessSummary.competitiveEdgeSignalCount,
+    investorAudiencePacketCount: investorAudienceReadinessSummary.audiencePacketCount,
+    investorAudienceReadyNowPacketCount: investorAudienceReadinessSummary.readyNowAudienceCount,
+    investorAudienceExternalReviewPacketCount:
+      investorAudienceReadinessSummary.externalReviewAudienceCount,
+    investorAudienceReadinessGateCount: investorAudienceReadinessSummary.readinessGateCount,
+    investorAudienceBlockedClaimCount: investorAudienceReadinessSummary.blockedClaimCount,
+    healthcareIntelligenceClinicalWorkflowTrackCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.trackCount,
+    healthcareIntelligencePatientSafetyControlCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.patientSafetyControlCount,
+    healthcareIntelligencePatientEngagementSignalCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.patientEngagementAnalysisSignalCount,
+    healthcareIntelligenceInteroperabilityBindingCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.interoperabilityBindingCount,
+    healthcareIntelligenceClinicianBurdenReductionCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.clinicianBurdenReductionMotionCount,
+    healthcareIntelligenceOperationsOptimizationLeverCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.operationsOptimizationLeverCount,
+    healthcareIntelligenceWorkflowBlockedActionCount:
+      healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.blockedActionCount,
+    healthRecordsCapabilityCount: healthRecordsSafetyExchangeSummary.capabilityCount,
+    healthRecordsSafetyCheckCount: healthRecordsSafetyExchangeSummary.safetyCheckCount,
+    healthRecordsBoundaryResolutionCount:
+      healthRecordsSafetyExchangeSummary.boundaryResolutionCount,
+    healthRecordsWorkaroundCount: healthRecordsSafetyExchangeSummary.workaroundCount,
+    healthRecordsBlockedActionCount: healthRecordsSafetyExchangeSummary.blockedActionCount,
     capitalVitalityRevenueCapabilityCount: capitalVitalitySummary.revenueCapabilityCount,
     capitalVitalityPackagedRevenueCapabilityCount:
       capitalVitalitySummary.packagedRevenueCapabilityCount,
@@ -1267,12 +1983,177 @@ export function getProductConsoleSummary() {
     growthEngineProofLadderStepCount: growthEngineSummary.proofLadderStepCount,
     growthEngineBottleneckCount: growthEngineSummary.growthBottleneckCount,
     growthEngineProofRouteCount: growthEngineSummary.proofRouteCount,
+    companyAssessmentOverallScore: companyAssessmentSummary.overallScore,
+    companyAssessmentDimensionCount: companyAssessmentSummary.dimensionCount,
+    companyAssessmentStrongDimensionCount: companyAssessmentSummary.strongDimensionCount,
+    companyAssessmentWatchDimensionCount: companyAssessmentSummary.watchDimensionCount,
+    companyAssessmentUpgradeNowDimensionCount: companyAssessmentSummary.upgradeNowDimensionCount,
+    companyAssessmentExternalReviewDimensionCount:
+      companyAssessmentSummary.externalReviewDimensionCount,
+    companyAssessmentProtectedGatedDimensionCount:
+      companyAssessmentSummary.protectedGatedDimensionCount,
+    companyAssessmentWeaknessCount: companyAssessmentSummary.weaknessCount,
+    companyAssessmentCriticalWeaknessCount: companyAssessmentSummary.criticalWeaknessCount,
+    companyAssessmentHighWeaknessCount: companyAssessmentSummary.highWeaknessCount,
+    companyAssessmentUpgradeWorkstreamCount: companyAssessmentSummary.upgradeWorkstreamCount,
+    companyAssessmentAuditFindingCount: companyAssessmentSummary.auditFindingCount,
+    companyAssessmentRevenueBuilderCount: companyAssessmentSummary.revenueBuilderCount,
+    companyAssessmentCompetitiveEdgeAmplifierCount:
+      companyAssessmentSummary.competitiveEdgeAmplifierCount,
+    companyAssessmentImprovementPriorityCount: companyAssessmentSummary.improvementPriorityCount,
+    companyAssessmentMissingCapabilityClosureCount:
+      companyAssessmentSummary.missingCapabilityClosureCount,
+    companyAssessmentCriticalMissingCapabilityClosureCount:
+      companyAssessmentSummary.criticalMissingCapabilityClosureCount,
+    companyAssessmentHardStopCount: companyAssessmentSummary.hardStopCount,
+    companyAssessmentTeamLaneCount: companyAssessmentSummary.teamLaneCount,
+    companyAssessmentEvidenceRouteCount: companyAssessmentSummary.evidenceRouteCount,
+    clinicalProductionReady: clinicalProductionReadinessSummary.clinicalProductionReady,
+    clinicalProductionReadinessScore: clinicalProductionReadinessSummary.readinessScore,
+    clinicalProductionTaskCount: clinicalProductionReadinessSummary.taskCount,
+    clinicalProductionIncompleteTaskCount: clinicalProductionReadinessSummary.incompleteTaskCount,
+    clinicalProductionCriticalOpenTaskCount: clinicalProductionReadinessSummary.criticalOpenTaskCount,
+    clinicalProductionExternalReviewTaskCount:
+      clinicalProductionReadinessSummary.externalReviewTaskCount,
+    clinicalProductionBlockedTaskCount: clinicalProductionReadinessSummary.blockedTaskCount,
+    clinicalProductionCurrentCapabilityMotionCount:
+      clinicalProductionReadinessSummary.currentCapabilityMotionCount,
+    clinicalProductionActivateNowMotionCount:
+      clinicalProductionReadinessSummary.activateNowMotionCount,
+    clinicalProductionGateCount: clinicalProductionReadinessSummary.gateCount,
+    clinicalProductionSourceReferenceCount:
+      clinicalProductionReadinessSummary.sourceReferenceCount,
+    productServicePortfolioOfferCount: productServicePortfolioSummary.offerCount,
+    productServicePortfolioSellableNowOfferCount:
+      productServicePortfolioSummary.sellableNowOfferCount,
+    productServicePortfolioPackageCount: productServicePortfolioSummary.packageCount,
+    productServicePortfolioMarginControlCount:
+      productServicePortfolioSummary.marginControlCount,
+    productServicePortfolioBoundaryResolutionCount:
+      productServicePortfolioSummary.boundaryResolutionCount,
+    productServicePortfolioProofRouteCount: productServicePortfolioSummary.proofRouteCount,
+    productServicePortfolioBlockedClaimCount: productServicePortfolioSummary.blockedClaimCount,
+    productServicePortfolioDeliveryPlaybookCount:
+      productServicePortfolioSummary.deliveryPlaybookCount,
+    serviceDeliveryOfferCount: serviceDeliverySummary.deliveryOfferCount,
+    serviceDeliveryPhaseCount: serviceDeliverySummary.phaseCount,
+    serviceDeliveryWorkOrderTemplateCount: serviceDeliverySummary.workOrderTemplateCount,
+    serviceDeliveryArtifactCount: serviceDeliverySummary.artifactCount,
+    serviceDeliveryActivationGateCount: serviceDeliverySummary.activationGateCount,
+    serviceDeliveryBlockedBeforeApprovalGateCount:
+      serviceDeliverySummary.blockedBeforeApprovalGateCount,
+    serviceDeliveryPackageBindingCount: serviceDeliverySummary.packageBindingCount,
+    serviceDeliveryEvidenceRouteCount: serviceDeliverySummary.evidenceRouteCount,
+    serviceDeliveryAcceptanceCriteriaCount: serviceDeliverySummary.acceptanceCriteriaCount,
+    serviceDeliveryMarginProtectionCount: serviceDeliverySummary.marginProtectionCount,
+    serviceDeliveryHardStopCount: serviceDeliverySummary.hardStopCount,
+    clientOnboardingStageCount: clientOnboardingCommunicationsSummary.stageCount,
+    clientOnboardingTemplateCount: clientOnboardingCommunicationsSummary.templateCount,
+    clientOnboardingCalendarPacketCount:
+      clientOnboardingCommunicationsSummary.calendarPacketCount,
+    clientOnboardingMeetingCadenceCount:
+      clientOnboardingCommunicationsSummary.meetingCadenceCount,
+    clientOnboardingPresentationPacketCount:
+      clientOnboardingCommunicationsSummary.presentationPacketCount,
+    clientOnboardingControlCount: clientOnboardingCommunicationsSummary.controlCount,
+    clientOnboardingHandoffCount: clientOnboardingCommunicationsSummary.handoffCount,
+    clientOnboardingBlockedContentCount:
+      clientOnboardingCommunicationsSummary.blockedContentCount,
+    clientOnboardingProofRouteCount: clientOnboardingCommunicationsSummary.proofRouteCount,
+    enterpriseBusinessOpsRevenueCapabilityCount:
+      enterpriseBusinessOpsSummary.revenueCapabilityCount,
+    enterpriseBusinessOpsMarginControlCount: enterpriseBusinessOpsSummary.marginControlCount,
+    enterpriseBusinessOpsTeamRoleCount: enterpriseBusinessOpsSummary.teamRoleCount,
+    enterpriseBusinessOpsLegalRoleCount: enterpriseBusinessOpsSummary.legalRoleCount,
+    enterpriseBusinessOpsFinanceAccountingTaxRoleCount:
+      enterpriseBusinessOpsSummary.financeAccountingTaxRoleCount,
+    enterpriseBusinessOpsEnterpriseControlCount:
+      enterpriseBusinessOpsSummary.enterpriseControlCount,
+    enterpriseBusinessOpsOperatingCadenceCount:
+      enterpriseBusinessOpsSummary.operatingCadenceCount,
+    enterpriseBusinessOpsProfitLeverCount: enterpriseBusinessOpsSummary.profitLeverCount,
+    enterpriseBusinessOpsBlockedClaimCount: enterpriseBusinessOpsSummary.blockedClaimCount,
+    enterpriseBusinessOpsSourceCount: enterpriseBusinessOpsSummary.sourceCount,
+    enterpriseBusinessOpsOfficialSourceCount: enterpriseBusinessOpsSummary.officialSourceCount,
+    enterpriseScalabilityDomainCount: enterpriseScalabilityOperationsSummary.domainCount,
+    enterpriseScalabilityControlCount: enterpriseScalabilityOperationsSummary.controlCount,
+    enterpriseScalabilityWorkstreamCount: enterpriseScalabilityOperationsSummary.workstreamCount,
+    enterpriseScalabilityCadenceCount: enterpriseScalabilityOperationsSummary.cadenceCount,
+    enterpriseScalabilityBottleneckCount: enterpriseScalabilityOperationsSummary.bottleneckCount,
+    enterpriseScalabilityOpenBottleneckCount:
+      enterpriseScalabilityOperationsSummary.openBottleneckCount,
+    enterpriseScalabilityProofRouteCount: enterpriseScalabilityOperationsSummary.proofRouteCount,
+    enterpriseScalabilityHardStopCount: enterpriseScalabilityOperationsSummary.hardStopCount,
+    enterpriseScalabilityBlockedClaimCount: enterpriseScalabilityOperationsSummary.blockedClaimCount,
+    platformPowerPillarCount: platformPowerSummary.pillarCount,
+    platformPowerControlCount: platformPowerSummary.controlCount,
+    platformPowerWorkstreamCount: platformPowerSummary.workstreamCount,
+    platformPowerCadenceCount: platformPowerSummary.cadenceCount,
+    platformPowerBottleneckCount: platformPowerSummary.bottleneckCount,
+    platformPowerOpenBottleneckCount: platformPowerSummary.openBottleneckCount,
+    platformPowerProofRouteCount: platformPowerSummary.proofRouteCount,
+    platformPowerHardStopCount: platformPowerSummary.hardStopCount,
+    platformPowerBlockedClaimCount: platformPowerSummary.blockedClaimCount,
+    productionArchitectureLayerCount: productionArchitectureSummary.layerCount,
+    productionArchitectureModelProviderCount: productionArchitectureSummary.modelProviderCount,
+    productionArchitectureContextDomainCount: productionArchitectureSummary.contextDomainCount,
+    productionArchitectureTrustControlCount: productionArchitectureSummary.trustControlCount,
+    productionArchitectureEvaluationScenarioCount:
+      productionArchitectureSummary.evaluationScenarioCount,
+    productionArchitectureClinSecOpsControlCount:
+      productionArchitectureSummary.clinSecOpsControlCount,
+    productionArchitectureWorkflowTrackCount: productionArchitectureSummary.workflowTrackCount,
+    productionArchitectureBlockedAutonomyCount: productionArchitectureSummary.blockedAutonomyCount,
+    productionArchitectureValidationStatus: productionArchitectureSummary.validation.status,
+    executionAttemptEnvelopeCount: executionAttemptEnvelopeSummary.envelopeCount,
+    executionAttemptEnvelopeAcceptedCount:
+      executionAttemptEnvelopeSummary.acceptedEnvelopeCount,
+    executionAttemptEnvelopeReplayReadyCount: executionAttemptEnvelopeSummary.replayReadyCount,
+    executionAttemptEnvelopeModelRouteTelemetryCount:
+      executionAttemptEnvelopeSummary.modelRouteTelemetryCount,
+    executionAttemptEnvelopeHumanReviewGateCount:
+      executionAttemptEnvelopeSummary.humanReviewGateCount,
+    executionAttemptEnvelopeScorecardCount: executionAttemptEnvelopeSummary.scorecardCount,
+    executionAttemptEnvelopePassingScorecardCount:
+      executionAttemptEnvelopeSummary.passingScorecardCount,
+    executionAttemptEnvelopeBlockedCapabilityCount:
+      executionAttemptEnvelopeSummary.blockedCapabilityCount,
+    executionAttemptEnvelopeReleaseDecision:
+      executionAttemptEnvelopeSummary.releaseDecision,
+    executionAttemptDurableStoreRecordableEnvelopeCount:
+      executionAttemptDurableStoreSummary.recordableEnvelopeCount,
+    executionAttemptDurableStorePriorityCount:
+      executionAttemptDurableStoreSummary.healthcareAIPriorityCount,
+    executionAttemptDurableStoreValidationStatus:
+      executionAttemptDurableStoreSummary.validation.status,
     approvalsReadinessStatus: approvalsReadinessSummary.status,
     approvalsReadinessTrackCount: approvalsReadinessSummary.trackCount,
     approvalsReadinessAgentControlCount: approvalsReadinessSummary.agentControlCount,
     approvalsReadinessExternalReviewCount: approvalsReadinessSummary.externalReviewCount,
     approvalsReadinessBlockedBeforeApprovalCount:
       approvalsReadinessSummary.blockedBeforeApprovalCount,
+    globalCertificationReadinessStatus: globalCertificationReadinessSummary.status,
+    globalCertificationReadinessTrackCount: globalCertificationReadinessSummary.trackCount,
+    globalCertificationReadinessSourceCount: globalCertificationReadinessSummary.sourceCount,
+    globalCertificationReadinessGateCount: globalCertificationReadinessSummary.gateCount,
+    globalCertificationReadinessRegionalPackCount:
+      globalCertificationReadinessSummary.regionalPackCount,
+    globalCertificationReadinessBlockedClaimCount:
+      globalCertificationReadinessSummary.blockedClaimCount,
+    globalCertificationReadinessExternalReviewCount:
+      globalCertificationReadinessSummary.externalReviewRequiredCount,
+    continuousReviewAuditStatus: continuousReviewAuditSummary.status,
+    continuousReviewAuditAgentCount: continuousReviewAuditSummary.agentCount,
+    continuousReviewAuditLoopCount: continuousReviewAuditSummary.loopCount,
+    continuousReviewAuditControlCount: continuousReviewAuditSummary.controlCount,
+    continuousReviewAuditInnovationTrackCount:
+      continuousReviewAuditSummary.innovationTrackCount,
+    continuousReviewAuditInternalResearchAssignmentCount:
+      continuousReviewAuditSummary.internalResearchAssignmentCount,
+    continuousReviewAuditSourceCount: continuousReviewAuditSummary.sourceCount,
+    continuousReviewAuditBlockedClaimCount: continuousReviewAuditSummary.blockedClaimCount,
+    continuousReviewAuditHumanReviewRequiredAgentCount:
+      continuousReviewAuditSummary.humanReviewRequiredAgentCount,
     clinicalAuthorityReadinessStatus: clinicalAuthorityReadinessSummary.status,
     clinicalAuthorityDomainCount: clinicalAuthorityReadinessSummary.authorityDomainCount,
     clinicalAuthorityBoundaryResolutionCount:
@@ -1339,6 +2220,18 @@ export function getProductConsoleSummary() {
     demoCount: demoPilotProgramSummary.demoCount,
     executableDemos: demoPilotProgramSummary.executableDemos,
     pilotProgramCount: demoPilotProgramSummary.pilotCount,
+    pilotDemoCommercialReadinessDemoPathCount:
+      pilotDemoCommercialReadinessSummary.demoPathCount,
+    pilotDemoCommercialReadinessMarketBenchmarkCount:
+      pilotDemoCommercialReadinessSummary.marketBenchmarkCount,
+    pilotDemoCommercialReadinessConversionStepCount:
+      pilotDemoCommercialReadinessSummary.conversionStepCount,
+    pilotDemoCommercialReadinessPricingAlignmentCount:
+      pilotDemoCommercialReadinessSummary.pricingAlignmentCount,
+    pilotDemoCommercialReadinessHardStopCount:
+      pilotDemoCommercialReadinessSummary.hardStopCount,
+    pilotDemoCommercialReadinessStandardPathScore:
+      pilotDemoCommercialReadinessSummary.standardPathScore,
     workflowCount: productWorkflows.length,
     workflowEngineCount: workflowEngineExamples.length,
     buyerPilotRoomCompetitiveEdgeCount: buyerPilotRoomCompetitiveEdges.length,
@@ -1349,6 +2242,26 @@ export function getProductConsoleSummary() {
     persistentAgentWorkspaceWorkOrderCount: persistentAgentWorkspaceSummary.workOrderCount,
     persistentAgentWorkspaceLimitationCount: persistentAgentWorkspaceSummary.limitationCount,
     strategicIntelligencePatternCount: strategicPlatformIntelligenceSummary.patternCount,
+    strategicExecutionBetCount: strategicPlatformIntelligenceSummary.executionBetCount,
+    strategicDecisionGateCount: strategicPlatformIntelligenceSummary.decisionGateCount,
+    strategicExecutionCommandCount: strategicPlatformIntelligenceSummary.executionCommandCount,
+    strategicCriticalExecutionCommandCount:
+      strategicPlatformIntelligenceSummary.criticalExecutionCommandCount,
+    strategicThisWeekExecutionCommandCount:
+      strategicPlatformIntelligenceSummary.thisWeekExecutionCommandCount,
+    strategicExecutionCommandProofRouteCount:
+      strategicPlatformIntelligenceSummary.executionCommandProofRouteCount,
+    strategicExecutionCommandBlockedExpansionCount:
+      strategicPlatformIntelligenceSummary.executionCommandBlockedExpansionCount,
+    strategicExecutionScorecardCount: strategicPlatformIntelligenceSummary.executionScorecardCount,
+    strategicActiveExecutionScorecardCount:
+      strategicPlatformIntelligenceSummary.activeExecutionScorecardCount,
+    strategicProofReadyExecutionScorecardCount:
+      strategicPlatformIntelligenceSummary.proofReadyExecutionScorecardCount,
+    strategicExternalReviewExecutionScorecardCount:
+      strategicPlatformIntelligenceSummary.externalReviewExecutionScorecardCount,
+    strategicExecutionScorecardMissingProofCount:
+      strategicPlatformIntelligenceSummary.executionScorecardMissingProofCount,
     deploymentProfileCount: deploymentProfileSummary.profileCount,
     revenueStreamCount: marketActivationSummary.revenueStreamCount,
     targetAudienceCount: marketActivationSummary.targetAudienceCount,
@@ -1425,6 +2338,7 @@ export function getProductConsoleSummary() {
     companyOperationsSummary,
     enterpriseReadinessSummary,
     demoPilotProgramSummary,
+    pilotDemoCommercialReadinessSummary,
     interoperabilitySummary,
     interoperabilityConformanceSummary,
     protectedPilotWorkspaceSummary,
@@ -1436,11 +2350,31 @@ export function getProductConsoleSummary() {
     marketActivationSummary,
     globalPartnerLocalizationSummary,
     releaseContinuitySummary,
+    healthcareIntelligenceOSSummary,
+    healthRecordsSafetyExchangeSummary,
     navigationAuditSummary,
     serviceReliabilitySummary,
+    operationalEfficiencySummary,
+    limitationsWorkaroundSummary,
+    launchReadinessSummary,
+    competitiveMarketIntelligenceSummary,
+    competitiveDefenseSummary,
     capitalVitalitySummary,
+    companyAssessmentSummary,
+    clinicalProductionReadinessSummary,
+    productServicePortfolioSummary,
+    serviceDeliverySummary,
+    clientOnboardingCommunicationsSummary,
     approvalsReadinessSummary,
+    globalCertificationReadinessSummary,
+    continuousReviewAuditSummary,
     boundaryResolutionSummary,
+    enterpriseBusinessOpsSummary,
+    enterpriseScalabilityOperationsSummary,
+    platformPowerSummary,
+    productionArchitectureSummary,
+    executionAttemptEnvelopeSummary,
+    executionAttemptDurableStoreSummary,
     clinicalAuthorityReadinessSummary,
     salesAttributionSummary,
     attributionAnalyticsSummary,
@@ -1460,6 +2394,7 @@ export function getProductConsoleSummary() {
     qaManualExecutionConsoleSummary,
     clinicalCareActivationSummary,
     publicMarketReadinessSummary,
+    investorAudienceReadinessSummary,
     growthEngineSummary,
     proofStack: {
       releaseContinuity: releaseContinuityProofStackStatus,
@@ -1468,12 +2403,75 @@ export function getProductConsoleSummary() {
       navigationAuditBrief: navigationAuditBriefProofStackStatus,
       serviceReliability: serviceReliabilityProofStackStatus,
       serviceReliabilityBrief: serviceReliabilityBriefProofStackStatus,
+      operationalEfficiency: operationalEfficiencyStatus,
+      operationalEfficiencyBrief: operationalEfficiencyBriefStatus,
+      automationAutopilot: scrimedAutomationAutopilotStatus,
+      automationAutopilotBrief: scrimedAutomationAutopilotBriefStatus,
+      strategicProblemResolution: strategicProblemResolutionStatus,
+      strategicProblemResolutionBrief: strategicProblemResolutionBriefStatus,
+      healthcareOptimizationCommand: healthcareOptimizationCommandStatus,
+      healthcareOptimizationCommandBrief: healthcareOptimizationCommandBriefStatus,
+      healthcareValueRealization: healthcareValueRealizationStatus,
+      healthcareValueRealizationBrief: healthcareValueRealizationBriefStatus,
+      pilotValueEvidence: pilotValueEvidenceStatus,
+      pilotValueEvidenceBrief: pilotValueEvidenceBriefStatus,
+      pilotActivationPlanner: pilotActivationPlannerStatus,
+      pilotActivationPlannerBrief: pilotActivationPlannerBriefStatus,
+      pilotHandoffCommand: pilotHandoffCommandStatus,
+      pilotHandoffCommandBrief: pilotHandoffCommandBriefStatus,
+      pilotSuccessReviewCommand: pilotSuccessReviewCommandStatus,
+      pilotSuccessReviewCommandBrief: pilotSuccessReviewCommandBriefStatus,
+      limitationsWorkarounds: limitationsWorkaroundStatus,
+      limitationsWorkaroundsBrief: limitationsWorkaroundBriefStatus,
+      launchReadiness: launchReadinessStatus,
+      launchReadinessBrief: launchReadinessBriefStatus,
+      globalEnterpriseCommand: globalEnterpriseCommandStatus,
+      globalEnterpriseCommandBrief: globalEnterpriseCommandBriefStatus,
+      competitiveMarketIntelligence: competitiveMarketIntelligenceSummary.status,
+      competitiveDefense: competitiveDefenseStatus,
+      competitiveDefenseBrief: competitiveDefenseBriefStatus,
+      investorAudienceReadiness: investorAudienceReadinessStatus,
+      investorAudienceReadinessBrief: investorAudienceReadinessBriefStatus,
       capitalVitality: capitalVitalityProofStackStatus,
       capitalVitalityBrief: capitalVitalityBriefProofStackStatus,
       growthEngine: growthEngineProofStackStatus,
       growthEngineBrief: growthEngineBriefProofStackStatus,
+      companyAssessment: companyAssessmentStatus,
+      companyAssessmentBrief: companyAssessmentBriefStatus,
+      clinicalProductionReadiness: clinicalProductionReadinessStatus,
+      clinicalProductionReadinessBrief: clinicalProductionReadinessBriefStatus,
+      pilotDemoCommercialReadiness: pilotDemoCommercialReadinessStatus,
+      pilotDemoCommercialReadinessBrief: pilotDemoCommercialReadinessBriefStatus,
+      productServicePortfolio: productServicePortfolioStatus,
+      productServicePortfolioBrief: productServicePortfolioBriefStatus,
+      serviceDelivery: serviceDeliveryStatus,
+      serviceDeliveryBrief: serviceDeliveryBriefStatus,
+      clientOnboardingCommunications: clientOnboardingCommunicationsStatus,
+      clientOnboardingCommunicationsBrief: clientOnboardingCommunicationsBriefStatus,
+      enterpriseBusinessOps: enterpriseBusinessOpsStatus,
+      enterpriseBusinessOpsBrief: enterpriseBusinessOpsBriefStatus,
+      enterpriseScalabilityOperations: enterpriseScalabilityOperationsStatus,
+      enterpriseScalabilityOperationsBrief: enterpriseScalabilityOperationsBriefStatus,
+      platformPower: platformPowerStatus,
+      platformPowerBrief: platformPowerBriefStatus,
+      productionArchitecture: productionArchitectureStatus,
+      productionArchitectureBrief: productionArchitectureBriefStatus,
+      executionAttemptEnvelope: executionAttemptEnvelopeStatus,
+      executionAttemptEnvelopeBrief: executionAttemptEnvelopeBriefStatus,
+      executionAttemptDurableStore: executionAttemptDurableStoreStatus,
+      executionAttemptDurableStoreBrief: executionAttemptDurableStoreBriefStatus,
       approvalsReadiness: approvalsReadinessStatus,
       approvalsReadinessBrief: approvalsReadinessBriefStatus,
+      globalCertificationReadiness: globalCertificationReadinessStatus,
+      globalCertificationReadinessBrief: globalCertificationReadinessBriefStatus,
+      healthcareIntelligenceOS: healthcareIntelligenceOSSummary.status,
+      healthcareClinicalWorkflowAutomation:
+        healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.status,
+      healthRecordsSafetyExchange: healthRecordsSafetyExchangeStatus,
+      healthRecordsSafetyExchangeBrief: healthRecordsSafetyExchangeBriefStatus,
+      healthRecordsSyntheticExtraction: healthRecordsSafetyExchangeExtractionStatus,
+      continuousReviewAudit: continuousReviewAuditStatus,
+      continuousReviewAuditBrief: continuousReviewAuditBriefStatus,
       clinicalAuthorityReadiness: clinicalAuthorityReadinessStatus,
       clinicalAuthorityReadinessBrief: clinicalAuthorityReadinessBriefStatus,
       clinicalCareActivation: clinicalCareActivationProofStackStatus,
@@ -1620,7 +2618,6 @@ export function getProductConsoleSummary() {
       strategicPlatformIntelligence: strategicPlatformIntelligenceSummary.status,
       deploymentProfiles: deploymentProfileSummary.status,
       marketActivation: marketActivationSummary.status,
-      healthcareIntelligenceOS: "healthcare-intelligence-os-foundation",
       persistentAgentWorkspace: persistentAgentWorkspaceSummary.status,
       pilotEvidenceDashboard: "enterprise-evidence-ready",
       pricingAndSales: commercialStrategySummary.status,
@@ -1646,8 +2643,8 @@ export function getProductConsoleSummary() {
     productionBoundary:
       "SCRIMED is sellable today as a governed synthetic pilot and enterprise operating-system evaluation surface; live clinical execution remains gated until customer scope, clinical governance, regulatory classification, identity, runtime safety, durable audit, privacy, connector, monitoring, rollback, and human-review controls are approved.",
     nextCommercialMove:
-      "Use Growth Engine to prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes without crossing revenue guarantee, securities, valuation, legal, tax, reimbursement, PHI, security, connector, or live-care boundaries; use Capital Vitality to keep revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, and external-review gates visible without crossing securities, valuation, legal, reimbursement, PHI, security, or live-care boundaries; use Service Reliability to keep product and service controls, fault classes, efficiency improvements, owners, proof routes, open gates, and retained approval boundaries visible before claims expand; use Navigation Audit to keep the page route inventory, API route count, navigation groups, smoke scope, protected fail-closed checks, and retained AAL2 or external-review boundaries visible before each release; use Release Continuity to keep production, GitHub, smoke checks, and AAL2 operator boundaries checkpointed after every deploy; use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
-    updated: "2026-06-24"
+      "Use Pilot Demo Commercial Readiness before every demo, pilot, pricing, or buyer-call conversation so each demo resolves to one recommended pilot path, price band, proof asset list, no-PHI intake route, market benchmark, margin rule, and hard stop before custom work expands; use Clinical Production Readiness before any PHI, live-care, connector, clinical AI, certification, global production, customer go-live, or clinical-production language expands so required tasks, incomplete gates, external-review needs, current capability motions, source references, and hard stops stay explicit while SCRIMED keeps selling no-PHI demos, paid readiness services, synthetic pilots, diligence packets, and governance assessments; use Company Assessment first before launch, buyer campaigns, investor packet release, service expansion, board review, platform claims, certification conversations, protected proof release, or broader app promotion so product, service, revenue, margin, legal, finance, accounting, tax, security, AI, health-record, launch, approval, investor, limitation, team-lane, and hard-stop posture is explicit; use Launch Readiness before public launch, buyer campaigns, investor packet release, board review, or broader app promotion so branded-domain smoke, sandbox DNS classification, fallback-only boundaries, product/service launch tracks, and protected proof hard stops are explicit; use Competitive Defense before public competitor comparisons, sales decks, investor packets, privacy/security claims, or launch expansion so biggest-competitor threat profiles, weakness relief, no-copy boundaries, legal/privacy/cyber controls, infiltration-deterrence layers, and external review gates are explicit without creating partnership, parity, PHI, security-certification, penetration-test, legal, privacy, or protection-guarantee claims; use Service Delivery Workbench before any paid service kickoff so every package has no-PHI intake, scope matrix, acceptance criteria, work-order templates, artifacts, margin protections, buyer handoff, and retained no-SLA, no-contract, no-PHI, no-live-care gates; use Enterprise Business Ops to route every enterprise opportunity through deal desk, price floor, margin model, counsel review, accounting/revenue-recognition triage, tax awareness, billing readiness, contract authority, and blocked-claim controls before proposal release; use Growth Engine to prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes without crossing revenue guarantee, securities, valuation, legal, tax, reimbursement, PHI, security, connector, or live-care boundaries; use Investor and Audience Readiness to turn weaknesses into owned relief tracks and route angel, corporate strategic, private investor, faith-based clinic, public-sector, payer, health-system, clinician, global-partner, and transformation-sponsor conversations into the right packet without crossing securities, solicitation, valuation, tax, legal, donor, customer-permission, PHI, clinical, reimbursement, certification, partnership, revenue, or profit boundaries; use Capital Vitality to keep revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, and external-review gates visible without crossing securities, valuation, legal, reimbursement, PHI, security, or live-care boundaries; use Service Reliability to keep product and service controls, fault classes, efficiency improvements, owners, proof routes, open gates, and retained approval boundaries visible before claims expand; use Operational Efficiency to centralize cross-system gaps, inefficiencies, bottlenecks, hard stops, proof-route density, owners, and resolution sprints before work becomes informal process memory; use Limitations and Workaround Operations whenever a request is blocked so SCRIMED has a safe packet, escalation owner, proof route, expiration rule, and graduation gate instead of informal exceptions; use Navigation Audit to keep the page route inventory, API route count, navigation groups, smoke scope, protected fail-closed checks, and retained AAL2 or external-review boundaries visible before each release; use Release Continuity to keep production, GitHub, smoke checks, and AAL2 operator boundaries checkpointed after every deploy; use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Global Certification Readiness to turn HIPAA, FDA, SOC 2, HITRUST, ISO, EU AI Act, GDPR, NHS DTAC, MHRA, Australia Essential Eight, and regional certification questions into evidence packets without claiming approval early; use Continuous Review and Audit to run 24/7 agent-assisted accuracy review, evidence attribution, claims guard, security drift, QA regression, incident learning, and internal innovation research without autonomous production remediation or public quantum claims; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
+    updated: "2026-06-26"
   };
 }
 
@@ -1664,6 +2661,142 @@ export function getProductReadinessBrief() {
     ...summary.enterpriseServiceOffers.map((offer) => `- ${offer.name}: ${offer.deliverable}`),
     "",
     "## Product Demos and Pilot Programs",
+    `Company Assessment: ${summary.companyAssessmentRoute}`,
+    `Company Assessment API: ${summary.companyAssessmentApiRoute}`,
+    `Company Assessment Brief: ${summary.companyAssessmentBriefRoute}`,
+    `Company Assessment Score: ${summary.companyAssessmentOverallScore}`,
+    `Company Assessment Dimensions: ${summary.companyAssessmentDimensionCount}`,
+    `Company Assessment Weakness Relief Items: ${summary.companyAssessmentWeaknessCount}`,
+    `Company Assessment Upgrade Workstreams: ${summary.companyAssessmentUpgradeWorkstreamCount}`,
+    `Company Assessment Audit Findings: ${summary.companyAssessmentAuditFindingCount}`,
+    `Company Assessment Revenue Builders: ${summary.companyAssessmentRevenueBuilderCount}`,
+    `Company Assessment Competitive Edge Amplifiers: ${summary.companyAssessmentCompetitiveEdgeAmplifierCount}`,
+    `Company Assessment Improvement Priorities: ${summary.companyAssessmentImprovementPriorityCount}`,
+    `Company Assessment Missing Capability Closures: ${summary.companyAssessmentMissingCapabilityClosureCount}`,
+    `Company Assessment Critical Missing Capability Closures: ${summary.companyAssessmentCriticalMissingCapabilityClosureCount}`,
+    `Company Assessment Team Lanes: ${summary.companyAssessmentTeamLaneCount}`,
+    `Company Assessment Hard Stops: ${summary.companyAssessmentHardStopCount}`,
+    summary.companyAssessmentSummary.boundary,
+    ...summary.companyAssessmentSummary.dimensions.map(
+      (dimension) =>
+        `- Company dimension: ${dimension.name} (${dimension.status}, ${dimension.score}/100) -> ${dimension.upgrade}`
+    ),
+    ...summary.companyAssessmentSummary.weaknessReliefQueue.map(
+      (weakness) =>
+        `- Company weakness relief: ${weakness.name} (${weakness.severity}) -> ${weakness.reliefMove}`
+    ),
+    ...summary.companyAssessmentSummary.missingCapabilityClosures.map(
+      (capability) =>
+        `- Missing capability closure: ${capability.capability} (${capability.severity}) -> ${capability.currentWorkaround}; build ${capability.permanentBuild}`
+    ),
+    ...summary.companyAssessmentSummary.revenueBuilders.map(
+      (builder) =>
+        `- Company revenue builder: ${builder.name} -> ${builder.conversionPath}`
+    ),
+    ...summary.companyAssessmentSummary.competitiveEdgeAmplifiers.map(
+      (edge) =>
+        `- Company competitive edge: ${edge.name} -> ${edge.makeApparentBy}`
+    ),
+    `Clinical Production Readiness: ${summary.clinicalProductionReadinessRoute}`,
+    `Clinical Production Readiness API: ${summary.clinicalProductionReadinessApiRoute}`,
+    `Clinical Production Readiness Brief: ${summary.clinicalProductionReadinessBriefRoute}`,
+    `Clinical Production Ready: ${summary.clinicalProductionReady ? "yes" : "no"}`,
+    `Clinical Production Readiness Score: ${summary.clinicalProductionReadinessScore}`,
+    `Clinical Production Required Tasks: ${summary.clinicalProductionTaskCount}`,
+    `Clinical Production Incomplete Tasks: ${summary.clinicalProductionIncompleteTaskCount}`,
+    `Clinical Production Critical Open Tasks: ${summary.clinicalProductionCriticalOpenTaskCount}`,
+    `Clinical Production External Review Tasks: ${summary.clinicalProductionExternalReviewTaskCount}`,
+    `Clinical Production Current Capability Motions: ${summary.clinicalProductionCurrentCapabilityMotionCount}`,
+    summary.clinicalProductionReadinessSummary.boundary,
+    ...summary.clinicalProductionReadinessSummary.nextTasks.map(
+      (task) =>
+        `- Clinical production next task: ${task.id} (${task.priority}, ${task.status}) -> ${task.task}`
+    ),
+    ...summary.clinicalProductionReadinessSummary.currentCapabilityMotions.map(
+      (motion) =>
+        `- Current capability motion: ${motion.name} (${motion.status}) -> ${motion.nextAction}`
+    ),
+    `Pilot Demo Commercial Readiness: ${summary.pilotDemoCommercialReadinessRoute}`,
+    `Pilot Demo Commercial Readiness API: ${summary.pilotDemoCommercialReadinessApiRoute}`,
+    `Pilot Demo Commercial Readiness Brief: ${summary.pilotDemoCommercialReadinessBriefRoute}`,
+    `Pilot Demo Commercial Paths: ${summary.pilotDemoCommercialReadinessDemoPathCount}`,
+    `Pilot Demo Market Benchmarks: ${summary.pilotDemoCommercialReadinessMarketBenchmarkCount}`,
+    `Pilot Demo Pricing Alignments: ${summary.pilotDemoCommercialReadinessPricingAlignmentCount}`,
+    `Pilot Demo Standard Path Score: ${summary.pilotDemoCommercialReadinessStandardPathScore}`,
+    summary.pilotDemoCommercialReadinessSummary.boundary,
+    ...summary.pilotDemoCommercialReadinessSummary.demoOfferPaths.map(
+      (path) =>
+        `- Demo commercial path: ${path.name} -> ${path.recommendedPilotName}; ${path.pricingBand}`
+    ),
+    ...summary.pilotDemoCommercialReadinessSummary.pricingTierAlignments.map(
+      (alignment) =>
+        `- Pricing alignment: ${alignment.tier} -> ${alignment.recommendedBand}`
+    ),
+    `Launch Readiness: ${summary.launchReadinessRoute}`,
+    `Launch Readiness API: ${summary.launchReadinessApiRoute}`,
+    `Launch Readiness Brief: ${summary.launchReadinessBriefRoute}`,
+    `Launch Tracks: ${summary.launchReadinessTrackCount}`,
+    `Launch DNS Controls: ${summary.launchReadinessDnsControlCount}`,
+    `Launch Service Paths: ${summary.launchReadinessServicePathCount}`,
+    `Launch High Risks: ${summary.launchReadinessHighRiskCount}`,
+    `Launch Hard Stops: ${summary.launchReadinessHardStopCount}`,
+    summary.launchReadinessSummary.boundary,
+    ...summary.launchReadinessSummary.launchDnsControls.map(
+      (control) =>
+        `- Launch DNS control: ${control.name} (${control.status}) -> ${control.launchRule}`
+    ),
+    ...summary.launchReadinessSummary.launchReadinessTracks.map(
+      (track) => `- Launch track: ${track.name} (${track.status}) -> ${track.goNoGoGate}`
+    ),
+    `Competitive Market Intelligence: ${summary.competitiveMarketIntelligenceRoute}`,
+    `Competitive Market Intelligence API: ${summary.competitiveMarketIntelligenceApiRoute}`,
+    `Competitive Market Sources: ${summary.competitiveMarketSourceCount}`,
+    `Competitive Market Build Patterns: ${summary.competitiveMarketBuildPatternCount}`,
+    `Competitive Target Audience Strategies: ${summary.competitiveTargetAudienceStrategyCount}`,
+    `Competitive Target Audience Proof Routes: ${summary.competitiveTargetAudienceProofRouteCount}`,
+    summary.competitiveMarketIntelligenceSummary.boundary,
+    ...summary.competitiveMarketIntelligenceSummary.targetAudienceStrategies.map(
+      (strategy) =>
+        `- Competitive audience strategy: ${strategy.targetAudience} (${strategy.priority}) -> ${strategy.salesMessage}; trigger ${strategy.conversionTrigger}`
+    ),
+    `Competitive Defense: ${summary.competitiveDefenseRoute}`,
+    `Competitive Defense API: ${summary.competitiveDefenseApiRoute}`,
+    `Competitive Defense Brief: ${summary.competitiveDefenseBriefRoute}`,
+    `Competitive Threat Profiles: ${summary.competitiveDefenseThreatProfileCount}`,
+    `Competitive Defense Legal Privacy Cyber Controls: ${summary.competitiveDefenseLegalPrivacyCyberControlCount}`,
+    `Competitive Defense Infiltration Layers: ${summary.competitiveDefenseInfiltrationDeterrenceLayerCount}`,
+    `Competitive Defense Hard Stops: ${summary.competitiveDefenseHardStopCount}`,
+    summary.competitiveDefenseSummary.boundary,
+    ...summary.competitiveDefenseSummary.threatProfiles.map(
+      (profile) => `- Defense profile: ${profile.competitor} -> ${profile.counterPosition}`
+    ),
+    ...summary.competitiveDefenseSummary.legalPrivacyCyberControls.map(
+      (control) => `- Legal/privacy/cyber control: ${control.control} -> ${control.retainedBoundary}`
+    ),
+    `Enterprise Business Ops: ${summary.enterpriseBusinessOpsRoute}`,
+    `Enterprise Business Ops API: ${summary.enterpriseBusinessOpsApiRoute}`,
+    `Enterprise Business Ops Brief: ${summary.enterpriseBusinessOpsBriefRoute}`,
+    `Enterprise Business Ops Revenue Capabilities: ${summary.enterpriseBusinessOpsRevenueCapabilityCount}`,
+    `Enterprise Business Ops Margin Controls: ${summary.enterpriseBusinessOpsMarginControlCount}`,
+    `Enterprise Business Ops Team Roles: ${summary.enterpriseBusinessOpsTeamRoleCount}`,
+    `Enterprise Business Ops Legal Roles: ${summary.enterpriseBusinessOpsLegalRoleCount}`,
+    `Enterprise Business Ops Finance/Accounting/Tax Roles: ${summary.enterpriseBusinessOpsFinanceAccountingTaxRoleCount}`,
+    `Enterprise Business Ops Controls: ${summary.enterpriseBusinessOpsEnterpriseControlCount}`,
+    `Enterprise Business Ops Cadences: ${summary.enterpriseBusinessOpsOperatingCadenceCount}`,
+    `Enterprise Business Ops Profit Levers: ${summary.enterpriseBusinessOpsProfitLeverCount}`,
+    `Enterprise Business Ops Blocked Claims: ${summary.enterpriseBusinessOpsBlockedClaimCount}`,
+    summary.enterpriseBusinessOpsSummary.boundary,
+    ...summary.enterpriseBusinessOpsSummary.revenueCapabilities.map(
+      (capability) =>
+        `- Business revenue capability: ${capability.name} (${capability.status}) -> ${capability.nextAction}`
+    ),
+    ...summary.enterpriseBusinessOpsSummary.marginControls.map(
+      (control) =>
+        `- Margin control: ${control.control} (${control.status}) -> ${control.operatingPolicy}`
+    ),
+    ...summary.enterpriseBusinessOpsSummary.teamRoles.map(
+      (role) => `- Business role: ${role.role} (${role.team}) -> ${role.escalationTrigger}`
+    ),
     `Growth Engine: ${summary.growthEngineRoute}`,
     `Growth Engine API: ${summary.growthEngineApiRoute}`,
     `Growth Engine Brief: ${summary.growthEngineBriefRoute}`,
@@ -1677,6 +2810,22 @@ export function getProductReadinessBrief() {
     ),
     ...summary.growthEngineSummary.revenueProofLadder.map(
       (step) => `- Revenue proof step: ${step.stage} (${step.status}) -> ${step.retainedGate}`
+    ),
+    `Investor Audience Readiness: ${summary.investorAudienceReadinessRoute}`,
+    `Investor Audience Readiness API: ${summary.investorAudienceReadinessApiRoute}`,
+    `Investor Audience Readiness Brief: ${summary.investorAudienceReadinessBriefRoute}`,
+    `Investor Audience Weakness Tracks: ${summary.investorAudienceWeaknessTrackCount}`,
+    `Investor Audience Competitive Edge Signals: ${summary.investorAudienceCompetitiveEdgeSignalCount}`,
+    `Investor Audience Packets: ${summary.investorAudiencePacketCount}`,
+    `Investor Audience Readiness Gates: ${summary.investorAudienceReadinessGateCount}`,
+    summary.investorAudienceReadinessSummary.boundary,
+    ...summary.investorAudienceReadinessSummary.weaknessReliefTracks.map(
+      (track) =>
+        `- Weakness relief: ${track.weakness} (${track.severity}) -> ${track.graduationGate}`
+    ),
+    ...summary.investorAudienceReadinessSummary.investorAudiencePackets.map(
+      (packet) =>
+        `- Audience packet: ${packet.audience} (${packet.readinessStatus}) -> ${packet.nextMove}`
     ),
     `Capital Vitality: ${summary.capitalVitalityRoute}`,
     `Capital Vitality API: ${summary.capitalVitalityApiRoute}`,
@@ -1694,6 +2843,22 @@ export function getProductReadinessBrief() {
       (workstream) =>
         `- Funding workstream: ${workstream.name} (${workstream.status}) -> ${workstream.nextAction}`
     ),
+    `Service Delivery Workbench: ${summary.serviceDeliveryRoute}`,
+    `Service Delivery API: ${summary.serviceDeliveryApiRoute}`,
+    `Service Delivery Brief: ${summary.serviceDeliveryBriefRoute}`,
+    `Service Delivery Offers: ${summary.serviceDeliveryOfferCount}`,
+    `Service Delivery Phases: ${summary.serviceDeliveryPhaseCount}`,
+    `Service Delivery Work Orders: ${summary.serviceDeliveryWorkOrderTemplateCount}`,
+    `Service Delivery Artifacts: ${summary.serviceDeliveryArtifactCount}`,
+    `Service Delivery Activation Gates: ${summary.serviceDeliveryActivationGateCount}`,
+    `Service Delivery Hard Stops: ${summary.serviceDeliveryHardStopCount}`,
+    summary.serviceDeliverySummary.boundary,
+    ...summary.serviceDeliverySummary.serviceDeliveryOffers.map(
+      (offer) => `- Service delivery offer: ${offer.name} (${offer.status}) -> ${offer.buyerPromise}`
+    ),
+    ...summary.serviceDeliverySummary.serviceDeliveryWorkOrderTemplates.map(
+      (template) => `- Work order: ${template.title} (${template.status}) -> ${template.outputArtifact}`
+    ),
     `Service Reliability: ${summary.serviceReliabilityRoute}`,
     `Service Reliability API: ${summary.serviceReliabilityApiRoute}`,
     `Service Reliability Brief: ${summary.serviceReliabilityBriefRoute}`,
@@ -1705,6 +2870,34 @@ export function getProductReadinessBrief() {
     ...summary.serviceReliabilitySummary.productServiceControls.map(
       (control) =>
         `- Reliability control: ${control.name} (${control.status}) -> ${control.mitigation}`
+    ),
+    `Automation Autopilot: ${summary.automationAutopilotRoute}`,
+    `Automation Autopilot API: ${summary.automationAutopilotApiRoute}`,
+    `Automation Autopilot Brief: ${summary.automationAutopilotBriefRoute}`,
+    `Automation Autopilot Capabilities: ${summary.automationAutopilotCapabilityCount}`,
+    `Automation Autopilot Average Readiness: ${summary.automationAutopilotAverageReadinessScore}`,
+    `Automation Autopilot Review Required: ${summary.automationAutopilotReviewRequiredCount}`,
+    `Automation Autopilot Production Authority Blocked: ${summary.automationAutopilotProductionAuthorityBlockedCount}`,
+    `Automation Autopilot Bottleneck Workarounds: ${summary.automationAutopilotBottleneckWorkaroundCount}`,
+    summary.automationAutopilotSummary.boundary,
+    ...summary.automationAutopilotSummary.capabilities.map(
+      (capability) =>
+        `- Automation capability: ${capability.name} (${capability.mode}) -> ${capability.nextAutomationStep}`
+    ),
+    `Limitations Workarounds: ${summary.limitationsWorkaroundRoute}`,
+    `Limitations Workarounds API: ${summary.limitationsWorkaroundApiRoute}`,
+    `Limitations Workarounds Brief: ${summary.limitationsWorkaroundBriefRoute}`,
+    `Limitations Workaround Tracks: ${summary.limitationsWorkaroundTrackCount}`,
+    `Limitations Workaround Packets: ${summary.limitationsWorkaroundPacketCount}`,
+    `Limitations Boundary Escalations: ${summary.limitationsWorkaroundBoundaryEscalationCount}`,
+    `Limitations Workaround Execution Ledger: ${summary.limitationsWorkaroundExecutionLedgerCount}`,
+    `Limitations Workaround Resolved Execution Ledger: ${summary.limitationsWorkaroundResolvedExecutionLedgerCount}`,
+    `Limitations Workaround Open Risks: ${summary.limitationsWorkaroundOpenRiskCount}`,
+    `Limitations Workaround Hard Stops: ${summary.limitationsWorkaroundHardStopCount}`,
+    summary.limitationsWorkaroundSummary.boundary,
+    ...summary.limitationsWorkaroundSummary.packets.map(
+      (packet) =>
+        `- Workaround packet: ${packet.name}. Output: ${packet.output} Expiry: ${packet.expiryRule}`
     ),
     `Navigation Audit: ${summary.navigationAuditRoute}`,
     `Navigation Audit API: ${summary.navigationAuditApiRoute}`,
@@ -1751,6 +2944,36 @@ export function getProductReadinessBrief() {
     ),
     ...summary.approvalsReadinessSummary.agentControls.map(
       (control) => `- Approval agent: ${control.agent}. Checkpoint: ${control.humanCheckpoint}`
+    ),
+    `Global Certification Readiness: ${summary.globalCertificationReadinessRoute}`,
+    `Global Certification API: ${summary.globalCertificationReadinessApiRoute}`,
+    `Global Certification Brief: ${summary.globalCertificationReadinessBriefRoute}`,
+    `Global Certification Tracks: ${summary.globalCertificationReadinessTrackCount}`,
+    `Global Certification Sources: ${summary.globalCertificationReadinessSourceCount}`,
+    `Global Certification Gates: ${summary.globalCertificationReadinessGateCount}`,
+    `Global Certification Regional Packs: ${summary.globalCertificationReadinessRegionalPackCount}`,
+    `Global Certification Blocked Claims: ${summary.globalCertificationReadinessBlockedClaimCount}`,
+    summary.globalCertificationReadinessSummary.boundary,
+    ...summary.globalCertificationReadinessSummary.tracks.map(
+      (track) => `- Global certification track: ${track.title} (${track.status}) -> ${track.nextAction}`
+    ),
+    ...summary.globalCertificationReadinessSummary.gates.map(
+      (gate) => `- Certification gate: ${gate.gate}. Owner: ${gate.owner}`
+    ),
+    `Continuous Review and Audit: ${summary.continuousReviewAuditRoute}`,
+    `Continuous Review API: ${summary.continuousReviewAuditApiRoute}`,
+    `Continuous Review Brief: ${summary.continuousReviewAuditBriefRoute}`,
+    `Continuous Review Agents: ${summary.continuousReviewAuditAgentCount}`,
+    `Continuous Review Loops: ${summary.continuousReviewAuditLoopCount}`,
+    `Continuous Audit Controls: ${summary.continuousReviewAuditControlCount}`,
+    `Internal Innovation Tracks: ${summary.continuousReviewAuditInnovationTrackCount}`,
+    `Internal Research Teams: ${summary.continuousReviewAuditInternalResearchAssignmentCount}`,
+    summary.continuousReviewAuditSummary.boundary,
+    ...summary.continuousReviewAuditSummary.loops.map(
+      (loop) => `- Review loop: ${loop.stage} (${loop.cadence}) -> ${loop.errorReductionMechanism}`
+    ),
+    ...summary.continuousReviewAuditSummary.innovationTracks.map(
+      (track) => `- Internal research: ${track.title} (${track.visibility}) -> ${track.owner}`
     ),
     `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
     `Clinical Authority Readiness: ${summary.clinicalAuthorityReadinessRoute}`,
@@ -2009,8 +3232,34 @@ export function getProductReadinessBrief() {
     `API: ${summary.strategicIntelligenceApiRoute}`,
     `Status: ${summary.strategicPlatformIntelligenceSummary.status}`,
     `Patterns: ${summary.strategicPlatformIntelligenceSummary.patternCount}`,
+    `Execution bets: ${summary.strategicExecutionBetCount}`,
+    `Decision gates: ${summary.strategicDecisionGateCount}`,
+    `Execution commands: ${summary.strategicExecutionCommandCount}`,
+    `Critical commands: ${summary.strategicCriticalExecutionCommandCount}`,
+    `This-week commands: ${summary.strategicThisWeekExecutionCommandCount}`,
+    `Command proof routes: ${summary.strategicExecutionCommandProofRouteCount}`,
+    `Execution scorecards: ${summary.strategicExecutionScorecardCount}`,
+    `Active scorecards: ${summary.strategicActiveExecutionScorecardCount}`,
+    `Proof-ready scorecards: ${summary.strategicProofReadyExecutionScorecardCount}`,
+    `External-review scorecards: ${summary.strategicExternalReviewExecutionScorecardCount}`,
+    `Missing proof items: ${summary.strategicExecutionScorecardMissingProofCount}`,
+    `Recommended sequence: ${summary.strategicPlatformIntelligenceSummary.recommendedStrategicSequence}`,
     ...summary.strategicPlatformIntelligenceSummary.patterns.map(
       (pattern) => `- ${pattern.title}: ${pattern.nextBuildStep}`
+    ),
+    ...summary.strategicPlatformIntelligenceSummary.executionCommands.map(
+      (command) =>
+        `- Command: ${command.lane} (${command.horizon}, ${command.priority}) -> ${command.revenueMotion}; metric ${command.successMetric}; block ${command.blockedExpansion.join(", ")}`
+    ),
+    ...summary.strategicPlatformIntelligenceSummary.executionBets.map(
+      (bet) => `- Bet: ${bet.name} (${bet.horizon}) -> ${bet.proofMetric}; stop if ${bet.stopCondition}`
+    ),
+    ...summary.strategicPlatformIntelligenceSummary.executionScorecards.map(
+      (scorecard) =>
+        `- Scorecard: ${scorecard.commandLane} (${scorecard.scoreState}, ${scorecard.evidenceState}) -> leading ${scorecard.leadingIndicator}; missing ${scorecard.missingProof.join(", ")}; promote ${scorecard.promotionCriteria.join(", ")}; demote ${scorecard.demotionTriggers.join(", ")}`
+    ),
+    ...summary.strategicPlatformIntelligenceSummary.decisionGates.map(
+      (gate) => `- Gate: ${gate.gate} -> allow when ${gate.allowIf}; block when ${gate.blockIf}`
     ),
     "",
     "## Deployment Profiles",
@@ -2020,6 +3269,43 @@ export function getProductReadinessBrief() {
     `Profiles: ${summary.deploymentProfileSummary.profileCount}`,
     ...summary.deploymentProfileSummary.profiles.map(
       (profile) => `- ${profile.name} (${profile.status}): ${profile.revenueUse}`
+    ),
+    "",
+    "## Global Certification Readiness",
+    `Route: ${summary.globalCertificationReadinessRoute}`,
+    `API: ${summary.globalCertificationReadinessApiRoute}`,
+    `Brief: ${summary.globalCertificationReadinessBriefRoute}`,
+    `Status: ${summary.globalCertificationReadinessSummary.status}`,
+    `Tracks: ${summary.globalCertificationReadinessTrackCount}`,
+    `Sources: ${summary.globalCertificationReadinessSourceCount}`,
+    `Gates: ${summary.globalCertificationReadinessGateCount}`,
+    `Regional packs: ${summary.globalCertificationReadinessRegionalPackCount}`,
+    `Blocked claims: ${summary.globalCertificationReadinessBlockedClaimCount}`,
+    summary.globalCertificationReadinessSummary.boundary,
+    ...summary.globalCertificationReadinessSummary.regionalPacks.map(
+      (pack) => `- Certification pack: ${pack.region} (${pack.priority}) -> ${pack.safeNearTermMotion}`
+    ),
+    ...summary.globalCertificationReadinessSummary.sources.map(
+      (source) => `- Source: ${source.name} -> ${source.scrimedImplication}`
+    ),
+    "",
+    "## Continuous Review, Audit, and Innovation",
+    `Route: ${summary.continuousReviewAuditRoute}`,
+    `API: ${summary.continuousReviewAuditApiRoute}`,
+    `Brief: ${summary.continuousReviewAuditBriefRoute}`,
+    `Status: ${summary.continuousReviewAuditSummary.status}`,
+    `Agents: ${summary.continuousReviewAuditAgentCount}`,
+    `Loops: ${summary.continuousReviewAuditLoopCount}`,
+    `Controls: ${summary.continuousReviewAuditControlCount}`,
+    `Innovation tracks: ${summary.continuousReviewAuditInnovationTrackCount}`,
+    `Internal research assignments: ${summary.continuousReviewAuditInternalResearchAssignmentCount}`,
+    `Quantum posture: ${summary.continuousReviewAuditSummary.quantumTrackStatus}`,
+    summary.continuousReviewAuditSummary.boundary,
+    ...summary.continuousReviewAuditSummary.agents.map(
+      (agent) => `- Review agent: ${agent.name} (${agent.status}) -> ${agent.mission}`
+    ),
+    ...summary.continuousReviewAuditSummary.controls.map(
+      (control) => `- Audit control: ${control.control} (${control.status}) -> ${control.purpose}`
     ),
     "",
     "## Global Reach",
@@ -2039,6 +3325,26 @@ export function getProductReadinessBrief() {
     ),
     ...summary.globalPartnerLocalizationSummary.boundaryResolutions.map(
       (resolution) => `- Global boundary: ${resolution.boundary}. Resolution: ${resolution.resolution}`
+    ),
+    "",
+    "## Global Enterprise Command",
+    `Route: ${summary.globalEnterpriseCommandRoute}`,
+    `API: ${summary.globalEnterpriseCommandApiRoute}`,
+    `Brief: ${summary.globalEnterpriseCommandBriefRoute}`,
+    `Status: ${summary.globalEnterpriseCommandSummary.status}`,
+    `Region commands: ${summary.globalEnterpriseCommandRegionCount}`,
+    `Sales playbooks: ${summary.globalEnterpriseCommandSalesPlaybookCount}`,
+    `Interoperability lanes: ${summary.globalEnterpriseCommandInteroperabilityLaneCount}`,
+    `Communication lanes: ${summary.globalEnterpriseCommandCommunicationLaneCount}`,
+    `Average readiness: ${summary.globalEnterpriseCommandAverageReadinessScore}`,
+    summary.globalEnterpriseCommandSummary.boundary,
+    ...summary.globalEnterpriseCommandSummary.scorecards.map(
+      (scorecard) =>
+        `- Global scorecard: ${scorecard.category} (${scorecard.score}) -> ${scorecard.nextAction}`
+    ),
+    ...summary.globalEnterpriseCommandSummary.regionalCommands.map(
+      (command) =>
+        `- Region command: ${command.region} (${command.tier}) -> ${command.nextAction}`
     ),
     "",
     "## Market Activation",
@@ -2138,6 +3444,58 @@ export function getProductReadinessBrief() {
     "## Agents",
     ...summary.productAgents.map((agent) => `- ${agent.name} (${agent.status}): ${agent.capability}`),
     "",
+    "## Production Architecture",
+    `Route: ${summary.productionArchitectureRoute}`,
+    `API: ${summary.productionArchitectureApiRoute}`,
+    `Brief: ${summary.productionArchitectureBriefRoute}`,
+    `Status: ${summary.productionArchitectureSummary.status}`,
+    `Validation: ${summary.productionArchitectureValidationStatus}`,
+    `Layers: ${summary.productionArchitectureLayerCount}`,
+    `Model providers: ${summary.productionArchitectureModelProviderCount}`,
+    `Context domains: ${summary.productionArchitectureContextDomainCount}`,
+    `Trust controls: ${summary.productionArchitectureTrustControlCount}`,
+    `Evaluation scenarios: ${summary.productionArchitectureEvaluationScenarioCount}`,
+    `ClinSecOps controls: ${summary.productionArchitectureClinSecOpsControlCount}`,
+    `Workflow tracks: ${summary.productionArchitectureWorkflowTrackCount}`,
+    `Blocked autonomy controls: ${summary.productionArchitectureBlockedAutonomyCount}`,
+    summary.productionArchitectureSummary.readinessAssessment,
+    summary.productionArchitectureSummary.boundary,
+    ...summary.productionArchitectureSummary.layers.map(
+      (layer) => `- ${layer.name} (${layer.status}): ${layer.objective}`
+    ),
+    "",
+    "## Execution Attempt Envelope",
+    `Route: ${summary.executionAttemptEnvelopeRoute}`,
+    `API: ${summary.executionAttemptEnvelopeApiRoute}`,
+    `Brief: ${summary.executionAttemptEnvelopeBriefRoute}`,
+    `Status: ${summary.executionAttemptEnvelopeSummary.status}`,
+    `Envelopes: ${summary.executionAttemptEnvelopeCount}`,
+    `Replay-ready: ${summary.executionAttemptEnvelopeReplayReadyCount}`,
+    `Model-route telemetry: ${summary.executionAttemptEnvelopeModelRouteTelemetryCount}`,
+    `Human review gates: ${summary.executionAttemptEnvelopeHumanReviewGateCount}`,
+    `Scorecards: ${summary.executionAttemptEnvelopePassingScorecardCount}/${summary.executionAttemptEnvelopeScorecardCount}`,
+    `Release decision: ${summary.executionAttemptEnvelopeReleaseDecision}`,
+    summary.executionAttemptEnvelopeSummary.boundary,
+    ...summary.executionAttemptEnvelopeSummary.envelopes.map(
+      (envelope) =>
+        `- ${envelope.workflowSlug}: ${envelope.lifecycleState}; idempotency ${envelope.idempotencyKey}; replay ${envelope.replayMetadata.replayToken}`
+    ),
+    "",
+    "## Execution Attempt Durable Store",
+    `API: ${summary.executionAttemptDurableStoreApiRoute}`,
+    `Brief: ${summary.executionAttemptDurableStoreBriefRoute}`,
+    `Protected record: ${summary.executionAttemptDurableStoreRecordRoute}`,
+    `Protected replay: ${summary.executionAttemptDurableStoreReplayRoute}`,
+    `Protected review disposition: ${summary.executionAttemptDurableStoreReviewDispositionRoute}`,
+    `Status: ${summary.executionAttemptDurableStoreSummary.status}`,
+    `Recordable envelopes: ${summary.executionAttemptDurableStoreRecordableEnvelopeCount}`,
+    `Healthcare AI OS lanes: ${summary.executionAttemptDurableStorePriorityCount}`,
+    `Validation: ${summary.executionAttemptDurableStoreValidationStatus}`,
+    summary.executionAttemptDurableStoreSummary.boundary,
+    ...summary.executionAttemptDurableStoreSummary.clinicalAIOperatingSystemFoundation.map(
+      (priority) => `- ${priority.priority}: ${priority.implementedBy}`
+    ),
+    "",
     "## Interoperability",
     `Status: ${summary.interoperabilitySummary.status}`,
     `Standards: ${summary.interoperabilitySummary.standardCount}`,
@@ -2147,6 +3505,26 @@ export function getProductReadinessBrief() {
     `Synthetic passes: ${summary.interoperabilityConformanceSummary.syntheticPassed}`,
     `Live blocked: ${summary.interoperabilityConformanceSummary.liveBlocked}`,
     "Conformance evaluations: /interoperability/evaluations",
+    `Healthcare Intelligence OS: ${summary.healthcareIntelligenceOSRoute}`,
+    `Healthcare Intelligence OS API: ${summary.healthcareIntelligenceOSApiRoute}`,
+    `Healthcare Intelligence OS Brief: ${summary.healthcareIntelligenceOSBriefRoute}`,
+    `Clinical workflow automation tracks: ${summary.healthcareIntelligenceClinicalWorkflowTrackCount}`,
+    `Clinical workflow patient-safety controls: ${summary.healthcareIntelligencePatientSafetyControlCount}`,
+    `Patient-engagement analysis signals: ${summary.healthcareIntelligencePatientEngagementSignalCount}`,
+    `Interoperability bindings: ${summary.healthcareIntelligenceInteroperabilityBindingCount}`,
+    `Clinician burden-reduction motions: ${summary.healthcareIntelligenceClinicianBurdenReductionCount}`,
+    `Operations optimization levers: ${summary.healthcareIntelligenceOperationsOptimizationLeverCount}`,
+    ...summary.healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.tracks.map(
+      (track) =>
+        `- Clinical workflow: ${track.lane} (${track.status}) -> ${track.automationScope}; blocked ${track.blockedActions.join(", ")}`
+    ),
+    `Health Records Safety Exchange: ${summary.healthRecordsSafetyExchangeRoute}`,
+    `Health Records API: ${summary.healthRecordsSafetyExchangeApiRoute}`,
+    `Health Records Brief: ${summary.healthRecordsSafetyExchangeBriefRoute}`,
+    `Synthetic extraction evaluator: ${summary.healthRecordsSafetyExchangeExtractRoute}`,
+    `Health record capabilities: ${summary.healthRecordsCapabilityCount}`,
+    `Health record safety checks: ${summary.healthRecordsSafetyCheckCount}`,
+    `Health record workarounds: ${summary.healthRecordsWorkaroundCount}`,
     "",
     "## Workflow Engine",
     ...summary.workflowEngineExamples.map(

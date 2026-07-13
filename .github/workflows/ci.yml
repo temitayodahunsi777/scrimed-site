@@ -29,11 +29,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Release provenance
+        run: npm run release:provenance:strict
+
       - name: Audit dependencies
         run: npm audit --audit-level=moderate
 
+      - name: Dependency security floor
+        run: npm run security:dependency-floor
+
       - name: Generated workspace integrity
         run: node scripts/check-generated-integrity.mjs
+
+      - name: Execution attempt durable-store contract
+        run: npm run smoke:execution-attempt-durable-store
+
+      - name: SCRIMED Work lifecycle and durable-store contracts
+        run: |
+          npm run test:scrimed-work:lifecycle
+          npm run test:scrimed-work:preflight-policy
+          npm run test:scrimed-work:browser-verification
+          npm run smoke:scrimed-work
+          npm run smoke:scrimed-work:durable-store-preflight
+
+      - name: SCRIMED Intelligence & Safety Stack contract
+        run: npm run smoke:scrimed-intelligence-safety-stack
+
+      - name: Non-secret SCRIMED contract suite
+        run: npm run test:nonsecret
 
       - name: Lint
         run: npm run lint

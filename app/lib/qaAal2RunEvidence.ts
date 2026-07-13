@@ -40,6 +40,52 @@ export type QaAal2RunBoundaryCheck = {
   evidence: string;
 };
 
+export type QaAal2SmokeReadinessGateStatus =
+  | "ready"
+  | "operator-action-required"
+  | "target-runtime-required"
+  | "blocked-until-human-aal2"
+  | "validated";
+
+export type QaAal2SmokeReadinessGate = {
+  id: string;
+  name: string;
+  status: QaAal2SmokeReadinessGateStatus;
+  evidence: string;
+  nextAction: string;
+};
+
+export type QaAal2SmokeReadinessPacket = {
+  service: "scrimed-aal2-smoke-readiness";
+  status: typeof qaAal2SmokeReadinessStatus;
+  generatedAt: "static-no-secret-operator-readiness";
+  runState: "preflight-ready-strict-smoke-token-required";
+  strictAttemptReady: false;
+  protectedHumanRunRequired: true;
+  syntheticDataOnly: true;
+  noPhiConfirmed: true;
+  tokenMaterialStored: false;
+  tokenMaterialPrinted: false;
+  protectedWritesEnabledByDefault: false;
+  operatorTokenRequired: true;
+  targetFeatureFlagRequired: true;
+  targetProtectedApiVerifiesToken: true;
+  routes: {
+    api: string;
+    brief: string;
+    qaEvidence: string;
+    durableStore: string;
+    storedVectorRpcSmoke: string;
+    protectedWorkspace: string;
+  };
+  commands: string[];
+  gates: QaAal2SmokeReadinessGate[];
+  guardrails: string[];
+  remainingOperatorActions: string[];
+  failureModes: string[];
+  boundary: string;
+};
+
 export type QaAal2RunEvidencePackage = {
   service: "scrimed-aal2-synthetic-qa-run-evidence";
   status: typeof qaAal2RunEvidenceStatus;
@@ -70,10 +116,13 @@ export type QaAal2RunEvidencePackage = {
   remainingBlockers: string[];
   unresolvedRisks: string[];
   recommendedMitigations: string[];
+  smokeReadiness: QaAal2SmokeReadinessPacket;
   routes: {
     page: string;
     api: string;
     brief: string;
+    smokeReadinessApi: string;
+    smokeReadinessBrief: string;
     protectedRoute: string;
     manualExecutionConsole: string;
     protectedManualExecutionConsole: string;
@@ -96,11 +145,20 @@ export const qaAal2RunEvidenceApiRoute =
   "/api/qa-evidence/aal2-run-evidence";
 export const qaAal2RunEvidenceBriefRoute =
   "/api/qa-evidence/aal2-run-evidence/brief";
+export const qaAal2SmokeReadinessStatus =
+  "aal2-smoke-readiness-preflight-ready-no-secret";
+export const qaAal2SmokeReadinessApiRoute =
+  "/api/qa-evidence/aal2-smoke-readiness";
+export const qaAal2SmokeReadinessBriefRoute =
+  "/api/qa-evidence/aal2-smoke-readiness/brief";
 export const qaAal2RunEvidenceProtectedRoute =
   "/api/pilot-workspaces/{workspaceSlug}/qa-evidence/aal2-run-evidence";
 
 export const qaAal2RunEvidenceBoundary =
   "SCRIMED AAL2 Synthetic QA Run Evidence records the first protected human-reviewed AAL2 synthetic QA evidence posture. It does not bypass human AAL2, store credentials, store PHI, touch production systems, trigger live patient workflows, perform autonomous clinical action, certify HIPAA/SOC/FDA/security status, guarantee reimbursement, approve connectors, approve buyer proof release, or authorize live clinical care.";
+
+export const qaAal2SmokeReadinessBoundary =
+  "SCRIMED AAL2 Smoke Readiness is a no-secret operator preflight for synthetic AAL2 durable-store and stored-vector RPC smoke tests. It does not mint, expose, retain, validate, or bypass bearer tokens; protected APIs remain the source of truth for role, AAL2, feature flag, tenant, and RLS verification.";
 
 const requestedCategoryNames = [
   "Clinical summary generation",
@@ -127,6 +185,145 @@ function category({
   nextAction
 }: QaAal2RunCategory): QaAal2RunCategory {
   return { id, name, status, evidence, reviewerNote, nextAction };
+}
+
+function smokeGate({
+  id,
+  name,
+  status,
+  evidence,
+  nextAction
+}: QaAal2SmokeReadinessGate): QaAal2SmokeReadinessGate {
+  return { id, name, status, evidence, nextAction };
+}
+
+export function getQaAal2SmokeReadinessPacket(): QaAal2SmokeReadinessPacket {
+  return {
+    service: "scrimed-aal2-smoke-readiness",
+    status: qaAal2SmokeReadinessStatus,
+    generatedAt: "static-no-secret-operator-readiness",
+    runState: "preflight-ready-strict-smoke-token-required",
+    strictAttemptReady: false,
+    protectedHumanRunRequired: true,
+    syntheticDataOnly: true,
+    noPhiConfirmed: true,
+    tokenMaterialStored: false,
+    tokenMaterialPrinted: false,
+    protectedWritesEnabledByDefault: false,
+    operatorTokenRequired: true,
+    targetFeatureFlagRequired: true,
+    targetProtectedApiVerifiesToken: true,
+    routes: {
+      api: qaAal2SmokeReadinessApiRoute,
+      brief: qaAal2SmokeReadinessBriefRoute,
+      qaEvidence: qaAal2RunEvidenceApiRoute,
+      durableStore: "/api/workflows/execution-attempts/durable-store",
+      storedVectorRpcSmoke: "/api/scrimed-build-roadmap/stored-vector-rpc-smoke",
+      protectedWorkspace: "/pilot-workspace/access"
+    },
+    commands: [
+      "npm run smoke:aal2:readiness",
+      "npm run smoke:aal2:token -- --prompt-token --write-env-local",
+      "npm run smoke:aal2:durable-store:strict",
+      "npm run smoke:scrimed-stored-vector-rpc:strict"
+    ],
+    gates: [
+      smokeGate({
+        id: "workspace-slug",
+        name: "Workspace slug",
+        status: "ready",
+        evidence:
+          "The operator flow supports SCRIMED_WORKSPACE_SLUG and defaults to atlas-synthetic-evaluation for synthetic smoke testing.",
+        nextAction:
+          "Set SCRIMED_WORKSPACE_SLUG only when running against a different authorized synthetic tenant."
+      }),
+      smokeGate({
+        id: "aal2-bearer-token",
+        name: "Short-lived AAL2 bearer token",
+        status: "blocked-until-human-aal2",
+        evidence:
+          "The app never prints or embeds token material. The local helper accepts clipboard, prompt, or session-file input and writes only to gitignored local environment when requested.",
+        nextAction:
+          "Generate a fresh authorized tenant-admin, pilot-lead, or reviewer session token and run the token helper immediately before strict smoke."
+      }),
+      smokeGate({
+        id: "role-verification",
+        name: "Role verification",
+        status: "target-runtime-required",
+        evidence:
+          "Protected APIs verify tenant role and AAL2 state at runtime; this readiness packet does not assert operator authorization.",
+        nextAction:
+          "Run the strict smoke against the protected target so Supabase/Auth/RLS can verify the token and role."
+      }),
+      smokeGate({
+        id: "durable-store-feature-flag",
+        name: "Durable-store feature flag",
+        status: "operator-action-required",
+        evidence:
+          "Protected writes intentionally stay disabled unless SCRIMED_EXECUTION_ATTEMPT_DURABLE_STORE_ENABLED is true on the target app.",
+        nextAction:
+          "Enable SCRIMED_EXECUTION_ATTEMPT_DURABLE_STORE_ENABLED=true only for the authorized synthetic smoke target."
+      }),
+      smokeGate({
+        id: "protected-supabase-runtime",
+        name: "Protected Supabase runtime",
+        status: "target-runtime-required",
+        evidence:
+          "Durable-store record, replay, and review disposition depend on protected Supabase RPCs and deny-by-default RLS.",
+        nextAction:
+          "Verify the target deployment has the durable-store migrations applied before strict smoke."
+      }),
+      smokeGate({
+        id: "stored-vector-registration-role",
+        name: "Stored-vector registration role",
+        status: "target-runtime-required",
+        evidence:
+          "Stored-vector RPC smoke requires authenticated registration through the protected target and must not run as public anonymous code.",
+        nextAction:
+          "Run npm run smoke:scrimed-stored-vector-rpc:strict after the same short-lived AAL2 token is accepted."
+      }),
+      smokeGate({
+        id: "no-secret-output",
+        name: "No-secret output",
+        status: "validated",
+        evidence:
+          "Readiness APIs, briefs, docs, and contract checks must not include JWT-like strings, bearer-token material, Supabase service role keys, PHI, or credential fragments.",
+        nextAction:
+          "Keep all token movement limited to local environment variables, .env.local, secure prompt input, or clipboard handoff."
+      }),
+      smokeGate({
+        id: "strict-smoke-commands",
+        name: "Strict smoke commands",
+        status: "ready",
+        evidence:
+          "Nonsecret preflight and strict durable-store/stored-vector commands are present as npm scripts and are covered by the nonsecret contract suite.",
+        nextAction:
+          "Run the readiness preflight before strict smoke and keep failed protected writes fail-closed."
+      })
+    ],
+    guardrails: [
+      "No PHI, patient identifiers, payer member identifiers, imaging, claims, or live records are accepted.",
+      "No autonomous diagnosis, treatment, prescribing, patient outreach, payer submission, billing submission, or EHR writeback is authorized.",
+      "The preflight does not weaken AAL2, tenant role checks, Supabase RLS, durable-store authorization, or protected API verification.",
+      "Token-like values must be redacted in logs and never committed to source, docs, tests, or chat output.",
+      "A failed or missing token keeps strict smoke blocked instead of falling back to public execution."
+    ],
+    remainingOperatorActions: [
+      "Create or confirm an authorized tenant-admin, pilot-lead, or reviewer account for the synthetic workspace.",
+      "Generate a fresh short-lived AAL2 session token immediately before smoke execution.",
+      "Store the token only through a secure local environment path such as .env.local with mode 0600.",
+      "Ensure SCRIMED_EXECUTION_ATTEMPT_DURABLE_STORE_ENABLED=true is configured on the target app before strict durable-store writes.",
+      "Run strict durable-store and stored-vector RPC smoke, then rotate or clear temporary token material."
+    ],
+    failureModes: [
+      "Missing SCRIMED_BEARER_TOKEN fails closed before authenticated strict smoke.",
+      "Expired, malformed, or non-JWT token material fails closed during local preflight or protected API verification.",
+      "Valid token with an unauthorized role is rejected by protected role checks.",
+      "Disabled durable-store target returns disabled/fail-safe status instead of accepting protected writes.",
+      "Unauthenticated public requests to protected record/replay/review paths remain fail-closed."
+    ],
+    boundary: qaAal2SmokeReadinessBoundary
+  };
 }
 
 function deriveCategoryStatus({
@@ -403,10 +600,13 @@ export function deriveQaAal2RunEvidencePackage({
       "Run protected Buyer Proof Release before exporting Buyer Diligence.",
       "Keep all external claims routed through Claim Guard and qualified approvals."
     ],
+    smokeReadiness: getQaAal2SmokeReadinessPacket(),
     routes: {
       page: qaAal2RunEvidenceRoute,
       api: qaAal2RunEvidenceApiRoute,
       brief: qaAal2RunEvidenceBriefRoute,
+      smokeReadinessApi: qaAal2SmokeReadinessApiRoute,
+      smokeReadinessBrief: qaAal2SmokeReadinessBriefRoute,
       protectedRoute: qaAal2RunEvidenceProtectedRoute.replace("{workspaceSlug}", workspaceSlug),
       manualExecutionConsole: qaManualExecutionConsoleRoute,
       protectedManualExecutionConsole: qaManualExecutionConsoleProtectedRoute.replace("{workspaceSlug}", workspaceSlug),
@@ -495,11 +695,55 @@ export function buildQaAal2RunEvidenceBrief({
     `- Page: ${packet.routes.page}`,
     `- API: ${packet.routes.api}`,
     `- Brief: ${packet.routes.brief}`,
+    `- AAL2 smoke readiness API: ${packet.routes.smokeReadinessApi}`,
+    `- AAL2 smoke readiness brief: ${packet.routes.smokeReadinessBrief}`,
     `- Protected route: ${packet.routes.protectedRoute}`,
     `- Manual Execution Console: ${packet.routes.manualExecutionConsole}`,
     `- Protected Manual Execution Console: ${packet.routes.protectedManualExecutionConsole}`,
     `- Protected workspace: ${packet.routes.protectedWorkspace}`,
     `- Buyer Proof Release: ${packet.routes.buyerProofRelease}`,
     `- Protected Buyer Proof Release: ${packet.routes.protectedBuyerProofRelease}`
+  ].join("\n");
+}
+
+export function buildQaAal2SmokeReadinessBrief() {
+  const packet = getQaAal2SmokeReadinessPacket();
+
+  return [
+    "# SCRIMED AAL2 Smoke Readiness Preflight",
+    "",
+    `Status: ${packet.status}`,
+    `Run state: ${packet.runState}`,
+    `Strict attempt ready: ${packet.strictAttemptReady ? "yes" : "no"}`,
+    `Protected human run required: ${packet.protectedHumanRunRequired ? "yes" : "no"}`,
+    "",
+    "## Boundary",
+    packet.boundary,
+    "",
+    "## Safe Commands",
+    markdownList(packet.commands),
+    "",
+    "## Readiness Gates",
+    ...packet.gates.map(
+      (gate) =>
+        `- ${gate.name} (${gate.status}): ${gate.evidence} Next: ${gate.nextAction}`
+    ),
+    "",
+    "## Guardrails",
+    markdownList(packet.guardrails),
+    "",
+    "## Remaining Operator Actions",
+    markdownList(packet.remainingOperatorActions),
+    "",
+    "## Expected Fail-Closed Modes",
+    markdownList(packet.failureModes),
+    "",
+    "## Routes",
+    `- API: ${packet.routes.api}`,
+    `- Brief: ${packet.routes.brief}`,
+    `- QA evidence: ${packet.routes.qaEvidence}`,
+    `- Durable store: ${packet.routes.durableStore}`,
+    `- Stored-vector RPC smoke: ${packet.routes.storedVectorRpcSmoke}`,
+    `- Protected workspace: ${packet.routes.protectedWorkspace}`
   ].join("\n");
 }

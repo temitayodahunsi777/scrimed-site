@@ -1,4 +1,5 @@
 name: Sales Demo Session QA Smoke
+run-name: Sales Demo Session QA Smoke (${{ github.event_name }})
 
 on:
   workflow_dispatch:
@@ -20,13 +21,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: sales-demo-session-qa-smoke
+  group: sales-demo-session-qa-smoke-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   sales-demo-session-qa:
     name: Sales demo session QA smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout

@@ -4,6 +4,7 @@ import {
   getProductDemoBySlug,
   getProductDemos
 } from "../../lib/demoPilotPrograms";
+import { getPilotDemoCommercialReadinessSummary } from "../../lib/pilotDemoCommercialReadiness";
 
 export function generateStaticParams() {
   return getProductDemos().map((demo) => ({ slug: demo.slug }));
@@ -20,6 +21,10 @@ export default async function DemoDetailPage({
   if (!demo) {
     notFound();
   }
+
+  const commercialPath = getPilotDemoCommercialReadinessSummary().demoOfferPaths.find(
+    (path) => path.slug === demo.slug
+  );
 
   return (
     <main>
@@ -46,6 +51,10 @@ export default async function DemoDetailPage({
         <article>
           <span>Exclusions</span>
           <strong>{demo.productionExclusions.length}</strong>
+        </article>
+        <article>
+          <span>Recommended pilot</span>
+          <strong>{commercialPath?.recommendedPilotName ?? "Needs review"}</strong>
         </article>
       </section>
 
@@ -81,6 +90,36 @@ export default async function DemoDetailPage({
           </article>
         ))}
       </section>
+
+      {commercialPath ? (
+        <section className="table-section" aria-label="Demo commercial path">
+          <div className="section-heading">
+            <p className="eyebrow">Commercial path</p>
+            <h2>Recommended next step: {commercialPath.recommendedPilotName}</h2>
+          </div>
+          <article className="module-row">
+            <div>
+              <span>{commercialPath.recommendedOffer}</span>
+              <h2>{commercialPath.pricingBand}</h2>
+            </div>
+            <p>{commercialPath.buyerFit}</p>
+            <div>
+              <strong>{commercialPath.retainedBoundary}</strong>
+              <ul className="compact-list">
+                {commercialPath.objectionHandling.map((objection) => <li key={objection}>{objection}</li>)}
+              </ul>
+              <div className="form-actions">
+                <Link className="module-link" href={commercialPath.recommendedPilotRoute}>
+                  Open recommended pilot
+                </Link>
+                <Link className="module-link" href={commercialPath.fastPathCta}>
+                  Start no-PHI intake
+                </Link>
+              </div>
+            </div>
+          </article>
+        </section>
+      ) : null}
 
       <section className="section-band principle-grid" aria-label="Demo outcomes">
         {demo.inspectableOutcomes.map((outcome, index) => (
@@ -126,6 +165,11 @@ export default async function DemoDetailPage({
             <span>Pilot</span>
             <strong>Compare pilot programs</strong>
             <p>Choose a structured engagement with outcomes, inputs, gates, and exclusions.</p>
+          </Link>
+          <Link className="action-card" href="/pilot-demo-commercial-readiness">
+            <span>Accelerator</span>
+            <strong>Map price and pilot path</strong>
+            <p>Use market-aligned packaging before custom buyer work expands.</p>
           </Link>
           <Link className="action-card" href="/pilot?offer=synthetic-pilot-evaluation">
             <span>Request</span>

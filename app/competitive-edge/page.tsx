@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { buyerPilotRoomBoundary, buyerPilotRoomCompetitiveEdges } from "../lib/buyerPilotRoom";
 import { getCommercialStrategySummary } from "../lib/commercialStrategy";
+import { getCompetitiveMarketIntelligenceSummary } from "../lib/competitiveMarketIntelligence";
 
 export default function CompetitiveEdgePage() {
   const commercial = getCommercialStrategySummary();
+  const marketIntelligence = getCompetitiveMarketIntelligenceSummary();
 
   return (
     <main>
@@ -13,7 +15,8 @@ export default function CompetitiveEdgePage() {
         <h1>SCRIMED is healthcare intelligence infrastructure for governed enterprise transformation.</h1>
         <p className="hero-text">
           SCRIMED combines specialized agents, TrustOS governance, interoperability standards, protected buyer proof,
-          premium enterprise sales discipline, and FaithCore optionality while keeping clinical execution review-gated.
+          competitor-informed product strategy, premium enterprise sales discipline, and FaithCore optionality while
+          keeping clinical execution review-gated.
         </p>
         <div className="form-actions">
           <Link className="primary-action" href="/pilot?offer=synthetic-pilot-evaluation">
@@ -24,6 +27,9 @@ export default function CompetitiveEdgePage() {
           </Link>
           <Link className="secondary-action" href="/pricing">
             Review Pricing
+          </Link>
+          <Link className="secondary-action" href="/competitive-intelligence">
+            Market Intelligence
           </Link>
         </div>
       </section>
@@ -38,6 +44,22 @@ export default function CompetitiveEdgePage() {
           <strong>{buyerPilotRoomCompetitiveEdges.length}</strong>
         </article>
         <article>
+          <span>Market sources</span>
+          <strong>{marketIntelligence.sourceCount}</strong>
+        </article>
+        <article>
+          <span>Build patterns</span>
+          <strong>{marketIntelligence.patternCount}</strong>
+        </article>
+        <article>
+          <span>Audience plays</span>
+          <strong>{marketIntelligence.targetAudienceStrategyCount}</strong>
+        </article>
+        <article>
+          <span>Proof metrics</span>
+          <strong>{marketIntelligence.proofMetricCount}</strong>
+        </article>
+        <article>
           <span>Pricing model</span>
           <strong>Enterprise</strong>
         </article>
@@ -45,6 +67,60 @@ export default function CompetitiveEdgePage() {
           <span>Boundary</span>
           <strong>Synthetic pilot</strong>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="Competitor-informed product strategy">
+        <div className="section-heading">
+          <p className="eyebrow">Market intelligence</p>
+          <h2>Competitor signals are translated into original SCRIMED product moves and no-copy boundaries.</h2>
+          <p className="section-copy">{marketIntelligence.boundary}</p>
+        </div>
+        {marketIntelligence.patterns.slice(0, 3).map((pattern) => (
+          <article className="module-row" key={pattern.slug}>
+            <div>
+              <span>{pattern.priority}</span>
+              <h2>{pattern.title}</h2>
+            </div>
+            <p>{pattern.productTranslation}</p>
+            <div>
+              <Link className="module-link" href="/competitive-intelligence">
+                Inspect market intelligence
+              </Link>
+              <ul className="compact-list">
+                <li>Sources: {pattern.sourceNames.join(", ")}</li>
+                <li>Proof: {pattern.proofMetrics.slice(0, 3).join(", ")}</li>
+                <li>Blocked: {pattern.blockedClaims.slice(0, 3).join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Target audience conversion plays">
+        <div className="section-heading">
+          <p className="eyebrow">Target buyers</p>
+          <h2>SCRIMED turns market pressure into buyer-specific proof paths and sales messages.</h2>
+        </div>
+        {marketIntelligence.targetAudienceStrategies.slice(0, 4).map((strategy) => (
+          <article className="module-row" key={strategy.slug}>
+            <div>
+              <span>{strategy.priority}</span>
+              <h2>{strategy.targetAudience}</h2>
+            </div>
+            <p>{strategy.salesMessage}</p>
+            <div>
+              <Link className="module-link" href="/competitive-intelligence">
+                Inspect audience strategy
+              </Link>
+              <ul className="compact-list">
+                <li>Pressure: {strategy.competitorPressure.join(", ")}</li>
+                <li>Offer: {strategy.offerMotion}</li>
+                <li>Trigger: {strategy.conversionTrigger}</li>
+                <li>Blocked: {strategy.blockedClaims.join(", ")}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Competitive edge proof">

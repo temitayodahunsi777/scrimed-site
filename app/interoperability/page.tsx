@@ -4,6 +4,7 @@ import {
   interoperabilityStandards
 } from "../lib/interoperabilityStandards";
 import { getInteroperabilityConformanceEvaluationSummary } from "../lib/interoperabilityConformanceEvaluations";
+import { getHealthRecordsSafetyExchangeSummary } from "../lib/healthRecordsSafetyExchange";
 
 export const metadata = {
   title: "SCRIMED Interoperability Control Plane",
@@ -14,6 +15,7 @@ export const metadata = {
 export default function InteroperabilityPage() {
   const summary = getInteroperabilitySummary();
   const evaluations = getInteroperabilityConformanceEvaluationSummary();
+  const healthRecords = getHealthRecordsSafetyExchangeSummary();
 
   return (
     <main>
@@ -26,6 +28,7 @@ export default function InteroperabilityPage() {
           <Link className="primary-action" href="/interoperability/evaluations">Run synthetic conformance review</Link>
           <Link className="secondary-action" href="/integrations">Review connector contracts</Link>
           <Link className="secondary-action" href="/integrations/fixture-validation">Inspect synthetic validation</Link>
+          <Link className="secondary-action" href={healthRecords.route}>Health records safety</Link>
         </div>
       </section>
 
@@ -53,6 +56,31 @@ export default function InteroperabilityPage() {
         <article>
           <span>Live blocked</span>
           <strong>{evaluations.liveBlocked}</strong>
+        </article>
+        <article>
+          <span>Record safety</span>
+          <strong>{healthRecords.safetyCheckCount}</strong>
+        </article>
+        <article>
+          <span>Record workarounds</span>
+          <strong>{healthRecords.workaroundCount}</strong>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Health records safety exchange shortcut">
+        <div className="section-heading">
+          <p className="eyebrow">Health records</p>
+          <h2>No-PHI extraction, source attribution, and patient-safety lint sit beside standards conformance.</h2>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>{healthRecords.status}</span>
+            <h2>Health Records Safety Exchange</h2>
+          </div>
+          <p>{healthRecords.boundary}</p>
+          <Link className="module-link" href={healthRecords.route}>
+            {healthRecords.capabilityCount} capabilities · {healthRecords.boundaryResolutionCount} hard-stop workarounds
+          </Link>
         </article>
       </section>
 

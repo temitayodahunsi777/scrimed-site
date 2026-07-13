@@ -4,6 +4,7 @@
 .tools
 .vercel
 node_modules
+node_modules 2
 out
 coverage
 *.log

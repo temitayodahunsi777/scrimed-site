@@ -104,6 +104,43 @@ export const operationsBlockers: OperationsBlocker[] = [
       "Use `https://scrimed-site.vercel.app` if the branded product domain experiences an outage."
   },
   {
+    id: "sandbox-dns-preflight",
+    area: "domain",
+    status: "ready",
+    blocker: "Sandbox DNS failures are now classified separately from production domain health.",
+    impact:
+      "Restricted Codex sandbox runs can return `getaddrinfo ENOTFOUND app.scrimedsolutions.com`; launch operators can now distinguish that false negative from a real branded-domain outage.",
+    currentEvidence:
+      "`/launch-readiness`, `/api/launch-readiness`, and `npm run smoke:launch-domain-preflight` define the strict primary-domain gate and fallback continuity path.",
+    owner: "Release Steward + Domain/DNS administrator",
+    resolutionPath: [
+      "Run strict public smoke against `https://app.scrimedsolutions.com` from approved network access before launch.",
+      "Run `npm run smoke:launch-domain-preflight` to classify sandbox DNS failures and fallback reachability.",
+      "Keep fallback Vercel URL success as continuity evidence only, never launch approval."
+    ],
+    fallback:
+      "Use `SCRIMED_ALLOW_DNS_FALLBACK=1 npm run smoke:launch-domain-preflight` for internal continuity proof when the sandbox cannot resolve the branded domain."
+  },
+  {
+    id: "competitive-defense-hardening",
+    area: "security",
+    status: "ready",
+    blocker:
+      "Competitor pressure, legal/privacy/cyber claims, and infiltration-risk language now require an explicit hardening lane before public expansion.",
+    impact:
+      "SCRIMED can respond to Abridge, Ambience, Nabla, Suki, Microsoft, Oracle Health, Hippocratic AI, Notable, Commure, Cohere, and similar buyer comparisons without copying, overclaiming, exposing PHI, or implying security certification.",
+    currentEvidence:
+      "`/competitive-defense`, `/api/competitive-defense`, and `/api/competitive-defense/brief` expose threat profiles, weakness relief, legal/privacy/cyber controls, infiltration-deterrence layers, external review gates, and no-authority headers.",
+    owner: "Founder + Legal Ops + Privacy + Security + TrustOS",
+    resolutionPath: [
+      "Run competitor, legal, privacy, security, claims, and investor statements through Competitive Defense before public use.",
+      "Keep security-certification, penetration-test, PHI, legal-advice, customer-release, competitor-partnership, and attack-guarantee claims blocked until qualified review.",
+      "Treat public APIs, protected workspaces, agent tools, health-record paths, claims, and build/dependency pipeline as explicit infiltration-deterrence layers."
+    ],
+    fallback:
+      "If a claim cannot be mapped to a defense profile, proof route, and external-review gate, keep it internal or route it to `/limitations-workarounds`."
+  },
+  {
     id: "wix-cta-routing",
     area: "sales",
     status: "ready",
@@ -144,33 +181,47 @@ export const buyerRouteChecklist: BuyerRouteChecklist[] = [
   {
     step: "1. Website discovery",
     source: "https://www.scrimedsolutions.com",
+    destination: "https://app.scrimedsolutions.com/launch-readiness",
+    requiredAction: "Verify Launch Readiness and the branded app domain before promoting buyer CTAs.",
+    verification: "Launch Readiness exposes primary-domain, fallback-domain, service path, hard-stop, and no-authority launch boundaries."
+  },
+  {
+    step: "2. Defense and trust review",
+    source: "https://www.scrimedsolutions.com",
+    destination: "https://app.scrimedsolutions.com/competitive-defense",
+    requiredAction: "Review competitor, legal, privacy, cybersecurity, and infiltration-deterrence hardening before promoting market claims.",
+    verification: "Competitive Defense exposes no-copy, no-PHI, no-certification, no-penetration-test, no-partnership, and no-protection-guarantee boundaries."
+  },
+  {
+    step: "3. Product discovery",
+    source: "https://www.scrimedsolutions.com",
     destination: "https://app.scrimedsolutions.com/product",
     requiredAction: "Keep the primary Wix View Product Console CTA mapped to the branded product route.",
     verification: "CTA opens Product Console without requiring buyer-owned Vercel access."
   },
   {
-    step: "2. Commercial review",
+    step: "4. Commercial review",
     source: "https://www.scrimedsolutions.com",
     destination: "https://app.scrimedsolutions.com/pricing",
     requiredAction: "Keep the Wix Review Pricing or Enterprise Pricing CTA mapped to the branded pricing route.",
     verification: "Pricing page shows public preview, assessment, synthetic pilot, protected pilot, enterprise license, and strategic partnership tiers."
   },
   {
-    step: "3. Product proof",
+    step: "5. Product proof",
     source: "https://app.scrimedsolutions.com/product",
     destination: "https://app.scrimedsolutions.com/evaluation",
     requiredAction: "Route qualified buyers into the AgentOS Evaluation Workspace.",
     verification: "Synthetic evaluation generates task plan, Trust Card, audit preview, and observability packet."
   },
   {
-    step: "4. Sales conversion",
+    step: "6. Sales conversion",
     source: "https://app.scrimedsolutions.com/evaluation",
     destination: "https://app.scrimedsolutions.com/pilot",
     requiredAction: "Route buyers from evaluation to pilot intake.",
     verification: "Pilot intake rejects PHI and produces a CRM-ready handoff packet."
   },
   {
-    step: "5. Opportunity operations",
+    step: "7. Opportunity operations",
     source: "https://app.scrimedsolutions.com/pilot",
     destination: "https://app.scrimedsolutions.com/sales-operations",
     requiredAction: "Use the protected tenant-admin console to assign ownership, advance the pipeline, release an audited proposal, and synchronize the approved CRM destination.",
@@ -198,6 +249,15 @@ export const smoothOpsPrinciples: SmoothOpsPrinciple[] = [
   {
     principle: "No production promotion by vibes",
     operatingRule: "Promotion requires build verification, deployment verification, route smoke tests, auth/DNS checks, and documented rollback path."
+  },
+  {
+    principle: "No unreviewed competitor or security claims",
+    operatingRule:
+      "Every competitor comparison, cybersecurity claim, privacy claim, penetration-test claim, customer-proof claim, and infiltration-risk statement must map to Competitive Defense, a proof route, and qualified review before public use."
+  },
+  {
+    principle: "No fallback-only launch",
+    operatingRule: "Fallback Vercel URLs can preserve internal continuity, but branded-domain smoke must pass before public launch approval."
   }
 ];
 
@@ -219,6 +279,6 @@ export function getCompanyOperationsSummary() {
     operationsBlockers,
     buyerRouteChecklist,
     smoothOpsPrinciples,
-    updated: "2026-06-15"
+    updated: "2026-06-26"
   };
 }

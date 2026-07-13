@@ -31,6 +31,15 @@ export default function HealthcareIntelligenceOSPage() {
           <a className="secondary-action" href="/api/healthcare-intelligence-os">
             Inspect OS API
           </a>
+          <a className="secondary-action" href="/api/clinical-data-fabric">
+            Clinical Data Fabric
+          </a>
+          <a className="secondary-action" href="/api/clinical-data-governance">
+            Data Governance
+          </a>
+          <a className="secondary-action" href="/api/clinical-context-gateway">
+            Context Gateway
+          </a>
           <a className="secondary-action" href="/api/healthcare-intelligence-os/brief">
             Download OS Brief
           </a>
@@ -59,6 +68,30 @@ export default function HealthcareIntelligenceOSPage() {
           <strong>{summary.clinicalKnowledgeGraph.nodeTypes.length}</strong>
         </article>
         <article>
+          <span>Source contracts</span>
+          <strong>{summary.clinicalDataFabric.sourceContractCount}</strong>
+        </article>
+        <article>
+          <span>Graph edge contracts</span>
+          <strong>{summary.clinicalDataFabric.graphEdgeCount}</strong>
+        </article>
+        <article>
+          <span>Governance rules</span>
+          <strong>{summary.clinicalDataGovernance.policyRuleCount}</strong>
+        </article>
+        <article>
+          <span>Governance evaluations</span>
+          <strong>{summary.clinicalDataGovernance.baselineEvaluationCount}</strong>
+        </article>
+        <article>
+          <span>Context scopes</span>
+          <strong>{summary.clinicalContextGateway.supportedScopeCount}</strong>
+        </article>
+        <article>
+          <span>Gateway controls</span>
+          <strong>{summary.clinicalContextGateway.gatewayControlCount}</strong>
+        </article>
+        <article>
           <span>Validation fields</span>
           <strong>{summary.validationTrustLab.fields.length}</strong>
         </article>
@@ -69,6 +102,22 @@ export default function HealthcareIntelligenceOSPage() {
         <article>
           <span>Protected workspace</span>
           <strong>{summary.persistentAgentWorkspace.status}</strong>
+        </article>
+        <article>
+          <span>Workflow tracks</span>
+          <strong>{summary.clinicalWorkflowAutomation.trackCount}</strong>
+        </article>
+        <article>
+          <span>Safety controls</span>
+          <strong>{summary.clinicalWorkflowAutomation.patientSafetyControlCount}</strong>
+        </article>
+        <article>
+          <span>Burden reducers</span>
+          <strong>{summary.clinicalWorkflowAutomation.clinicianBurdenReductionMotionCount}</strong>
+        </article>
+        <article>
+          <span>Engagement signals</span>
+          <strong>{summary.clinicalWorkflowAutomation.patientEngagementAnalysisSignalCount}</strong>
         </article>
       </section>
 
@@ -174,6 +223,146 @@ export default function HealthcareIntelligenceOSPage() {
         ))}
       </section>
 
+      <section className="section-band" id="clinical-data-fabric" aria-label="Clinical Data Fabric">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical Data Fabric</p>
+          <h2>Healthcare source contracts, semantic normalization, provenance, and health-graph projection stay governed before any agent receives context.</h2>
+          <p className="section-copy">{summary.clinicalDataFabric.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>{summary.clinicalDataFabric.status}</span>
+            <h3>Source contracts</h3>
+            <p>
+              {summary.clinicalDataFabric.sourceContractCount} source contracts cover FHIR, HL7, DICOM, X12,
+              documents, pharmacy, device, genomics, pathology, scheduling, portal, and patient-access context.
+            </p>
+            <ul className="compact-list">
+              <li>Data boundary: {summary.clinicalDataFabric.dataBoundary}</li>
+              <li>Connector authority: {summary.clinicalDataFabric.connectorAuthority}</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.clinicalDataFabric.validationStatus}</span>
+            <h3>Semantic layer</h3>
+            <p>
+              {summary.clinicalDataFabric.semanticMappingCount} semantic mappings normalize patient, condition,
+              lab, medication, imaging, and claim concepts with provenance and confidence requirements.
+            </p>
+            <ul className="compact-list">
+              <li>Agent data authority: {summary.clinicalDataFabric.agentDataAuthority}</li>
+              <li>Live ingestion authority: {summary.clinicalDataFabric.liveIngestionAuthority}</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.clinicalDataFabric.workflowEventCount} events</span>
+            <h3>Health graph controls</h3>
+            <p>
+              {summary.clinicalDataFabric.graphNodeCount} node contracts and {summary.clinicalDataFabric.graphEdgeCount} edge
+              contracts preserve source lineage, reviewer state, blocked uses, and human review requirements.
+            </p>
+            <ul className="compact-list">
+              <li>Clinical care authority: {summary.clinicalDataFabric.clinicalCareAuthority}</li>
+              <li>Blocked claims: {summary.clinicalDataFabric.blockedClaimCount}</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-band" id="clinical-data-governance" aria-label="Clinical Data Governance">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical Data Governance</p>
+          <h2>Every healthcare context request must pass deterministic policy checks before agents, tools, models, or connectors receive authority.</h2>
+          <p className="section-copy">{summary.clinicalDataGovernance.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>{summary.clinicalDataGovernance.status}</span>
+            <h3>Policy engine</h3>
+            <p>
+              {summary.clinicalDataGovernance.policyRuleCount} rules evaluate role, purpose, data class,
+              action, destination, consent, tenant scope, minimum necessary access, review, residency, and contract readiness.
+            </p>
+            <ul className="compact-list">
+              <li>Policy version: {summary.clinicalDataGovernance.policyVersion}</li>
+              <li>Data boundary: {summary.clinicalDataGovernance.dataBoundary}</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.clinicalDataGovernance.validationStatus}</span>
+            <h3>Decision coverage</h3>
+            <p>
+              {summary.clinicalDataGovernance.baselineEvaluationCount} baseline control evaluations prove metadata access,
+              deidentified review packets, external model PHI, record mutation, and semantic context decisions stay governed.
+            </p>
+            <ul className="compact-list">
+              <li>Supported actions: {summary.clinicalDataGovernance.supportedActionCount}</li>
+              <li>Supported destinations: {summary.clinicalDataGovernance.supportedDestinationCount}</li>
+            </ul>
+          </article>
+          <article>
+            <span>authority blocked</span>
+            <h3>Retained limits</h3>
+            <p>
+              Live care, production connectors, record mutation, patient outreach, payer submission, and external model PHI remain blocked.
+            </p>
+            <ul className="compact-list">
+              <li>Clinical care: {summary.clinicalDataGovernance.clinicalCareAuthority}</li>
+              <li>Connector: {summary.clinicalDataGovernance.productionConnectorAuthority}</li>
+              <li>Record mutation: {summary.clinicalDataGovernance.recordMutationAuthority}</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-band" id="clinical-context-gateway" aria-label="Clinical Context Gateway">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical Context Gateway</p>
+          <h2>Agents receive governed semantic envelopes, not raw schemas, raw connector payloads, or patient records.</h2>
+          <p className="section-copy">{summary.clinicalContextGateway.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>{summary.clinicalContextGateway.status}</span>
+            <h3>Semantic envelope control</h3>
+            <p>
+              The gateway covers {summary.clinicalContextGateway.supportedScopeCount} context scopes and
+              {summary.clinicalContextGateway.sourceContractCount} source contracts with policy-cleared,
+              metadata-only context envelopes.
+            </p>
+            <ul className="compact-list">
+              <li>Envelope version: {summary.clinicalContextGateway.envelopeVersion}</li>
+              <li>Data boundary: {summary.clinicalContextGateway.dataBoundary}</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.clinicalContextGateway.validationStatus}</span>
+            <h3>Gateway proof coverage</h3>
+            <p>
+              {summary.clinicalContextGateway.baselineEvaluationCount} baseline evaluations prove allowed,
+              review-gated, unsafe-destination, live-data, and unregistered-source requests remain deterministic.
+            </p>
+            <ul className="compact-list">
+              <li>Gateway controls: {summary.clinicalContextGateway.gatewayControlCount}</li>
+              <li>Raw schema access: {summary.clinicalContextGateway.rawSchemaAccess}</li>
+            </ul>
+          </article>
+          <article>
+            <span>raw access blocked</span>
+            <h3>Agent containment</h3>
+            <p>
+              Context delivery preserves source-contract provenance, confidence inputs, evidence requirements,
+              blocked-use instructions, and audit hashes without widening agent authority.
+            </p>
+            <ul className="compact-list">
+              <li>Raw connector payload: {summary.clinicalContextGateway.rawConnectorPayloadAccess}</li>
+              <li>Record mutation: {summary.clinicalContextGateway.recordMutationAuthority}</li>
+              <li>Patient outreach: {summary.clinicalContextGateway.patientOutreachAuthority}</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
       <section className="section-band" aria-label="Validation and Trust Lab contract">
         <div className="section-heading">
           <p className="eyebrow">Validation and Trust Lab</p>
@@ -226,6 +415,38 @@ export default function HealthcareIntelligenceOSPage() {
                 <li key={control}>{control}</li>
               ))}
             </ul>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Clinical workflow automation and clinician burden reduction">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical workflow automation</p>
+          <h2>SCRIMED can reduce administrative drag through draft-only, source-attributed, human-reviewed workflow support.</h2>
+          <p className="section-copy">{summary.clinicalWorkflowAutomation.boundary}</p>
+        </div>
+        {summary.clinicalWorkflowAutomation.tracks.map((track) => (
+          <article className="module-row" key={track.slug}>
+            <div>
+              <span>{track.status}</span>
+              <h2>{track.lane}</h2>
+            </div>
+            <p>{track.clinicalAwareness}</p>
+            <div>
+              <strong>{track.automationScope}</strong>
+              <ul className="compact-list">
+                <li>Buyer: {track.buyer}</li>
+                <li>Patient safety: {track.patientSafetyControls.join(", ")}</li>
+                <li>Patient engagement analysis: {track.patientEngagementAnalysis.join(", ")}</li>
+                <li>Interoperability: {track.interoperabilityBindings.join(", ")}</li>
+                <li>Clinician burden reduction: {track.clinicianBurdenReduction.join(", ")}</li>
+                <li>Operations optimization: {track.operationsOptimization.join(", ")}</li>
+                <li>Proof routes: {track.proofRoutes.join(", ")}</li>
+                <li>Blocked actions: {track.blockedActions.join(", ")}</li>
+                <li>Before live: {track.requiredBeforeLive}</li>
+                <li>Boundary: {track.retainedBoundary}</li>
+              </ul>
+            </div>
           </article>
         ))}
       </section>

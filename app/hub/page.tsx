@@ -3,6 +3,21 @@ import { getHubSummary, hubModules, hubSignals } from "../lib/scrimedHub";
 
 const consoleViews = [
   {
+    name: "Company Assessment",
+    href: "/company-assessment",
+    summary: "Assess SCRIMED as a whole across product, service, revenue, margin, approvals, security, AI, health records, launch, investors, teams, hard stops, and proof routes."
+  },
+  {
+    name: "Clinical Production Readiness",
+    href: "/clinical-production-readiness",
+    summary: "Track required clinical-production tasks while maximizing current no-PHI demos, paid readiness services, synthetic pilots, and diligence packets."
+  },
+  {
+    name: "Pilot Demo Accelerator",
+    href: "/pilot-demo-commercial-readiness",
+    summary: "Map demos into recommended pilot packages, price bands, proof assets, market benchmarks, and no-PHI intake before buyer calls."
+  },
+  {
     name: "Readiness",
     href: "/hub/readiness",
     summary: "Review foundation checks, non-blocking watches, and gated clinical integrations."
@@ -18,6 +33,31 @@ const consoleViews = [
     summary: "Review SCRIMED Atlas Pilot offers, buyer workflows, proof routes, deployment stages, and production boundaries."
   },
   {
+    name: "Operating Command Center",
+    href: "/scrimed-operating-command",
+    summary: "Prioritize owner-bound operating lanes for systems, agents, infrastructure, workflows, services, products, UI, KPIs, proof routes, and retained gates."
+  },
+  {
+    name: "Automation Autopilot",
+    href: "/scrimed-automation-autopilot",
+    summary: "Score safe autonomy lanes, reduce operating bottlenecks, recommend reversible no-PHI automation, and keep production authority blocked behind human review."
+  },
+  {
+    name: "Service Delivery",
+    href: "/service-delivery",
+    summary: "Turn packaged offers into scoped work orders, acceptance criteria, artifacts, buyer handoffs, margin protections, and retained authority gates."
+  },
+  {
+    name: "Launch Readiness",
+    href: "/launch-readiness",
+    summary: "Review launch structure, sandbox DNS classification, strict branded-domain gates, service paths, protected proof boundaries, and hard stops."
+  },
+  {
+    name: "Competitive Defense",
+    href: "/competitive-defense",
+    summary: "Review competitor threat profiles, weakness relief, legal/privacy/cyber controls, infiltration-deterrence layers, and external review gates."
+  },
+  {
     name: "Navigation Audit",
     href: "/navigation",
     summary: "Review page route inventory, API route pattern counts, smoke coverage, protected fail-closed checks, and retained AAL2 or external-review boundaries."
@@ -28,6 +68,21 @@ const consoleViews = [
     summary: "Review product/service controls, fault classes, efficiency improvements, owners, proof routes, and retained authority boundaries."
   },
   {
+    name: "Enterprise Scalability",
+    href: "/enterprise-scalability",
+    summary: "Review capacity planning, tenant scale, queues, SLO readiness, incidents, support load, global deployment, and cost controls."
+  },
+  {
+    name: "Platform Power",
+    href: "/platform-power",
+    summary: "Review API contracts, operator UI, AI model-route readiness, agent approvals, eval loops, evidence retrieval, and platform cost controls."
+  },
+  {
+    name: "Limitations Workarounds",
+    href: "/limitations-workarounds",
+    summary: "Resolve blocked requests through safe workaround packets, escalation owners, proof routes, expiration rules, and graduation gates."
+  },
+  {
     name: "Capital Vitality",
     href: "/capital-vitality",
     summary: "Review revenue capabilities, competitive moat evidence, investor milestones, funding workstreams, and retained external-review gates."
@@ -36,6 +91,16 @@ const consoleViews = [
     name: "Growth Engine",
     href: "/growth-engine",
     summary: "Prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes."
+  },
+  {
+    name: "Investor Readiness",
+    href: "/investor-audience-readiness",
+    summary: "Route weaknesses, competitive edge, sellable value, and investor, clinic, buyer, and partner audiences into safe proof packets."
+  },
+  {
+    name: "Client Onboarding",
+    href: "/client-onboarding",
+    summary: "Run buyer onboarding, discovery scheduling, demos, pilot workshops, presentations, email-ready copy, calendar-ready agendas, follow-up SLAs, and handoffs."
   },
   {
     name: "Pilot Deal Room",
@@ -309,6 +374,38 @@ export default function HubPage() {
           <strong>{summary.status}</strong>
         </article>
         <article>
+          <span>Company score</span>
+          <strong>{summary.companyAssessmentSummary.overallScore}</strong>
+        </article>
+        <article>
+          <span>Company dimensions</span>
+          <strong>{summary.companyAssessmentSummary.dimensionCount}</strong>
+        </article>
+        <article>
+          <span>Company workstreams</span>
+          <strong>{summary.companyAssessmentSummary.upgradeWorkstreamCount}</strong>
+        </article>
+        <article>
+          <span>Company hard stops</span>
+          <strong>{summary.companyAssessmentSummary.hardStopCount}</strong>
+        </article>
+        <article>
+          <span>Clinical production</span>
+          <strong>{summary.clinicalProductionReadinessSummary.clinicalProductionReady ? "ready" : "not ready"}</strong>
+        </article>
+        <article>
+          <span>Clinical tasks</span>
+          <strong>{summary.clinicalProductionReadinessSummary.taskCount}</strong>
+        </article>
+        <article>
+          <span>Critical open</span>
+          <strong>{summary.clinicalProductionReadinessSummary.criticalOpenTaskCount}</strong>
+        </article>
+        <article>
+          <span>Current motions</span>
+          <strong>{summary.clinicalProductionReadinessSummary.currentCapabilityMotionCount}</strong>
+        </article>
+        <article>
           <span>Modules</span>
           <strong>{summary.moduleCount}</strong>
         </article>
@@ -319,6 +416,30 @@ export default function HubPage() {
         <article>
           <span>Foundation</span>
           <strong>{summary.activeModules}</strong>
+        </article>
+        <article>
+          <span>Command lanes</span>
+          <strong>{summary.operatingCommandCenterSummary.laneCount}</strong>
+        </article>
+        <article>
+          <span>P0 command</span>
+          <strong>{summary.operatingCommandCenterSummary.p0LaneCount}</strong>
+        </article>
+        <article>
+          <span>Review-gated lanes</span>
+          <strong>{summary.operatingCommandCenterSummary.highControlLaneCount}</strong>
+        </article>
+        <article>
+          <span>Command packets</span>
+          <strong>{summary.operatingCommandCenterSummary.evidencePacketCount}</strong>
+        </article>
+        <article>
+          <span>Protected packets</span>
+          <strong>{summary.operatingCommandCenterSummary.protectedOperatorEvidencePacketCount}</strong>
+        </article>
+        <article>
+          <span>Boundary packets</span>
+          <strong>{summary.operatingCommandCenterSummary.boundaryReleaseEvidencePacketCount}</strong>
         </article>
         <article>
           <span>Product demos</span>
@@ -361,6 +482,22 @@ export default function HubPage() {
           <strong>{summary.serviceReliabilitySummary.faultClassCount}</strong>
         </article>
         <article>
+          <span>Autonomy lanes</span>
+          <strong>{summary.automationAutopilotSummary.capabilityCount}</strong>
+        </article>
+        <article>
+          <span>Auto readiness</span>
+          <strong>{summary.automationAutopilotSummary.averageReadinessScore}</strong>
+        </article>
+        <article>
+          <span>Autonomy blocked</span>
+          <strong>{summary.automationAutopilotSummary.productionAuthorityBlockedCount}</strong>
+        </article>
+        <article>
+          <span>Review gated</span>
+          <strong>{summary.automationAutopilotSummary.reviewRequiredCount}</strong>
+        </article>
+        <article>
           <span>Revenue capabilities</span>
           <strong>{summary.capitalVitalitySummary.revenueCapabilityCount}</strong>
         </article>
@@ -392,6 +529,136 @@ export default function HubPage() {
           <span>Growth bottlenecks</span>
           <strong>{summary.growthEngineSummary.growthBottleneckCount}</strong>
         </article>
+        <article>
+          <span>Workaround tracks</span>
+          <strong>{summary.limitationsWorkaroundSummary.trackCount}</strong>
+        </article>
+        <article>
+          <span>Workaround packets</span>
+          <strong>{summary.limitationsWorkaroundSummary.packetCount}</strong>
+        </article>
+        <article>
+          <span>Open workaround risks</span>
+          <strong>{summary.limitationsWorkaroundSummary.openRiskCount}</strong>
+        </article>
+        <article>
+          <span>Launch tracks</span>
+          <strong>{summary.launchReadinessSummary.launchTrackCount}</strong>
+        </article>
+        <article>
+          <span>DNS controls</span>
+          <strong>{summary.launchReadinessSummary.dnsControlCount}</strong>
+        </article>
+        <article>
+          <span>Launch hard stops</span>
+          <strong>{summary.launchReadinessSummary.hardStopCount}</strong>
+        </article>
+        <article>
+          <span>Threat profiles</span>
+          <strong>{summary.competitiveDefenseSummary.competitorThreatProfileCount}</strong>
+        </article>
+        <article>
+          <span>Cyber controls</span>
+          <strong>{summary.competitiveDefenseSummary.legalPrivacyCyberControlCount}</strong>
+        </article>
+        <article>
+          <span>Defense hard stops</span>
+          <strong>{summary.competitiveDefenseSummary.hardStopCount}</strong>
+        </article>
+        <article>
+          <span>Delivery offers</span>
+          <strong>{summary.serviceDeliverySummary.deliveryOfferCount}</strong>
+        </article>
+        <article>
+          <span>Work orders</span>
+          <strong>{summary.serviceDeliverySummary.workOrderTemplateCount}</strong>
+        </article>
+        <article>
+          <span>Delivery gates</span>
+          <strong>{summary.serviceDeliverySummary.activationGateCount}</strong>
+        </article>
+        <article>
+          <span>Delivery hard stops</span>
+          <strong>{summary.serviceDeliverySummary.hardStopCount}</strong>
+        </article>
+      </section>
+
+      <section className="section-band split-band" aria-label="SCRIMED operating command posture">
+        <div>
+          <p className="eyebrow">Operating command</p>
+          <h2>{summary.operatingCommandCenterSummary.status}</h2>
+          <p className="section-copy">{summary.operatingCommandCenterSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href="/scrimed-operating-command">
+              Open Command Center
+            </Link>
+            <a className="secondary-action" href={summary.operatingCommandCenterSummary.briefRoute}>
+              Download Command Brief
+            </a>
+          </div>
+        </div>
+        <div className="layer-list">
+          {summary.operatingCommandCenterSummary.lanes.slice(0, 5).map((lane, index) => (
+            <div className="layer-row" key={lane.id}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{lane.priority} {lane.id}: {lane.nextSafeAction}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-band split-band" aria-label="SCRIMED automation autopilot posture">
+        <div>
+          <p className="eyebrow">Automation Autopilot</p>
+          <h2>{summary.automationAutopilotSummary.status}</h2>
+          <p className="section-copy">{summary.automationAutopilotSummary.boundary}</p>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.automationAutopilotSummary.route}>
+              Open Automation Autopilot
+            </Link>
+            <a className="secondary-action" href={summary.automationAutopilotSummary.briefRoute}>
+              Download Autopilot Brief
+            </a>
+          </div>
+        </div>
+        <div className="layer-list">
+          {summary.automationAutopilotSummary.capabilities.slice(0, 5).map((capability, index) => (
+            <div className="layer-row" key={capability.id}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>
+                {capability.name}: {capability.mode}, review gate{" "}
+                {capability.humanReviewRequired ? "required" : "not required"},
+                production authority blocked
+              </strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED operating evidence packets">
+        <div className="section-heading">
+          <p className="eyebrow">Operating evidence packets</p>
+          <h2>Every command lane now has a review packet with missing evidence, AAL2 status, boundary-release status, and a deterministic hash.</h2>
+        </div>
+        {summary.operatingCommandCenterSummary.evidencePackets.slice(0, 6).map((packet) => (
+          <article className="module-row" key={packet.packetId}>
+            <div>
+              <span>{packet.releaseStage}</span>
+              <h2>{packet.packetId}</h2>
+            </div>
+            <p>{packet.nextReviewAction}</p>
+            <div>
+              <strong>{packet.evidenceState}</strong>
+              <ul className="compact-list">
+                <li>Lane: {packet.laneId}</li>
+                <li>AAL2 required: {packet.aal2Required ? "yes" : "no"}</li>
+                <li>Boundary release required: {packet.boundaryReleaseRequired ? "yes" : "no"}</li>
+                <li>Protected operator required: {packet.protectedOperatorRequired ? "yes" : "no"}</li>
+                <li>Hash: {packet.packetHash}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="section-band principle-grid" aria-label="Hub console views">

@@ -25,7 +25,7 @@ Deployment profiles help SCRIMED discuss infrastructure readiness with enterpris
 
 ## Known Limitation Handling
 
-- Local `npm` unavailability is bypassed through direct Node entrypoints for lint, typecheck, integrity, and build.
+- Local `npm` unavailability is bypassed through the contract-backed `node scripts/scrimed-local-quality-runner.mjs` path for cleanup, integrity, hygiene, nonsecret tests, typecheck, lint, and build.
 - Local Turbopack is blocked by macOS SWC code-signature validation; local production verification uses Next's Webpack fallback while Vercel production deployments remain READY.
 - No-secret public deployment readiness is covered by `scripts/public-production-smoke.mjs`.
 - Authenticated mutation smoke still requires an out-of-band `SCRIMED_BEARER_TOKEN` secret and cannot be safely resolved in source code.

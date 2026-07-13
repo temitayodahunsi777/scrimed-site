@@ -166,8 +166,8 @@ const safeTextPattern = /^[A-Za-z0-9][A-Za-z0-9 ._:/#-]*$/;
 
 const forbiddenReferencePatterns = [
   /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/,
-  /sk-[A-Za-z0-9_-]{12,}/i,
-  /sbp_[A-Za-z0-9_-]{12,}/i,
+  /(^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{12,}/i,
+  /(^|[^A-Za-z0-9])sbp_[A-Za-z0-9_-]{12,}/i,
   /bearer\s+[A-Za-z0-9._-]+/i,
   /token/i,
   /secret/i,

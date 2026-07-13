@@ -1,6 +1,6 @@
 # SCRIMED Boundary Resolution Register
 
-Updated: 2026-06-23
+Updated: 2026-06-25
 
 SCRIMED exposes the Boundary Resolution Register at `/boundary-resolution`, `/api/boundary-resolution`, and `/api/boundary-resolution/brief`.
 
@@ -11,6 +11,9 @@ The register aggregates known limits from:
 - Persistent Agent Workspace limitations
 - QA Evidence Ledger, Manual AAL2 Activation Plan, Execution Readiness, Run Control, Launch Kit, Human Run Packet, Manual QA Execution Console, Completion Bridge, Claim Guard, Activation Seal, Proof Promotion, and Buyer Proof Release
 - Public Market Readiness limitations
+- Global Certification Readiness tracks
+- Continuous Review, Audit, and Innovation agents and controls
+- Enterprise-growth operations limitations for legal, finance, accounting, tax, revenue, profit, investor, securities, global partner, and procurement claims
 
 ## Operating Purpose
 
@@ -25,7 +28,19 @@ The register exists to keep hard boundaries visible, owned, and actionable. A bo
 
 ## Current Boundary
 
-The register does not authorize live clinical care, PHI processing, legal approval, regional regulatory approval, reimbursement certainty, security certification, production clinical authorization, autonomous clinical decisions, patient outreach, payer submission, EHR writeback, public customer claims, or securities offering material.
+The register does not authorize live clinical care, PHI processing, legal approval, regional regulatory approval, reimbursement certainty, security certification, production clinical authorization, autonomous clinical decisions, patient outreach, payer submission, EHR writeback, public customer claims, audited financial reporting, revenue or profit guarantees, managed 24/7 SOC/MDR coverage, public quantum capability claims, or securities offering material.
+
+## 2026-06-25 Limitations Control Expansion
+
+The register now centralizes the newer operating limitations created during SCRIMED CODE pt.3:
+
+- Global approval and certification preparation remains evidence-building only until qualified regulators, auditors, certification bodies, counsel, or buyer authorities approve the specific claim.
+- 24/7 review and innovation agents may flag, route, sample, recommend tests, and assign research, but they do not provide managed SOC/MDR coverage, autonomous remediation, error-free review, clinical validation, or permission to bypass human approval.
+- Quantum-safe and post-quantum work remains internal research only; no buyer-facing quantum-safe certification, quantum clinical advantage, or post-quantum production-readiness claim is allowed.
+- Enterprise business operations may improve revenue motion, deal desk, price floors, margin discipline, billing readiness, and review routing, but they do not create legal, accounting, tax, contract, audited-financial, securities, valuation, revenue, ROI, or profit authority.
+- Global partner and public-sector work remains localization and procurement-readiness planning only until regional legal, privacy, security, hosting, procurement, partner, and customer-specific approvals exist.
+
+Additional proof headers on `/api/boundary-resolution` and `/api/boundary-resolution/brief` now expose limitation-control, autonomy, financial, quantum, revenue, and securities boundaries for smoke verification.
 
 ## 2026-06-22 AAL2 Synthetic QA Boundary Inventory
 
@@ -62,6 +77,8 @@ Recommended mitigations:
 Use the register as the central no-secret operating map before buyer conversations, investor diligence, clinical authority review, protected pilot escalation, or production-readiness planning.
 
 Do not treat a safe workaround as external approval. If a record says `human-aal2-required`, `customer-specific-required`, `external-approval-required`, or `blocked-before-approval`, keep the gate closed until retained evidence exists.
+
+Do not position a review loop, innovation track, growth lane, finance control, partner packet, or certification-prep surface as proof that the underlying authority has been granted.
 
 ## Next Step
 
