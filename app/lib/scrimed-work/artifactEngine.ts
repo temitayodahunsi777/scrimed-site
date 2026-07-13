@@ -1,4 +1,5 @@
 import { createAuditHash, nowIso } from "./audit";
+import { buildScrimedWorkArtifactId } from "./durableIdentifier";
 import { verifyScrimedWorkResult } from "./verificationEngine";
 import type { ArtifactType, WorkArtifact, WorkSession, WorkAgentRole } from "./types";
 
@@ -35,7 +36,11 @@ export function buildScrimedWorkArtifact(input: {
       : "Human review is recommended before external use."
   ].join("\n");
   const verification = verifyScrimedWorkResult({ session: input.session, outputText: content });
-  const artifactId = `artifact_${createAuditHash({ sessionId: input.session.id, type: input.type, title }).slice(0, 16)}`;
+  const artifactSeed = { sessionId: input.session.id, type: input.type, title };
+  const artifactId = buildScrimedWorkArtifactId(
+    createAuditHash(artifactSeed),
+    createAuditHash({ ...artifactSeed, partition: "scrimed-work-artifact-id-v1" })
+  );
 
   return {
     artifactId,

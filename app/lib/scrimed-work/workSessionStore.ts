@@ -5,7 +5,7 @@ import { searchScrimedWorkContext } from "./contextEngine";
 import { routeScrimedWorkModel } from "./modelRouter";
 import { buildAgentPlan, buildToolCallPlan } from "./orchestrationEngine";
 import { scoreAutonomy } from "./autonomyPolicy";
-import { buildScrimedWorkSessionId } from "./sessionIdentifier";
+import { buildScrimedWorkSessionId } from "./durableIdentifier";
 import { applyWorkSessionTransition, type WorkSessionTransitionDecision } from "./sessionLifecycle";
 import { calculateValueTelemetry } from "./valueTelemetry";
 import type {

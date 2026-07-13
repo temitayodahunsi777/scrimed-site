@@ -10,9 +10,11 @@ import {
 } from "../app/lib/scrimed-work/browserVerification.ts";
 import { scrimedWorkDurableStoreRpcFailure } from "../app/lib/scrimed-work/durableStore.ts";
 import {
+  buildScrimedWorkArtifactId,
   buildScrimedWorkSessionId,
+  scrimedWorkArtifactIdPattern,
   scrimedWorkSessionIdPattern
-} from "../app/lib/scrimed-work/sessionIdentifier.ts";
+} from "../app/lib/scrimed-work/durableIdentifier.ts";
 
 const payload = buildScrimedWorkBrowserVerificationPayload("atlas-synthetic-evaluation", "fixture123456");
 const serialized = JSON.stringify(payload);
@@ -36,6 +38,11 @@ assert.equal(firstSessionId, "work_session_0123abcd4567ef89");
 assert.equal(replaySessionId, firstSessionId);
 assert.notEqual(distinctSessionId, firstSessionId);
 assert.throws(() => buildScrimedWorkSessionId("scrimed-intel-invalid", "scrimed-intel-4567ef89"));
+
+const artifactId = buildScrimedWorkArtifactId("scrimed-intel-89abcdef", "scrimed-intel-01234567");
+assert.match(artifactId, scrimedWorkArtifactIdPattern);
+assert.equal(artifactId, "artifact_89abcdef01234567");
+assert.throws(() => buildScrimedWorkArtifactId("scrimed-intel-89abcdef", "scrimed-intel-invalid"));
 
 assert.equal(
   scrimedWorkDurableStoreRpcFailure(
