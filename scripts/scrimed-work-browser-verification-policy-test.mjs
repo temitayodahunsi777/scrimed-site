@@ -8,6 +8,11 @@ import {
   scrimedWorkBrowserVerificationBoundary,
   scrimedWorkBrowserVerificationChecks
 } from "../app/lib/scrimed-work/browserVerification.ts";
+import { scrimedWorkDurableStoreRpcFailure } from "../app/lib/scrimed-work/durableStore.ts";
+import {
+  buildScrimedWorkSessionId,
+  scrimedWorkSessionIdPattern
+} from "../app/lib/scrimed-work/sessionIdentifier.ts";
 
 const payload = buildScrimedWorkBrowserVerificationPayload("atlas-synthetic-evaluation", "fixture123456");
 const serialized = JSON.stringify(payload);
@@ -21,6 +26,31 @@ assert.ok(payload.definitionOfDone.prohibitedActions.includes("live PHI"));
 assert.ok(payload.definitionOfDone.prohibitedActions.includes("payer submission"));
 assert.ok(payload.definitionOfDone.prohibitedActions.includes("EHR writeback"));
 assert.ok(!/patient[_ -]?(name|email|phone|address)|member[_ -]?id/i.test(serialized));
+
+const firstSessionId = buildScrimedWorkSessionId("scrimed-intel-0123abcd", "scrimed-intel-4567ef89");
+const replaySessionId = buildScrimedWorkSessionId("scrimed-intel-0123abcd", "scrimed-intel-4567ef89");
+const distinctSessionId = buildScrimedWorkSessionId("scrimed-intel-0123abcd", "scrimed-intel-4567ef80");
+
+assert.match(firstSessionId, scrimedWorkSessionIdPattern);
+assert.equal(firstSessionId, "work_session_0123abcd4567ef89");
+assert.equal(replaySessionId, firstSessionId);
+assert.notEqual(distinctSessionId, firstSessionId);
+assert.throws(() => buildScrimedWorkSessionId("scrimed-intel-invalid", "scrimed-intel-4567ef89"));
+
+assert.equal(
+  scrimedWorkDurableStoreRpcFailure(
+    {
+      message: 'new row for relation "scrimed_work_sessions" violates check constraint "scrimed_work_sessions_session_id_check"',
+      details: "Failing row contains tenant-scoped synthetic metadata."
+    },
+    "fallback"
+  ).code,
+  "scrimed-work-invalid-record-shape"
+);
+assert.equal(
+  scrimedWorkDurableStoreRpcFailure({ message: "governance-workspace-or-role-denied" }, "fallback").code,
+  "scrimed-work-role-denied"
+);
 
 assert.equal(scrimedWorkBrowserVerificationChecks.length, 11);
 assert.equal(scrimedWorkBrowserVerificationChecks.at(1)?.id, "unauthenticated-fail-closed");

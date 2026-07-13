@@ -378,19 +378,31 @@ export function scrimedWorkDurableStoreRpcFailure(error: unknown, fallbackCode: 
     };
   }
 
-  if (/workspace.*denied|role-denied|membership|tenant/i.test(text)) {
-    return {
-      status: 403,
-      code: "scrimed-work-role-denied",
-      message: "The authenticated operator is not authorized for this tenant workspace."
-    };
-  }
-
-  if (/server-authorization|required|token/i.test(text)) {
+  if (/server-authorization|runtime-authorization|server-held.*token/i.test(text)) {
     return {
       status: 503,
       code: "scrimed-work-runtime-authorization-missing",
       message: "SCRIMED Work durable mutations require the server-held runtime authorization token."
+    };
+  }
+
+  if (/violates check constraint|session_id_check|scrimed-work-invalid-session/i.test(text)) {
+    return {
+      status: 400,
+      code: "scrimed-work-invalid-record-shape",
+      message: "SCRIMED Work rejected metadata that did not satisfy the durable record contract."
+    };
+  }
+
+  if (
+    /workspace(?:-or)?-role-denied|workspace.*role.*denied|role-denied|membership-role-denied|not authorized for this tenant workspace/i.test(
+      text
+    )
+  ) {
+    return {
+      status: 403,
+      code: "scrimed-work-role-denied",
+      message: "The authenticated operator is not authorized for this tenant workspace."
     };
   }
 

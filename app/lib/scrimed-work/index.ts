@@ -428,6 +428,7 @@ export async function guardedCreateSession(request: Request) {
       role: auth.context.actorRole,
       tenantId: auth.context.tenantId
     },
+    idempotencySeed: auth.context.idempotencyKey,
     definitionOfDone: parsed.value.definitionOfDone
   });
   const durable = await recordScrimedWorkSessionInDurableStore(auth.context, session);

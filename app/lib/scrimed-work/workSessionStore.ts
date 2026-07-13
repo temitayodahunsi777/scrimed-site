@@ -5,6 +5,7 @@ import { searchScrimedWorkContext } from "./contextEngine";
 import { routeScrimedWorkModel } from "./modelRouter";
 import { buildAgentPlan, buildToolCallPlan } from "./orchestrationEngine";
 import { scoreAutonomy } from "./autonomyPolicy";
+import { buildScrimedWorkSessionId } from "./sessionIdentifier";
 import { applyWorkSessionTransition, type WorkSessionTransitionDecision } from "./sessionLifecycle";
 import { calculateValueTelemetry } from "./valueTelemetry";
 import type {
@@ -189,11 +190,30 @@ export function getWorkSession(sessionId: string) {
   return sessions.get(sessionId) ?? null;
 }
 
-export function buildWorkSessionFromContract(input: Partial<WorkSession> & { definitionOfDone: DefinitionOfDoneContract }) {
-  const id = `work_session_${createAuditHash({ title: input.title, goal: input.definitionOfDone.goal }).slice(0, 16)}`;
+type WorkSessionBuildInput = Partial<WorkSession> & {
+  definitionOfDone: DefinitionOfDoneContract;
+  idempotencySeed?: string;
+};
+
+export function createWorkSessionId(input: Pick<WorkSessionBuildInput, "title" | "definitionOfDone" | "idempotencySeed">) {
+  const seed = {
+    title: input.title,
+    goal: input.definitionOfDone.goal,
+    idempotencySeed: input.idempotencySeed ?? "deterministic-default"
+  };
+  return buildScrimedWorkSessionId(
+    createAuditHash(seed),
+    createAuditHash({ ...seed, partition: "scrimed-work-session-id-v1" })
+  );
+}
+
+export function buildWorkSessionFromContract(input: WorkSessionBuildInput) {
+  const sessionInput = { ...input };
+  delete sessionInput.idempotencySeed;
+  const id = createWorkSessionId(input);
 
   return buildSyntheticWorkSession({
-    ...input,
+    ...sessionInput,
     id,
     statusHistory: [
       {
@@ -211,7 +231,7 @@ export function saveWorkSession(session: WorkSession) {
   return session;
 }
 
-export function createWorkSessionFromContract(input: Partial<WorkSession> & { definitionOfDone: DefinitionOfDoneContract }) {
+export function createWorkSessionFromContract(input: WorkSessionBuildInput) {
   return saveWorkSession(buildWorkSessionFromContract(input));
 }
 
