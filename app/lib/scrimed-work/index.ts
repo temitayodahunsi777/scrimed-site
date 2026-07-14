@@ -10,6 +10,7 @@ import {
   getScrimedWorkWorkspaceSlug,
   fetchScrimedWorkSessionFromDurableStore,
   isScrimedWorkDurableStoreEnabled,
+  listScrimedWorkArtifactReviewQueueInDurableStore,
   recordScrimedWorkArtifactInDurableStore,
   reviewScrimedWorkArtifactInDurableStore,
   recordScrimedWorkSessionInDurableStore,
@@ -31,6 +32,11 @@ import { sampleModelRouteInputs, routeScrimedWorkModel } from "./modelRouter";
 import { previewOrchestration } from "./orchestrationEngine";
 import { getScrimedWorkProductionHardeningGate } from "./productionHardening";
 import { scrimedWorkProviderRegistry } from "./providerRegistry";
+import {
+  parseScrimedWorkReviewQueueLimit,
+  scrimedWorkReviewQueueBoundary,
+  scrimedWorkReviewQueuePolicyVersion
+} from "./reviewQueue";
 import { containsPhiRisk, containsTokenLikeField, parseArtifactRequest, parseWorkSessionCreateInput } from "./schemas";
 import { scrimedWorkScheduleDefinitions } from "./scheduleDefinitions";
 import {
@@ -65,6 +71,7 @@ export * from "./autonomyPolicy";
 export * from "./approvalEngine";
 export * from "./artifactEngine";
 export * from "./artifactReview";
+export * from "./reviewQueue";
 export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
@@ -186,7 +193,7 @@ export function getScrimedWorkSummary() {
     },
     productionHardening: getScrimedWorkProductionHardeningGate(),
     nextProductionHardeningStep:
-      "Apply and verify all four SCRIMED Work migrations in an approved no-PHI target, run the AAL2 lifecycle plus independent artifact-review smoke with separate operator and reviewer identities, then retain one internal-only canary evidence packet."
+      "Apply and verify all five SCRIMED Work migrations in the approved no-PHI target, validate the AAL2 reviewer queue with a separate reviewer identity, then retain the internal-only review and completion evidence packet."
   };
 }
 
@@ -851,6 +858,79 @@ export async function guardedCreatePayerIqProtectedHandoff(request: Request) {
         "complete the session only after all mandatory criteria pass"
       ],
       ...payerIqProtectedHandoffAuthority
+    }
+  };
+}
+
+export async function guardedListProtectedArtifactReviewQueue(request: Request) {
+  const limit = parseScrimedWorkReviewQueueLimit(new URL(request.url).searchParams.get("limit"));
+  if (!limit.ok) {
+    return {
+      allowed: false as const,
+      status: 422,
+      error: errorEnvelope(
+        "scrimed_work_review_queue_invalid_limit",
+        limit.reason,
+        "artifact-review-queue-read",
+        false
+      )
+    };
+  }
+
+  const auth = await buildReadAuthorizationDecision(request, "artifact-review-queue-read", {
+    limit: limit.value
+  });
+  if (!auth.allowed) return auth;
+
+  if (auth.context.memberRole !== "reviewer" || auth.context.actorRole !== "reviewer") {
+    return {
+      allowed: false as const,
+      status: 403,
+      error: errorEnvelope(
+        "scrimed_work_review_queue_reviewer_required",
+        "SCRIMED Work review queue access requires a separately authorized reviewer membership.",
+        "artifact-review-queue-read",
+        false
+      )
+    };
+  }
+
+  const durable = await listScrimedWorkArtifactReviewQueueInDurableStore(
+    auth.context,
+    limit.value
+  );
+  if (durable.error || !durable.queue) {
+    const failure = scrimedWorkDurableStoreRpcFailure(
+      durable.error,
+      "scrimed-work-review-queue-unavailable"
+    );
+    return {
+      allowed: false as const,
+      status: failure.status,
+      error: errorEnvelope(
+        failure.code,
+        failure.message,
+        "artifact-review-queue-read",
+        failure.status >= 500
+      )
+    };
+  }
+
+  return {
+    allowed: true as const,
+    status: 200,
+    data: {
+      queue: durable.queue,
+      authorization: {
+        memberRole: auth.context.memberRole,
+        reviewerOnly: true,
+        aal2Required: true,
+        tenantScoped: true,
+        metadataOnly: true,
+        auditEventId: durable.queue.auditEventId
+      },
+      policyVersion: scrimedWorkReviewQueuePolicyVersion,
+      boundary: scrimedWorkReviewQueueBoundary
     }
   };
 }

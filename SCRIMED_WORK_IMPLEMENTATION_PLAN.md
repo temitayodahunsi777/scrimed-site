@@ -32,6 +32,8 @@ flowchart TD
   Tools --> Orchestration
   Orchestration --> Artifacts["Artifact Engine"]
   Artifacts --> Approval["Human Approval Queue"]
+  Approval --> ReviewQueue["AAL2 Reviewer Queue"]
+  ReviewQueue --> Audit
   Verification --> Telemetry["Value Telemetry"]
   Approval --> Audit
   Telemetry --> Learning["Learning Loop Proposals"]
@@ -55,6 +57,7 @@ Implement:
 - contract/smoke coverage and navigation audit wiring.
 - protected durable-store adapter and ordered local Supabase migrations for AAL2/RBAC/RLS session, artifact, transition idempotency, lifecycle integrity, and audit persistence.
 - production-hardening gate that separates evidence-ready controls from operator-required release steps.
+- reviewer-only, tenant-scoped, audited artifact queue with strict metadata parsing and creator/reviewer separation.
 
 ## Safety Boundary
 
@@ -71,11 +74,14 @@ SCRIMED Work does not authorize live PHI, autonomous clinical care, diagnosis, t
 7. Add no-secret durable-store preflight for migration safeguards, environment readiness, AAL2 token shape, and strict operator gating.
 8. Add no-secret production-hardening gate for protected-write, durable-store, Supabase runtime, server-token, AAL2, workspace, migration, and canary readiness.
 9. Add an authoritative session lifecycle with database row locking, append-only history, independent reviewer separation, scoped mutations, and transition replay protection.
-9. Run typecheck, lint, nonsecret tests, build, generated-integrity, and diff checks.
+10. Add a bounded reviewer queue that operationalizes separation of duties without exposing raw artifact payloads.
+11. Add a no-secret two-identity token policy, reviewer-token capture path, and strict lifecycle canary that proves reviewer-only queue access, self-approval denial, independent review, verification, and internal completion.
+12. Bind successful canary evidence through nonsecret release-provenance identifiers; never retain bearer values as evidence.
+13. Run typecheck, lint, nonsecret tests, build, generated-integrity, and diff checks.
 
 ## Production Hardening Required Later
 
-- run `npm run smoke:scrimed-work:durable-store-preflight:strict`, apply all three SCRIMED Work migrations in order in a non-production Supabase project, then run authenticated AAL2 smoke;
+- retain the verified five-migration Supabase evidence, run `npm run smoke:scrimed-work:durable-store-preflight:strict`, then run `npm run smoke:scrimed-work:two-identity:strict` with separate operator and reviewer identities;
 - add CSRF controls for browser-origin protected write calls before any browser mutation UI is enabled;
 - add real queue/scheduler only after approval and feature flags;
 - add approved provider credentials only through secret-managed deployment configuration;

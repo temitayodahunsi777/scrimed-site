@@ -7,6 +7,10 @@ import type {
   WorkSessionTransitionAction
 } from "./types";
 import type { ArtifactReviewDecision } from "./artifactReview";
+import {
+  parseScrimedWorkReviewQueuePayload,
+  type ScrimedWorkReviewQueue
+} from "./reviewQueue";
 
 export const scrimedWorkDurableStoreStatus = "scrimed-work-durable-store-contract-ready-no-phi";
 export const scrimedWorkDurableStoreBoundary =
@@ -275,6 +279,25 @@ export async function fetchScrimedWorkSessionFromDurableStore(
   };
 }
 
+export async function listScrimedWorkArtifactReviewQueueInDurableStore(
+  context: Pick<ScrimedWorkDurableStoreContext, "client" | "workspaceSlug">,
+  limit: number
+): Promise<{
+  queue: ScrimedWorkReviewQueue | null;
+  error: unknown;
+}> {
+  const { data, error } = await context.client.rpc("list_scrimed_work_artifact_review_queue", {
+    p_workspace_slug: context.workspaceSlug,
+    p_limit: limit
+  });
+  const queue = parseScrimedWorkReviewQueuePayload(data);
+
+  return {
+    queue,
+    error: error ?? (queue ? null : new Error("scrimed-work-review-queue-invalid-response"))
+  };
+}
+
 export async function recordScrimedWorkArtifactInDurableStore(
   context: ScrimedWorkDurableStoreContext,
   input: {
@@ -451,7 +474,7 @@ export function scrimedWorkDurableStoreRpcFailure(error: unknown, fallbackCode: 
     return {
       status: 403,
       code: "scrimed-work-aal2-required",
-      message: "A fresh AAL2 governance session is required before SCRIMED Work durable mutations."
+      message: "A fresh AAL2 governance session is required before SCRIMED Work protected durable access."
     };
   }
 

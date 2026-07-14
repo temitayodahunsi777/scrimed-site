@@ -16,6 +16,7 @@ const migrationPath = "supabase/migrations/20260709193000_scrimed_work_durable_s
 const lifecycleMigrationPath = "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql";
 const advisorIndexMigrationPath = "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql";
 const artifactReviewMigrationPath = "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql";
+const reviewerQueueMigrationPath = "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql";
 const requiredEnv = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -66,6 +67,7 @@ const migration = await readFile(migrationPath, "utf8");
 const lifecycleMigration = await readFile(lifecycleMigrationPath, "utf8");
 const advisorIndexMigration = await readFile(advisorIndexMigrationPath, "utf8");
 const artifactReviewMigration = await readFile(artifactReviewMigrationPath, "utf8");
+const reviewerQueueMigration = await readFile(reviewerQueueMigrationPath, "utf8");
 const tokenAnalysis = analyzeAal2BearerToken({
   bearerToken: process.env.SCRIMED_BEARER_TOKEN,
   workspaceSlug: process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? ""
@@ -117,7 +119,17 @@ const checks = [
   check(requireIncludes(artifactReviewMigration, "artifact-review-idempotency-reused"), "artifact-review-idempotent-audit", "Idempotent review replays produce an audit event."),
   check(requireIncludes(artifactReviewMigration, "create or replace function public.review_scrimed_work_artifact"), "artifact-review-public-wrapper", "Public artifact-review RPC wrapper exists."),
   check(requireRegex(artifactReviewMigration, /language sql[\s\S]*?security invoker/i), "artifact-review-wrapper-security-invoker", "Artifact-review public wrapper uses SECURITY INVOKER."),
-  check(requireIncludes(artifactReviewMigration, "grant execute on function public.review_scrimed_work_artifact"), "artifact-review-authenticated-grant", "Only the authenticated wrapper execution path is granted.")
+  check(requireIncludes(artifactReviewMigration, "grant execute on function public.review_scrimed_work_artifact"), "artifact-review-authenticated-grant", "Only the authenticated wrapper execution path is granted."),
+  check(requireIncludes(reviewerQueueMigration, "private.list_scrimed_work_artifact_review_queue"), "review-queue-private-rpc", "Private reviewer queue RPC exists."),
+  check(requireIncludes(reviewerQueueMigration, "array['reviewer']"), "review-queue-reviewer-only", "Review queue requires reviewer membership."),
+  check(requireIncludes(reviewerQueueMigration, "session.created_by <> (select auth.uid())"), "review-queue-session-separation", "Session creator is excluded from the review queue."),
+  check(requireIncludes(reviewerQueueMigration, "artifact.created_by <> (select auth.uid())"), "review-queue-artifact-separation", "Artifact creator is excluded from the review queue."),
+  check(requireIncludes(reviewerQueueMigration, "limit p_limit"), "review-queue-bounded", "Review queue output is bounded."),
+  check(requireIncludes(reviewerQueueMigration, "artifact-review-queue-viewed"), "review-queue-audited", "Every reviewer queue read emits an audit event."),
+  check(requireIncludes(reviewerQueueMigration, "public.list_scrimed_work_artifact_review_queue"), "review-queue-public-wrapper", "Public reviewer queue wrapper exists."),
+  check(requireRegex(reviewerQueueMigration, /language sql[\s\S]*?security invoker/i), "review-queue-wrapper-security-invoker", "Reviewer queue public wrapper uses SECURITY INVOKER."),
+  check(requireIncludes(reviewerQueueMigration, "externalDistributionAllowed', false"), "review-queue-distribution-blocked", "Reviewer queue fixes external distribution false."),
+  check(requireIncludes(reviewerQueueMigration, "payerSubmissionAllowed', false"), "review-queue-payer-blocked", "Reviewer queue fixes payer submission false.")
 ];
 
 for (const name of requiredEnv) {
@@ -160,7 +172,8 @@ const report = {
     migrationPath,
     lifecycleMigrationPath,
     advisorIndexMigrationPath,
-    artifactReviewMigrationPath
+    artifactReviewMigrationPath,
+    reviewerQueueMigrationPath
   ],
   environment: summarizeEnvironment(),
   token: {
