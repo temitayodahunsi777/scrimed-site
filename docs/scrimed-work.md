@@ -27,7 +27,8 @@ flowchart TD
   Tools --> Agents
   Agents --> Artifact["Artifact Engine"]
   Artifact --> Approval["Human Approval Queue"]
-  Approval --> Review["Independent Artifact Review Binding"]
+  Approval --> Queue["Independent Reviewer Queue"]
+  Queue --> Review["Independent Artifact Review Binding"]
   Review --> Complete["Verified Internal Completion"]
   Verify --> Telemetry["Value Telemetry"]
   Approval --> Audit["Metadata Audit"]
@@ -51,6 +52,7 @@ flowchart TD
 - `verificationEngine.ts`: schema, citation, policy, PHI, loop, budget, rollback, and approval checks.
 - `artifactEngine.ts`: JSON/Markdown draft artifacts with citations, verification, review status, and export metadata.
 - `artifactReview.ts`: reviewer-only internal disposition policy with separation of duties, database-verifiable reviewer/decision hashes, mandatory verification, and fixed external-use blocks.
+- `reviewQueue.ts`: strict parser and bounded-response contract for the tenant-scoped reviewer queue.
 - `payerIqHandoff.ts`: strict synthetic PayerIQ packet-to-session adapter for the revenue-cycle workspace.
 - `scheduleDefinitions.ts`: disabled-by-default scheduled-work templates.
 - `voiceWorkflow.ts`: provider-neutral voice-state simulation with consent and emergency escalation boundaries.
@@ -71,6 +73,7 @@ Read routes:
 - `GET /api/scrimed-work/tools`
 - `GET /api/scrimed-work/schedules`
 - `GET /api/scrimed-work/production-hardening`
+- `GET /api/scrimed-work/review-queue` (reviewer-only AAL2, tenant-scoped, metadata-only, audited)
 
 Metadata POST routes:
 
@@ -114,8 +117,9 @@ The ordered local migrations are:
 2. `supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql` adds the authoritative transition matrix, row locking, append-only history checks, scoped mutation checks, independent reviewer separation, high-risk clinical reviewer blocking, and a private tenant-scoped transition idempotency ledger.
 3. `supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql` adds covering indexes for the artifact tenant, audit tenant, and audit artifact foreign keys identified by the post-migration Supabase performance advisor.
 4. `supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql` adds the private reviewer ledger, reviewer-only AAL2 RPC, cryptographic identity/decision binding, immutable artifact mutation scope, idempotent review audit evidence, and synchronized artifact/session review state.
+5. `supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql` adds the reviewer-only queue RPC, bounded synthetic/no-PHI metadata, creator exclusion, audited reads, and fixed external-distribution and payer-submission blocks.
 
-On 2026-07-13, the first three migrations were retained as the existing connected no-PHI durable-store baseline. The fourth migration is repository-ready but is not represented here as applied to any external environment. An approved operator must apply and verify all four migrations in order on the target, then retain migration history, RLS/grant review, advisor results, and strict AAL2 evidence before activation.
+On 2026-07-14, all five migrations were applied to the approved no-PHI target. The reviewer-queue migration is recorded remotely as `20260714172055_scrimed_work_reviewer_queue`; its validated event constraint, authenticated-only execution grants, private `security definer` function, public `security invoker` wrapper, and empty search paths were verified after application. Supabase security advisors reported no new database finding from the migration. The earlier bounded browser canary passed 11 of 11 checks, but a separate-reviewer AAL2 queue canary is still required before release promotion. This evidence does not authorize live PHI, clinical care, external distribution, or customer go-live.
 
 ## Session Lifecycle
 
@@ -138,6 +142,14 @@ draft -> planning -> active or awaiting_approval -> verifying -> completed
 - Artifact review never enables export, external distribution, or payer submission.
 - Completion is exposed only as a protected transition and requires a durably reviewed, verification-eligible artifact; it is never autonomous.
 
+## Independent Reviewer Queue
+
+The protected pilot workspace now contains an explicit reviewer console. Queue reads require a fresh AAL2 session and the exact `reviewer` membership role. The application and database independently enforce tenant scope and exclude sessions or artifacts created by the current reviewer.
+
+The queue returns at most 50 records and only exposes artifact identifiers, type, synthetic title, workspace domain, risk, review state, approval readiness, verification metadata, a one-way creator identity hash, and timestamps. It never returns raw artifact content, source documents, prompts, connector payloads, patient data, credentials, or free-text reviewer notes. Every queue load records `artifact-review-queue-viewed` evidence, and each approved/changes-requested/rejected disposition continues through the existing durable review RPC.
+
+“Approved” means internal synthetic use only. It does not permit external distribution, payer submission, EHR writeback, patient outreach, clinical action, production connectors, certification claims, or customer activation.
+
 ## Production Hardening Gate
 
 ### AAL2 browser-session verification
@@ -145,6 +157,27 @@ draft -> planning -> active or awaiting_approval -> verifying -> completed
 The protected pilot access surface includes a bounded eleven-check SCRIMED Work verifier. It uses the active tenant AAL2 browser session directly and never exports the bearer token to a terminal, CI log, page field, download, or audit record. The verifier proves unauthenticated fail-closed behavior, durable create and replay, authoritative tenant-scoped read, verification evidence with the human-review completion gate held, lifecycle transition and replay, invalid-transition denial, artifact metadata persistence, and cancellation cleanup.
 
 Every run is synthetic metadata only. It stops when routes, durable storage, authorization, or operator flags are unavailable; it does not downgrade to an unapproved provider or in-memory success path. A created verification session is cancelled in a `finally` cleanup path while its append-only evidence remains available for review.
+
+### Two-Identity AAL2 Canary
+
+The release canary proves the complete internal lifecycle with two genuinely distinct people and Supabase Auth users. A tenant-admin or pilot-lead creates the synthetic session and artifact. That operator is denied access to the reviewer-only queue and cannot self-approve. A separately enrolled `reviewer` approves the session, observes the bounded metadata-only queue item, binds an internal-use-only artifact review, and leaves completion to mandatory verification. Completion never authorizes external distribution, payer submission, EHR writeback, clinical action, connector activation, certification, or customer go-live.
+
+Use a separate business email controlled by the reviewer. A plus-address alias, a second token for the same Auth user, or the same person in another browser profile does not satisfy independent review evidence.
+
+1. Have the reviewer enroll through the approved SCRIMED sign-in flow and configure AAL2 MFA.
+2. As tenant admin, create a reviewer invitation from `/pilot-workspace/access`.
+3. Activate the invitation only after the reviewer Auth identity exists. Invitation records do not send email or create Auth users.
+4. Keep the operator and reviewer signed in through separate browser profiles so one session cannot overwrite the other.
+5. Capture each short-lived token through the hidden terminal prompt. The helper writes only to gitignored `.env.local` with mode `0600` and never prints the token.
+
+```bash
+npm run smoke:aal2:token -- --prompt-token --token-env SCRIMED_BEARER_TOKEN --required-role tenant-admin --write-env-local
+npm run smoke:aal2:token -- --prompt-token --token-env SCRIMED_REVIEWER_BEARER_TOKEN --required-role reviewer --write-env-local
+npm run smoke:scrimed-work:durable-store-preflight:strict
+npm run smoke:scrimed-work:two-identity:strict
+```
+
+The strict canary checks distinct JWT `sub` and `session_id` claims locally, then relies on protected APIs for signature, AAL2, tenant membership, role, and lifecycle verification. Output is limited to synthetic record IDs, audit IDs, and one-way fingerprints. After a reviewed successful run, bind the retained evidence with `SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED=true` and a nonsecret `SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID`; never retain the bearer values as release evidence.
 
 `GET /api/scrimed-work/production-hardening` returns a no-secret readiness gate for SCRIMED Work. It reports:
 
@@ -171,6 +204,9 @@ The gate intentionally does not apply migrations, verify production readiness, e
 - `SCRIMED_WORK_DURABLE_STORE_ENABLED`: disabled unless the Supabase durable-store migration is applied and authenticated smoke passes.
 - `SCRIMED_WORK_MIGRATIONS_VERIFIED`: disabled until the target migration history, RLS, grants, and advisors are reviewed.
 - `SCRIMED_WORK_MIGRATION_EVIDENCE_ID`: required nonsecret identifier linking the environment to its reviewed migration evidence.
+- `SCRIMED_REVIEWER_BEARER_TOKEN`: short-lived local-only reviewer AAL2 token used by the strict two-identity canary; never deploy or log it.
+- `SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED`: true only after the protected two-person lifecycle succeeds and its evidence is reviewed.
+- `SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID`: nonsecret identifier linking release provenance to that reviewed canary evidence.
 - `SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG`: optional fallback workspace slug for protected SCRIMED Work smoke tests.
 
 ## Local Validation
@@ -181,8 +217,12 @@ Run:
 npm run smoke:scrimed-work
 npm run test:scrimed-work:lifecycle
 npm run test:scrimed-work:artifact-review-policy
+npm run test:scrimed-work:review-queue-policy
+npm run test:scrimed-work:two-identity-policy
+npm run test:scrimed-work:production-hardening-policy
 npm run smoke:scrimed-work:durable-store-preflight
 npm run smoke:scrimed-work:authenticated
+npm run smoke:scrimed-work:two-identity
 npm run typecheck
 npm run lint
 npm run test:nonsecret
@@ -196,9 +236,10 @@ For the protected non-production durable-store operator path, use:
 ```bash
 npm run smoke:scrimed-work:durable-store-preflight:strict
 npm run smoke:scrimed-work:strict
+npm run smoke:scrimed-work:two-identity:strict
 ```
 
-The preflight validates all four ordered migration contracts, RLS/deny-policy posture, lifecycle matrix, transition and artifact-review ledgers, authoritative locking, append-only history, reviewer separation, database-verifiable review hashes, immutable artifact scope, external-use blocks, `security invoker` public wrappers, AAL2 token shape, required environment variables, feature flags, workspace slug, and no-secret output behavior. It does not apply migrations, mutate Supabase, verify production, or authorize live clinical workflows.
+The preflight validates all five ordered migration contracts, RLS/deny-policy posture, lifecycle matrix, transition and artifact-review ledgers, the bounded reviewer queue, authoritative locking, append-only history, reviewer separation, database-verifiable review hashes, immutable artifact scope, audited queue reads, external-use blocks, `security invoker` public wrappers, AAL2 token shape, required environment variables, feature flags, workspace slug, and no-secret output behavior. It does not apply migrations, mutate Supabase, verify production, or authorize live clinical workflows.
 
 Local token inspection is explicitly reported as `signature=not-verified-local-preflight`. Only a successful Supabase Auth check or protected API request may promote that evidence to a verified state. Operator logs redact JWT-shaped values, bearer credentials, named access or refresh tokens, API keys, and Supabase-style secrets.
 
@@ -206,7 +247,7 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 - Read-only public views remain synthetic. Protected durable reads and verification require an AAL2 bearer session, authorized workspace membership, workspace scope, and the durable-store flag. Protected writes additionally require the server runtime token, mutation idempotency key, protected-write flag, and reviewed migration evidence.
 - The existing membership model has tenant-admin, pilot-lead, reviewer, and observer roles but no verified clinician credential binding. High-risk clinical approval therefore remains blocked rather than treating a generic reviewer as a clinician.
-- Live database migration application and authenticated smoke must be run by an approved operator; this implementation did not touch production data.
+- The reviewer-queue migration is applied and catalog-verified; the authenticated two-identity queue flow still requires a separately enrolled reviewer and retained canary evidence before release promotion.
 - A complete PayerIQ lifecycle needs two distinct AAL2 identities: an authorized initiator and a separate `reviewer` member. One account cannot satisfy separation of duties.
 - Provider adapters do not call external models and require future secret-managed configuration, legal/privacy review, and budget controls.
 - Schedules are definitions only; no uncontrolled background scheduler is introduced.
@@ -215,4 +256,4 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 ## Next Production-Hardening Step
 
-Apply and verify all four SCRIMED Work migrations, including the artifact-review binding, in an approved no-PHI target. Then execute the protected PayerIQ lifecycle with separate fresh AAL2 operator and reviewer identities, retain the review/completion audit evidence, and canary one internal-only workspace. Keep buyer-facing mutations disabled and add externally reviewed clinician-identity binding before any high-risk clinical approval path is considered.
+Enroll a distinct reviewer identity in the approved no-PHI workspace, then execute the protected lifecycle with separate fresh AAL2 operator and reviewer sessions. Prove the creator cannot view or review their own artifact, retain queue-read/review/completion evidence, and keep buyer-facing mutations disabled. Externally reviewed clinician-identity binding remains mandatory before any high-risk clinical approval path is considered.

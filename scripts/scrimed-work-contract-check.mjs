@@ -23,6 +23,7 @@ const requiredFiles = [
   "app/lib/scrimed-work/approvalEngine.ts",
   "app/lib/scrimed-work/artifactEngine.ts",
   "app/lib/scrimed-work/artifactReview.ts",
+  "app/lib/scrimed-work/reviewQueue.ts",
   "app/lib/scrimed-work/payerIqHandoff.ts",
   "app/lib/scrimed-work/scheduleDefinitions.ts",
   "app/lib/scrimed-work/voiceWorkflow.ts",
@@ -46,6 +47,7 @@ const requiredFiles = [
   "app/api/scrimed-work/sessions/[sessionId]/reject/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/complete/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review/route.ts",
+  "app/api/scrimed-work/review-queue/route.ts",
   "app/api/scrimed-work/providers/route.ts",
   "app/api/scrimed-work/agents/route.ts",
   "app/api/scrimed-work/tools/route.ts",
@@ -58,19 +60,27 @@ const requiredFiles = [
   "app/api/documentation-before-authorization/scrimed-work-handoff/route.ts",
   "app/scrimed-work/page.tsx",
   "app/pilot-workspace/ScrimedWorkBrowserVerificationPanel.tsx",
+  "app/pilot-workspace/ScrimedWorkReviewerQueuePanel.tsx",
   "app/lib/siteNavigation.ts",
   "app/lib/navigationAudit.ts",
   "scripts/public-production-smoke.mjs",
   "scripts/scrimed-work-durable-store-preflight.mjs",
   "scripts/scrimed-work-authenticated-smoke.mjs",
+  "scripts/aal2-bearer-token-helper.mjs",
+  "scripts/lib/two-identity-aal2-policy.mjs",
+  "scripts/scrimed-work-two-identity-policy-test.mjs",
+  "scripts/scrimed-work-production-hardening-policy-test.mjs",
+  "scripts/scrimed-work-two-identity-authenticated-smoke.mjs",
   "scripts/scrimed-work-lifecycle-policy-test.mjs",
   "scripts/scrimed-work-artifact-review-policy-test.mjs",
+  "scripts/scrimed-work-review-queue-policy-test.mjs",
   "scripts/scrimed-work-preflight-policy-test.mjs",
   "scripts/scrimed-work-browser-verification-policy-test.mjs",
   "supabase/migrations/20260709193000_scrimed_work_durable_store.sql",
   "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql",
   "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql",
   "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql",
+  "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs"
 ];
@@ -102,6 +112,7 @@ const combinedLib = [
   files["app/lib/scrimed-work/verificationEngine.ts"],
   files["app/lib/scrimed-work/artifactEngine.ts"],
   files["app/lib/scrimed-work/artifactReview.ts"],
+  files["app/lib/scrimed-work/reviewQueue.ts"],
   files["app/lib/scrimed-work/payerIqHandoff.ts"],
   files["app/lib/scrimed-work/scheduleDefinitions.ts"],
   files["app/lib/scrimed-work/voiceWorkflow.ts"],
@@ -180,7 +191,10 @@ for (const expected of [
   "createArtifactReviewDecisionHash",
   "buildPayerIqProtectedWorkSession",
   "guardedCreatePayerIqProtectedHandoff",
-  "guardedReviewProtectedArtifact"
+  "guardedReviewProtectedArtifact",
+  "guardedListProtectedArtifactReviewQueue",
+  "listScrimedWorkArtifactReviewQueueInDurableStore",
+  "scrimed-work-review-queue-v2026-07-14"
 ]) {
   requireIncludes("app/lib/scrimed-work/*", combinedLib, expected);
 }
@@ -195,6 +209,21 @@ for (const expected of [
   "not-authorized"
 ]) {
   requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], expected);
+}
+
+for (const expected of [
+  "guardedListProtectedArtifactReviewQueue",
+  "reviewer-only-aal2-tenant-scoped-metadata",
+  "fail-closed",
+  "X-SCRIMED-External-Distribution",
+  "X-SCRIMED-Payer-Submission",
+  "not-authorized"
+]) {
+  requireIncludes(
+    "app/api/scrimed-work/review-queue/route.ts",
+    files["app/api/scrimed-work/review-queue/route.ts"],
+    expected
+  );
 }
 
 for (const route of [
@@ -314,13 +343,35 @@ for (const expected of [
   requireIncludes("supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql", artifactReviewMigration, expected);
 }
 
+const reviewerQueueMigration = files["supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql"];
+for (const expected of [
+  "private.list_scrimed_work_artifact_review_queue",
+  "array['reviewer']",
+  "session.created_by <> (select auth.uid())",
+  "artifact.created_by <> (select auth.uid())",
+  "limit p_limit",
+  "artifact-review-queue-viewed",
+  "public.list_scrimed_work_artifact_review_queue",
+  "security invoker",
+  "externalDistributionAllowed', false",
+  "payerSubmissionAllowed', false"
+]) {
+  requireIncludes("supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql", reviewerQueueMigration, expected);
+}
+
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:lifecycle");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:artifact-review-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-queue-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:two-identity-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:production-hardening-policy");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedGetProtectedWorkSession");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedVerifyProtectedWorkSession");
 requireNotIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "saveWorkSession(");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_MIGRATIONS_VERIFIED");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_MIGRATION_EVIDENCE_ID");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_REVIEWER_BEARER_TOKEN");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID");
 requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
@@ -330,6 +381,26 @@ requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
   "SCRIMED Work artifact review policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work reviewer queue policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work two-identity AAL2 policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work production-hardening policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED_REVIEWER_BEARER_TOKEN: \"\""
 );
 
 for (const expected of [
@@ -343,7 +414,9 @@ for (const expected of [
   "Known Limitations",
   "Next Production-Hardening Step",
   "Independent Artifact Review Binding",
-  "all four ordered migration contracts"
+  "Independent Reviewer Queue",
+  "Two-Identity AAL2 Canary",
+  "all five ordered migration contracts"
 ]) {
   requireIncludes("docs/scrimed-work.md", files["docs/scrimed-work.md"], expected);
 }
@@ -411,6 +484,21 @@ for (const expected of [
 }
 
 for (const expected of [
+  "SCRIMED Work Reviewer Queue",
+  "session.access_token",
+  "/api/scrimed-work/review-queue?limit=25",
+  "Reviewer membership with fresh AAL2 is required",
+  "Approve Internal Use",
+  "External distribution remains blocked"
+]) {
+  requireIncludes(
+    "app/pilot-workspace/ScrimedWorkReviewerQueuePanel.tsx",
+    files["app/pilot-workspace/ScrimedWorkReviewerQueuePanel.tsx"],
+    expected
+  );
+}
+
+for (const expected of [
   "SCRIMED_BEARER_TOKEN",
   "SCRIMED_WORK_DURABLE_STORE_ENABLED",
   "x-scrimed-workspace-slug",
@@ -428,6 +516,78 @@ for (const expected of [
 }
 
 for (const expected of [
+  "SCRIMED_REVIEWER_BEARER_TOKEN",
+  "--required-role reviewer",
+  "--token-env",
+  "SCRIMED_REQUIRE_TWO_IDENTITY_SMOKE",
+  "mode 0600",
+  "never prints bearer-token values"
+]) {
+  requireIncludes("scripts/aal2-bearer-token-helper.mjs", files["scripts/aal2-bearer-token-helper.mjs"], expected);
+}
+
+for (const expected of [
+  "different authenticated users",
+  "different authenticated sessions",
+  "signature_and_roles=verified-by-protected-api",
+  "identitySeparationVerifiedLocally"
+]) {
+  requireIncludes(
+    "scripts/lib/two-identity-aal2-policy.mjs",
+    files["scripts/lib/two-identity-aal2-policy.mjs"],
+    expected
+  );
+}
+
+for (const expected of [
+  "SCRIMED Work two-identity AAL2 lifecycle canary completed",
+  "/api/scrimed-work/review-queue?limit=25",
+  "operator self-approval fail-closed",
+  "reviewer-only queue authorization",
+  "approved_for_internal_use",
+  "evidence_and_boundaries_confirmed",
+  "verified-internal-work-complete",
+  "X-SCRIMED-External-Distribution",
+  "X-SCRIMED-Payer-Submission",
+  "different authenticated users"
+]) {
+  requireIncludes(
+    "scripts/scrimed-work-two-identity-authenticated-smoke.mjs",
+    files["scripts/scrimed-work-two-identity-authenticated-smoke.mjs"],
+    expected
+  );
+}
+
+for (const expected of [
+  "sameUser",
+  "sameSession",
+  "missingReviewer",
+  "expiredReviewer",
+  "report.includes(operatorToken), false",
+  "SCRIMED Work two-identity AAL2 policy behavior"
+]) {
+  requireIncludes(
+    "scripts/scrimed-work-two-identity-policy-test.mjs",
+    files["scripts/scrimed-work-two-identity-policy-test.mjs"],
+    expected
+  );
+}
+
+for (const expected of [
+  "scrimed-work-aal2-reviewer-session",
+  "scrimed-work-canary-release",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID",
+  "tokens redacted"
+]) {
+  requireIncludes(
+    "scripts/scrimed-work-production-hardening-policy-test.mjs",
+    files["scripts/scrimed-work-production-hardening-policy-test.mjs"],
+    expected
+  );
+}
+
+for (const expected of [
   "SCRIMED Work",
   "/scrimed-work",
   "work-session control plane"
@@ -436,7 +596,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "expectedApiRoutePatternCount = 438",
+  "expectedApiRoutePatternCount = 439",
   "\"/scrimed-work\""
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], expected);
@@ -447,6 +607,7 @@ for (const expected of [
   "/api/scrimed-work",
   "/api/scrimed-work/brief",
   "/api/scrimed-work/production-hardening",
+  "/api/scrimed-work/review-queue",
   "/scrimed-work",
   "pass scrimed work"
 ]) {
@@ -456,6 +617,8 @@ for (const expected of [
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work\": \"node scripts/scrimed-work-contract-check.mjs\"");
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:durable-store-preflight\": \"node scripts/scrimed-work-durable-store-preflight.mjs\"");
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:authenticated\": \"node scripts/scrimed-work-authenticated-smoke.mjs\"");
+requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:two-identity\": \"node scripts/scrimed-work-two-identity-authenticated-smoke.mjs\"");
+requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:two-identity:strict\": \"node scripts/scrimed-work-two-identity-authenticated-smoke.mjs --strict\"");
 requireIncludes("app/api/scrimed-work/production-hardening/route.ts", files["app/api/scrimed-work/production-hardening/route.ts"], "operator-gated-no-production-authorization");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", files["scripts/scrimed-nonsecret-test-suite.mjs"], "scripts/scrimed-work-durable-store-preflight.mjs");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", files["scripts/scrimed-nonsecret-test-suite.mjs"], "scripts/scrimed-work-contract-check.mjs");

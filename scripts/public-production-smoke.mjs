@@ -12501,6 +12501,19 @@ async function checkScrimedWork() {
   requireStatus("SCRIMED Work protected session read", protectedRead.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected session read", protectedRead.response);
 
+  const protectedReviewQueue = await request("/api/scrimed-work/review-queue");
+  requireStatus("SCRIMED Work protected reviewer queue", protectedReviewQueue.response.status, [401, 503]);
+  requireScrimedWorkBoundary("SCRIMED Work protected reviewer queue", protectedReviewQueue.response);
+  if (protectedReviewQueue.response.headers.get("x-scrimed-review-queue") !== "fail-closed") {
+    throw new Error("SCRIMED Work reviewer queue must fail closed without AAL2 reviewer authorization.");
+  }
+  if (
+    protectedReviewQueue.response.headers.get("x-scrimed-external-distribution") !== "not-authorized" ||
+    protectedReviewQueue.response.headers.get("x-scrimed-payer-submission") !== "not-authorized"
+  ) {
+    throw new Error("SCRIMED Work reviewer queue must retain external-distribution and payer-submission locks.");
+  }
+
   const protectedVerification = await postJson(
     "/api/scrimed-work/sessions/work_session_unknown_protected/verify",
     {}

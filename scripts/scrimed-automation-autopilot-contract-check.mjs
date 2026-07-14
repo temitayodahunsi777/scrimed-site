@@ -168,7 +168,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "expectedApiRoutePatternCount = 438",
+  "expectedApiRoutePatternCount = 439",
   "\"/scrimed-automation-autopilot\""
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", audit, expected);

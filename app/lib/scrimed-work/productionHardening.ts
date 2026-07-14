@@ -69,7 +69,7 @@ function gate(input: ScrimedWorkHardeningGate): ScrimedWorkHardeningGate {
 
 export function getScrimedWorkProductionHardeningGate(
   env: NodeJS.ProcessEnv = process.env,
-  generatedAt = "2026-07-13T00:00:00.000Z"
+  generatedAt = "2026-07-14T00:00:00.000Z"
 ): ScrimedWorkProductionHardeningGate {
   const flags = getScrimedWorkFeatureFlags(env);
   const durableStoreEnabled = isScrimedWorkDurableStoreEnabled(env);
@@ -78,8 +78,15 @@ export function getScrimedWorkProductionHardeningGate(
   const runtimeTokenConfigured = envPresent("SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN", env);
   const workspaceConfigured = envPresent("SCRIMED_WORKSPACE_SLUG", env) || envPresent("SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG", env);
   const bearerProvided = envPresent("SCRIMED_BEARER_TOKEN", env);
+  const reviewerBearerProvided = envPresent("SCRIMED_REVIEWER_BEARER_TOKEN", env);
   const migrationEvidenceId = nonsecretEvidenceId(env["SCRIMED_WORK_MIGRATION_EVIDENCE_ID"]);
   const migrationsVerified = envTrue("SCRIMED_WORK_MIGRATIONS_VERIFIED", env) && migrationEvidenceId.length > 0;
+  const twoIdentityCanaryEvidenceId = nonsecretEvidenceId(
+    env["SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID"]
+  );
+  const twoIdentityCanaryVerified =
+    envTrue("SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED", env) &&
+    twoIdentityCanaryEvidenceId.length > 0;
 
   const gates: ScrimedWorkHardeningGate[] = [
     gate({
@@ -173,6 +180,26 @@ export function getScrimedWorkProductionHardeningGate(
       retainedBoundary: "Reviewed means verified for internal synthetic use only; it grants no payer, EHR, clinical, connector, external-distribution, certification, or go-live authority."
     }),
     gate({
+      gateId: "scrimed-work-reviewer-queue",
+      domain: "verification",
+      title: "Reviewer-only artifact queue",
+      status: "evidence_ready",
+      severity: "critical",
+      requiredFor: "Operationally usable separation of duties for protected SCRIMED Work artifacts.",
+      evidence: [
+        "reviewer-only AAL2 and tenant-scoped queue RPC",
+        "bounded synthetic/no-PHI metadata response",
+        "creator/reviewer exclusion in application and database policy",
+        "audit event on every queue read",
+        "no raw artifact payload or free-text reviewer input",
+        "external distribution and payer submission fixed false"
+      ],
+      blocker: null,
+      operatorAction: "Retain reviewer-queue migration and advisor evidence, then validate the queue with a separately enrolled reviewer identity.",
+      automationSafe: true,
+      retainedBoundary: "Queue visibility and internal review grant no live-PHI, clinical, payer, EHR, connector, external-distribution, certification, go-live, or production authority."
+    }),
+    gate({
       gateId: "scrimed-work-durable-store-flag",
       domain: "durable-store",
       title: "Durable store feature flag",
@@ -221,16 +248,47 @@ export function getScrimedWorkProductionHardeningGate(
       gateId: "scrimed-work-aal2-operator-session",
       domain: "auth",
       title: "Fresh AAL2 operator bearer session",
-      status: "operator_required",
+      status: twoIdentityCanaryVerified ? "evidence_ready" : "operator_required",
       severity: "critical",
       requiredFor: "Strict authenticated durable-store smoke.",
-      evidence: bearerProvided
-        ? ["SCRIMED_BEARER_TOKEN is present but must be verified by protected API during strict smoke."]
-        : ["SCRIMED_BEARER_TOKEN is missing or expired."],
-      blocker: bearerProvided ? "Protected API verification still required." : "Fresh tenant-admin, pilot-lead, or reviewer AAL2 bearer token required.",
-      operatorAction: "Generate a fresh short-lived AAL2 bearer token immediately before strict smoke.",
+      evidence: twoIdentityCanaryVerified
+        ? [`twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`]
+        : bearerProvided
+          ? ["SCRIMED_BEARER_TOKEN is present but must be verified by protected API during strict smoke."]
+          : ["SCRIMED_BEARER_TOKEN is missing or expired."],
+      blocker: twoIdentityCanaryVerified
+        ? null
+        : bearerProvided
+          ? "Protected API verification still required."
+          : "Fresh tenant-admin or pilot-lead AAL2 bearer token required.",
+      operatorAction: twoIdentityCanaryVerified
+        ? "Retain the protected two-identity canary evidence; refresh the operator token only for a new canary run."
+        : "Generate a fresh short-lived tenant-admin or pilot-lead AAL2 bearer token immediately before strict smoke.",
       automationSafe: false,
       retainedBoundary: "A bearer token alone does not grant production authority or bypass tenant role checks."
+    }),
+    gate({
+      gateId: "scrimed-work-aal2-reviewer-session",
+      domain: "auth",
+      title: "Distinct AAL2 reviewer bearer session",
+      status: twoIdentityCanaryVerified ? "evidence_ready" : "operator_required",
+      severity: "critical",
+      requiredFor: "Reviewer-only queue, independent approval, artifact review, and completion evidence.",
+      evidence: twoIdentityCanaryVerified
+        ? [`twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`]
+        : reviewerBearerProvided
+          ? ["SCRIMED_REVIEWER_BEARER_TOKEN is present but reviewer role and separation must be verified by protected API."]
+          : ["A distinct SCRIMED_REVIEWER_BEARER_TOKEN is missing or expired."],
+      blocker: twoIdentityCanaryVerified
+        ? null
+        : reviewerBearerProvided
+          ? "Protected reviewer-role and different-user verification still required."
+          : "A separately enrolled human reviewer with fresh AAL2 is required.",
+      operatorAction: twoIdentityCanaryVerified
+        ? "Retain the reviewer queue, approval, review, verification, and completion evidence."
+        : "Enroll a genuinely separate reviewer, activate reviewer membership, then capture a fresh reviewer AAL2 token without printing it.",
+      automationSafe: false,
+      retainedBoundary: "Aliases, duplicated sessions, and a second token for the same user do not satisfy independent review."
     }),
     gate({
       gateId: "scrimed-work-workspace-scope",
@@ -259,15 +317,16 @@ export function getScrimedWorkProductionHardeningGate(
         "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql exists",
         "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql exists",
         "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql exists",
+        "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql exists",
         "scripts/scrimed-work-durable-store-preflight.mjs validates migration posture",
         ...(migrationsVerified ? [`migrationEvidenceId=${migrationEvidenceId}`] : [])
       ],
       blocker: migrationsVerified
         ? null
-        : "All four ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved non-production target.",
+        : "All five ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved no-PHI target.",
       operatorAction: migrationsVerified
         ? "Retain migration history, RLS/grant checks, and post-migration advisor evidence with this release."
-        : "Apply all four migrations in order to a non-production Supabase project/branch, run Supabase advisors, then set the verified flag and nonsecret evidence identifier.",
+        : "Apply all five migrations in order to an approved no-PHI Supabase project/branch, run Supabase advisors, then set the verified flag and nonsecret evidence identifier.",
       automationSafe: false,
       retainedBoundary: "This code path does not mutate live Supabase, apply migrations, or approve production deployment."
     }),
@@ -275,12 +334,21 @@ export function getScrimedWorkProductionHardeningGate(
       gateId: "scrimed-work-canary-release",
       domain: "release-control",
       title: "No-PHI canary workspace",
-      status: "operator_required",
+      status: twoIdentityCanaryVerified ? "evidence_ready" : "operator_required",
       severity: "high",
       requiredFor: "Buyer-facing protected workflow readiness.",
-      evidence: ["Canary requires strict preflight plus authenticated strict smoke success."],
-      blocker: "Strict durable-store smoke has not been completed in an approved non-production target.",
-      operatorAction: "Run one no-PHI protected workspace canary after strict smoke passes; collect evidence before buyer-facing mutations.",
+      evidence: twoIdentityCanaryVerified
+        ? [
+            `twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`,
+            "Strict canary proved distinct users, reviewer-only queue access, self-approval denial, independent review, verification, and internal completion."
+          ]
+        : ["Canary requires strict preflight plus two-identity authenticated lifecycle success."],
+      blocker: twoIdentityCanaryVerified
+        ? null
+        : "A protected two-identity lifecycle canary has not been bound to reviewed nonsecret evidence.",
+      operatorAction: twoIdentityCanaryVerified
+        ? "Retain the nonsecret evidence identifier with release provenance; do not retain bearer tokens."
+        : "Run one no-PHI protected workspace canary with distinct operator and reviewer identities, then bind reviewed evidence before buyer-facing mutations.",
       automationSafe: false,
       retainedBoundary: "Canary success is not certification, clinical validation, production connector approval, or customer go-live."
     })
@@ -297,6 +365,7 @@ export function getScrimedWorkProductionHardeningGate(
     workspaceConfigured &&
     migrationsVerified &&
     bearerProvided &&
+    reviewerBearerProvided &&
     flags.consequentialActionsEnabled === false;
 
   return {
@@ -305,7 +374,7 @@ export function getScrimedWorkProductionHardeningGate(
     generatedAt,
     storageMode: getScrimedWorkDurableStorageMode(env),
     canRunStrictNonProductionSmoke,
-    canaryEligible: false,
+    canaryEligible: canRunStrictNonProductionSmoke,
     noProductionAuthorization: true,
     noPhiAuthority: true,
     noAutonomousClinicalAuthority: true,
@@ -318,18 +387,22 @@ export function getScrimedWorkProductionHardeningGate(
     },
     gates,
     nextOperatorActions: [
-      "Refresh the short-lived AAL2 bearer token immediately before strict smoke.",
+      twoIdentityCanaryVerified
+        ? `Retain reviewed two-identity canary evidence ${twoIdentityCanaryEvidenceId} with release provenance.`
+        : "Refresh short-lived AAL2 tokens for a tenant-admin or pilot-lead operator and a genuinely separate reviewer immediately before strict smoke.",
       "Configure non-production Supabase URL, publishable key, runtime authorization token, workspace slug, protected writes flag, and durable-store flag.",
       migrationsVerified
         ? `Retain reviewed migration evidence ${migrationEvidenceId} with the release packet.`
-        : "Apply all four SCRIMED Work migrations in order only to an approved non-production Supabase target and bind the advisor review to a nonsecret evidence identifier.",
+        : "Apply all five SCRIMED Work migrations in order only to an approved no-PHI Supabase target and bind the advisor review to a nonsecret evidence identifier.",
       "Run npm run smoke:scrimed-work:durable-store-preflight:strict.",
       "Run npm run smoke:scrimed-work:strict.",
-      "Canary one no-PHI protected workspace and attach the evidence to buyer diligence materials."
+      "Run npm run smoke:scrimed-work:two-identity:strict and retain its no-secret audit identifiers.",
+      "Bind successful two-identity evidence to SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID before release promotion."
     ],
     strictSmokeCommands: [
       "npm run smoke:scrimed-work:durable-store-preflight:strict",
-      "npm run smoke:scrimed-work:strict"
+      "npm run smoke:scrimed-work:strict",
+      "npm run smoke:scrimed-work:two-identity:strict"
     ],
     retainedBoundaries: [
       "No live PHI.",

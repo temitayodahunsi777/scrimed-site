@@ -43,9 +43,10 @@ function usage() {
     "  npm run smoke:aal2:token -- --session-file /tmp/scrimed-session.json --write-env-local",
     "  npm run smoke:aal2:token -- --clipboard-token --clear-clipboard --write-env-local",
     "  npm run smoke:aal2:token -- --prompt-token --write-env-local",
+    "  npm run smoke:aal2:token -- --prompt-token --token-env SCRIMED_REVIEWER_BEARER_TOKEN --required-role reviewer --write-env-local",
     "",
     "The helper validates aal=aal2, short lifetime, session_id, Supabase Auth verification, and tenant role when Supabase env is configured.",
-    "It never prints bearer-token values. Use .env.local or shell env to supply the token to smoke scripts."
+    "It never prints bearer-token values. Token output keys are restricted to SCRIMED_BEARER_TOKEN or SCRIMED_REVIEWER_BEARER_TOKEN."
   ].join("\n");
 }
 
@@ -289,8 +290,29 @@ if (hasFlag("--help") || hasFlag("-h")) {
 }
 
 let bearerToken = "";
+const allowedTokenEnvironmentNames = new Set([
+  "SCRIMED_BEARER_TOKEN",
+  "SCRIMED_REVIEWER_BEARER_TOKEN"
+]);
+const tokenEnvironmentName = optionValue("--token-env") || "SCRIMED_BEARER_TOKEN";
+const requiredRole = optionValue("--required-role");
+
+if (!allowedTokenEnvironmentNames.has(tokenEnvironmentName)) {
+  console.error("--token-env must be SCRIMED_BEARER_TOKEN or SCRIMED_REVIEWER_BEARER_TOKEN.");
+  process.exit(1);
+}
+
+if (requiredRole && !["tenant-admin", "pilot-lead", "reviewer"].includes(requiredRole)) {
+  console.error("--required-role must be tenant-admin, pilot-lead, or reviewer.");
+  process.exit(1);
+}
+
 const sessionFile = optionValue("--session-file");
-const sessionJsonEnv = optionValue("--session-json-env") || "SCRIMED_SUPABASE_SESSION_JSON";
+const sessionJsonEnv =
+  optionValue("--session-json-env") ||
+  (tokenEnvironmentName === "SCRIMED_REVIEWER_BEARER_TOKEN"
+    ? "SCRIMED_REVIEWER_SUPABASE_SESSION_JSON"
+    : "SCRIMED_SUPABASE_SESSION_JSON");
 const workspaceSlug = optionValue("--workspace") || process.env.SCRIMED_WORKSPACE_SLUG || "atlas-synthetic-evaluation";
 const baseUrl = optionValue("--base-url") || process.env.SCRIMED_BASE_URL || "https://app.scrimedsolutions.com";
 
@@ -312,13 +334,13 @@ try {
   }
 
   if (!bearerToken) {
-    bearerToken = process.env.SCRIMED_BEARER_TOKEN?.trim() ?? "";
+    bearerToken = process.env[tokenEnvironmentName]?.trim() ?? "";
   }
 
   if (!bearerToken) {
     console.log(usage());
     throw new Error(
-      "No bearer token found. Provide SCRIMED_BEARER_TOKEN, --session-file, SCRIMED_SUPABASE_SESSION_JSON, or --prompt-token."
+      `No bearer token found. Provide ${tokenEnvironmentName}, --session-file, ${sessionJsonEnv}, or --prompt-token.`
     );
   }
 
@@ -342,14 +364,28 @@ try {
     console.warn(`warn AAL2 token verification: ${redactSensitive(verification.warning)}`);
   }
 
+  if (requiredRole && !verification.skipped && verification.role !== requiredRole) {
+    throw new Error(`AAL2 token verification failed: verified role is ${verification.role}; ${requiredRole} is required.`);
+  }
+
+  if (requiredRole && verification.skipped) {
+    console.warn(`warn AAL2 role verification: ${requiredRole} role remains pending protected API verification.`);
+  }
+
   if (hasFlag("--write-env-local")) {
-    mergeEnvLocal({
+    const updates = {
       SCRIMED_BASE_URL: baseUrl,
       SCRIMED_WORKSPACE_SLUG: workspaceSlug,
       SCRIMED_REQUIRE_AUTHENTICATED_SMOKE: "true",
-      SCRIMED_BEARER_TOKEN: bearerToken
-    });
-    console.log("pass AAL2 token stored in .env.local with mode 0600");
+      [tokenEnvironmentName]: bearerToken
+    };
+
+    if (tokenEnvironmentName === "SCRIMED_REVIEWER_BEARER_TOKEN") {
+      updates.SCRIMED_REQUIRE_TWO_IDENTITY_SMOKE = "true";
+    }
+
+    mergeEnvLocal(updates);
+    console.log(`pass ${tokenEnvironmentName} stored in .env.local with mode 0600`);
   }
 
   if (hasFlag("--clear-clipboard")) {
@@ -375,7 +411,11 @@ try {
       .filter(Boolean)
       .join(" ")
   );
-  console.log("next: npm run smoke:aal2:durable-store:strict");
+  console.log(
+    tokenEnvironmentName === "SCRIMED_REVIEWER_BEARER_TOKEN"
+      ? "next: npm run smoke:scrimed-work:two-identity:strict"
+      : "next: npm run smoke:aal2:durable-store:strict"
+  );
 } catch (error) {
   console.error(redactSensitive(error instanceof Error ? error.message : String(error)));
   process.exit(1);

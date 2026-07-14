@@ -170,7 +170,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "expectedApiRoutePatternCount = 438",
+  "expectedApiRoutePatternCount = 439",
   "\"/scrimed-operating-command\""
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", audit, expected);

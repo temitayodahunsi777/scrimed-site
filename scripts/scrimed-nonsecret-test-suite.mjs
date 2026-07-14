@@ -253,12 +253,34 @@ const checks = [
     ]
   },
   {
+    label: "SCRIMED Work reviewer queue policy behavior",
+    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-review-queue-policy-test.mjs"]
+  },
+  {
+    label: "SCRIMED Work two-identity AAL2 policy behavior",
+    args: ["scripts/scrimed-work-two-identity-policy-test.mjs"]
+  },
+  {
+    label: "SCRIMED Work production-hardening policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-production-hardening-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED Work preflight policy behavior",
     args: ["scripts/scrimed-work-preflight-policy-test.mjs"]
   },
   {
     label: "SCRIMED Work browser verification policy behavior",
-    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-browser-verification-policy-test.mjs"]
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-browser-verification-policy-test.mjs"
+    ]
   },
   {
     label: "SCRIMED Intelligence Control Plane contract",
@@ -316,8 +338,10 @@ for (const check of checks) {
     env: {
       ...process.env,
       SCRIMED_BEARER_TOKEN: "",
+      SCRIMED_REVIEWER_BEARER_TOKEN: "",
       SCRIMED_SALES_QA_BEARER_TOKEN: "",
-      SCRIMED_SUPABASE_SESSION_JSON: ""
+      SCRIMED_SUPABASE_SESSION_JSON: "",
+      SCRIMED_REVIEWER_SUPABASE_SESSION_JSON: ""
     },
     stdio: "inherit"
   });
