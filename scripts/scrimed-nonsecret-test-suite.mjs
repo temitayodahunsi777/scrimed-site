@@ -76,6 +76,10 @@ const checks = [
     args: ["scripts/documentation-before-authorization-contract-check.mjs"]
   },
   {
+    label: "Strategic investor outreach contract",
+    args: ["scripts/strategic-investor-outreach-contract-check.mjs"]
+  },
+  {
     label: "On-Device De-Identification contract",
     args: ["scripts/on-device-deidentification-contract-check.mjs"]
   },
@@ -238,6 +242,15 @@ const checks = [
   {
     label: "SCRIMED Work lifecycle policy behavior",
     args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-lifecycle-policy-test.mjs"]
+  },
+  {
+    label: "SCRIMED Work artifact review policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-artifact-review-policy-test.mjs"
+    ]
   },
   {
     label: "SCRIMED Work preflight policy behavior",

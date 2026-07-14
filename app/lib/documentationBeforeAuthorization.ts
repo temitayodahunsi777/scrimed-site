@@ -68,6 +68,78 @@ export type DocumentationBeforeAuthorizationEvaluation = {
   boundary: typeof documentationBeforeAuthorizationBoundary;
 };
 
+export type DocumentationBeforeAuthorizationWorkbenchRequest = {
+  scenarioPacketId: string;
+  documentedRequirementIds: DocumentationBeforeAuthorizationRequirementId[];
+  reviewerStatus: DocumentationBeforeAuthorizationSyntheticPacket["reviewerStatus"];
+  requestedAction: DocumentationBeforeAuthorizationSyntheticPacket["requestedAction"];
+  dataBoundaryAcknowledged: boolean;
+};
+
+export type DocumentationBeforeAuthorizationReviewPacket = {
+  workbenchId: string;
+  sourcePacketId: string;
+  generatedAt: string;
+  status: "review-packet-prepared" | "request-blocked";
+  scenario: string;
+  procedureFamily: string;
+  readinessScore: number;
+  evaluation: DocumentationBeforeAuthorizationEvaluation;
+  evidencePacket: {
+    presentRequirements: string[];
+    missingRequirements: string[];
+    evidenceRefs: string[];
+    policyFreshness: "synthetic-current-for-demo";
+    sourceTrustTier: "synthetic-reviewed-fixture";
+  };
+  reviewQueue: {
+    requiredRole: DocumentationBeforeAuthorizationEvaluation["recommendedOwner"];
+    status: "queued" | "reviewed-for-demo" | "blocked";
+    humanReviewRequired: true;
+    externalActionAllowed: false;
+    nextActions: string[];
+  };
+  workSessionHandoff: {
+    workspaceDomain: "revenue-cycle";
+    riskLevel: "high";
+    requestedAutonomy: "prepare";
+    artifactType: "prior-authorization-draft";
+    definitionOfDone: {
+      goal: string;
+      allowedScope: string[];
+      prohibitedActions: string[];
+      requiredEvidence: string[];
+      successCriteria: string[];
+      stoppingConditions: string[];
+      humanApprovalRequired: true;
+      rollbackPlan: string;
+      verificationChecks: string[];
+    };
+  };
+  valueTelemetry: {
+    measurementMode: "synthetic-assumption-only";
+    documentationCompletenessPercent: number;
+    missingRequirementCount: number;
+    estimatedManualReviewMinutes: number;
+    estimatedAssistedReviewMinutes: number;
+    estimatedReviewMinutesReallocated: number;
+    outcomeBoundary: string;
+  };
+  exportPacket: {
+    fileName: string;
+    mediaType: "text/markdown";
+    markdown: string;
+    exportAllowed: false;
+    exportRequiresHumanReview: true;
+  };
+  auditHash: string;
+  boundary: typeof documentationBeforeAuthorizationBoundary;
+};
+
+export type DocumentationBeforeAuthorizationWorkbenchResult =
+  | { valid: true; packet: DocumentationBeforeAuthorizationReviewPacket }
+  | { valid: false; errors: string[] };
+
 export const documentationBeforeAuthorizationStatus =
   "documentation-before-authorization-ready-synthetic-only";
 
@@ -202,6 +274,121 @@ function requiredRequirements() {
   return documentationBeforeAuthorizationRequirements.filter((requirement) => requirement.required);
 }
 
+const reviewerStatuses: DocumentationBeforeAuthorizationSyntheticPacket["reviewerStatus"][] = [
+  "not_reviewed",
+  "queued",
+  "reviewed_for_demo"
+];
+
+const requestedActions: DocumentationBeforeAuthorizationSyntheticPacket["requestedAction"][] = [
+  "pre_submission_gap_check",
+  "draft_reviewer_packet",
+  "payer_submission_blocked"
+];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isRequirementId(value: unknown): value is DocumentationBeforeAuthorizationRequirementId {
+  return (
+    typeof value === "string" &&
+    documentationBeforeAuthorizationRequirements.some((requirement) => requirement.id === value)
+  );
+}
+
+function containsSensitiveWorkbenchField(value: unknown): boolean {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return Object.entries(value).some(([key, entry]) => {
+    if (/token|secret|password|credential|authorization|cookie|member|patient|mrn/i.test(key)) {
+      return true;
+    }
+
+    if (isRecord(entry)) {
+      return containsSensitiveWorkbenchField(entry);
+    }
+
+    return typeof entry === "string" && /\b(?:Bearer\s+|sk-)[A-Za-z0-9._-]+/i.test(entry);
+  });
+}
+
+function parseWorkbenchRequest(
+  value: unknown
+):
+  | { valid: true; request: DocumentationBeforeAuthorizationWorkbenchRequest }
+  | { valid: false; errors: string[] } {
+  if (!isRecord(value)) {
+    return { valid: false, errors: ["Request body must be a JSON object."] };
+  }
+
+  const allowedFields = new Set([
+    "scenarioPacketId",
+    "documentedRequirementIds",
+    "reviewerStatus",
+    "requestedAction",
+    "dataBoundaryAcknowledged"
+  ]);
+  const unexpectedFields = Object.keys(value).filter((key) => !allowedFields.has(key));
+  const errors: string[] = [];
+
+  if (unexpectedFields.length > 0 || containsSensitiveWorkbenchField(value)) {
+    errors.push("Only enumerated synthetic workbench fields are accepted; sensitive or unexpected fields are blocked.");
+  }
+
+  const scenarioPacketId = typeof value.scenarioPacketId === "string" ? value.scenarioPacketId : "";
+  const scenario = documentationBeforeAuthorizationSyntheticPackets.find(
+    (packet) => packet.packetId === scenarioPacketId
+  );
+
+  if (!scenario) {
+    errors.push("Select a registered synthetic scenario packet.");
+  }
+
+  const requirementValues = Array.isArray(value.documentedRequirementIds)
+    ? value.documentedRequirementIds
+    : [];
+  const documentedRequirementIds = Array.from(new Set(requirementValues.filter(isRequirementId)));
+
+  if (
+    requirementValues.length !== documentedRequirementIds.length ||
+    documentedRequirementIds.length > documentationBeforeAuthorizationRequirements.length
+  ) {
+    errors.push("Documented requirements must be unique registered requirement identifiers.");
+  }
+
+  const reviewerStatus = value.reviewerStatus;
+  if (!reviewerStatuses.includes(reviewerStatus as DocumentationBeforeAuthorizationSyntheticPacket["reviewerStatus"])) {
+    errors.push("Select a supported synthetic reviewer status.");
+  }
+
+  const requestedAction = value.requestedAction;
+  if (!requestedActions.includes(requestedAction as DocumentationBeforeAuthorizationSyntheticPacket["requestedAction"])) {
+    errors.push("Select a supported workbench action.");
+  }
+
+  if (value.dataBoundaryAcknowledged !== true) {
+    errors.push("Acknowledge the synthetic/no-PHI and no-submission boundary before evaluation.");
+  }
+
+  if (errors.length > 0 || !scenario) {
+    return { valid: false, errors };
+  }
+
+  return {
+    valid: true,
+    request: {
+      scenarioPacketId,
+      documentedRequirementIds,
+      reviewerStatus: reviewerStatus as DocumentationBeforeAuthorizationSyntheticPacket["reviewerStatus"],
+      requestedAction: requestedAction as DocumentationBeforeAuthorizationSyntheticPacket["requestedAction"],
+      dataBoundaryAcknowledged: true
+    }
+  };
+}
+
 function ownerForMissingRequirements(
   missingRequiredIds: DocumentationBeforeAuthorizationRequirementId[]
 ): DocumentationBeforeAuthorizationEvaluation["recommendedOwner"] {
@@ -293,6 +480,203 @@ export function evaluateDocumentationBeforeAuthorizationPacket(
   };
 }
 
+function buildEvidenceRefs(
+  packet: DocumentationBeforeAuthorizationSyntheticPacket,
+  documentedRequirementIds: DocumentationBeforeAuthorizationRequirementId[]
+) {
+  return Array.from(
+    new Set([
+      ...packet.evidenceRefs,
+      ...documentedRequirementIds.map((requirementId) => `synthetic-evidence-${requirementId}`)
+    ])
+  );
+}
+
+function buildReviewPacketMarkdown(input: {
+  workbenchId: string;
+  scenario: DocumentationBeforeAuthorizationSyntheticPacket;
+  evaluation: DocumentationBeforeAuthorizationEvaluation;
+  readinessScore: number;
+  evidenceRefs: string[];
+}) {
+  const missing = input.evaluation.missingEvidenceLabels.length
+    ? input.evaluation.missingEvidenceLabels.map((label) => `- ${label}`).join("\n")
+    : "- No required documentation gaps detected in this synthetic packet.";
+  const actions = input.evaluation.recommendedActions.map((action) => `- ${action}`).join("\n");
+
+  return [
+    "# SCRIMED PayerIQ Documentation Readiness Packet",
+    "",
+    `- Workbench ID: ${input.workbenchId}`,
+    `- Synthetic scenario: ${input.scenario.scenario}`,
+    `- Procedure family: ${input.scenario.procedureFamily}`,
+    `- Documentation completeness: ${input.readinessScore}%`,
+    `- Risk level: ${input.evaluation.riskLevel}`,
+    `- Readiness: ${input.evaluation.readiness}`,
+    `- Required reviewer: ${input.evaluation.recommendedOwner}`,
+    "- Payer submission allowed: no",
+    "",
+    "## Missing Documentation",
+    missing,
+    "",
+    "## Evidence References",
+    ...input.evidenceRefs.map((reference) => `- ${reference}`),
+    "",
+    "## Recommended Human Actions",
+    actions,
+    "",
+    "## Safety Boundary",
+    documentationBeforeAuthorizationBoundary,
+    "",
+    "This packet remains a synthetic decision-support draft. Human review is required, and no payer-facing transmission is authorized."
+  ].join("\n");
+}
+
+export function runDocumentationBeforeAuthorizationWorkbench(
+  payload: unknown,
+  generatedAt = new Date().toISOString()
+): DocumentationBeforeAuthorizationWorkbenchResult {
+  const parsed = parseWorkbenchRequest(payload);
+
+  if (!parsed.valid) {
+    return parsed;
+  }
+
+  const sourcePacket = documentationBeforeAuthorizationSyntheticPackets.find(
+    (packet) => packet.packetId === parsed.request.scenarioPacketId
+  )!;
+  const evidenceRefs = buildEvidenceRefs(sourcePacket, parsed.request.documentedRequirementIds);
+  const packet: DocumentationBeforeAuthorizationSyntheticPacket = {
+    ...sourcePacket,
+    documentedRequirementIds: parsed.request.documentedRequirementIds,
+    evidenceRefs,
+    reviewerStatus: parsed.request.reviewerStatus,
+    requestedAction: parsed.request.requestedAction,
+    syntheticOnly: true,
+    noPhi: true
+  };
+  const evaluation = evaluateDocumentationBeforeAuthorizationPacket(packet);
+  const requiredCount = requiredRequirements().length;
+  const completenessScore = Math.round((evaluation.presentRequiredIds.length / requiredCount) * 100);
+  const readinessScore =
+    evaluation.riskLevel === "blocked"
+      ? 0
+      : packet.reviewerStatus === "reviewed_for_demo"
+        ? completenessScore
+        : Math.min(completenessScore, 90);
+  const estimatedManualReviewMinutes = 30 + evaluation.missingRequiredIds.length * 3;
+  const estimatedAssistedReviewMinutes = 12 + evaluation.missingRequiredIds.length * 2;
+  const auditHash = generateScrimedAuditHash({
+    sourcePacketId: sourcePacket.packetId,
+    documentedRequirementIds: packet.documentedRequirementIds,
+    evidenceRefs,
+    reviewerStatus: packet.reviewerStatus,
+    requestedAction: packet.requestedAction,
+    readiness: evaluation.readiness,
+    riskLevel: evaluation.riskLevel,
+    boundary: "synthetic-no-phi-no-payer-submission"
+  });
+  const workbenchId = `payeriq-${auditHash.replace("scrimed-intel-", "")}`;
+  const markdown = buildReviewPacketMarkdown({
+    workbenchId,
+    scenario: packet,
+    evaluation,
+    readinessScore,
+    evidenceRefs
+  });
+
+  return {
+    valid: true,
+    packet: {
+      workbenchId,
+      sourcePacketId: sourcePacket.packetId,
+      generatedAt,
+      status: evaluation.riskLevel === "blocked" ? "request-blocked" : "review-packet-prepared",
+      scenario: packet.scenario,
+      procedureFamily: packet.procedureFamily,
+      readinessScore,
+      evaluation,
+      evidencePacket: {
+        presentRequirements: documentationBeforeAuthorizationRequirements
+          .filter((requirement) => evaluation.presentRequiredIds.includes(requirement.id))
+          .map((requirement) => requirement.label),
+        missingRequirements: evaluation.missingEvidenceLabels,
+        evidenceRefs,
+        policyFreshness: "synthetic-current-for-demo",
+        sourceTrustTier: "synthetic-reviewed-fixture"
+      },
+      reviewQueue: {
+        requiredRole: evaluation.recommendedOwner,
+        status:
+          evaluation.riskLevel === "blocked"
+            ? "blocked"
+            : packet.reviewerStatus === "reviewed_for_demo"
+              ? "reviewed-for-demo"
+              : "queued",
+        humanReviewRequired: true,
+        externalActionAllowed: false,
+        nextActions: evaluation.recommendedActions
+      },
+      workSessionHandoff: {
+        workspaceDomain: "revenue-cycle",
+        riskLevel: "high",
+        requestedAutonomy: "prepare",
+        artifactType: "prior-authorization-draft",
+        definitionOfDone: {
+          goal: "Prepare a source-traceable synthetic prior-authorization documentation review packet for qualified human review.",
+          allowedScope: [
+            "synthetic documentation completeness scoring",
+            "missing-evidence detection",
+            "review packet preparation"
+          ],
+          prohibitedActions: [
+            "live PHI",
+            "medical necessity determination",
+            "payer submission",
+            "patient outreach",
+            "EHR writeback",
+            "reimbursement guarantee"
+          ],
+          requiredEvidence: ["synthetic payer-policy reference", "documentation requirement trace"],
+          successCriteria: ["evidence", "missing documentation", "review gate", "blocked submission"],
+          stoppingConditions: ["PHI detected", "policy source missing", "human review unavailable", "submission requested"],
+          humanApprovalRequired: true,
+          rollbackPlan: "Cancel the draft, retain non-sensitive audit metadata, and prohibit external distribution.",
+          verificationChecks: [
+            "schema validity",
+            "evidence reference presence",
+            "documentation completeness",
+            "human review state",
+            "payer submission denial"
+          ]
+        }
+      },
+      valueTelemetry: {
+        measurementMode: "synthetic-assumption-only",
+        documentationCompletenessPercent: readinessScore,
+        missingRequirementCount: evaluation.missingRequiredIds.length,
+        estimatedManualReviewMinutes,
+        estimatedAssistedReviewMinutes,
+        estimatedReviewMinutesReallocated: Math.max(
+          0,
+          estimatedManualReviewMinutes - estimatedAssistedReviewMinutes
+        ),
+        outcomeBoundary:
+          "Illustrative workflow economics only; buyer baselines and qualified finance review are required before savings, denial-reduction, or ROI claims."
+      },
+      exportPacket: {
+        fileName: `${workbenchId}-review-packet.md`,
+        mediaType: "text/markdown",
+        markdown,
+        exportAllowed: false,
+        exportRequiresHumanReview: true
+      },
+      auditHash,
+      boundary: documentationBeforeAuthorizationBoundary
+    }
+  };
+}
+
 export function getDocumentationBeforeAuthorizationSummary() {
   const evaluations = documentationBeforeAuthorizationSyntheticPackets.map((packet) =>
     evaluateDocumentationBeforeAuthorizationPacket(packet)
@@ -311,6 +695,15 @@ export function getDocumentationBeforeAuthorizationSummary() {
     syntheticPacketCount: documentationBeforeAuthorizationSyntheticPackets.length,
     syntheticPackets: documentationBeforeAuthorizationSyntheticPackets,
     evaluations,
+    workbench: {
+      route: "/documentation-before-authorization",
+      apiRoute: "/api/documentation-before-authorization",
+      mode: "interactive-synthetic-review-packet",
+      acceptedInput: "registered scenario identifiers and enumerated documentation requirement states only",
+      freeTextAccepted: false,
+      payerSubmissionAllowed: false,
+      workSessionHandoff: "SCRIMED Work revenue-cycle prepare-only Definition-of-Done contract"
+    },
     validation: {
       status:
         evaluations.every(
@@ -349,4 +742,28 @@ export function getDocumentationBeforeAuthorizationSummary() {
       ]
     }
   };
+}
+
+export function buildDocumentationBeforeAuthorizationBrief() {
+  const summary = getDocumentationBeforeAuthorizationSummary();
+
+  return [
+    "# SCRIMED PayerIQ Documentation-Before-Authorization",
+    "",
+    `Status: ${summary.status}`,
+    `Workbench: ${summary.workbench.route}`,
+    `API: ${summary.workbench.apiRoute}`,
+    "",
+    "## Product Value",
+    "PayerIQ converts a registered synthetic authorization scenario into a source-traceable documentation completeness score, missing-evidence packet, reviewer queue, Definition-of-Done handoff, and claims-safe workflow economics preview.",
+    "",
+    "## Controls",
+    "- Enumerated synthetic inputs only; no free-text patient or policy data.",
+    "- Human review is required for every result.",
+    "- Payer submission, medical-necessity determination, patient outreach, EHR writeback, and reimbursement claims remain blocked.",
+    "- Export remains disabled until human review and an authorized distribution path exist.",
+    "",
+    "## Boundary",
+    summary.boundary
+  ].join("\n");
 }

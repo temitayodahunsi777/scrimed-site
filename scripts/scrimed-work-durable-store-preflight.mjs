@@ -15,6 +15,7 @@ const strict = process.argv.includes("--strict");
 const migrationPath = "supabase/migrations/20260709193000_scrimed_work_durable_store.sql";
 const lifecycleMigrationPath = "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql";
 const advisorIndexMigrationPath = "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql";
+const artifactReviewMigrationPath = "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql";
 const requiredEnv = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -64,6 +65,7 @@ function summarizeEnvironment() {
 const migration = await readFile(migrationPath, "utf8");
 const lifecycleMigration = await readFile(lifecycleMigrationPath, "utf8");
 const advisorIndexMigration = await readFile(advisorIndexMigrationPath, "utf8");
+const artifactReviewMigration = await readFile(artifactReviewMigrationPath, "utf8");
 const tokenAnalysis = analyzeAal2BearerToken({
   bearerToken: process.env.SCRIMED_BEARER_TOKEN,
   workspaceSlug: process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? ""
@@ -99,7 +101,23 @@ const checks = [
   check(requireIncludes(lifecycleMigration, "idempotentReplay"), "lifecycle-idempotent-replay", "Transition replay returns explicit idempotency metadata."),
   check(requireIncludes(advisorIndexMigration, "scrimed_work_artifacts_tenant_created_idx"), "advisor-artifact-tenant-index", "Artifact tenant foreign key has a covering index."),
   check(requireIncludes(advisorIndexMigration, "scrimed_work_audit_events_tenant_created_idx"), "advisor-audit-tenant-index", "Audit tenant foreign key has a covering index."),
-  check(requireIncludes(advisorIndexMigration, "scrimed_work_audit_events_artifact_idx"), "advisor-audit-artifact-index", "Audit artifact foreign key has a covering index.")
+  check(requireIncludes(advisorIndexMigration, "scrimed_work_audit_events_artifact_idx"), "advisor-audit-artifact-index", "Audit artifact foreign key has a covering index."),
+  check(requireIncludes(artifactReviewMigration, "private.scrimed_work_artifact_reviews"), "artifact-review-ledger", "Private append-only artifact review ledger exists."),
+  check(requireRegex(artifactReviewMigration, /alter table private\.scrimed_work_artifact_reviews enable row level security/i), "artifact-review-rls", "RLS is enabled for artifact reviews."),
+  check(requireIncludes(artifactReviewMigration, "revoke all on private.scrimed_work_artifact_reviews from public, anon, authenticated"), "artifact-review-direct-access-revoked", "Direct artifact-review access is revoked."),
+  check(requireIncludes(artifactReviewMigration, "scrimed_work_artifact_reviews_deny_all"), "artifact-review-deny-policy", "Artifact reviews have a restrictive deny policy."),
+  check(requireIncludes(artifactReviewMigration, "array['reviewer']"), "artifact-review-reviewer-only", "Artifact review requires the reviewer membership role."),
+  check(requireIncludes(artifactReviewMigration, "scrimed-work-independent-reviewer-required"), "artifact-review-separation-of-duties", "Artifact creator and reviewer separation is enforced."),
+  check(requireIncludes(artifactReviewMigration, "expected_reviewer_identity_hash"), "artifact-review-identity-binding", "Reviewer identity hash is recomputed in the database."),
+  check(requireIncludes(artifactReviewMigration, "expected_review_decision_hash"), "artifact-review-decision-binding", "Review decision hash is recomputed in the database."),
+  check(requireIncludes(artifactReviewMigration, "scrimed-work-artifact-review-mutation-scope-violation"), "artifact-review-immutable-payload", "Review can mutate only review and verification metadata."),
+  check(requireIncludes(artifactReviewMigration, "scrimed-work-artifact-review-verification-required"), "artifact-review-verification-required", "Internal-use approval requires mandatory verification."),
+  check(requireIncludes(artifactReviewMigration, "external_distribution_allowed boolean not null default false check (not external_distribution_allowed)"), "artifact-review-external-distribution-blocked", "External distribution remains structurally blocked."),
+  check(requireIncludes(artifactReviewMigration, "payer_submission_allowed boolean not null default false check (not payer_submission_allowed)"), "artifact-review-payer-submission-blocked", "Payer submission remains structurally blocked."),
+  check(requireIncludes(artifactReviewMigration, "artifact-review-idempotency-reused"), "artifact-review-idempotent-audit", "Idempotent review replays produce an audit event."),
+  check(requireIncludes(artifactReviewMigration, "create or replace function public.review_scrimed_work_artifact"), "artifact-review-public-wrapper", "Public artifact-review RPC wrapper exists."),
+  check(requireRegex(artifactReviewMigration, /language sql[\s\S]*?security invoker/i), "artifact-review-wrapper-security-invoker", "Artifact-review public wrapper uses SECURITY INVOKER."),
+  check(requireIncludes(artifactReviewMigration, "grant execute on function public.review_scrimed_work_artifact"), "artifact-review-authenticated-grant", "Only the authenticated wrapper execution path is granted.")
 ];
 
 for (const name of requiredEnv) {
@@ -138,7 +156,12 @@ const report = {
   status,
   strict,
   migrationPath,
-  migrationPaths: [migrationPath, lifecycleMigrationPath, advisorIndexMigrationPath],
+  migrationPaths: [
+    migrationPath,
+    lifecycleMigrationPath,
+    advisorIndexMigrationPath,
+    artifactReviewMigrationPath
+  ],
   environment: summarizeEnvironment(),
   token: {
     provided: hasEnv("SCRIMED_BEARER_TOKEN"),

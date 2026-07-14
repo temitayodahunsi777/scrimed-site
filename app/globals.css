@@ -1752,6 +1752,66 @@ h3 {
   gap: 28px;
 }
 
+.requirement-checklist {
+  border: 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  margin: 0;
+  padding: 0;
+}
+
+.requirement-checklist legend {
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 20px 0 10px;
+  text-transform: uppercase;
+}
+
+.requirement-checklist label {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 18px minmax(0, 1fr);
+  padding: 16px 0;
+}
+
+.requirement-checklist input {
+  height: 18px;
+  margin: 2px 0 0;
+  width: 18px;
+}
+
+.requirement-checklist label > span {
+  display: grid;
+  gap: 5px;
+}
+
+.requirement-checklist small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.workbench-notice,
+.workbench-export-lock {
+  background: #f6fbf8;
+  border: 1px solid rgba(16, 97, 63, 0.34);
+  color: var(--green-dark);
+  line-height: 1.5;
+  padding: 16px;
+}
+
+.workbench-export-lock {
+  display: grid;
+  gap: 8px;
+}
+
+.workbench-export-lock p {
+  margin: 0;
+}
+
 .evaluation-preview {
   background: #f7f4eb;
   display: grid;

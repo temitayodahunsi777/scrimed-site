@@ -119,7 +119,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "expectedApiRoutePatternCount = 434",
+  "expectedApiRoutePatternCount = 438",
   "\"/pilot-handoff-command\""
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", audit, expected);

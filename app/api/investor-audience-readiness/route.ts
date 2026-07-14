@@ -20,6 +20,8 @@ export async function GET() {
       "X-SCRIMED-Securities-Authority": "not-securities-offering-material",
       "X-SCRIMED-Security-Certification": "not-security-certified",
       "X-SCRIMED-Solicitation-Authority": "not-solicitation",
+      "X-SCRIMED-External-Outreach": "not-sent",
+      "X-SCRIMED-Strategic-Relationship": "not-implied",
       "X-SCRIMED-Tax-Authority": "qualified-review-required",
       "X-SCRIMED-Valuation-Authority": "not-valuation-assurance"
     }
