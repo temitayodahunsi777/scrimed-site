@@ -344,6 +344,30 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     retainedBoundary: "No final note, EHR filing, diagnosis insertion, autonomous documentation, PHI, or clinical validation claim."
   },
   {
+    slug: "prior-authorization-support",
+    name: "PayerIQ Documentation Readiness Demo",
+    demoRoute: "/demos/prior-authorization-support",
+    recommendedPilotSlug: "60-day-governed-automation-pilot",
+    recommendedPilotName: "60-Day Governed Automation Pilot",
+    recommendedPilotRoute: "/pilots/60-day-governed-automation-pilot",
+    recommendedOffer: "Synthetic Pilot Evaluation",
+    pricingBand: "$125k-$350k for a governed synthetic documentation-readiness pilot; buyer-specific policy mapping is separately scoped.",
+    buyerFit: "Prior authorization, RCM, utilization-management, access, and finance transformation leaders.",
+    fastPathCta: "/pilot?offer=synthetic-pilot-evaluation&demo=prior-authorization-support",
+    proofAssets: [
+      "/documentation-before-authorization",
+      "/healthcare-value-realization",
+      "/health-records",
+      "/scrimed-work"
+    ],
+    objectionHandling: [
+      "The workbench identifies missing documentation and reviewer ownership; it does not determine medical necessity.",
+      "Pilot value is measured through buyer-approved completeness, reviewer-time, and rework baselines.",
+      "Payer submission, appeals, reimbursement guarantees, and live PHI remain blocked."
+    ],
+    retainedBoundary: "No live PHI, medical-necessity determination, payer submission, appeal filing, EHR writeback, or reimbursement guarantee."
+  },
+  {
     slug: "trialcore-research-operations",
     name: "TrialCore Research Operations Demo",
     demoRoute: "/demos/trialcore-research-operations",
@@ -490,6 +514,30 @@ const conversionPacketOverrides: Record<
       "Buyer treats the demo as clinical validation."
     ],
     closePlan: "Convert the buyer to a governed documentation pilot with capped note fixtures, reviewer role, and source-trace acceptance criteria."
+  },
+  "prior-authorization-support": {
+    sponsorRole: "VP Revenue Cycle, prior authorization director, utilization-management leader, or CFO transformation sponsor",
+    workflowOwnerRole: "Prior authorization operations manager or RCM documentation lead",
+    reviewCadence: "Weekly completeness and evidence-gap review with policy-source freshness, reviewer disposition, and no-submission proof",
+    decisionWindow: "One workbench review plus one workflow and measurement scoping call",
+    minimumPaidStep: "Synthetic Pilot Evaluation",
+    acceptanceCriteria: [
+      "Buyer accepts registered synthetic packets as the initial data boundary.",
+      "Buyer names a prior-authorization workflow owner and qualified reviewer role.",
+      "Pilot metrics include completeness, reviewer effort, evidence trace, and avoidable rework signals.",
+      "Payer submission, medical-necessity determination, and reimbursement claims remain blocked."
+    ],
+    paidDiligenceTriggers: [
+      "Buyer asks for organization-specific policy requirement mapping.",
+      "Buyer requests specialty-specific evidence rubrics or multi-payer workflow analysis.",
+      "Buyer needs finance methodology, security review, or executive proof packet support."
+    ],
+    disqualifiers: [
+      "Buyer wants autonomous payer submission or appeal filing.",
+      "Buyer wants live PHI accepted before protected-data authority is approved.",
+      "Buyer requires a reimbursement or denial-reduction guarantee."
+    ],
+    closePlan: "Scope one procedure family, synthetic requirement set, reviewer role, buyer baseline, price band, and no-submission acceptance criteria."
   },
   "trialcore-research-operations": {
     sponsorRole: "Research operations leader, oncology program leader, or clinical trials executive",

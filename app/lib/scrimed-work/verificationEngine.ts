@@ -15,10 +15,15 @@ export function detectDoomLoop(input: {
 }) {
   const repeatedSteps = input.recentSteps.length - new Set(input.recentSteps).size;
   const repeatedToolCalls = input.toolCallIds.length - new Set(input.toolCallIds).size;
-  const outputText = input.outputText ?? "";
-  const repeatedSpan = outputText
+  const words = (input.outputText ?? "")
+    .toLowerCase()
     .split(/\s+/)
-    .some((word, index, words) => word.length > 5 && words.slice(index + 1, index + 8).includes(word));
+    .map((word) => word.replace(/[^a-z0-9-]/g, ""))
+    .filter(Boolean);
+  const spans = words.slice(0, -5).map((_, index) => words.slice(index, index + 6).join(" "));
+  const spanCounts = new Map<string, number>();
+  for (const span of spans) spanCounts.set(span, (spanCounts.get(span) ?? 0) + 1);
+  const repeatedSpan = Math.max(0, ...spanCounts.values()) >= 3;
 
   return {
     loopDetected: repeatedSteps >= 2 || repeatedToolCalls >= 2 || repeatedSpan,

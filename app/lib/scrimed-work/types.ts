@@ -203,6 +203,20 @@ export type WorkArtifact = {
     exportRequiresHumanReview: boolean;
     noPhiConfirmed: boolean;
   };
+  reviewMetadata?: {
+    disposition: "approved_for_internal_use" | "changes_requested" | "rejected";
+    reasonCode:
+      | "evidence_and_boundaries_confirmed"
+      | "missing_required_evidence"
+      | "scope_or_policy_conflict"
+      | "unsafe_or_unsupported_claim"
+      | "revision_required";
+    reviewerIdentityHash: string;
+    decisionHash: string;
+    reviewedAt: string;
+    externalDistributionAllowed: false;
+    payerSubmissionAllowed: false;
+  };
 };
 
 export type ValueTelemetry = {

@@ -153,6 +153,26 @@ export function getScrimedWorkProductionHardeningGate(
       retainedBoundary: "High-risk clinical approval stays blocked until a separately verified clinician-reviewer identity can be bound."
     }),
     gate({
+      gateId: "scrimed-work-artifact-review-binding",
+      domain: "verification",
+      title: "Durable independent artifact review binding",
+      status: "evidence_ready",
+      severity: "critical",
+      requiredFor: "Verified internal completion of any protected SCRIMED Work artifact.",
+      evidence: [
+        "reviewer-only AAL2 durable RPC",
+        "creator/reviewer separation of duties",
+        "database-verifiable reviewer and decision hashes",
+        "immutable artifact mutation scope",
+        "mandatory verification before internal-use approval",
+        "external distribution and payer submission fixed false"
+      ],
+      blocker: null,
+      operatorAction: "Keep review and completion behind separate AAL2 reviewer identity, idempotency, authoritative durable state, and mandatory verification.",
+      automationSafe: true,
+      retainedBoundary: "Reviewed means verified for internal synthetic use only; it grants no payer, EHR, clinical, connector, external-distribution, certification, or go-live authority."
+    }),
+    gate({
       gateId: "scrimed-work-durable-store-flag",
       domain: "durable-store",
       title: "Durable store feature flag",
@@ -238,15 +258,16 @@ export function getScrimedWorkProductionHardeningGate(
         "supabase/migrations/20260709193000_scrimed_work_durable_store.sql exists",
         "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql exists",
         "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql exists",
+        "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql exists",
         "scripts/scrimed-work-durable-store-preflight.mjs validates migration posture",
         ...(migrationsVerified ? [`migrationEvidenceId=${migrationEvidenceId}`] : [])
       ],
       blocker: migrationsVerified
         ? null
-        : "All three ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved non-production target.",
+        : "All four ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved non-production target.",
       operatorAction: migrationsVerified
         ? "Retain migration history, RLS/grant checks, and post-migration advisor evidence with this release."
-        : "Apply all three migrations in order to a non-production Supabase project/branch, run Supabase advisors, then set the verified flag and nonsecret evidence identifier.",
+        : "Apply all four migrations in order to a non-production Supabase project/branch, run Supabase advisors, then set the verified flag and nonsecret evidence identifier.",
       automationSafe: false,
       retainedBoundary: "This code path does not mutate live Supabase, apply migrations, or approve production deployment."
     }),
@@ -301,7 +322,7 @@ export function getScrimedWorkProductionHardeningGate(
       "Configure non-production Supabase URL, publishable key, runtime authorization token, workspace slug, protected writes flag, and durable-store flag.",
       migrationsVerified
         ? `Retain reviewed migration evidence ${migrationEvidenceId} with the release packet.`
-        : "Apply all three SCRIMED Work migrations in order only to an approved non-production Supabase target and bind the advisor review to a nonsecret evidence identifier.",
+        : "Apply all four SCRIMED Work migrations in order only to an approved non-production Supabase target and bind the advisor review to a nonsecret evidence identifier.",
       "Run npm run smoke:scrimed-work:durable-store-preflight:strict.",
       "Run npm run smoke:scrimed-work:strict.",
       "Canary one no-PHI protected workspace and attach the evidence to buyer diligence materials."

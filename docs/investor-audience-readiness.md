@@ -1,6 +1,6 @@
 # SCRIMED Investor And Audience Readiness
 
-Updated: 2026-06-26
+Updated: 2026-07-13
 
 SCRIMED Investor and Audience Readiness turns known weaknesses into owned relief tracks and packages the company for distinct capital, clinic, buyer, and partner audiences. It is designed to strengthen competitive edge, sellable value, and diligence readiness without creating securities, valuation, legal, tax, donor, clinical, PHI, reimbursement, customer-proof, partnership, or approval claims.
 
@@ -45,6 +45,25 @@ The readiness layer packages SCRIMED for:
 - Enterprise innovation and transformation sponsors.
 
 Each packet contains a primary question, sellable value, pitch angle, proof routes, diligence packet, next move, required review, and blocked claims.
+
+## Strategic Ecosystem Outreach
+
+The control plane now includes distinct, evidence-backed preparation packets for OpenAI, NVIDIA, Anthropic, and Microsoft. These are strategic ecosystem targets, not claimed investors or partners. Each packet contains:
+
+- The official startup or partner-program source.
+- A company-specific SCRIMED fit thesis.
+- A concrete first ask.
+- Product and governance proof routes.
+- Diligence requirements.
+- Explicit claim boundaries.
+
+The associated diligence manifest separates `evidence-ready`, `qualified-review-required`, and `external-evidence-required` items across company narrative, product, safety, security, commercial proof, finance, legal, and clinical/regulatory readiness.
+
+No external outreach, program application, investment request, or partnership communication is sent by this module.
+
+## Pitch Architecture
+
+The investor narrative is organized around twelve decision questions: category, workflow problem, entry wedge, product, architecture, trust, proof, market, business model, defensibility, milestones/capital, and company-specific strategic fit. Every slide has proof routes and a claim guard.
 
 ## Competitive Edge
 

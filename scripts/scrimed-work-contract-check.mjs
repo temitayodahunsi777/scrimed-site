@@ -22,6 +22,8 @@ const requiredFiles = [
   "app/lib/scrimed-work/autonomyPolicy.ts",
   "app/lib/scrimed-work/approvalEngine.ts",
   "app/lib/scrimed-work/artifactEngine.ts",
+  "app/lib/scrimed-work/artifactReview.ts",
+  "app/lib/scrimed-work/payerIqHandoff.ts",
   "app/lib/scrimed-work/scheduleDefinitions.ts",
   "app/lib/scrimed-work/voiceWorkflow.ts",
   "app/lib/scrimed-work/learningLoop.ts",
@@ -42,6 +44,8 @@ const requiredFiles = [
   "app/api/scrimed-work/sessions/[sessionId]/verify/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/approve/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/reject/route.ts",
+  "app/api/scrimed-work/sessions/[sessionId]/complete/route.ts",
+  "app/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review/route.ts",
   "app/api/scrimed-work/providers/route.ts",
   "app/api/scrimed-work/agents/route.ts",
   "app/api/scrimed-work/tools/route.ts",
@@ -51,6 +55,7 @@ const requiredFiles = [
   "app/api/scrimed-work/context/search/route.ts",
   "app/api/scrimed-work/artifacts/route.ts",
   "app/api/scrimed-work/voice/simulate/route.ts",
+  "app/api/documentation-before-authorization/scrimed-work-handoff/route.ts",
   "app/scrimed-work/page.tsx",
   "app/pilot-workspace/ScrimedWorkBrowserVerificationPanel.tsx",
   "app/lib/siteNavigation.ts",
@@ -59,11 +64,13 @@ const requiredFiles = [
   "scripts/scrimed-work-durable-store-preflight.mjs",
   "scripts/scrimed-work-authenticated-smoke.mjs",
   "scripts/scrimed-work-lifecycle-policy-test.mjs",
+  "scripts/scrimed-work-artifact-review-policy-test.mjs",
   "scripts/scrimed-work-preflight-policy-test.mjs",
   "scripts/scrimed-work-browser-verification-policy-test.mjs",
   "supabase/migrations/20260709193000_scrimed_work_durable_store.sql",
   "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql",
   "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql",
+  "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs"
 ];
@@ -94,6 +101,8 @@ const combinedLib = [
   files["app/lib/scrimed-work/contextEngine.ts"],
   files["app/lib/scrimed-work/verificationEngine.ts"],
   files["app/lib/scrimed-work/artifactEngine.ts"],
+  files["app/lib/scrimed-work/artifactReview.ts"],
+  files["app/lib/scrimed-work/payerIqHandoff.ts"],
   files["app/lib/scrimed-work/scheduleDefinitions.ts"],
   files["app/lib/scrimed-work/voiceWorkflow.ts"],
   files["app/lib/scrimed-work/valueTelemetry.ts"],
@@ -165,7 +174,13 @@ for (const expected of [
   "hasSatisfiedRequiredHumanApproval",
   "separation-of-duties-required",
   "idempotent_replay_candidate",
-  "resolveScrimedWorkMembership"
+  "resolveScrimedWorkMembership",
+  "evaluateArtifactReview",
+  "createArtifactReviewerIdentityHash",
+  "createArtifactReviewDecisionHash",
+  "buildPayerIqProtectedWorkSession",
+  "guardedCreatePayerIqProtectedHandoff",
+  "guardedReviewProtectedArtifact"
 ]) {
   requireIncludes("app/lib/scrimed-work/*", combinedLib, expected);
 }
@@ -190,7 +205,8 @@ for (const route of [
   "app/api/scrimed-work/sessions/[sessionId]/resume/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/cancel/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/approve/route.ts",
-  "app/api/scrimed-work/sessions/[sessionId]/reject/route.ts"
+  "app/api/scrimed-work/sessions/[sessionId]/reject/route.ts",
+  "app/api/scrimed-work/sessions/[sessionId]/complete/route.ts"
 ]) {
   requireIncludes(route, files[route], route.endsWith("sessions/route.ts") ? "guardedCreateSession" : "guardedTransitionSession");
   requireIncludes(route, files[route], "fail-closed");
@@ -222,6 +238,19 @@ requireIncludes(
   files["app/api/scrimed-work/artifacts/route.ts"],
   "guardedCreateArtifact"
 );
+
+for (const expected of [
+  "guardedReviewProtectedArtifact",
+  "independent-aal2-review",
+  "X-SCRIMED-External-Distribution",
+  "not-authorized"
+]) {
+  requireIncludes(
+    "app/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review/route.ts",
+    files["app/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review/route.ts"],
+    expected
+  );
+}
 requireIncludes(
   "app/api/scrimed-work/artifacts/route.ts",
   files["app/api/scrimed-work/artifacts/route.ts"],
@@ -269,7 +298,24 @@ for (const expected of [
   requireIncludes("supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql", advisorIndexMigration, expected);
 }
 
+const artifactReviewMigration = files["supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql"];
+for (const expected of [
+  "private.scrimed_work_artifact_reviews",
+  "scrimed_work_artifact_reviews_deny_all",
+  "array['reviewer']",
+  "expected_reviewer_identity_hash",
+  "expected_review_decision_hash",
+  "scrimed-work-artifact-review-mutation-scope-violation",
+  "scrimed-work-artifact-review-verification-required",
+  "artifact-review-idempotency-reused",
+  "public.review_scrimed_work_artifact",
+  "security invoker"
+]) {
+  requireIncludes("supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql", artifactReviewMigration, expected);
+}
+
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:lifecycle");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:artifact-review-policy");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedGetProtectedWorkSession");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedVerifyProtectedWorkSession");
 requireNotIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "saveWorkSession(");
@@ -279,6 +325,11 @@ requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
   "SCRIMED Work lifecycle policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work artifact review policy behavior"
 );
 
 for (const expected of [
@@ -290,7 +341,9 @@ for (const expected of [
   "Production Hardening Gate",
   "/api/scrimed-work/production-hardening",
   "Known Limitations",
-  "Next Production-Hardening Step"
+  "Next Production-Hardening Step",
+  "Independent Artifact Review Binding",
+  "all four ordered migration contracts"
 ]) {
   requireIncludes("docs/scrimed-work.md", files["docs/scrimed-work.md"], expected);
 }
@@ -383,7 +436,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "expectedApiRoutePatternCount = 434",
+  "expectedApiRoutePatternCount = 438",
   "\"/scrimed-work\""
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], expected);

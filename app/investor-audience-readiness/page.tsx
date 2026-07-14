@@ -69,6 +69,18 @@ export default function InvestorAudienceReadinessPage() {
           <span>Blocked claims</span>
           <strong>{summary.blockedClaimCount}</strong>
         </article>
+        <article>
+          <span>Strategic targets</span>
+          <strong>{summary.strategicTargetCount}</strong>
+        </article>
+        <article>
+          <span>Diligence ready</span>
+          <strong>{summary.diligenceEvidenceReadyCount}</strong>
+        </article>
+        <article>
+          <span>Review still required</span>
+          <strong>{summary.diligenceReviewRequiredCount}</strong>
+        </article>
       </section>
 
       <section className="section-band split-band" aria-label="Investor audience boundary">
@@ -93,6 +105,87 @@ export default function InvestorAudienceReadinessPage() {
           <div className="layer-row">
             <span>04</span>
             <strong>{summary.authority.phiAuthority}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section className="table-section" aria-label="Strategic investor ecosystem targets">
+        <div className="section-heading">
+          <p className="eyebrow">Strategic outreach</p>
+          <h2>Four company-specific theses replace generic logo outreach.</h2>
+          <p className="section-copy">
+            Each path names the official ecosystem program, a specific evidence-backed ask, the proof routes to open, and the claims that must stay blocked. No outreach has been sent and no investment or partnership is implied.
+          </p>
+        </div>
+        {summary.strategicInvestorOutreach.targets.map((target) => (
+          <article className="module-row" key={target.id}>
+            <div>
+              <span>{target.outreachStatus}</span>
+              <h2>{target.organization}</h2>
+            </div>
+            <p>{target.proofThesis}</p>
+            <div>
+              <strong>{target.specificAsk}</strong>
+              <ul className="compact-list">
+                <li>Strategic fit: {target.strategicFit}</li>
+                <li>Official path: <a href={target.officialSource} rel="noreferrer" target="_blank">{target.officialProgram}</a></li>
+                <li>Proof: {target.proofRoutes.join(", ")}</li>
+                <li>Diligence: {target.diligenceRequirements.join(", ")}</li>
+                <li>Boundary: {target.claimBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Strategic diligence manifest">
+        <div className="section-heading">
+          <p className="eyebrow">Diligence manifest</p>
+          <h2>What is ready, what needs qualified review, and what still needs external evidence.</h2>
+          <p className="section-copy">{summary.strategicInvestorOutreach.boundary}</p>
+        </div>
+        {summary.strategicInvestorOutreach.diligenceManifest.map((item) => (
+          <article className="module-row" key={item.id}>
+            <div>
+              <span>{item.status}</span>
+              <h2>{item.title}</h2>
+            </div>
+            <p>{item.nextEvidence}</p>
+            <div>
+              <strong>{item.owner}</strong>
+              <ul className="compact-list">
+                <li>Category: {item.category}</li>
+                <li>Evidence: {item.evidenceRoutes.join(", ")}</li>
+                <li>Boundary: {item.disclosureBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-band split-band" aria-label="Strategic pitch and outreach sequence">
+        <div>
+          <p className="eyebrow">Pitch architecture</p>
+          <h2>A twelve-question deck earns the next diligence step.</h2>
+          <div className="layer-list">
+            {summary.strategicInvestorOutreach.pitchOutline.map((slide) => (
+              <div className="layer-row" key={slide.order}>
+                <span>{String(slide.order).padStart(2, "0")}</span>
+                <strong>{slide.title}: {slide.decisionQuestion}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="eyebrow">Controlled outreach</p>
+          <h2>Every external step remains human-approved.</h2>
+          <div className="layer-list">
+            {summary.strategicInvestorOutreach.outreachStages.map((stage) => (
+              <div className="layer-row" key={stage.order}>
+                <span>{String(stage.order).padStart(2, "0")}</span>
+                <strong>{stage.stage}: {stage.exitEvidence}</strong>
+              </div>
+            ))}
           </div>
         </div>
       </section>

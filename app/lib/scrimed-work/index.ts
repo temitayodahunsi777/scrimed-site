@@ -2,7 +2,8 @@ import { evaluateScrimedSafetyGate, scrimedSafetyHeaders } from "../scrimedSafet
 import { getAuthenticatedGovernanceContext } from "../protectedPilotStore";
 import { scrimedWorkAgents } from "./agentRegistry";
 import { buildScrimedWorkArtifact, scrimedWorkArtifactTemplates } from "./artifactEngine";
-import { createAuditEvent, envelope, errorEnvelope, scrimedWorkAuditBoundary, scrimedWorkPolicyVersion } from "./audit";
+import { evaluateArtifactReview, parseArtifactReviewInput } from "./artifactReview";
+import { createAuditEvent, createAuditHash, envelope, errorEnvelope, scrimedWorkAuditBoundary, scrimedWorkPolicyVersion } from "./audit";
 import { getHealthcareOntologyRegistry, searchScrimedWorkContext } from "./contextEngine";
 import {
   getScrimedWorkDurableStorageMode,
@@ -10,6 +11,7 @@ import {
   fetchScrimedWorkSessionFromDurableStore,
   isScrimedWorkDurableStoreEnabled,
   recordScrimedWorkArtifactInDurableStore,
+  reviewScrimedWorkArtifactInDurableStore,
   recordScrimedWorkSessionInDurableStore,
   resolveScrimedWorkMembership,
   scrimedWorkDurableStoreBoundary,
@@ -20,6 +22,11 @@ import {
 } from "./durableStore";
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
 import { sampleLearningLoopArtifacts } from "./learningLoop";
+import {
+  buildPayerIqProtectedWorkSession,
+  parsePayerIqProtectedHandoffInput,
+  payerIqProtectedHandoffAuthority
+} from "./payerIqHandoff";
 import { sampleModelRouteInputs, routeScrimedWorkModel } from "./modelRouter";
 import { previewOrchestration } from "./orchestrationEngine";
 import { getScrimedWorkProductionHardeningGate } from "./productionHardening";
@@ -57,6 +64,8 @@ export * from "./verificationEngine";
 export * from "./autonomyPolicy";
 export * from "./approvalEngine";
 export * from "./artifactEngine";
+export * from "./artifactReview";
+export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
 export * from "./valueTelemetry";
@@ -177,7 +186,7 @@ export function getScrimedWorkSummary() {
     },
     productionHardening: getScrimedWorkProductionHardeningGate(),
     nextProductionHardeningStep:
-      "Confirm all three SCRIMED Work migrations and RLS/advisor evidence in the target environment, run the expanded AAL2 read/verify/lifecycle smoke, then canary one no-PHI protected workspace before enabling buyer-facing mutations."
+      "Apply and verify all four SCRIMED Work migrations in an approved no-PHI target, run the AAL2 lifecycle plus independent artifact-review smoke with separate operator and reviewer identities, then retain one internal-only canary evidence packet."
   };
 }
 
@@ -543,13 +552,43 @@ export async function guardedTransitionSession(
     };
   }
 
+  const completionArtifact =
+    action === "complete"
+      ? resolved.session.artifacts.find(
+          (artifact) =>
+            artifact.reviewStatus === "reviewed" &&
+            artifact.verification.eligibleForCompletion
+        )
+      : undefined;
+
+  if (action === "complete" && !completionArtifact) {
+    return {
+      allowed: false as const,
+      status: 422,
+      error: errorEnvelope(
+        "scrimed_work_completion_verification_required",
+        "Completion requires a durably bound, independently reviewed artifact with current mandatory verification evidence.",
+        `${action}-${sessionId}`,
+        false
+      )
+    };
+  }
+
+  const completionVerification = completionArtifact
+    ? verifyScrimedWorkResult({
+        session: resolved.session,
+        artifact: completionArtifact
+      })
+    : undefined;
+
   const lifecycle = evaluateWorkSessionTransition({
     session: resolved.session,
     action,
     actor: {
       actorId: auth.context.user.id,
       role: auth.context.actorRole
-    }
+    },
+    verification: completionVerification
   });
 
   if (!lifecycle.allowed) {
@@ -588,6 +627,7 @@ export async function guardedTransitionSession(
     data: {
       session,
       lifecycle,
+      ...(completionVerification ? { verification: completionVerification } : {}),
       durableStore: {
         status: scrimedWorkDurableStoreStatus,
         transitioned: durable.transitioned,
@@ -701,6 +741,224 @@ export async function guardedCreateArtifact(request: Request) {
         persisted: durable.persisted,
         idempotentReplay: durable.idempotentReplay,
         eventId: durable.eventId,
+        workspaceSlug: auth.context.workspaceSlug,
+        boundary: durable.boundary
+      }
+    }
+  };
+}
+
+function scopedIdempotencyKey(seed: string, scope: string) {
+  return `scrimed-work-${scope}-${createAuditHash({ seed, scope }).slice(0, 24)}`;
+}
+
+export async function guardedCreatePayerIqProtectedHandoff(request: Request) {
+  const body = await readBoundedJson(request, "payeriq-protected-handoff", 12_000);
+  if (!body.ok) return { allowed: false as const, status: body.status, error: body.error };
+
+  const parsed = parsePayerIqProtectedHandoffInput(body.payload);
+  if (!parsed.ok) {
+    return {
+      allowed: false as const,
+      status: 422,
+      error: errorEnvelope("payeriq_protected_handoff_invalid", parsed.reason, "payeriq-protected-handoff", false)
+    };
+  }
+
+  const auth = await buildWriteAuthorizationDecision(request, "payeriq-protected-handoff", body.payload);
+  if (!auth.allowed) return auth;
+
+  const idempotencySeed = scopedIdempotencyKey(auth.context.idempotencyKey, "payeriq-handoff");
+  const { session, artifact } = buildPayerIqProtectedWorkSession({
+    packet: parsed.packet,
+    actor: {
+      actorId: auth.context.user.id,
+      displayName: "Authenticated PayerIQ operator",
+      role: auth.context.actorRole,
+      tenantId: auth.context.tenantId
+    },
+    tenantId: auth.context.tenantId,
+    workspaceSlug: auth.context.workspaceSlug,
+    idempotencySeed
+  });
+  const sessionContext = {
+    ...auth.context,
+    idempotencyKey: scopedIdempotencyKey(auth.context.idempotencyKey, "payeriq-session")
+  };
+  const artifactContext = {
+    ...auth.context,
+    idempotencyKey: scopedIdempotencyKey(auth.context.idempotencyKey, "payeriq-artifact")
+  };
+  const durableSession = await recordScrimedWorkSessionInDurableStore(sessionContext, session);
+
+  if (durableSession.error || !durableSession.record) {
+    const failure = scrimedWorkDurableStoreRpcFailure(
+      durableSession.error,
+      "payeriq-scrimed-work-session-record-failed"
+    );
+    return {
+      allowed: false as const,
+      status: failure.status,
+      error: errorEnvelope(failure.code, failure.message, "payeriq-protected-handoff", true)
+    };
+  }
+
+  const durableArtifact = await recordScrimedWorkArtifactInDurableStore(artifactContext, {
+    sessionId: session.id,
+    artifact
+  });
+
+  if (durableArtifact.error || !durableArtifact.artifactId) {
+    const failure = scrimedWorkDurableStoreRpcFailure(
+      durableArtifact.error,
+      "payeriq-scrimed-work-artifact-record-failed"
+    );
+    return {
+      allowed: false as const,
+      status: failure.status,
+      error: errorEnvelope(
+        failure.code,
+        `${failure.message} The durable session can be safely retried with the same idempotency key.`,
+        session.id,
+        true
+      )
+    };
+  }
+
+  return {
+    allowed: true as const,
+    status:
+      durableSession.idempotentReplay && durableArtifact.idempotentReplay ? 200 : 201,
+    data: {
+      session,
+      artifact,
+      packet: parsed.packet,
+      durableStore: {
+        persisted: durableSession.persisted && durableArtifact.persisted,
+        sessionIdempotentReplay: durableSession.idempotentReplay,
+        artifactIdempotentReplay: durableArtifact.idempotentReplay,
+        sessionEventId: durableSession.eventId,
+        artifactEventId: durableArtifact.eventId,
+        workspaceSlug: auth.context.workspaceSlug,
+        boundary: durableArtifact.boundary
+      },
+      nextRequiredActions: [
+        "plan the durable session",
+        "run it into awaiting approval",
+        "record approval with a separate AAL2 reviewer",
+        "bind the artifact review disposition",
+        "run mandatory verification",
+        "complete the session only after all mandatory criteria pass"
+      ],
+      ...payerIqProtectedHandoffAuthority
+    }
+  };
+}
+
+export async function guardedReviewProtectedArtifact(
+  request: Request,
+  sessionId: string,
+  artifactId: string
+) {
+  const body = await readBoundedJson(request, `artifact-review-${sessionId}`, 4_000);
+  if (!body.ok) return { allowed: false as const, status: body.status, error: body.error };
+
+  const parsed = parseArtifactReviewInput(body.payload);
+  if (!parsed.ok) {
+    return {
+      allowed: false as const,
+      status: 422,
+      error: errorEnvelope("scrimed_work_artifact_review_invalid", parsed.reason, artifactId, false)
+    };
+  }
+
+  const auth = await buildWriteAuthorizationDecision(
+    request,
+    `artifact-review-${sessionId}-${artifactId}`,
+    { sessionId, artifactId, ...parsed.value }
+  );
+  if (!auth.allowed) return auth;
+
+  const resolved = await resolveProtectedWorkSession(auth.context, sessionId);
+  if (!resolved.session && resolved.failure) {
+    return {
+      allowed: false as const,
+      status: resolved.failure.status,
+      error: errorEnvelope(
+        resolved.failure.code,
+        resolved.failure.message,
+        `artifact-review-${sessionId}`,
+        resolved.failure.status >= 500
+      )
+    };
+  }
+
+  if (!resolved.session) {
+    return {
+      allowed: false as const,
+      status: 404,
+      error: errorEnvelope("scrimed_work_session_not_found", "SCRIMED Work session was not found.", sessionId, false)
+    };
+  }
+
+  const decision = evaluateArtifactReview({
+    session: resolved.session,
+    artifactId,
+    actor: { actorId: auth.context.user.id, role: auth.context.actorRole },
+    review: parsed.value
+  });
+
+  if (!decision.allowed || !decision.reviewedArtifact) {
+    const status = decision.code.includes("role") || decision.code.includes("separation")
+      ? 403
+      : decision.code.includes("state")
+        ? 409
+        : 422;
+    return {
+      allowed: false as const,
+      status,
+      error: errorEnvelope(
+        `scrimed_work_${decision.code.replaceAll("-", "_")}`,
+        decision.code === "artifact-review-verification-required"
+          ? "Artifact approval remains blocked until mandatory verification passes."
+          : "Artifact review was denied by the independent-review lifecycle policy.",
+        decision.reviewDecisionHash,
+        false
+      ),
+      decision
+    };
+  }
+
+  const durable = await reviewScrimedWorkArtifactInDurableStore(auth.context, {
+    sessionId,
+    artifact: decision.reviewedArtifact,
+    decision
+  });
+
+  if (durable.error || !durable.record || !durable.reviewId) {
+    const failure = scrimedWorkDurableStoreRpcFailure(
+      durable.error,
+      "scrimed-work-artifact-review-failed"
+    );
+    return {
+      allowed: false as const,
+      status: failure.status,
+      error: errorEnvelope(failure.code, failure.message, decision.reviewDecisionHash, failure.status >= 500)
+    };
+  }
+
+  return {
+    allowed: true as const,
+    status: 200,
+    data: {
+      session: durable.record.session,
+      artifact: decision.reviewedArtifact,
+      decision,
+      durableStore: {
+        reviewId: durable.reviewId,
+        eventId: durable.eventId,
+        reviewed: durable.reviewed,
+        idempotentReplay: durable.idempotentReplay,
         workspaceSlug: auth.context.workspaceSlug,
         boundary: durable.boundary
       }

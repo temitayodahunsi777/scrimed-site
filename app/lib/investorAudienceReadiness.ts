@@ -4,6 +4,7 @@ import { getGrowthEngineSummary } from "./growthEngine";
 import { getLimitationsWorkaroundSummary } from "./limitationsWorkaroundOperations";
 import { getMarketActivationSummary } from "./marketActivation";
 import { getPublicMarketReadinessSummary } from "./publicMarketReadiness";
+import { getStrategicInvestorOutreachSummary } from "./strategicInvestorOutreach";
 
 export type WeaknessSeverity = "critical" | "high" | "medium";
 
@@ -59,7 +60,7 @@ export const investorAudienceReadinessStatus =
   "investor-audience-readiness-control-plane-active";
 export const investorAudienceReadinessBriefStatus =
   "investor-audience-readiness-brief-ready-no-securities-offer";
-export const investorAudienceReadinessUpdatedAt = "2026-06-26";
+export const investorAudienceReadinessUpdatedAt = "2026-07-13";
 
 export const investorAudienceReadinessBoundary =
   "SCRIMED Investor and Audience Readiness organizes weakness relief, competitive differentiation, sellable value, and investor or buyer audience packets for readiness review. It is operating-readiness material only. It is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, accounting advice, solicitation, private placement approval, Form D filing, crowdfunding approval, nonprofit tax advice, donor advice, faith-based endorsement, customer revenue guarantee, profit guarantee, reimbursement assurance, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.";
@@ -587,6 +588,7 @@ export function getInvestorAudienceReadinessSummary() {
   const marketActivationSummary = getMarketActivationSummary();
   const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
   const limitationsWorkaroundSummary = getLimitationsWorkaroundSummary();
+  const strategicInvestorOutreach = getStrategicInvestorOutreachSummary();
   const proofRoutes = unique([
     ...weaknessReliefTracks.flatMap((track) => track.proofRoutes),
     ...competitiveEdgeSignals.flatMap((signal) => signal.proofRoutes),
@@ -660,16 +662,22 @@ export function getInvestorAudienceReadinessSummary() {
     packageNextAudienceCount,
     externalReviewAudienceCount,
     readinessGateCount: investorReadinessGates.length,
+    strategicTargetCount: strategicInvestorOutreach.targetCount,
+    diligenceEvidenceReadyCount: strategicInvestorOutreach.evidenceReadyCount,
+    diligenceReviewRequiredCount:
+      strategicInvestorOutreach.qualifiedReviewRequiredCount +
+      strategicInvestorOutreach.externalEvidenceRequiredCount,
     proofRouteCount: proofRoutes.length,
     blockedClaimCount: blockedClaims.length,
     weaknessReliefTracks,
     competitiveEdgeSignals,
     investorAudiencePackets,
     investorReadinessGates,
+    strategicInvestorOutreach,
     proofRoutes,
     blockedClaims,
     nextInvestorMove:
-      "Use Investor and Audience Readiness as the routing layer for angels, corporate strategics, private investors, faith-based clinics, health systems, payers, public-sector funders, clinicians, global partners, and transformation sponsors: open one packet, attach proof routes, route blocked claims through Claim Guard, and keep securities, valuation, legal, tax, nonprofit, customer, PHI, clinical, reimbursement, certification, partnership, and revenue claims behind qualified review.",
+      "Close the qualified-review and external-evidence items in the strategic diligence manifest, approve one company-specific thesis and ask, then use a permissioned introduction or official startup-program path. Keep securities, valuation, legal, tax, customer, PHI, clinical, certification, partnership, revenue, and outcome claims behind the appropriate human review.",
     updated: investorAudienceReadinessUpdatedAt
   };
 }
@@ -689,6 +697,9 @@ export function buildInvestorAudienceReadinessBrief() {
     `Ready-now audience packets: ${summary.readyNowAudienceCount}`,
     `External-review audience packets: ${summary.externalReviewAudienceCount}`,
     `Readiness gates: ${summary.readinessGateCount}`,
+    `Strategic ecosystem targets: ${summary.strategicTargetCount}`,
+    `Diligence evidence-ready items: ${summary.diligenceEvidenceReadyCount}`,
+    `Diligence review-required items: ${summary.diligenceReviewRequiredCount}`,
     `Proof routes: ${summary.proofRouteCount}`,
     `Blocked claims: ${summary.blockedClaimCount}`,
     "",
@@ -719,6 +730,24 @@ export function buildInvestorAudienceReadinessBrief() {
     ...summary.investorReadinessGates.map(
       (gate) =>
         `- ${gate.gate}: ${gate.readinessUse} Source: ${gate.source} (${gate.sourceUrl}) Hard stop: ${gate.hardStop}`
+    ),
+    "",
+    "## Strategic Ecosystem Targets",
+    ...summary.strategicInvestorOutreach.targets.map(
+      (target) =>
+        `- ${target.organization} (${target.outreachStatus}): ${target.proofThesis} Ask: ${target.specificAsk} Official path: ${target.officialProgram} (${target.officialSource}) Boundary: ${target.claimBoundary}`
+    ),
+    "",
+    "## Diligence Manifest",
+    ...summary.strategicInvestorOutreach.diligenceManifest.map(
+      (item) =>
+        `- ${item.title} (${item.status}): Owner: ${item.owner} Next evidence: ${item.nextEvidence} Boundary: ${item.disclosureBoundary}`
+    ),
+    "",
+    "## Pitch Structure",
+    ...summary.strategicInvestorOutreach.pitchOutline.map(
+      (slide) =>
+        `${slide.order}. ${slide.title}: ${slide.decisionQuestion} Claim guard: ${slide.claimGuard}`
     ),
     "",
     "## Next Investor Move",

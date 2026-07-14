@@ -367,6 +367,68 @@ export const productDemos: ProductDemo[] = [
       "No production connector access",
       "No payer or patient-facing action"
     ]
+  },
+  {
+    slug: "prior-authorization-support",
+    name: "PayerIQ Documentation Readiness Demo",
+    route: "/demos/prior-authorization-support",
+    apiRoute: "/api/demos/prior-authorization-support",
+    status: "executable-demo",
+    buyer: "Prior authorization, revenue-cycle, utilization-management, access, and finance transformation leaders",
+    product: "PayerIQ",
+    agent: "Documentation-Before-Authorization Agent",
+    objective:
+      "Demonstrate how a synthetic authorization scenario becomes a scored documentation-gap packet, reviewer queue, audit trace, and prepare-only workflow handoff.",
+    scenario:
+      "A registered synthetic authorization packet is checked against symptom, function, timing, rationale, therapy-history, evidence, policy, note, and reviewer requirements without accepting free text or payer identifiers.",
+    runRoute: "/documentation-before-authorization",
+    runLabel: "Run PayerIQ workbench",
+    proofRoutes: [
+      {
+        label: "Interactive workbench",
+        route: "/documentation-before-authorization",
+        evidence: "Deterministic completeness scoring, missing-evidence packet, reviewer queue, value assumptions, and payer-action denial."
+      },
+      {
+        label: "Workflow value methodology",
+        route: "/healthcare-value-realization",
+        evidence: "Buyer-defined baseline and claims-safe measurement rules for documentation completeness and reviewer effort."
+      },
+      {
+        label: "Health records boundary",
+        route: "/health-records",
+        evidence: "No-PHI extraction, provenance, standards mapping, and live-data approval path."
+      }
+    ],
+    guidedSteps: [
+      "Choose a registered synthetic procedure-authorization scenario.",
+      "Mark the documentation requirements represented in the packet.",
+      "Generate the completeness score, missing-evidence list, reviewer queue, and audit hash.",
+      "Test the payer-action path and confirm it fails closed with no transmission."
+    ],
+    inspectableOutcomes: [
+      "Documentation completeness score",
+      "Missing-evidence packet",
+      "Reviewer ownership and next actions",
+      "Prepare-only SCRIMED Work handoff"
+    ],
+    successSignals: [
+      "Documentation gaps surfaced before submission",
+      "Reviewer queue made explicit",
+      "Evidence trace retained",
+      "Payer-facing action blocked"
+    ],
+    governanceBoundaries: [
+      "Registered synthetic scenarios and enumerated inputs only.",
+      "Human review remains required for every output.",
+      "Workflow economics remain assumptions until buyer baselines and finance review exist."
+    ],
+    productionExclusions: [
+      "No live PHI or payer-member identifiers",
+      "No medical-necessity determination",
+      "No prior-authorization or appeal submission",
+      "No reimbursement or denial-reduction guarantee"
+    ]
   }
 ];
 
@@ -429,7 +491,12 @@ export const pilotPrograms: PilotProgram[] = [
       "Recommended synthetic-pilot range: $125k-$350k; $350k-$500k when multiple workflows, custom diligence, or executive proof packets expand scope",
     objective:
       "Run a selected workflow through deterministic synthetic evidence, AgentOS orchestration, TrustQA, observability, and executive review.",
-    demoSlugs: ["carepath-access-operations", "docutwin-documentation-review", "trialcore-research-operations"],
+    demoSlugs: [
+      "carepath-access-operations",
+      "docutwin-documentation-review",
+      "prior-authorization-support",
+      "trialcore-research-operations"
+    ],
     deliverables: [
       "Configured synthetic workflow packet",
       "AgentOS orchestration and approval map",
@@ -562,7 +629,7 @@ export const investorReadinessSignals: InvestorReadinessSignal[] = [
     label: "Executable product proof",
     route: "/demos",
     status: "active",
-    evidence: "Five buyer-facing synthetic demos connect named products, agents, workflow outputs, proof routes, and production exclusions."
+    evidence: "Six buyer-facing synthetic demos connect named products, agents, workflow outputs, proof routes, and production exclusions."
   },
   {
     label: "Sellable pilot packaging",

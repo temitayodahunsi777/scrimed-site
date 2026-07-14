@@ -319,6 +319,8 @@ function requireInvestorAudienceReadinessBoundary(label, response) {
   const securitiesAuthority = response.headers.get("x-scrimed-securities-authority");
   const securityCertification = response.headers.get("x-scrimed-security-certification");
   const solicitationAuthority = response.headers.get("x-scrimed-solicitation-authority");
+  const externalOutreach = response.headers.get("x-scrimed-external-outreach");
+  const strategicRelationship = response.headers.get("x-scrimed-strategic-relationship");
   const taxAuthority = response.headers.get("x-scrimed-tax-authority");
   const valuationAuthority = response.headers.get("x-scrimed-valuation-authority");
 
@@ -387,6 +389,14 @@ function requireInvestorAudienceReadinessBoundary(label, response) {
 
   if (solicitationAuthority !== "not-solicitation") {
     throw new Error(`${label} expected x-scrimed-solicitation-authority not-solicitation but received ${solicitationAuthority}.`);
+  }
+
+  if (externalOutreach !== "not-sent") {
+    throw new Error(`${label} expected x-scrimed-external-outreach not-sent but received ${externalOutreach}.`);
+  }
+
+  if (strategicRelationship !== "not-implied") {
+    throw new Error(`${label} expected x-scrimed-strategic-relationship not-implied but received ${strategicRelationship}.`);
   }
 
   if (taxAuthority !== "qualified-review-required") {
@@ -12527,6 +12537,47 @@ async function checkScrimedWork() {
   requireStatus("SCRIMED Work protected session create", protectedCreate.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected session create", protectedCreate.response);
 
+  const protectedPayerIqHandoff = await postJson(
+    "/api/documentation-before-authorization/scrimed-work-handoff",
+    {
+      workspaceSlug: "atlas-synthetic-evaluation",
+      scenarioPacketId: "doc-auth-imaging-synthetic-review-ready",
+      documentedRequirementIds: [
+        "symptom_language",
+        "functional_status",
+        "visit_timing",
+        "medical_necessity_rationale",
+        "prior_therapy_history",
+        "diagnosis_specific_evidence",
+        "policy_reference",
+        "recent_visit_note",
+        "reviewer_attestation"
+      ],
+      reviewerStatus: "queued",
+      requestedAction: "draft_reviewer_packet",
+      dataBoundaryAcknowledged: true
+    }
+  );
+  requireStatus("PayerIQ protected SCRIMED Work handoff", protectedPayerIqHandoff.response.status, [401, 503]);
+  requireScrimedWorkBoundary("PayerIQ protected SCRIMED Work handoff", protectedPayerIqHandoff.response);
+
+  const protectedArtifactReview = await postJson(
+    "/api/scrimed-work/sessions/work_session_unknown_protected/artifacts/artifact_unknown_protected/review",
+    {
+      disposition: "approved_for_internal_use",
+      reasonCode: "evidence_and_boundaries_confirmed"
+    }
+  );
+  requireStatus("SCRIMED Work protected artifact review", protectedArtifactReview.response.status, [401, 503]);
+  requireScrimedWorkBoundary("SCRIMED Work protected artifact review", protectedArtifactReview.response);
+
+  const protectedCompletion = await postJson(
+    "/api/scrimed-work/sessions/work_session_unknown_protected/complete",
+    {}
+  );
+  requireStatus("SCRIMED Work protected completion", protectedCompletion.response.status, [401, 503]);
+  requireScrimedWorkBoundary("SCRIMED Work protected completion", protectedCompletion.response);
+
   const brief = await request("/api/scrimed-work/brief");
   requireStatus("SCRIMED Work brief", brief.response.status, 200);
   requireContentType("SCRIMED Work brief", brief.response, "text/markdown");
@@ -13964,6 +14015,31 @@ async function checkInvestorAudienceReadiness() {
 
   if (body.sourceAlignment?.growthPlayCount < 6) {
     throw new Error("Investor Audience Readiness expected Growth Engine source alignment.");
+  }
+
+  if (
+    body.strategicTargetCount !== 4 ||
+    body.strategicInvestorOutreach?.externalOutreachSent !== false ||
+    body.strategicInvestorOutreach?.investmentOrPartnershipImplied !== false
+  ) {
+    throw new Error("Investor Audience Readiness expected four unsent, non-implied strategic ecosystem packets.");
+  }
+
+  const strategicOrganizations = new Set(
+    body.strategicInvestorOutreach?.targets?.map((target) => target.organization) ?? []
+  );
+  for (const organization of ["OpenAI", "NVIDIA", "Anthropic", "Microsoft"]) {
+    if (!strategicOrganizations.has(organization)) {
+      throw new Error(`Investor Audience Readiness missing strategic packet for ${organization}.`);
+    }
+  }
+
+  if (
+    body.strategicInvestorOutreach?.pitchSlideCount !== 12 ||
+    body.strategicInvestorOutreach?.diligenceItemCount < 8 ||
+    body.diligenceReviewRequiredCount < 1
+  ) {
+    throw new Error("Investor Audience Readiness expected pitch and diligence gap coverage.");
   }
 
   const brief = await request("/api/investor-audience-readiness/brief");

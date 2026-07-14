@@ -6,6 +6,7 @@ import type {
   WorkSessionStatus,
   WorkSessionTransitionAction
 } from "./types";
+import type { ArtifactReviewDecision } from "./artifactReview";
 
 export const scrimedWorkDurableStoreStatus = "scrimed-work-durable-store-contract-ready-no-phi";
 export const scrimedWorkDurableStoreBoundary =
@@ -314,6 +315,58 @@ export async function recordScrimedWorkArtifactInDurableStore(
   };
 }
 
+export async function reviewScrimedWorkArtifactInDurableStore(
+  context: ScrimedWorkDurableStoreContext,
+  input: {
+    sessionId: string;
+    artifact: WorkArtifact;
+    decision: ArtifactReviewDecision;
+  }
+): Promise<{
+  record: ScrimedWorkDurableSessionRecord | null;
+  reviewId: string | null;
+  eventId: string | null;
+  reviewed: boolean;
+  idempotentReplay: boolean;
+  boundary: string;
+  error: unknown;
+}> {
+  const { data, error } = await context.client.rpc("review_scrimed_work_artifact", {
+    p_workspace_slug: context.workspaceSlug,
+    p_session_id: input.sessionId,
+    p_artifact_id: input.artifact.artifactId,
+    p_artifact: input.artifact,
+    p_disposition: input.decision.disposition,
+    p_reason_code: input.decision.reasonCode,
+    p_reviewer_identity_hash: input.decision.reviewerIdentityHash,
+    p_review_decision_hash: input.decision.reviewDecisionHash,
+    p_idempotency_key: context.idempotencyKey,
+    p_audit_event: {
+      actorRole: context.actorRole,
+      memberRole: context.memberRole,
+      reviewerIdentityHash: input.decision.reviewerIdentityHash,
+      policyVersion: input.decision.policyVersion,
+      verificationEligible: input.decision.verificationEligible,
+      externalDistributionAllowed: false,
+      payerSubmissionAllowed: false,
+      source: "scrimed-work-artifact-review-route",
+      syntheticOnly: true,
+      noPhi: true
+    }
+  });
+  const payload = asRecord(data);
+
+  return {
+    record: mapSessionRecord(payload.record),
+    reviewId: stringValue(payload.reviewId) || null,
+    eventId: stringValue(payload.eventId) || null,
+    reviewed: payload.reviewed === true,
+    idempotentReplay: payload.idempotentReplay === true,
+    boundary: stringValue(payload.boundary) || scrimedWorkDurableStoreBoundary,
+    error
+  };
+}
+
 export function redactScrimedWorkSensitiveText(value: string) {
   return value
     .replace(/\bBearer\s+[A-Za-z0-9._-]{16,}\b/gi, "Bearer [REDACTED]")
@@ -367,6 +420,30 @@ export function scrimedWorkDurableStoreRpcFailure(error: unknown, fallbackCode: 
       status: 403,
       code: "scrimed-work-independent-review-required",
       message: "This approval requires a separately authorized reviewer with the required role."
+    };
+  }
+
+  if (/artifact-review-state-conflict|artifact-review-session-state/i.test(text)) {
+    return {
+      status: 409,
+      code: "scrimed-work-artifact-review-state-conflict",
+      message: "Artifact review requires an authoritative SCRIMED Work session in the verifying state."
+    };
+  }
+
+  if (/artifact-review-verification-required|artifact-verification-required/i.test(text)) {
+    return {
+      status: 422,
+      code: "scrimed-work-artifact-review-verification-required",
+      message: "Artifact approval remains blocked until every mandatory verification criterion passes."
+    };
+  }
+
+  if (/artifact-review-approval-required/i.test(text)) {
+    return {
+      status: 422,
+      code: "scrimed-work-artifact-review-approval-required",
+      message: "Artifact review remains blocked until every required session approval checkpoint is approved."
     };
   }
 

@@ -27,6 +27,8 @@ flowchart TD
   Tools --> Agents
   Agents --> Artifact["Artifact Engine"]
   Artifact --> Approval["Human Approval Queue"]
+  Approval --> Review["Independent Artifact Review Binding"]
+  Review --> Complete["Verified Internal Completion"]
   Verify --> Telemetry["Value Telemetry"]
   Approval --> Audit["Metadata Audit"]
   Telemetry --> Learning["Learning Loop Proposals"]
@@ -48,6 +50,8 @@ flowchart TD
 - `contextEngine.ts`: citation-required hybrid retrieval scaffold with ontology concepts mapped to FHIR previews.
 - `verificationEngine.ts`: schema, citation, policy, PHI, loop, budget, rollback, and approval checks.
 - `artifactEngine.ts`: JSON/Markdown draft artifacts with citations, verification, review status, and export metadata.
+- `artifactReview.ts`: reviewer-only internal disposition policy with separation of duties, database-verifiable reviewer/decision hashes, mandatory verification, and fixed external-use blocks.
+- `payerIqHandoff.ts`: strict synthetic PayerIQ packet-to-session adapter for the revenue-cycle workspace.
 - `scheduleDefinitions.ts`: disabled-by-default scheduled-work templates.
 - `voiceWorkflow.ts`: provider-neutral voice-state simulation with consent and emergency escalation boundaries.
 - `learningLoop.ts`: memory-vs-learning correction artifacts requiring review and tests.
@@ -85,7 +89,10 @@ Protected write-shaped routes:
 - `POST /api/scrimed-work/sessions/:sessionId/cancel`
 - `POST /api/scrimed-work/sessions/:sessionId/approve`
 - `POST /api/scrimed-work/sessions/:sessionId/reject`
+- `POST /api/scrimed-work/sessions/:sessionId/complete`
+- `POST /api/scrimed-work/sessions/:sessionId/artifacts/:artifactId/review`
 - `POST /api/scrimed-work/artifacts`
+- `POST /api/documentation-before-authorization/scrimed-work-handoff`
 
 Protected writes return fail-closed by default unless all of the following are true:
 
@@ -106,8 +113,9 @@ The ordered local migrations are:
 1. `supabase/migrations/20260709193000_scrimed_work_durable_store.sql` creates private SCRIMED Work session, artifact, and audit-event tables with RLS enabled, direct table access revoked, restrictive deny policies, and authenticated public RPC wrappers that delegate to private AAL2 governance functions.
 2. `supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql` adds the authoritative transition matrix, row locking, append-only history checks, scoped mutation checks, independent reviewer separation, high-risk clinical reviewer blocking, and a private tenant-scoped transition idempotency ledger.
 3. `supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql` adds covering indexes for the artifact tenant, audit tenant, and audit artifact foreign keys identified by the post-migration Supabase performance advisor.
+4. `supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql` adds the private reviewer ledger, reviewer-only AAL2 RPC, cryptographic identity/decision binding, immutable artifact mutation scope, idempotent review audit evidence, and synchronized artifact/session review state.
 
-On 2026-07-13, the connected `scrimed-protected-pilot` Supabase project was verified as synthetic-only and no-PHI before these migrations were transaction-tested and applied. Each additional environment must independently verify migration history, RLS, grants, advisors, and strict AAL2 smoke before activation.
+On 2026-07-13, the first three migrations were retained as the existing connected no-PHI durable-store baseline. The fourth migration is repository-ready but is not represented here as applied to any external environment. An approved operator must apply and verify all four migrations in order on the target, then retain migration history, RLS/grant review, advisor results, and strict AAL2 evidence before activation.
 
 ## Session Lifecycle
 
@@ -126,7 +134,9 @@ draft -> planning -> active or awaiting_approval -> verifying -> completed
 - The session initiator cannot approve the same session.
 - Approval requires the checkpoint role; tenant administration alone is not reviewer authority.
 - High-risk clinical-support approval remains blocked until a separately verified clinician-reviewer identity can be bound.
-- Completion requires current verification evidence and is not exposed as an autonomous route.
+- Artifact approval for internal use requires a separate reviewer, an approved checkpoint, current verification, immutable source content, and a database-recomputed decision hash.
+- Artifact review never enables export, external distribution, or payer submission.
+- Completion is exposed only as a protected transition and requires a durably reviewed, verification-eligible artifact; it is never autonomous.
 
 ## Production Hardening Gate
 
@@ -170,6 +180,7 @@ Run:
 ```bash
 npm run smoke:scrimed-work
 npm run test:scrimed-work:lifecycle
+npm run test:scrimed-work:artifact-review-policy
 npm run smoke:scrimed-work:durable-store-preflight
 npm run smoke:scrimed-work:authenticated
 npm run typecheck
@@ -187,7 +198,7 @@ npm run smoke:scrimed-work:durable-store-preflight:strict
 npm run smoke:scrimed-work:strict
 ```
 
-The preflight validates both ordered migration contracts, RLS/deny-policy posture, lifecycle matrix, transition ledger, authoritative locking, append-only history, reviewer separation, `security invoker` public wrappers, AAL2 token shape, required environment variables, feature flags, workspace slug, and no-secret output behavior. It does not apply migrations, mutate Supabase, verify production, or authorize live clinical workflows.
+The preflight validates all four ordered migration contracts, RLS/deny-policy posture, lifecycle matrix, transition and artifact-review ledgers, authoritative locking, append-only history, reviewer separation, database-verifiable review hashes, immutable artifact scope, external-use blocks, `security invoker` public wrappers, AAL2 token shape, required environment variables, feature flags, workspace slug, and no-secret output behavior. It does not apply migrations, mutate Supabase, verify production, or authorize live clinical workflows.
 
 Local token inspection is explicitly reported as `signature=not-verified-local-preflight`. Only a successful Supabase Auth check or protected API request may promote that evidence to a verified state. Operator logs redact JWT-shaped values, bearer credentials, named access or refresh tokens, API keys, and Supabase-style secrets.
 
@@ -196,6 +207,7 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 - Read-only public views remain synthetic. Protected durable reads and verification require an AAL2 bearer session, authorized workspace membership, workspace scope, and the durable-store flag. Protected writes additionally require the server runtime token, mutation idempotency key, protected-write flag, and reviewed migration evidence.
 - The existing membership model has tenant-admin, pilot-lead, reviewer, and observer roles but no verified clinician credential binding. High-risk clinical approval therefore remains blocked rather than treating a generic reviewer as a clinician.
 - Live database migration application and authenticated smoke must be run by an approved operator; this implementation did not touch production data.
+- A complete PayerIQ lifecycle needs two distinct AAL2 identities: an authorized initiator and a separate `reviewer` member. One account cannot satisfy separation of duties.
 - Provider adapters do not call external models and require future secret-managed configuration, legal/privacy review, and budget controls.
 - Schedules are definitions only; no uncontrolled background scheduler is introduced.
 - Voice workflows are simulation-only and never store raw audio by default.
@@ -203,4 +215,4 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 ## Next Production-Hardening Step
 
-Confirm all three SCRIMED Work migrations, RLS/grant posture, and advisor evidence independently in each target environment. Then run the expanded eleven-check browser verifier and `npm run smoke:scrimed-work:strict` with a fresh authorized AAL2 session before canarying one no-PHI protected workspace. Add an externally reviewed clinician-identity binding before any high-risk clinical approval path is considered, and keep buyer-facing mutations disabled until canary evidence is reviewed.
+Apply and verify all four SCRIMED Work migrations, including the artifact-review binding, in an approved no-PHI target. Then execute the protected PayerIQ lifecycle with separate fresh AAL2 operator and reviewer identities, retain the review/completion audit evidence, and canary one internal-only workspace. Keep buyer-facing mutations disabled and add externally reviewed clinician-identity binding before any high-risk clinical approval path is considered.
