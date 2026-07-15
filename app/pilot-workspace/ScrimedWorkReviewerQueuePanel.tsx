@@ -67,6 +67,7 @@ export default function ScrimedWorkReviewerQueuePanel({
   const [queue, setQueue] = useState<ScrimedWorkReviewQueue | null>(null);
   const [message, setMessage] = useState("Reviewer membership and fresh AAL2 are checked when the queue is loaded.");
   const [reviewingArtifactId, setReviewingArtifactId] = useState<string | null>(null);
+  const [approvingSessionId, setApprovingSessionId] = useState<string | null>(null);
 
   const protectedHeaders = {
     Authorization: `Bearer ${session.access_token}`,
@@ -163,6 +164,49 @@ export default function ScrimedWorkReviewerQueuePanel({
     }
   }
 
+  async function approveSessionForReview(sessionId: string) {
+    if (
+      !window.confirm(
+        "Record independent session approval and advance this synthetic/no-PHI work to artifact review?"
+      )
+    ) {
+      return;
+    }
+
+    setApprovingSessionId(sessionId);
+    setMessage("Recording independent session approval. Artifact disposition remains a separate step.");
+
+    try {
+      const response = await boundedFetch(
+        `/api/scrimed-work/sessions/${encodeURIComponent(sessionId)}/approve`,
+        {
+          method: "POST",
+          headers: {
+            ...protectedHeaders,
+            "Content-Type": "application/json",
+            "idempotency-key": `scrimed-work-reviewer-approve-${crypto.randomUUID()}`
+          },
+          body: JSON.stringify({ workspaceSlug: workspace.slug })
+        }
+      );
+      const body = await readJson(response);
+
+      if (!response.ok) {
+        setMessage(`Independent session approval failed closed: ${safeError(response, body)}.`);
+        return;
+      }
+
+      setMessage(
+        "Independent session approval recorded. The artifact can now receive a separate reviewer disposition."
+      );
+      await loadQueue();
+    } catch {
+      setMessage("Independent session approval could not be confirmed and remained uncommitted.");
+    } finally {
+      setApprovingSessionId(null);
+    }
+  }
+
   return (
     <section className="table-section" aria-label="SCRIMED Work independent reviewer queue">
       <div className="section-heading">
@@ -176,7 +220,11 @@ export default function ScrimedWorkReviewerQueuePanel({
         <div className="form-actions">
           <button
             className="primary-action"
-            disabled={state === "loading" || reviewingArtifactId !== null}
+            disabled={
+              state === "loading" ||
+              reviewingArtifactId !== null ||
+              approvingSessionId !== null
+            }
             onClick={loadQueue}
             type="button"
           >
@@ -188,7 +236,12 @@ export default function ScrimedWorkReviewerQueuePanel({
 
       {queue?.items.map((item) => {
         const busy = reviewingArtifactId === item.artifactId;
-        const actionsBlocked = reviewingArtifactId !== null || !item.approvalsReady;
+        const approvalBusy = approvingSessionId === item.sessionId;
+        const actionsBlocked =
+          reviewingArtifactId !== null ||
+          approvingSessionId !== null ||
+          item.sessionStatus !== "verifying" ||
+          !item.approvalsReady;
 
         return (
           <article className="module-row" key={item.artifactId}>
@@ -200,10 +253,24 @@ export default function ScrimedWorkReviewerQueuePanel({
               {item.workspaceDomain} · {item.riskLevel} risk · {item.reviewStatus.replaceAll("_", " ")}
             </p>
             <strong>
-              {item.approvalsReady
+              {item.sessionStatus === "awaiting_approval"
+                ? "Independent session approval is required before artifact disposition."
+                : item.approvalsReady
                 ? "Session approvals are ready; verification is recomputed when the disposition is recorded."
                 : "Session approvals are incomplete; disposition controls remain locked."}
             </strong>
+            {item.sessionStatus === "awaiting_approval" ? (
+              <div className="form-actions" aria-label={`Session approval for ${item.title}`}>
+                <button
+                  className="primary-action"
+                  disabled={reviewingArtifactId !== null || approvingSessionId !== null}
+                  onClick={() => approveSessionForReview(item.sessionId)}
+                  type="button"
+                >
+                  {approvalBusy ? "Recording Session Approval" : "Approve Session for Review"}
+                </button>
+              </div>
+            ) : null}
             <div className="form-actions" aria-label={`Review actions for ${item.title}`}>
               <button
                 className="secondary-action"

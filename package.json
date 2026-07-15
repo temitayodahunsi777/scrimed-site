@@ -111,6 +111,7 @@
     "test:scrimed-work:lifecycle": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/scrimed-work-lifecycle-policy-test.mjs",
     "test:scrimed-work:artifact-review-policy": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-work-artifact-review-policy-test.mjs",
     "test:scrimed-work:review-queue-policy": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/scrimed-work-review-queue-policy-test.mjs",
+    "test:scrimed-work:review-preparation-policy": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/scrimed-work-review-preparation-policy-test.mjs",
     "test:scrimed-work:two-identity-policy": "node scripts/scrimed-work-two-identity-policy-test.mjs",
     "test:scrimed-work:production-hardening-policy": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-work-production-hardening-policy-test.mjs",
     "test:scrimed-work:preflight-policy": "node scripts/scrimed-work-preflight-policy-test.mjs",

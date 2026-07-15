@@ -265,6 +265,7 @@ export default function TenantAccessAdministrationPanel({
   const [inviteRole, setInviteRole] = useState<PilotWorkspaceRole>("reviewer");
   const [inviteNote, setInviteNote] = useState("");
   const [inviteExpiresAt, setInviteExpiresAt] = useState(defaultExpiryDate);
+  const [workspaceTargetConfirmed, setWorkspaceTargetConfirmed] = useState(false);
   const [cancelReasons, setCancelReasons] = useState<Record<string, string>>({});
   const [deactivationReasons, setDeactivationReasons] = useState<Record<string, string>>({});
   const [deliveryNotes, setDeliveryNotes] = useState<Record<string, string>>({});
@@ -369,9 +370,15 @@ export default function TenantAccessAdministrationPanel({
   }
 
   async function createInvitation() {
+    if (!workspaceTargetConfirmed) {
+      setMessage(`Confirm ${workspace.name} as the target workspace before creating an invitation.`);
+      return;
+    }
+
     const created = await commitAction(
       {
         action: "create-invitation",
+        confirmedWorkspaceSlug: workspace.slug,
         email: inviteEmail,
         role: inviteRole,
         expiresAt: inviteExpiresAt,
@@ -387,6 +394,7 @@ export default function TenantAccessAdministrationPanel({
     setInviteEmail("");
     setInviteNote("");
     setInviteExpiresAt(defaultExpiryDate());
+    setWorkspaceTargetConfirmed(false);
   }
 
   async function updateRole(userId: string) {
@@ -839,9 +847,24 @@ export default function TenantAccessAdministrationPanel({
                   value={inviteNote}
                 />
               </label>
+              <div className="intake-acknowledgement">
+                <div>
+                  <strong>Target workspace: {workspace.name}</strong>
+                  <p>{workspace.slug}</p>
+                </div>
+                <label>
+                  <input
+                    checked={workspaceTargetConfirmed}
+                    disabled={status === "saving"}
+                    onChange={(event) => setWorkspaceTargetConfirmed(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>I confirm this invitation targets the active workspace shown above.</span>
+                </label>
+              </div>
               <button
                 className="secondary-action"
-                disabled={status === "saving" || !inviteEmail}
+                disabled={status === "saving" || !inviteEmail || !workspaceTargetConfirmed}
                 onClick={createInvitation}
                 type="button"
               >

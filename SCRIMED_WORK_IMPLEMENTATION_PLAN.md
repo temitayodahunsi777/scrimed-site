@@ -76,12 +76,13 @@ SCRIMED Work does not authorize live PHI, autonomous clinical care, diagnosis, t
 9. Add an authoritative session lifecycle with database row locking, append-only history, independent reviewer separation, scoped mutations, and transition replay protection.
 10. Add a bounded reviewer queue that operationalizes separation of duties without exposing raw artifact payloads.
 11. Add a no-secret two-identity token policy, reviewer-token capture path, and strict lifecycle canary that proves reviewer-only queue access, self-approval denial, independent review, verification, and internal completion.
+12. Add a browser-native admin preparation control and two-step reviewer queue so session approval and artifact disposition remain separate, explicit AAL2 actions without token export.
 12. Bind successful canary evidence through nonsecret release-provenance identifiers; never retain bearer values as evidence.
 13. Run typecheck, lint, nonsecret tests, build, generated-integrity, and diff checks.
 
 ## Production Hardening Required Later
 
-- retain the verified five-migration Supabase evidence, run `npm run smoke:scrimed-work:durable-store-preflight:strict`, then run `npm run smoke:scrimed-work:two-identity:strict` with separate operator and reviewer identities;
+- retain the verified six-migration Supabase evidence, run `npm run smoke:scrimed-work:durable-store-preflight:strict`, then run `npm run smoke:scrimed-work:two-identity:strict` with separate operator and reviewer identities;
 - add CSRF controls for browser-origin protected write calls before any browser mutation UI is enabled;
 - add real queue/scheduler only after approval and feature flags;
 - add approved provider credentials only through secret-managed deployment configuration;

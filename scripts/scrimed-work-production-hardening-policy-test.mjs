@@ -12,6 +12,9 @@ const baseEnv = {
   SCRIMED_WORK_DURABLE_STORE_ENABLED: "true",
   SCRIMED_WORK_MIGRATIONS_VERIFIED: "true",
   SCRIMED_WORK_MIGRATION_EVIDENCE_ID: "supabase-work-advisor-20260714",
+  SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED: "true",
+  SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID:
+    "supabase-work-review-approval-20260715",
   SCRIMED_WORKSPACE_SLUG: "atlas-synthetic-evaluation",
   SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: "false"
 };
@@ -21,6 +24,24 @@ function gate(report, gateId) {
   assert.ok(value, `missing ${gateId}`);
   return value;
 }
+
+const missingReviewApprovalMigration = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED: "false",
+    SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID: ""
+  },
+  "2026-07-15T00:00:00.000Z"
+);
+
+assert.equal(
+  gate(missingReviewApprovalMigration, "scrimed-work-migration-application").status,
+  "operator_required"
+);
+assert.match(
+  gate(missingReviewApprovalMigration, "scrimed-work-migration-application").blocker ?? "",
+  /all six ordered migrations/i
+);
 
 const missingReviewer = getScrimedWorkProductionHardeningGate(
   {

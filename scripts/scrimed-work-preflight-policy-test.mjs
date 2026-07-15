@@ -14,6 +14,9 @@ function runPreflight(migrationsVerified) {
       SCRIMED_WORK_DURABLE_STORE_ENABLED: "true",
       SCRIMED_WORK_MIGRATIONS_VERIFIED: migrationsVerified,
       SCRIMED_WORK_MIGRATION_EVIDENCE_ID: "supabase-work-advisor-20260713",
+      SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED: "true",
+      SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID:
+        "supabase-work-review-approval-20260715",
       SCRIMED_WORKSPACE_SLUG: "atlas-synthetic-evaluation",
       SCRIMED_BEARER_TOKEN: "not-a-real-token"
     }

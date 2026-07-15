@@ -2,9 +2,10 @@
 
 import { readFile } from "node:fs/promises";
 
-const [accessSurface, administrationPanel, styles] = await Promise.all([
+const [accessSurface, administrationPanel, tenantAccessRoute, styles] = await Promise.all([
   readFile("app/pilot-workspace/ProtectedPilotAccess.tsx", "utf8"),
   readFile("app/pilot-workspace/TenantAccessAdministrationPanel.tsx", "utf8"),
+  readFile("app/api/pilot-workspaces/[workspaceSlug]/tenant-access/route.ts", "utf8"),
   readFile("app/globals.css", "utf8")
 ]);
 
@@ -32,7 +33,17 @@ requireIncludes("tenant access administration", administrationPanel, [
   "return false",
   "return true",
   "Active workspace:",
+  "workspaceTargetConfirmed",
+  "confirmedWorkspaceSlug: workspace.slug",
+  "I confirm this invitation targets the active workspace shown above.",
   "Metadata only. Exclude sensitive or clinical details."
+]);
+
+requireIncludes("tenant access API", tenantAccessRoute, [
+  'stringValue(body, "confirmedWorkspaceSlug", 160)',
+  "confirmedWorkspaceSlug !== workspaceSlug",
+  'code: "workspace-confirmation-required"',
+  "Confirm the active workspace before creating a governed invitation record."
 ]);
 
 if (administrationPanel.includes('placeholder="Metadata only. No PHI or clinical details."')) {

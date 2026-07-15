@@ -89,6 +89,14 @@ function requireHeader(label, response, name, expected) {
   }
 }
 
+function currentSessionStatus(session) {
+  const history = Array.isArray(session?.statusHistory) ? session.statusHistory : [];
+  const latest = history.at(-1);
+  return latest && typeof latest === "object" && typeof latest.status === "string"
+    ? latest.status
+    : "";
+}
+
 function failClosed(message) {
   console.error(redactSensitive(message));
   process.exit(1);
@@ -315,7 +323,7 @@ const planResult = await request(`/api/scrimed-work/sessions/${sessionId}/plan`,
 requireStatus("operator SCRIMED Work session plan", planResult.response.status, 200, planResult.body);
 const planBody = requireJson("operator SCRIMED Work session plan", planResult.body);
 if (
-  planBody.data?.session?.status !== "planning" ||
+  currentSessionStatus(planBody.data?.session) !== "planning" ||
   planBody.data?.durableStore?.transitioned !== true
 ) {
   throw new Error("operator plan did not record the expected durable planning transition.");
@@ -349,7 +357,7 @@ const runResult = await request(`/api/scrimed-work/sessions/${sessionId}/run`, {
 requireStatus("operator SCRIMED Work run", runResult.response.status, 200, runResult.body);
 const runBody = requireJson("operator SCRIMED Work run", runResult.body);
 if (
-  runBody.data?.session?.status !== "awaiting_approval" ||
+  currentSessionStatus(runBody.data?.session) !== "awaiting_approval" ||
   runBody.data?.durableStore?.transitioned !== true
 ) {
   throw new Error("operator run did not pause at the mandatory human approval gate.");
@@ -395,7 +403,7 @@ const reviewerApprovalBody = requireJson(
   reviewerApprovalResult.body
 );
 if (
-  reviewerApprovalBody.data?.session?.status !== "verifying" ||
+  currentSessionStatus(reviewerApprovalBody.data?.session) !== "verifying" ||
   reviewerApprovalBody.data?.durableStore?.transitioned !== true
 ) {
   throw new Error("reviewer approval did not durably transition the session to verifying.");
@@ -500,7 +508,7 @@ const completionResult = await request(`/api/scrimed-work/sessions/${sessionId}/
 requireStatus("verified internal completion", completionResult.response.status, 200, completionResult.body);
 const completionBody = requireJson("verified internal completion", completionResult.body);
 if (
-  completionBody.data?.session?.status !== "completed" ||
+  currentSessionStatus(completionBody.data?.session) !== "completed" ||
   completionBody.data?.durableStore?.transitioned !== true
 ) {
   throw new Error("verified internal completion did not durably reach completed status.");

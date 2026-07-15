@@ -283,10 +283,23 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 
     mutation = await updateTenantMembershipRole(context.client, workspaceSlug, userId, role);
   } else if (action === "create-invitation") {
+    const confirmedWorkspaceSlug = stringValue(body, "confirmedWorkspaceSlug", 160);
     const email = stringValue(body, "email", 254).toLowerCase();
     const role = typeof body.role === "string" ? (body.role as PilotWorkspaceRole) : null;
     const expiresAt = typeof body.expiresAt === "string" && body.expiresAt.trim() ? body.expiresAt.trim() : null;
     const note = stringValue(body, "note", 700);
+
+    if (confirmedWorkspaceSlug !== workspaceSlug) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "workspace-confirmation-required",
+            message: "Confirm the active workspace before creating a governed invitation record."
+          }
+        },
+        { status: 409, headers }
+      );
+    }
 
     if (!emailPattern.test(email) || !role || !allowedRoles.has(role) || !validOptionalTimestamp(expiresAt)) {
       return NextResponse.json(
