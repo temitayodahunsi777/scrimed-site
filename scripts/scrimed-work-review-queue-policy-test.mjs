@@ -57,6 +57,21 @@ assert.ok(parsed);
 assert.equal(parsed.count, 1);
 assert.equal(parsed.items[0].approvalsReady, true);
 
+const pendingApprovalQueue = {
+  ...validQueue,
+  items: [
+    {
+      ...validQueue.items[0],
+      sessionStatus: "awaiting_approval",
+      approvalsReady: false
+    }
+  ]
+};
+const pendingApprovalParsed = parseScrimedWorkReviewQueuePayload(pendingApprovalQueue);
+assert.ok(pendingApprovalParsed);
+assert.equal(pendingApprovalParsed.items[0].sessionStatus, "awaiting_approval");
+assert.equal(pendingApprovalParsed.items[0].approvalsReady, false);
+
 for (const unsafeQueue of [
   { ...validQueue, count: 2 },
   { ...validQueue, reviewerRoleRequired: false },
@@ -71,6 +86,14 @@ for (const unsafeQueue of [
   {
     ...validQueue,
     items: [{ ...validQueue.items[0], sessionStatus: "active" }]
+  },
+  {
+    ...validQueue,
+    items: [{ ...validQueue.items[0], sessionStatus: "awaiting_approval", approvalsReady: true }]
+  },
+  {
+    ...validQueue,
+    items: [{ ...validQueue.items[0], sessionStatus: "verifying", approvalsReady: false }]
   },
   {
     ...validQueue,

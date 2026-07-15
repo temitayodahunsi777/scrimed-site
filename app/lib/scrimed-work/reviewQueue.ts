@@ -1,6 +1,6 @@
-export const scrimedWorkReviewQueuePolicyVersion = "scrimed-work-review-queue-v2026-07-14";
+export const scrimedWorkReviewQueuePolicyVersion = "scrimed-work-review-queue-v2026-07-15";
 export const scrimedWorkReviewQueueBoundary =
-  "SCRIMED Work Reviewer Queue is an AAL2-gated, reviewer-only, tenant-scoped view of bounded synthetic/no-PHI artifact metadata. It enforces separation of duties, records queue access, and grants no raw-payload access, external distribution, payer submission, EHR writeback, clinical authority, connector approval, certification claim, customer go-live, or production authorization.";
+  "SCRIMED Work Reviewer Queue is an AAL2-gated, reviewer-only, tenant-scoped view of bounded synthetic/no-PHI artifact metadata. It exposes an explicit independent session-approval checkpoint before artifact disposition, enforces separation of duties, records queue access, and grants no raw-payload access, external distribution, payer submission, EHR writeback, clinical authority, connector approval, certification claim, customer go-live, or production authorization.";
 
 export type ScrimedWorkReviewQueueItem = {
   sessionId: string;
@@ -9,7 +9,7 @@ export type ScrimedWorkReviewQueueItem = {
   title: string;
   workspaceDomain: string;
   riskLevel: string;
-  sessionStatus: "verifying";
+  sessionStatus: "awaiting_approval" | "verifying";
   reviewStatus: "draft" | "human_review_required";
   approvalsReady: boolean;
   verificationReportedEligible: boolean;
@@ -62,7 +62,7 @@ function parseItem(value: unknown): ScrimedWorkReviewQueueItem | null {
     item.title.length <= 220 &&
     isString(item.workspaceDomain, /^[a-z][a-z0-9-]{2,40}$/) &&
     isString(item.riskLevel, /^(low|moderate|high)$/) &&
-    item.sessionStatus === "verifying" &&
+    (item.sessionStatus === "awaiting_approval" || item.sessionStatus === "verifying") &&
     (item.reviewStatus === "draft" || item.reviewStatus === "human_review_required") &&
     typeof item.approvalsReady === "boolean" &&
     typeof item.verificationReportedEligible === "boolean" &&
@@ -75,7 +75,13 @@ function parseItem(value: unknown): ScrimedWorkReviewQueueItem | null {
     item.externalDistributionAllowed === false &&
     item.payerSubmissionAllowed === false;
 
-  return valid ? (item as unknown as ScrimedWorkReviewQueueItem) : null;
+  const lifecycleConsistent =
+    (item.sessionStatus === "awaiting_approval" && item.approvalsReady === false) ||
+    (item.sessionStatus === "verifying" && item.approvalsReady === true);
+
+  return valid && lifecycleConsistent
+    ? (item as unknown as ScrimedWorkReviewQueueItem)
+    : null;
 }
 
 export function parseScrimedWorkReviewQueuePayload(value: unknown): ScrimedWorkReviewQueue | null {

@@ -72,6 +72,7 @@ export * from "./approvalEngine";
 export * from "./artifactEngine";
 export * from "./artifactReview";
 export * from "./reviewQueue";
+export * from "./reviewPreparation";
 export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";

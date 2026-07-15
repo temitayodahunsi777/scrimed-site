@@ -17,6 +17,7 @@ const lifecycleMigrationPath = "supabase/migrations/20260713160000_scrimed_work_
 const advisorIndexMigrationPath = "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql";
 const artifactReviewMigrationPath = "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql";
 const reviewerQueueMigrationPath = "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql";
+const reviewerApprovalMigrationPath = "supabase/migrations/20260715143000_scrimed_work_review_queue_approval_step.sql";
 const requiredEnv = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -25,12 +26,15 @@ const requiredEnv = [
   "SCRIMED_WORK_DURABLE_STORE_ENABLED",
   "SCRIMED_WORK_MIGRATIONS_VERIFIED",
   "SCRIMED_WORK_MIGRATION_EVIDENCE_ID",
+  "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED",
+  "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID",
   "SCRIMED_WORKSPACE_SLUG"
 ];
 const trueOnlyEnv = new Set([
   "SCRIMED_WORK_PROTECTED_WRITES_ENABLED",
   "SCRIMED_WORK_DURABLE_STORE_ENABLED",
-  "SCRIMED_WORK_MIGRATIONS_VERIFIED"
+  "SCRIMED_WORK_MIGRATIONS_VERIFIED",
+  "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED"
 ]);
 
 function hasEnv(name) {
@@ -68,6 +72,7 @@ const lifecycleMigration = await readFile(lifecycleMigrationPath, "utf8");
 const advisorIndexMigration = await readFile(advisorIndexMigrationPath, "utf8");
 const artifactReviewMigration = await readFile(artifactReviewMigrationPath, "utf8");
 const reviewerQueueMigration = await readFile(reviewerQueueMigrationPath, "utf8");
+const reviewerApprovalMigration = await readFile(reviewerApprovalMigrationPath, "utf8");
 const tokenAnalysis = analyzeAal2BearerToken({
   bearerToken: process.env.SCRIMED_BEARER_TOKEN,
   workspaceSlug: process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? ""
@@ -129,7 +134,14 @@ const checks = [
   check(requireIncludes(reviewerQueueMigration, "public.list_scrimed_work_artifact_review_queue"), "review-queue-public-wrapper", "Public reviewer queue wrapper exists."),
   check(requireRegex(reviewerQueueMigration, /language sql[\s\S]*?security invoker/i), "review-queue-wrapper-security-invoker", "Reviewer queue public wrapper uses SECURITY INVOKER."),
   check(requireIncludes(reviewerQueueMigration, "externalDistributionAllowed', false"), "review-queue-distribution-blocked", "Reviewer queue fixes external distribution false."),
-  check(requireIncludes(reviewerQueueMigration, "payerSubmissionAllowed', false"), "review-queue-payer-blocked", "Reviewer queue fixes payer submission false.")
+  check(requireIncludes(reviewerQueueMigration, "payerSubmissionAllowed', false"), "review-queue-payer-blocked", "Reviewer queue fixes payer submission false."),
+  check(requireIncludes(reviewerApprovalMigration, "session.status in ('awaiting_approval', 'verifying')"), "review-queue-session-approval-step", "Reviewer queue exposes awaiting-approval metadata before artifact disposition."),
+  check(requireIncludes(reviewerApprovalMigration, "sessionApprovalStepExposed', true"), "review-queue-session-approval-audit", "Reviewer queue audit evidence identifies the explicit session-approval step."),
+  check(requireIncludes(reviewerApprovalMigration, "array['reviewer']"), "review-queue-approval-reviewer-only", "Two-step review queue remains reviewer-only."),
+  check(requireIncludes(reviewerApprovalMigration, "session.created_by <> (select auth.uid())"), "review-queue-approval-separation", "Two-step review queue retains creator separation."),
+  check(requireRegex(reviewerApprovalMigration, /language sql[\s\S]*?security invoker/i), "review-queue-approval-wrapper-security-invoker", "Two-step review queue public wrapper uses SECURITY INVOKER."),
+  check(requireIncludes(reviewerApprovalMigration, "externalDistributionAllowed', false"), "review-queue-approval-distribution-blocked", "Two-step review queue keeps external distribution blocked."),
+  check(requireIncludes(reviewerApprovalMigration, "payerSubmissionAllowed', false"), "review-queue-approval-payer-blocked", "Two-step review queue keeps payer submission blocked.")
 ];
 
 for (const name of requiredEnv) {
@@ -173,7 +185,8 @@ const report = {
     lifecycleMigrationPath,
     advisorIndexMigrationPath,
     artifactReviewMigrationPath,
-    reviewerQueueMigrationPath
+    reviewerQueueMigrationPath,
+    reviewerApprovalMigrationPath
   ],
   environment: summarizeEnvironment(),
   token: {
