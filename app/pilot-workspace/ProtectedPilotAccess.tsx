@@ -3,7 +3,7 @@
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   PilotAuditEventRecord,
   PilotSessionRecord,
@@ -424,6 +424,7 @@ export default function ProtectedPilotAccess({
   );
   const [workspaces, setWorkspaces] = useState<PilotWorkspaceRecord[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<PilotWorkspaceRecord | null>(null);
+  const selectedWorkspaceSlugRef = useRef<string | null>(null);
   const [sessions, setSessions] = useState<PilotSessionRecord[]>([]);
   const [auditEvents, setAuditEvents] = useState<PilotAuditEventRecord[]>([]);
   const [demoReadinessSnapshots, setDemoReadinessSnapshots] = useState<PilotDemoReadinessSnapshotRecord[]>([]);
@@ -761,6 +762,7 @@ export default function ProtectedPilotAccess({
         setUser(null);
         setPasskeyStatus("idle");
         setWorkspaces([]);
+        selectedWorkspaceSlugRef.current = null;
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
@@ -828,6 +830,7 @@ export default function ProtectedPilotAccess({
 
       if (assurance.data.currentLevel !== "aal2") {
         setWorkspaces([]);
+        selectedWorkspaceSlugRef.current = null;
         setSelectedWorkspace(null);
         setSessions([]);
         setAuditEvents([]);
@@ -898,8 +901,13 @@ export default function ProtectedPilotAccess({
       }
 
       const nextWorkspaces = body.workspaces ?? [];
+      const activeWorkspace =
+        nextWorkspaces.find((workspace) => workspace.slug === selectedWorkspaceSlugRef.current) ??
+        nextWorkspaces[0] ??
+        null;
       setWorkspaces(nextWorkspaces);
-      setSelectedWorkspace(nextWorkspaces[0] ?? null);
+      selectedWorkspaceSlugRef.current = activeWorkspace?.slug ?? null;
+      setSelectedWorkspace(activeWorkspace);
       setDemoReadinessSnapshots([]);
       setManualQaEvidencePackets([]);
       setCommandIntelligenceSnapshots([]);
@@ -934,33 +942,33 @@ export default function ProtectedPilotAccess({
       setVerificationReadiness(null);
       setStatus("ready");
 
-      if (nextWorkspaces[0]) {
+      if (activeWorkspace) {
         await Promise.all([
-          loadSessions(activeSession, nextWorkspaces[0]),
-          loadAuditEvents(activeSession, nextWorkspaces[0]),
-          loadDemoReadinessSnapshots(activeSession, nextWorkspaces[0]),
-          loadManualQaEvidencePackets(activeSession, nextWorkspaces[0]),
-          loadCommandIntelligenceSnapshots(activeSession, nextWorkspaces[0]),
-          loadClinicalActivationApprovals(activeSession, nextWorkspaces[0]),
-          loadProtectedOperatorMetrics(activeSession, nextWorkspaces[0]),
-          loadProtectedMetricRollups(activeSession, nextWorkspaces[0]),
-          loadProtectedMetricTrends(activeSession, nextWorkspaces[0]),
-          loadProtectedBoardScorecards(activeSession, nextWorkspaces[0]),
-          loadProtectedFinanceMethodology(activeSession, nextWorkspaces[0]),
-          loadProtectedExternalApprovalEvidence(activeSession, nextWorkspaces[0]),
-          loadProtectedReleaseDecision(activeSession, nextWorkspaces[0]),
-          loadProtectedNamedReviewerSignoffs(activeSession, nextWorkspaces[0]),
-          loadProtectedDistributionLockboxes(activeSession, nextWorkspaces[0]),
-          loadProtectedReleaseAuthorityAttestations(activeSession, nextWorkspaces[0]),
-          loadProtectedEvidenceRoomRecipientAttestations(activeSession, nextWorkspaces[0]),
-          loadProtectedEvidenceRoomAccessLogReconciliation(activeSession, nextWorkspaces[0]),
-          loadProtectedEvidenceRoomProviderAdapters(activeSession, nextWorkspaces[0]),
-          loadProtectedProviderSecurityReviews(activeSession, nextWorkspaces[0]),
-          loadProtectedProcurementEvidenceRegistry(activeSession, nextWorkspaces[0]),
-          loadProtectedClinicalAuthorityEvidenceRoom(activeSession, nextWorkspaces[0]),
-          loadProtectedClinicalAuthorityOwnerMatrix(activeSession, nextWorkspaces[0]),
-          loadProtectedClinicalAuthorityArtifactIntake(activeSession, nextWorkspaces[0]),
-          loadProtectedAuthorityArtifactReferences(activeSession, nextWorkspaces[0])
+          loadSessions(activeSession, activeWorkspace),
+          loadAuditEvents(activeSession, activeWorkspace),
+          loadDemoReadinessSnapshots(activeSession, activeWorkspace),
+          loadManualQaEvidencePackets(activeSession, activeWorkspace),
+          loadCommandIntelligenceSnapshots(activeSession, activeWorkspace),
+          loadClinicalActivationApprovals(activeSession, activeWorkspace),
+          loadProtectedOperatorMetrics(activeSession, activeWorkspace),
+          loadProtectedMetricRollups(activeSession, activeWorkspace),
+          loadProtectedMetricTrends(activeSession, activeWorkspace),
+          loadProtectedBoardScorecards(activeSession, activeWorkspace),
+          loadProtectedFinanceMethodology(activeSession, activeWorkspace),
+          loadProtectedExternalApprovalEvidence(activeSession, activeWorkspace),
+          loadProtectedReleaseDecision(activeSession, activeWorkspace),
+          loadProtectedNamedReviewerSignoffs(activeSession, activeWorkspace),
+          loadProtectedDistributionLockboxes(activeSession, activeWorkspace),
+          loadProtectedReleaseAuthorityAttestations(activeSession, activeWorkspace),
+          loadProtectedEvidenceRoomRecipientAttestations(activeSession, activeWorkspace),
+          loadProtectedEvidenceRoomAccessLogReconciliation(activeSession, activeWorkspace),
+          loadProtectedEvidenceRoomProviderAdapters(activeSession, activeWorkspace),
+          loadProtectedProviderSecurityReviews(activeSession, activeWorkspace),
+          loadProtectedProcurementEvidenceRegistry(activeSession, activeWorkspace),
+          loadProtectedClinicalAuthorityEvidenceRoom(activeSession, activeWorkspace),
+          loadProtectedClinicalAuthorityOwnerMatrix(activeSession, activeWorkspace),
+          loadProtectedClinicalAuthorityArtifactIntake(activeSession, activeWorkspace),
+          loadProtectedAuthorityArtifactReferences(activeSession, activeWorkspace)
         ]);
       }
     }
@@ -1708,7 +1716,12 @@ export default function ProtectedPilotAccess({
     initializeAccess();
     const {
       data: { subscription }
-    } = activeClient.auth.onAuthStateChange((_event, nextSession) => {
+    } = activeClient.auth.onAuthStateChange((event, nextSession) => {
+      if (event === "TOKEN_REFRESHED" && nextSession) {
+        setSession(nextSession);
+        return;
+      }
+
       void applySession(nextSession);
     });
 
@@ -1892,6 +1905,7 @@ export default function ProtectedPilotAccess({
       return;
     }
 
+    selectedWorkspaceSlugRef.current = workspace.slug;
     setSelectedWorkspace(workspace);
     setDemoReadinessSnapshots([]);
     setManualQaEvidencePackets([]);
@@ -4656,7 +4670,10 @@ export default function ProtectedPilotAccess({
           {workspaces.length > 0 ? (
             workspaces.map((workspace, index) => (
               <button
-                className="layer-row workspace-selector"
+                aria-pressed={selectedWorkspace?.id === workspace.id}
+                className={`layer-row workspace-selector${
+                  selectedWorkspace?.id === workspace.id ? " workspace-selector-active" : ""
+                }`}
                 key={workspace.id}
                 onClick={() => selectWorkspace(workspace)}
                 type="button"
@@ -4664,6 +4681,9 @@ export default function ProtectedPilotAccess({
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>
                   {workspace.name}: {workspace.status}
+                  <small>
+                    {selectedWorkspace?.id === workspace.id ? "Active workspace" : "Select workspace"}
+                  </small>
                 </strong>
               </button>
             ))
@@ -4675,6 +4695,14 @@ export default function ProtectedPilotAccess({
           )}
         </div>
       </section>
+
+      {selectedWorkspace ? (
+        <div className="workspace-active-notice" role="status" aria-live="polite">
+          <span>Active workspace</span>
+          <strong>{selectedWorkspace.name}</strong>
+          <small>{status === "loading" ? "Loading governed records" : "Ready for governed actions"}</small>
+        </div>
+      ) : null}
 
       {supabase ? (
         <PasskeyManagementPanel supabase={supabase} surface="protected pilot workspace" />
@@ -4945,7 +4973,11 @@ export default function ProtectedPilotAccess({
             workspace={selectedWorkspace}
           />
 
-          <TenantAccessAdministrationPanel session={session} workspace={selectedWorkspace} />
+          <TenantAccessAdministrationPanel
+            key={`tenant-access-${selectedWorkspace.id}`}
+            session={session}
+            workspace={selectedWorkspace}
+          />
 
           <ScrimedWorkReviewerQueuePanel
             key={`scrimed-work-review-queue-${selectedWorkspace.id}`}

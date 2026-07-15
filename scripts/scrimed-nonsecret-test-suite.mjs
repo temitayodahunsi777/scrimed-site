@@ -52,6 +52,10 @@ const checks = [
     args: ["scripts/aal2-smoke-readiness-preflight.mjs"]
   },
   {
+    label: "tenant access workspace selection contract",
+    args: ["scripts/tenant-access-workspace-selection-contract-check.mjs"]
+  },
+  {
     label: "durable-store source contract",
     args: ["scripts/execution-attempt-durable-store-contract-check.mjs"]
   },

@@ -356,7 +356,7 @@ export default function TenantAccessAdministrationPanel({
     if (!response.ok) {
       setStatus("error");
       setMessage(body.error?.message ?? "The governed tenant access lifecycle action could not be committed.");
-      return;
+      return false;
     }
 
     if (body.dashboard) {
@@ -365,10 +365,11 @@ export default function TenantAccessAdministrationPanel({
 
     setStatus("ready");
     setMessage(successMessage);
+    return true;
   }
 
   async function createInvitation() {
-    await commitAction(
+    const created = await commitAction(
       {
         action: "create-invitation",
         email: inviteEmail,
@@ -378,6 +379,11 @@ export default function TenantAccessAdministrationPanel({
       },
       "Invitation record created. Email delivery remains disabled until enterprise SMTP is approved."
     );
+
+    if (!created) {
+      return;
+    }
+
     setInviteEmail("");
     setInviteNote("");
     setInviteExpiresAt(defaultExpiryDate());
@@ -677,8 +683,9 @@ export default function TenantAccessAdministrationPanel({
         <p className="eyebrow">Tenant access administration</p>
         <h2>Govern protected-pilot identities.</h2>
         <p className="section-copy">
-          Tenant-admin lifecycle actions require fresh AAL2 assurance and create append-only access evidence. The
-          workspace remains synthetic-only: no PHI intake, no autonomous care, and no direct invitation email delivery.
+          Active workspace: <strong>{workspace.name}</strong>. Tenant-admin lifecycle actions require fresh AAL2
+          assurance and create append-only access evidence. The workspace remains synthetic-only: no PHI intake, no
+          autonomous care, and no direct invitation email delivery.
         </p>
       </div>
 
@@ -828,7 +835,7 @@ export default function TenantAccessAdministrationPanel({
                 <textarea
                   disabled={status === "saving"}
                   onChange={(event) => setInviteNote(event.target.value)}
-                  placeholder="Metadata only. No PHI or clinical details."
+                  placeholder="Metadata only. Exclude sensitive or clinical details."
                   value={inviteNote}
                 />
               </label>
@@ -907,7 +914,7 @@ export default function TenantAccessAdministrationPanel({
                       notes: event.target.value
                     }))
                   }
-                  placeholder="Metadata only. No PHI or clinical details."
+                  placeholder="Metadata only. Exclude sensitive or clinical details."
                   value={(identityDraft ?? dashboard.identityReadiness).notes}
                 />
               </label>
@@ -986,7 +993,7 @@ export default function TenantAccessAdministrationPanel({
                       notes: event.target.value
                     }))
                   }
-                  placeholder="Metadata only. No PHI or clinical details."
+                  placeholder="Metadata only. Exclude sensitive or clinical details."
                   value={(deliveryDraft ?? dashboard.deliveryReadiness).notes}
                 />
               </label>
@@ -1101,7 +1108,7 @@ export default function TenantAccessAdministrationPanel({
                 <textarea
                   disabled={status === "saving"}
                   onChange={(event) => setReviewNotes(event.target.value)}
-                  placeholder="Metadata only. No PHI or clinical details."
+                  placeholder="Metadata only. Exclude sensitive or clinical details."
                   value={reviewNotes}
                 />
               </label>
