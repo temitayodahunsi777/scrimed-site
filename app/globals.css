@@ -558,6 +558,45 @@ h3 {
   outline-offset: -2px;
 }
 
+.workspace-selector strong {
+  display: grid;
+  gap: 4px;
+}
+
+.workspace-selector small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.workspace-selector-active {
+  background: #e7f1ec;
+  box-shadow: inset 4px 0 0 var(--green);
+}
+
+.workspace-selector-active small {
+  color: var(--green);
+}
+
+.workspace-active-notice {
+  align-items: center;
+  background: #e7f1ec;
+  border-block: 1px solid var(--line);
+  display: grid;
+  gap: 8px 20px;
+  grid-template-columns: auto 1fr auto;
+  padding: 18px clamp(20px, 5vw, 72px);
+}
+
+.workspace-active-notice span,
+.workspace-active-notice small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .tenant-access-panel {
   border-top: 1px solid var(--line);
 }
@@ -1896,6 +1935,10 @@ h3 {
   .review-event-list article,
   .agent-readiness-grid,
   .evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-active-notice {
     grid-template-columns: 1fr;
   }
 
