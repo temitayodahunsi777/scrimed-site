@@ -8,10 +8,15 @@ import {
   scrimedWorkReviewPreparationChecks,
   scrimedWorkReviewPreparationPolicyVersion
 } from "../app/lib/scrimed-work/reviewPreparation.ts";
+import { buildWorkSessionFromContract } from "../app/lib/scrimed-work/workSessionStore.ts";
+import {
+  collectVerificationEvidenceIds,
+  verifyScrimedWorkResult
+} from "../app/lib/scrimed-work/verificationEngine.ts";
 
 assert.equal(
   scrimedWorkReviewPreparationPolicyVersion,
-  "scrimed-work-review-preparation-v2026-07-15"
+  "scrimed-work-review-preparation-v2026-07-15.2"
 );
 
 const payload = buildScrimedWorkReviewPreparationPayload(
@@ -30,7 +35,43 @@ assert.ok(payload.definitionOfDone.prohibitedActions.includes("payer submission"
 assert.ok(payload.definitionOfDone.prohibitedActions.includes("EHR writeback"));
 assert.ok(payload.definitionOfDone.prohibitedActions.includes("external distribution"));
 assert.ok(payload.definitionOfDone.requiredEvidence.includes("independent reviewer approval"));
+assert.deepEqual(payload.definitionOfDone.requiredEvidence.slice(0, 3), [
+  "Care coordination review SOP",
+  "FHIR R4 preview contract",
+  "Board brief evidence template"
+]);
+assert.ok(!payload.definitionOfDone.requiredEvidence.includes("mandatory verification result"));
 assert.ok(payload.definitionOfDone.stoppingConditions.includes("separation of duties unavailable"));
+
+const preparedSession = buildWorkSessionFromContract(payload);
+const draftArtifact = preparedSession.artifacts[0];
+assert.equal(preparedSession.evidence.length, 3);
+assert.equal(collectVerificationEvidenceIds(preparedSession).length, 3);
+assert.ok(
+  verifyScrimedWorkResult({ session: preparedSession, artifact: draftArtifact })
+    .failedCriteria.includes("required-evidence")
+);
+
+const approvedSession = {
+  ...preparedSession,
+  approvalCheckpoints: preparedSession.approvalCheckpoints.map((checkpoint) => ({
+    ...checkpoint,
+    status: "approved",
+    auditHash: "scrimed-work-lifecycle-independent-review-fixture"
+  }))
+};
+const reviewedArtifact = { ...draftArtifact, reviewStatus: "reviewed" };
+const approvedVerification = verifyScrimedWorkResult({
+  session: approvedSession,
+  artifact: reviewedArtifact
+});
+assert.equal(collectVerificationEvidenceIds(approvedSession).length, 4);
+assert.equal(approvedVerification.eligibleForCompletion, true);
+assert.ok(
+  approvedVerification.evidence.includes(
+    "evidence_scrimed-work-lifecycle-independent-review-fixture"
+  )
+);
 
 const passedChecks = scrimedWorkReviewPreparationChecks.map(() => ({ status: "pass" }));
 assert.equal(

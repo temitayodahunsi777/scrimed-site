@@ -28,6 +28,7 @@ import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ScrimedWorkBrowserVerificationPanel from "./ScrimedWorkBrowserVerificationPanel";
+import ScrimedWorkCompletionQueuePanel from "./ScrimedWorkCompletionQueuePanel";
 import ScrimedWorkReviewPreparationPanel from "./ScrimedWorkReviewPreparationPanel";
 import ScrimedWorkReviewerQueuePanel from "./ScrimedWorkReviewerQueuePanel";
 import ProtectedBoardScorecardsPanel from "./ProtectedBoardScorecardsPanel";
@@ -4989,6 +4990,13 @@ export default function ProtectedPilotAccess({
 
           <ScrimedWorkReviewerQueuePanel
             key={`scrimed-work-review-queue-${selectedWorkspace.id}`}
+            onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
+            session={session}
+            workspace={selectedWorkspace}
+          />
+
+          <ScrimedWorkCompletionQueuePanel
+            key={`scrimed-work-completion-queue-${selectedWorkspace.id}`}
             onAuditChanged={() => refreshAuditEvents(session, selectedWorkspace)}
             session={session}
             workspace={selectedWorkspace}

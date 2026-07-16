@@ -121,8 +121,12 @@ The ordered local migrations are:
 4. `supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql` adds the private reviewer ledger, reviewer-only AAL2 RPC, cryptographic identity/decision binding, immutable artifact mutation scope, idempotent review audit evidence, and synchronized artifact/session review state.
 5. `supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql` adds the reviewer-only queue RPC, bounded synthetic/no-PHI metadata, creator exclusion, audited reads, and fixed external-distribution and payer-submission blocks.
 6. `supabase/migrations/20260715143000_scrimed_work_review_queue_approval_step.sql` extends the bounded queue to expose awaiting-approval artifacts so a separate reviewer can record session approval before the independent artifact disposition.
+7. `supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql` transactionally upserts each persisted artifact into its authoritative session payload, validates tenant/workspace/session/artifact identity, and repairs prior synthetic records without changing creator or review history.
+8. `supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql` binds an approved reviewer checkpoint into metadata-only verification evidence, records a dedicated audit event, and repairs already-approved synthetic sessions without exposing identities or weakening review policy.
 
-On 2026-07-14, the first five migrations were applied to the approved no-PHI target. The reviewer-queue migration is recorded remotely as `20260714172055_scrimed_work_reviewer_queue`; its validated event constraint, authenticated-only execution grants, private `security definer` function, public `security invoker` wrapper, and empty search paths were verified after application. Supabase security advisors reported no new database finding from the migration. The sixth migration remains pending approved application and post-migration validation. The earlier bounded browser canary passed 11 of 11 checks, but a separate-reviewer AAL2 queue canary is still required before release promotion. This evidence does not authorize live PHI, clinical care, external distribution, or customer go-live.
+On 2026-07-15, the eight ordered migrations were present on the approved no-PHI target. The reviewer queue, two-step approval, artifact-session binding, and approval-evidence binding migrations are recorded remotely as `20260714172055_scrimed_work_reviewer_queue`, `20260715152845_scrimed_work_review_queue_approval_step`, `20260716012403_scrimed_work_artifact_session_binding`, and `20260716015159_scrimed_work_approval_evidence_binding`. Post-migration validation confirmed both synchronization triggers are active and the pending synthetic artifact is bound to its authoritative session with audit-derived independent-approval evidence. Supabase security advisors reported no new database finding from the binding migration; the existing leaked-password-protection warning remains an external Auth hardening item. The separate reviewer must still record the final internal-use-only disposition before the canary is complete. This evidence does not authorize live PHI, clinical care, external distribution, or customer go-live.
+
+Independent approval is verification evidence only when a required reviewer checkpoint is durably marked approved. The verifier derives a metadata-only evidence identifier from that checkpoint's audit hash, avoids circular "verification proves verification" requirements, and still requires cited source evidence, rollback readiness, no-PHI checks, and a separately authenticated reviewer before internal-use approval.
 
 ## Session Lifecycle
 
@@ -151,9 +155,17 @@ The protected pilot workspace now contains an explicit reviewer console. Queue r
 
 The tenant-admin review-preparation control creates one bounded synthetic/no-PHI session and artifact, advances it to `awaiting_approval`, proves creator self-approval fails closed, and stops. The reviewer queue then exposes two distinct human actions: first `Approve Session for Review`, which advances the session to `verifying`; then the artifact disposition. Failed or incomplete preparation is cancelled automatically where the authoritative lifecycle permits it. No bearer token is exported from the browser.
 
-The queue returns at most 50 records and only exposes artifact identifiers, type, synthetic title, workspace domain, risk, review state, approval readiness, verification metadata, a one-way creator identity hash, and timestamps. It never returns raw artifact content, source documents, prompts, connector payloads, patient data, credentials, or free-text reviewer notes. Every queue load records `artifact-review-queue-viewed` evidence, and each approved/changes-requested/rejected disposition continues through the existing durable review RPC.
+The queue returns at most 50 records and only exposes artifact identifiers, type, synthetic title, workspace domain, risk, review state, approval readiness, verification metadata, a one-way creator identity hash, and timestamps. It never returns raw artifact content, source documents, prompts, connector payloads, patient data, credentials, or free-text reviewer notes. Every queue load records `artifact-review-queue-viewed` evidence, and each approved/changes-requested/rejected disposition continues through the existing durable review RPC. A database trigger keeps the separately persisted artifact row synchronized with the session artifact collection, so policy evaluation and durable review bind to the same stable artifact identifier.
 
 “Approved” means internal synthetic use only. It does not permit external distribution, payer submission, EHR writeback, patient outreach, clinical action, production connectors, certification claims, or customer activation.
+
+## Verified Completion Queue
+
+The protected pilot workspace includes a separate tenant-admin/pilot-lead completion queue. It lists only tenant-scoped sessions that are still `verifying`, contain bound independent-approval evidence, have an `approved_for_internal_use` artifact disposition, and carry a current 100% mandatory verification result. Reviewer and observer memberships are denied at both the application and database layers.
+
+Selecting `Verify and Complete Internal Work` does not trust stored readiness alone. The application requests a fresh server-side verification result and requires `allPass=true`, `eligibleForCompletion=true`, and no failed criteria before it submits the idempotent completion transition. The lifecycle route recomputes verification again against authoritative durable state before recording `completed`. Every queue read and lifecycle transition is audited.
+
+Completion means only that the synthetic internal work contract passed its bounded evidence gates. It does not authorize export, external distribution, payer submission, EHR writeback, clinical action, production connectors, certification claims, customer go-live, or production deployment.
 
 ## Production Hardening Gate
 
@@ -247,7 +259,7 @@ npm run smoke:scrimed-work:strict
 npm run smoke:scrimed-work:two-identity:strict
 ```
 
-The preflight validates all six ordered migration contracts, RLS/deny-policy posture, lifecycle matrix, transition and artifact-review ledgers, the bounded two-step reviewer queue, authoritative locking, append-only history, reviewer separation, database-verifiable review hashes, immutable artifact scope, audited queue reads, external-use blocks, `security invoker` public wrappers, AAL2 token shape, required environment variables, feature flags, workspace slug, and no-secret output behavior. It does not apply migrations, mutate Supabase, verify production, or authorize live clinical workflows.
+The preflight validates all nine ordered migration contracts, RLS/deny-policy posture, lifecycle matrix, transition and artifact-review ledgers, the bounded two-step reviewer queue, the operator-only completion queue, authoritative locking, append-only history, reviewer separation, database-verifiable review hashes, immutable artifact scope, audited queue reads, external-use blocks, `security invoker` public wrappers, AAL2 token shape, required environment variables, feature flags, workspace slug, and no-secret output behavior. It does not apply migrations, mutate Supabase, verify production, or authorize live clinical workflows.
 
 Local token inspection is explicitly reported as `signature=not-verified-local-preflight`. Only a successful Supabase Auth check or protected API request may promote that evidence to a verified state. Operator logs redact JWT-shaped values, bearer credentials, named access or refresh tokens, API keys, and Supabase-style secrets.
 
@@ -255,7 +267,7 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 - Read-only public views remain synthetic. Protected durable reads and verification require an AAL2 bearer session, authorized workspace membership, workspace scope, and the durable-store flag. Protected writes additionally require the server runtime token, mutation idempotency key, protected-write flag, and reviewed migration evidence.
 - The existing membership model has tenant-admin, pilot-lead, reviewer, and observer roles but no verified clinician credential binding. High-risk clinical approval therefore remains blocked rather than treating a generic reviewer as a clinician.
-- The reviewer-queue migration is applied and catalog-verified; the authenticated two-identity queue flow still requires a separately enrolled reviewer and retained canary evidence before release promotion.
+- Completion remains internal synthetic lifecycle evidence. It is not release, distribution, clinical, regulatory, connector, or customer go-live authority.
 - A complete PayerIQ lifecycle needs two distinct AAL2 identities: an authorized initiator and a separate `reviewer` member. One account cannot satisfy separation of duties.
 - Provider adapters do not call external models and require future secret-managed configuration, legal/privacy review, and budget controls.
 - Schedules are definitions only; no uncontrolled background scheduler is introduced.
@@ -264,4 +276,4 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 ## Next Production-Hardening Step
 
-Apply and validate the sixth review-queue migration in the approved no-PHI target, deploy the reviewed UI, then use separate fresh AAL2 operator and reviewer sessions to prepare, approve, review, verify, and complete one internal-only synthetic artifact. Retain queue-read/review/completion evidence and keep buyer-facing mutations disabled. Externally reviewed clinician-identity binding remains mandatory before any high-risk clinical approval path is considered.
+Apply and validate the operator-only completion-queue migration in the approved no-PHI target, deploy the reviewed UI, and use the active tenant-admin AAL2 session to verify and complete the independently reviewed internal-only synthetic artifact. Retain queue-read, verification, review, and completion evidence while keeping buyer-facing mutations disabled. Externally reviewed clinician-identity binding remains mandatory before any high-risk clinical approval path is considered.

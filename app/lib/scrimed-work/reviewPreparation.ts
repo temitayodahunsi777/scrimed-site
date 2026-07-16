@@ -1,5 +1,5 @@
 export const scrimedWorkReviewPreparationPolicyVersion =
-  "scrimed-work-review-preparation-v2026-07-15";
+  "scrimed-work-review-preparation-v2026-07-15.2";
 
 export const scrimedWorkReviewPreparationBoundary =
   "SCRIMED Work review preparation creates one tenant-scoped synthetic/no-PHI session and one metadata-only artifact, advances the session only to the independent-review checkpoint, and leaves external distribution, payer submission, EHR writeback, patient outreach, clinical authority, connector activation, certification claims, and customer go-live disabled.";
@@ -96,10 +96,10 @@ export function buildScrimedWorkReviewPreparationPayload(
         "external distribution"
       ],
       requiredEvidence: [
-        "AAL2 tenant operator",
-        "independent reviewer approval",
-        "reviewer-only queue evidence",
-        "mandatory verification result"
+        "Care coordination review SOP",
+        "FHIR R4 preview contract",
+        "Board brief evidence template",
+        "independent reviewer approval"
       ],
       successCriteria: [
         "session persisted",

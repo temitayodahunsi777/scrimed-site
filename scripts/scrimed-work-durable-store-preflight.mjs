@@ -18,6 +18,9 @@ const advisorIndexMigrationPath = "supabase/migrations/20260713163000_scrimed_wo
 const artifactReviewMigrationPath = "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql";
 const reviewerQueueMigrationPath = "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql";
 const reviewerApprovalMigrationPath = "supabase/migrations/20260715143000_scrimed_work_review_queue_approval_step.sql";
+const artifactSessionBindingMigrationPath = "supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql";
+const approvalEvidenceBindingMigrationPath = "supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql";
+const completionQueueMigrationPath = "supabase/migrations/20260716030000_scrimed_work_completion_queue.sql";
 const requiredEnv = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -73,6 +76,9 @@ const advisorIndexMigration = await readFile(advisorIndexMigrationPath, "utf8");
 const artifactReviewMigration = await readFile(artifactReviewMigrationPath, "utf8");
 const reviewerQueueMigration = await readFile(reviewerQueueMigrationPath, "utf8");
 const reviewerApprovalMigration = await readFile(reviewerApprovalMigrationPath, "utf8");
+const artifactSessionBindingMigration = await readFile(artifactSessionBindingMigrationPath, "utf8");
+const approvalEvidenceBindingMigration = await readFile(approvalEvidenceBindingMigrationPath, "utf8");
+const completionQueueMigration = await readFile(completionQueueMigrationPath, "utf8");
 const tokenAnalysis = analyzeAal2BearerToken({
   bearerToken: process.env.SCRIMED_BEARER_TOKEN,
   workspaceSlug: process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? ""
@@ -141,7 +147,30 @@ const checks = [
   check(requireIncludes(reviewerApprovalMigration, "session.created_by <> (select auth.uid())"), "review-queue-approval-separation", "Two-step review queue retains creator separation."),
   check(requireRegex(reviewerApprovalMigration, /language sql[\s\S]*?security invoker/i), "review-queue-approval-wrapper-security-invoker", "Two-step review queue public wrapper uses SECURITY INVOKER."),
   check(requireIncludes(reviewerApprovalMigration, "externalDistributionAllowed', false"), "review-queue-approval-distribution-blocked", "Two-step review queue keeps external distribution blocked."),
-  check(requireIncludes(reviewerApprovalMigration, "payerSubmissionAllowed', false"), "review-queue-approval-payer-blocked", "Two-step review queue keeps payer submission blocked.")
+  check(requireIncludes(reviewerApprovalMigration, "payerSubmissionAllowed', false"), "review-queue-approval-payer-blocked", "Two-step review queue keeps payer submission blocked."),
+  check(requireIncludes(artifactSessionBindingMigration, "private.sync_scrimed_work_artifact_payload_to_session"), "artifact-session-binding-function", "Persisted artifacts are synchronized into their authoritative session payload."),
+  check(requireIncludes(artifactSessionBindingMigration, "scrimed_work_artifact_payload_session_sync"), "artifact-session-binding-trigger", "Artifact persistence and payload updates trigger authoritative session synchronization."),
+  check(requireIncludes(artifactSessionBindingMigration, "scrimed-work-artifact-session-sync-binding-conflict"), "artifact-session-binding-identity-check", "Session synchronization validates artifact and session identifiers."),
+  check(requireIncludes(artifactSessionBindingMigration, "after insert or update of artifact_payload"), "artifact-session-binding-write-coverage", "New and reviewed artifact payloads remain synchronized."),
+  check(requireIncludes(artifactSessionBindingMigration, "not exists"), "artifact-session-binding-backfill", "Previously persisted artifacts receive a bounded consistency repair."),
+  check(requireIncludes(artifactSessionBindingMigration, "revoke all on function private.sync_scrimed_work_artifact_payload_to_session()"), "artifact-session-binding-direct-execution-revoked", "Direct synchronization-function execution remains revoked."),
+  check(requireIncludes(approvalEvidenceBindingMigration, "private.bind_scrimed_work_approval_evidence"), "approval-evidence-binding-function", "Independent approval evidence is bound by a private trigger function."),
+  check(requireIncludes(approvalEvidenceBindingMigration, "scrimed_work_approval_evidence_binding"), "approval-evidence-binding-trigger", "Approval evidence binding runs on authoritative session updates."),
+  check(requireIncludes(approvalEvidenceBindingMigration, "session-evidence-bound"), "approval-evidence-binding-audit", "Approval evidence binding emits a dedicated audit event."),
+  check(requireIncludes(approvalEvidenceBindingMigration, "independent reviewer approval"), "approval-evidence-binding-requirement", "Only contracts requiring independent approval receive lifecycle evidence."),
+  check(requireIncludes(approvalEvidenceBindingMigration, "revoke all on function private.bind_scrimed_work_approval_evidence()"), "approval-evidence-binding-direct-execution-revoked", "Direct approval-evidence function execution remains revoked."),
+  check(requireIncludes(approvalEvidenceBindingMigration, "update private.scrimed_work_sessions session"), "approval-evidence-binding-backfill", "Previously approved synthetic sessions receive bounded lifecycle evidence."),
+  check(requireIncludes(completionQueueMigration, "private.list_scrimed_work_completion_queue"), "completion-queue-private-rpc", "Private completion queue RPC exists."),
+  check(requireIncludes(completionQueueMigration, "array['tenant-admin', 'pilot-lead']"), "completion-queue-operator-only", "Completion queue requires tenant-admin or pilot-lead membership."),
+  check(requireIncludes(completionQueueMigration, "session.status = 'verifying'"), "completion-queue-verifying-only", "Completion queue lists only verifying sessions."),
+  check(requireIncludes(completionQueueMigration, "review.disposition = 'approved_for_internal_use'"), "completion-queue-independent-review", "Completion queue requires an approved independent disposition."),
+  check(requireIncludes(completionQueueMigration, "artifact.artifact_payload #>> '{verification,allPass}' = 'true'"), "completion-queue-verification-pass", "Completion queue requires current all-pass verification metadata."),
+  check(requireIncludes(completionQueueMigration, "session-completion-queue-viewed"), "completion-queue-audited", "Every completion queue read emits an audit event."),
+  check(requireIncludes(completionQueueMigration, "public.list_scrimed_work_completion_queue"), "completion-queue-public-wrapper", "Public completion queue wrapper exists."),
+  check(requireRegex(completionQueueMigration, /language sql[\s\S]*?security invoker/i), "completion-queue-wrapper-security-invoker", "Completion queue public wrapper uses SECURITY INVOKER."),
+  check(requireIncludes(completionQueueMigration, "externalDistributionAllowed', false"), "completion-queue-distribution-blocked", "Completion queue fixes external distribution false."),
+  check(requireIncludes(completionQueueMigration, "payerSubmissionAllowed', false"), "completion-queue-payer-blocked", "Completion queue fixes payer submission false."),
+  check(requireIncludes(completionQueueMigration, "ehrWritebackAllowed', false"), "completion-queue-ehr-blocked", "Completion queue fixes EHR writeback false.")
 ];
 
 for (const name of requiredEnv) {
@@ -186,7 +215,10 @@ const report = {
     advisorIndexMigrationPath,
     artifactReviewMigrationPath,
     reviewerQueueMigrationPath,
-    reviewerApprovalMigrationPath
+    reviewerApprovalMigrationPath,
+    artifactSessionBindingMigrationPath,
+    approvalEvidenceBindingMigrationPath,
+    completionQueueMigrationPath
   ],
   environment: summarizeEnvironment(),
   token: {
