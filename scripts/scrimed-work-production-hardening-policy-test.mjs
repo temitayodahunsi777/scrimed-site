@@ -40,7 +40,7 @@ assert.equal(
 );
 assert.match(
   gate(missingReviewApprovalMigration, "scrimed-work-migration-application").blocker ?? "",
-  /all six ordered migrations/i
+  /all nine ordered migrations/i
 );
 
 const missingReviewer = getScrimedWorkProductionHardeningGate(

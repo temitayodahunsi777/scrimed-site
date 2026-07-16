@@ -338,10 +338,10 @@ export function getScrimedWorkProductionHardeningGate(
       ],
       blocker: migrationsVerified
         ? null
-        : "All six ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved no-PHI target.",
+        : "All nine ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved no-PHI target.",
       operatorAction: migrationsVerified
         ? "Retain migration history, RLS/grant checks, and post-migration advisor evidence with this release."
-        : "Apply all six migrations in order to an approved no-PHI Supabase project/branch, run Supabase advisors, then set both migration verification flags and nonsecret evidence identifiers.",
+        : "Apply all nine migrations in order to an approved no-PHI Supabase project/branch, run Supabase advisors, then set both migration verification flags and nonsecret evidence identifiers.",
       automationSafe: false,
       retainedBoundary: "This code path does not mutate live Supabase, apply migrations, or approve production deployment."
     }),
@@ -408,7 +408,7 @@ export function getScrimedWorkProductionHardeningGate(
       "Configure non-production Supabase URL, publishable key, runtime authorization token, workspace slug, protected writes flag, and durable-store flag.",
       migrationsVerified
         ? `Retain reviewed migration evidence ${migrationEvidenceId} with the release packet.`
-        : "Apply all six SCRIMED Work migrations in order only to an approved no-PHI Supabase target and bind both migration reviews to nonsecret evidence identifiers.",
+        : "Apply all nine SCRIMED Work migrations in order only to an approved no-PHI Supabase target and bind both migration reviews to nonsecret evidence identifiers.",
       "Run npm run smoke:scrimed-work:durable-store-preflight:strict.",
       "Run npm run smoke:scrimed-work:strict.",
       "Run npm run smoke:scrimed-work:two-identity:strict and retain its no-secret audit identifiers.",

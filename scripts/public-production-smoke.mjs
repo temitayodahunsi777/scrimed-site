@@ -12514,6 +12514,20 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work reviewer queue must retain external-distribution and payer-submission locks.");
   }
 
+  const protectedCompletionQueue = await request("/api/scrimed-work/completion-queue");
+  requireStatus("SCRIMED Work protected completion queue", protectedCompletionQueue.response.status, [401, 503]);
+  requireScrimedWorkBoundary("SCRIMED Work protected completion queue", protectedCompletionQueue.response);
+  if (protectedCompletionQueue.response.headers.get("x-scrimed-completion-queue") !== "fail-closed") {
+    throw new Error("SCRIMED Work completion queue must fail closed without AAL2 operator authorization.");
+  }
+  if (
+    protectedCompletionQueue.response.headers.get("x-scrimed-external-distribution") !== "not-authorized" ||
+    protectedCompletionQueue.response.headers.get("x-scrimed-payer-submission") !== "not-authorized" ||
+    protectedCompletionQueue.response.headers.get("x-scrimed-ehr-writeback") !== "not-authorized"
+  ) {
+    throw new Error("SCRIMED Work completion queue must retain external, payer, and EHR locks.");
+  }
+
   const protectedVerification = await postJson(
     "/api/scrimed-work/sessions/work_session_unknown_protected/verify",
     {}

@@ -10,6 +10,7 @@ import {
   getScrimedWorkWorkspaceSlug,
   fetchScrimedWorkSessionFromDurableStore,
   isScrimedWorkDurableStoreEnabled,
+  listScrimedWorkCompletionQueueInDurableStore,
   listScrimedWorkArtifactReviewQueueInDurableStore,
   recordScrimedWorkArtifactInDurableStore,
   reviewScrimedWorkArtifactInDurableStore,
@@ -21,6 +22,12 @@ import {
   transitionScrimedWorkSessionInDurableStore,
   type ScrimedWorkDurableStoreContext
 } from "./durableStore";
+import {
+  isScrimedWorkCompletionOperator,
+  parseScrimedWorkCompletionQueueLimit,
+  scrimedWorkCompletionQueueBoundary,
+  scrimedWorkCompletionQueuePolicyVersion
+} from "./completionQueue";
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
 import { sampleLearningLoopArtifacts } from "./learningLoop";
 import {
@@ -71,6 +78,7 @@ export * from "./autonomyPolicy";
 export * from "./approvalEngine";
 export * from "./artifactEngine";
 export * from "./artifactReview";
+export * from "./completionQueue";
 export * from "./reviewQueue";
 export * from "./reviewPreparation";
 export * from "./payerIqHandoff";
@@ -194,7 +202,7 @@ export function getScrimedWorkSummary() {
     },
     productionHardening: getScrimedWorkProductionHardeningGate(),
     nextProductionHardeningStep:
-      "Apply and verify all five SCRIMED Work migrations in the approved no-PHI target, validate the AAL2 reviewer queue with a separate reviewer identity, then retain the internal-only review and completion evidence packet."
+      "Apply and verify the SCRIMED Work completion-queue migration in the approved no-PHI target, then use the AAL2 tenant-admin control to retain verified internal-only completion evidence without granting external authority."
   };
 }
 
@@ -541,6 +549,22 @@ export async function guardedTransitionSession(
 ) {
   const auth = await buildWriteAuthorizationDecision(request, `${action}-${sessionId}`, { sessionId, action, reason });
   if (!auth.allowed) return auth;
+
+  if (
+    action === "complete" &&
+    !isScrimedWorkCompletionOperator(auth.context.memberRole, auth.context.actorRole)
+  ) {
+    return {
+      allowed: false as const,
+      status: 403,
+      error: errorEnvelope(
+        "scrimed_work_completion_operator_required",
+        "Verified internal completion requires tenant-admin or pilot-lead membership after independent review.",
+        `${action}-${sessionId}`,
+        false
+      )
+    };
+  }
 
   const resolved = await resolveProtectedWorkSession(auth.context, sessionId);
 
@@ -932,6 +956,81 @@ export async function guardedListProtectedArtifactReviewQueue(request: Request) 
       },
       policyVersion: scrimedWorkReviewQueuePolicyVersion,
       boundary: scrimedWorkReviewQueueBoundary
+    }
+  };
+}
+
+export async function guardedListProtectedCompletionQueue(request: Request) {
+  const limit = parseScrimedWorkCompletionQueueLimit(
+    new URL(request.url).searchParams.get("limit")
+  );
+  if (!limit.ok) {
+    return {
+      allowed: false as const,
+      status: 422,
+      error: errorEnvelope(
+        "scrimed_work_completion_queue_invalid_limit",
+        limit.reason,
+        "completion-queue-read",
+        false
+      )
+    };
+  }
+
+  const auth = await buildReadAuthorizationDecision(request, "completion-queue-read", {
+    limit: limit.value
+  });
+  if (!auth.allowed) return auth;
+
+  if (!isScrimedWorkCompletionOperator(auth.context.memberRole, auth.context.actorRole)) {
+    return {
+      allowed: false as const,
+      status: 403,
+      error: errorEnvelope(
+        "scrimed_work_completion_queue_operator_required",
+        "SCRIMED Work completion queue access requires tenant-admin or pilot-lead membership.",
+        "completion-queue-read",
+        false
+      )
+    };
+  }
+
+  const durable = await listScrimedWorkCompletionQueueInDurableStore(
+    auth.context,
+    limit.value
+  );
+  if (durable.error || !durable.queue) {
+    const failure = scrimedWorkDurableStoreRpcFailure(
+      durable.error,
+      "scrimed-work-completion-queue-unavailable"
+    );
+    return {
+      allowed: false as const,
+      status: failure.status,
+      error: errorEnvelope(
+        failure.code,
+        failure.message,
+        "completion-queue-read",
+        failure.status >= 500
+      )
+    };
+  }
+
+  return {
+    allowed: true as const,
+    status: 200,
+    data: {
+      queue: durable.queue,
+      authorization: {
+        memberRole: auth.context.memberRole,
+        operatorOnly: true,
+        aal2Required: true,
+        tenantScoped: true,
+        metadataOnly: true,
+        auditEventId: durable.queue.auditEventId
+      },
+      policyVersion: scrimedWorkCompletionQueuePolicyVersion,
+      boundary: scrimedWorkCompletionQueueBoundary
     }
   };
 }

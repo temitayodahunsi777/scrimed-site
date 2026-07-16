@@ -42,6 +42,34 @@ function hasRequiredSections(contract: DefinitionOfDoneContract, text: string) {
   );
 }
 
+function isIndependentApprovalRequirement(requirement: string) {
+  return requirement.trim().toLowerCase() === "independent reviewer approval";
+}
+
+export function collectVerificationEvidenceIds(session: WorkSession) {
+  const evidenceIds = session.evidence.map((record) => record.evidenceId);
+  const requiresIndependentApprovalEvidence =
+    session.definitionOfDone.requiredEvidence.some(isIndependentApprovalRequirement);
+  const explicitApprovalEvidence = session.evidence.some(
+    (record) =>
+      isIndependentApprovalRequirement(record.title) ||
+      isIndependentApprovalRequirement(record.supports)
+  );
+  const approvedCheckpoint = session.approvalCheckpoints.find(
+    (checkpoint) => checkpoint.status === "approved"
+  );
+
+  if (
+    requiresIndependentApprovalEvidence &&
+    !explicitApprovalEvidence &&
+    approvedCheckpoint
+  ) {
+    evidenceIds.push(`evidence_${approvedCheckpoint.auditHash}`);
+  }
+
+  return evidenceIds;
+}
+
 export function verifyScrimedWorkResult(input: VerificationInput): VerificationResult {
   const artifact = input.artifact;
   const outputText = input.outputText ?? artifact?.content ?? "";
@@ -49,9 +77,10 @@ export function verifyScrimedWorkResult(input: VerificationInput): VerificationR
   const failures: string[] = [];
   const warnings: string[] = [];
   const evidence: string[] = [];
+  const verificationEvidenceIds = collectVerificationEvidenceIds(input.session);
 
   if (!contract.goal || contract.requiredEvidence.length === 0) failures.push("definition-of-done-contract");
-  if (input.session.evidence.length < contract.requiredEvidence.length) failures.push("required-evidence");
+  if (verificationEvidenceIds.length < contract.requiredEvidence.length) failures.push("required-evidence");
   if (artifact && artifact.sourceCitations.length === 0) failures.push("citation-presence");
   if (containsPhiRisk(outputText)) failures.push("phi-leakage-check");
   if (!hasRequiredSections(contract, outputText)) warnings.push("required-section-completeness");
@@ -71,7 +100,7 @@ export function verifyScrimedWorkResult(input: VerificationInput): VerificationR
 
   if (loop.loopDetected) failures.push("doom-loop-guard");
 
-  evidence.push(...input.session.evidence.map((record) => record.evidenceId));
+  evidence.push(...verificationEvidenceIds);
 
   const totalCriteria = 11;
   const passedCriteria = Math.max(0, totalCriteria - failures.length);

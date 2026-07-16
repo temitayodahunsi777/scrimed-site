@@ -23,6 +23,7 @@ const requiredFiles = [
   "app/lib/scrimed-work/approvalEngine.ts",
   "app/lib/scrimed-work/artifactEngine.ts",
   "app/lib/scrimed-work/artifactReview.ts",
+  "app/lib/scrimed-work/completionQueue.ts",
   "app/lib/scrimed-work/reviewQueue.ts",
   "app/lib/scrimed-work/reviewPreparation.ts",
   "app/lib/scrimed-work/payerIqHandoff.ts",
@@ -48,6 +49,7 @@ const requiredFiles = [
   "app/api/scrimed-work/sessions/[sessionId]/reject/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/complete/route.ts",
   "app/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review/route.ts",
+  "app/api/scrimed-work/completion-queue/route.ts",
   "app/api/scrimed-work/review-queue/route.ts",
   "app/api/scrimed-work/providers/route.ts",
   "app/api/scrimed-work/agents/route.ts",
@@ -62,6 +64,7 @@ const requiredFiles = [
   "app/scrimed-work/page.tsx",
   "app/pilot-workspace/ProtectedPilotAccess.tsx",
   "app/pilot-workspace/ScrimedWorkBrowserVerificationPanel.tsx",
+  "app/pilot-workspace/ScrimedWorkCompletionQueuePanel.tsx",
   "app/pilot-workspace/ScrimedWorkReviewPreparationPanel.tsx",
   "app/pilot-workspace/ScrimedWorkReviewerQueuePanel.tsx",
   "app/lib/siteNavigation.ts",
@@ -76,6 +79,7 @@ const requiredFiles = [
   "scripts/scrimed-work-two-identity-authenticated-smoke.mjs",
   "scripts/scrimed-work-lifecycle-policy-test.mjs",
   "scripts/scrimed-work-artifact-review-policy-test.mjs",
+  "scripts/scrimed-work-completion-queue-policy-test.mjs",
   "scripts/scrimed-work-review-queue-policy-test.mjs",
   "scripts/scrimed-work-review-preparation-policy-test.mjs",
   "scripts/scrimed-work-preflight-policy-test.mjs",
@@ -86,6 +90,9 @@ const requiredFiles = [
   "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql",
   "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql",
   "supabase/migrations/20260715143000_scrimed_work_review_queue_approval_step.sql",
+  "supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql",
+  "supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql",
+  "supabase/migrations/20260716030000_scrimed_work_completion_queue.sql",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs"
 ];
@@ -117,6 +124,7 @@ const combinedLib = [
   files["app/lib/scrimed-work/verificationEngine.ts"],
   files["app/lib/scrimed-work/artifactEngine.ts"],
   files["app/lib/scrimed-work/artifactReview.ts"],
+  files["app/lib/scrimed-work/completionQueue.ts"],
   files["app/lib/scrimed-work/reviewQueue.ts"],
   files["app/lib/scrimed-work/reviewPreparation.ts"],
   files["app/lib/scrimed-work/payerIqHandoff.ts"],
@@ -201,6 +209,10 @@ for (const expected of [
   "guardedListProtectedArtifactReviewQueue",
   "listScrimedWorkArtifactReviewQueueInDurableStore",
   "scrimed-work-review-queue-v2026-07-15",
+  "guardedListProtectedCompletionQueue",
+  "listScrimedWorkCompletionQueueInDurableStore",
+  "scrimed-work-completion-queue-v2026-07-16",
+  "scrimed_work_completion_operator_required",
   "scrimed-work-review-preparation-v2026-07-15"
 ]) {
   requireIncludes("app/lib/scrimed-work/*", combinedLib, expected);
@@ -229,6 +241,22 @@ for (const expected of [
   requireIncludes(
     "app/api/scrimed-work/review-queue/route.ts",
     files["app/api/scrimed-work/review-queue/route.ts"],
+    expected
+  );
+}
+
+for (const expected of [
+  "guardedListProtectedCompletionQueue",
+  "operator-only-aal2-tenant-scoped-metadata",
+  "fail-closed",
+  "X-SCRIMED-External-Distribution",
+  "X-SCRIMED-Payer-Submission",
+  "X-SCRIMED-EHR-Writeback",
+  "not-authorized"
+]) {
+  requireIncludes(
+    "app/api/scrimed-work/completion-queue/route.ts",
+    files["app/api/scrimed-work/completion-queue/route.ts"],
     expected
   );
 }
@@ -384,9 +412,78 @@ for (const expected of [
   );
 }
 
+const artifactSessionBindingMigration = files["supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql"];
+for (const expected of [
+  "private.sync_scrimed_work_artifact_payload_to_session",
+  "scrimed_work_artifact_payload_session_sync",
+  "scrimed-work-artifact-session-sync-binding-conflict",
+  "after insert or update of artifact_payload",
+  "revoke all on function private.sync_scrimed_work_artifact_payload_to_session()"
+]) {
+  requireIncludes(
+    "supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql",
+    artifactSessionBindingMigration,
+    expected
+  );
+}
+
+const approvalEvidenceBindingMigration = files["supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql"];
+for (const expected of [
+  "private.bind_scrimed_work_approval_evidence",
+  "scrimed_work_approval_evidence_binding",
+  "session-evidence-bound",
+  "independent reviewer approval",
+  "revoke all on function private.bind_scrimed_work_approval_evidence()",
+  "update private.scrimed_work_sessions session"
+]) {
+  requireIncludes(
+    "supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql",
+    approvalEvidenceBindingMigration,
+    expected
+  );
+}
+
+const completionQueueMigration = files["supabase/migrations/20260716030000_scrimed_work_completion_queue.sql"];
+for (const expected of [
+  "private.list_scrimed_work_completion_queue",
+  "array['tenant-admin', 'pilot-lead']",
+  "session.status = 'verifying'",
+  "review.disposition = 'approved_for_internal_use'",
+  "artifact.artifact_payload #>> '{verification,allPass}' = 'true'",
+  "session-completion-queue-viewed",
+  "public.list_scrimed_work_completion_queue",
+  "security invoker",
+  "externalDistributionAllowed', false",
+  "payerSubmissionAllowed', false",
+  "ehrWritebackAllowed', false"
+]) {
+  requireIncludes(
+    "supabase/migrations/20260716030000_scrimed_work_completion_queue.sql",
+    completionQueueMigration,
+    expected
+  );
+}
+
+requireIncludes(
+  "app/lib/scrimed-work/verificationEngine.ts",
+  files["app/lib/scrimed-work/verificationEngine.ts"],
+  "collectVerificationEvidenceIds"
+);
+requireIncludes(
+  "app/lib/scrimed-work/reviewPreparation.ts",
+  files["app/lib/scrimed-work/reviewPreparation.ts"],
+  "independent reviewer approval"
+);
+requireNotIncludes(
+  "app/lib/scrimed-work/reviewPreparation.ts",
+  files["app/lib/scrimed-work/reviewPreparation.ts"],
+  "mandatory verification result"
+);
+
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:lifecycle");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:artifact-review-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-queue-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:completion-queue-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-preparation-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:two-identity-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:production-hardening-policy");
@@ -418,6 +515,11 @@ requireIncludes(
 requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work completion queue policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
   "SCRIMED Work two-identity AAL2 policy behavior"
 );
 requireIncludes(
@@ -444,7 +546,7 @@ for (const expected of [
   "Independent Artifact Review Binding",
   "Independent Reviewer Queue",
   "Two-Identity AAL2 Canary",
-  "all six ordered migration contracts"
+  "all nine ordered migration contracts"
 ]) {
   requireIncludes("docs/scrimed-work.md", files["docs/scrimed-work.md"], expected);
 }
@@ -532,6 +634,11 @@ requireIncludes(
   files["app/pilot-workspace/ProtectedPilotAccess.tsx"],
   "ScrimedWorkReviewPreparationPanel"
 );
+requireIncludes(
+  "app/pilot-workspace/ProtectedPilotAccess.tsx",
+  files["app/pilot-workspace/ProtectedPilotAccess.tsx"],
+  "ScrimedWorkCompletionQueuePanel"
+);
 
 for (const expected of [
   "SCRIMED Work Reviewer Queue",
@@ -545,6 +652,22 @@ for (const expected of [
   requireIncludes(
     "app/pilot-workspace/ScrimedWorkReviewerQueuePanel.tsx",
     files["app/pilot-workspace/ScrimedWorkReviewerQueuePanel.tsx"],
+    expected
+  );
+}
+
+for (const expected of [
+  "SCRIMED Work Completion Queue",
+  "session.access_token",
+  "/api/scrimed-work/completion-queue?limit=25",
+  "Tenant-admin or pilot-lead membership with fresh AAL2 is required",
+  "eligibleForCompletion",
+  "Verify and Complete Internal Work",
+  "External distribution, payer submission, EHR writeback"
+]) {
+  requireIncludes(
+    "app/pilot-workspace/ScrimedWorkCompletionQueuePanel.tsx",
+    files["app/pilot-workspace/ScrimedWorkCompletionQueuePanel.tsx"],
     expected
   );
 }

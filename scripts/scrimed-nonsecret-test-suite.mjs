@@ -261,8 +261,17 @@ const checks = [
     args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-review-queue-policy-test.mjs"]
   },
   {
+    label: "SCRIMED Work completion queue policy behavior",
+    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-completion-queue-policy-test.mjs"]
+  },
+  {
     label: "SCRIMED Work independent review preparation policy behavior",
-    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-review-preparation-policy-test.mjs"]
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-review-preparation-policy-test.mjs"
+    ]
   },
   {
     label: "SCRIMED Work two-identity AAL2 policy behavior",

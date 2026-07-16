@@ -8,6 +8,10 @@ import type {
 } from "./types";
 import type { ArtifactReviewDecision } from "./artifactReview";
 import {
+  parseScrimedWorkCompletionQueuePayload,
+  type ScrimedWorkCompletionQueue
+} from "./completionQueue";
+import {
   parseScrimedWorkReviewQueuePayload,
   type ScrimedWorkReviewQueue
 } from "./reviewQueue";
@@ -295,6 +299,25 @@ export async function listScrimedWorkArtifactReviewQueueInDurableStore(
   return {
     queue,
     error: error ?? (queue ? null : new Error("scrimed-work-review-queue-invalid-response"))
+  };
+}
+
+export async function listScrimedWorkCompletionQueueInDurableStore(
+  context: Pick<ScrimedWorkDurableStoreContext, "client" | "workspaceSlug">,
+  limit: number
+): Promise<{
+  queue: ScrimedWorkCompletionQueue | null;
+  error: unknown;
+}> {
+  const { data, error } = await context.client.rpc("list_scrimed_work_completion_queue", {
+    p_workspace_slug: context.workspaceSlug,
+    p_limit: limit
+  });
+  const queue = parseScrimedWorkCompletionQueuePayload(data);
+
+  return {
+    queue,
+    error: error ?? (queue ? null : new Error("scrimed-work-completion-queue-invalid-response"))
   };
 }
 
