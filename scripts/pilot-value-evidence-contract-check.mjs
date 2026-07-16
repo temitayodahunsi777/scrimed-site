@@ -117,7 +117,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "expectedApiRoutePatternCount = 439",
+  "expectedApiRoutePatternCount = 440",
   "\"/pilot-value-evidence\""
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", audit, expected);
