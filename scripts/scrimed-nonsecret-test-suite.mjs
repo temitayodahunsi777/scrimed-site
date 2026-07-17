@@ -265,6 +265,19 @@ const checks = [
     args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-completion-queue-policy-test.mjs"]
   },
   {
+    label: "SCRIMED Work completion evidence policy behavior",
+    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-completion-evidence-policy-test.mjs"]
+  },
+  {
+    label: "SCRIMED Work migration-set policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-migration-set-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED Work independent review preparation policy behavior",
     args: [
       "--disable-warning=ExperimentalWarning",

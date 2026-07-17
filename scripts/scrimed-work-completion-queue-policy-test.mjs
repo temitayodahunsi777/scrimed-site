@@ -6,6 +6,7 @@ import {
   isScrimedWorkCompletionOperator,
   parseScrimedWorkCompletionQueueLimit,
   parseScrimedWorkCompletionQueuePayload,
+  parseScrimedWorkCompletionReadMode,
   scrimedWorkCompletionQueuePolicyVersion
 } from "../app/lib/scrimed-work/completionQueue.ts";
 
@@ -16,6 +17,11 @@ assert.equal(parseScrimedWorkCompletionQueueLimit("0").ok, false);
 assert.equal(parseScrimedWorkCompletionQueueLimit("51").ok, false);
 assert.equal(parseScrimedWorkCompletionQueueLimit("2.5").ok, false);
 assert.equal(parseScrimedWorkCompletionQueueLimit("all").ok, false);
+
+assert.deepEqual(parseScrimedWorkCompletionReadMode(null), { ok: true, value: "ready" });
+assert.deepEqual(parseScrimedWorkCompletionReadMode("ready"), { ok: true, value: "ready" });
+assert.deepEqual(parseScrimedWorkCompletionReadMode("evidence"), { ok: true, value: "evidence" });
+assert.equal(parseScrimedWorkCompletionReadMode("history").ok, false);
 
 assert.equal(isScrimedWorkCompletionOperator("tenant-admin", "admin"), true);
 assert.equal(isScrimedWorkCompletionOperator("pilot-lead", "operator"), true);

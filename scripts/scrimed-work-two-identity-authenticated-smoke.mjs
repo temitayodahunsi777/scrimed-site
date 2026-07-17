@@ -556,4 +556,57 @@ if (
 console.log(
   `pass final authoritative evidence: session=${sessionId} artifact=${artifactId} status=completed`
 );
+
+const completionEvidenceResult = await request(
+  "/api/scrimed-work/completion-queue?mode=evidence&limit=50",
+  { headers: readHeaders(operatorToken) }
+);
+requireStatus(
+  "completed SCRIMED Work evidence history",
+  completionEvidenceResult.response.status,
+  200,
+  completionEvidenceResult.body
+);
+const completionEvidenceBody = requireJson(
+  "completed SCRIMED Work evidence history",
+  completionEvidenceResult.body
+);
+const completionEvidenceItem = completionEvidenceBody.data?.evidence?.items?.find(
+  (item) => item.sessionId === sessionId && item.artifactId === artifactId
+);
+
+if (
+  completionEvidenceBody.data?.mode !== "evidence" ||
+  !completionEvidenceItem ||
+  completionEvidenceItem.sessionStatus !== "completed" ||
+  completionEvidenceItem.verificationAllPass !== true ||
+  completionEvidenceItem.verificationPassRate !== 100 ||
+  completionEvidenceItem.reviewEventId !== reviewBody.data.durableStore.eventId ||
+  completionEvidenceItem.completionEventId !== completionBody.data.durableStore.eventId ||
+  completionEvidenceItem.reviewerSeparationEnforced !== true ||
+  completionEvidenceItem.internalUseOnly !== true ||
+  completionEvidenceItem.externalDistributionAllowed !== false ||
+  completionEvidenceItem.payerSubmissionAllowed !== false ||
+  completionEvidenceItem.ehrWritebackAllowed !== false ||
+  !/^scrimed-work-completion-evidence-[a-f0-9]{64}$/.test(
+    completionEvidenceItem.evidencePacketHash ?? ""
+  )
+) {
+  throw new Error("completed evidence history did not bind the independent review and completion events.");
+}
+requireHeader(
+  "completed SCRIMED Work evidence history",
+  completionEvidenceResult.response,
+  "X-SCRIMED-Completion-Read-Mode",
+  "evidence"
+);
+requireHeader(
+  "completed SCRIMED Work evidence history",
+  completionEvidenceResult.response,
+  "X-SCRIMED-External-Distribution",
+  "not-authorized"
+);
+console.log(
+  `pass immutable completion evidence: packet=${completionEvidenceItem.evidencePacketHash} audit_event=${completionEvidenceBody.data.evidence.auditEventId}`
+);
 console.log("SCRIMED Work two-identity AAL2 lifecycle canary completed.");

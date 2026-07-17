@@ -1,5 +1,10 @@
 import { getScrimedWorkDurableStorageMode, isScrimedWorkDurableStoreEnabled } from "./durableStore";
 import { getScrimedWorkFeatureFlags } from "./featureFlags";
+import {
+  getScrimedWorkMigrationSetStatus,
+  SCRIMED_WORK_REQUIRED_MIGRATIONS,
+  SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION
+} from "./migrationSet";
 
 export type ScrimedWorkHardeningStatus =
   | "evidence_ready"
@@ -37,6 +42,12 @@ export type ScrimedWorkProductionHardeningGate = {
   noProductionAuthorization: true;
   noPhiAuthority: true;
   noAutonomousClinicalAuthority: true;
+  migrationSet: {
+    requiredVersion: typeof SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION;
+    requiredCount: number;
+    configuredCurrent: boolean;
+    verified: boolean;
+  };
   summary: {
     totalGates: number;
     evidenceReady: number;
@@ -69,7 +80,7 @@ function gate(input: ScrimedWorkHardeningGate): ScrimedWorkHardeningGate {
 
 export function getScrimedWorkProductionHardeningGate(
   env: NodeJS.ProcessEnv = process.env,
-  generatedAt = "2026-07-14T00:00:00.000Z"
+  generatedAt = "2026-07-16T00:00:00.000Z"
 ): ScrimedWorkProductionHardeningGate {
   const flags = getScrimedWorkFeatureFlags(env);
   const durableStoreEnabled = isScrimedWorkDurableStoreEnabled(env);
@@ -80,16 +91,12 @@ export function getScrimedWorkProductionHardeningGate(
   const bearerProvided = envPresent("SCRIMED_BEARER_TOKEN", env);
   const reviewerBearerProvided = envPresent("SCRIMED_REVIEWER_BEARER_TOKEN", env);
   const migrationEvidenceId = nonsecretEvidenceId(env["SCRIMED_WORK_MIGRATION_EVIDENCE_ID"]);
+  const migrationSetStatus = getScrimedWorkMigrationSetStatus(env);
+  const migrationSetCurrent = migrationSetStatus.configuredCurrent;
   const reviewApprovalMigrationEvidenceId = nonsecretEvidenceId(
     env["SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID"]
   );
-  const reviewApprovalMigrationVerified =
-    envTrue("SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED", env) &&
-    reviewApprovalMigrationEvidenceId.length > 0;
-  const migrationsVerified =
-    envTrue("SCRIMED_WORK_MIGRATIONS_VERIFIED", env) &&
-    migrationEvidenceId.length > 0 &&
-    reviewApprovalMigrationVerified;
+  const migrationsVerified = migrationSetStatus.verified;
   const twoIdentityCanaryEvidenceId = nonsecretEvidenceId(
     env["SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID"]
   );
@@ -322,15 +329,13 @@ export function getScrimedWorkProductionHardeningGate(
       severity: "critical",
       requiredFor: "Real Supabase durable-store validation.",
       evidence: [
-        "supabase/migrations/20260709193000_scrimed_work_durable_store.sql exists",
-        "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql exists",
-        "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql exists",
-        "supabase/migrations/20260713210000_scrimed_work_artifact_review_binding.sql exists",
-        "supabase/migrations/20260714163930_scrimed_work_reviewer_queue.sql exists",
-        "supabase/migrations/20260715143000_scrimed_work_review_queue_approval_step.sql exists",
+        `requiredMigrationSetVersion=${SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION}`,
+        `requiredMigrationCount=${SCRIMED_WORK_REQUIRED_MIGRATIONS.length}`,
+        ...SCRIMED_WORK_REQUIRED_MIGRATIONS.map((path) => `${path} exists`),
         "scripts/scrimed-work-durable-store-preflight.mjs validates migration posture",
         ...(migrationsVerified
           ? [
+              "configuredMigrationSetVersion=current",
               `migrationEvidenceId=${migrationEvidenceId}`,
               `reviewApprovalMigrationEvidenceId=${reviewApprovalMigrationEvidenceId}`
             ]
@@ -338,10 +343,12 @@ export function getScrimedWorkProductionHardeningGate(
       ],
       blocker: migrationsVerified
         ? null
-        : "All nine ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved no-PHI target.",
+        : migrationSetCurrent
+          ? "All ten ordered migrations must be applied and bound to reviewed, nonsecret evidence from an approved no-PHI target."
+          : `SCRIMED_WORK_MIGRATION_SET_VERSION must equal ${SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION} after all ten migrations are reviewed.`,
       operatorAction: migrationsVerified
         ? "Retain migration history, RLS/grant checks, and post-migration advisor evidence with this release."
-        : "Apply all nine migrations in order to an approved no-PHI Supabase project/branch, run Supabase advisors, then set both migration verification flags and nonsecret evidence identifiers.",
+        : `Apply all ten migrations in order to an approved no-PHI Supabase project/branch, run Supabase advisors, then set SCRIMED_WORK_MIGRATION_SET_VERSION=${SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION}, both migration verification flags, and the nonsecret evidence identifiers.`,
       automationSafe: false,
       retainedBoundary: "This code path does not mutate live Supabase, apply migrations, or approve production deployment."
     }),
@@ -393,6 +400,12 @@ export function getScrimedWorkProductionHardeningGate(
     noProductionAuthorization: true,
     noPhiAuthority: true,
     noAutonomousClinicalAuthority: true,
+    migrationSet: {
+      requiredVersion: SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION,
+      requiredCount: SCRIMED_WORK_REQUIRED_MIGRATIONS.length,
+      configuredCurrent: migrationSetCurrent,
+      verified: migrationsVerified
+    },
     summary: {
       totalGates: gates.length,
       evidenceReady,
@@ -408,7 +421,7 @@ export function getScrimedWorkProductionHardeningGate(
       "Configure non-production Supabase URL, publishable key, runtime authorization token, workspace slug, protected writes flag, and durable-store flag.",
       migrationsVerified
         ? `Retain reviewed migration evidence ${migrationEvidenceId} with the release packet.`
-        : "Apply all nine SCRIMED Work migrations in order only to an approved no-PHI Supabase target and bind both migration reviews to nonsecret evidence identifiers.",
+        : `Apply all ten SCRIMED Work migrations in order only to an approved no-PHI Supabase target, set SCRIMED_WORK_MIGRATION_SET_VERSION=${SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION}, and bind both migration reviews to nonsecret evidence identifiers.`,
       "Run npm run smoke:scrimed-work:durable-store-preflight:strict.",
       "Run npm run smoke:scrimed-work:strict.",
       "Run npm run smoke:scrimed-work:two-identity:strict and retain its no-secret audit identifiers.",

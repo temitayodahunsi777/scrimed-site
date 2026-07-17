@@ -12528,6 +12528,32 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work completion queue must retain external, payer, and EHR locks.");
   }
 
+  const protectedCompletionEvidence = await request(
+    "/api/scrimed-work/completion-queue?mode=evidence"
+  );
+  requireStatus(
+    "SCRIMED Work protected completion evidence",
+    protectedCompletionEvidence.response.status,
+    [401, 503]
+  );
+  requireScrimedWorkBoundary(
+    "SCRIMED Work protected completion evidence",
+    protectedCompletionEvidence.response
+  );
+  if (
+    protectedCompletionEvidence.response.headers.get("x-scrimed-completion-queue") !== "fail-closed" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-completion-read-mode") !== "denied"
+  ) {
+    throw new Error("SCRIMED Work completion evidence must fail closed without AAL2 operator authorization.");
+  }
+  if (
+    protectedCompletionEvidence.response.headers.get("x-scrimed-external-distribution") !== "not-authorized" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-payer-submission") !== "not-authorized" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-ehr-writeback") !== "not-authorized"
+  ) {
+    throw new Error("SCRIMED Work completion evidence must retain external, payer, and EHR locks.");
+  }
+
   const protectedVerification = await postJson(
     "/api/scrimed-work/sessions/work_session_unknown_protected/verify",
     {}
