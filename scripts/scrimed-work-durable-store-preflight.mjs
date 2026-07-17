@@ -21,6 +21,8 @@ const reviewerApprovalMigrationPath = "supabase/migrations/20260715143000_scrime
 const artifactSessionBindingMigrationPath = "supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql";
 const approvalEvidenceBindingMigrationPath = "supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql";
 const completionQueueMigrationPath = "supabase/migrations/20260716030000_scrimed_work_completion_queue.sql";
+const completionEvidenceMigrationPath = "supabase/migrations/20260716184500_scrimed_work_completion_evidence.sql";
+const requiredMigrationSetVersion = "20260716184500";
 const requiredEnv = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -29,6 +31,7 @@ const requiredEnv = [
   "SCRIMED_WORK_DURABLE_STORE_ENABLED",
   "SCRIMED_WORK_MIGRATIONS_VERIFIED",
   "SCRIMED_WORK_MIGRATION_EVIDENCE_ID",
+  "SCRIMED_WORK_MIGRATION_SET_VERSION",
   "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED",
   "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID",
   "SCRIMED_WORKSPACE_SLUG"
@@ -65,7 +68,11 @@ function summarizeEnvironment() {
   return Object.fromEntries(
     requiredEnv.map((name) => [
       name,
-      trueOnlyEnv.has(name) ? process.env[name] === "true" : hasEnv(name)
+      name === "SCRIMED_WORK_MIGRATION_SET_VERSION"
+        ? process.env[name] === requiredMigrationSetVersion
+        : trueOnlyEnv.has(name)
+          ? process.env[name] === "true"
+          : hasEnv(name)
     ])
   );
 }
@@ -79,6 +86,7 @@ const reviewerApprovalMigration = await readFile(reviewerApprovalMigrationPath, 
 const artifactSessionBindingMigration = await readFile(artifactSessionBindingMigrationPath, "utf8");
 const approvalEvidenceBindingMigration = await readFile(approvalEvidenceBindingMigrationPath, "utf8");
 const completionQueueMigration = await readFile(completionQueueMigrationPath, "utf8");
+const completionEvidenceMigration = await readFile(completionEvidenceMigrationPath, "utf8");
 const tokenAnalysis = analyzeAal2BearerToken({
   bearerToken: process.env.SCRIMED_BEARER_TOKEN,
   workspaceSlug: process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? ""
@@ -170,19 +178,38 @@ const checks = [
   check(requireRegex(completionQueueMigration, /language sql[\s\S]*?security invoker/i), "completion-queue-wrapper-security-invoker", "Completion queue public wrapper uses SECURITY INVOKER."),
   check(requireIncludes(completionQueueMigration, "externalDistributionAllowed', false"), "completion-queue-distribution-blocked", "Completion queue fixes external distribution false."),
   check(requireIncludes(completionQueueMigration, "payerSubmissionAllowed', false"), "completion-queue-payer-blocked", "Completion queue fixes payer submission false."),
-  check(requireIncludes(completionQueueMigration, "ehrWritebackAllowed', false"), "completion-queue-ehr-blocked", "Completion queue fixes EHR writeback false.")
+  check(requireIncludes(completionQueueMigration, "ehrWritebackAllowed', false"), "completion-queue-ehr-blocked", "Completion queue fixes EHR writeback false."),
+  check(requireIncludes(completionEvidenceMigration, "private.list_scrimed_work_completion_evidence"), "completion-evidence-private-rpc", "Private completion evidence RPC exists."),
+  check(requireIncludes(completionEvidenceMigration, "array['tenant-admin', 'pilot-lead']"), "completion-evidence-operator-only", "Completion evidence requires tenant-admin or pilot-lead membership."),
+  check(requireIncludes(completionEvidenceMigration, "session.status = 'completed'"), "completion-evidence-completed-only", "Completion evidence lists only completed sessions."),
+  check(requireIncludes(completionEvidenceMigration, "scrimed_work_sessions_completed_evidence_idx"), "completion-evidence-partial-index", "Completed synthetic sessions have a focused evidence lookup index."),
+  check(requireIncludes(completionEvidenceMigration, "artifact_review.reviewer_user_id <> session.created_by"), "completion-evidence-reviewer-separation", "Completion evidence requires independent reviewer separation."),
+  check(requireIncludes(completionEvidenceMigration, "artifact.artifact_payload #>> '{verification,allPass}' = 'true'"), "completion-evidence-verification-pass", "Completion evidence requires current all-pass verification metadata."),
+  check(requireIncludes(completionEvidenceMigration, "session-completion-evidence-viewed"), "completion-evidence-read-audited", "Every completion evidence read emits an audit event."),
+  check(requireIncludes(completionEvidenceMigration, "public.list_scrimed_work_completion_evidence"), "completion-evidence-public-wrapper", "Public completion evidence wrapper exists."),
+  check(requireRegex(completionEvidenceMigration, /language sql[\s\S]*?security invoker/i), "completion-evidence-wrapper-security-invoker", "Completion evidence public wrapper uses SECURITY INVOKER."),
+  check(requireIncludes(completionEvidenceMigration, "scrimed-work-completion-evidence-"), "completion-evidence-deterministic-hash", "Completion evidence binds a deterministic SHA-256 packet hash."),
+  check(requireIncludes(completionEvidenceMigration, "internalUseOnly', true"), "completion-evidence-internal-only", "Completion evidence remains internal-use only."),
+  check(requireIncludes(completionEvidenceMigration, "externalDistributionAllowed', false"), "completion-evidence-distribution-blocked", "Completion evidence fixes external distribution false."),
+  check(requireIncludes(completionEvidenceMigration, "payerSubmissionAllowed', false"), "completion-evidence-payer-blocked", "Completion evidence fixes payer submission false."),
+  check(requireIncludes(completionEvidenceMigration, "ehrWritebackAllowed', false"), "completion-evidence-ehr-blocked", "Completion evidence fixes EHR writeback false.")
 ];
 
 for (const name of requiredEnv) {
   const configured = hasEnv(name);
   const trueOnly = trueOnlyEnv.has(name);
   const enabledFlag = trueOnly ? process.env[name] === "true" : true;
+  const currentMigrationSet =
+    name !== "SCRIMED_WORK_MIGRATION_SET_VERSION" ||
+    process.env[name] === requiredMigrationSetVersion;
 
   checks.push(
     check(
-      configured && enabledFlag,
+      configured && enabledFlag && currentMigrationSet,
       `env-${name.toLowerCase()}`,
-      trueOnly
+      name === "SCRIMED_WORK_MIGRATION_SET_VERSION"
+        ? `${name} must equal ${requiredMigrationSetVersion} for strict durable-store smoke.`
+        : trueOnly
         ? `${name} must be explicitly true for strict durable-store smoke.`
         : `${name} must be configured for strict durable-store smoke.`,
       "operator"
@@ -218,8 +245,15 @@ const report = {
     reviewerApprovalMigrationPath,
     artifactSessionBindingMigrationPath,
     approvalEvidenceBindingMigrationPath,
-    completionQueueMigrationPath
+    completionQueueMigrationPath,
+    completionEvidenceMigrationPath
   ],
+  migrationSet: {
+    requiredVersion: requiredMigrationSetVersion,
+    requiredCount: 10,
+    configuredCurrent:
+      process.env.SCRIMED_WORK_MIGRATION_SET_VERSION === requiredMigrationSetVersion
+  },
   environment: summarizeEnvironment(),
   token: {
     provided: hasEnv("SCRIMED_BEARER_TOKEN"),

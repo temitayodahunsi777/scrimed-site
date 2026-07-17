@@ -10,6 +10,7 @@ import {
   getScrimedWorkWorkspaceSlug,
   fetchScrimedWorkSessionFromDurableStore,
   isScrimedWorkDurableStoreEnabled,
+  listScrimedWorkCompletionEvidenceInDurableStore,
   listScrimedWorkCompletionQueueInDurableStore,
   listScrimedWorkArtifactReviewQueueInDurableStore,
   recordScrimedWorkArtifactInDurableStore,
@@ -25,11 +26,17 @@ import {
 import {
   isScrimedWorkCompletionOperator,
   parseScrimedWorkCompletionQueueLimit,
+  parseScrimedWorkCompletionReadMode,
   scrimedWorkCompletionQueueBoundary,
   scrimedWorkCompletionQueuePolicyVersion
 } from "./completionQueue";
+import {
+  scrimedWorkCompletionEvidenceBoundary,
+  scrimedWorkCompletionEvidencePolicyVersion
+} from "./completionEvidence";
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
 import { sampleLearningLoopArtifacts } from "./learningLoop";
+import { isScrimedWorkMigrationSetVerified } from "./migrationSet";
 import {
   buildPayerIqProtectedWorkSession,
   parsePayerIqProtectedHandoffInput,
@@ -78,12 +85,14 @@ export * from "./autonomyPolicy";
 export * from "./approvalEngine";
 export * from "./artifactEngine";
 export * from "./artifactReview";
+export * from "./completionEvidence";
 export * from "./completionQueue";
 export * from "./reviewQueue";
 export * from "./reviewPreparation";
 export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
+export * from "./migrationSet";
 export * from "./valueTelemetry";
 export * from "./audit";
 export * from "./featureFlags";
@@ -327,6 +336,19 @@ async function buildProtectedAuthorizationDecision(
         accessMode === "write"
           ? "SCRIMED Work protected writes require SCRIMED_WORK_DURABLE_STORE_ENABLED=true and the approved Supabase migration before mutation routes can run."
           : "SCRIMED Work protected reads require SCRIMED_WORK_DURABLE_STORE_ENABLED=true and the approved Supabase migration before authoritative records can be retrieved.",
+        action,
+        false
+      )
+    };
+  }
+
+  if (!isScrimedWorkMigrationSetVerified()) {
+    return {
+      allowed: false as const,
+      status: 503,
+      error: errorEnvelope(
+        "scrimed_work_migration_set_unverified",
+        "SCRIMED Work protected access requires the current reviewed ten-migration set and nonsecret migration evidence before durable routes can run.",
         action,
         false
       )
@@ -961,9 +983,8 @@ export async function guardedListProtectedArtifactReviewQueue(request: Request) 
 }
 
 export async function guardedListProtectedCompletionQueue(request: Request) {
-  const limit = parseScrimedWorkCompletionQueueLimit(
-    new URL(request.url).searchParams.get("limit")
-  );
+  const searchParams = new URL(request.url).searchParams;
+  const limit = parseScrimedWorkCompletionQueueLimit(searchParams.get("limit"));
   if (!limit.ok) {
     return {
       allowed: false as const,
@@ -977,8 +998,24 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
     };
   }
 
-  const auth = await buildReadAuthorizationDecision(request, "completion-queue-read", {
-    limit: limit.value
+  const mode = parseScrimedWorkCompletionReadMode(searchParams.get("mode"));
+  if (!mode.ok) {
+    return {
+      allowed: false as const,
+      status: 422,
+      error: errorEnvelope(
+        "scrimed_work_completion_read_invalid_mode",
+        mode.reason,
+        "completion-read",
+        false
+      )
+    };
+  }
+
+  const action = mode.value === "evidence" ? "completion-evidence-read" : "completion-queue-read";
+  const auth = await buildReadAuthorizationDecision(request, action, {
+    limit: limit.value,
+    mode: mode.value
   });
   if (!auth.allowed) return auth;
 
@@ -988,10 +1025,53 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
       status: 403,
       error: errorEnvelope(
         "scrimed_work_completion_queue_operator_required",
-        "SCRIMED Work completion queue access requires tenant-admin or pilot-lead membership.",
-        "completion-queue-read",
+        "SCRIMED Work completion access requires tenant-admin or pilot-lead membership.",
+        action,
         false
       )
+    };
+  }
+
+  if (mode.value === "evidence") {
+    const durable = await listScrimedWorkCompletionEvidenceInDurableStore(
+      auth.context,
+      limit.value
+    );
+    if (durable.error || !durable.evidence) {
+      const failure = scrimedWorkDurableStoreRpcFailure(
+        durable.error,
+        "scrimed-work-completion-evidence-unavailable"
+      );
+      return {
+        allowed: false as const,
+        status: failure.status,
+        error: errorEnvelope(
+          failure.code,
+          failure.message,
+          action,
+          failure.status >= 500
+        )
+      };
+    }
+
+    return {
+      allowed: true as const,
+      status: 200,
+      data: {
+        mode: "evidence" as const,
+        evidence: durable.evidence,
+        authorization: {
+          memberRole: auth.context.memberRole,
+          operatorOnly: true,
+          aal2Required: true,
+          tenantScoped: true,
+          metadataOnly: true,
+          internalUseOnly: true,
+          auditEventId: durable.evidence.auditEventId
+        },
+        policyVersion: scrimedWorkCompletionEvidencePolicyVersion,
+        boundary: scrimedWorkCompletionEvidenceBoundary
+      }
     };
   }
 
@@ -1020,6 +1100,7 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
     allowed: true as const,
     status: 200,
     data: {
+      mode: "ready" as const,
       queue: durable.queue,
       authorization: {
         memberRole: auth.context.memberRole,

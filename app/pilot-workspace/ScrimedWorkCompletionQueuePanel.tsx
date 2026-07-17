@@ -8,6 +8,11 @@ import {
   scrimedWorkCompletionQueueBoundary,
   type ScrimedWorkCompletionQueue
 } from "../lib/scrimed-work/completionQueue";
+import {
+  parseScrimedWorkCompletionEvidencePayload,
+  scrimedWorkCompletionEvidenceBoundary,
+  type ScrimedWorkCompletionEvidence
+} from "../lib/scrimed-work/completionEvidence";
 import type { PilotWorkspaceRecord } from "../lib/protectedPilotWorkspace";
 
 type QueueState = "idle" | "loading" | "ready" | "denied" | "failed";
@@ -65,6 +70,8 @@ export default function ScrimedWorkCompletionQueuePanel({
 }) {
   const [state, setState] = useState<QueueState>("idle");
   const [queue, setQueue] = useState<ScrimedWorkCompletionQueue | null>(null);
+  const [completionEvidence, setCompletionEvidence] =
+    useState<ScrimedWorkCompletionEvidence | null>(null);
   const [message, setMessage] = useState(
     "Tenant-admin or pilot-lead membership and fresh AAL2 are checked when readiness is loaded."
   );
@@ -77,26 +84,31 @@ export default function ScrimedWorkCompletionQueuePanel({
 
   async function loadQueue() {
     setState("loading");
-    setMessage("Loading independently reviewed synthetic/no-PHI completion metadata.");
+    setMessage("Loading completion readiness and immutable synthetic/no-PHI evidence references.");
 
     try {
-      const response = await boundedFetch("/api/scrimed-work/completion-queue?limit=25", {
-        headers: protectedHeaders,
-        cache: "no-store"
-      });
+      const response = await boundedFetch(
+        "/api/scrimed-work/completion-queue?limit=25&mode=ready",
+        {
+          headers: protectedHeaders,
+          cache: "no-store"
+        }
+      );
       const body = await readJson(response);
       const data = asRecord(body?.data);
       const parsedQueue = parseScrimedWorkCompletionQueuePayload(data?.queue);
 
       if (response.status === 403) {
         setQueue(null);
+        setCompletionEvidence(null);
         setState("denied");
-        setMessage("Tenant-admin or pilot-lead membership with fresh AAL2 is required. The queue remained closed.");
+        setMessage("Tenant-admin or pilot-lead membership with fresh AAL2 is required. Completion records remained closed.");
         return;
       }
 
       if (!response.ok || !parsedQueue) {
         setQueue(null);
+        setCompletionEvidence(null);
         setState("failed");
         setMessage(`The completion queue failed closed: ${safeError(response, body)}.`);
         return;
@@ -104,16 +116,48 @@ export default function ScrimedWorkCompletionQueuePanel({
 
       setQueue(parsedQueue);
       setState("ready");
+
+      let evidenceResponse: Response;
+      try {
+        evidenceResponse = await boundedFetch(
+          "/api/scrimed-work/completion-queue?limit=25&mode=evidence",
+          {
+            headers: protectedHeaders,
+            cache: "no-store"
+          }
+        );
+      } catch {
+        setCompletionEvidence(null);
+        setMessage(
+          `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification. Completed evidence could not be reached and remained closed.`
+        );
+        await onAuditChanged().catch(() => undefined);
+        return;
+      }
+
+      const evidenceBody = await readJson(evidenceResponse);
+      const evidenceData = asRecord(evidenceBody?.data);
+      const parsedEvidence = parseScrimedWorkCompletionEvidencePayload(evidenceData?.evidence);
+
+      if (!evidenceResponse.ok || !parsedEvidence) {
+        setCompletionEvidence(null);
+        setMessage(
+          `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification. Completed evidence remained closed: ${safeError(evidenceResponse, evidenceBody)}.`
+        );
+        await onAuditChanged().catch(() => undefined);
+        return;
+      }
+
+      setCompletionEvidence(parsedEvidence);
       setMessage(
-        parsedQueue.count === 0
-          ? "No independently reviewed sessions are ready for internal completion."
-          : `${parsedQueue.count} independently reviewed session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification.`
+        `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification; ${parsedEvidence.count} completed internal evidence record${parsedEvidence.count === 1 ? " is" : "s are"} retained.`
       );
       await onAuditChanged().catch(() => undefined);
     } catch {
       setQueue(null);
+      setCompletionEvidence(null);
       setState("failed");
-      setMessage("The completion queue could not be reached and remained closed.");
+      setMessage("Completion records could not be reached and remained closed.");
     }
   }
 
@@ -208,7 +252,7 @@ export default function ScrimedWorkCompletionQueuePanel({
             onClick={loadQueue}
             type="button"
           >
-            {state === "loading" ? "Checking Completion Readiness" : "Load Completion Queue"}
+            {state === "loading" ? "Checking Completion Control" : "Load Completion Control"}
           </button>
         </div>
         <p role="status">{message}</p>
@@ -250,7 +294,51 @@ export default function ScrimedWorkCompletionQueuePanel({
         </article>
       ) : null}
 
+      {completionEvidence?.count ? (
+        <div className="section-heading">
+          <p className="eyebrow">Immutable metadata references</p>
+          <h2>Completed Internal Evidence</h2>
+          <p className="section-copy">
+            These records bind independent review, mandatory verification, and the final lifecycle transition.
+            They contain no artifact content and provide no external-use authority.
+          </p>
+        </div>
+      ) : null}
+
+      {completionEvidence?.items.map((item) => (
+        <article className="module-row" key={`${item.sessionId}-${item.artifactId}`}>
+          <div>
+            <span>completed internal evidence</span>
+            <h2>{item.title}</h2>
+          </div>
+          <p>
+            {item.artifactType} · {item.workspaceDomain} · {item.riskLevel} risk · completed {item.completedAt}
+          </p>
+          <strong>Independent review and 100% mandatory verification are bound.</strong>
+          <p style={{ overflowWrap: "anywhere" }}>Packet hash: {item.evidencePacketHash}</p>
+          <p style={{ overflowWrap: "anywhere" }}>
+            Review event: {item.reviewEventId} · Completion event: {item.completionEventId}
+          </p>
+          <p>
+            Internal use only. External distribution, payer submission, EHR writeback, and clinical authority remain
+            disabled.
+          </p>
+        </article>
+      ))}
+
+      {state === "ready" && completionEvidence?.count === 0 ? (
+        <article className="module-row">
+          <div>
+            <span>evidence history clear</span>
+            <h2>No completed evidence records yet</h2>
+          </div>
+          <p>Only fully verified, independently reviewed, completed synthetic sessions can appear here.</p>
+          <strong>Incomplete and cross-tenant records remain excluded.</strong>
+        </article>
+      ) : null}
+
       <p className="section-copy">{scrimedWorkCompletionQueueBoundary}</p>
+      <p className="section-copy">{scrimedWorkCompletionEvidenceBoundary}</p>
     </section>
   );
 }

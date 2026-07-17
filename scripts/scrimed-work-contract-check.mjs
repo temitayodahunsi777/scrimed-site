@@ -12,6 +12,7 @@ const requiredFiles = [
   "app/lib/scrimed-work/modelRouter.ts",
   "app/lib/scrimed-work/providerRegistry.ts",
   "app/lib/scrimed-work/productionHardening.ts",
+  "app/lib/scrimed-work/migrationSet.ts",
   "app/lib/scrimed-work/browserVerification.ts",
   "app/lib/scrimed-work/sessionLifecycle.ts",
   "app/lib/scrimed-work/toolRegistry.ts",
@@ -23,6 +24,7 @@ const requiredFiles = [
   "app/lib/scrimed-work/approvalEngine.ts",
   "app/lib/scrimed-work/artifactEngine.ts",
   "app/lib/scrimed-work/artifactReview.ts",
+  "app/lib/scrimed-work/completionEvidence.ts",
   "app/lib/scrimed-work/completionQueue.ts",
   "app/lib/scrimed-work/reviewQueue.ts",
   "app/lib/scrimed-work/reviewPreparation.ts",
@@ -80,6 +82,8 @@ const requiredFiles = [
   "scripts/scrimed-work-lifecycle-policy-test.mjs",
   "scripts/scrimed-work-artifact-review-policy-test.mjs",
   "scripts/scrimed-work-completion-queue-policy-test.mjs",
+  "scripts/scrimed-work-completion-evidence-policy-test.mjs",
+  "scripts/scrimed-work-migration-set-policy-test.mjs",
   "scripts/scrimed-work-review-queue-policy-test.mjs",
   "scripts/scrimed-work-review-preparation-policy-test.mjs",
   "scripts/scrimed-work-preflight-policy-test.mjs",
@@ -93,6 +97,7 @@ const requiredFiles = [
   "supabase/migrations/20260716012403_scrimed_work_artifact_session_binding.sql",
   "supabase/migrations/20260716015159_scrimed_work_approval_evidence_binding.sql",
   "supabase/migrations/20260716030000_scrimed_work_completion_queue.sql",
+  "supabase/migrations/20260716184500_scrimed_work_completion_evidence.sql",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs"
 ];
@@ -124,6 +129,7 @@ const combinedLib = [
   files["app/lib/scrimed-work/verificationEngine.ts"],
   files["app/lib/scrimed-work/artifactEngine.ts"],
   files["app/lib/scrimed-work/artifactReview.ts"],
+  files["app/lib/scrimed-work/completionEvidence.ts"],
   files["app/lib/scrimed-work/completionQueue.ts"],
   files["app/lib/scrimed-work/reviewQueue.ts"],
   files["app/lib/scrimed-work/reviewPreparation.ts"],
@@ -213,6 +219,10 @@ for (const expected of [
   "listScrimedWorkCompletionQueueInDurableStore",
   "scrimed-work-completion-queue-v2026-07-16",
   "scrimed_work_completion_operator_required",
+  "parseScrimedWorkCompletionReadMode",
+  "listScrimedWorkCompletionEvidenceInDurableStore",
+  "scrimed-work-completion-evidence-v2026-07-16",
+  "immutableEvidenceReferences",
   "scrimed-work-review-preparation-v2026-07-15"
 ]) {
   requireIncludes("app/lib/scrimed-work/*", combinedLib, expected);
@@ -252,6 +262,8 @@ for (const expected of [
   "X-SCRIMED-External-Distribution",
   "X-SCRIMED-Payer-Submission",
   "X-SCRIMED-EHR-Writeback",
+  "X-SCRIMED-Completion-Read-Mode",
+  "X-SCRIMED-Completion-Evidence-Policy",
   "not-authorized"
 ]) {
   requireIncludes(
@@ -464,6 +476,30 @@ for (const expected of [
   );
 }
 
+const completionEvidenceMigration = files["supabase/migrations/20260716184500_scrimed_work_completion_evidence.sql"];
+for (const expected of [
+  "private.list_scrimed_work_completion_evidence",
+  "array['tenant-admin', 'pilot-lead']",
+  "session.status = 'completed'",
+  "scrimed_work_sessions_completed_evidence_idx",
+  "artifact_review.reviewer_user_id <> session.created_by",
+  "review.disposition = 'approved_for_internal_use'",
+  "artifact.artifact_payload #>> '{verification,allPass}' = 'true'",
+  "session-completion-evidence-viewed",
+  "public.list_scrimed_work_completion_evidence",
+  "security invoker",
+  "scrimed-work-completion-evidence-",
+  "externalDistributionAllowed', false",
+  "payerSubmissionAllowed', false",
+  "ehrWritebackAllowed', false"
+]) {
+  requireIncludes(
+    "supabase/migrations/20260716184500_scrimed_work_completion_evidence.sql",
+    completionEvidenceMigration,
+    expected
+  );
+}
+
 requireIncludes(
   "app/lib/scrimed-work/verificationEngine.ts",
   files["app/lib/scrimed-work/verificationEngine.ts"],
@@ -484,16 +520,35 @@ requireIncludes("package.json", files["package.json"], "test:scrimed-work:lifecy
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:artifact-review-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-queue-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:completion-queue-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:completion-evidence-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:migration-set-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-preparation-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:two-identity-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:production-hardening-policy");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedGetProtectedWorkSession");
 requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "guardedVerifyProtectedWorkSession");
 requireNotIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "saveWorkSession(");
-requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_MIGRATIONS_VERIFIED");
-requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_MIGRATION_EVIDENCE_ID");
-requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED");
-requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID");
+for (const expected of [
+  "SCRIMED_WORK_MIGRATIONS_VERIFIED",
+  "SCRIMED_WORK_MIGRATION_EVIDENCE_ID",
+  "SCRIMED_WORK_MIGRATION_SET_VERSION",
+  "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED",
+  "SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID",
+  "SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION",
+  "SCRIMED_WORK_REQUIRED_MIGRATIONS",
+  "isScrimedWorkMigrationSetVerified"
+]) {
+  requireIncludes(
+    "app/lib/scrimed-work/migrationSet.ts",
+    files["app/lib/scrimed-work/migrationSet.ts"],
+    expected
+  );
+}
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "getScrimedWorkMigrationSetStatus");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_REQUIRED_MIGRATIONS");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "All ten ordered migrations");
+requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "isScrimedWorkMigrationSetVerified");
+requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], "scrimed_work_migration_set_unverified");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_REVIEWER_BEARER_TOKEN");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID");
@@ -516,6 +571,16 @@ requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
   "SCRIMED Work completion queue policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work completion evidence policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work migration-set policy behavior"
 );
 requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
@@ -545,8 +610,9 @@ for (const expected of [
   "Next Production-Hardening Step",
   "Independent Artifact Review Binding",
   "Independent Reviewer Queue",
+  "Completed Internal Evidence",
   "Two-Identity AAL2 Canary",
-  "all nine ordered migration contracts"
+  "all ten ordered migration contracts"
 ]) {
   requireIncludes("docs/scrimed-work.md", files["docs/scrimed-work.md"], expected);
 }

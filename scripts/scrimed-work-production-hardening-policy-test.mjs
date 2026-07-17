@@ -11,7 +11,8 @@ const baseEnv = {
   SCRIMED_WORK_PROTECTED_WRITES_ENABLED: "true",
   SCRIMED_WORK_DURABLE_STORE_ENABLED: "true",
   SCRIMED_WORK_MIGRATIONS_VERIFIED: "true",
-  SCRIMED_WORK_MIGRATION_EVIDENCE_ID: "supabase-work-advisor-20260714",
+  SCRIMED_WORK_MIGRATION_EVIDENCE_ID: "supabase-work-advisor-20260716",
+  SCRIMED_WORK_MIGRATION_SET_VERSION: "20260716184500",
   SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_VERIFIED: "true",
   SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID:
     "supabase-work-review-approval-20260715",
@@ -40,7 +41,29 @@ assert.equal(
 );
 assert.match(
   gate(missingReviewApprovalMigration, "scrimed-work-migration-application").blocker ?? "",
-  /all nine ordered migrations/i
+  /all ten ordered migrations/i
+);
+
+const staleMigrationSet = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_MIGRATION_SET_VERSION: "20260716030000",
+    SCRIMED_BEARER_TOKEN: "operator-token-test-value",
+    SCRIMED_REVIEWER_BEARER_TOKEN: "reviewer-token-test-value"
+  },
+  "2026-07-16T00:00:00.000Z"
+);
+
+assert.equal(staleMigrationSet.migrationSet.configuredCurrent, false);
+assert.equal(staleMigrationSet.migrationSet.verified, false);
+assert.equal(staleMigrationSet.canRunStrictNonProductionSmoke, false);
+assert.equal(
+  gate(staleMigrationSet, "scrimed-work-migration-application").status,
+  "operator_required"
+);
+assert.match(
+  gate(staleMigrationSet, "scrimed-work-migration-application").blocker ?? "",
+  /20260716184500/
 );
 
 const missingReviewer = getScrimedWorkProductionHardeningGate(
@@ -100,6 +123,12 @@ const verifiedEvidence = getScrimedWorkProductionHardeningGate(
 assert.equal(gate(verifiedEvidence, "scrimed-work-aal2-operator-session").status, "evidence_ready");
 assert.equal(gate(verifiedEvidence, "scrimed-work-aal2-reviewer-session").status, "evidence_ready");
 assert.equal(gate(verifiedEvidence, "scrimed-work-canary-release").status, "evidence_ready");
+assert.deepEqual(verifiedEvidence.migrationSet, {
+  requiredVersion: "20260716184500",
+  requiredCount: 10,
+  configuredCurrent: true,
+  verified: true
+});
 assert.equal(verifiedEvidence.canRunStrictNonProductionSmoke, false);
 assert.equal(verifiedEvidence.canaryEligible, false);
 assert.ok(

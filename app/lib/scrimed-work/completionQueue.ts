@@ -4,6 +4,8 @@ export const scrimedWorkCompletionQueuePolicyVersion =
 export const scrimedWorkCompletionQueueBoundary =
   "SCRIMED Work Completion Queue is an AAL2-gated, tenant-admin/pilot-lead, tenant-scoped view of bounded synthetic/no-PHI completion metadata. It lists only independently approved artifacts with current mandatory verification evidence, records every queue read, and grants no raw-payload access, external distribution, payer submission, EHR writeback, clinical authority, connector approval, certification claim, customer go-live, or production authorization.";
 
+export type ScrimedWorkCompletionReadMode = "ready" | "evidence";
+
 export type ScrimedWorkCompletionQueueItem = {
   sessionId: string;
   artifactId: string;
@@ -162,4 +164,19 @@ export function parseScrimedWorkCompletionQueueLimit(value: string | null) {
   }
 
   return { ok: true as const, value: parsed };
+}
+
+export function parseScrimedWorkCompletionReadMode(value: string | null) {
+  if (value === null || value.trim() === "" || value === "ready") {
+    return { ok: true as const, value: "ready" as const };
+  }
+
+  if (value === "evidence") {
+    return { ok: true as const, value: "evidence" as const };
+  }
+
+  return {
+    ok: false as const,
+    reason: "Completion read mode must be ready or evidence."
+  };
 }
