@@ -360,6 +360,19 @@ export default function HealthcareIntelligenceOSPage() {
               <li>Patient outreach: {summary.clinicalContextGateway.patientOutreachAuthority}</li>
             </ul>
           </article>
+          <article>
+            <span>Context Lens</span>
+            <h3>Evidence inside the governed workflow surface</h3>
+            <p>
+              Public Evidence and Clinical Context remain isolated. Every proposed next action carries
+              source provenance, freshness, confidence, missing-data state, constraints, and a reason.
+            </p>
+            <ul className="compact-list">
+              <li>Modes: {summary.clinicalContextGateway.contextLensModes.join(", ")}</li>
+              <li>Stale or unsupported context: {summary.clinicalContextGateway.unsupportedOrStaleContextAction}</li>
+              <li>Live PHI: {summary.clinicalContextGateway.contextLensLivePhiEnabled ? "enabled" : "disabled"}</li>
+            </ul>
+          </article>
         </div>
       </section>
 

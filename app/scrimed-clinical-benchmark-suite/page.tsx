@@ -44,6 +44,31 @@ export default function ScrimedClinicalBenchmarkSuitePage() {
           <span>Human review</span>
           <strong>{summary.humanReviewerRequiredCount}</strong>
         </article>
+        <article>
+          <span>Worst-cell gate</span>
+          <strong>{summary.domainStressGate.decision}</strong>
+        </article>
+      </section>
+
+      <section className="section-band split-band" aria-label="Worst material cell release gate">
+        <div>
+          <p className="eyebrow">Domain Stress Matrix</p>
+          <h2>The weakest material subgroup controls release.</h2>
+          <p>
+            Global benchmark averages cannot override a sparse, failed, or unreviewed material cell.
+            Synthetic evaluation status never grants clinical authority.
+          </p>
+        </div>
+        <div>
+          <span>{summary.domainStressGate.releaseBasis}</span>
+          <ul className="compact-list">
+            <li>Decision: {summary.domainStressGate.decision}</li>
+            <li>Worst cell: {summary.domainStressGate.worstMaterialCell?.cellId ?? "none"}</li>
+            <li>Material cells: {summary.domainStressGate.summary.material}</li>
+            <li>Sparse cells: {summary.domainStressGate.summary.sparse}</li>
+            <li>Clinical authority: disabled</li>
+          </ul>
+        </div>
       </section>
 
       <section className="table-section" aria-label="Clinical Benchmark domains">

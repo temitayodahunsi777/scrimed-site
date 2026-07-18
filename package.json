@@ -56,6 +56,8 @@
     "smoke:clinical-data-fabric": "node scripts/clinical-data-fabric-contract-check.mjs",
     "smoke:clinical-data-governance": "node scripts/clinical-data-governance-contract-check.mjs",
     "smoke:clinical-context-gateway": "node scripts/clinical-context-gateway-contract-check.mjs",
+    "test:clinical-evidence-controls": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/clinical-evidence-controls-policy-test.mjs",
+    "smoke:scrimed-p31": "node scripts/scrimed-p31-applied-intelligence-contract-check.mjs",
     "smoke:launch-domain-preflight": "node scripts/launch-domain-preflight.mjs",
     "smoke:clinical-robustness-lab": "node scripts/clinical-robustness-lab-contract-check.mjs",
     "smoke:scrimed-context-injection": "node scripts/scrimed-context-injection-contract-check.mjs",

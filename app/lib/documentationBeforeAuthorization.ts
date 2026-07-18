@@ -1,4 +1,8 @@
 import { generateScrimedAuditHash } from "./scrimedIntelligencePlatform";
+import {
+  buildCaseEvidencePacket,
+  type CaseEvidencePacket
+} from "./clinicalEvidenceControls";
 
 export type DocumentationBeforeAuthorizationRequirementId =
   | "symptom_language"
@@ -92,6 +96,7 @@ export type DocumentationBeforeAuthorizationReviewPacket = {
     policyFreshness: "synthetic-current-for-demo";
     sourceTrustTier: "synthetic-reviewed-fixture";
   };
+  caseEvidence: CaseEvidencePacket;
   reviewQueue: {
     requiredRole: DocumentationBeforeAuthorizationEvaluation["recommendedOwner"];
     status: "queued" | "reviewed-for-demo" | "blocked";
@@ -498,6 +503,7 @@ function buildReviewPacketMarkdown(input: {
   evaluation: DocumentationBeforeAuthorizationEvaluation;
   readinessScore: number;
   evidenceRefs: string[];
+  caseEvidencePacketHash: string;
 }) {
   const missing = input.evaluation.missingEvidenceLabels.length
     ? input.evaluation.missingEvidenceLabels.map((label) => `- ${label}`).join("\n")
@@ -521,6 +527,7 @@ function buildReviewPacketMarkdown(input: {
     "",
     "## Evidence References",
     ...input.evidenceRefs.map((reference) => `- ${reference}`),
+    `- Case evidence packet hash: ${input.caseEvidencePacketHash}`,
     "",
     "## Recommended Human Actions",
     actions,
@@ -577,12 +584,78 @@ export function runDocumentationBeforeAuthorizationWorkbench(
     boundary: "synthetic-no-phi-no-payer-submission"
   });
   const workbenchId = `payeriq-${auditHash.replace("scrimed-intel-", "")}`;
+  const caseEvidence = buildCaseEvidencePacket(
+    {
+      syntheticCaseId: `synthetic-${sourcePacket.packetId}`,
+      workflowId: "documentation-before-authorization",
+      cohortDefinition: "Single registered synthetic authorization-readiness scenario.",
+      eligibilityCriteria: [
+        "registered synthetic fixture",
+        "enumerated documentation requirements only",
+        "no PHI or free-text patient data"
+      ],
+      baselineComparator: "Unassisted synthetic documentation review baseline; no causal comparison is claimed.",
+      intervention: {
+        label: "SCRIMED PayerIQ deterministic documentation-gap review",
+        startedAt: generatedAt,
+        completedAt: generatedAt
+      },
+      sourceLineage: evidenceRefs,
+      versions: {
+        model: "not-used-deterministic-rules",
+        prompt: "not-used-enumerated-schema",
+        tools: ["documentation-gap-evaluator", "review-packet-builder"],
+        policy: "documentation-before-authorization-synthetic-v1"
+      },
+      clinicianAction:
+        packet.reviewerStatus === "reviewed_for_demo" ? "accepted" : "awaiting-review",
+      overrideReasonCode: null,
+      outcomes: [
+        {
+          metricId: "documentation-completeness-percent",
+          category: "operational",
+          baselineValue: null,
+          observedValue: readinessScore,
+          unit: "percent",
+          observedAt: generatedAt,
+          sourceRef: evidenceRefs[0],
+          interpretation: "descriptive-only"
+        },
+        {
+          metricId: "missing-required-documentation-count",
+          category: "operational",
+          baselineValue: null,
+          observedValue: evaluation.missingRequiredIds.length,
+          unit: "count",
+          observedAt: generatedAt,
+          sourceRef: evidenceRefs[0],
+          interpretation: "descriptive-only"
+        }
+      ],
+      safetyEventCodes: [
+        ...(evaluation.missingRequiredIds.length > 0 ? ["missing-documentation"] : []),
+        "human-review-required",
+        "payer-submission-blocked"
+      ],
+      missingness: evaluation.missingEvidenceLabels,
+      confounders: ["synthetic-fixture", "no-live-payer-policy", "no-causal-design"],
+      siteAttributes: ["synthetic-site", "no-production-connector"],
+      subgroupAttributes: [sourcePacket.procedureFamily.replaceAll(" ", "-")],
+      analysisPlanStatus: "draft",
+      trustQaStatus: "review-required",
+      humanReviewRequired: true,
+      syntheticOnly: true,
+      noPhi: true
+    },
+    generatedAt
+  );
   const markdown = buildReviewPacketMarkdown({
     workbenchId,
     scenario: packet,
     evaluation,
     readinessScore,
-    evidenceRefs
+    evidenceRefs,
+    caseEvidencePacketHash: caseEvidence.evidencePacketHash
   });
 
   return {
@@ -605,6 +678,7 @@ export function runDocumentationBeforeAuthorizationWorkbench(
         policyFreshness: "synthetic-current-for-demo",
         sourceTrustTier: "synthetic-reviewed-fixture"
       },
+      caseEvidence,
       reviewQueue: {
         requiredRole: evaluation.recommendedOwner,
         status:
@@ -704,6 +778,25 @@ export function getDocumentationBeforeAuthorizationSummary() {
       payerSubmissionAllowed: false,
       workSessionHandoff: "SCRIMED Work revenue-cycle prepare-only Definition-of-Done contract"
     },
+    evidenceFromFirstCase: {
+      status: "enabled-for-synthetic-workbench",
+      schema: "scrimed-clinical-evidence-controls-v1-2026-07-17",
+      captures: [
+        "cohort and eligibility",
+        "baseline comparator",
+        "intervention timestamps",
+        "source lineage",
+        "model prompt tool and policy versions",
+        "reviewer action and override state",
+        "operational outcomes",
+        "safety events",
+        "missingness and confounders",
+        "site and subgroup attributes"
+      ],
+      causalityClaimAllowed: false,
+      externalDistributionAllowed: false,
+      humanReviewRequired: true
+    },
     validation: {
       status:
         evaluations.every(
@@ -760,6 +853,8 @@ export function buildDocumentationBeforeAuthorizationBrief() {
     "## Controls",
     "- Enumerated synthetic inputs only; no free-text patient or policy data.",
     "- Human review is required for every result.",
+    "- Every workbench result emits a deterministic synthetic Case Evidence packet with lineage, versions, outcomes, safety events, missingness, confounders, and subgroup metadata.",
+    "- Case Evidence remains descriptive-only; uncontrolled associations cannot support causal product claims.",
     "- Payer submission, medical-necessity determination, patient outreach, EHR writeback, and reimbursement claims remain blocked.",
     "- Export remains disabled until human review and an authorized distribution path exist.",
     "",

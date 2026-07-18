@@ -76,6 +76,19 @@ const checks = [
     args: ["scripts/clinical-context-gateway-contract-check.mjs"]
   },
   {
+    label: "P31 clinical evidence controls policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/clinical-evidence-controls-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P31 applied intelligence contract",
+    args: ["scripts/scrimed-p31-applied-intelligence-contract-check.mjs"]
+  },
+  {
     label: "Documentation-Before-Authorization contract",
     args: ["scripts/documentation-before-authorization-contract-check.mjs"]
   },

@@ -1,5 +1,9 @@
 import { generateScrimedAuditHash } from "./scrimedIntelligencePlatform";
 import { scrimedSafetyPolicyVersion } from "./scrimedSafetyGovernance";
+import {
+  evaluateWorstCellReleaseGate,
+  type DomainStressCell
+} from "./clinicalEvidenceControls";
 
 export type ScrimedClinicalBenchmarkRisk = "low" | "medium" | "high" | "blocked";
 
@@ -81,7 +85,92 @@ function benchmarkForDomain(domain: string): ScrimedClinicalBenchmark {
 
 export const scrimedClinicalBenchmarks: ScrimedClinicalBenchmark[] = benchmarkDomains.map(benchmarkForDomain);
 
+export const scrimedClinicalDomainStressMatrix: DomainStressCell[] = [
+  {
+    cellId: "prior-auth-cardiology-afib-adult-english-outpatient",
+    task: "prior authorization documentation completeness",
+    diseaseSubtype: "synthetic-atrial-fibrillation",
+    patientSubgroup: "synthetic-adult",
+    site: "synthetic-outpatient-cardiology",
+    modality: "structured-document-metadata",
+    language: "en",
+    workflowState: "pre-submission-review",
+    riskLevel: "high",
+    metric: "citation-completeness",
+    direction: "higher-is-better",
+    value: 0.94,
+    threshold: 0.9,
+    sampleSize: 64,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: true,
+    material: true
+  },
+  {
+    cellId: "patient-education-complex-care-older-adult-spanish",
+    task: "patient education source grounding",
+    diseaseSubtype: "synthetic-complex-care",
+    patientSubgroup: "synthetic-older-adult",
+    site: "synthetic-community-clinic",
+    modality: "text",
+    language: "es",
+    workflowState: "draft-review",
+    riskLevel: "moderate",
+    metric: "citation-completeness",
+    direction: "higher-is-better",
+    value: 0.92,
+    threshold: 0.9,
+    sampleSize: 18,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: true,
+    material: true
+  },
+  {
+    cellId: "imaging-exam-completeness-radiology-dicom-english",
+    task: "imaging exam completeness QA",
+    diseaseSubtype: "not-applicable-workflow-qa",
+    patientSubgroup: "synthetic-general",
+    site: "synthetic-radiology-department",
+    modality: "DICOM-metadata",
+    language: "en",
+    workflowState: "pre-interpretation-worklist",
+    riskLevel: "high",
+    metric: "selective-accuracy",
+    direction: "higher-is-better",
+    value: 0.91,
+    threshold: 0.9,
+    sampleSize: 55,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: false,
+    material: true
+  },
+  {
+    cellId: "denial-evidence-extraction-general-rcm-english",
+    task: "denial evidence extraction",
+    diseaseSubtype: "not-applicable-administrative",
+    patientSubgroup: "synthetic-general",
+    site: "synthetic-central-rcm",
+    modality: "structured-document-metadata",
+    language: "en",
+    workflowState: "appeal-draft-review",
+    riskLevel: "moderate",
+    metric: "precision",
+    direction: "higher-is-better",
+    value: 0.93,
+    threshold: 0.9,
+    sampleSize: 100,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: true,
+    material: true
+  }
+];
+
 export function getScrimedClinicalBenchmarkSuiteSummary() {
+  const domainStressGate = evaluateWorstCellReleaseGate(scrimedClinicalDomainStressMatrix);
+
   return {
     service: "scrimed-clinical-benchmark-suite",
     status: scrimedClinicalBenchmarkSuiteStatus,
@@ -92,6 +181,7 @@ export function getScrimedClinicalBenchmarkSuiteSummary() {
     highRiskCount: scrimedClinicalBenchmarks.filter((benchmark) => benchmark.riskLevel === "high").length,
     humanReviewerRequiredCount: scrimedClinicalBenchmarks.filter((benchmark) => benchmark.humanReviewerRequired).length,
     benchmarks: scrimedClinicalBenchmarks,
+    domainStressGate,
     productionReadiness: false,
     noPhiConfirmed: true
   };
@@ -116,6 +206,14 @@ export function buildScrimedClinicalBenchmarkSuiteBrief() {
     "- Source grounding and citation readiness",
     "- Completeness and verifiability",
     "- Human review for high-risk and protected workflows",
-    "- No autonomous diagnosis, treatment, prescribing, payer submission, or EHR writeback"
+    "- No autonomous diagnosis, treatment, prescribing, payer submission, or EHR writeback",
+    "",
+    "## Worst-Cell Release Gate",
+    `- Decision: ${summary.domainStressGate.decision}`,
+    `- Basis: ${summary.domainStressGate.releaseBasis}`,
+    `- Worst material cell: ${summary.domainStressGate.worstMaterialCell?.cellId ?? "none"}`,
+    `- Sparse material cells: ${summary.domainStressGate.summary.sparse}`,
+    "- Aggregate averages cannot override a failed, sparse, or unreviewed material cell.",
+    "- Clinical authority remains disabled regardless of synthetic benchmark status."
   ].join("\n");
 }

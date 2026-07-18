@@ -1037,6 +1037,12 @@ export function getHealthcareIntelligenceOSSummary() {
       productionConnectorAuthority: clinicalContextGateway.productionConnectorAuthority,
       supportedScopeCount: clinicalContextGateway.supportedScopes.length,
       gatewayControlCount: clinicalContextGateway.gatewayControls.length,
+      contextLensModes: clinicalContextGateway.contextLens.modes,
+      contextLensLivePhiEnabled: clinicalContextGateway.contextLens.livePhiEnabled,
+      unsupportedOrStaleContextAction:
+        clinicalContextGateway.contextLens.unsupportedOrStaleContextAction,
+      contextLensSourceAndReasonRequired:
+        clinicalContextGateway.contextLens.sourceAndReasonRequired,
       sourceContractCount: clinicalContextGateway.sourceContractCount,
       baselineEvaluationCount: clinicalContextGateway.baselineEvaluationCount,
       validationStatus: clinicalContextGateway.validation.status,
@@ -1230,6 +1236,9 @@ export function buildHealthcareIntelligenceOSBrief() {
     `- Raw schema access: ${summary.clinicalContextGateway.rawSchemaAccess}`,
     `- Raw connector payload access: ${summary.clinicalContextGateway.rawConnectorPayloadAccess}`,
     `- Gateway controls: ${summary.clinicalContextGateway.gatewayControlCount}`,
+    `- Context Lens modes: ${summary.clinicalContextGateway.contextLensModes.join(", ")}`,
+    `- Unsupported or stale context: ${summary.clinicalContextGateway.unsupportedOrStaleContextAction}`,
+    `- Source and action reason required: ${summary.clinicalContextGateway.contextLensSourceAndReasonRequired}`,
     `- Baseline evaluations: ${summary.clinicalContextGateway.baselineEvaluationCount}`,
     `- Validation: ${summary.clinicalContextGateway.validationStatus}`,
     `- Boundary: ${summary.clinicalContextGateway.boundary}`,

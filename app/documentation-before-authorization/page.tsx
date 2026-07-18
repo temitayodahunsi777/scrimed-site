@@ -62,6 +62,10 @@ export default function DocumentationBeforeAuthorizationPage() {
           <span>Payer submission</span>
           <strong>blocked</strong>
         </article>
+        <article>
+          <span>Case evidence</span>
+          <strong>emitted from first synthetic run</strong>
+        </article>
       </section>
 
       <section className="section-band split-band" aria-label="PayerIQ operating model">
@@ -76,6 +80,26 @@ export default function DocumentationBeforeAuthorizationPage() {
             <li>Missing symptom, function, timing, rationale, history, evidence, policy, note, and attestation checks</li>
             <li>Reviewer ownership and audit hash on every packet</li>
             <li>Prepare-only revenue-cycle handoff with no payer transmission</li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="section-band split-band" aria-label="Evidence from first case">
+        <div>
+          <p className="eyebrow">Evidence From First Case</p>
+          <h2>Every workbench run produces reviewable evidence, not just an answer.</h2>
+          <p>
+            The packet captures lineage, versions, reviewer state, descriptive outcomes, safety events,
+            missingness, confounders, and subgroup attributes from the first synthetic case.
+          </p>
+        </div>
+        <div>
+          <span>{summary.evidenceFromFirstCase.status}</span>
+          <ul className="compact-list">
+            <li>Human review: required</li>
+            <li>Causal claims: blocked</li>
+            <li>External distribution: blocked</li>
+            <li>Live PHI and payer transmission: blocked</li>
           </ul>
         </div>
       </section>
