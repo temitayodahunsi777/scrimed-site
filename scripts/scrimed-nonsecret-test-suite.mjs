@@ -269,6 +269,28 @@ const checks = [
     args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-completion-evidence-policy-test.mjs"]
   },
   {
+    label: "SCRIMED Work release-bound canary attestation policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-canary-attestation-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Work browser mutation CSRF policy behavior",
+    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-csrf-policy-test.mjs"]
+  },
+  {
+    label: "SCRIMED Work actor and tenant mutation rate-limit policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-rate-limit-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED Work migration-set policy behavior",
     args: [
       "--disable-warning=ExperimentalWarning",

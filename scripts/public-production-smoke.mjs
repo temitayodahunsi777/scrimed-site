@@ -46,14 +46,15 @@ async function request(path) {
   return { body, response };
 }
 
-async function postJson(path, payload) {
+async function postJson(path, payload, extraHeaders = {}) {
   let response;
 
   try {
     response = await fetch(endpoint(path), {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...extraHeaders
       },
       body: JSON.stringify(payload)
     });
@@ -2018,6 +2019,7 @@ function requireScrimedWorkBoundary(label, response) {
   const consequentialActions = response.headers.get("x-scrimed-consequential-actions");
   const productionAuthorization = response.headers.get("x-scrimed-production-authorization");
   const customerGoLive = response.headers.get("x-scrimed-customer-go-live");
+  const csrfProtection = response.headers.get("x-scrimed-csrf-protection");
 
   if (work !== "scrimed-work-intelligence-platform-active-synthetic-no-phi") {
     throw new Error(`${label} expected SCRIMED Work active synthetic header but received ${work}.`);
@@ -2057,6 +2059,10 @@ function requireScrimedWorkBoundary(label, response) {
 
   if (customerGoLive !== "not-authorized") {
     throw new Error(`${label} expected x-scrimed-customer-go-live not-authorized but received ${customerGoLive}.`);
+  }
+
+  if (csrfProtection !== "exact-same-origin-or-explicit-non-browser") {
+    throw new Error(`${label} expected SCRIMED Work request-provenance protection but received ${csrfProtection}.`);
   }
 }
 
@@ -12404,6 +12410,27 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work expected durable writes to require Supabase AAL2/RBAC/RLS.");
   }
 
+  if (
+    body.governanceStatus?.mutationRateLimit?.policyVersion !==
+      "scrimed-work-mutation-rate-limit-v1-2026-07-17" ||
+    !["distributed-required", "bounded-memory"].includes(
+      body.governanceStatus?.mutationRateLimit?.mode
+    ) ||
+    body.governanceStatus?.mutationRateLimit?.actorLimit !== 30 ||
+    body.governanceStatus?.mutationRateLimit?.tenantLimit !== 120 ||
+    body.governanceStatus?.mutationRateLimit?.windowSeconds !== 600
+  ) {
+    throw new Error("SCRIMED Work expected actor and tenant mutation rate-limit posture metadata.");
+  }
+
+  if (
+    body.governanceStatus.mutationRateLimit.productionRuntime === true &&
+    (body.governanceStatus.mutationRateLimit.mode !== "distributed-required" ||
+      body.governanceStatus.mutationRateLimit.failClosedOnProviderUnavailable !== true)
+  ) {
+    throw new Error("SCRIMED Work production runtime must require distributed fail-closed mutation limiting.");
+  }
+
   if (body.productionHardening?.service !== "scrimed-work-production-hardening-gate") {
     throw new Error("SCRIMED Work expected production hardening gate metadata.");
   }
@@ -12412,8 +12439,36 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work production hardening gate must retain no-production and no-PHI authority boundaries.");
   }
 
+  if (
+    body.productionHardening?.mutationRateLimit?.policyVersion !==
+      "scrimed-work-mutation-rate-limit-v1-2026-07-17" ||
+    typeof body.productionHardening?.mutationRateLimit?.distributedProviderConfigured !==
+      "boolean" ||
+    typeof body.productionHardening?.mutationRateLimit?.readyForProtectedMutations !== "boolean"
+  ) {
+    throw new Error("SCRIMED Work production hardening must expose no-secret mutation rate-limit posture.");
+  }
+
   if (!Array.isArray(body.productionHardening?.gates) || body.productionHardening.gates.length < 8) {
     throw new Error("SCRIMED Work production hardening gate expected release-control coverage.");
+  }
+
+  if (
+    typeof body.productionHardening?.releaseBinding?.currentReleaseShaFingerprint !== "string" ||
+    typeof body.productionHardening?.releaseBinding?.canaryReleaseShaFingerprint !== "string" ||
+    typeof body.productionHardening?.releaseBinding?.evidenceIdFormatValid !== "boolean" ||
+    typeof body.productionHardening?.releaseBinding?.evidenceIdAuthenticated !== "boolean" ||
+    typeof body.productionHardening?.releaseBinding?.workspaceSlug !== "string" ||
+    typeof body.productionHardening?.releaseBinding?.workspaceBound !== "boolean" ||
+    (body.productionHardening?.releaseBinding?.completedAt !== null &&
+      typeof body.productionHardening?.releaseBinding?.completedAt !== "string") ||
+    (body.productionHardening?.releaseBinding?.ageHours !== null &&
+      typeof body.productionHardening?.releaseBinding?.ageHours !== "number") ||
+    typeof body.productionHardening?.releaseBinding?.maxAgeHours !== "number" ||
+    typeof body.productionHardening?.releaseBinding?.fresh !== "boolean" ||
+    typeof body.productionHardening?.releaseBinding?.matched !== "boolean"
+  ) {
+    throw new Error("SCRIMED Work production hardening must expose no-secret release-binding posture.");
   }
 
   if (!Array.isArray(body.sessions) || body.sessions.length < 2) {
@@ -12542,7 +12597,9 @@ async function checkScrimedWork() {
   );
   if (
     protectedCompletionEvidence.response.headers.get("x-scrimed-completion-queue") !== "fail-closed" ||
-    protectedCompletionEvidence.response.headers.get("x-scrimed-completion-read-mode") !== "denied"
+    protectedCompletionEvidence.response.headers.get("x-scrimed-completion-read-mode") !== "denied" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-canary-attestation") !== "denied" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-canary-freshness") !== "denied"
   ) {
     throw new Error("SCRIMED Work completion evidence must fail closed without AAL2 operator authorization.");
   }
@@ -12584,9 +12641,11 @@ async function checkScrimedWork() {
   requireStatus("SCRIMED Work voice simulate", voice.response.status, 200);
   requireScrimedWorkBoundary("SCRIMED Work voice simulate", voice.response);
 
-  const protectedCreate = await postJson("/api/scrimed-work/sessions", {
-    title: "blocked synthetic session create without protected write auth"
-  });
+  const protectedCreate = await postJson(
+    "/api/scrimed-work/sessions",
+    { title: "blocked synthetic session create without protected write auth" },
+    { "x-scrimed-request-context": "operator-smoke-v1" }
+  );
   requireStatus("SCRIMED Work protected session create", protectedCreate.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected session create", protectedCreate.response);
 
@@ -12609,7 +12668,8 @@ async function checkScrimedWork() {
       reviewerStatus: "queued",
       requestedAction: "draft_reviewer_packet",
       dataBoundaryAcknowledged: true
-    }
+    },
+    { "x-scrimed-request-context": "operator-smoke-v1" }
   );
   requireStatus("PayerIQ protected SCRIMED Work handoff", protectedPayerIqHandoff.response.status, [401, 503]);
   requireScrimedWorkBoundary("PayerIQ protected SCRIMED Work handoff", protectedPayerIqHandoff.response);
@@ -12619,14 +12679,16 @@ async function checkScrimedWork() {
     {
       disposition: "approved_for_internal_use",
       reasonCode: "evidence_and_boundaries_confirmed"
-    }
+    },
+    { "x-scrimed-request-context": "operator-smoke-v1" }
   );
   requireStatus("SCRIMED Work protected artifact review", protectedArtifactReview.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected artifact review", protectedArtifactReview.response);
 
   const protectedCompletion = await postJson(
     "/api/scrimed-work/sessions/work_session_unknown_protected/complete",
-    {}
+    {},
+    { "x-scrimed-request-context": "operator-smoke-v1" }
   );
   requireStatus("SCRIMED Work protected completion", protectedCompletion.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected completion", protectedCompletion.response);

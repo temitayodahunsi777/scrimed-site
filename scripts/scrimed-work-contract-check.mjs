@@ -19,11 +19,14 @@ const requiredFiles = [
   "app/lib/scrimed-work/agentRegistry.ts",
   "app/lib/scrimed-work/orchestrationEngine.ts",
   "app/lib/scrimed-work/contextEngine.ts",
+  "app/lib/scrimed-work/csrfProtection.ts",
+  "app/lib/scrimed-work/rateLimitPolicy.ts",
   "app/lib/scrimed-work/verificationEngine.ts",
   "app/lib/scrimed-work/autonomyPolicy.ts",
   "app/lib/scrimed-work/approvalEngine.ts",
   "app/lib/scrimed-work/artifactEngine.ts",
   "app/lib/scrimed-work/artifactReview.ts",
+  "app/lib/scrimed-work/canaryAttestation.ts",
   "app/lib/scrimed-work/completionEvidence.ts",
   "app/lib/scrimed-work/completionQueue.ts",
   "app/lib/scrimed-work/reviewQueue.ts",
@@ -83,6 +86,9 @@ const requiredFiles = [
   "scripts/scrimed-work-artifact-review-policy-test.mjs",
   "scripts/scrimed-work-completion-queue-policy-test.mjs",
   "scripts/scrimed-work-completion-evidence-policy-test.mjs",
+  "scripts/scrimed-work-canary-attestation-policy-test.mjs",
+  "scripts/scrimed-work-csrf-policy-test.mjs",
+  "scripts/scrimed-work-rate-limit-policy-test.mjs",
   "scripts/scrimed-work-migration-set-policy-test.mjs",
   "scripts/scrimed-work-review-queue-policy-test.mjs",
   "scripts/scrimed-work-review-preparation-policy-test.mjs",
@@ -126,9 +132,12 @@ const combinedLib = [
   files["app/lib/scrimed-work/toolRegistry.ts"],
   files["app/lib/scrimed-work/orchestrationEngine.ts"],
   files["app/lib/scrimed-work/contextEngine.ts"],
+  files["app/lib/scrimed-work/csrfProtection.ts"],
+  files["app/lib/scrimed-work/rateLimitPolicy.ts"],
   files["app/lib/scrimed-work/verificationEngine.ts"],
   files["app/lib/scrimed-work/artifactEngine.ts"],
   files["app/lib/scrimed-work/artifactReview.ts"],
+  files["app/lib/scrimed-work/canaryAttestation.ts"],
   files["app/lib/scrimed-work/completionEvidence.ts"],
   files["app/lib/scrimed-work/completionQueue.ts"],
   files["app/lib/scrimed-work/reviewQueue.ts"],
@@ -186,6 +195,13 @@ for (const expected of [
   "planner-specialist-verifier",
   "scrimed-a2a-envelope-v1",
   "searchScrimedWorkContext",
+  "evaluateScrimedWorkWriteRequestProvenance",
+  "scrimed-work-csrf-v1-2026-07-17",
+  "operator-smoke-v1",
+  "scrimed-work-mutation-rate-limit-v1-2026-07-17",
+  "enforceScrimedWorkMutationRateLimit",
+  "scrimed_work_rate_limit_provider_unavailable",
+  "distributed-required",
   "citationRequired",
   "getHealthcareOntologyRegistry",
   "verifyScrimedWorkResult",
@@ -223,6 +239,15 @@ for (const expected of [
   "listScrimedWorkCompletionEvidenceInDurableStore",
   "scrimed-work-completion-evidence-v2026-07-16",
   "immutableEvidenceReferences",
+  "scrimed-work-release-bound-canary-v2-2026-07-17",
+  "scrimed-work-release-bound-canary-hmac-v2",
+  "scrimedWorkCanaryMaxAgeHours",
+  "buildScrimedWorkCanaryAttestation",
+  "completion_evidence_stale",
+  "signing_authority_required",
+  "getScrimedWorkCanaryAuthenticationMessage",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT",
   "scrimed-work-review-preparation-v2026-07-15"
 ]) {
   requireIncludes("app/lib/scrimed-work/*", combinedLib, expected);
@@ -235,9 +260,25 @@ for (const expected of [
   "not-authorized",
   "disabled-by-default",
   "not-production-authorized",
+  "X-SCRIMED-CSRF-Protection",
+  "scrimed_work_csrf_denied",
   "not-authorized"
 ]) {
   requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], expected);
+}
+
+for (const expected of [
+  "X-SCRIMED-Rate-Limit-Policy",
+  "X-SCRIMED-Actor-RateLimit-Remaining",
+  "X-SCRIMED-Tenant-RateLimit-Remaining",
+  "scrimed_work_rate_limit_exceeded",
+  "scrimed_work_rate_limit_provider_unavailable"
+]) {
+  requireIncludes(
+    "app/lib/scrimed-work/rateLimitPolicy.ts",
+    files["app/lib/scrimed-work/rateLimitPolicy.ts"],
+    expected
+  );
 }
 
 for (const expected of [
@@ -264,6 +305,8 @@ for (const expected of [
   "X-SCRIMED-EHR-Writeback",
   "X-SCRIMED-Completion-Read-Mode",
   "X-SCRIMED-Completion-Evidence-Policy",
+  "X-SCRIMED-Canary-Attestation",
+  "X-SCRIMED-Canary-Freshness",
   "not-authorized"
 ]) {
   requireIncludes(
@@ -286,6 +329,7 @@ for (const route of [
 ]) {
   requireIncludes(route, files[route], route.endsWith("sessions/route.ts") ? "guardedCreateSession" : "guardedTransitionSession");
   requireIncludes(route, files[route], "fail-closed");
+  requireIncludes(route, files[route], "request)");
 }
 
 requireIncludes(
@@ -314,6 +358,11 @@ requireIncludes(
   files["app/api/scrimed-work/artifacts/route.ts"],
   "guardedCreateArtifact"
 );
+requireIncludes(
+  "app/api/scrimed-work/artifacts/route.ts",
+  files["app/api/scrimed-work/artifacts/route.ts"],
+  ", request)"
+);
 
 for (const expected of [
   "guardedReviewProtectedArtifact",
@@ -335,6 +384,7 @@ requireIncludes(
 
 for (const expected of [
   "SCRIMED Work & Intelligence Platform",
+  'dynamic = "force-dynamic"',
   "Workspace selector",
   "Definition of Done",
   "Agent Plan and Step Timeline",
@@ -521,6 +571,9 @@ requireIncludes("package.json", files["package.json"], "test:scrimed-work:artifa
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-queue-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:completion-queue-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:completion-evidence-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:canary-attestation-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:csrf-policy");
+requireIncludes("package.json", files["package.json"], "test:scrimed-work:rate-limit-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:migration-set-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:review-preparation-policy");
 requireIncludes("package.json", files["package.json"], "test:scrimed-work:two-identity-policy");
@@ -552,6 +605,13 @@ requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/ind
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_REVIEWER_BEARER_TOKEN");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED");
 requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "timingSafeEqual");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "evidenceIdAuthenticated");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "workspaceBound");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "scrimed-work-distributed-mutation-rate-limit");
+requireIncludes("app/lib/scrimed-work/productionHardening.ts", files["app/lib/scrimed-work/productionHardening.ts"], "failClosedOnProviderUnavailable");
 requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
@@ -566,6 +626,21 @@ requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
   "SCRIMED Work reviewer queue policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work release-bound canary attestation policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work browser mutation CSRF policy behavior"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "SCRIMED Work actor and tenant mutation rate-limit policy behavior"
 );
 requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
@@ -612,6 +687,12 @@ for (const expected of [
   "Independent Reviewer Queue",
   "Completed Internal Evidence",
   "Two-Identity AAL2 Canary",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT",
+  "domain-separated HMAC",
+  "72 hours",
+  "exact same-origin",
+  "operator-smoke-v1",
   "all ten ordered migration contracts"
 ]) {
   requireIncludes("docs/scrimed-work.md", files["docs/scrimed-work.md"], expected);
@@ -729,7 +810,11 @@ for (const expected of [
   "Tenant-admin or pilot-lead membership with fresh AAL2 is required",
   "eligibleForCompletion",
   "Verify and Complete Internal Work",
-  "External distribution, payer submission, EHR writeback"
+  "External distribution, payer submission, EHR writeback",
+  "Derived Evidence Ready",
+  "release-bound canary",
+  "Evidence ID",
+  "Freshness:"
 ]) {
   requireIncludes(
     "app/pilot-workspace/ScrimedWorkCompletionQueuePanel.tsx",
@@ -743,6 +828,7 @@ for (const expected of [
   "SCRIMED_WORK_DURABLE_STORE_ENABLED",
   "x-scrimed-workspace-slug",
   "idempotency-key",
+  "x-scrimed-request-context",
   "pass unauthenticated SCRIMED Work session create fail-closed",
   "authenticated SCRIMED Work token preflight",
   "durable session read",
@@ -791,6 +877,12 @@ for (const expected of [
   "verified-internal-work-complete",
   "X-SCRIMED-External-Distribution",
   "X-SCRIMED-Payer-Submission",
+  "X-SCRIMED-Canary-Attestation",
+  "X-SCRIMED-Canary-Freshness",
+  "X-SCRIMED-CSRF-Protection",
+  "X-SCRIMED-Rate-Limit-Decision",
+  "rate_limit=",
+  "release-bound canary attestation",
   "different authenticated users"
 ]) {
   requireIncludes(
@@ -820,6 +912,11 @@ for (const expected of [
   "scrimed-work-canary-release",
   "SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED",
   "SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA",
+  "SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT",
+  "freshness window",
+  "crossWorkspaceEvidence",
+  "exact current release sha",
   "tokens redacted"
 ]) {
   requireIncludes(
@@ -861,6 +958,12 @@ requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:dur
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:authenticated\": \"node scripts/scrimed-work-authenticated-smoke.mjs\"");
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:two-identity\": \"node scripts/scrimed-work-two-identity-authenticated-smoke.mjs\"");
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-work:two-identity:strict\": \"node scripts/scrimed-work-two-identity-authenticated-smoke.mjs --strict\"");
+requireIncludes(
+  "scripts/public-production-smoke.mjs",
+  files["scripts/public-production-smoke.mjs"],
+  "scrimed-work-mutation-rate-limit-v1-2026-07-17"
+);
+requireIncludes("scripts/public-production-smoke.mjs", files["scripts/public-production-smoke.mjs"], "exact-same-origin-or-explicit-non-browser");
 requireIncludes("app/api/scrimed-work/production-hardening/route.ts", files["app/api/scrimed-work/production-hardening/route.ts"], "operator-gated-no-production-authorization");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", files["scripts/scrimed-nonsecret-test-suite.mjs"], "scripts/scrimed-work-durable-store-preflight.mjs");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", files["scripts/scrimed-nonsecret-test-suite.mjs"], "scripts/scrimed-work-contract-check.mjs");

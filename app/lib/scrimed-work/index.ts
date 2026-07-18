@@ -4,7 +4,18 @@ import { scrimedWorkAgents } from "./agentRegistry";
 import { buildScrimedWorkArtifact, scrimedWorkArtifactTemplates } from "./artifactEngine";
 import { evaluateArtifactReview, parseArtifactReviewInput } from "./artifactReview";
 import { createAuditEvent, createAuditHash, envelope, errorEnvelope, scrimedWorkAuditBoundary, scrimedWorkPolicyVersion } from "./audit";
+import {
+  buildScrimedWorkCanaryAttestation,
+  getScrimedWorkRuntimeReleaseSha,
+  scrimedWorkCanaryAttestationBoundary,
+  scrimedWorkCanaryAttestationPolicyVersion
+} from "./canaryAttestation";
 import { getHealthcareOntologyRegistry, searchScrimedWorkContext } from "./contextEngine";
+import {
+  evaluateScrimedWorkWriteRequestProvenance,
+  scrimedWorkCsrfBoundary,
+  scrimedWorkCsrfPolicyVersion
+} from "./csrfProtection";
 import {
   getScrimedWorkDurableStorageMode,
   getScrimedWorkWorkspaceSlug,
@@ -47,6 +58,11 @@ import { previewOrchestration } from "./orchestrationEngine";
 import { getScrimedWorkProductionHardeningGate } from "./productionHardening";
 import { scrimedWorkProviderRegistry } from "./providerRegistry";
 import {
+  enforceScrimedWorkMutationRateLimit,
+  getScrimedWorkRateLimitPosture,
+  scrimedWorkMutationRateLimitHeaders
+} from "./rateLimitPolicy";
+import {
   parseScrimedWorkReviewQueueLimit,
   scrimedWorkReviewQueueBoundary,
   scrimedWorkReviewQueuePolicyVersion
@@ -76,15 +92,18 @@ export * from "./workSessionStore";
 export * from "./modelRouter";
 export * from "./providerRegistry";
 export * from "./productionHardening";
+export * from "./rateLimitPolicy";
 export * from "./toolRegistry";
 export * from "./agentRegistry";
 export * from "./orchestrationEngine";
 export * from "./contextEngine";
+export * from "./csrfProtection";
 export * from "./verificationEngine";
 export * from "./autonomyPolicy";
 export * from "./approvalEngine";
 export * from "./artifactEngine";
 export * from "./artifactReview";
+export * from "./canaryAttestation";
 export * from "./completionEvidence";
 export * from "./completionQueue";
 export * from "./reviewQueue";
@@ -108,7 +127,10 @@ export const scrimedWorkUpdatedAt = "2026-07-13";
 export const scrimedWorkBoundary =
   "SCRIMED Work & Intelligence Platform is a synthetic/no-PHI, verification-first control plane for workspace sessions, model/tool routing, agent orchestration, context retrieval, artifacts, schedules, voice simulation, learning loops, governance, auditability, rollback, and value telemetry. It does not authorize live PHI, autonomous clinical care, diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, final imaging interpretation, production connector approval, certification claims, customer go-live, or external model calls.";
 
-export function scrimedWorkHeaders(extra: Record<string, string> = {}) {
+export function scrimedWorkHeaders(
+  extra: Record<string, string> = {},
+  request?: Request
+) {
   const safety = evaluateScrimedSafetyGate({
     route: scrimedWorkApiRoute,
     requestedAction: "synthetic no-phi metadata-only work intelligence platform audit preparation internal testing",
@@ -126,6 +148,8 @@ export function scrimedWorkHeaders(extra: Record<string, string> = {}) {
     "X-SCRIMED-Patient-Outreach": "human-review-and-consent-required",
     "X-SCRIMED-External-Model-Calls": "disabled-by-default",
     "X-SCRIMED-Consequential-Actions": "disabled-by-default",
+    "X-SCRIMED-CSRF-Protection": "exact-same-origin-or-explicit-non-browser",
+    ...scrimedWorkMutationRateLimitHeaders(request),
     "X-SCRIMED-Production-Authorization": "not-production-authorized",
     "X-SCRIMED-Customer-Go-Live": "not-authorized",
     "X-SCRIMED-Audit-Boundary": scrimedWorkAuditBoundary,
@@ -143,6 +167,7 @@ export function getScrimedWorkSummary() {
     tenant: "synthetic-tenant",
     limit: 4
   });
+  const mutationRateLimit = getScrimedWorkRateLimitPosture();
 
   return {
     service: "scrimed-work-intelligence-platform",
@@ -207,11 +232,15 @@ export function getScrimedWorkSummary() {
       externalProviderCallsDisabledByDefault: true,
       humanReviewForHighRisk: true,
       cancellationAndRollbackMetadataRequired: true,
-      durableWritesRequireSupabaseAal2RbacRls: true
+      durableWritesRequireSupabaseAal2RbacRls: true,
+      browserWriteCsrfEnforced: true,
+      csrfPolicyVersion: scrimedWorkCsrfPolicyVersion,
+      csrfBoundary: scrimedWorkCsrfBoundary,
+      mutationRateLimit
     },
     productionHardening: getScrimedWorkProductionHardeningGate(),
     nextProductionHardeningStep:
-      "Apply and verify the SCRIMED Work completion-queue migration in the approved no-PHI target, then use the AAL2 tenant-admin control to retain verified internal-only completion evidence without granting external authority."
+      "Verify the distributed actor/tenant mutation limiter in the exact-release two-identity canary, then add retained no-secret abuse-event evidence and provider-health circuit-breaker telemetry without expanding action authority."
   };
 }
 
@@ -236,6 +265,7 @@ export function buildScrimedWorkBrief() {
     "- Autonomy follows verification strength, reversibility, evidence quality, privacy sensitivity, and clinical/financial consequence.",
     "- Consequential tools remain disabled and approval-gated by default.",
     "- Protected write routes require AAL2 governance identity, tenant role authorization, server runtime token, idempotency, and the durable-store feature flag.",
+    "- Protected mutations use actor and tenant quotas; production requires the distributed provider and fails closed if it is unavailable.",
     "- Retrieved context is treated as untrusted data with citations, tenant metadata, and confidence scores.",
     "- Verification blocks completion when citations, scope, policy, PHI checks, rollback, budget, loop, or approval criteria fail.",
     "- Lifecycle transitions use authoritative durable state, append-only history, independent reviewer checks, and tenant-scoped idempotency.",
@@ -320,11 +350,28 @@ async function buildProtectedAuthorizationDecision(
       status: 503,
       error: errorEnvelope(
         "scrimed_work_protected_writes_disabled",
-        "SCRIMED Work protected write endpoints are disabled until approved auth, RBAC, CSRF, rate limiting, and durable storage are configured.",
+        "SCRIMED Work protected write endpoints are disabled until approved auth, RBAC, rate limiting, and durable storage are configured.",
         action,
         false
       )
     };
+  }
+
+  if (accessMode === "write") {
+    const provenance = evaluateScrimedWorkWriteRequestProvenance(request);
+
+    if (!provenance.allowed) {
+      return {
+        allowed: false as const,
+        status: 403,
+        error: errorEnvelope(
+          "scrimed_work_csrf_denied",
+          "SCRIMED Work rejected the protected mutation because its browser origin or non-browser request provenance could not be verified.",
+          action,
+          false
+        )
+      };
+    }
   }
 
   if (!isScrimedWorkDurableStoreEnabled()) {
@@ -421,6 +468,31 @@ async function buildProtectedAuthorizationDecision(
       status: membership.status,
       error: errorEnvelope(membership.code, membership.message, action, membership.status >= 500)
     };
+  }
+
+  if (accessMode === "write") {
+    const mutationRateLimit = await enforceScrimedWorkMutationRateLimit({
+      request,
+      workspaceId: membership.workspaceId,
+      tenantId: membership.tenantId,
+      actorId: context.user.id,
+      action
+    });
+
+    if (!mutationRateLimit.allowed) {
+      return {
+        allowed: false as const,
+        status: mutationRateLimit.status,
+        error: errorEnvelope(
+          mutationRateLimit.code,
+          mutationRateLimit.reason === "provider-unavailable"
+            ? "SCRIMED Work protected mutations are unavailable because the required rate-limit control could not be verified."
+            : "SCRIMED Work protected mutation quota was exceeded; retry after the bounded window resets.",
+          action,
+          true
+        )
+      };
+    }
   }
 
   return {
@@ -1054,12 +1126,19 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
       };
     }
 
+    const canaryAttestation = await buildScrimedWorkCanaryAttestation({
+      evidence: durable.evidence,
+      releaseSha: getScrimedWorkRuntimeReleaseSha(),
+      signingSecret: process.env.SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN
+    });
+
     return {
       allowed: true as const,
       status: 200,
       data: {
         mode: "evidence" as const,
         evidence: durable.evidence,
+        canaryAttestation,
         authorization: {
           memberRole: auth.context.memberRole,
           operatorOnly: true,
@@ -1070,7 +1149,9 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
           auditEventId: durable.evidence.auditEventId
         },
         policyVersion: scrimedWorkCompletionEvidencePolicyVersion,
-        boundary: scrimedWorkCompletionEvidenceBoundary
+        canaryAttestationPolicyVersion: scrimedWorkCanaryAttestationPolicyVersion,
+        boundary: scrimedWorkCompletionEvidenceBoundary,
+        canaryAttestationBoundary: scrimedWorkCanaryAttestationBoundary
       }
     };
   }

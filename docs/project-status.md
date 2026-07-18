@@ -1,6 +1,33 @@
 # SCRIMED Project Status
 
-Updated: 2026-07-13
+Updated: 2026-07-17
+
+## Latest SCRIMED Work Distributed Mutation Abuse Control
+
+- Added one shared actor- and tenant-scoped mutation policy after AAL2 identity and workspace membership resolution, so current and future protected SCRIMED Work writes inherit the same quota boundary.
+- Added 30-per-actor/workspace and 120-per-tenant ten-minute budgets with stable identifiers hashed before counter storage; endpoint switching does not create a fresh quota.
+- Required distributed Upstash enforcement in production, prevented configuration downgrade to process memory, and returned fail-closed `503` when the provider is missing or unavailable. Quota exhaustion returns `429` with bounded retry metadata.
+- Preserved the existing bounded-memory adapter for local/test validation and existing unrelated route behavior; local fallback is visibly nonproduction and cannot satisfy the distributed hardening gate.
+- Added no-secret response evidence, readiness posture, UI visibility, deterministic adversarial tests, contract coverage, and operator documentation without introducing a migration, external call, credential, or action authority.
+- Preserved retained boundaries: rate-limit success grants no live PHI, clinical, payer, EHR, outreach, external-distribution, connector, certification, production, or customer go-live authority.
+
+## Latest SCRIMED Work Browser Mutation CSRF Hardening
+
+- Added one deny-by-default request-provenance policy at the shared SCRIMED Work write authorization boundary so every current and future protected mutation receives the same control.
+- Required exact same-origin browser requests and validated Fetch Metadata when present; cross-origin, sibling-subdomain, null-origin, malformed, navigational, and incomplete browser requests fail closed before tenant or authentication lookup.
+- Added an explicit fixed nonsecret `operator-smoke-v1` context for Node/CLI release canaries without weakening bearer authentication, AAL2, RBAC, RLS, workspace isolation, idempotency, migration, runtime-token, or durable-audit controls.
+- Added machine-readable hardening evidence, response headers, authenticated/public smoke coverage, adversarial policy tests, contract checks, and operator documentation.
+- Preserved retained boundaries: request provenance grants no live PHI, clinical, payer, EHR, external-distribution, connector, certification, production, or customer go-live authority.
+
+## Latest Release-Bound Two-Identity Canary Hardening
+
+- Added a deterministic SCRIMED Work canary attestation derived only from authoritative immutable review/completion evidence, the tenant workspace, retained safety controls, and the exact deployed Git SHA.
+- Authenticated each nonsecret evidence ID with a domain-separated HMAC backed by the existing server-held runtime authority, without returning or retaining that secret in evidence.
+- Strengthened the production-hardening gate so `SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED=true` is insufficient by itself: the evidence authentication tag must verify, the release and explicit workspace must match, and immutable completion evidence must remain within a 72-hour promotion window.
+- Exposed the metadata-only attestation through the existing AAL2/RBAC/RLS protected completion-evidence route and browser control, without creating a new public evidence endpoint or returning bearer tokens, artifact content, or raw PHI.
+- Extended the strict two-identity smoke to verify source IDs, review/completion hashes, release/workspace/freshness binding, fixed blocked controls, and response headers before it reports success.
+- Added deterministic policy coverage for same-release stability, cross-release and cross-workspace invalidation, stale and future-dated evidence, malformed evidence rejection, review/completion event separation, and chronological evidence integrity.
+- Preserved retained boundaries: this evidence supports controlled internal synthetic release provenance only. It grants no live PHI, autonomous clinical care, payer submission, EHR writeback, external distribution, certification, connector, production, or customer go-live authority.
 
 ## Latest SCRIMED Work Durable Read and Verification Release
 

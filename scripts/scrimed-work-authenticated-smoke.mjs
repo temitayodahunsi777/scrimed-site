@@ -10,6 +10,7 @@ const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.c
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? "atlas-synthetic-evaluation";
 const bearerToken = process.env.SCRIMED_BEARER_TOKEN?.trim();
 const strict = ["1", "true", "yes"].includes((process.env.SCRIMED_REQUIRE_AUTHENTICATED_SMOKE ?? "").toLowerCase()) || process.argv.includes("--strict");
+const nonBrowserRequestContext = "operator-smoke-v1";
 
 function endpoint(path) {
   return `${baseUrl}${path}`;
@@ -119,6 +120,7 @@ const unauth = await request("/api/scrimed-work/sessions", {
   headers: {
     "Content-Type": "application/json",
     "idempotency-key": `scrimed-work-unauth-${Date.now()}`,
+    "x-scrimed-request-context": nonBrowserRequestContext,
     "x-scrimed-workspace-slug": workspaceSlug
   },
   method: "POST"
@@ -173,6 +175,7 @@ const authHeaders = {
   Authorization: `Bearer ${bearerToken}`,
   "Content-Type": "application/json",
   "idempotency-key": createIdempotencyKey,
+  "x-scrimed-request-context": nonBrowserRequestContext,
   "x-scrimed-workspace-slug": workspaceSlug
 };
 const createPayload = buildSessionPayload(uniqueSuffix);
@@ -184,6 +187,25 @@ const createResult = await request("/api/scrimed-work/sessions", {
 });
 requireStatus("authenticated SCRIMED Work session create", createResult.response.status, [200, 201], createResult.body);
 
+if (createResult.response.headers.get("x-scrimed-csrf-protection") !== "exact-same-origin-or-explicit-non-browser") {
+  throw new Error("authenticated SCRIMED Work session create did not expose the request-provenance protection header.");
+}
+
+const rateLimitMode = createResult.response.headers.get("x-scrimed-rate-limit-mode");
+const rateLimitProvider = createResult.response.headers.get("x-scrimed-rate-limit-provider");
+
+if (createResult.response.headers.get("x-scrimed-rate-limit-decision") !== "allowed") {
+  throw new Error("authenticated SCRIMED Work session create did not expose an allowed mutation rate-limit decision.");
+}
+
+if (
+  !["distributed-required", "bounded-memory"].includes(rateLimitMode ?? "") ||
+  (rateLimitMode === "distributed-required" && rateLimitProvider !== "upstash-redis") ||
+  (rateLimitMode === "bounded-memory" && rateLimitProvider !== "bounded-memory")
+) {
+  throw new Error("authenticated SCRIMED Work session create returned an invalid mutation rate-limit provider posture.");
+}
+
 const createBody = requireJson("authenticated SCRIMED Work session create", createResult.body);
 const createData = createBody.data;
 const sessionId = createData?.session?.id;
@@ -192,7 +214,7 @@ if (!sessionId || createData?.durableStore?.persisted !== true) {
   throw new Error("authenticated SCRIMED Work session create did not return a durable persisted session.");
 }
 
-console.log(`pass authenticated SCRIMED Work session create: ${sessionId}`);
+console.log(`pass authenticated SCRIMED Work session create: ${sessionId} rate_limit=${rateLimitMode}/${rateLimitProvider}`);
 
 const idempotentResult = await request("/api/scrimed-work/sessions", {
   body: JSON.stringify(createPayload),

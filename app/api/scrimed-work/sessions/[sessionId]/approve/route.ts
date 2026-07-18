@@ -13,11 +13,11 @@ export async function POST(
   if (!result.allowed) {
     return NextResponse.json(result.error, {
       status: result.status,
-      headers: scrimedWorkHeaders({ "X-SCRIMED-Approval-Authority": "fail-closed" })
+      headers: scrimedWorkHeaders({ "X-SCRIMED-Approval-Authority": "fail-closed" }, request)
     });
   }
 
   return NextResponse.json(wrapWorkData(result.data, sessionId), {
-    headers: scrimedWorkHeaders({ "X-SCRIMED-Approval-Authority": "independent-role-verified-aal2-durable-write" })
+    headers: scrimedWorkHeaders({ "X-SCRIMED-Approval-Authority": "independent-role-verified-aal2-durable-write" }, request)
   });
 }

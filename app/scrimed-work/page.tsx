@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getScrimedWorkSummary } from "../lib/scrimed-work";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "SCRIMED Work & Intelligence Platform",
   description:
@@ -87,6 +89,10 @@ export default function ScrimedWorkPage() {
           <ul className="compact-list">
             <li>Definition of Done required: {summary.governanceStatus.definitionOfDoneRequired ? "yes" : "no"}</li>
             <li>Verification blocks completion: {summary.governanceStatus.verificationBlocksCompletion ? "yes" : "no"}</li>
+            <li>Browser mutation CSRF protection: {summary.governanceStatus.browserWriteCsrfEnforced ? "exact same-origin" : "not enforced"}</li>
+            <li>Mutation rate-limit mode: {summary.governanceStatus.mutationRateLimit.mode}</li>
+            <li>Distributed rate-limit provider configured: {summary.governanceStatus.mutationRateLimit.distributedProviderConfigured ? "yes" : "no"}</li>
+            <li>Provider-unavailable behavior: {summary.governanceStatus.mutationRateLimit.failClosedOnProviderUnavailable ? "fail closed" : "local/test bounded fallback"}</li>
             <li>Schedules disabled by default: {summary.governanceStatus.schedulesDisabledByDefault ? "yes" : "no"}</li>
             <li>Voice simulation only: {summary.governanceStatus.voiceSimulationOnly ? "yes" : "no"}</li>
           </ul>
@@ -114,6 +120,17 @@ export default function ScrimedWorkPage() {
               <li>Operator-required gates: {summary.productionHardening.summary.operatorRequired}</li>
               <li>Strict smoke eligible: {summary.productionHardening.canRunStrictNonProductionSmoke ? "yes" : "no"}</li>
               <li>Canary eligible: {summary.productionHardening.canaryEligible ? "yes" : "no"}</li>
+              <li>Mutation rate-limit mode: {summary.productionHardening.mutationRateLimit.mode}</li>
+              <li>Actor quota: {summary.productionHardening.mutationRateLimit.actorLimit} / {summary.productionHardening.mutationRateLimit.windowSeconds}s</li>
+              <li>Tenant quota: {summary.productionHardening.mutationRateLimit.tenantLimit} / {summary.productionHardening.mutationRateLimit.windowSeconds}s</li>
+              <li>Distributed provider configured: {summary.productionHardening.mutationRateLimit.distributedProviderConfigured ? "yes" : "no"}</li>
+              <li>Production downgrade prevented: {summary.productionHardening.mutationRateLimit.downgradePrevented ? "yes" : "not requested"}</li>
+              <li>Current release: {summary.productionHardening.releaseBinding.currentReleaseShaFingerprint}</li>
+              <li>Canary release: {summary.productionHardening.releaseBinding.canaryReleaseShaFingerprint}</li>
+              <li>Evidence authenticated: {summary.productionHardening.releaseBinding.evidenceIdAuthenticated ? "yes" : "no"}</li>
+              <li>Workspace binding: {summary.productionHardening.releaseBinding.workspaceBound ? summary.productionHardening.releaseBinding.workspaceSlug : "not verified"}</li>
+              <li>Canary freshness: {summary.productionHardening.releaseBinding.fresh ? `fresh (${summary.productionHardening.releaseBinding.ageHours?.toFixed(2) ?? "0.00"}h)` : "stale or unavailable"}</li>
+              <li>Release binding matched: {summary.productionHardening.releaseBinding.matched ? "yes" : "no"}</li>
             </ul>
           </div>
           <div>

@@ -23,6 +23,12 @@ const strict =
   ["1", "true", "yes"].includes(
     (process.env.SCRIMED_REQUIRE_TWO_IDENTITY_SMOKE ?? "").toLowerCase()
   ) || process.argv.includes("--strict");
+const expectedReleaseSha = (
+  process.env.SCRIMED_EXPECTED_RELEASE_SHA ??
+  process.env.SCRIMED_APPROVED_RELEASE_SHA ??
+  ""
+).trim().toLowerCase();
+const nonBrowserRequestContext = "operator-smoke-v1";
 
 function endpoint(path) {
   return `${baseUrl}${path}`;
@@ -113,7 +119,8 @@ function writeHeaders(token, idempotencyKey) {
   return {
     ...readHeaders(token),
     "Content-Type": "application/json",
-    "idempotency-key": idempotencyKey
+    "idempotency-key": idempotencyKey,
+    "x-scrimed-request-context": nonBrowserRequestContext
   };
 }
 
@@ -307,13 +314,34 @@ const createResult = await request("/api/scrimed-work/sessions", {
   method: "POST"
 });
 requireStatus("operator SCRIMED Work session create", createResult.response.status, [200, 201], createResult.body);
+requireHeader(
+  "operator SCRIMED Work session create",
+  createResult.response,
+  "X-SCRIMED-CSRF-Protection",
+  "exact-same-origin-or-explicit-non-browser"
+);
+requireHeader(
+  "operator SCRIMED Work session create",
+  createResult.response,
+  "X-SCRIMED-Rate-Limit-Decision",
+  "allowed"
+);
+const mutationRateLimitMode = createResult.response.headers.get("x-scrimed-rate-limit-mode");
+const mutationRateLimitProvider = createResult.response.headers.get("x-scrimed-rate-limit-provider");
+if (
+  !["distributed-required", "bounded-memory"].includes(mutationRateLimitMode ?? "") ||
+  (mutationRateLimitMode === "distributed-required" && mutationRateLimitProvider !== "upstash-redis") ||
+  (mutationRateLimitMode === "bounded-memory" && mutationRateLimitProvider !== "bounded-memory")
+) {
+  throw new Error("operator session create returned an invalid mutation rate-limit provider posture.");
+}
 const createBody = requireJson("operator SCRIMED Work session create", createResult.body);
 const sessionId = createBody.data?.session?.id;
 
 if (!sessionId || createBody.data?.durableStore?.persisted !== true) {
   throw new Error("operator session create did not return a durable synthetic SCRIMED Work session.");
 }
-console.log(`pass operator durable session create: ${sessionId}`);
+console.log(`pass operator durable session create: ${sessionId} rate_limit=${mutationRateLimitMode}/${mutationRateLimitProvider}`);
 
 const planResult = await request(`/api/scrimed-work/sessions/${sessionId}/plan`, {
   body: JSON.stringify({ workspaceSlug }),
@@ -574,6 +602,10 @@ const completionEvidenceBody = requireJson(
 const completionEvidenceItem = completionEvidenceBody.data?.evidence?.items?.find(
   (item) => item.sessionId === sessionId && item.artifactId === artifactId
 );
+const canaryAttestation = completionEvidenceBody.data?.canaryAttestation;
+const canaryCompletedAtMs = Date.parse(canaryAttestation?.freshness?.completedAt ?? "");
+const canaryEvaluatedAtMs = Date.parse(canaryAttestation?.freshness?.evaluatedAt ?? "");
+const canaryAgeMs = canaryEvaluatedAtMs - canaryCompletedAtMs;
 
 if (
   completionEvidenceBody.data?.mode !== "evidence" ||
@@ -594,6 +626,53 @@ if (
 ) {
   throw new Error("completed evidence history did not bind the independent review and completion events.");
 }
+if (
+  canaryAttestation?.service !== "scrimed-work-release-bound-canary-attestation" ||
+  canaryAttestation?.status !== "verified_release_bound" ||
+  canaryAttestation?.eligibleForReleaseBinding !== true ||
+  !/^scrimed-work-canary-[a-f0-9]{64}\.[a-f0-9]{64}$/.test(canaryAttestation?.evidenceId ?? "") ||
+  !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(canaryAttestation?.releaseSha ?? "") ||
+  canaryAttestation?.releaseShaFingerprint !== canaryAttestation.releaseSha.slice(0, 12) ||
+  canaryAttestation?.workspaceSlug !== workspaceSlug ||
+  canaryAttestation?.freshness?.fresh !== true ||
+  canaryAttestation?.freshness?.maxAgeHours !== 72 ||
+  canaryAttestation?.freshness?.clockSkewMinutes !== 5 ||
+  !Number.isFinite(canaryCompletedAtMs) ||
+  !Number.isFinite(canaryEvaluatedAtMs) ||
+  canaryAgeMs < -(5 * 60 * 1000) ||
+  canaryAgeMs > 72 * 60 * 60 * 1000 ||
+  canaryAttestation?.source?.sessionId !== sessionId ||
+  canaryAttestation?.source?.artifactId !== artifactId ||
+  canaryAttestation?.source?.reviewEventId !== completionEvidenceItem.reviewEventId ||
+  canaryAttestation?.source?.completionEventId !== completionEvidenceItem.completionEventId ||
+  canaryAttestation?.source?.evidencePacketHash !== completionEvidenceItem.evidencePacketHash ||
+  canaryAttestation?.source?.readAuditEventId !== completionEvidenceBody.data.evidence.auditEventId ||
+  canaryAttestation?.configuration?.values?.verified !== "true" ||
+  canaryAttestation?.configuration?.values?.evidenceId !== canaryAttestation.evidenceId ||
+  canaryAttestation?.configuration?.values?.releaseSha !== canaryAttestation.releaseSha ||
+  canaryAttestation?.configuration?.values?.completedAt !== canaryAttestation.freshness.completedAt ||
+  canaryAttestation?.configuration?.values?.workspaceSlug !== workspaceSlug ||
+  canaryAttestation?.configuration?.variableNames?.completedAt !== "SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT" ||
+  canaryAttestation?.configuration?.variableNames?.workspaceSlug !== "SCRIMED_WORKSPACE_SLUG" ||
+  canaryAttestation?.controls?.independentReviewerRequired !== true ||
+  canaryAttestation?.controls?.exactReleaseRequired !== true ||
+  canaryAttestation?.controls?.exactWorkspaceRequired !== true ||
+  canaryAttestation?.controls?.freshnessRequired !== true ||
+  canaryAttestation?.controls?.noPhi !== true ||
+  canaryAttestation?.controls?.externalDistributionAllowed !== false ||
+  canaryAttestation?.controls?.payerSubmissionAllowed !== false ||
+  canaryAttestation?.controls?.ehrWritebackAllowed !== false ||
+  canaryAttestation?.controls?.productionAuthorization !== false
+) {
+  throw new Error("completed evidence did not produce a valid release-bound canary attestation.");
+}
+if (
+  expectedReleaseSha &&
+  (!/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(expectedReleaseSha) ||
+    canaryAttestation.releaseSha !== expectedReleaseSha)
+) {
+  throw new Error("release-bound canary attestation did not match SCRIMED_EXPECTED_RELEASE_SHA.");
+}
 requireHeader(
   "completed SCRIMED Work evidence history",
   completionEvidenceResult.response,
@@ -603,10 +682,25 @@ requireHeader(
 requireHeader(
   "completed SCRIMED Work evidence history",
   completionEvidenceResult.response,
+  "X-SCRIMED-Canary-Attestation",
+  "verified_release_bound"
+);
+requireHeader(
+  "completed SCRIMED Work evidence history",
+  completionEvidenceResult.response,
+  "X-SCRIMED-Canary-Freshness",
+  "fresh"
+);
+requireHeader(
+  "completed SCRIMED Work evidence history",
+  completionEvidenceResult.response,
   "X-SCRIMED-External-Distribution",
   "not-authorized"
 );
 console.log(
   `pass immutable completion evidence: packet=${completionEvidenceItem.evidencePacketHash} audit_event=${completionEvidenceBody.data.evidence.auditEventId}`
+);
+console.log(
+  `pass release-bound canary attestation: evidence_id=${canaryAttestation.evidenceId} release=${canaryAttestation.releaseShaFingerprint} workspace=${canaryAttestation.workspaceSlug} completed_at=${canaryAttestation.freshness.completedAt}`
 );
 console.log("SCRIMED Work two-identity AAL2 lifecycle canary completed.");

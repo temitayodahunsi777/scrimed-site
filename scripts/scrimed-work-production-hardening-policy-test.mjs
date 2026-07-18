@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
 
+import { getScrimedWorkCanaryAuthenticationMessage } from "../app/lib/scrimed-work/canaryAttestation.ts";
 import { getScrimedWorkProductionHardeningGate } from "../app/lib/scrimed-work/productionHardening.ts";
 
 const baseEnv = {
@@ -17,14 +19,93 @@ const baseEnv = {
   SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID:
     "supabase-work-review-approval-20260715",
   SCRIMED_WORKSPACE_SLUG: "atlas-synthetic-evaluation",
-  SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: "false"
+  SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: "false",
+  VERCEL_GIT_COMMIT_SHA: "a".repeat(40)
 };
+const canaryEvidenceDigest = "c".repeat(64);
+const canaryCompletedAt = "2026-07-14T00:00:00.000Z";
+const canaryEvaluatedAt = "2026-07-14T01:00:00.000Z";
+const canaryAuthenticationTag = createHmac(
+  "sha256",
+  baseEnv.SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN
+)
+  .update(getScrimedWorkCanaryAuthenticationMessage({
+    evidenceDigest: canaryEvidenceDigest,
+    releaseSha: baseEnv.VERCEL_GIT_COMMIT_SHA,
+    workspaceSlug: baseEnv.SCRIMED_WORKSPACE_SLUG,
+    completedAt: canaryCompletedAt
+  }))
+  .digest("hex");
+const authenticatedCanaryEvidenceId =
+  `scrimed-work-canary-${canaryEvidenceDigest}.${canaryAuthenticationTag}`;
 
 function gate(report, gateId) {
   const value = report.gates.find((item) => item.gateId === gateId);
   assert.ok(value, `missing ${gateId}`);
   return value;
 }
+
+const localRateLimitOnly = getScrimedWorkProductionHardeningGate(
+  baseEnv,
+  "2026-07-14T00:00:00.000Z"
+);
+assert.equal(localRateLimitOnly.mutationRateLimit.mode, "bounded-memory");
+assert.equal(
+  gate(localRateLimitOnly, "scrimed-work-distributed-mutation-rate-limit").status,
+  "operator_required"
+);
+assert.equal(localRateLimitOnly.canRunStrictNonProductionSmoke, false);
+
+const productionRateLimitMissing = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    VERCEL_ENV: "production",
+    SCRIMED_BEARER_TOKEN: "operator-token-test-value",
+    SCRIMED_REVIEWER_BEARER_TOKEN: "reviewer-token-test-value"
+  },
+  "2026-07-14T00:00:00.000Z"
+);
+assert.equal(productionRateLimitMissing.mutationRateLimit.mode, "distributed-required");
+assert.equal(productionRateLimitMissing.mutationRateLimit.readyForProtectedMutations, false);
+assert.equal(productionRateLimitMissing.canRunStrictNonProductionSmoke, false);
+assert.match(
+  gate(productionRateLimitMissing, "scrimed-work-distributed-mutation-rate-limit").blocker ?? "",
+  /distributed Upstash/i
+);
+
+const productionRateLimitReady = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    VERCEL_ENV: "production",
+    SCRIMED_WORK_RATE_LIMIT_MODE: "bounded-memory",
+    UPSTASH_REDIS_REST_URL: "https://synthetic-upstash.example",
+    UPSTASH_REDIS_REST_TOKEN: "nonsecret-test-token",
+    SCRIMED_BEARER_TOKEN: "operator-token-test-value",
+    SCRIMED_REVIEWER_BEARER_TOKEN: "reviewer-token-test-value"
+  },
+  "2026-07-14T00:00:00.000Z"
+);
+assert.equal(productionRateLimitReady.mutationRateLimit.mode, "distributed-required");
+assert.equal(productionRateLimitReady.mutationRateLimit.downgradePrevented, true);
+assert.equal(productionRateLimitReady.mutationRateLimit.readyForProtectedMutations, true);
+assert.equal(productionRateLimitReady.canRunStrictNonProductionSmoke, true);
+assert.equal(
+  gate(productionRateLimitReady, "scrimed-work-distributed-mutation-rate-limit").status,
+  "evidence_ready"
+);
+
+const invalidRateLimitMode = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_RATE_LIMIT_MODE: "permissive"
+  },
+  "2026-07-14T00:00:00.000Z"
+);
+assert.equal(invalidRateLimitMode.status, "blocked");
+assert.equal(
+  gate(invalidRateLimitMode, "scrimed-work-distributed-mutation-rate-limit").status,
+  "blocked"
+);
 
 const missingReviewApprovalMigration = getScrimedWorkProductionHardeningGate(
   {
@@ -104,25 +185,78 @@ const malformedEvidence = getScrimedWorkProductionHardeningGate(
   {
     ...baseEnv,
     SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
-    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: "bad"
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: "bad",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "a".repeat(40),
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT: canaryCompletedAt
   },
   "2026-07-14T00:00:00.000Z"
 );
 
 assert.equal(gate(malformedEvidence, "scrimed-work-canary-release").status, "operator_required");
 
+const missingCompletionTimestamp = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: authenticatedCanaryEvidenceId,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "a".repeat(40)
+  },
+  canaryEvaluatedAt
+);
+
+assert.equal(missingCompletionTimestamp.releaseBinding.fresh, false);
+assert.match(
+  gate(missingCompletionTimestamp, "scrimed-work-canary-release").blocker ?? "",
+  /completion timestamp/i
+);
+
+const forgedEvidence = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID:
+      `scrimed-work-canary-${"c".repeat(64)}.${"d".repeat(64)}`,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "a".repeat(40),
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT: canaryCompletedAt
+  },
+  "2026-07-14T00:00:00.000Z"
+);
+
+assert.equal(forgedEvidence.releaseBinding.evidenceIdFormatValid, true);
+assert.equal(forgedEvidence.releaseBinding.evidenceIdAuthenticated, false);
+assert.equal(gate(forgedEvidence, "scrimed-work-canary-release").status, "operator_required");
+assert.match(
+  gate(forgedEvidence, "scrimed-work-canary-release").blocker ?? "",
+  /not authenticated/i
+);
+
 const verifiedEvidence = getScrimedWorkProductionHardeningGate(
   {
     ...baseEnv,
     SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
-    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: "scrimed-work-canary-20260714-a1b2c3d4"
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: authenticatedCanaryEvidenceId,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "a".repeat(40),
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT: canaryCompletedAt
   },
-  "2026-07-14T00:00:00.000Z"
+  canaryEvaluatedAt
 );
 
 assert.equal(gate(verifiedEvidence, "scrimed-work-aal2-operator-session").status, "evidence_ready");
 assert.equal(gate(verifiedEvidence, "scrimed-work-aal2-reviewer-session").status, "evidence_ready");
 assert.equal(gate(verifiedEvidence, "scrimed-work-canary-release").status, "evidence_ready");
+assert.deepEqual(verifiedEvidence.releaseBinding, {
+  currentReleaseShaFingerprint: "a".repeat(12),
+  canaryReleaseShaFingerprint: "a".repeat(12),
+  evidenceIdFormatValid: true,
+  evidenceIdAuthenticated: true,
+  workspaceSlug: "atlas-synthetic-evaluation",
+  workspaceBound: true,
+  completedAt: canaryCompletedAt,
+  ageHours: 1,
+  maxAgeHours: 72,
+  fresh: true,
+  matched: true
+});
 assert.deepEqual(verifiedEvidence.migrationSet, {
   requiredVersion: "20260716184500",
   requiredCount: 10,
@@ -135,6 +269,61 @@ assert.ok(
   verifiedEvidence.strictSmokeCommands.includes("npm run smoke:scrimed-work:two-identity:strict")
 );
 
+const staleReleaseEvidence = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: authenticatedCanaryEvidenceId,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "b".repeat(40),
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT: canaryCompletedAt
+  },
+  canaryEvaluatedAt
+);
+
+assert.equal(gate(staleReleaseEvidence, "scrimed-work-canary-release").status, "operator_required");
+assert.match(
+  gate(staleReleaseEvidence, "scrimed-work-canary-release").blocker ?? "",
+  /exact current release sha/i
+);
+assert.equal(staleReleaseEvidence.releaseBinding.evidenceIdFormatValid, true);
+assert.equal(staleReleaseEvidence.releaseBinding.evidenceIdAuthenticated, false);
+assert.equal(staleReleaseEvidence.releaseBinding.matched, false);
+
+const staleCompletionEvidence = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: authenticatedCanaryEvidenceId,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "a".repeat(40),
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT: canaryCompletedAt
+  },
+  "2026-07-17T00:00:00.001Z"
+);
+
+assert.equal(staleCompletionEvidence.releaseBinding.evidenceIdAuthenticated, true);
+assert.equal(staleCompletionEvidence.releaseBinding.fresh, false);
+assert.equal(gate(staleCompletionEvidence, "scrimed-work-canary-release").status, "operator_required");
+assert.match(
+  gate(staleCompletionEvidence, "scrimed-work-canary-release").blocker ?? "",
+  /freshness window/i
+);
+
+const crossWorkspaceEvidence = getScrimedWorkProductionHardeningGate(
+  {
+    ...baseEnv,
+    SCRIMED_WORKSPACE_SLUG: "northstar-synthetic-evaluation",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED: "true",
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID: authenticatedCanaryEvidenceId,
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA: "a".repeat(40),
+    SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT: canaryCompletedAt
+  },
+  canaryEvaluatedAt
+);
+
+assert.equal(crossWorkspaceEvidence.releaseBinding.evidenceIdAuthenticated, false);
+assert.equal(crossWorkspaceEvidence.releaseBinding.workspaceBound, false);
+assert.equal(gate(crossWorkspaceEvidence, "scrimed-work-canary-release").status, "operator_required");
+
 console.log(
-  "pass SCRIMED Work production-hardening policy (two identities required, evidence bound, tokens redacted)"
+  "pass SCRIMED Work production-hardening policy (two identities required, evidence release-bound, tokens redacted)"
 );
