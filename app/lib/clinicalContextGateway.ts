@@ -25,6 +25,10 @@ import {
   evaluateClinicalContextLens,
   type ClinicalContextLensResult
 } from "./clinicalEvidenceControls";
+import {
+  clinicalSearchFabricBoundary,
+  clinicalSearchFabricVersion
+} from "./clinicalSearchFabric";
 
 export type ClinicalContextGatewayScope =
   | "patient-context-summary"
@@ -160,6 +164,16 @@ export type ClinicalContextGatewaySummary = {
     livePhiEnabled: false;
     unsupportedOrStaleContextAction: "abstain-or-require-review";
     sourceAndReasonRequired: true;
+  };
+  clinicalSearchFabric: {
+    version: typeof clinicalSearchFabricVersion;
+    pipeline: string[];
+    externalCrawlerEnabled: false;
+    patientSpecificCacheEnabled: false;
+    conflictAction: "present-conflict-and-require-review";
+    retrievalFailureIsNoEvidence: false;
+    optimizationTarget: "cost-per-clinically-accepted-answer";
+    boundary: typeof clinicalSearchFabricBoundary;
   };
   sourceContractCount: number;
   baselineEvaluationCount: number;
@@ -442,6 +456,7 @@ function buildContextLens(
   return evaluateClinicalContextLens(
     {
       mode: publicEvidence ? "public-evidence" : "clinical-context",
+      tenantId: publicEvidence ? null : "synthetic-tenant-scope",
       taskType: request.requestedContextScope,
       dataClassification: publicEvidence ? "public" : "metadata",
       authenticated: request.requesterRole !== "public-visitor",
@@ -456,6 +471,7 @@ function buildContextLens(
           id: sourceContract.id,
           title: sourceContract.name,
           uri: `source-contract:${sourceContract.id}`,
+          tenantScope: publicEvidence ? "public" : "synthetic-tenant-scope",
           trustTier: "reviewed",
           effectiveAt: "2026-07-17T00:00:00.000Z",
           expiresAt: null,
@@ -893,6 +909,25 @@ export function getClinicalContextGatewaySummary(): ClinicalContextGatewaySummar
       unsupportedOrStaleContextAction: clinicalContextIsolationPolicy.unsupportedOrStaleContextAction,
       sourceAndReasonRequired: true
     },
+    clinicalSearchFabric: {
+      version: clinicalSearchFabricVersion,
+      pipeline: [
+        "clinical-intent-classification",
+        "bounded-query-expansion",
+        "approved-source-selection",
+        "rights-aware-retrieval",
+        "evidence-ranking",
+        "claim-citation-validation",
+        "conflict-and-uncertainty-presentation",
+        "accepted-answer-cost-measurement"
+      ],
+      externalCrawlerEnabled: false,
+      patientSpecificCacheEnabled: false,
+      conflictAction: "present-conflict-and-require-review",
+      retrievalFailureIsNoEvidence: false,
+      optimizationTarget: "cost-per-clinically-accepted-answer",
+      boundary: clinicalSearchFabricBoundary
+    },
     sourceContractCount: getClinicalDataFabricSummary().sourceContractCount,
     baselineEvaluationCount: baselineEvaluations.length,
     baselineEvaluations,
@@ -925,6 +960,13 @@ export function buildClinicalContextGatewayBrief() {
     "",
     "## Gateway Controls",
     ...summary.gatewayControls.map((control) => `- ${control}`),
+    "",
+    "## Clinical Search Fabric",
+    `- Version: ${summary.clinicalSearchFabric.version}`,
+    `- Optimization target: ${summary.clinicalSearchFabric.optimizationTarget}`,
+    `- Conflict action: ${summary.clinicalSearchFabric.conflictAction}`,
+    `- External crawler enabled: ${summary.clinicalSearchFabric.externalCrawlerEnabled}`,
+    `- Patient-specific cache enabled: ${summary.clinicalSearchFabric.patientSpecificCacheEnabled}`,
     "",
     "## Context Lens",
     `- Modes: ${summary.contextLens.modes.join(", ")}`,

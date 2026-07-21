@@ -231,6 +231,13 @@ checks.push(
 const requiredFailures = checks.filter((item) => item.severity === "required" && !item.passed);
 const operatorFailures = checks.filter((item) => item.severity === "operator" && !item.passed);
 const status = requiredFailures.length > 0 ? "fail" : operatorFailures.length > 0 ? "operator-action-required" : "ready";
+const browserSessionWorkaround = {
+  url: "https://app.scrimedsolutions.com/pilot-workspace/access",
+  requires: "Fresh AAL2 tenant-admin or pilot-lead browser session",
+  actions: ["Run SCRIMED Work Verification", "Run Tenant Verification"],
+  retainedBoundary:
+    "Uses the active browser session without exporting a bearer token; synthetic metadata only."
+};
 const report = {
   service: "scrimed-work-durable-store-preflight",
   status,
@@ -263,11 +270,12 @@ const report = {
       ? aal2SignatureVerification.localPreflight
       : "not-verified-invalid-or-missing"
   },
+  browserSessionWorkaround,
   checks,
   next:
     status === "ready"
       ? "Reviewed non-production migration evidence is configured; run npm run smoke:scrimed-work:strict, then retain the no-PHI canary evidence."
-      : "Configure missing operator inputs, confirm reviewed migration history and evidence for every SCRIMED Work migration on the approved no-PHI target, then rerun this preflight in strict mode.",
+      : "For interactive verification, use the protected browser-session workaround without exporting a token. For CLI strict smoke, configure missing operator inputs, confirm reviewed migration history and evidence for every SCRIMED Work migration on the approved no-PHI target, then rerun this preflight in strict mode.",
   boundaries: [
     "No secrets, bearer tokens, Supabase keys, PHI, raw connector payloads, or patient data are printed.",
     "This preflight does not apply migrations, mutate Supabase, approve production use, or authorize live clinical workflows."

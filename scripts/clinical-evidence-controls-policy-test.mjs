@@ -3,10 +3,15 @@
 import assert from "node:assert/strict";
 
 import {
+  buildContextPacket,
   buildCaseEvidencePacket,
   createClinicalEvidenceHash,
+  evaluateCaseEvidenceAggregation,
   evaluateClinicalContextLens,
-  evaluateWorstCellReleaseGate
+  evaluateWorstCellReleaseGate,
+  exportCaseEvidenceForAnalysis,
+  InMemoryCaseEvidenceEventStore,
+  verifyCaseEvidencePacketIntegrity
 } from "../app/lib/clinicalEvidenceControls.ts";
 import {
   documentationBeforeAuthorizationRequirements,
@@ -22,6 +27,7 @@ const source = {
   id: "public-guideline-001",
   title: "Synthetic reviewed guideline contract",
   uri: "https://evidence.example/guideline-001",
+  tenantScope: "public",
   trustTier: "reviewed",
   effectiveAt: "2026-07-01T00:00:00.000Z",
   expiresAt: "2026-08-01T00:00:00.000Z",
@@ -31,6 +37,7 @@ const source = {
 const publicContext = evaluateClinicalContextLens(
   {
     mode: "public-evidence",
+    tenantId: null,
     taskType: "public-evidence-review",
     dataClassification: "public",
     authenticated: false,
@@ -58,6 +65,7 @@ assert.equal(publicContext.actionAuthority, "decision-support-only");
 const clinicalContext = evaluateClinicalContextLens(
   {
     mode: "clinical-context",
+    tenantId: "synthetic-tenant-a",
     taskType: "synthetic-care-coordination-context",
     dataClassification: "metadata",
     authenticated: true,
@@ -67,7 +75,7 @@ const clinicalContext = evaluateClinicalContextLens(
     humanReviewRequired: true,
     patientFit: "not-assessed",
     relevantHistory: ["semantic-concept:encounter"],
-    sources: [source],
+    sources: [{ ...source, tenantScope: "synthetic-tenant-a" }],
     missingData: ["verify-at-runtime:source timestamp"],
     confidenceScore: 0.8,
     calibrationStatus: "not-evaluated",
@@ -79,6 +87,17 @@ const clinicalContext = evaluateClinicalContextLens(
 );
 assert.equal(clinicalContext.status, "review-required");
 assert.equal(clinicalContext.humanReviewRequired, true);
+const crossTenantClinical = evaluateClinicalContextLens(
+  {
+    ...clinicalContext,
+    tenantId: "synthetic-tenant-a",
+    sources: [{ ...source, tenantScope: "synthetic-tenant-b" }],
+    proposedNextAction: "Blocked."
+  },
+  generatedAt
+);
+assert.equal(crossTenantClinical.status, "blocked");
+assert.equal(crossTenantClinical.abstentionReasons.some((reason) => reason.includes("requesting tenant")), true);
 
 const unauthenticatedClinical = evaluateClinicalContextLens(
   {
@@ -107,6 +126,7 @@ assert.equal(unauthenticatedClinical.status, "blocked");
 const staleContext = evaluateClinicalContextLens(
   {
     mode: "public-evidence",
+    tenantId: null,
     taskType: "stale-public-evidence-review",
     dataClassification: "public",
     authenticated: false,
@@ -133,6 +153,7 @@ assert.deepEqual(staleContext.freshness.expiredSourceIds, [source.id]);
 const phiContext = evaluateClinicalContextLens(
   {
     mode: "clinical-context",
+    tenantId: "synthetic-tenant-a",
     taskType: "live-phi-request",
     dataClassification: "phi",
     authenticated: true,
@@ -142,7 +163,7 @@ const phiContext = evaluateClinicalContextLens(
     humanReviewRequired: true,
     patientFit: "not-assessed",
     relevantHistory: [],
-    sources: [source],
+    sources: [{ ...source, tenantScope: "synthetic-tenant-a" }],
     missingData: [],
     confidenceScore: 0.9,
     calibrationStatus: "not-evaluated",
@@ -154,8 +175,96 @@ const phiContext = evaluateClinicalContextLens(
 );
 assert.equal(phiContext.status, "blocked");
 
+const mislabeledPhiContext = evaluateClinicalContextLens(
+  {
+    ...clinicalContext,
+    relevantHistory: ["contact patient@example.com"],
+    proposedNextAction: "Blocked."
+  },
+  generatedAt
+);
+assert.equal(mislabeledPhiContext.status, "blocked");
+assert.equal(
+  mislabeledPhiContext.abstentionReasons.some((reason) => reason.includes("prohibited PHI")),
+  true
+);
+
+const contextPacket = buildContextPacket(
+  {
+    tenantId: "synthetic-tenant-a",
+    subjectReference: { kind: "workflow-subject", reference: "synthetic-workflow-subject-001" },
+    encounterOrWorkflowReference: "workflow-documentation-review-001",
+    requestingActor: {
+      actorId: "synthetic-reviewer-001",
+      role: "rcm-reviewer",
+      purposeOfUse: "synthetic-documentation-review"
+    },
+    operatingMode: "clinical-context",
+    lensInput: {
+      mode: "clinical-context",
+      tenantId: "synthetic-tenant-a",
+      taskType: "synthetic-documentation-review",
+      dataClassification: "metadata",
+      authenticated: true,
+      tenantScoped: true,
+      minimumNecessary: true,
+      consentVerified: true,
+      humanReviewRequired: true,
+      patientFit: "not-assessed",
+      relevantHistory: ["synthetic-evidence-001"],
+      sources: [{ ...source, tenantScope: "synthetic-tenant-a" }],
+      missingData: [],
+      confidenceScore: 0.9,
+      calibrationStatus: "synthetic-calibrated",
+      contraindications: [],
+      policyConstraints: ["human-review-required"],
+      proposedNextAction: "Queue qualified review."
+    },
+    supportingEvidence: ["synthetic-evidence-001"],
+    contradictoryEvidenceSourceIds: [],
+    versions: {
+      model: "not-used",
+      prompt: "not-used",
+      tools: ["context-lens"],
+      policy: "synthetic-policy-v1",
+      retrieval: "synthetic-retrieval-v1"
+    },
+    correlationId: "correlation-context-001",
+    traceId: "trace-context-001"
+  },
+  generatedAt
+);
+assert.equal(contextPacket.operatingMode, "clinical-context");
+assert.equal(contextPacket.requiredReviewLevel, "clinical-authority-review");
+assert.equal(contextPacket.containsPhi, false);
+assert.throws(
+  () => buildContextPacket({
+    ...contextPacket,
+    lensInput: {
+      ...clinicalContext,
+      dataClassification: "public",
+      proposedNextAction: "Blocked.",
+      authenticated: false,
+      tenantScoped: false,
+      minimumNecessary: true,
+      consentVerified: true,
+      humanReviewRequired: false
+    },
+    operatingMode: "public-evidence",
+    tenantId: "synthetic-tenant-a",
+    subjectReference: null,
+    supportingEvidence: [],
+    contradictoryEvidenceSourceIds: [],
+    versions: contextPacket.versions
+  }, generatedAt),
+  /Public Evidence mode cannot bind a clinical tenant/
+);
+
 const caseEvidenceInput = {
+  tenantId: "synthetic-tenant-a",
+  siteId: "synthetic-site-a",
   syntheticCaseId: "synthetic-case-001",
+  workflowCaseId: "workflow-case-001",
   workflowId: "documentation-before-authorization",
   cohortDefinition: "Registered synthetic workflow case.",
   eligibilityCriteria: ["synthetic fixture", "no PHI"],
@@ -164,6 +273,12 @@ const caseEvidenceInput = {
     label: "Deterministic documentation review",
     startedAt: generatedAt,
     completedAt: generatedAt
+  },
+  eventTimestamps: {
+    eligibleAt: generatedAt,
+    baselineObservedAt: generatedAt,
+    interventionStartedAt: generatedAt,
+    dispositionedAt: generatedAt
   },
   sourceLineage: ["synthetic-evidence-001"],
   versions: {
@@ -174,6 +289,7 @@ const caseEvidenceInput = {
   },
   clinicianAction: "awaiting-review",
   overrideReasonCode: null,
+  workflowDisposition: "prepared-for-review",
   outcomes: [
     {
       metricId: "documentation-completeness",
@@ -186,11 +302,24 @@ const caseEvidenceInput = {
       interpretation: "descriptive-only"
     }
   ],
+  patientReportedOutcomes: [],
   safetyEventCodes: ["human-review-required"],
   missingness: ["reviewer disposition"],
   confounders: ["synthetic fixture"],
   siteAttributes: ["synthetic site"],
   subgroupAttributes: ["synthetic subgroup"],
+  latencyMs: 250,
+  utilizationCount: 1,
+  adoptionStatus: "offered",
+  costPerAcceptedOutcomeUsd: null,
+  traceId: "trace-case-evidence-001",
+  correlationId: "correlation-case-evidence-001",
+  governance: {
+    consentStatus: "not-applicable-synthetic",
+    duaStatus: "not-applicable-single-tenant",
+    aggregationAuthorization: "single-tenant-only",
+    purposeOfUse: "synthetic-workflow-evaluation"
+  },
   analysisPlanStatus: "draft",
   trustQaStatus: "review-required",
   humanReviewRequired: true,
@@ -204,11 +333,60 @@ assert.equal(packetOne.caseIdHash.length, 64);
 assert.equal(packetOne.evidencePacketHash.length, 64);
 assert.equal(packetOne.causalClaimAllowed, false);
 assert.equal(packetOne.externalDistributionAllowed, false);
+assert.equal(packetOne.completeness.completenessPercent, 100);
+assert.equal(packetOne.tenantIdHash.length, 64);
+assert.equal(packetOne.traceId, caseEvidenceInput.traceId);
 assert.equal("syntheticCaseId" in packetOne, false);
 assert.throws(
   () => buildCaseEvidencePacket({ ...caseEvidenceInput, syntheticCaseId: "patient-name" }, generatedAt),
   /Invalid synthetic case evidence input/
 );
+assert.throws(
+  () => buildCaseEvidencePacket({ ...caseEvidenceInput, cohortDefinition: "MRN: ABCD-1234" }, generatedAt),
+  /prohibited PHI/
+);
+
+const tamperedPacket = { ...packetOne, cohortDefinition: "MRN: ABCD-1234" };
+const tamperedPacketPayload = { ...tamperedPacket };
+delete tamperedPacketPayload.evidencePacketHash;
+tamperedPacket.evidencePacketHash = createClinicalEvidenceHash(tamperedPacketPayload);
+assert.equal(verifyCaseEvidencePacketIntegrity(tamperedPacket), false);
+
+const eventStore = new InMemoryCaseEvidenceEventStore();
+const firstAppend = eventStore.append(packetOne);
+const duplicateAppend = eventStore.append(packetOne);
+assert.equal(firstAppend.status, "appended");
+assert.equal(duplicateAppend.status, "duplicate");
+assert.equal(firstAppend.event.eventHash, duplicateAppend.event.eventHash);
+assert.equal(eventStore.listForTenant(packetOne.tenantIdHash).length, 1);
+assert.equal(eventStore.listForTenant(createClinicalEvidenceHash({ tenantId: "synthetic-tenant-b" })).length, 0);
+assert.throws(() => eventStore.append(tamperedPacket), /integrity verification failed/);
+assert.equal(exportCaseEvidenceForAnalysis(packetOne).interpretation, "descriptive-only");
+assert.equal(evaluateCaseEvidenceAggregation([packetOne]).allowed, true);
+const aggregationNotAuthorizedPacket = buildCaseEvidencePacket(
+  {
+    ...caseEvidenceInput,
+    syntheticCaseId: "synthetic-case-no-aggregation",
+    workflowCaseId: "workflow-case-no-aggregation",
+    governance: {
+      ...caseEvidenceInput.governance,
+      aggregationAuthorization: "not-authorized"
+    }
+  },
+  generatedAt
+);
+assert.equal(evaluateCaseEvidenceAggregation([aggregationNotAuthorizedPacket]).allowed, false);
+const tenantBPacket = buildCaseEvidencePacket(
+  {
+    ...caseEvidenceInput,
+    tenantId: "synthetic-tenant-b",
+    siteId: "synthetic-site-b",
+    syntheticCaseId: "synthetic-case-002",
+    workflowCaseId: "workflow-case-002"
+  },
+  generatedAt
+);
+assert.equal(evaluateCaseEvidenceAggregation([packetOne, tenantBPacket]).allowed, false);
 
 const baseCell = {
   task: "synthetic benchmark",
@@ -241,6 +419,9 @@ const sparseGate = evaluateWorstCellReleaseGate([
 ]);
 assert.equal(sparseGate.decision, "restricted");
 assert.equal(sparseGate.summary.sparse, 1);
+const emptyGate = evaluateWorstCellReleaseGate([]);
+assert.equal(emptyGate.decision, "blocked");
+assert.equal(emptyGate.requiredActions.some((action) => action.includes("at least one material domain cell")), true);
 
 const workbench = runDocumentationBeforeAuthorizationWorkbench(
   {

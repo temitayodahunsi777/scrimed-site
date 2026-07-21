@@ -71,6 +71,32 @@ export default function ScrimedClinicalBenchmarkSuitePage() {
         </div>
       </section>
 
+      <section className="table-section" aria-label="Cell-specific model routing eligibility">
+        <div className="section-heading">
+          <p className="eyebrow">Internal benchmark card</p>
+          <h2>Model authority is earned cell by cell.</h2>
+          <p>{summary.benchmarkCard.humanReadableSummary}</p>
+        </div>
+        {summary.benchmarkCard.routingDecisions.map((decision) => (
+          <article className="module-row" key={decision.cellId}>
+            <div>
+              <span>{decision.status}</span>
+              <h2>{decision.cellId}</h2>
+            </div>
+            <p>{decision.reason}</p>
+            <div>
+              <strong>
+                Eligible models: {decision.eligibleModelIds.join(", ") || "none"}
+              </strong>
+              <ul className="compact-list">
+                <li>Human review: {decision.humanReviewRequired ? "required" : "retained by workflow policy"}</li>
+                <li>Clinical authority: disabled</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="Clinical Benchmark domains">
         <div className="section-heading">
           <p className="eyebrow">Benchmark Domains</p>

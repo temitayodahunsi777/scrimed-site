@@ -8,6 +8,7 @@ const requiredFiles = [
   "app/investor-audience-readiness/page.tsx",
   "app/api/investor-audience-readiness/route.ts",
   "app/api/investor-audience-readiness/brief/route.ts",
+  "app/api/investor-audience-readiness/meeting-packet/route.ts",
   "docs/investor-audience-readiness.md",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs"
@@ -30,7 +31,8 @@ for (const expected of [
   "NVIDIA",
   "Anthropic",
   "Microsoft",
-  "https://openai.com/business/why-openai/startups/",
+  "https://openai.com/startups",
+  "https://openai.com/index/openai-for-healthcare/",
   "https://www.nvidia.com/en-us/startups/",
   "https://www.anthropic.com/startup-program-official-terms",
   "https://www.microsoft.com/en/startups/ai",
@@ -40,6 +42,11 @@ for (const expected of [
   "external-evidence-required",
   "strategicPitchOutline",
   "strategicOutreachStages",
+  "strategicInvestorMeetingProfiles",
+  "strategicFundingReadinessControls",
+  "no-public-direct-investment-application-verified",
+  "externalFundraisingReleaseAuthorized: false",
+  "externalReleaseAuthorized: false",
   "externalOutreachSent: false",
   "investmentOrPartnershipImplied: false",
   "No autonomous diagnosis, treatment, prescribing, imaging interpretation, or live-care authority.",
@@ -68,6 +75,28 @@ for (const expected of [
   requireIncludes("app/investor-audience-readiness/page.tsx", expected);
 }
 
+for (const expected of [
+  "Strategic investor meeting room",
+  "Funding release controls",
+  "direct investment path is not assumed",
+  "Download {profile.organization} Meeting Brief"
+]) {
+  requireIncludes("app/investor-audience-readiness/page.tsx", expected);
+}
+
+for (const expected of [
+  "strategic_investor_target_not_found",
+  "strategic_investor_packet_format_not_supported",
+  "X-SCRIMED-Fundraising-Release",
+  "not-authorized",
+  "format === \"markdown\"",
+  "externalReleaseAuthorized: false",
+  "externalOutreachSent: false",
+  "relationshipImplied: false"
+]) {
+  requireIncludes("app/api/investor-audience-readiness/meeting-packet/route.ts", expected);
+}
+
 requireIncludes(
   "package.json",
   '"smoke:strategic-investor-outreach": "node scripts/strategic-investor-outreach-contract-check.mjs"'
@@ -78,6 +107,8 @@ requireIncludes(
 );
 requireIncludes("docs/investor-audience-readiness.md", "Strategic Ecosystem Outreach");
 requireIncludes("docs/investor-audience-readiness.md", "not claimed investors or partners");
+requireIncludes("docs/investor-audience-readiness.md", "Strategic Meeting Room");
+requireIncludes("docs/investor-audience-readiness.md", "Funding Release Ledger");
 
 const combined = Object.values(files).join("\n");
 for (const forbidden of [

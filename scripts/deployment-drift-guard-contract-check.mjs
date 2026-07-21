@@ -110,7 +110,7 @@ for (const expected of [
 for (const expected of [
   "/deployment-drift-guard",
   "/api/deployment-drift-guard",
-  "expectedApiRoutePatternCount = 440",
+  "expectedApiRoutePatternCount = 443",
   "Deployment drift"
 ]) {
   requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], expected);

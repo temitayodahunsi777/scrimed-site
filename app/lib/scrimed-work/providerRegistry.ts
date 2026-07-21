@@ -17,7 +17,19 @@ export type ScrimedWorkProvider = {
   observedLatencyMs: number;
   availability: "available" | "unavailable_missing_secret" | "disabled_by_policy" | "future_adapter";
   healthStatus: "healthy" | "degraded" | "unavailable";
+  circuitState: "closed" | "open" | "half-open";
+  artifactSignatureStatus: "verified-synthetic" | "verification-required";
   policyTags: string[];
+};
+
+export type ConfiguredModelFitAlias = {
+  alias: "fast-economical" | "balanced" | "flagship";
+  providerId: "bedrock-compatible";
+  configuredModelId: string | null;
+  configured: boolean;
+  clinicalAuthorityGranted: false;
+  requiresShadowEvaluation: true;
+  requiredEvidence: string[];
 };
 
 export const scrimedWorkProviderRegistry: ScrimedWorkProvider[] = [
@@ -38,7 +50,35 @@ export const scrimedWorkProviderRegistry: ScrimedWorkProvider[] = [
     observedLatencyMs: 50,
     availability: "available",
     healthStatus: "healthy",
+    circuitState: "closed",
+    artifactSignatureStatus: "verified-synthetic",
     policyTags: ["no-external-call", "no-secret-required", "synthetic-only"]
+  },
+  {
+    providerId: "independent-local-rules",
+    modelId: "scrimed-independent-policy-handoff",
+    label: "SCRIMED independent deterministic handoff route",
+    routingClass: "balanced",
+    capabilities: ["fast", "balanced", "reasoning"],
+    contextLimit: 16_000,
+    dataResidency: "local-only",
+    phiEligible: false,
+    toolCalling: false,
+    multimodal: false,
+    structuredOutput: true,
+    estimatedInputCostUsdPer1k: 0,
+    estimatedOutputCostUsdPer1k: 0,
+    observedLatencyMs: 30,
+    availability: "available",
+    healthStatus: "healthy",
+    circuitState: "closed",
+    artifactSignatureStatus: "verified-synthetic",
+    policyTags: [
+      "materially-independent-synthetic-fallback",
+      "no-external-call",
+      "no-secret-required",
+      "human-handoff-only"
+    ]
   },
   {
     providerId: "openai-compatible",
@@ -57,6 +97,8 @@ export const scrimedWorkProviderRegistry: ScrimedWorkProvider[] = [
     observedLatencyMs: 2_500,
     availability: process.env.SCRIMED_OPENAI_COMPATIBLE_API_KEY ? "disabled_by_policy" : "unavailable_missing_secret",
     healthStatus: "unavailable",
+    circuitState: "open",
+    artifactSignatureStatus: "verification-required",
     policyTags: ["requires-contract-review", "requires-privacy-review", "provider-calls-disabled-by-default"]
   },
   {
@@ -76,6 +118,8 @@ export const scrimedWorkProviderRegistry: ScrimedWorkProvider[] = [
     observedLatencyMs: 3_000,
     availability: process.env.SCRIMED_ANTHROPIC_COMPATIBLE_API_KEY ? "disabled_by_policy" : "unavailable_missing_secret",
     healthStatus: "unavailable",
+    circuitState: "open",
+    artifactSignatureStatus: "verification-required",
     policyTags: ["requires-contract-review", "requires-privacy-review", "provider-calls-disabled-by-default"]
   },
   {
@@ -95,14 +139,42 @@ export const scrimedWorkProviderRegistry: ScrimedWorkProvider[] = [
     observedLatencyMs: 1_800,
     availability: "future_adapter",
     healthStatus: "unavailable",
+    circuitState: "open",
+    artifactSignatureStatus: "verification-required",
     policyTags: ["private-inference-roadmap", "customer-vpc-or-edge", "requires-local-deployment"]
   }
 ];
+
+export function getConfiguredModelFitAliases(env: NodeJS.ProcessEnv = process.env): ConfiguredModelFitAlias[] {
+  return [
+    { alias: "fast-economical", configuredModelId: env.SCRIMED_BEDROCK_LUNA_MODEL_ID ?? null },
+    { alias: "balanced", configuredModelId: env.SCRIMED_BEDROCK_TERRA_MODEL_ID ?? null },
+    { alias: "flagship", configuredModelId: env.SCRIMED_BEDROCK_SOL_MODEL_ID ?? null }
+  ].map((entry) => ({
+    alias: entry.alias as ConfiguredModelFitAlias["alias"],
+    providerId: "bedrock-compatible" as const,
+    configuredModelId: entry.configuredModelId,
+    configured: Boolean(entry.configuredModelId),
+    clinicalAuthorityGranted: false as const,
+    requiresShadowEvaluation: true as const,
+    requiredEvidence: [
+      "provider and service-scope approval",
+      "BAA/DPA and retention review before any PHI eligibility",
+      "region and data-residency review",
+      "workflow-specific shadow benchmark",
+      "worst-cell and abstention gate",
+      "cost per accepted outcome",
+      "human review and rollback readiness"
+    ]
+  }));
+}
 
 export function selectProviderCandidates(input: {
   requiredCapability: ProviderRoutingClass;
   dataClassification: DataClassification;
   residencyRequirement?: "us" | "customer-region" | "local-only";
+  providerHealth?: Record<string, ScrimedWorkProvider["healthStatus"]>;
+  blockedProviderIds?: string[];
 }) {
   return scrimedWorkProviderRegistry.filter((provider) => {
     const capabilityOk = provider.capabilities.includes(input.requiredCapability);
@@ -112,6 +184,10 @@ export function selectProviderCandidates(input: {
       provider.dataResidency === "configurable";
     const phiOk = input.dataClassification !== "phi-blocked" || provider.phiEligible;
 
-    return capabilityOk && residencyOk && phiOk;
+    const effectiveHealth = input.providerHealth?.[provider.providerId] ?? provider.healthStatus;
+    const circuitOk = provider.circuitState === "closed" && effectiveHealth !== "unavailable";
+    const providerAllowed = !input.blockedProviderIds?.includes(provider.providerId);
+
+    return capabilityOk && residencyOk && phiOk && circuitOk && providerAllowed;
   });
 }

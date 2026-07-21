@@ -15,6 +15,7 @@ export type ClinicalContextLensSource = {
   id: string;
   title: string;
   uri: string;
+  tenantScope: string;
   trustTier: "authoritative" | "reviewed" | "unverified";
   effectiveAt: string;
   expiresAt: string | null;
@@ -23,6 +24,7 @@ export type ClinicalContextLensSource = {
 
 export type ClinicalContextLensInput = {
   mode: ClinicalContextLensMode;
+  tenantId: string | null;
   taskType: string;
   dataClassification: ClinicalContextLensDataClass;
   authenticated: boolean;
@@ -69,6 +71,63 @@ export type ClinicalContextLensResult = {
   boundary: typeof clinicalEvidenceControlsBoundary;
 };
 
+export type ContextPacketRequest = {
+  tenantId: string | null;
+  subjectReference: {
+    kind: "synthetic-patient" | "workflow-subject" | "public-topic";
+    reference: string;
+  } | null;
+  encounterOrWorkflowReference: string;
+  requestingActor: {
+    actorId: string;
+    role: string;
+    purposeOfUse: string;
+  };
+  operatingMode: ClinicalContextLensMode;
+  lensInput: ClinicalContextLensInput;
+  supportingEvidence: string[];
+  contradictoryEvidenceSourceIds: string[];
+  versions: {
+    model: string;
+    prompt: string;
+    tools: string[];
+    policy: string;
+    retrieval: string;
+  };
+  correlationId: string;
+  traceId: string;
+};
+
+export type ContextPacket = {
+  schemaVersion: typeof clinicalEvidenceControlsVersion;
+  tenantId: string | null;
+  subjectReferenceHash: string | null;
+  encounterOrWorkflowReference: string;
+  requestingActor: ContextPacketRequest["requestingActor"];
+  operatingMode: ClinicalContextLensMode;
+  relevantHistory: string[];
+  patientFit: ClinicalContextLensInput["patientFit"];
+  supportingEvidence: string[];
+  sources: ClinicalContextLensSource[];
+  provenance: Array<{ sourceId: string; provenanceHash: string }>;
+  freshness: ClinicalContextLensResult["freshness"];
+  missingData: string[];
+  confidenceScore: number;
+  calibrationStatus: ClinicalContextLensInput["calibrationStatus"];
+  contraindications: string[];
+  policyConstraints: string[];
+  recommendedNextAction: string | null;
+  requiredReviewLevel: "none" | "qualified-human-review" | "clinical-authority-review";
+  abstentionReason: string | null;
+  versions: ContextPacketRequest["versions"];
+  correlationId: string;
+  traceId: string;
+  actionAuthority: "decision-support-only";
+  containsPhi: false;
+  auditHash: string;
+  boundary: typeof clinicalEvidenceControlsBoundary;
+};
+
 export const clinicalContextIsolationPolicy = {
   policyVersion: clinicalEvidenceControlsVersion,
   modes: {
@@ -106,8 +165,31 @@ export type CaseEvidenceOutcome = {
   interpretation: "descriptive-only";
 };
 
+export type CaseEvidenceRuntimeAuthorization = {
+  assuranceLevel:
+    | "CAL_0_PUBLIC_ZERO_PHI"
+    | "CAL_1_STANDARD_PHI"
+    | "CAL_2_RESTRICTED_CLINICAL"
+    | "CAL_3_SOVEREIGN_ISOLATED";
+  enclaveId: string | null;
+  policyDecisionId: string;
+  modelPassportDigest: string | null;
+  fallbackPassportDigest: string | null;
+  toolArtifactDigests: string[];
+  capacityDecisionId: string;
+  concentrationDecisionId: string;
+  routingDecisionId: string;
+  subgroupEvaluationIds: string[];
+  queueTimeMs: number;
+  retryCount: number;
+  finalDisposition: "authorized-synthetic-route" | "queued" | "human-handoff" | "blocked";
+};
+
 export type CaseEvidenceInput = {
+  tenantId: string;
+  siteId: string;
   syntheticCaseId: string;
+  workflowCaseId: string;
   workflowId: string;
   cohortDefinition: string;
   eligibilityCriteria: string[];
@@ -116,6 +198,12 @@ export type CaseEvidenceInput = {
     label: string;
     startedAt: string;
     completedAt: string | null;
+  };
+  eventTimestamps: {
+    eligibleAt: string;
+    baselineObservedAt: string;
+    interventionStartedAt: string;
+    dispositionedAt: string;
   };
   sourceLineage: string[];
   versions: {
@@ -126,12 +214,27 @@ export type CaseEvidenceInput = {
   };
   clinicianAction: "awaiting-review" | "accepted" | "modified" | "overrode" | "not-applicable";
   overrideReasonCode: string | null;
+  workflowDisposition: "prepared-for-review" | "accepted-for-internal-use" | "changes-requested" | "blocked";
   outcomes: CaseEvidenceOutcome[];
+  patientReportedOutcomes: CaseEvidenceOutcome[];
   safetyEventCodes: string[];
   missingness: string[];
   confounders: string[];
   siteAttributes: string[];
   subgroupAttributes: string[];
+  latencyMs: number;
+  utilizationCount: number;
+  adoptionStatus: "not-measured" | "offered" | "accepted" | "modified" | "rejected";
+  costPerAcceptedOutcomeUsd: number | null;
+  traceId: string;
+  correlationId: string;
+  governance: {
+    consentStatus: "not-applicable-synthetic" | "verified" | "missing";
+    duaStatus: "not-applicable-single-tenant" | "verified" | "missing";
+    aggregationAuthorization: "single-tenant-only" | "explicit-approved" | "not-authorized";
+    purposeOfUse: string;
+  };
+  runtimeAuthorization?: CaseEvidenceRuntimeAuthorization;
   analysisPlanStatus: "draft" | "approved-for-synthetic-analysis";
   trustQaStatus: "not-reviewed" | "review-required" | "approved-for-internal-synthetic-use";
   humanReviewRequired: true;
@@ -141,22 +244,36 @@ export type CaseEvidenceInput = {
 
 export type CaseEvidencePacket = {
   schemaVersion: typeof clinicalEvidenceControlsVersion;
+  tenantIdHash: string;
+  siteIdHash: string;
   caseIdHash: string;
+  workflowCaseIdHash: string;
   workflowId: string;
   cohortDefinition: string;
   eligibilityCriteria: string[];
   baselineComparator: string;
   intervention: CaseEvidenceInput["intervention"];
+  eventTimestamps: CaseEvidenceInput["eventTimestamps"];
   sourceLineage: string[];
   versions: CaseEvidenceInput["versions"];
   clinicianAction: CaseEvidenceInput["clinicianAction"];
   overrideReasonCode: string | null;
+  workflowDisposition: CaseEvidenceInput["workflowDisposition"];
   outcomes: CaseEvidenceOutcome[];
+  patientReportedOutcomes: CaseEvidenceOutcome[];
   safetyEventCodes: string[];
   missingness: string[];
   confounders: string[];
   siteAttributes: string[];
   subgroupAttributes: string[];
+  latencyMs: number;
+  utilizationCount: number;
+  adoptionStatus: CaseEvidenceInput["adoptionStatus"];
+  costPerAcceptedOutcomeUsd: number | null;
+  traceId: string;
+  correlationId: string;
+  governance: CaseEvidenceInput["governance"];
+  runtimeAuthorization: CaseEvidenceRuntimeAuthorization | null;
   analysisPlanStatus: CaseEvidenceInput["analysisPlanStatus"];
   trustQaStatus: CaseEvidenceInput["trustQaStatus"];
   humanReviewRequired: true;
@@ -165,8 +282,34 @@ export type CaseEvidencePacket = {
   syntheticOnly: true;
   noPhi: true;
   generatedAt: string;
+  completeness: CaseEvidenceCompleteness;
   evidencePacketHash: string;
   boundary: typeof clinicalEvidenceControlsBoundary;
+};
+
+export type CaseEvidenceCompleteness = {
+  requiredSectionCount: number;
+  completeSectionCount: number;
+  completenessPercent: number;
+  missingSections: string[];
+  complete: boolean;
+};
+
+export type CaseEvidenceEvent = {
+  eventId: string;
+  eventType: "case-evidence-recorded";
+  sequence: number;
+  tenantIdHash: string;
+  packetHash: string;
+  previousEventHash: string | null;
+  occurredAt: string;
+  eventHash: string;
+  packet: CaseEvidencePacket;
+};
+
+export type CaseEvidenceAppendResult = {
+  status: "appended" | "duplicate";
+  event: CaseEvidenceEvent;
 };
 
 export type DomainStressMetric =
@@ -175,7 +318,15 @@ export type DomainStressMetric =
   | "selective-accuracy"
   | "precision"
   | "recall"
+  | "f1"
+  | "extraction-accuracy"
   | "citation-completeness"
+  | "grounding-accuracy"
+  | "abstention-performance"
+  | "override-rate"
+  | "safety-event-rate"
+  | "accepted-outcome-rate"
+  | "latency"
   | "cost-per-accepted-outcome"
   | "time-per-accepted-outcome";
 
@@ -335,6 +486,21 @@ function isSafeReference(value: string) {
   return /^[a-z0-9][a-z0-9._:/-]{2,180}$/i.test(value) && !/bearer|token|secret|password/i.test(value);
 }
 
+const prohibitedSensitiveValuePatterns = [
+  /\bbearer\s+[a-z0-9._~-]+/i,
+  /\beyJ[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+\b/i,
+  /\b(?:secret|password|access[_ -]?token|service[_ -]?role[_ -]?key)\s*[:=]/i,
+  /\b\d{3}-\d{2}-\d{4}\b/,
+  /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i,
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+  /\b(?:mrn|medical record number|member id|subscriber id|policy id|patient name|date of birth|dob)\s*[:#=]/i
+];
+
+function containsProhibitedSensitiveValue(value: unknown) {
+  const serialized = JSON.stringify(value ?? "");
+  return prohibitedSensitiveValuePatterns.some((pattern) => pattern.test(serialized));
+}
+
 function contextSourceIsCurrent(source: ClinicalContextLensSource, evaluatedAt: string) {
   const effective = Date.parse(source.effectiveAt);
   const expires = source.expiresAt ? Date.parse(source.expiresAt) : Number.POSITIVE_INFINITY;
@@ -351,15 +517,36 @@ export function evaluateClinicalContextLens(
   const abstentionReasons: string[] = [];
 
   if (!isIsoTimestamp(evaluatedAt)) blockers.push("evaluation timestamp is invalid");
+  if (containsProhibitedSensitiveValue(input)) {
+    blockers.push("Context Lens input contains prohibited PHI or credential-like material");
+  }
   if (input.dataClassification === "phi") blockers.push("live PHI is disabled in the current Context Lens");
+  if (input.mode === "public-evidence" && input.tenantId !== null) {
+    blockers.push("Public Evidence mode cannot bind a clinical tenant");
+  }
   if (input.mode === "public-evidence" && input.dataClassification !== "public") {
     blockers.push("Public Evidence mode accepts public sources only");
   }
+  if (input.mode === "public-evidence" && input.sources.some((source) => source.tenantScope !== "public")) {
+    blockers.push("Public Evidence mode accepts public-bound sources only");
+  }
   if (
     input.mode === "clinical-context" &&
-    (!input.authenticated || !input.tenantScoped || !input.minimumNecessary || !input.consentVerified)
+    (!input.tenantId ||
+      !isSafeReference(input.tenantId) ||
+      !input.authenticated ||
+      !input.tenantScoped ||
+      !input.minimumNecessary ||
+      !input.consentVerified)
   ) {
     blockers.push("Clinical Context mode requires authenticated, consented, minimum-necessary tenant scope");
+  }
+  if (
+    input.mode === "clinical-context" &&
+    input.tenantId &&
+    input.sources.some((source) => source.tenantScope !== input.tenantId)
+  ) {
+    blockers.push("Clinical Context sources do not match the requesting tenant");
   }
   if (input.mode === "clinical-context" && !input.humanReviewRequired) {
     blockers.push("Clinical Context mode cannot disable human review");
@@ -368,7 +555,11 @@ export function evaluateClinicalContextLens(
   if (input.sources.some((source) => source.trustTier === "unverified")) {
     abstentionReasons.push("one or more sources are unverified");
   }
-  if (input.sources.some((source) => !isSafeReference(source.uri) || source.provenanceHash.length !== 64)) {
+  if (
+    input.sources.some(
+      (source) => !isSafeReference(source.uri) || !/^[a-f0-9]{64}$/i.test(source.provenanceHash)
+    )
+  ) {
     blockers.push("source URI or provenance hash is invalid");
   }
   if (input.confidenceScore < 0 || input.confidenceScore > 1) blockers.push("confidence score must be between 0 and 1");
@@ -443,12 +634,143 @@ export function evaluateClinicalContextLens(
   };
 }
 
+export function buildContextPacket(
+  input: ContextPacketRequest,
+  evaluatedAt = new Date().toISOString()
+): ContextPacket {
+  const contractErrors: string[] = [];
+  if (input.operatingMode !== input.lensInput.mode) {
+    contractErrors.push("operating mode must match the Context Lens mode");
+  }
+  if (input.tenantId !== input.lensInput.tenantId) {
+    contractErrors.push("ContextPacket tenant must match the Context Lens tenant");
+  }
+  if (!isSafeReference(input.encounterOrWorkflowReference)) {
+    contractErrors.push("encounter or workflow reference is invalid");
+  }
+  if (
+    !isSafeReference(input.requestingActor.actorId) ||
+    !isSafeReference(input.requestingActor.role) ||
+    !isSafeReference(input.requestingActor.purposeOfUse)
+  ) {
+    contractErrors.push("requesting actor metadata is invalid");
+  }
+  if (!isSafeReference(input.correlationId) || !isSafeReference(input.traceId)) {
+    contractErrors.push("correlation and trace identifiers must be safe metadata references");
+  }
+  if (input.operatingMode === "public-evidence") {
+    if (input.tenantId !== null) contractErrors.push("Public Evidence mode cannot bind a clinical tenant");
+    if (input.subjectReference?.kind !== "public-topic" && input.subjectReference !== null) {
+      contractErrors.push("Public Evidence mode cannot bind a patient or workflow subject");
+    }
+  } else {
+    if (!input.tenantId || !isSafeReference(input.tenantId)) {
+      contractErrors.push("Clinical Context mode requires a valid tenant scope");
+    }
+    if (!input.subjectReference || input.subjectReference.kind === "public-topic") {
+      contractErrors.push("Clinical Context mode requires a synthetic patient or workflow subject");
+    }
+  }
+  if (input.subjectReference && !isSafeReference(input.subjectReference.reference)) {
+    contractErrors.push("subject reference is invalid");
+  }
+  if (!input.supportingEvidence.every(isSafeReference)) {
+    contractErrors.push("supporting evidence contains an unsafe reference");
+  }
+  if (!input.contradictoryEvidenceSourceIds.every(isSafeReference)) {
+    contractErrors.push("contradictory evidence contains an unsafe reference");
+  }
+  if (contractErrors.length > 0) {
+    throw new Error(`Invalid ContextPacket request: ${contractErrors.join("; ")}`);
+  }
+
+  const lens = evaluateClinicalContextLens(input.lensInput, evaluatedAt);
+  const contradictions = input.contradictoryEvidenceSourceIds;
+  const abstentionReasons = [
+    ...lens.abstentionReasons,
+    ...(contradictions.length > 0 ? ["supporting sources contain unresolved contradictions"] : [])
+  ];
+  const recommendedNextAction =
+    lens.status === "blocked" || lens.status === "abstained" || contradictions.length > 0
+      ? null
+      : lens.nextAction;
+  const requiredReviewLevel: ContextPacket["requiredReviewLevel"] =
+    input.operatingMode === "clinical-context"
+      ? "clinical-authority-review"
+      : abstentionReasons.length > 0 || lens.humanReviewRequired
+        ? "qualified-human-review"
+        : "none";
+  const subjectReferenceHash = input.subjectReference
+    ? hash({ kind: input.subjectReference.kind, reference: input.subjectReference.reference })
+    : null;
+  const auditInput = {
+    schemaVersion: clinicalEvidenceControlsVersion,
+    tenantId: input.tenantId,
+    subjectReferenceHash,
+    encounterOrWorkflowReference: input.encounterOrWorkflowReference,
+    actorId: input.requestingActor.actorId,
+    role: input.requestingActor.role,
+    purposeOfUse: input.requestingActor.purposeOfUse,
+    operatingMode: input.operatingMode,
+    sourceIds: lens.sources.map((source) => source.id),
+    supportingEvidence: input.supportingEvidence,
+    contradictions,
+    recommendedNextAction,
+    requiredReviewLevel,
+    versions: input.versions,
+    correlationId: input.correlationId,
+    traceId: input.traceId,
+    evaluatedAt
+  };
+
+  return {
+    schemaVersion: clinicalEvidenceControlsVersion,
+    tenantId: input.tenantId,
+    subjectReferenceHash,
+    encounterOrWorkflowReference: input.encounterOrWorkflowReference,
+    requestingActor: input.requestingActor,
+    operatingMode: input.operatingMode,
+    relevantHistory: lens.relevantHistory,
+    patientFit: lens.patientFit,
+    supportingEvidence: input.supportingEvidence,
+    sources: lens.sources,
+    provenance: lens.sources.map((source) => ({
+      sourceId: source.id,
+      provenanceHash: source.provenanceHash
+    })),
+    freshness: lens.freshness,
+    missingData: lens.missingData,
+    confidenceScore: lens.confidenceScore,
+    calibrationStatus: lens.calibrationStatus,
+    contraindications: lens.contraindications,
+    policyConstraints: lens.policyConstraints,
+    recommendedNextAction,
+    requiredReviewLevel,
+    abstentionReason: abstentionReasons.length > 0 ? abstentionReasons.join("; ") : null,
+    versions: input.versions,
+    correlationId: input.correlationId,
+    traceId: input.traceId,
+    actionAuthority: "decision-support-only",
+    containsPhi: false,
+    auditHash: hash(auditInput),
+    boundary: clinicalEvidenceControlsBoundary
+  };
+}
+
 function validateCaseEvidenceInput(input: CaseEvidenceInput) {
   const errors: string[] = [];
+  if (containsProhibitedSensitiveValue(input)) {
+    errors.push("case evidence contains prohibited PHI or credential-like material");
+  }
+  if (!isSafeReference(input.tenantId) || !isSafeReference(input.siteId)) {
+    errors.push("tenantId and siteId must be safe scoped identifiers");
+  }
   if (!/^synthetic-[a-z0-9-]{3,80}$/.test(input.syntheticCaseId)) {
     errors.push("syntheticCaseId must be a bounded synthetic identifier");
   }
-  if (!isSafeReference(input.workflowId)) errors.push("workflowId is invalid");
+  if (!isSafeReference(input.workflowCaseId) || !isSafeReference(input.workflowId)) {
+    errors.push("workflow identifiers are invalid");
+  }
   if (!input.syntheticOnly || !input.noPhi) errors.push("case evidence must be synthetic and no-PHI");
   if (!input.humanReviewRequired) errors.push("case evidence must require human review");
   if (input.sourceLineage.length === 0 || !input.sourceLineage.every(isSafeReference)) {
@@ -461,7 +783,77 @@ function validateCaseEvidenceInput(input: CaseEvidenceInput) {
   if (input.outcomes.some((outcome) => !isIsoTimestamp(outcome.observedAt) || !isSafeReference(outcome.sourceRef))) {
     errors.push("outcome timestamps and source references must be valid");
   }
+  if (
+    Object.values(input.eventTimestamps).some((timestamp) => !isIsoTimestamp(timestamp)) ||
+    !isSafeReference(input.traceId) ||
+    !isSafeReference(input.correlationId)
+  ) {
+    errors.push("event, trace, or correlation metadata is invalid");
+  }
+  if (!Number.isFinite(input.latencyMs) || input.latencyMs < 0 || !Number.isInteger(input.utilizationCount) || input.utilizationCount < 0) {
+    errors.push("latency and utilization values must be non-negative");
+  }
+  if (input.costPerAcceptedOutcomeUsd !== null && (!Number.isFinite(input.costPerAcceptedOutcomeUsd) || input.costPerAcceptedOutcomeUsd < 0)) {
+    errors.push("cost per accepted outcome must be null or non-negative");
+  }
+  if (!isSafeReference(input.governance.purposeOfUse)) {
+    errors.push("governance purpose of use is invalid");
+  }
+  if (input.runtimeAuthorization) {
+    const runtimeReferences = [
+      input.runtimeAuthorization.policyDecisionId,
+      input.runtimeAuthorization.capacityDecisionId,
+      input.runtimeAuthorization.concentrationDecisionId,
+      input.runtimeAuthorization.routingDecisionId,
+      ...input.runtimeAuthorization.subgroupEvaluationIds,
+      ...input.runtimeAuthorization.toolArtifactDigests,
+      ...(input.runtimeAuthorization.enclaveId ? [input.runtimeAuthorization.enclaveId] : []),
+      ...(input.runtimeAuthorization.modelPassportDigest ? [input.runtimeAuthorization.modelPassportDigest] : []),
+      ...(input.runtimeAuthorization.fallbackPassportDigest ? [input.runtimeAuthorization.fallbackPassportDigest] : [])
+    ];
+    if (!runtimeReferences.every(isSafeReference)) {
+      errors.push("runtime authorization references are invalid");
+    }
+    if (
+      !Number.isFinite(input.runtimeAuthorization.queueTimeMs) ||
+      input.runtimeAuthorization.queueTimeMs < 0 ||
+      !Number.isInteger(input.runtimeAuthorization.retryCount) ||
+      input.runtimeAuthorization.retryCount < 0
+    ) {
+      errors.push("runtime authorization queue and retry metadata must be non-negative");
+    }
+  }
   return errors;
+}
+
+export function evaluateCaseEvidenceCompleteness(input: CaseEvidenceInput): CaseEvidenceCompleteness {
+  const checks: Array<[string, boolean]> = [
+    ["tenant-and-site", Boolean(input.tenantId && input.siteId)],
+    ["workflow-and-case", Boolean(input.workflowId && input.workflowCaseId && input.syntheticCaseId)],
+    ["cohort-and-eligibility", Boolean(input.cohortDefinition && input.eligibilityCriteria.length)],
+    ["baseline-and-intervention", Boolean(input.baselineComparator && input.intervention.label)],
+    ["event-timestamps", Object.values(input.eventTimestamps).every(isIsoTimestamp)],
+    ["source-lineage", input.sourceLineage.length > 0],
+    ["version-lineage", Boolean(input.versions.model && input.versions.prompt && input.versions.policy && input.versions.tools.length)],
+    ["clinician-and-disposition", Boolean(input.clinicianAction && input.workflowDisposition)],
+    ["outcomes", input.outcomes.length + input.patientReportedOutcomes.length > 0],
+    ["safety-and-missingness", Array.isArray(input.safetyEventCodes) && Array.isArray(input.missingness)],
+    ["confounders-and-subgroups", Boolean(input.confounders.length && input.siteAttributes.length && input.subgroupAttributes.length)],
+    ["latency-utilization-adoption-cost", Number.isFinite(input.latencyMs) && Number.isInteger(input.utilizationCount)],
+    ["trace-lineage", Boolean(input.traceId && input.correlationId)],
+    ["governance", Boolean(input.governance.purposeOfUse && input.governance.aggregationAuthorization)],
+    ["analysis-and-trust-qa", Boolean(input.analysisPlanStatus && input.trustQaStatus)]
+  ];
+  const missingSections = checks.filter(([, complete]) => !complete).map(([name]) => name);
+  const completeSectionCount = checks.length - missingSections.length;
+
+  return {
+    requiredSectionCount: checks.length,
+    completeSectionCount,
+    completenessPercent: Math.round((completeSectionCount / checks.length) * 100),
+    missingSections,
+    complete: missingSections.length === 0
+  };
 }
 
 export function buildCaseEvidencePacket(
@@ -478,24 +870,42 @@ export function buildCaseEvidencePacket(
     syntheticCaseId: input.syntheticCaseId,
     workflowId: input.workflowId
   });
+  const completeness = evaluateCaseEvidenceCompleteness(input);
+  if (!completeness.complete) {
+    throw new Error(`Invalid synthetic case evidence input: incomplete sections ${completeness.missingSections.join(", ")}`);
+  }
   const packetWithoutHash: Omit<CaseEvidencePacket, "evidencePacketHash"> = {
     schemaVersion: clinicalEvidenceControlsVersion,
+    tenantIdHash: hash({ tenantId: input.tenantId }),
+    siteIdHash: hash({ tenantId: input.tenantId, siteId: input.siteId }),
     caseIdHash,
+    workflowCaseIdHash: hash({ tenantId: input.tenantId, workflowCaseId: input.workflowCaseId }),
     workflowId: input.workflowId,
     cohortDefinition: input.cohortDefinition,
     eligibilityCriteria: input.eligibilityCriteria,
     baselineComparator: input.baselineComparator,
     intervention: input.intervention,
+    eventTimestamps: input.eventTimestamps,
     sourceLineage: input.sourceLineage,
     versions: input.versions,
     clinicianAction: input.clinicianAction,
     overrideReasonCode: input.overrideReasonCode,
+    workflowDisposition: input.workflowDisposition,
     outcomes: input.outcomes,
+    patientReportedOutcomes: input.patientReportedOutcomes,
     safetyEventCodes: input.safetyEventCodes,
     missingness: input.missingness,
     confounders: input.confounders,
     siteAttributes: input.siteAttributes,
     subgroupAttributes: input.subgroupAttributes,
+    latencyMs: input.latencyMs,
+    utilizationCount: input.utilizationCount,
+    adoptionStatus: input.adoptionStatus,
+    costPerAcceptedOutcomeUsd: input.costPerAcceptedOutcomeUsd,
+    traceId: input.traceId,
+    correlationId: input.correlationId,
+    governance: input.governance,
+    runtimeAuthorization: input.runtimeAuthorization ?? null,
     analysisPlanStatus: input.analysisPlanStatus,
     trustQaStatus: input.trustQaStatus,
     humanReviewRequired: true as const,
@@ -504,12 +914,170 @@ export function buildCaseEvidencePacket(
     syntheticOnly: true as const,
     noPhi: true as const,
     generatedAt,
+    completeness,
     boundary: clinicalEvidenceControlsBoundary
   };
 
   return {
     ...packetWithoutHash,
     evidencePacketHash: hash(packetWithoutHash)
+  };
+}
+
+export function buildCaseEvidenceEvent(
+  packet: CaseEvidencePacket,
+  input: { sequence?: number; previousEventHash?: string | null; occurredAt?: string } = {}
+): CaseEvidenceEvent {
+  if (!verifyCaseEvidencePacketIntegrity(packet)) {
+    throw new Error("CaseEvidence packet integrity or safety verification failed");
+  }
+  const sequence = input.sequence ?? 1;
+  const previousEventHash = input.previousEventHash ?? null;
+  const occurredAt = input.occurredAt ?? packet.generatedAt;
+  if (!Number.isInteger(sequence) || sequence < 1 || !isIsoTimestamp(occurredAt)) {
+    throw new Error("Invalid CaseEvidence event sequence or timestamp");
+  }
+  if (previousEventHash !== null && !/^[a-f0-9]{64}$/i.test(previousEventHash)) {
+    throw new Error("Invalid CaseEvidence previous event hash");
+  }
+  const eventWithoutHash = {
+    eventId: `case-evidence-${packet.evidencePacketHash.slice(0, 24)}`,
+    eventType: "case-evidence-recorded" as const,
+    sequence,
+    tenantIdHash: packet.tenantIdHash,
+    packetHash: packet.evidencePacketHash,
+    previousEventHash,
+    occurredAt
+  };
+
+  return {
+    ...eventWithoutHash,
+    eventHash: hash(eventWithoutHash),
+    packet
+  };
+}
+
+export function verifyCaseEvidencePacketIntegrity(packet: CaseEvidencePacket) {
+  const { evidencePacketHash, ...packetWithoutHash } = packet;
+  const semanticSafetyValid =
+    /^[a-f0-9]{64}$/i.test(evidencePacketHash) &&
+    [packet.tenantIdHash, packet.siteIdHash, packet.caseIdHash, packet.workflowCaseIdHash].every((value) =>
+      /^[a-f0-9]{64}$/i.test(value)
+    ) &&
+    packet.syntheticOnly === true &&
+    packet.noPhi === true &&
+    packet.humanReviewRequired === true &&
+    packet.causalClaimAllowed === false &&
+    packet.externalDistributionAllowed === false &&
+    packet.completeness.complete === true &&
+    packet.completeness.completenessPercent === 100 &&
+    packet.sourceLineage.length > 0 &&
+    packet.sourceLineage.every(isSafeReference) &&
+    isSafeReference(packet.traceId) &&
+    isSafeReference(packet.correlationId) &&
+    !containsProhibitedSensitiveValue(packet);
+  return semanticSafetyValid && hash(packetWithoutHash) === evidencePacketHash;
+}
+
+export class InMemoryCaseEvidenceEventStore {
+  private readonly eventsByTenant = new Map<string, CaseEvidenceEvent[]>();
+
+  append(packet: CaseEvidencePacket): CaseEvidenceAppendResult {
+    if (!verifyCaseEvidencePacketIntegrity(packet)) {
+      throw new Error("CaseEvidence packet integrity verification failed");
+    }
+    const existing = this.eventsByTenant.get(packet.tenantIdHash) ?? [];
+    const duplicate = existing.find((event) => event.packetHash === packet.evidencePacketHash);
+    if (duplicate) return { status: "duplicate", event: duplicate };
+
+    const previous = existing.at(-1) ?? null;
+    const event = buildCaseEvidenceEvent(packet, {
+      sequence: existing.length + 1,
+      previousEventHash: previous?.eventHash ?? null,
+      occurredAt: packet.generatedAt
+    });
+    this.eventsByTenant.set(packet.tenantIdHash, [...existing, event]);
+    return { status: "appended", event };
+  }
+
+  listForTenant(requestingTenantIdHash: string): readonly CaseEvidenceEvent[] {
+    return [...(this.eventsByTenant.get(requestingTenantIdHash) ?? [])];
+  }
+}
+
+export function evaluateCaseEvidenceAggregation(packets: CaseEvidencePacket[]) {
+  const tenantHashes = new Set(packets.map((packet) => packet.tenantIdHash));
+  const crossTenant = tenantHashes.size > 1;
+  const integrityComplete = packets.every(verifyCaseEvidencePacketIntegrity);
+  const baseGovernanceComplete = packets.every(
+    (packet) =>
+      packet.governance.consentStatus !== "missing" &&
+      packet.governance.duaStatus !== "missing"
+  );
+  const aggregationScopeAuthorized = packets.every((packet) =>
+    crossTenant
+      ? packet.governance.aggregationAuthorization === "explicit-approved"
+      : packet.governance.aggregationAuthorization === "single-tenant-only" ||
+        packet.governance.aggregationAuthorization === "explicit-approved"
+  );
+  const governanceComplete = baseGovernanceComplete && aggregationScopeAuthorized;
+  const allowed = packets.length > 0 && integrityComplete && governanceComplete;
+
+  return {
+    allowed,
+    scope: crossTenant ? "cross-tenant" as const : "single-tenant" as const,
+    analysisAuthority: allowed ? "internal-descriptive-analysis-only" as const : "blocked" as const,
+    causalClaimAllowed: false as const,
+    externalDistributionAllowed: false as const,
+    reason: allowed
+      ? "Consent, DUA, aggregation, and tenant-scope controls permit internal descriptive analysis only."
+      : "Aggregation is blocked because tenant, consent, DUA, or governance authority is missing.",
+    auditHash: hash({
+      packetHashes: packets.map((packet) => packet.evidencePacketHash),
+      crossTenant,
+      integrityComplete,
+      governanceComplete,
+      allowed
+    })
+  };
+}
+
+export function exportCaseEvidenceForAnalysis(packet: CaseEvidencePacket) {
+  if (!verifyCaseEvidencePacketIntegrity(packet)) {
+    throw new Error("CaseEvidence packet is not eligible for analysis-ready export");
+  }
+
+  return {
+    schemaVersion: packet.schemaVersion,
+    tenantIdHash: packet.tenantIdHash,
+    siteIdHash: packet.siteIdHash,
+    caseIdHash: packet.caseIdHash,
+    workflowCaseIdHash: packet.workflowCaseIdHash,
+    workflowId: packet.workflowId,
+    cohortDefinition: packet.cohortDefinition,
+    eligibilityCriteria: packet.eligibilityCriteria,
+    baselineComparator: packet.baselineComparator,
+    intervention: packet.intervention,
+    eventTimestamps: packet.eventTimestamps,
+    versions: packet.versions,
+    clinicianAction: packet.clinicianAction,
+    workflowDisposition: packet.workflowDisposition,
+    outcomeRows: [...packet.outcomes, ...packet.patientReportedOutcomes],
+    safetyEventCodes: packet.safetyEventCodes,
+    missingness: packet.missingness,
+    confounders: packet.confounders,
+    siteAttributes: packet.siteAttributes,
+    subgroupAttributes: packet.subgroupAttributes,
+    latencyMs: packet.latencyMs,
+    utilizationCount: packet.utilizationCount,
+    adoptionStatus: packet.adoptionStatus,
+    costPerAcceptedOutcomeUsd: packet.costPerAcceptedOutcomeUsd,
+    traceId: packet.traceId,
+    correlationId: packet.correlationId,
+    interpretation: "descriptive-only" as const,
+    causalClaimAllowed: false as const,
+    externalDistributionAllowed: false as const,
+    evidencePacketHash: packet.evidencePacketHash
   };
 }
 
@@ -560,19 +1128,24 @@ export function evaluateWorstCellReleaseGate(cells: DomainStressCell[]): WorstCe
       : right.threshold - right.value;
     return leftMargin - rightMargin || left.cellId.localeCompare(right.cellId);
   })[0] ?? null;
-  const hasBlocked = materialCells.some((cell) => cell.status === "blocked");
+  const hasBlocked = materialCells.length === 0 || materialCells.some((cell) => cell.status === "blocked");
   const hasRestricted = materialCells.some((cell) => cell.status === "restricted" || cell.status === "human-review");
   const decision: WorstCellReleaseGate["decision"] = hasBlocked
     ? "blocked"
     : hasRestricted
       ? "restricted"
       : "synthetic-evaluation-ready";
-  const requiredActions = Array.from(new Set(materialCells.flatMap((cell) => {
+  const requiredActions = Array.from(new Set([
+    ...(materialCells.length === 0
+      ? ["Block release until at least one material domain cell has complete evaluation evidence."]
+      : []),
+    ...materialCells.flatMap((cell) => {
     if (cell.status === "blocked") return [`Block release for ${cell.cellId}; correct evidence or performance and retest.`];
     if (cell.status === "restricted") return [`Restrict ${cell.cellId}; collect additional samples and retain uncertainty labeling.`];
     if (cell.status === "human-review") return [`Complete qualified human review for ${cell.cellId}.`];
     return [];
-  })));
+    })
+  ]));
   const summary = {
     total: decisions.length,
     material: materialCells.length,

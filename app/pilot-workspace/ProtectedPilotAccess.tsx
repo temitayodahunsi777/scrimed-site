@@ -943,6 +943,11 @@ export default function ProtectedPilotAccess({
       resetProtectedAuthorityArtifactReferences();
       setVerificationReadiness(null);
       setStatus("ready");
+      setMessage(
+        activeWorkspace
+          ? ""
+          : "No protected workspace is visible. If this identity already has membership, sign out, sign in again, and verify the authenticator to renew the governance session."
+      );
 
       if (activeWorkspace) {
         await Promise.all([
@@ -4631,7 +4636,7 @@ export default function ProtectedPilotAccess({
       <section className="section-band hub-summary" aria-label="Authenticated pilot workspace access">
         <article>
           <span>Access assurance</span>
-          <strong>AAL2 protected pilot</strong>
+          <strong>AAL2 required</strong>
         </article>
         <article>
           <span>Passkey posture</span>
@@ -4659,6 +4664,7 @@ export default function ProtectedPilotAccess({
             Signed in as {user.email ?? user.id}. Workspace visibility is constrained by authenticated membership,
             fresh AAL2 assurance, and PostgreSQL row-level security.
           </p>
+          {message ? <div className="intake-alert">{message}</div> : null}
           <div className="form-actions">
             <button className="secondary-action" onClick={() => signOut("local")} type="button">
               Sign Out
@@ -4692,7 +4698,10 @@ export default function ProtectedPilotAccess({
           ) : (
             <div className="layer-row">
               <span>00</span>
-              <strong>No approved tenant workspace membership is assigned to this identity.</strong>
+              <strong>
+                No protected workspace is currently visible.
+                <small>Membership and fresh governance assurance are both required.</small>
+              </strong>
             </div>
           )}
         </div>

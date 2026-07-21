@@ -174,7 +174,12 @@ export const approvalAchievementGraph: ApprovalNode[] = [
     commercialValue: "Reduces claim inconsistency, shortens buyer review, and protects credibility across every sales and investor channel.",
     accountableOwners: ["Founder/CEO", "Product", "Legal reviewer", "Clinical governance reviewer"],
     externalAuthority: null,
-    evidence: [reviewEvidence("intended-use-memo", "Proposed Intended Use Memo", "docs/SCRIMED_INTENDED_USE_MEMO.md"), reviewEvidence("claims-boundary", "Claims and safety boundary", "/claims and /qa-claim-guard"), reviewEvidence("technical-gate", "Automated technical gate", "automated-no-phi-technical-quality-gate")],
+    evidence: [
+      reviewEvidence("intended-use-memo", "Proposed Intended Use Memo", "docs/SCRIMED_INTENDED_USE_MEMO.md"),
+      reviewEvidence("intended-use-review-packet", "Controlled Intended Use review packet", "/approvals-readiness#intended-use-review-workbench"),
+      reviewEvidence("claims-boundary", "Claims and safety boundary", "/claims and /qa-claim-guard"),
+      reviewEvidence("technical-gate", "Automated technical gate", "automated-no-phi-technical-quality-gate")
+    ],
     missingEvidence: ["Founder/CEO approval", "qualified legal review", "clinical governance review", "versioned effective date and review expiry"],
     requiredHumanSignoffs: ["Founder/CEO", "Legal reviewer", "Clinical governance reviewer"],
     nextAction: "Review and sign the proposed memo, record reviewer identities and dates outside source code, then align public copy and sales assets to the approved version.",

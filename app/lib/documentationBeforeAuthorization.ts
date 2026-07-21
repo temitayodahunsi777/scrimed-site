@@ -1,8 +1,21 @@
 import { generateScrimedAuditHash } from "./scrimedIntelligencePlatform";
 import {
+  buildContextPacket,
+  buildCaseEvidenceEvent,
   buildCaseEvidencePacket,
-  type CaseEvidencePacket
+  createClinicalEvidenceHash,
+  type CaseEvidenceEvent,
+  type CaseEvidencePacket,
+  type ContextPacket
 } from "./clinicalEvidenceControls";
+import {
+  authorizeClinicalAssuranceInvocation,
+  getClinicalAssuranceControlPlaneSummary,
+  syntheticClinicalAssuranceRegistry,
+  syntheticPayerIqAssuranceRequest,
+  type ClinicalAssuranceDecision
+} from "./clinicalAssuranceControlPlane";
+import { getScrimedWorkFeatureFlags } from "./scrimed-work/featureFlags";
 
 export type DocumentationBeforeAuthorizationRequirementId =
   | "symptom_language"
@@ -96,7 +109,10 @@ export type DocumentationBeforeAuthorizationReviewPacket = {
     policyFreshness: "synthetic-current-for-demo";
     sourceTrustTier: "synthetic-reviewed-fixture";
   };
+  contextPacket: ContextPacket;
+  clinicalAssuranceDecision: ClinicalAssuranceDecision;
   caseEvidence: CaseEvidencePacket;
+  caseEvidenceEvent: CaseEvidenceEvent;
   reviewQueue: {
     requiredRole: DocumentationBeforeAuthorizationEvaluation["recommendedOwner"];
     status: "queued" | "reviewed-for-demo" | "blocked";
@@ -584,9 +600,90 @@ export function runDocumentationBeforeAuthorizationWorkbench(
     boundary: "synthetic-no-phi-no-payer-submission"
   });
   const workbenchId = `payeriq-${auditHash.replace("scrimed-intel-", "")}`;
+  const featureFlags = getScrimedWorkFeatureFlags();
+  const clinicalAssuranceDecision = authorizeClinicalAssuranceInvocation(
+    {
+      ...syntheticPayerIqAssuranceRequest,
+      caseInputFingerprint: createClinicalEvidenceHash({ workbenchId, boundary: "synthetic-no-phi" }),
+      enforcementEnabled:
+        featureFlags.clinicalAssuranceControlPlaneEnabled &&
+        featureFlags.clinicalAssuranceEnforcementEnabled,
+      at: generatedAt
+    },
+    syntheticClinicalAssuranceRegistry
+  );
+  const assuranceGateBlocksRequest =
+    featureFlags.clinicalAssuranceControlPlaneEnabled &&
+    featureFlags.clinicalAssuranceEnforcementEnabled &&
+    clinicalAssuranceDecision.status !== "allowed";
+  const contextPacket = buildContextPacket(
+    {
+      tenantId: "synthetic-tenant",
+      subjectReference: {
+        kind: "workflow-subject",
+        reference: `synthetic-workflow-${sourcePacket.packetId}`
+      },
+      encounterOrWorkflowReference: `workflow-${workbenchId}`,
+      requestingActor: {
+        actorId: "synthetic-rcm-operator",
+        role: "rcm-reviewer",
+        purposeOfUse: "authorization-documentation-review"
+      },
+      operatingMode: "clinical-context",
+      lensInput: {
+        mode: "clinical-context",
+        tenantId: "synthetic-tenant",
+        taskType: "synthetic-documentation-before-authorization",
+        dataClassification: "metadata",
+        authenticated: true,
+        tenantScoped: true,
+        minimumNecessary: true,
+        consentVerified: true,
+        humanReviewRequired: true,
+        patientFit: "not-assessed",
+        relevantHistory: evidenceRefs,
+        sources: [
+          {
+            id: "synthetic-payer-policy-reference",
+            title: "Synthetic reviewed payer-policy fixture",
+            uri: "synthetic://payer-policy/documentation-before-authorization",
+            tenantScope: "synthetic-tenant",
+            trustTier: "reviewed",
+            effectiveAt: "2020-01-01T00:00:00.000Z",
+            expiresAt: "2099-12-31T23:59:59.999Z",
+            provenanceHash: createClinicalEvidenceHash({
+              policy: "documentation-before-authorization-synthetic-v1",
+              packetId: sourcePacket.packetId
+            })
+          }
+        ],
+        missingData: evaluation.missingEvidenceLabels,
+        confidenceScore: evaluation.riskLevel === "blocked" ? 0.5 : 0.82,
+        calibrationStatus: evaluation.riskLevel === "blocked" ? "insufficient-evidence" : "synthetic-calibrated",
+        contraindications: [],
+        policyConstraints: ["no-payer-submission", "no-medical-necessity-determination", "human-review-required"],
+        proposedNextAction: "Queue the synthetic documentation packet for qualified review."
+      },
+      supportingEvidence: evidenceRefs,
+      contradictoryEvidenceSourceIds: [],
+      versions: {
+        model: "not-used-deterministic-rules",
+        prompt: "not-used-enumerated-schema",
+        tools: ["documentation-gap-evaluator", "context-lens"],
+        policy: "documentation-before-authorization-synthetic-v1",
+        retrieval: "enumerated-synthetic-evidence-v1"
+      },
+      correlationId: `correlation-${workbenchId}`,
+      traceId: `trace-${workbenchId}`
+    },
+    generatedAt
+  );
   const caseEvidence = buildCaseEvidencePacket(
     {
+      tenantId: "synthetic-tenant",
+      siteId: "synthetic-site",
       syntheticCaseId: `synthetic-${sourcePacket.packetId}`,
+      workflowCaseId: `workflow-case-${workbenchId}`,
       workflowId: "documentation-before-authorization",
       cohortDefinition: "Single registered synthetic authorization-readiness scenario.",
       eligibilityCriteria: [
@@ -600,6 +697,12 @@ export function runDocumentationBeforeAuthorizationWorkbench(
         startedAt: generatedAt,
         completedAt: generatedAt
       },
+      eventTimestamps: {
+        eligibleAt: generatedAt,
+        baselineObservedAt: generatedAt,
+        interventionStartedAt: generatedAt,
+        dispositionedAt: generatedAt
+      },
       sourceLineage: evidenceRefs,
       versions: {
         model: "not-used-deterministic-rules",
@@ -610,6 +713,12 @@ export function runDocumentationBeforeAuthorizationWorkbench(
       clinicianAction:
         packet.reviewerStatus === "reviewed_for_demo" ? "accepted" : "awaiting-review",
       overrideReasonCode: null,
+      workflowDisposition:
+        evaluation.riskLevel === "blocked"
+          ? "blocked"
+          : packet.reviewerStatus === "reviewed_for_demo"
+            ? "accepted-for-internal-use"
+            : "prepared-for-review",
       outcomes: [
         {
           metricId: "documentation-completeness-percent",
@@ -632,8 +741,12 @@ export function runDocumentationBeforeAuthorizationWorkbench(
           interpretation: "descriptive-only"
         }
       ],
+      patientReportedOutcomes: [],
       safetyEventCodes: [
         ...(evaluation.missingRequiredIds.length > 0 ? ["missing-documentation"] : []),
+        ...(clinicalAssuranceDecision.status !== "allowed"
+          ? [`clinical-assurance-${clinicalAssuranceDecision.status}`]
+          : []),
         "human-review-required",
         "payer-submission-blocked"
       ],
@@ -641,6 +754,19 @@ export function runDocumentationBeforeAuthorizationWorkbench(
       confounders: ["synthetic-fixture", "no-live-payer-policy", "no-causal-design"],
       siteAttributes: ["synthetic-site", "no-production-connector"],
       subgroupAttributes: [sourcePacket.procedureFamily.replaceAll(" ", "-")],
+      latencyMs: 0,
+      utilizationCount: 1,
+      adoptionStatus: packet.reviewerStatus === "reviewed_for_demo" ? "accepted" : "offered",
+      costPerAcceptedOutcomeUsd: null,
+      traceId: `trace-${workbenchId}`,
+      correlationId: `correlation-${workbenchId}`,
+      governance: {
+        consentStatus: "not-applicable-synthetic",
+        duaStatus: "not-applicable-single-tenant",
+        aggregationAuthorization: "single-tenant-only",
+        purposeOfUse: "synthetic-authorization-readiness-evaluation"
+      },
+      runtimeAuthorization: clinicalAssuranceDecision.caseEvidenceBinding,
       analysisPlanStatus: "draft",
       trustQaStatus: "review-required",
       humanReviewRequired: true,
@@ -649,6 +775,7 @@ export function runDocumentationBeforeAuthorizationWorkbench(
     },
     generatedAt
   );
+  const caseEvidenceEvent = buildCaseEvidenceEvent(caseEvidence);
   const markdown = buildReviewPacketMarkdown({
     workbenchId,
     scenario: packet,
@@ -664,7 +791,10 @@ export function runDocumentationBeforeAuthorizationWorkbench(
       workbenchId,
       sourcePacketId: sourcePacket.packetId,
       generatedAt,
-      status: evaluation.riskLevel === "blocked" ? "request-blocked" : "review-packet-prepared",
+      status:
+        evaluation.riskLevel === "blocked" || assuranceGateBlocksRequest
+          ? "request-blocked"
+          : "review-packet-prepared",
       scenario: packet.scenario,
       procedureFamily: packet.procedureFamily,
       readinessScore,
@@ -678,11 +808,14 @@ export function runDocumentationBeforeAuthorizationWorkbench(
         policyFreshness: "synthetic-current-for-demo",
         sourceTrustTier: "synthetic-reviewed-fixture"
       },
+      contextPacket,
+      clinicalAssuranceDecision,
       caseEvidence,
+      caseEvidenceEvent,
       reviewQueue: {
         requiredRole: evaluation.recommendedOwner,
         status:
-          evaluation.riskLevel === "blocked"
+          evaluation.riskLevel === "blocked" || assuranceGateBlocksRequest
             ? "blocked"
             : packet.reviewerStatus === "reviewed_for_demo"
               ? "reviewed-for-demo"
@@ -797,6 +930,12 @@ export function getDocumentationBeforeAuthorizationSummary() {
       externalDistributionAllowed: false,
       humanReviewRequired: true
     },
+    clinicalAssurance: {
+      ...getClinicalAssuranceControlPlaneSummary().verticalSlice,
+      controlPlaneEnabled: getScrimedWorkFeatureFlags().clinicalAssuranceControlPlaneEnabled,
+      enforcementEnabled: getScrimedWorkFeatureFlags().clinicalAssuranceEnforcementEnabled,
+      consequentialActionsEnabled: getScrimedWorkFeatureFlags().consequentialActionsEnabled
+    },
     validation: {
       status:
         evaluations.every(
@@ -854,6 +993,7 @@ export function buildDocumentationBeforeAuthorizationBrief() {
     "- Enumerated synthetic inputs only; no free-text patient or policy data.",
     "- Human review is required for every result.",
     "- Every workbench result emits a deterministic synthetic Case Evidence packet with lineage, versions, outcomes, safety events, missingness, confounders, and subgroup metadata.",
+    "- Every workbench run is bound to CAL, enclave, exact model passport, capacity, concentration, fallback-independence, and worst-cell preflight evidence.",
     "- Case Evidence remains descriptive-only; uncontrolled associations cannot support causal product claims.",
     "- Payer submission, medical-necessity determination, patient outreach, EHR writeback, and reimbursement claims remain blocked.",
     "- Export remains disabled until human review and an authorized distribution path exist.",

@@ -88,7 +88,7 @@ if (boundedSecretKeyPattern.test("risk-analysis-report")) {
   throw new Error("boundary release evidence intake secret scanner must not flag risk-analysis-report.");
 }
 
-if (!boundedSecretKeyPattern.test(" sk-testsecretvalue123456")) {
+if (!boundedSecretKeyPattern.test(" sk-example-testsecretvalue123456")) {
   throw new Error("boundary release evidence intake secret scanner must still flag standalone sk-style keys.");
 }
 
@@ -96,7 +96,7 @@ if (boundedSupabaseSecretPattern.test("asbp_reference_label")) {
   throw new Error("boundary release evidence intake secret scanner must not flag embedded sbp_ substrings.");
 }
 
-if (!boundedSupabaseSecretPattern.test(" sbp_testsecretvalue123456")) {
+if (!boundedSupabaseSecretPattern.test(" sbp_example_testsecretvalue123456")) {
   throw new Error("boundary release evidence intake secret scanner must still flag standalone sbp_ secrets.");
 }
 
@@ -236,7 +236,7 @@ for (const path of [
   "scripts/scrimed-os-upgrade-batch-contract-check.mjs",
   "scripts/boundary-release-approval-matrix-contract-check.mjs"
 ]) {
-  requireIncludes(path, files[path], "expectedApiRoutePatternCount = 440");
+  requireIncludes(path, files[path], "expectedApiRoutePatternCount = 443");
 }
 
 console.log("pass boundary release evidence intake contract check");

@@ -11,3 +11,4 @@ out/
 .env.*.local
 *.log
 *.tsbuildinfo
+outputs/SCRIMED_Strategic_Investor_Deck.pptx

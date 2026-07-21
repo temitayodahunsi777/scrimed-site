@@ -28,6 +28,38 @@ const checks = [
     args: ["scripts/release-provenance-preflight.mjs", "--self-test"]
   },
   {
+    label: "release candidate manifest policy self-test",
+    args: ["scripts/release-candidate-manifest.mjs", "--self-test"]
+  },
+  {
+    label: "release candidate manifest contract",
+    args: ["scripts/release-candidate-manifest-contract-check.mjs"]
+  },
+  {
+    label: "release candidate validation policy self-test",
+    args: ["scripts/release-candidate-validation.mjs", "--self-test"]
+  },
+  {
+    label: "release candidate validation contract",
+    args: ["scripts/release-candidate-validation-contract-check.mjs"]
+  },
+  {
+    label: "release candidate review packet policy self-test",
+    args: ["scripts/release-candidate-review-packet.mjs", "--self-test"]
+  },
+  {
+    label: "release candidate review packet contract",
+    args: ["scripts/release-candidate-review-packet-contract-check.mjs"]
+  },
+  {
+    label: "investor deck review policy self-test",
+    args: ["scripts/investor-deck-review.mjs", "--self-test"]
+  },
+  {
+    label: "investor deck review contract",
+    args: ["scripts/investor-deck-review-contract-check.mjs"]
+  },
+  {
     label: "design governance contract",
     args: ["scripts/design-governance-contract-check.mjs"]
   },
@@ -42,6 +74,18 @@ const checks = [
   {
     label: "dependency security floor contract",
     args: ["scripts/dependency-security-floor-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED deterministic SBOM self-test",
+    args: ["scripts/scrimed-sbom.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED no-secret candidate scanner self-test",
+    args: ["scripts/scrimed-secret-scan.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED migration evidence analyzer self-test",
+    args: ["scripts/scrimed-migration-evidence-packet.mjs", "--self-test"]
   },
   {
     label: "AAL2 bearer-token policy",
@@ -89,12 +133,140 @@ const checks = [
     args: ["scripts/scrimed-p31-applied-intelligence-contract-check.mjs"]
   },
   {
+    label: "SCRIMED P31 extended workstreams policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p31-workstreams-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P31 extended workstreams contract",
+    args: ["scripts/scrimed-p31-workstreams-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 policy and negative-path behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 production harness and guarded workflow behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-execution-harness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 governed runtime and release hardening behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-release-hardening-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 repository-native contract",
+    args: ["scripts/scrimed-p32-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 candidate-bound release gate evidence",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-release-gate-evidence.mjs",
+      "--self-test"
+    ]
+  },
+  {
+    label: "SCRIMED Clinical Assurance Control Plane policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/clinical-assurance-control-plane-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Clinical Assurance Control Plane contract",
+    args: ["scripts/clinical-assurance-control-plane-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED Clinical Assurance migration contract",
+    args: ["scripts/clinical-assurance-migration-contract-check.mjs"]
+  },
+  {
     label: "Documentation-Before-Authorization contract",
     args: ["scripts/documentation-before-authorization-contract-check.mjs"]
   },
   {
     label: "Strategic investor outreach contract",
     args: ["scripts/strategic-investor-outreach-contract-check.mjs"]
+  },
+  {
+    label: "Strategic investor meeting policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/strategic-investor-meeting-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Capital planning policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/capital-planning-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Capital acquisition readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/capital-acquisition-readiness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Federal contract readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/federal-contract-readiness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Federal contract readiness contract",
+    args: ["scripts/federal-contract-readiness-contract-check.mjs"]
+  },
+  {
+    label: "Capital Vitality contract",
+    args: ["scripts/capital-vitality-contract-check.mjs"]
+  },
+  {
+    label: "Intended Use review policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/intended-use-review-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Approvals Readiness contract",
+    args: ["scripts/approvals-readiness-contract-check.mjs"]
   },
   {
     label: "On-Device De-Identification contract",

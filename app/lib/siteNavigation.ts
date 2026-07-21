@@ -184,6 +184,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     boundary: "Synthetic/no-PHI work intelligence only; not autonomous clinical care, patient outreach, payer submission, EHR writeback, external model authorization, production connector approval, certification, or customer go-live."
   },
   {
+    label: "Clinical Assurance",
+    href: "/clinical-assurance-control-plane",
+    description: "CAL, sovereign enclave, model passport, capacity, concentration, kill-switch, worst-cell evidence, and independent-failover control plane.",
+    boundary: "Internal synthetic assurance controls only; not an external certification, live-PHI authorization, clinical authority, payer submission, EHR writeback, production connector approval, or customer go-live."
+  },
+  {
     label: "Intelligence Control Plane",
     href: "/scrimed-control-plane",
     description: "Executive mission control for governed agents, skills, workflows, context, routing, verification, ConsequenceBench, capital intelligence, compute resilience, learning, outcomes, and audit evidence.",
@@ -323,6 +329,7 @@ export const siteNavigationSections: SiteNavigationSection[] = [
       { label: "Patient Context Gateway", href: "/scrimed-patient-context-gateway", description: "CODE pt. 4 no-PHI patient story continuity, provenance, HIE concept, FHIR abstraction, consent, and no-writeback gateway." },
       { label: "Operating Command", href: "/scrimed-operating-command", description: "Owner-bound operating lanes for systems, agents, infrastructure, workflows, products, services, UI, KPIs, proof routes, and retained gates." },
       { label: "SCRIMED Work", href: "/scrimed-work", description: "Governed work-session platform for Definition of Done, agents, model routing, context, verification, artifacts, schedules, voice simulation, audit, rollback, and value telemetry." },
+      { label: "Clinical Assurance", href: "/clinical-assurance-control-plane", description: "Inspect CAL resolution, sovereign enclaves, exact model passports, capacity and concentration admission, kill switches, worst-cell evidence, and independent fallback." },
       { label: "PayerIQ Workbench", href: "/documentation-before-authorization", description: "Interactive synthetic documentation completeness, evidence-gap, reviewer-queue, and no-submission workflow for prior-authorization teams." },
       { label: "Intelligence Control Plane", href: "/scrimed-control-plane", description: "Unified executive control plane for agent, skill, workflow, context, model, benchmark, capital, compute, outcome, and audit governance." },
       { label: "Automation Autopilot", href: "/scrimed-automation-autopilot", description: "Automation control for safe autonomy modes, human approval gates, bottleneck workarounds, proof routes, and no-production-authority decisions." },
@@ -457,6 +464,7 @@ export const siteNavigationSections: SiteNavigationSection[] = [
       { label: "SCRIMED OS Plan", href: "/scrimed-os", description: "Production-ready roadmap and starter architecture for the Healthcare Intelligence Operating System." },
       { label: "Intelligence Platform", href: "/scrimed-intelligence-platform", description: "Synthetic-only SCRIMED intelligence control surface for mesh routing, memory graph, provenance, tracing, evals, outcomes, model routing, and education." },
       { label: "SCRIMED Work", href: "/scrimed-work", description: "Open the unified workspace for long-running governed sessions, verification-first autonomy, artifact generation, schedules, voice simulation, and SCRIMED Studio registries." },
+      { label: "Clinical Assurance", href: "/clinical-assurance-control-plane", description: "Open the internal assurance control plane for CAL, enclaves, model and capacity passports, concentration budgets, kill switches, and continuity drills." },
       { label: "PayerIQ Workbench", href: "/documentation-before-authorization", description: "Run enumerated synthetic authorization scenarios through documentation scoring, evidence tracing, human review, audit, and payer-action denial." },
       { label: "Intelligence Control Plane", href: "/scrimed-control-plane", description: "Inspect the consolidated mission-control view across Work, Context Fabric, ConsequenceBench, model policy, capital intelligence, compute resilience, learning, and outcomes." },
       { label: "SCRIMED Modules", href: "/scrimed-modules", description: "No-PHI module registry for benchmark, evidence, memory, trust, workflow, research, multi-agent, and multi-model platform systems." },

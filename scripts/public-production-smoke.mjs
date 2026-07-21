@@ -192,11 +192,19 @@ function requirePublicMarketBoundary(label, response) {
 
 function requireCapitalVitalityBoundary(label, response) {
   const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const capitalInputPersistence = response.headers.get("x-scrimed-capital-input-persistence");
+  const capturePacket = response.headers.get("x-scrimed-capture-packet");
   const capitalVitality = response.headers.get("x-scrimed-capital-vitality");
   const financialAuthority = response.headers.get("x-scrimed-financial-authority");
+  const federalOfferAuthority = response.headers.get("x-scrimed-federal-offer-authority");
+  const fundraisingRelease = response.headers.get("x-scrimed-fundraising-release");
+  const governmentAwardAuthority = response.headers.get("x-scrimed-government-award-authority");
+  const governmentRegistration = response.headers.get("x-scrimed-government-registration");
   const investmentAdvice = response.headers.get("x-scrimed-investment-advice");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const publicSectorSubmission = response.headers.get("x-scrimed-public-sector-submission");
   const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const samControl = response.headers.get("x-scrimed-sam-control");
   const securitiesAuthority = response.headers.get("x-scrimed-securities-authority");
   const securityCertification = response.headers.get("x-scrimed-security-certification");
   const valuationAuthority = response.headers.get("x-scrimed-valuation-authority");
@@ -206,6 +214,14 @@ function requireCapitalVitalityBoundary(label, response) {
 
   if (approvalAuthority !== "external-review-required") {
     throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (capitalInputPersistence !== "none-local-browser-only") {
+    throw new Error(`${label} expected x-scrimed-capital-input-persistence none-local-browser-only but received ${capitalInputPersistence}.`);
+  }
+
+  if (capturePacket !== "internal-metadata-only-not-release-authority") {
+    throw new Error(`${label} expected x-scrimed-capture-packet internal-metadata-only-not-release-authority but received ${capturePacket}.`);
   }
 
   if (![
@@ -219,6 +235,22 @@ function requireCapitalVitalityBoundary(label, response) {
     throw new Error(`${label} expected x-scrimed-financial-authority not-audited-financial-report but received ${financialAuthority}.`);
   }
 
+  if (federalOfferAuthority !== "not-authorized") {
+    throw new Error(`${label} expected x-scrimed-federal-offer-authority not-authorized but received ${federalOfferAuthority}.`);
+  }
+
+  if (fundraisingRelease !== "not-authorized") {
+    throw new Error(`${label} expected x-scrimed-fundraising-release not-authorized but received ${fundraisingRelease}.`);
+  }
+
+  if (governmentAwardAuthority !== "not-contract-or-grant-award") {
+    throw new Error(`${label} expected x-scrimed-government-award-authority not-contract-or-grant-award but received ${governmentAwardAuthority}.`);
+  }
+
+  if (governmentRegistration !== "not-verified") {
+    throw new Error(`${label} expected x-scrimed-government-registration not-verified but received ${governmentRegistration}.`);
+  }
+
   if (investmentAdvice !== "not-investment-advice") {
     throw new Error(`${label} expected x-scrimed-investment-advice not-investment-advice but received ${investmentAdvice}.`);
   }
@@ -227,8 +259,16 @@ function requireCapitalVitalityBoundary(label, response) {
     throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
   }
 
+  if (publicSectorSubmission !== "not-authorized") {
+    throw new Error(`${label} expected x-scrimed-public-sector-submission not-authorized but received ${publicSectorSubmission}.`);
+  }
+
   if (reimbursementAuthority !== "no-reimbursement-guarantee") {
     throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (samControl !== "operator-evidence-required") {
+    throw new Error(`${label} expected x-scrimed-sam-control operator-evidence-required but received ${samControl}.`);
   }
 
   if (securitiesAuthority !== "not-securities-offering-material") {
@@ -946,6 +986,7 @@ function requireBoundaryReleaseApprovalMatrixBoundary(label, response) {
 
 function requireApprovalsReadinessBoundary(label, response) {
   const approvalsReadiness = response.headers.get("x-scrimed-approvals-readiness");
+  const intendedUseAuthority = response.headers.get("x-scrimed-intended-use-authority");
   const legalAuthority = response.headers.get("x-scrimed-legal-authority");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
   const regulatoryAuthority = response.headers.get("x-scrimed-regulatory-authority");
@@ -961,6 +1002,10 @@ function requireApprovalsReadinessBoundary(label, response) {
 
   if (legalAuthority !== "external-approval-required") {
     throw new Error(`${label} expected x-scrimed-legal-authority external-approval-required but received ${legalAuthority}.`);
+  }
+
+  if (intendedUseAuthority !== "qualified-review-required") {
+    throw new Error(`${label} expected x-scrimed-intended-use-authority qualified-review-required but received ${intendedUseAuthority}.`);
   }
 
   if (phiAuthority !== "not-authorized-production-phi") {
@@ -6857,7 +6902,7 @@ async function checkQaEvidenceLedger() {
     operatorAttestation: "no-secrets-no-phi-aal2-human-run",
     tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
     dataBoundary: "synthetic-business-workflow-only",
-    bearerToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkby1ub3Qtc3RvcmUifQ.signature"
+    bearerToken: "eyJexampleHeader.examplePayload.exampleSignature"
   });
   requireStatus("QA manual run evidence packet secret rejection", rejectedSecret.response.status, 400);
   requireContentType("QA manual run evidence packet secret rejection", rejectedSecret.response, "application/json");
@@ -9562,6 +9607,30 @@ async function checkApprovalsReadiness() {
     throw new Error("Approvals Readiness expected approval processes.");
   }
 
+  if (body.intendedUseReview?.service !== "scrimed-intended-use-review") {
+    throw new Error("Approvals Readiness expected the Intended Use review program.");
+  }
+
+  if (body.intendedUseReview?.status !== "intended-use-review-packet-safe-draft-only") {
+    throw new Error("Approvals Readiness expected Intended Use draft-only status.");
+  }
+
+  const intendedUseDefault = body.intendedUseReview?.defaultEvaluation;
+
+  if (intendedUseDefault?.decision !== "qualified-review-packet-ready") {
+    throw new Error("Approvals Readiness expected the bounded default scope to be ready for qualified review.");
+  }
+
+  for (const field of ["approved", "approvalClaimAllowed", "externalUseAuthorized", "phiAuthority", "clinicalAuthority", "productionAuthority"]) {
+    if (intendedUseDefault?.[field] !== false) {
+      throw new Error(`Approvals Readiness Intended Use default must keep ${field} false.`);
+    }
+  }
+
+  if (!Array.isArray(body.intendedUseReview?.actionOptions) || !body.intendedUseReview.actionOptions.some((action) => action.id === "ehr-writeback" && action.classification === "prohibited")) {
+    throw new Error("Approvals Readiness Intended Use registry must prohibit EHR writeback.");
+  }
+
   const brief = await request("/api/approvals-readiness/brief");
   requireStatus("Approvals Readiness brief", brief.response.status, 200);
   requireContentType("Approvals Readiness brief", brief.response, "text/markdown");
@@ -9577,6 +9646,14 @@ async function checkApprovalsReadiness() {
 
   if (!brief.body.text.includes("FDA clearance")) {
     throw new Error("Approvals Readiness brief missing FDA boundary.");
+  }
+
+  if (!brief.body.text.includes("Intended Use Review Packet")) {
+    throw new Error("Approvals Readiness brief missing Intended Use review packet.");
+  }
+
+  if (!brief.body.text.includes("External use authorized: false")) {
+    throw new Error("Approvals Readiness brief must preserve blocked external use.");
   }
 
   console.log("pass approvals readiness");
@@ -13927,6 +14004,89 @@ async function checkCapitalVitality() {
     throw new Error("Capital Vitality must not create audited financial reporting.");
   }
 
+  if (body.capitalPlanning?.status !== "capital-planning-workbench-ready-local-only") {
+    throw new Error("Capital Vitality expected a local-only capital planning workbench.");
+  }
+
+  if (
+    body.capitalPlanning?.modelVersion !== "scrimed-capital-plan-v1" ||
+    body.capitalPlanning?.localOnly !== true ||
+    body.capitalPlanning?.inputPersistence !== false ||
+    body.capitalPlanning?.externalUseAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality planning posture must remain local, nonpersistent, and externally unauthorized.");
+  }
+
+  if (body.investorDiligenceManifest?.status !== "investor-diligence-manifest-active-metadata-only") {
+    throw new Error("Capital Vitality expected a metadata-only investor diligence manifest.");
+  }
+
+  if (
+    body.investorDiligenceManifest?.artifactCount !== 6 ||
+    body.investorDiligenceManifest?.blockingArtifactCount !== 5 ||
+    body.investorDiligenceManifest?.acceptsRawEvidence !== false ||
+    body.investorDiligenceManifest?.externalReleaseAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality diligence manifest counts or fail-closed posture drifted.");
+  }
+
+  if (
+    body.investorDiligenceManifest?.releaseAssessment?.decision !== "blocked-remediation-required" ||
+    body.investorDiligenceManifest?.releaseAssessment?.externalReleaseAuthorized !== false ||
+    body.externalFundraisingReleaseAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality fundraising release must remain blocked pending qualified evidence and approval.");
+  }
+
+  if (
+    body.capitalAcquisitionReadiness?.status !== "capital-and-public-sector-readiness-active-evidence-gated" ||
+    body.capitalAcquisitionReadiness?.capitalAccessLaneCount !== 7 ||
+    body.capitalAcquisitionReadiness?.readinessGateCount < 10
+  ) {
+    throw new Error("Capital Vitality expected evidence-gated capital and public-sector acquisition readiness.");
+  }
+
+  if (
+    body.capitalAcquisitionReadiness?.authority?.registrationsVerified !== false ||
+    body.capitalAcquisitionReadiness?.authority?.certificationsVerified !== false ||
+    body.capitalAcquisitionReadiness?.authority?.governmentAwardVerified !== false ||
+    body.capitalAcquisitionReadiness?.authority?.externalSubmissionAuthorized !== false ||
+    body.externalPublicSectorSubmissionAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality must not infer registration, certification, government award, or submission authority.");
+  }
+
+  if (body.capitalAcquisitionReadiness?.defaultAssessment?.decision !== "input-required") {
+    throw new Error("Capital Vitality public-sector evaluator must require verified operator input by default.");
+  }
+
+  if (
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.status !==
+      "sam-far-readiness-active-operator-evidence-required" ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.checkpointCount !== 14 ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.defaultDecision !== "operator-input-required" ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.authority?.samRegistrationVerified !== false ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.authority?.primeOfferAuthorized !== false ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.authority?.externalSubmissionAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality federal contract readiness must require operator evidence and retain all registration, offer, and submission authority.");
+  }
+
+  if (
+    body.capitalAcquisitionCapturePacket?.status !==
+      "capital-acquisition-capture-packet-active-internal-metadata-only" ||
+    body.capitalAcquisitionCapturePacket?.supportedLaneCount !== 5 ||
+    body.capitalAcquisitionCapturePacket?.proofArtifactCount !== 5 ||
+    body.capitalAcquisitionCapturePacket?.defaultExternalReleaseAuthorized !== false ||
+    body.capitalAcquisitionCapturePacket?.defaultExternalSubmissionAuthorized !== false ||
+    body.capitalAcquisitionCapturePacket?.containsRawProposal !== false ||
+    body.capitalAcquisitionCapturePacket?.containsRegistrationIdentifiers !== false ||
+    body.capitalAcquisitionCapturePacket?.containsCredentials !== false ||
+    body.capitalAcquisitionCapturePacket?.containsPhi !== false
+  ) {
+    throw new Error("Capital Vitality capture packet must remain internal, metadata-only, and fail-closed for external release and submission.");
+  }
+
   if (!Array.isArray(body.revenueCapabilities) || body.revenueCapabilities.length < 8) {
     throw new Error("Capital Vitality expected revenue capability coverage.");
   }
@@ -13973,6 +14133,30 @@ async function checkCapitalVitality() {
 
   if (!brief.body.text.includes("not securities offering material")) {
     throw new Error("Capital Vitality brief missing securities boundary.");
+  }
+
+  if (!brief.body.text.includes("Capital Planning Workbench")) {
+    throw new Error("Capital Vitality brief missing capital planning workbench posture.");
+  }
+
+  if (!brief.body.text.includes("Investor Diligence Manifest")) {
+    throw new Error("Capital Vitality brief missing investor diligence manifest posture.");
+  }
+
+  if (!brief.body.text.includes("Capital And Public-Sector Acquisition Readiness")) {
+    throw new Error("Capital Vitality brief missing public-sector acquisition readiness posture.");
+  }
+
+  if (!brief.body.text.includes("Capital Acquisition Capture Packet")) {
+    throw new Error("Capital Vitality brief missing the internal capital acquisition capture packet posture.");
+  }
+
+  if (!brief.body.text.includes("External submission authorized: false")) {
+    throw new Error("Capital Vitality brief must preserve the public-sector submission lock.");
+  }
+
+  if (!brief.body.text.includes("External release authorized: false")) {
+    throw new Error("Capital Vitality brief must preserve the external fundraising release lock.");
   }
 
   console.log("pass capital vitality");
@@ -14156,6 +14340,54 @@ async function checkInvestorAudienceReadiness() {
   ) {
     throw new Error("Investor Audience Readiness expected pitch and diligence gap coverage.");
   }
+
+  if (
+    body.strategicMeetingPacketCount !== 4 ||
+    body.strategicInvestorOutreach?.meetingPreparationReady !== true ||
+    body.strategicInvestorOutreach?.externalFundraisingReleaseAuthorized !== false ||
+    body.fundingReleaseBlockerCount !== 5
+  ) {
+    throw new Error("Investor Audience Readiness expected four internal meeting packets and five weakest-link funding release blockers.");
+  }
+
+  const openaiPacket = await request(
+    "/api/investor-audience-readiness/meeting-packet?target=openai&format=json"
+  );
+  requireStatus("OpenAI meeting packet", openaiPacket.response.status, 200);
+  requireContentType("OpenAI meeting packet", openaiPacket.response, "application/json");
+  const openaiPacketBody = requireJson("OpenAI meeting packet", openaiPacket.body);
+
+  if (
+    openaiPacketBody.ok !== true ||
+    openaiPacketBody.data?.organization !== "OpenAI" ||
+    openaiPacketBody.data?.fundingPathStatus !== "no-public-direct-investment-application-verified" ||
+    openaiPacketBody.meta?.externalReleaseAuthorized !== false ||
+    openaiPacketBody.meta?.relationshipImplied !== false
+  ) {
+    throw new Error("OpenAI meeting packet must remain internal, source-aligned, and relationship-neutral.");
+  }
+
+  if (openaiPacket.response.headers.get("x-scrimed-fundraising-release") !== "not-authorized") {
+    throw new Error("OpenAI meeting packet must fail closed for external fundraising release.");
+  }
+
+  const openaiMarkdown = await request(
+    "/api/investor-audience-readiness/meeting-packet?target=openai&format=markdown"
+  );
+  requireStatus("OpenAI meeting packet markdown", openaiMarkdown.response.status, 200);
+  requireContentType("OpenAI meeting packet markdown", openaiMarkdown.response, "text/markdown");
+
+  if (
+    !openaiMarkdown.body.text.includes("SCRIMED OpenAI Meeting Preparation Brief") ||
+    !openaiMarkdown.body.text.includes("External release authorized: no")
+  ) {
+    throw new Error("OpenAI meeting packet markdown missing heading or external-release boundary.");
+  }
+
+  const invalidPacket = await request(
+    "/api/investor-audience-readiness/meeting-packet?target=unsupported&format=json"
+  );
+  requireStatus("Invalid strategic meeting target", invalidPacket.response.status, 400);
 
   const brief = await request("/api/investor-audience-readiness/brief");
   requireStatus("Investor Audience Readiness brief", brief.response.status, 200);

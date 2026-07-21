@@ -45,13 +45,20 @@ export function evaluateCostApiGuardrail(input: {
 }): CostGuardrailDecision {
   const config = getCostGuardrailConfig();
   const projectedRequestsPerMinute = input.projectedRequestsPerMinute ?? 1;
+  const invalidProjection =
+    !Number.isFinite(input.projectedCostUsd) ||
+    input.projectedCostUsd < 0 ||
+    !Number.isFinite(projectedRequestsPerMinute) ||
+    projectedRequestsPerMinute < 0;
   const suspiciousUsageDetected =
+    invalidProjection ||
     projectedRequestsPerMinute > config.maxSyntheticRequestsPerMinute ||
     input.projectedCostUsd > config.maxEstimatedCostUsdPerRequest;
   const blockedByProviderKillSwitch =
     Boolean(input.externalProviderCallRequested) && !config.providerCallsEnabled;
   const blocked =
-    config.costGuardrailsEnabled && (suspiciousUsageDetected || blockedByProviderKillSwitch);
+    blockedByProviderKillSwitch ||
+    (config.costGuardrailsEnabled && suspiciousUsageDetected);
 
   return {
     allowed: !blocked,
@@ -64,7 +71,9 @@ export function evaluateCostApiGuardrail(input: {
     projectedCostUsd: input.projectedCostUsd,
     projectedRequestsPerMinute,
     suspiciousUsageDetected,
-    reason: blockedByProviderKillSwitch
+    reason: invalidProjection
+      ? "Projected usage metadata is invalid and failed closed."
+      : blockedByProviderKillSwitch
       ? "External AI provider calls are disabled by default for SCRIMED."
       : suspiciousUsageDetected
         ? "Projected usage exceeds SCRIMED synthetic request or cost guardrail thresholds."

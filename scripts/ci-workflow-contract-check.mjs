@@ -8,9 +8,13 @@ const workflowPaths = [
   ".github/workflows/authority-reference-qa-smoke.yml",
   ".github/workflows/sales-demo-session-qa-smoke.yml"
 ];
+const securityWorkflowPaths = [
+  ".github/workflows/dependency-review.yml",
+  ".github/workflows/codeql.yml"
+];
 
 const files = Object.fromEntries(
-  await Promise.all(workflowPaths.map(async (pathname) => [pathname, await readFile(pathname, "utf8")]))
+  await Promise.all([...workflowPaths, ...securityWorkflowPaths].map(async (pathname) => [pathname, await readFile(pathname, "utf8")]))
 );
 
 function requireIncludes(pathname, expected) {
@@ -52,6 +56,9 @@ for (const expected of [
   "npm run release:provenance:strict",
   "npm audit --audit-level=moderate",
   "npm run security:dependency-floor",
+  "npm run security:secret-scan",
+  "npm run security:sbom",
+  "npm run release:migration-packet",
   "node scripts/check-generated-integrity.mjs",
   "npm run smoke:execution-attempt-durable-store",
   "npm run smoke:scrimed-intelligence-safety-stack",
@@ -61,6 +68,33 @@ for (const expected of [
   "npm run build"
 ]) {
   requireIncludes(".github/workflows/ci.yml", expected);
+}
+
+for (const pathname of securityWorkflowPaths) {
+  requireIncludes(pathname, "permissions:\n  contents: read");
+  requireIncludes(pathname, "uses: actions/checkout@v6");
+  for (const forbidden of ["continue-on-error: true", "|| true", "set -x", "printenv", "cat .env", "echo ${{ secrets."]) {
+    forbidIncludes(pathname, forbidden);
+  }
+}
+
+for (const expected of [
+  "pull_request:",
+  "uses: actions/dependency-review-action@v4",
+  "fail-on-severity: moderate",
+  "license-check: true"
+]) {
+  requireIncludes(".github/workflows/dependency-review.yml", expected);
+}
+
+for (const expected of [
+  "uses: github/codeql-action/init@v4",
+  "languages: javascript-typescript",
+  "build-mode: none",
+  "uses: github/codeql-action/analyze@v4",
+  "security-events: write"
+]) {
+  requireIncludes(".github/workflows/codeql.yml", expected);
 }
 
 for (const pathname of [
@@ -105,4 +139,4 @@ for (const expected of [
   requireIncludes(".github/workflows/sales-demo-session-qa-smoke.yml", expected);
 }
 
-console.log(`pass SCRIMED CI workflow contract check (${workflowPaths.length} workflows verified)`);
+console.log(`pass SCRIMED CI workflow contract check (${workflowPaths.length + securityWorkflowPaths.length} workflows verified)`);

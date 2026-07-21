@@ -46,7 +46,10 @@ import {
   scrimedWorkCompletionEvidencePolicyVersion
 } from "./completionEvidence";
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
-import { sampleLearningLoopArtifacts } from "./learningLoop";
+import { sampleLearningLoopArtifacts, sampleOutcomeLearningControllers } from "./learningLoop";
+import { priorAuthorizationFoundryBlueprint } from "./foundry";
+import { getClinicalAgentSreSummary } from "../clinicalAgentSre";
+import { getClinicalAssuranceControlPlaneSummary } from "../clinicalAssuranceControlPlane";
 import { isScrimedWorkMigrationSetVerified } from "./migrationSet";
 import {
   buildPayerIqProtectedWorkSession,
@@ -111,6 +114,8 @@ export * from "./reviewPreparation";
 export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
+export * from "./foundry";
+export * from "./governedRuntime";
 export * from "./migrationSet";
 export * from "./valueTelemetry";
 export * from "./audit";
@@ -118,6 +123,7 @@ export * from "./featureFlags";
 export * from "./voiceWorkflow";
 export * from "./durableStore";
 export * from "./sessionLifecycle";
+export * from "./p32Contracts";
 
 export const scrimedWorkRoute = "/scrimed-work";
 export const scrimedWorkApiRoute = "/api/scrimed-work";
@@ -205,6 +211,14 @@ export function getScrimedWorkSummary() {
       consentAcknowledged: true
     }),
     learningLoopArtifacts: sampleLearningLoopArtifacts,
+    outcomeLearningControllers: sampleOutcomeLearningControllers,
+    clinicianAgentFoundry: {
+      blueprint: priorAuthorizationFoundryBlueprint,
+      deploymentEnabled: featureFlags.foundryDeploymentEnabled,
+      productionActivationAllowed: false as const
+    },
+    clinicalAgentSre: getClinicalAgentSreSummary(),
+    clinicalAssuranceControlPlane: getClinicalAssuranceControlPlaneSummary(),
     orchestrationPreview: previewOrchestration(sessions[0]),
     auditEvents: [
       createAuditEvent({

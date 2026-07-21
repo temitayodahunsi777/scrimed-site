@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getApprovalsReadinessSummary } from "../lib/approvalsReadiness";
 import { getGlobalCertificationReadinessSummary } from "../lib/globalCertificationReadiness";
+import IntendedUseReviewWorkbench from "./IntendedUseReviewWorkbench";
 
 export const metadata = {
   title: "SCRIMED Approvals Readiness",
@@ -23,7 +24,8 @@ export default function ApprovalsReadinessPage() {
           ONC, and state care-delivery questions organized without pretending approvals are complete.
         </p>
         <div className="hero-actions">
-          <a className="primary-action" href={summary.briefRoute}>Download Approvals Brief</a>
+          <a className="primary-action" href="#intended-use-review-workbench">Review Intended Use</a>
+          <a className="secondary-action" href={summary.briefRoute}>Download Approvals Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href={globalCertificationSummary.route}>Global Certifications</Link>
           <Link className="secondary-action" href="/clinical-authority-readiness">Clinical Authority</Link>
@@ -65,6 +67,10 @@ export default function ApprovalsReadinessPage() {
           <span>Processes</span>
           <strong>{summary.processCount}</strong>
         </article>
+        <article>
+          <span>Intended Use</span>
+          <strong>qualified review pending</strong>
+        </article>
       </section>
 
       <section className="section-band split-band">
@@ -104,6 +110,8 @@ export default function ApprovalsReadinessPage() {
           ))}
         </div>
       </section>
+
+      <IntendedUseReviewWorkbench />
 
       <section className="table-section" aria-label="Approval tracks">
         <div className="section-heading">

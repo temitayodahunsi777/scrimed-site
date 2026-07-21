@@ -74,12 +74,20 @@ export default function InvestorAudienceReadinessPage() {
           <strong>{summary.strategicTargetCount}</strong>
         </article>
         <article>
+          <span>Meeting packets</span>
+          <strong>{summary.strategicMeetingPacketCount}</strong>
+        </article>
+        <article>
           <span>Diligence ready</span>
           <strong>{summary.diligenceEvidenceReadyCount}</strong>
         </article>
         <article>
           <span>Review still required</span>
           <strong>{summary.diligenceReviewRequiredCount}</strong>
+        </article>
+        <article>
+          <span>Funding release blockers</span>
+          <strong>{summary.fundingReleaseBlockerCount}</strong>
         </article>
       </section>
 
@@ -132,6 +140,69 @@ export default function InvestorAudienceReadinessPage() {
                 <li>Proof: {target.proofRoutes.join(", ")}</li>
                 <li>Diligence: {target.diligenceRequirements.join(", ")}</li>
                 <li>Boundary: {target.claimBoundary}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Strategic investor meeting room">
+        <div className="section-heading">
+          <p className="eyebrow">Meeting room</p>
+          <h2>Each strategic conversation now has an objective, proof sequence, hard questions, exact ask, and controlled next step.</h2>
+          <p className="section-copy">
+            OpenAI is approached through verified startup and healthcare ecosystem paths first. A direct investment path is not assumed, every packet remains an internal preparation artifact, and external release still requires founder, legal, finance, claims, and provenance approval.
+          </p>
+        </div>
+        {summary.strategicInvestorOutreach.meetingProfiles.map((profile) => (
+          <article className="module-row" key={profile.targetId}>
+            <div>
+              <span>{profile.packetStatus}</span>
+              <h2>{profile.organization}</h2>
+            </div>
+            <p>{profile.openingNarrative}</p>
+            <div>
+              <strong>{profile.specificAsk}</strong>
+              <ul className="compact-list">
+                <li>Objective: {profile.firstMeetingObjective}</li>
+                <li>Non-goal: {profile.firstMeetingNonGoal}</li>
+                <li>Engagement lane: {profile.engagementLane}</li>
+                <li>Funding path: {profile.fundingPathStatus}</li>
+                <li>Proof sequence: {profile.demoSequence.map((step) => step.route).join(" -> ")}</li>
+                <li>Mutual next step: {profile.mutualNextStep}</li>
+                <li>External release authorized: {profile.externalReleaseAuthorized ? "yes" : "no"}</li>
+              </ul>
+              <a
+                className="secondary-action"
+                href={`${summary.strategicInvestorOutreach.meetingPacketRoute}?target=${profile.targetId}&format=markdown`}
+              >
+                Download {profile.organization} Meeting Brief
+              </a>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Funding release controls">
+        <div className="section-heading">
+          <p className="eyebrow">Funding release controls</p>
+          <h2>Meeting preparation is ready; external fundraising material remains blocked until the weakest evidence links close.</h2>
+          <p className="section-copy">
+            This ledger prevents a polished presentation from outrunning financial reconciliation, securities review, permissioned customer evidence, independent assurance, or immutable packet provenance.
+          </p>
+        </div>
+        {summary.strategicInvestorOutreach.fundingReadinessControls.map((control) => (
+          <article className="module-row" key={control.id}>
+            <div>
+              <span>{control.status}</span>
+              <h2>{control.title}</h2>
+            </div>
+            <p>{control.requiredEvidence}</p>
+            <div>
+              <strong>{control.owner}</strong>
+              <ul className="compact-list">
+                <li>Completion: {control.completionRule}</li>
+                <li>Blocks fundraising release: {control.blocksFundraisingRelease ? "yes" : "no"}</li>
               </ul>
             </div>
           </article>
