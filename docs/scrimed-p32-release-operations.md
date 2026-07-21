@@ -13,6 +13,8 @@ npm run release:scrimed-p32-evidence:strict
 
 `release:scrimed-p32-evidence:all-gates` is intentionally fail-closed until every technical and named external decision is current and bound to the exact clean candidate.
 
+When the working tree is clean, the candidate manifest and review packet evaluate the committed first-parent change set rather than an empty working-tree diff. Candidate, source, commit-tree, validation, and review-packet fingerprints therefore remain attributable after local commit promotion.
+
 ## Operator Gates
 
 The gate packet is the source of truth. Every unresolved gate contains a responsible role, exact action, candidate/source/artifact/validation fingerprints, command or protected form, expiry, rejection consequence, and verification procedure. Do not copy a prior packet to a changed candidate.

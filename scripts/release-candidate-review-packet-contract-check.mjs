@@ -45,7 +45,9 @@ for (const expected of [
   "migrationApplyAuthorized: false",
   "externalDistributionAuthorized: false",
   "investorOutreachAuthorized: false",
-  "releasePromotionAllowed: false"
+  "releasePromotionAllowed: false",
+  "parseCommittedNameStatus",
+  "manifest.candidateMode === \"clean-commit\""
 ]) {
   requireIncludes("scripts/release-candidate-review-packet.mjs", packet, expected);
 }
@@ -55,7 +57,8 @@ for (const expected of [
   "npm run release:candidate-review-packet:strict",
   "candidate, source, and review-packet SHA-256",
   "does not authorize review approval, a commit, deployment, migration, release promotion, or external distribution",
-  "Any source change invalidates the packet"
+  "Any source change invalidates the packet",
+  "first-parent `HEAD^..HEAD` change set"
 ]) {
   requireIncludes("docs/release-candidate-validation.md", docs, expected);
 }

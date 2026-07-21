@@ -9,6 +9,7 @@ const args = new Set(process.argv.slice(2));
 const allowedArgs = new Set(["--json", "--markdown", "--strict", "--self-test"]);
 const unknownArgs = [...args].filter((arg) => !allowedArgs.has(arg));
 const maximumHashFileBytes = 32 * 1024 * 1024;
+const emptyGitTreeSha = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 
 if (unknownArgs.length > 0) {
   throw new Error(`Unsupported release candidate review packet option: ${unknownArgs.join(", ")}`);
@@ -240,7 +241,10 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
   const completeCoverage = blockers.length === 0;
   const packetCore = {
     schemaVersion: "1.0.0",
+    candidateMode: manifest.candidateMode,
     baseHeadSha: manifest.baseHeadSha,
+    parentCommitSha: manifest.parentCommitSha,
+    headTreeSha: manifest.headTreeSha,
     candidateDigestSha256: manifest.candidateDigestSha256,
     sourceCandidateDigestSha256: manifest.sourceCandidateDigestSha256,
     changedFileCount: manifest.changedFileCount,
@@ -353,6 +357,26 @@ function parsePorcelainStatus(statusBuffer) {
   return files;
 }
 
+function parseCommittedNameStatus(statusBuffer) {
+  const records = statusBuffer.toString("utf8").split("\0").filter(Boolean);
+  const files = [];
+
+  for (let index = 0; index < records.length;) {
+    const rawStatus = records[index++];
+    if (!rawStatus) continue;
+    if (rawStatus.startsWith("R") || rawStatus.startsWith("C")) {
+      const previousPath = records[index++] ?? "";
+      const filePath = records[index++] ?? "";
+      files.push({ rawStatus, status: normalizeStatus(rawStatus), path: filePath, previousPath });
+      continue;
+    }
+    const filePath = records[index++] ?? "";
+    files.push({ rawStatus, status: normalizeStatus(rawStatus), path: filePath, previousPath: null });
+  }
+
+  return files;
+}
+
 async function inspectFile(repoRoot, file) {
   if (!isSafeRelativePath(file.path)) {
     return { ...file, fileType: "invalid", sizeBytes: 0, contentSha256: null, inspectionError: "unsafe-path" };
@@ -415,11 +439,19 @@ function loadManifest(repoRoot) {
 async function inspectCurrentCandidate() {
   const repoRoot = runGit(["rev-parse", "--show-toplevel"]).trim();
   const manifest = loadManifest(repoRoot);
-  const statusBuffer = runGit(["status", "--porcelain=v1", "-z", "--untracked-files=all"], {
-    cwd: repoRoot,
-    encoding: null
-  });
-  const parsedFiles = parsePorcelainStatus(statusBuffer);
+  const parsedFiles = manifest.candidateMode === "clean-commit"
+    ? parseCommittedNameStatus(runGit([
+        "diff",
+        "--name-status",
+        "-z",
+        manifest.parentCommitSha ?? emptyGitTreeSha,
+        manifest.baseHeadSha,
+        "--"
+      ], { cwd: repoRoot, encoding: null }))
+    : parsePorcelainStatus(runGit(["status", "--porcelain=v1", "-z", "--untracked-files=all"], {
+        cwd: repoRoot,
+        encoding: null
+      }));
   const inspectedFiles = [];
   for (const file of parsedFiles) {
     inspectedFiles.push(await inspectFile(repoRoot, file));
@@ -472,7 +504,10 @@ function renderMarkdown(packet) {
 function runSelfTest() {
   const digest = "a".repeat(64);
   const manifest = {
+    candidateMode: "working-tree",
     baseHeadSha: "b".repeat(40),
+    parentCommitSha: "c".repeat(40),
+    headTreeSha: "d".repeat(40),
     candidateDigestSha256: digest,
     sourceCandidateDigestSha256: digest,
     changedFileCount: 3,
@@ -561,6 +596,9 @@ function runSelfTest() {
 
   if (
     ready.status !== "ready-for-named-reviewer-disposition"
+    || ready.candidateMode !== "working-tree"
+    || ready.parentCommitSha !== manifest.parentCommitSha
+    || ready.headTreeSha !== manifest.headTreeSha
     || !ready.completeCoverage
     || !ready.requiredBaseCoverage
     || ready.reviewableFileCount !== 3

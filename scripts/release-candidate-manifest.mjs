@@ -33,6 +33,8 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+const emptyGitTreeSha = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+
 function classifyPath(path) {
   if (path.startsWith("app/api/")) return "api";
   if (path.startsWith("app/lib/")) return "core-policy";
@@ -143,8 +145,11 @@ export function evaluateReleaseCandidateManifest(input) {
   return {
     service: "scrimed-release-candidate-manifest",
     status,
+    candidateMode: input.candidateMode,
     baseHeadSha: isSha(input.headSha, 40) ? input.headSha : null,
     baseHeadFingerprint: isSha(input.headSha, 40) ? input.headSha.slice(0, 12) : "unavailable",
+    parentCommitSha: isSha(input.parentCommitSha, 40) ? input.parentCommitSha : null,
+    headTreeSha: isSha(input.headTreeSha, 40) ? input.headTreeSha : null,
     candidateDigestSha256: candidateDigestReady ? input.candidateDigestSha256 : null,
     sourceCandidateDigestSha256: sourceDigestReady ? input.sourceCandidateDigestSha256 : null,
     nonSourceDeliverablesDigestSha256: isSha(input.nonSourceDeliverablesDigestSha256, 64)
@@ -179,13 +184,20 @@ export function evaluateReleaseCandidateManifest(input) {
     fileContentsPrinted: false,
     rawDiffPrinted: false,
     remediation,
-    nextActions: [
-      "Review category counts, risk signals, and required reviewer roles without distributing raw candidate content.",
-      "Run typecheck, lint, the full nonsecret suite, build, and applicable authenticated or public smoke in an approved environment.",
-      "Stage and commit only the reviewed candidate through the approved source-control workflow.",
-      "Run npm run release:provenance:strict on the resulting clean immutable revision.",
-      "Record the approved full SHA only after named release authority signs off."
-    ],
+    nextActions: strictProvenanceEligible
+      ? [
+          "Generate the commit-bound review packet for the exact HEAD change set.",
+          "Run typecheck, lint, the full nonsecret suite, build, and applicable authenticated or public smoke against the immutable revision.",
+          "Record named reviewer decisions against the exact commit, source, review-packet, and validation fingerprints.",
+          "Keep deployment, migration, external distribution, PHI, and clinical authority blocked until their independent gates pass."
+        ]
+      : [
+          "Review category counts, risk signals, and required reviewer roles without distributing raw candidate content.",
+          "Run typecheck, lint, the full nonsecret suite, build, and applicable authenticated or public smoke in an approved environment.",
+          "Stage and commit only the reviewed candidate through the approved source-control workflow.",
+          "Run npm run release:provenance:strict on the resulting clean immutable revision.",
+          "Record the approved full SHA only after named release authority signs off."
+        ],
     boundary: "The candidate manifest fingerprints local source changes without printing paths, file contents, raw diffs, secrets, credentials, or PHI. It is review preparation only and never commits, deploys, applies migrations, approves claims, grants PHI or clinical authority, or permits release promotion."
   };
 }
@@ -256,12 +268,33 @@ async function hashUntrackedFiles(paths) {
 
 async function inspectCandidate() {
   const headSha = runGitText(["rev-parse", "HEAD"])?.trim() ?? null;
+  const parentCommitSha = runGitText(["rev-parse", "HEAD^"])?.trim() ?? null;
+  const headTreeSha = runGitText(["rev-parse", "HEAD^{tree}"])?.trim() ?? null;
   const statusText = runGitText(["status", "--porcelain=v1", "--untracked-files=all"]);
-  const trackedPaths = splitNullTerminated(runGitText(["diff", "--name-only", "-z", "HEAD", "--"]));
-  const untrackedPaths = splitNullTerminated(runGitText(["ls-files", "--others", "--exclude-standard", "-z"]));
-  const trackedDiff = runGitBuffer(["diff", "--binary", "--no-ext-diff", "HEAD", "--"]);
-  const gitAvailable = isSha(headSha, 40) && statusText !== null && trackedDiff !== null;
   const statusLines = statusText?.split(/\r?\n/).filter(Boolean) ?? [];
+  const cleanCommitCandidate = isSha(headSha, 40) && statusText !== null && statusLines.length === 0;
+  const candidateMode = cleanCommitCandidate ? "clean-commit" : "working-tree";
+  const commitDiffBase = isSha(parentCommitSha, 40) ? parentCommitSha : emptyGitTreeSha;
+  const trackedPaths = splitNullTerminated(runGitText(
+    cleanCommitCandidate
+      ? ["diff", "--name-only", "-z", commitDiffBase, headSha, "--"]
+      : ["diff", "--name-only", "-z", "HEAD", "--"]
+  ));
+  const untrackedPaths = cleanCommitCandidate
+    ? []
+    : splitNullTerminated(runGitText(["ls-files", "--others", "--exclude-standard", "-z"]));
+  const trackedDiff = runGitBuffer(
+    cleanCommitCandidate
+      ? ["diff", "--binary", "--no-ext-diff", commitDiffBase, headSha, "--"]
+      : ["diff", "--binary", "--no-ext-diff", "HEAD", "--"]
+  );
+  const commitNameStatus = cleanCommitCandidate
+    ? runGitText(["diff", "--name-status", commitDiffBase, headSha, "--"])?.split(/\r?\n/).filter(Boolean) ?? []
+    : [];
+  const gitAvailable = isSha(headSha, 40)
+    && isSha(headTreeSha, 40)
+    && statusText !== null
+    && trackedDiff !== null;
   const allPaths = [...new Set([...trackedPaths, ...untrackedPaths])].sort();
   const sourcePaths = allPaths.filter((path) => !isNonSourceDeliverable(path));
   const sourceTrackedPaths = trackedPaths.filter((path) => !isNonSourceDeliverable(path));
@@ -280,16 +313,23 @@ async function inspectCandidate() {
   const nonSourceUntracked = await hashUntrackedFiles(nonSourceUntrackedPaths);
   const trackedDiffSha256 = trackedDiff ? sha256(trackedDiff) : null;
   const sourceTrackedDiff = sourceTrackedPaths.length > 0
-    ? runGitBuffer(["diff", "--binary", "--no-ext-diff", "HEAD", "--", ...sourceTrackedPaths])
+    ? runGitBuffer(cleanCommitCandidate
+      ? ["diff", "--binary", "--no-ext-diff", commitDiffBase, headSha, "--", ...sourceTrackedPaths]
+      : ["diff", "--binary", "--no-ext-diff", "HEAD", "--", ...sourceTrackedPaths])
     : Buffer.from("");
   const nonSourceTrackedDiff = nonSourceTrackedPaths.length > 0
-    ? runGitBuffer(["diff", "--binary", "--no-ext-diff", "HEAD", "--", ...nonSourceTrackedPaths])
+    ? runGitBuffer(cleanCommitCandidate
+      ? ["diff", "--binary", "--no-ext-diff", commitDiffBase, headSha, "--", ...nonSourceTrackedPaths]
+      : ["diff", "--binary", "--no-ext-diff", "HEAD", "--", ...nonSourceTrackedPaths])
     : Buffer.from("");
   const sourceTrackedDiffSha256 = sourceTrackedDiff ? sha256(sourceTrackedDiff) : null;
   const nonSourceTrackedDiffSha256 = nonSourceTrackedDiff ? sha256(nonSourceTrackedDiff) : null;
   const candidateDigestSha256 = gitAvailable && trackedDiffSha256
     ? sha256(JSON.stringify({
+      candidateMode,
       headSha,
+      parentCommitSha: isSha(parentCommitSha, 40) ? parentCommitSha : null,
+      headTreeSha,
       trackedDiffSha256,
       untrackedContentSha256: untracked.digest,
       changedFileCount: allPaths.length
@@ -297,7 +337,10 @@ async function inspectCandidate() {
     : null;
   const sourceCandidateDigestSha256 = gitAvailable && sourceTrackedDiffSha256
     ? sha256(JSON.stringify({
+      candidateMode,
       headSha,
+      parentCommitSha: isSha(parentCommitSha, 40) ? parentCommitSha : null,
+      headTreeSha,
       sourceTrackedDiffSha256,
       sourceUntrackedContentSha256: sourceUntracked.digest,
       sourceChangedFileCount: sourcePaths.length
@@ -314,7 +357,10 @@ async function inspectCandidate() {
 
   return {
     gitAvailable,
+    candidateMode,
     headSha,
+    parentCommitSha,
+    headTreeSha,
     candidateDigestSha256,
     sourceCandidateDigestSha256,
     nonSourceDeliverablesDigestSha256,
@@ -323,10 +369,16 @@ async function inspectCandidate() {
     dirtyEntryCount: statusLines.length,
     changedFileCount: allPaths.length,
     sourceChangedFileCount: sourcePaths.length,
-    modifiedFileCount: statusLines.filter((line) => !line.startsWith("??") && !line.slice(0, 2).includes("D") && !line.slice(0, 2).includes("R")).length,
-    untrackedFileCount: statusLines.filter((line) => line.startsWith("??")).length,
-    deletedFileCount: statusLines.filter((line) => line.slice(0, 2).includes("D")).length,
-    renamedFileCount: statusLines.filter((line) => line.slice(0, 2).includes("R")).length,
+    modifiedFileCount: cleanCommitCandidate
+      ? commitNameStatus.filter((line) => line.startsWith("M\t")).length
+      : statusLines.filter((line) => !line.startsWith("??") && !line.slice(0, 2).includes("D") && !line.slice(0, 2).includes("R")).length,
+    untrackedFileCount: cleanCommitCandidate ? 0 : statusLines.filter((line) => line.startsWith("??")).length,
+    deletedFileCount: cleanCommitCandidate
+      ? commitNameStatus.filter((line) => line.startsWith("D\t")).length
+      : statusLines.filter((line) => line.slice(0, 2).includes("D")).length,
+    renamedFileCount: cleanCommitCandidate
+      ? commitNameStatus.filter((line) => line.startsWith("R")).length
+      : statusLines.filter((line) => line.slice(0, 2).includes("R")).length,
     categoryCounts,
     riskSignals: deriveSignals(allPaths),
     disposableArtifactCount: allPaths.filter(isDisposablePath).length,
@@ -343,7 +395,10 @@ function runSelfTest() {
   const digest = "a".repeat(64);
   const base = {
     gitAvailable: true,
+    candidateMode: "working-tree",
     headSha: "b".repeat(40),
+    parentCommitSha: "c".repeat(40),
+    headTreeSha: "d".repeat(40),
     candidateDigestSha256: digest,
     sourceCandidateDigestSha256: digest,
     nonSourceDeliverablesDigestSha256: null,
@@ -383,6 +438,7 @@ function runSelfTest() {
   const sensitive = evaluateReleaseCandidateManifest({ ...base, sensitivePathCount: 1 });
   const clean = evaluateReleaseCandidateManifest({
     ...base,
+    candidateMode: "clean-commit",
     dirtyEntryCount: 0,
     changedFileCount: 0,
     modifiedFileCount: 0,
@@ -404,6 +460,10 @@ function runSelfTest() {
     || nonSource.status !== "dirty-candidate-partitioned-review-required"
     || sensitive.candidateReviewReady
     || !clean.strictProvenanceEligible
+    || !clean.candidateReviewReady
+    || clean.candidateMode !== "clean-commit"
+    || clean.parentCommitSha !== base.parentCommitSha
+    || clean.headTreeSha !== base.headTreeSha
     || unavailable.status !== "candidate-manifest-blocked-git-unavailable"
     || unavailable.baseHeadSha !== null
   ) {
