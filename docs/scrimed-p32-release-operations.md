@@ -24,7 +24,7 @@ The gate packet is the source of truth. Every unresolved gate contains a respons
 
 ### Candidate-Bound Operator Handoff
 
-`npm run release:scrimed-p32-operator-packet` renders the unresolved gate packet as a deterministic, no-secret Markdown handoff. It groups work into candidate review, independent pre-deployment evidence, deployment authorization, post-deployment verification, and customer go-live. Actions whose prerequisites have not passed remain visibly deferred.
+`npm run release:scrimed-p32-operator-packet` renders the unresolved gate packet as a deterministic, no-secret Markdown handoff. It includes the exact source commit, Candidate fingerprint, source fingerprint, artifact fingerprint, validation fingerprint, gate-packet hash, and handoff hash. It groups work into candidate review, independent pre-deployment evidence, deployment authorization, post-deployment verification, and customer go-live. Actions whose prerequisites have not passed remain visibly deferred.
 
 The handoff does not mint identity evidence or approvals. Export supplemental evidence only from the protected AAL2 workspace or a qualified external authority. Never hand-author reviewer IDs, decision hashes, evidence hashes, timestamps, or approval records. Keep the local transfer file outside Git and validate it with:
 

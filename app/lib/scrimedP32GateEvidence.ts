@@ -487,6 +487,7 @@ export function buildP32OperatorHandoffMarkdown(handoff: P32OperatorHandoff) {
     "## Candidate",
     "",
     `- Source commit: \`${handoff.expectedFingerprints.sourceCommit}\``,
+    `- Candidate fingerprint: \`${handoff.candidateFingerprint}\``,
     `- Source fingerprint: \`${handoff.expectedFingerprints.sourceTree}\``,
     `- Artifact fingerprint: \`${handoff.expectedFingerprints.artifact}\``,
     `- Validation fingerprint: \`${handoff.expectedFingerprints.validationEvidence}\``,

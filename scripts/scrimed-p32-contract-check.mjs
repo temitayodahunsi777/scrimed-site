@@ -327,6 +327,7 @@ for (const text of [
 
 for (const text of [
   "Candidate-Bound Operator Handoff",
+  "Candidate fingerprint",
   "release:scrimed-p32-operator-packet",
   "Never hand-author"
 ]) requireIncludes("docs/scrimed-p32-release-operations.md", text);

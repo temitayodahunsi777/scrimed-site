@@ -180,6 +180,7 @@ function runSelfTest() {
     deploymentAction?.executionState !== "WAIT_FOR_PREREQUISITES" ||
     deploymentAction.blockedByGateIds.length === 0 ||
     !handoffMarkdown.includes(packet.expectedFingerprints.sourceCommit) ||
+    !handoffMarkdown.includes(packet.candidateFingerprint) ||
     !handoffMarkdown.includes("Release promotion allowed: **false**")
   ) {
     throw new Error("SCRIMED p.32 operator handoff self-test failed.");
