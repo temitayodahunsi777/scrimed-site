@@ -5,12 +5,17 @@ import {
   verify
 } from "node:crypto";
 
-import { createClinicalEvidenceHash } from "../../app/lib/clinicalEvidenceControls.ts";
+import {
+  computeP32SupplementalEvidencePayloadHash,
+  p32EvidenceTrustRegistryVersion,
+  p32SupplementalEvidenceAttestationVersion
+} from "../../app/lib/scrimedP32EvidenceAttestation.ts";
 
-export const p32EvidenceTrustRegistryVersion =
-  "scrimed-p32-evidence-trust-registry-v1";
-export const p32SupplementalEvidenceAttestationVersion =
-  "scrimed-p32-supplemental-evidence-attestation-v1";
+export {
+  computeP32SupplementalEvidencePayloadHash,
+  p32EvidenceTrustRegistryVersion,
+  p32SupplementalEvidenceAttestationVersion
+};
 
 const maximumAttestationLifetimeMs = 60 * 60 * 1000;
 const maximumFutureClockSkewMs = 5 * 60 * 1000;
@@ -149,7 +154,12 @@ function assertIssuerScope(entry, supplementalEvidence) {
   }
 }
 
-export function computeP32SupplementalEvidencePayloadHash(supplementalEvidence) {
+export function verifyP32SupplementalEvidenceAttestation({
+  supplementalEvidence,
+  attestation,
+  trustedPublicKeysJson,
+  evaluatedAt = new Date().toISOString()
+}) {
   if (
     !isObject(supplementalEvidence) ||
     !Array.isArray(supplementalEvidence.automatedEvidence) ||
@@ -157,18 +167,6 @@ export function computeP32SupplementalEvidencePayloadHash(supplementalEvidence) 
   ) {
     reject("supplemental evidence requires automatedEvidence and approvals arrays");
   }
-  return createClinicalEvidenceHash({
-    automatedEvidence: supplementalEvidence.automatedEvidence,
-    approvals: supplementalEvidence.approvals
-  });
-}
-
-export function verifyP32SupplementalEvidenceAttestation({
-  supplementalEvidence,
-  attestation,
-  trustedPublicKeysJson,
-  evaluatedAt = new Date().toISOString()
-}) {
   const payloadHash = computeP32SupplementalEvidencePayloadHash(supplementalEvidence);
   const hasEvidence =
     supplementalEvidence.automatedEvidence.length > 0 ||

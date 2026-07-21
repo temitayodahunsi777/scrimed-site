@@ -236,6 +236,7 @@ Feature flags:
 - `SCRIMED_TRIALCORE_ENABLEMENT_ENABLED=false` by default; enabling retains synthetic-only and no-enrollment boundaries.
 - `SCRIMED_GROWTH_OS_ENABLED=false` by default; enabling retains no-send and public-material-only boundaries.
 - `SCRIMED_P32_RCM_VOICE_ENABLED=false` by default; enabling permits synthetic state-machine evaluation only and never enables a live call or writeback.
+- `SCRIMED_P32_EVIDENCE_ISSUER_ENABLED=false` by default. Enabling requires a server-only Ed25519 key, exact candidate fingerprints, an applied protected issuance-ledger migration, current retained no-PHI QA evidence, AAL2, and a database-authorized tenant-admin or pilot-lead. It signs only short-lived AAL2 technical evidence and grants no human or release authority.
 - Provider calls, connector writes, trial enrollment, automatic outreach, live PHI, payer submission, and EHR writeback remain disabled.
 
 ## External References
@@ -252,7 +253,7 @@ The supplied external materials are architectural research inputs, not proof tha
 ## Known Limitations
 
 - No external search, commercial model, connector, EHR, payer, trial, or outreach call is enabled.
-- No durable p.32 incident or gate registry migration is applied; current code supplies typed, deterministic contracts and hash-chain validation.
+- A durable p.32 AAL2 evidence-issuance migration is present but not applied by this work. The broader incident and release-gate registries remain typed deterministic contracts until separately approved persistence work is completed.
 - Device, memory, thermal, power, energy, and zero-copy results are deterministic simulations until approved runtime telemetry is integrated; energy remains unavailable rather than fabricated.
 - Payer voice has no telephony, IVR, recording, payer, credential, or writeback adapter. Only the guarded synthetic state machine is implemented.
 - Application disposition has no contract termination, data migration, or retirement executor. Recommendations require named human review.

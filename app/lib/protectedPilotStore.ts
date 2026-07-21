@@ -167,6 +167,10 @@ import type {
   ProtectedAuthorityArtifactReferenceRecord,
   ProtectedAuthorityArtifactReferenceStatus
 } from "./protectedAuthorityArtifactReferences";
+import type {
+  P32EvidenceIssuerReceipt,
+  P32EvidenceIssuerReceiptInput
+} from "./scrimedP32EvidenceIssuer";
 
 type AuthenticatedPilotContext =
   | {
@@ -4035,6 +4039,24 @@ export async function recordQaManualRunEvidencePacket(
     boundary: typeof payload.boundary === "string" ? payload.boundary : null,
     error
   };
+}
+
+export async function recordP32EvidenceAttestationIssuance(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32EvidenceIssuerReceiptInput
+) {
+  const { data, error } = await client.rpc("record_p32_evidence_attestation_issuance", {
+    p_workspace_slug: workspaceSlug,
+    p_issuance: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32EvidenceIssuerReceipt)
+      : null;
+
+  return { receipt, error };
 }
 
 export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {

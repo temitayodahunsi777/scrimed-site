@@ -36,9 +36,37 @@ The evidence importer rejects missing or invalid signatures, unknown, revoked, e
 
 Configure `SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON` only in the verifier environment. The versioned JSON registry maps each key ID to its issuer, Ed25519 public key, active/retiring/revoked status, validity window, permitted automated evidence IDs, permitted approval gates, and permitted identity-assurance classes. Public keys are not secrets, but registry integrity and rotation are security controls. Private signing keys must remain in the protected issuing service and must never enter this repository, the transfer file, or verifier configuration. An empty supplemental file remains valid without an attestation and grants no gate evidence.
 
+### Protected AAL2 Issuer
+
+The repository now contains the missing issuer side at `/api/pilot-workspaces/{workspaceSlug}/qa-evidence/p32-attestation`. It is disabled by default and signs only `aal2-cli-evidence`; it cannot sign a human approval. The route requires a fresh bearer session verified by Supabase, the existing AAL2 governance context, tenant membership, and a database-enforced `tenant-admin` or `pilot-lead` role. It also requires one current retained no-PHI QA packet and exact equality with the source commit, source-tree, artifact, and validation fingerprints configured on the issuing service.
+
+Provision an Ed25519 key pair through the approved secret-management process. Keep the private PKCS#8 PEM only in `SCRIMED_P32_EVIDENCE_ISSUER_PRIVATE_KEY_PEM`. Put the independently distributed public SPKI PEM in the verifier trust registry with only:
+
+- `allowedAutomatedEvidenceIds: ["aal2-cli-evidence"]`
+- `allowedApprovalGateIds: []`
+- `allowedIdentityAssurance: ["protected-aal2-workspace"]`
+
+Set the remaining `SCRIMED_P32_EVIDENCE_ISSUER_*` values to the exact validated candidate, apply the new migration to an approved nonproduction Supabase target, and only then enable `SCRIMED_P32_EVIDENCE_ISSUER_ENABLED=true`. The issuer never returns until the database has persisted the packet hash, candidate fingerprints, signature fingerprint, actor, one-use idempotency key, prior audit hash, and current audit hash. It does not persist the detached signature or private key.
+
+With a fresh local AAL2 token and an issuer configured for the unchanged candidate:
+
+```bash
+npm run release:scrimed-p32-aal2-evidence -- \
+  --base-url=http://127.0.0.1:3000 \
+  --workspace=atlas-synthetic-evaluation \
+  --output=/absolute/path/outside/repository/scrimed-p32-aal2-evidence.json
+
+npm run release:scrimed-p32-evidence:strict -- \
+  --evidence-file=/absolute/path/outside/repository/scrimed-p32-aal2-evidence.json
+```
+
+The client reruns bounded candidate validation, never prints the bearer token, requires an absolute output path outside Git, creates the transfer file with mode `0600`, and refuses to overwrite an existing file. Remove the short-lived token after the run. A valid issuer signature can satisfy only the AAL2 technical gate; all named approvals, deployment authority, post-deployment evidence, and customer go-live remain separate. `release:scrimed-p32-evidence:all-gates` must therefore remain nonzero until those independent gates are also satisfied.
+
 ## Migration Packet
 
 `npm run release:migration-packet` hashes every repository migration and performs deterministic static analysis. It does not run a database and therefore leaves forward migration, recovery, row-count invariants, locking, PHI/log review, and database-owner approval false. A database owner must run the exact migration set against an isolated disposable database and bind the evidence to the candidate and migration-set hashes.
+
+`20260721173000_p32_evidence_attestation_issuances.sql` adds only a private append-only no-PHI issuance ledger and a tightly scoped public RPC. It does not enable the issuer feature flag and must not be applied to production without the normal migration dry-run and database-owner approval.
 
 ## Supply Chain
 

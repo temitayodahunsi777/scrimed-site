@@ -21,6 +21,8 @@ const requiredFiles = [
   "app/lib/scrimedP32RepoOps.ts",
   "app/lib/scrimedP32ReleaseGates.ts",
   "app/lib/scrimedP32GateEvidence.ts",
+  "app/lib/scrimedP32EvidenceAttestation.ts",
+  "app/lib/scrimedP32EvidenceIssuer.ts",
   "app/lib/scrimedP32ControlPlane.ts",
   "app/lib/scrimedClinicalBenchmarkSuite.ts",
   "app/lib/clinicalContextGateway.ts",
@@ -266,12 +268,24 @@ for (const text of [
 
 for (const text of [
   "verifyP32SupplementalEvidenceAttestation",
-  "scrimed-p32-evidence-trust-registry-v1",
   "allowedAutomatedEvidenceIds",
   "allowedApprovalGateIds",
   "allowedIdentityAssurance",
   "issuer signature verification failed"
 ]) requireIncludes("scripts/lib/scrimed-p32-evidence-attestation.mjs", text);
+
+for (const text of [
+  "scrimed-p32-evidence-trust-registry-v1",
+  "scrimed-p32-supplemental-evidence-attestation-v1",
+  "computeP32SupplementalEvidencePayloadHash"
+]) requireIncludes("app/lib/scrimedP32EvidenceAttestation.ts", text);
+
+for (const text of [
+  "SCRIMED_P32_EVIDENCE_ISSUER_ENABLED",
+  "issueP32Aal2Evidence",
+  "aal2-cli-evidence",
+  "release authority"
+]) requireIncludes("app/lib/scrimedP32EvidenceIssuer.ts", text);
 
 for (const text of [
   "buildEvidenceOpsBenchmarkCard",
