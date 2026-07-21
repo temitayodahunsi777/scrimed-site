@@ -26,13 +26,15 @@ The gate packet is the source of truth. Every unresolved gate contains a respons
 
 `npm run release:scrimed-p32-operator-packet` renders the unresolved gate packet as a deterministic, no-secret Markdown handoff. It includes the exact source commit, Candidate fingerprint, source fingerprint, artifact fingerprint, validation fingerprint, gate-packet hash, and handoff hash. It groups work into candidate review, independent pre-deployment evidence, deployment authorization, post-deployment verification, and customer go-live. Actions whose prerequisites have not passed remain visibly deferred.
 
-The handoff does not mint identity evidence or approvals. Export supplemental evidence only from the protected AAL2 workspace or a qualified external authority. Never hand-author reviewer IDs, decision hashes, evidence hashes, timestamps, or approval records. Keep the local transfer file outside Git and validate it with:
+The handoff does not mint identity evidence or approvals. Export supplemental evidence only from a protected AAL2 workspace or qualified external authority configured in the trusted issuer registry. Never hand-author reviewer IDs, decision hashes, evidence hashes, timestamps, approval records, or issuer attestations. Non-empty evidence must carry a short-lived Ed25519 attestation over the canonical `automatedEvidence` and `approvals` payload. Keep the local transfer file outside Git and validate it with:
 
 ```bash
 npm run release:scrimed-p32-evidence:all-gates -- --evidence-file=/absolute/path/to/no-secret-evidence.json
 ```
 
-The evidence importer rejects unknown evidence types, duplicate identifiers, unsafe pointers, secret-like content, invalid identity assurance, stale timestamps, changed fingerprints, and tampered hashes. Delete the transfer file after validated protected retention according to the approved retention policy.
+The evidence importer rejects missing or invalid signatures, unknown, revoked, expired, or out-of-scope issuer keys, unknown evidence types, duplicate identifiers, unsafe pointers, secret-like content, invalid identity assurance, stale timestamps, changed fingerprints, and tampered hashes. It retains only safe issuer metadata and a SHA-256 signature fingerprint in the gate packet, not the detached signature. Delete the transfer file after validated protected retention according to the approved retention policy.
+
+Configure `SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON` only in the verifier environment. The versioned JSON registry maps each key ID to its issuer, Ed25519 public key, active/retiring/revoked status, validity window, permitted automated evidence IDs, permitted approval gates, and permitted identity-assurance classes. Public keys are not secrets, but registry integrity and rotation are security controls. Private signing keys must remain in the protected issuing service and must never enter this repository, the transfer file, or verifier configuration. An empty supplemental file remains valid without an attestation and grants no gate evidence.
 
 ## Migration Packet
 

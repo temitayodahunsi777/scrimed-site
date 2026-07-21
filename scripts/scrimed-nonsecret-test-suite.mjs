@@ -177,6 +177,15 @@ const checks = [
     args: ["scripts/scrimed-p32-contract-check.mjs"]
   },
   {
+    label: "SCRIMED P32 trusted evidence issuer attestation",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-evidence-attestation-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED P32 candidate-bound release gate evidence",
     args: [
       "--disable-warning=ExperimentalWarning",

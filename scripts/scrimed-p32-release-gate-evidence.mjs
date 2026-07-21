@@ -9,6 +9,10 @@ import {
   buildP32OperatorHandoff,
   buildP32OperatorHandoffMarkdown
 } from "../app/lib/scrimedP32GateEvidence.ts";
+import {
+  computeP32SupplementalEvidencePayloadHash,
+  verifyP32SupplementalEvidenceAttestation
+} from "./lib/scrimed-p32-evidence-attestation.mjs";
 
 const rawArgs = process.argv.slice(2);
 const flags = new Set(rawArgs.filter((arg) => !arg.startsWith("--evidence-file=")));
@@ -57,7 +61,7 @@ function containsSecretLikeMaterial(value) {
   return /(?:bearer\s+[A-Za-z0-9._-]+|eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+|sk-[A-Za-z0-9_-]{12,}|sbp_[A-Za-z0-9_-]{12,}|service[_ -]?role|-----BEGIN [A-Z ]*PRIVATE KEY-----)/i.test(value);
 }
 
-async function readSupplementalEvidence() {
+async function readSupplementalEvidence(evaluatedAt) {
   if (!evidenceFileArg) return { automatedEvidence: [], approvals: [] };
   const requestedPath = evidenceFileArg.slice("--evidence-file=".length).trim();
   if (!requestedPath) throw new Error("--evidence-file requires a local JSON file path.");
@@ -82,7 +86,24 @@ async function readSupplementalEvidence() {
   if (!Array.isArray(parsed.automatedEvidence) || !Array.isArray(parsed.approvals)) {
     throw new Error("SCRIMED p.32 supplemental evidence requires automatedEvidence and approvals arrays.");
   }
-  return parsed;
+  const allowedTopLevelFields = new Set(["automatedEvidence", "approvals", "attestation"]);
+  if (Object.keys(parsed).some((field) => !allowedTopLevelFields.has(field))) {
+    throw new Error("SCRIMED p.32 supplemental evidence contains unsupported top-level fields.");
+  }
+  const supplementalEvidence = {
+    automatedEvidence: parsed.automatedEvidence,
+    approvals: parsed.approvals
+  };
+  const verifiedAttestation = verifyP32SupplementalEvidenceAttestation({
+    supplementalEvidence,
+    attestation: parsed.attestation,
+    trustedPublicKeysJson: process.env.SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON,
+    evaluatedAt
+  });
+  return {
+    ...supplementalEvidence,
+    ...(verifiedAttestation ? { verifiedAttestation } : {})
+  };
 }
 
 function syntheticReports() {
@@ -155,12 +176,28 @@ function runSelfTest() {
   }
   if (!rejectedTamper) throw new Error("SCRIMED p.32 evidence accepted a mismatched artifact fingerprint.");
   let rejectedUnknownEvidence = false;
+  const unknownAutomatedEvidence = [{ evidenceId: "unregistered-evidence" }];
   try {
     buildP32GateEvidencePacket({
       ...input,
       supplementalEvidence: {
         approvals: [],
-        automatedEvidence: [{ evidenceId: "unregistered-evidence" }]
+        automatedEvidence: unknownAutomatedEvidence,
+        verifiedAttestation: {
+          version: "scrimed-p32-supplemental-evidence-attestation-v1",
+          issuer: "scrimed-synthetic-self-test-issuer",
+          keyId: "scrimed-synthetic-self-test-key",
+          algorithm: "Ed25519",
+          signedAt: input.evaluatedAt,
+          expiresAt: "2026-07-20T12:30:00.000Z",
+          payloadHash: computeP32SupplementalEvidencePayloadHash({
+            automatedEvidence: unknownAutomatedEvidence,
+            approvals: []
+          }),
+          signatureFingerprint: "f".repeat(64),
+          verifiedAt: input.evaluatedAt,
+          verificationMethod: "ed25519-trusted-issuer"
+        }
       }
     });
   } catch {
@@ -196,13 +233,14 @@ if (flags.has("--self-test")) {
 const validation = readJsonCommand("scripts/release-candidate-validation.mjs", ["--json"]);
 const manifest = readJsonCommand("scripts/release-candidate-manifest.mjs", ["--json"]);
 const investorDeckReview = readJsonCommand("scripts/investor-deck-review.mjs", ["--json", "--strict"]);
-const supplementalEvidence = await readSupplementalEvidence();
+const evaluatedAt = new Date().toISOString();
+const supplementalEvidence = await readSupplementalEvidence(evaluatedAt);
 const packet = buildP32GateEvidencePacket({
   manifest,
   validation,
   investorDeckReview,
   supplementalEvidence,
-  evaluatedAt: new Date().toISOString()
+  evaluatedAt
 });
 
 if (flags.has("--operator-packet")) {

@@ -43,6 +43,8 @@ const requiredFiles = [
   ".github/workflows/dependency-review.yml",
   ".github/workflows/codeql.yml",
   "scripts/scrimed-p32-release-gate-evidence.mjs",
+  "scripts/lib/scrimed-p32-evidence-attestation.mjs",
+  "scripts/scrimed-p32-evidence-attestation-policy-test.mjs",
   "scripts/scrimed-nonsecret-test-suite.mjs",
   "package.json"
 ];
@@ -247,6 +249,9 @@ for (const text of [
   "buildP32GateEvidencePacket",
   "buildP32OperatorHandoff",
   "buildP32OperatorHandoffMarkdown",
+  "P32VerifiedEvidenceAttestation",
+  "supplementalEvidenceAttestation",
+  "Ed25519",
   "READY_FOR_AUTHORIZED_OPERATOR",
   "WAIT_FOR_PREREQUISITES",
   "do not hand-author decision hashes",
@@ -258,6 +263,15 @@ for (const text of [
   "releasePromotionAllowed: false",
   "aggregateReleaseAuthorityGranted: false"
 ]) requireIncludes("app/lib/scrimedP32GateEvidence.ts", text);
+
+for (const text of [
+  "verifyP32SupplementalEvidenceAttestation",
+  "scrimed-p32-evidence-trust-registry-v1",
+  "allowedAutomatedEvidenceIds",
+  "allowedApprovalGateIds",
+  "allowedIdentityAssurance",
+  "issuer signature verification failed"
+]) requireIncludes("scripts/lib/scrimed-p32-evidence-attestation.mjs", text);
 
 for (const text of [
   "buildEvidenceOpsBenchmarkCard",
@@ -314,6 +328,7 @@ for (const text of [
   "test:scrimed-p32-release-hardening",
   "smoke:scrimed-p32",
   "test:scrimed-p32-release-evidence",
+  "test:scrimed-p32-evidence-attestation",
   "release:scrimed-p32-evidence:strict",
   "release:scrimed-p32-evidence:all-gates",
   "release:scrimed-p32-operator-packet"
@@ -322,8 +337,12 @@ for (const text of [
 for (const text of [
   "--operator-packet",
   "Use either --json or --operator-packet",
-  "buildP32OperatorHandoffMarkdown"
+  "buildP32OperatorHandoffMarkdown",
+  "SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON",
+  "verifyP32SupplementalEvidenceAttestation"
 ]) requireIncludes("scripts/scrimed-p32-release-gate-evidence.mjs", text);
+
+requireIncludes(".env.example", "SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON=");
 
 for (const text of [
   "Candidate-Bound Operator Handoff",
@@ -342,6 +361,7 @@ for (const text of [
   "scripts/scrimed-p32-execution-harness-policy-test.mjs",
   "scripts/scrimed-p32-release-hardening-policy-test.mjs",
   "scripts/scrimed-p32-contract-check.mjs",
+  "scripts/scrimed-p32-evidence-attestation-policy-test.mjs",
   "scripts/scrimed-p32-release-gate-evidence.mjs"
 ]) requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", text);
 

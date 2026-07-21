@@ -89,6 +89,7 @@
     "test:scrimed-p32-execution-harness": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-execution-harness-policy-test.mjs",
     "test:scrimed-p32-release-hardening": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-hardening-policy-test.mjs",
     "smoke:scrimed-p32": "node scripts/scrimed-p32-contract-check.mjs",
+    "test:scrimed-p32-evidence-attestation": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-evidence-attestation-policy-test.mjs",
     "test:scrimed-p32-release-evidence": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs --self-test",
     "release:scrimed-p32-evidence": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs",
     "release:scrimed-p32-evidence:strict": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs --strict",

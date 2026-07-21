@@ -11,13 +11,13 @@ import {
 import type { ApprovalEvidence } from "./scrimed-work/p32Contracts";
 
 export const scrimedP32GateEvidencePacketVersion =
-  "scrimed-p32-gate-evidence-v1-2026-07-20";
+  "scrimed-p32-gate-evidence-v2-2026-07-21";
 
 export const scrimedP32GateEvidenceBoundary =
   "SCRIMED p.32 Gate Evidence binds no-secret technical checks and metadata-only human decisions to one exact candidate. It never stores tokens, PHI, raw review documents, signatures, legal opinions, clinical records, or connector payloads, and it does not grant commit, migration, deployment, external-distribution, certification, clinical-care, or customer go-live authority.";
 
 export const scrimedP32OperatorHandoffVersion =
-  "scrimed-p32-operator-handoff-v1-2026-07-21";
+  "scrimed-p32-operator-handoff-v2-2026-07-21";
 
 export const scrimedP32OperatorHandoffBoundary =
   "This operator handoff orders unresolved evidence work for an exact candidate. It does not create identity evidence, reviewer approval, migration approval, deployment authority, production evidence, customer authorization, PHI authority, or clinical authority.";
@@ -54,6 +54,20 @@ export type InvestorDeckReviewReport = {
 export type P32SupplementalGateEvidence = {
   automatedEvidence: AutomatedGateEvidence[];
   approvals: ApprovalEvidence[];
+  verifiedAttestation?: P32VerifiedEvidenceAttestation;
+};
+
+export type P32VerifiedEvidenceAttestation = {
+  version: "scrimed-p32-supplemental-evidence-attestation-v1";
+  issuer: string;
+  keyId: string;
+  algorithm: "Ed25519";
+  signedAt: string;
+  expiresAt: string;
+  payloadHash: string;
+  signatureFingerprint: string;
+  verifiedAt: string;
+  verificationMethod: "ed25519-trusted-issuer";
 };
 
 export type P32GateEvidencePacketInput = {
@@ -257,6 +271,32 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
   ];
   const supplementalAutomatedEvidence = input.supplementalEvidence?.automatedEvidence ?? [];
   const approvals = input.supplementalEvidence?.approvals ?? [];
+  const verifiedAttestation = input.supplementalEvidence?.verifiedAttestation;
+  const hasSupplementalEvidence = supplementalAutomatedEvidence.length > 0 || approvals.length > 0;
+  if (hasSupplementalEvidence) {
+    requireValidInput(Boolean(verifiedAttestation), "non-empty supplemental evidence requires a verified issuer attestation");
+  }
+  if (verifiedAttestation) {
+    const expectedPayloadHash = createClinicalEvidenceHash({
+      automatedEvidence: supplementalAutomatedEvidence,
+      approvals
+    });
+    requireValidInput(
+      verifiedAttestation.version === "scrimed-p32-supplemental-evidence-attestation-v1" &&
+      verifiedAttestation.algorithm === "Ed25519" &&
+      verifiedAttestation.verificationMethod === "ed25519-trusted-issuer" &&
+      isIsoTimestamp(verifiedAttestation.signedAt) &&
+      isIsoTimestamp(verifiedAttestation.expiresAt) &&
+      isIsoTimestamp(verifiedAttestation.verifiedAt) &&
+      isSha256(verifiedAttestation.payloadHash) &&
+      isSha256(verifiedAttestation.signatureFingerprint) &&
+      verifiedAttestation.payloadHash === expectedPayloadHash &&
+      Date.parse(verifiedAttestation.signedAt) <= Date.parse(verifiedAttestation.verifiedAt) &&
+      Date.parse(verifiedAttestation.verifiedAt) <= Date.parse(input.evaluatedAt) &&
+      Date.parse(verifiedAttestation.expiresAt) > Date.parse(input.evaluatedAt),
+      "verified issuer attestation metadata is malformed, stale, or bound to different supplemental evidence"
+    );
+  }
   const gateCatalog = getP32ReleaseGateCatalog();
   const allowedAutomatedEvidenceIds = new Set(
     gateCatalog.flatMap((gate) => gate.requiredAutomatedEvidenceIds)
@@ -349,6 +389,7 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
     releasePromotionAllowed: false as const,
     aggregateReleaseAuthorityGranted: false as const,
     automatedEvidence,
+    supplementalEvidenceAttestation: verifiedAttestation ?? null,
     approvalCount: approvals.length,
     approvalDecisionHashes: approvals.map((approval) => approval.decisionHash),
     registry,
@@ -453,16 +494,16 @@ export function buildP32OperatorHandoff(packet: P32GateEvidencePacket) {
     actions,
     evidenceIntake: {
       acceptedIdentitySources: [
-        "protected AAL2 workspace export",
-        "qualified external reference"
+        "trusted Ed25519-attested protected AAL2 workspace export",
+        "trusted Ed25519-attested qualified external reference"
       ],
-      requiredTopLevelFields: ["automatedEvidence", "approvals"],
+      requiredTopLevelFields: ["automatedEvidence", "approvals", "attestation"],
       validationCommand:
         "npm run release:scrimed-p32-evidence:all-gates -- --evidence-file=<local-no-secret-json>",
       rules: [
-        "Export evidence from the protected workflow or qualified external authority; do not hand-author decision hashes.",
-        "Keep the evidence file outside Git and exclude tokens, secrets, PHI, signatures, legal opinions, and source documents.",
-        "Reject evidence that is stale, expired, malformed, or bound to different candidate fingerprints.",
+        "Export evidence from a trusted protected workflow or qualified external authority; do not hand-author decision hashes, and require a short-lived Ed25519 issuer attestation for non-empty evidence.",
+        "Keep the evidence file outside Git and exclude tokens, secrets, PHI, private keys, signed source documents, legal opinions, and source documents.",
+        "Reject evidence that is unsigned, signed by an unknown or out-of-scope key, stale, expired, malformed, or bound to different candidate fingerprints.",
         "Delete the local transfer file after validated protected retention according to the approved retention policy."
       ]
     },
