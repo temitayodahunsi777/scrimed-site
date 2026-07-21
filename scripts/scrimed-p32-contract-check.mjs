@@ -31,6 +31,7 @@ const requiredFiles = [
   "app/healthcare-intelligence-os/page.tsx",
   "docs/scrimed-p32-traceability.md",
   "docs/scrimed-p32-architecture.md",
+  "docs/scrimed-p32-release-operations.md",
   "scripts/scrimed-p32-policy-test.mjs",
   "scripts/scrimed-p32-execution-harness-policy-test.mjs",
   "scripts/scrimed-p32-release-hardening-policy-test.mjs",
@@ -244,6 +245,11 @@ for (const text of [
 
 for (const text of [
   "buildP32GateEvidencePacket",
+  "buildP32OperatorHandoff",
+  "buildP32OperatorHandoffMarkdown",
+  "READY_FOR_AUTHORIZED_OPERATOR",
+  "WAIT_FOR_PREREQUISITES",
+  "do not hand-author decision hashes",
   "source-commit-alignment",
   "artifact-fingerprint-alignment",
   "candidateReviewPacketReady",
@@ -309,8 +315,21 @@ for (const text of [
   "smoke:scrimed-p32",
   "test:scrimed-p32-release-evidence",
   "release:scrimed-p32-evidence:strict",
-  "release:scrimed-p32-evidence:all-gates"
+  "release:scrimed-p32-evidence:all-gates",
+  "release:scrimed-p32-operator-packet"
 ]) requireIncludes("package.json", `\"${text}\"`);
+
+for (const text of [
+  "--operator-packet",
+  "Use either --json or --operator-packet",
+  "buildP32OperatorHandoffMarkdown"
+]) requireIncludes("scripts/scrimed-p32-release-gate-evidence.mjs", text);
+
+for (const text of [
+  "Candidate-Bound Operator Handoff",
+  "release:scrimed-p32-operator-packet",
+  "Never hand-author"
+]) requireIncludes("docs/scrimed-p32-release-operations.md", text);
 for (const text of [
   "security:secret-scan",
   "security:sbom",

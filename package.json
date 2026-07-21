@@ -93,6 +93,7 @@
     "release:scrimed-p32-evidence": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs",
     "release:scrimed-p32-evidence:strict": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs --strict",
     "release:scrimed-p32-evidence:all-gates": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs --strict --require-all-gate-evidence",
+    "release:scrimed-p32-operator-packet": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-release-gate-evidence.mjs --strict --operator-packet",
     "release:migration-packet": "node scripts/scrimed-migration-evidence-packet.mjs",
     "test:clinical-assurance-control-plane": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/clinical-assurance-control-plane-policy-test.mjs",
     "contract:clinical-assurance-migration": "node scripts/clinical-assurance-migration-contract-check.mjs",

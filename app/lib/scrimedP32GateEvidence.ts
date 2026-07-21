@@ -16,6 +16,12 @@ export const scrimedP32GateEvidencePacketVersion =
 export const scrimedP32GateEvidenceBoundary =
   "SCRIMED p.32 Gate Evidence binds no-secret technical checks and metadata-only human decisions to one exact candidate. It never stores tokens, PHI, raw review documents, signatures, legal opinions, clinical records, or connector payloads, and it does not grant commit, migration, deployment, external-distribution, certification, clinical-care, or customer go-live authority.";
 
+export const scrimedP32OperatorHandoffVersion =
+  "scrimed-p32-operator-handoff-v1-2026-07-21";
+
+export const scrimedP32OperatorHandoffBoundary =
+  "This operator handoff orders unresolved evidence work for an exact candidate. It does not create identity evidence, reviewer approval, migration approval, deployment authority, production evidence, customer authorization, PHI authority, or clinical authority.";
+
 export type ReleaseCandidateManifestReport = {
   baseHeadSha: string | null;
   candidateDigestSha256: string | null;
@@ -366,4 +372,167 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
     ...packetWithoutHash,
     packetHash: createClinicalEvidenceHash(packetWithoutHash)
   };
+}
+
+export type P32GateEvidencePacket = ReturnType<typeof buildP32GateEvidencePacket>;
+
+type P32Gate = P32GateEvidencePacket["registry"]["gates"][number];
+
+function unresolvedGateIds(packet: P32GateEvidencePacket, phase: P32Gate["phase"]) {
+  return packet.registry.gates
+    .filter((gate) => gate.phase === phase && gate.status !== "PASS")
+    .map((gate) => gate.gateId);
+}
+
+function operatorPrerequisites(packet: P32GateEvidencePacket, gate: P32Gate) {
+  if (gate.phase === "candidate-review") return [];
+  if (gate.gateId === "aal2-cli-evidence" || gate.gateId === "migration-dry-run-and-approval") {
+    return [];
+  }
+  if (gate.gateId === "deployment-authorization") {
+    return [
+      ...unresolvedGateIds(packet, "candidate-review"),
+      ...unresolvedGateIds(packet, "pre-deployment")
+        .filter((gateId) => gateId !== "deployment-authorization")
+    ];
+  }
+  if (gate.phase === "post-deployment") return ["deployment-authorization"];
+  return ["deployment-authorization", "post-deployment-smoke-evidence"];
+}
+
+function operatorSequence(gate: P32Gate) {
+  if (gate.phase === "candidate-review") return 1;
+  if (gate.gateId === "deployment-authorization") return 3;
+  if (gate.phase === "pre-deployment") return 2;
+  if (gate.phase === "post-deployment") return 4;
+  return 5;
+}
+
+export function buildP32OperatorHandoff(packet: P32GateEvidencePacket) {
+  const actions = packet.registry.gates
+    .filter((gate) => gate.status !== "PASS" && gate.operatorAction)
+    .map((gate) => {
+      const blockedByGateIds = operatorPrerequisites(packet, gate);
+      return {
+        sequence: operatorSequence(gate),
+        gateId: gate.gateId,
+        phase: gate.phase,
+        classification: gate.classification,
+        status: gate.status,
+        ownerRole: gate.ownerRole,
+        executionState: blockedByGateIds.length === 0
+          ? "READY_FOR_AUTHORIZED_OPERATOR" as const
+          : "WAIT_FOR_PREREQUISITES" as const,
+        blockedByGateIds,
+        exactAction: gate.operatorAction!.exactAction,
+        commandOrForm: gate.operatorAction!.commandOrForm,
+        verificationProcedure: gate.operatorAction!.verificationProcedure,
+        consequenceOfRejection: gate.operatorAction!.consequenceOfRejection,
+        expiresAt: gate.operatorAction!.expiresAt
+      };
+    })
+    .sort((left, right) => left.sequence - right.sequence || left.gateId.localeCompare(right.gateId));
+  const readyActionCount = actions.filter(
+    (action) => action.executionState === "READY_FOR_AUTHORIZED_OPERATOR"
+  ).length;
+  const handoffWithoutHash = {
+    service: "scrimed-p32-operator-handoff",
+    version: scrimedP32OperatorHandoffVersion,
+    status: actions.length === 0
+      ? "DEFINED_EVIDENCE_COMPLETE_NO_RELEASE_AUTHORITY" as const
+      : "AUTHORIZED_OPERATOR_ACTION_REQUIRED" as const,
+    generatedFromGatePacketHash: packet.packetHash,
+    evaluatedAt: packet.evaluatedAt,
+    expiresAt: packet.expiresAt,
+    candidateFingerprint: packet.candidateFingerprint,
+    expectedFingerprints: packet.expectedFingerprints,
+    gateSummary: packet.registry.summary,
+    actionCount: actions.length,
+    readyActionCount,
+    deferredActionCount: actions.length - readyActionCount,
+    actions,
+    evidenceIntake: {
+      acceptedIdentitySources: [
+        "protected AAL2 workspace export",
+        "qualified external reference"
+      ],
+      requiredTopLevelFields: ["automatedEvidence", "approvals"],
+      validationCommand:
+        "npm run release:scrimed-p32-evidence:all-gates -- --evidence-file=<local-no-secret-json>",
+      rules: [
+        "Export evidence from the protected workflow or qualified external authority; do not hand-author decision hashes.",
+        "Keep the evidence file outside Git and exclude tokens, secrets, PHI, signatures, legal opinions, and source documents.",
+        "Reject evidence that is stale, expired, malformed, or bound to different candidate fingerprints.",
+        "Delete the local transfer file after validated protected retention according to the approved retention policy."
+      ]
+    },
+    releasePromotionAllowed: false as const,
+    aggregateReleaseAuthorityGranted: false as const,
+    boundary: scrimedP32OperatorHandoffBoundary
+  };
+  return {
+    ...handoffWithoutHash,
+    handoffHash: createClinicalEvidenceHash(handoffWithoutHash)
+  };
+}
+
+export type P32OperatorHandoff = ReturnType<typeof buildP32OperatorHandoff>;
+
+export function buildP32OperatorHandoffMarkdown(handoff: P32OperatorHandoff) {
+  const lines = [
+    "# SCRIMED p.32 Candidate-Bound Operator Handoff",
+    "",
+    "> Internal no-PHI control metadata only. This handoff grants no approval or release authority.",
+    "",
+    "## Candidate",
+    "",
+    `- Source commit: \`${handoff.expectedFingerprints.sourceCommit}\``,
+    `- Source fingerprint: \`${handoff.expectedFingerprints.sourceTree}\``,
+    `- Artifact fingerprint: \`${handoff.expectedFingerprints.artifact}\``,
+    `- Validation fingerprint: \`${handoff.expectedFingerprints.validationEvidence}\``,
+    `- Gate packet: \`${handoff.generatedFromGatePacketHash}\``,
+    `- Operator handoff: \`${handoff.handoffHash}\``,
+    `- Evidence expires: \`${handoff.expiresAt}\``,
+    "",
+    "## Gate Posture",
+    "",
+    `- PASS: ${handoff.gateSummary.passed}`,
+    `- OPERATOR_REQUIRED: ${handoff.gateSummary.operatorRequired}`,
+    `- BLOCKED: ${handoff.gateSummary.blocked}`,
+    `- FAIL: ${handoff.gateSummary.failed}`,
+    `- Ready for an authorized operator now: ${handoff.readyActionCount}`,
+    `- Waiting for prerequisites: ${handoff.deferredActionCount}`,
+    "",
+    "## Controlled Actions"
+  ];
+  for (const action of handoff.actions) {
+    lines.push(
+      "",
+      `### ${action.sequence}. ${action.gateId}`,
+      "",
+      `- Owner: ${action.ownerRole}`,
+      `- State: ${action.executionState}`,
+      `- Gate status: ${action.status}`,
+      `- Action: ${action.exactAction}`,
+      `- Command or form: ${action.commandOrForm}`,
+      `- Verify: ${action.verificationProcedure}`,
+      `- Blocked by: ${action.blockedByGateIds.join(", ") || "none"}`,
+      `- Rejection consequence: ${action.consequenceOfRejection}`
+    );
+  }
+  lines.push(
+    "",
+    "## Evidence Intake",
+    "",
+    `Validate exported no-secret evidence with: \`${handoff.evidenceIntake.validationCommand}\``,
+    "",
+    ...handoff.evidenceIntake.rules.map((rule) => `- ${rule}`),
+    "",
+    "## Boundary",
+    "",
+    handoff.boundary,
+    "",
+    "Release promotion allowed: **false**"
+  );
+  return `${lines.join("\n")}\n`;
 }

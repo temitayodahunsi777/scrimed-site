@@ -9,6 +9,7 @@ npm run release:migration-packet
 npm run release:candidate-validate:strict
 npm run release:candidate-review-packet:strict
 npm run release:scrimed-p32-evidence:strict
+npm run release:scrimed-p32-operator-packet
 ```
 
 `release:scrimed-p32-evidence:all-gates` is intentionally fail-closed until every technical and named external decision is current and bound to the exact clean candidate.
@@ -20,6 +21,18 @@ If promotion spans more than one local commit, export `SCRIMED_RELEASE_CANDIDATE
 ## Operator Gates
 
 The gate packet is the source of truth. Every unresolved gate contains a responsible role, exact action, candidate/source/artifact/validation fingerprints, command or protected form, expiry, rejection consequence, and verification procedure. Do not copy a prior packet to a changed candidate.
+
+### Candidate-Bound Operator Handoff
+
+`npm run release:scrimed-p32-operator-packet` renders the unresolved gate packet as a deterministic, no-secret Markdown handoff. It groups work into candidate review, independent pre-deployment evidence, deployment authorization, post-deployment verification, and customer go-live. Actions whose prerequisites have not passed remain visibly deferred.
+
+The handoff does not mint identity evidence or approvals. Export supplemental evidence only from the protected AAL2 workspace or a qualified external authority. Never hand-author reviewer IDs, decision hashes, evidence hashes, timestamps, or approval records. Keep the local transfer file outside Git and validate it with:
+
+```bash
+npm run release:scrimed-p32-evidence:all-gates -- --evidence-file=/absolute/path/to/no-secret-evidence.json
+```
+
+The evidence importer rejects unknown evidence types, duplicate identifiers, unsafe pointers, secret-like content, invalid identity assurance, stale timestamps, changed fingerprints, and tampered hashes. Delete the transfer file after validated protected retention according to the approved retention policy.
 
 ## Migration Packet
 

@@ -4,12 +4,22 @@ import { readFile, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
-import { buildP32GateEvidencePacket } from "../app/lib/scrimedP32GateEvidence.ts";
+import {
+  buildP32GateEvidencePacket,
+  buildP32OperatorHandoff,
+  buildP32OperatorHandoffMarkdown
+} from "../app/lib/scrimedP32GateEvidence.ts";
 
 const rawArgs = process.argv.slice(2);
 const flags = new Set(rawArgs.filter((arg) => !arg.startsWith("--evidence-file=")));
 const evidenceFileArg = rawArgs.find((arg) => arg.startsWith("--evidence-file="));
-const allowedFlags = new Set(["--json", "--strict", "--require-all-gate-evidence", "--self-test"]);
+const allowedFlags = new Set([
+  "--json",
+  "--operator-packet",
+  "--strict",
+  "--require-all-gate-evidence",
+  "--self-test"
+]);
 const unknownArgs = rawArgs.filter(
   (arg) => !allowedFlags.has(arg) && !arg.startsWith("--evidence-file=")
 );
@@ -18,6 +28,9 @@ const commandTimeoutMs = 20 * 60 * 1000;
 
 if (unknownArgs.length > 0) {
   throw new Error(`Unsupported p.32 release gate evidence option: ${unknownArgs.join(", ")}`);
+}
+if (flags.has("--json") && flags.has("--operator-packet")) {
+  throw new Error("Use either --json or --operator-packet, not both.");
 }
 
 function readJsonCommand(script, args) {
@@ -154,6 +167,23 @@ function runSelfTest() {
     rejectedUnknownEvidence = true;
   }
   if (!rejectedUnknownEvidence) throw new Error("SCRIMED p.32 evidence accepted an unregistered evidence type.");
+  const handoff = buildP32OperatorHandoff(packet);
+  const handoffMarkdown = buildP32OperatorHandoffMarkdown(handoff);
+  const deploymentAction = handoff.actions.find((action) => action.gateId === "deployment-authorization");
+  const reviewerAction = handoff.actions.find((action) => action.gateId === "named-reviewer-approval");
+  if (
+    !/^[0-9a-f]{64}$/.test(handoff.handoffHash) ||
+    handoff.releasePromotionAllowed ||
+    handoff.aggregateReleaseAuthorityGranted ||
+    handoff.actionCount !== packet.unresolvedGates.length ||
+    reviewerAction?.executionState !== "READY_FOR_AUTHORIZED_OPERATOR" ||
+    deploymentAction?.executionState !== "WAIT_FOR_PREREQUISITES" ||
+    deploymentAction.blockedByGateIds.length === 0 ||
+    !handoffMarkdown.includes(packet.expectedFingerprints.sourceCommit) ||
+    !handoffMarkdown.includes("Release promotion allowed: **false**")
+  ) {
+    throw new Error("SCRIMED p.32 operator handoff self-test failed.");
+  }
   console.log("pass SCRIMED p.32 candidate-bound release gate evidence self-test");
 }
 
@@ -174,7 +204,9 @@ const packet = buildP32GateEvidencePacket({
   evaluatedAt: new Date().toISOString()
 });
 
-if (flags.has("--json")) {
+if (flags.has("--operator-packet")) {
+  console.log(buildP32OperatorHandoffMarkdown(buildP32OperatorHandoff(packet)).trimEnd());
+} else if (flags.has("--json")) {
   console.log(JSON.stringify(packet, null, 2));
 } else {
   console.log(`report SCRIMED p.32 release gate evidence: ${packet.status}`);
