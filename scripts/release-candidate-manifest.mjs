@@ -146,6 +146,8 @@ export function evaluateReleaseCandidateManifest(input) {
     service: "scrimed-release-candidate-manifest",
     status,
     candidateMode: input.candidateMode,
+    candidateBaseRef: input.candidateBaseRef,
+    candidateBaseSha: isSha(input.candidateBaseSha, 40) ? input.candidateBaseSha : null,
     baseHeadSha: isSha(input.headSha, 40) ? input.headSha : null,
     baseHeadFingerprint: isSha(input.headSha, 40) ? input.headSha.slice(0, 12) : "unavailable",
     parentCommitSha: isSha(input.parentCommitSha, 40) ? input.parentCommitSha : null,
@@ -225,6 +227,35 @@ function splitNullTerminated(value) {
   return value.split("\0").filter(Boolean);
 }
 
+function resolveCandidateBase(headSha, parentCommitSha) {
+  const requestedBaseRef = process.env.SCRIMED_RELEASE_CANDIDATE_BASE_REF?.trim();
+  if (!requestedBaseRef) {
+    return {
+      candidateBaseRef: isSha(parentCommitSha, 40) ? "HEAD^" : "EMPTY_TREE",
+      candidateBaseSha: isSha(parentCommitSha, 40) ? parentCommitSha : emptyGitTreeSha
+    };
+  }
+  if (
+    requestedBaseRef.startsWith("-")
+    || requestedBaseRef.includes("..")
+    || requestedBaseRef.includes("@{")
+    || !/^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/.test(requestedBaseRef)
+  ) {
+    throw new Error("SCRIMED_RELEASE_CANDIDATE_BASE_REF is not a safe Git commit or reference.");
+  }
+  const candidateBaseSha = runGitText(["rev-parse", "--verify", `${requestedBaseRef}^{commit}`])?.trim() ?? null;
+  if (!isSha(candidateBaseSha, 40)) {
+    throw new Error("SCRIMED_RELEASE_CANDIDATE_BASE_REF could not be resolved to a commit.");
+  }
+  if (runGitText(["merge-base", "--is-ancestor", candidateBaseSha, headSha]) === null) {
+    throw new Error("SCRIMED_RELEASE_CANDIDATE_BASE_REF must be an ancestor of HEAD.");
+  }
+  if (candidateBaseSha === headSha) {
+    throw new Error("SCRIMED_RELEASE_CANDIDATE_BASE_REF must precede HEAD.");
+  }
+  return { candidateBaseRef: requestedBaseRef, candidateBaseSha };
+}
+
 async function hashUntrackedFiles(paths) {
   const aggregate = createHash("sha256");
   let unreadableFileCount = 0;
@@ -274,7 +305,10 @@ async function inspectCandidate() {
   const statusLines = statusText?.split(/\r?\n/).filter(Boolean) ?? [];
   const cleanCommitCandidate = isSha(headSha, 40) && statusText !== null && statusLines.length === 0;
   const candidateMode = cleanCommitCandidate ? "clean-commit" : "working-tree";
-  const commitDiffBase = isSha(parentCommitSha, 40) ? parentCommitSha : emptyGitTreeSha;
+  const resolvedBase = cleanCommitCandidate
+    ? resolveCandidateBase(headSha, parentCommitSha)
+    : { candidateBaseRef: "HEAD", candidateBaseSha: headSha };
+  const commitDiffBase = resolvedBase.candidateBaseSha;
   const trackedPaths = splitNullTerminated(runGitText(
     cleanCommitCandidate
       ? ["diff", "--name-only", "-z", commitDiffBase, headSha, "--"]
@@ -327,6 +361,7 @@ async function inspectCandidate() {
   const candidateDigestSha256 = gitAvailable && trackedDiffSha256
     ? sha256(JSON.stringify({
       candidateMode,
+      candidateBaseSha: resolvedBase.candidateBaseSha,
       headSha,
       parentCommitSha: isSha(parentCommitSha, 40) ? parentCommitSha : null,
       headTreeSha,
@@ -338,6 +373,7 @@ async function inspectCandidate() {
   const sourceCandidateDigestSha256 = gitAvailable && sourceTrackedDiffSha256
     ? sha256(JSON.stringify({
       candidateMode,
+      candidateBaseSha: resolvedBase.candidateBaseSha,
       headSha,
       parentCommitSha: isSha(parentCommitSha, 40) ? parentCommitSha : null,
       headTreeSha,
@@ -348,6 +384,8 @@ async function inspectCandidate() {
     : null;
   const nonSourceDeliverablesDigestSha256 = nonSourcePaths.length > 0 && nonSourceTrackedDiffSha256
     ? sha256(JSON.stringify({
+      candidateMode,
+      candidateBaseSha: resolvedBase.candidateBaseSha,
       headSha,
       nonSourceTrackedDiffSha256,
       nonSourceUntrackedContentSha256: nonSourceUntracked.digest,
@@ -358,6 +396,8 @@ async function inspectCandidate() {
   return {
     gitAvailable,
     candidateMode,
+    candidateBaseRef: resolvedBase.candidateBaseRef,
+    candidateBaseSha: resolvedBase.candidateBaseSha,
     headSha,
     parentCommitSha,
     headTreeSha,
@@ -396,6 +436,8 @@ function runSelfTest() {
   const base = {
     gitAvailable: true,
     candidateMode: "working-tree",
+    candidateBaseRef: "HEAD",
+    candidateBaseSha: "b".repeat(40),
     headSha: "b".repeat(40),
     parentCommitSha: "c".repeat(40),
     headTreeSha: "d".repeat(40),
@@ -439,6 +481,8 @@ function runSelfTest() {
   const clean = evaluateReleaseCandidateManifest({
     ...base,
     candidateMode: "clean-commit",
+    candidateBaseRef: "reviewed-base",
+    candidateBaseSha: base.parentCommitSha,
     dirtyEntryCount: 0,
     changedFileCount: 0,
     modifiedFileCount: 0,
@@ -462,6 +506,8 @@ function runSelfTest() {
     || !clean.strictProvenanceEligible
     || !clean.candidateReviewReady
     || clean.candidateMode !== "clean-commit"
+    || clean.candidateBaseRef !== "reviewed-base"
+    || clean.candidateBaseSha !== base.parentCommitSha
     || clean.parentCommitSha !== base.parentCommitSha
     || clean.headTreeSha !== base.headTreeSha
     || unavailable.status !== "candidate-manifest-blocked-git-unavailable"

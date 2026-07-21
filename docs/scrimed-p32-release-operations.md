@@ -13,7 +13,9 @@ npm run release:scrimed-p32-evidence:strict
 
 `release:scrimed-p32-evidence:all-gates` is intentionally fail-closed until every technical and named external decision is current and bound to the exact clean candidate.
 
-When the working tree is clean, the candidate manifest and review packet evaluate the committed first-parent change set rather than an empty working-tree diff. Candidate, source, commit-tree, validation, and review-packet fingerprints therefore remain attributable after local commit promotion.
+When the working tree is clean, the candidate manifest and review packet evaluate a committed base-to-`HEAD` change set rather than an empty working-tree diff. Candidate, source, commit-tree, validation, and review-packet fingerprints therefore remain attributable after local commit promotion.
+
+If promotion spans more than one local commit, export `SCRIMED_RELEASE_CANDIDATE_BASE_REF` with the exact reviewed ancestor for every evidence command. This prevents a follow-up commit from narrowing review coverage to only its immediate parent diff.
 
 ## Operator Gates
 

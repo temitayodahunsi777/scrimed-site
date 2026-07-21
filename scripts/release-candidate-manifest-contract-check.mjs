@@ -41,6 +41,8 @@ for (const expected of [
   "rawDiffPrinted: false",
   "candidateMode",
   "clean-commit",
+  "SCRIMED_RELEASE_CANDIDATE_BASE_REF",
+  "candidateBaseSha",
   "parentCommitSha",
   "headTreeSha",
   "emptyGitTreeSha",

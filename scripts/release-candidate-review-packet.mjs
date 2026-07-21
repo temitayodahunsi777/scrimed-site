@@ -242,6 +242,8 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
   const packetCore = {
     schemaVersion: "1.0.0",
     candidateMode: manifest.candidateMode,
+    candidateBaseRef: manifest.candidateBaseRef,
+    candidateBaseSha: manifest.candidateBaseSha,
     baseHeadSha: manifest.baseHeadSha,
     parentCommitSha: manifest.parentCommitSha,
     headTreeSha: manifest.headTreeSha,
@@ -444,7 +446,7 @@ async function inspectCurrentCandidate() {
         "diff",
         "--name-status",
         "-z",
-        manifest.parentCommitSha ?? emptyGitTreeSha,
+        manifest.candidateBaseSha ?? manifest.parentCommitSha ?? emptyGitTreeSha,
         manifest.baseHeadSha,
         "--"
       ], { cwd: repoRoot, encoding: null }))
@@ -505,6 +507,8 @@ function runSelfTest() {
   const digest = "a".repeat(64);
   const manifest = {
     candidateMode: "working-tree",
+    candidateBaseRef: "HEAD",
+    candidateBaseSha: "b".repeat(40),
     baseHeadSha: "b".repeat(40),
     parentCommitSha: "c".repeat(40),
     headTreeSha: "d".repeat(40),
@@ -597,6 +601,8 @@ function runSelfTest() {
   if (
     ready.status !== "ready-for-named-reviewer-disposition"
     || ready.candidateMode !== "working-tree"
+    || ready.candidateBaseRef !== manifest.candidateBaseRef
+    || ready.candidateBaseSha !== manifest.candidateBaseSha
     || ready.parentCommitSha !== manifest.parentCommitSha
     || ready.headTreeSha !== manifest.headTreeSha
     || !ready.completeCoverage
