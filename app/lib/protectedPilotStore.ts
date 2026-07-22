@@ -171,6 +171,12 @@ import type {
   P32EvidenceIssuerReceipt,
   P32EvidenceIssuerReceiptInput
 } from "./scrimedP32EvidenceIssuer";
+import type {
+  P32CandidateReviewAssignmentReceipt,
+  P32CandidateReviewAssignmentReceiptInput,
+  P32CandidateReviewDecisionReceipt,
+  P32CandidateReviewDecisionReceiptInput
+} from "./scrimedP32CandidateReview";
 
 type AuthenticatedPilotContext =
   | {
@@ -4054,6 +4060,42 @@ export async function recordP32EvidenceAttestationIssuance(
   const receipt =
     payload.receipt && typeof payload.receipt === "object"
       ? (payload.receipt as unknown as P32EvidenceIssuerReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function createP32CandidateReviewAssignmentReceipt(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32CandidateReviewAssignmentReceiptInput
+) {
+  const { data, error } = await client.rpc("create_p32_candidate_review_assignment", {
+    p_workspace_slug: workspaceSlug,
+    p_assignment: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32CandidateReviewAssignmentReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function recordP32CandidateReviewDecisionReceipt(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32CandidateReviewDecisionReceiptInput
+) {
+  const { data, error } = await client.rpc("record_p32_candidate_review_decision", {
+    p_workspace_slug: workspaceSlug,
+    p_decision: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32CandidateReviewDecisionReceipt)
       : null;
 
   return { receipt, error };

@@ -199,6 +199,19 @@ const checks = [
     args: ["scripts/scrimed-p32-evidence-issuer-contract-check.mjs"]
   },
   {
+    label: "SCRIMED P32 protected candidate-review behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-candidate-review-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 protected candidate-review contract",
+    args: ["scripts/scrimed-p32-candidate-review-contract-check.mjs"]
+  },
+  {
     label: "SCRIMED P32 candidate-bound release gate evidence",
     args: [
       "--disable-warning=ExperimentalWarning",

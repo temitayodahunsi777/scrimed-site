@@ -25,6 +25,7 @@ import ClinicalActivationDossierPanel from "./ClinicalActivationDossierPanel";
 import CommandIntelligenceHubPanel from "./CommandIntelligenceHubPanel";
 import ManualQaExecutionConsolePanel from "./ManualQaExecutionConsolePanel";
 import ManualQaEvidencePanel from "./ManualQaEvidencePanel";
+import P32CandidateReviewPanel from "./P32CandidateReviewPanel";
 import PilotDemoReadinessCommandCenter from "./PilotDemoReadinessCommandCenter";
 import PilotWorkspaceVerificationPanel from "./PilotWorkspaceVerificationPanel";
 import ScrimedWorkBrowserVerificationPanel from "./ScrimedWorkBrowserVerificationPanel";
@@ -4721,6 +4722,11 @@ export default function ProtectedPilotAccess({
 
       {selectedWorkspace ? (
         <>
+          <P32CandidateReviewPanel
+            accessToken={session.access_token}
+            workspace={selectedWorkspace}
+          />
+
           <PilotDemoReadinessCommandCenter
             auditEvents={auditEvents}
             demoPacketBusyId={demoPacketBusyId}
