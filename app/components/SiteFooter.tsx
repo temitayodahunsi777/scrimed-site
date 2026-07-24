@@ -1,15 +1,29 @@
 import Link from "next/link";
+import { companyIdentity } from "../lib/companyIdentity";
 import { limitationControlLinks, siteNavigationFooterLinks } from "../lib/siteNavigation";
 
 export function SiteFooter() {
   return (
     <footer className="site-footer" aria-label="SCRIMED site footer">
       <div>
-        <strong>SCRIMED</strong>
+        <strong>{companyIdentity.displayName}</strong>
         <p>
-          Healthcare operations intelligence for governed synthetic pilots, buyer diligence, proof routing,
-          and readiness coordination.
+          Pre-commercial, Atlas-first healthcare intelligence for governed synthetic evaluation. No PHI and
+          no live clinical execution.
         </p>
+        <a href={`mailto:${companyIdentity.publicContactEmail}`}>{companyIdentity.publicContactEmail}</a>
+      </div>
+      <div>
+        <span>Evidence and Legal</span>
+        <nav aria-label="Evidence and legal navigation">
+          <Link href="/validation-evidence">Validation and Evidence</Link>
+          <Link href="/legal">Legal and Policy Center</Link>
+          <Link href="/legal/privacy">Privacy Notice</Link>
+          <Link href="/legal/terms">Terms of Use</Link>
+          <Link href="/legal/cookies">Cookie Notice</Link>
+          <Link href="/legal/accessibility">Accessibility</Link>
+          <Link href="/legal/healthcare-ai-disclaimer">Healthcare and AI Disclaimer</Link>
+        </nav>
       </div>
       <div>
         <span>Limitations</span>

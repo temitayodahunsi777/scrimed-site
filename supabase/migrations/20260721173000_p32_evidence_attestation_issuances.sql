@@ -1,7 +1,7 @@
 create table if not exists private.p32_evidence_attestation_issuances (
   id uuid primary key,
   tenant_id uuid not null references public.pilot_tenants(id) on delete restrict,
-  workspace_id uuid not null references public.pilot_workspaces(id) on delete restrict,
+  workspace_id uuid not null,
   qa_evidence_packet_id uuid not null references public.qa_manual_run_evidence_packets(id) on delete restrict,
   qa_evidence_packet_hash text not null check (qa_evidence_packet_hash ~ '^[0-9a-f]{64}$'),
   idempotency_key uuid not null,
@@ -30,6 +30,10 @@ create table if not exists private.p32_evidence_attestation_issuances (
   audit_hash text not null unique check (audit_hash ~ '^[0-9a-f]{64}$'),
   created_at timestamptz not null default now(),
   unique (workspace_id, idempotency_key),
+  constraint p32_evidence_attestation_issuances_workspace_tenant_fk
+    foreign key (workspace_id, tenant_id)
+    references public.pilot_workspaces(id, tenant_id)
+    on delete restrict,
   check (generated_at = checked_at),
   check (expires_at > checked_at),
   check (expires_at <= checked_at + interval '1 hour')

@@ -49,6 +49,8 @@ for (const expected of [
 
 for (const expected of [
   "private.p32_evidence_attestation_issuances",
+  "foreign key (workspace_id, tenant_id)",
+  "references public.pilot_workspaces(id, tenant_id)",
   "array['tenant-admin', 'pilot-lead']",
   "private.require_governance_workspace",
   "qa_manual_run_evidence_packets",

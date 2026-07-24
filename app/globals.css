@@ -32,6 +32,29 @@ a {
   text-decoration: none;
 }
 
+.operating-mode-banner {
+  align-items: center;
+  background: #eef6f2;
+  border-bottom: 1px solid var(--line);
+  color: var(--green-dark);
+  display: flex;
+  gap: 10px 24px;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px clamp(16px, 4vw, 48px);
+  text-align: center;
+}
+
+.operating-mode-banner strong,
+.operating-mode-banner span {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.operating-mode-banner span {
+  color: var(--muted);
+}
+
 main {
   min-height: 100vh;
 }
@@ -1999,6 +2022,12 @@ h3 {
 }
 
 @media (max-width: 640px) {
+  .operating-mode-banner {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   .site-navigation-shell {
     max-height: 82vh;
     overflow: auto;

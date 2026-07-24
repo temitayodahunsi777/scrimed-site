@@ -3461,12 +3461,12 @@ async function checkSiteNavigationShell() {
     throw new Error("site navigation root expected persistent site-navigation-shell markup.");
   }
 
-  if (!root.body.text.includes("Buy governed healthcare AI with proof before production risk")) {
-    throw new Error("site navigation root expected buyer-centric advertising hero copy.");
+  if (!root.body.text.includes("Atlas-first healthcare intelligence")) {
+    throw new Error("site navigation root expected Atlas-first public positioning.");
   }
 
-  if (!root.body.text.includes("What you can buy now")) {
-    throw new Error("site navigation root expected buyer purchase-options section.");
+  if (!root.body.text.includes("Illustrative engagement paths")) {
+    throw new Error("site navigation root expected pre-commercial engagement paths.");
   }
 
   if (!root.body.text.includes("Trust that helps close the deal")) {
@@ -11252,6 +11252,14 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /continuous-review-audit in smoke-covered HTML routes.");
   }
 
+  if (!body.smokeCoveredHtmlRoutes.includes("/validation-evidence")) {
+    throw new Error("Navigation Audit expected /validation-evidence in smoke-covered HTML routes.");
+  }
+
+  if (!body.smokeCoveredHtmlRoutes.includes("/legal")) {
+    throw new Error("Navigation Audit expected /legal in smoke-covered HTML routes.");
+  }
+
   if (!Array.isArray(body.bottlenecks) || !body.bottlenecks.some((bottleneck) => bottleneck.status === "operator-required")) {
     throw new Error("Navigation Audit expected an operator-required AAL2 bottleneck.");
   }
@@ -15490,6 +15498,8 @@ await checkHtml("/qa-buyer-proof-release");
 await checkHtml("/buyer-release-control-run");
 await checkHtml("/qa-manual-execution-console");
 await checkHtml("/qa-aal2-run-evidence");
+await checkHtml("/validation-evidence");
+await checkHtml("/legal");
 await checkReleaseContinuity();
 await checkNavigationAudit();
 await checkServiceReliability();

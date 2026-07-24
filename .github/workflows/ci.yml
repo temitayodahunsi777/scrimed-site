@@ -47,6 +47,9 @@ jobs:
       - name: Generate migration evidence packet
         run: npm run release:migration-packet
 
+      - name: Verify pending migration authorization packet
+        run: npm run release:pending-migrations
+
       - name: Generated workspace integrity
         run: node scripts/check-generated-integrity.mjs
 
@@ -75,3 +78,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify public release surfaces
+        run: npm run verify:public-release

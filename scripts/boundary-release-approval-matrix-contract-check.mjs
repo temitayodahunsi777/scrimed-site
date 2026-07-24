@@ -207,7 +207,7 @@ for (const path of [
   "scripts/scrimed-os-upgrade-batch-contract-check.mjs",
   "scripts/boundary-release-approval-matrix-contract-check.mjs"
 ]) {
-  requireIncludes(path, files[path], "expectedApiRoutePatternCount = 443");
+  requireIncludes(path, files[path], "expectedApiRoutePatternCount = 448");
 }
 
 requireIncludes(

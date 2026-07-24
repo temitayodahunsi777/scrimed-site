@@ -269,6 +269,6 @@ requireIncludes(
   files["scripts/public-production-smoke.mjs"],
   "checkScrimedSecurityDiligenceEvidencePacket"
 );
-requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "expectedApiRoutePatternCount = 443");
+requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "expectedApiRoutePatternCount = 448");
 
 console.log("pass SCRIMED Cyber Defense contract check");

@@ -1,0 +1,120 @@
+{
+  "version": "2026-07-23.public-claims-v3",
+  "blockedRules": [
+    {
+      "id": "unsubstantiated-named-testimonial",
+      "markers": ["dr. emily carter"],
+      "reason": "Named customer testimony requires written authorization, substantiation, and applicable disclosures.",
+      "allowNegated": false
+    },
+    {
+      "id": "unsubstantiated-testimonial-outcome",
+      "markers": ["revolutionized our practice"],
+      "reason": "A customer outcome claim requires evidence, typicality context, publication permission, and approval.",
+      "allowNegated": false
+    },
+    {
+      "id": "unverified-physical-location",
+      "markers": ["500 innovation way", "500 terry francine street"],
+      "reason": "A published business location requires an owner-verified address record.",
+      "allowNegated": false
+    },
+    {
+      "id": "unverified-spiritual-governance-superlative",
+      "markers": ["world's first spiritually governed healthtech platform", "world’s first spiritually governed healthtech platform"],
+      "reason": "Novelty and spiritual-governance claims require substantiation and must not appear in Atlas-first enterprise positioning.",
+      "allowNegated": false
+    },
+    {
+      "id": "faith-language-outside-faithcore",
+      "markers": ["scripture-enhanced care engagement"],
+      "reason": "Faith language is permitted only in an explicitly opt-in FaithCore context.",
+      "allowNegated": false
+    },
+    {
+      "id": "faith-first-enterprise-metadata",
+      "markers": ["faith-based healthcare company"],
+      "reason": "Primary enterprise metadata must remain Atlas-first; faith positioning is permitted only in an explicit FaithCore context.",
+      "allowNegated": false
+    },
+    {
+      "id": "unverified-organization-contact-metadata",
+      "markers": ["+14049814427", "atlanta, ga"],
+      "reason": "Organization telephone and locality metadata require a founder-verified business identity record and counsel-approved publication posture.",
+      "allowNegated": false
+    },
+    {
+      "id": "unsupported-fda-claim",
+      "markers": ["fda approved", "fda cleared"],
+      "reason": "FDA status may not be claimed without exact, current authorization evidence.",
+      "allowNegated": true
+    },
+    {
+      "id": "unsupported-hipaa-claim",
+      "markers": ["hipaa compliant"],
+      "reason": "Specific implemented controls may be described, but blanket compliance claims require qualified review and evidence.",
+      "allowNegated": true
+    },
+    {
+      "id": "unsupported-soc2-claim",
+      "markers": ["soc 2 certified"],
+      "reason": "SOC 2 status may not be claimed without a current report and authorized publication language.",
+      "allowNegated": true
+    },
+    {
+      "id": "unsupported-clinical-validation-claim",
+      "markers": ["clinically proven"],
+      "reason": "Clinical validation claims require an approved study, analysis, and publication authorization.",
+      "allowNegated": true
+    },
+    {
+      "id": "unsupported-production-readiness-claim",
+      "markers": ["deployment ready", "deployment-ready", "live clinical deployment"],
+      "reason": "Current public status is pre-commercial and synthetic demonstration only.",
+      "allowNegated": true
+    },
+    {
+      "id": "unsupported-vitals-alert-claim",
+      "markers": [
+        "predictive alerts",
+        "real-time patient condition insights",
+        "real-time insight into patient conditions",
+        "real-time, predictive, and faith-centered patient monitoring"
+      ],
+      "reason": "Vitals experiences remain synthetic workflow demonstrations and are not emergency or patient-monitoring services.",
+      "allowNegated": false
+    },
+    {
+      "id": "unsupported-autonomous-care-claim",
+      "markers": ["autonomous diagnosis", "autonomous treatment"],
+      "reason": "SCRIMED does not authorize autonomous diagnosis or treatment.",
+      "allowNegated": true
+    }
+  ],
+  "negationMarkers": [
+    "not ",
+    "no ",
+    "does not ",
+    "do not ",
+    "never ",
+    "prohibited",
+    "blocked",
+    "without verified evidence",
+    "cannot claim",
+    "must not claim"
+  ],
+  "requiredDisclosureRules": [
+    {
+      "id": "no-phi-disclosure",
+      "markers": ["do not submit protected health information", "no phi", "no-phi"]
+    },
+    {
+      "id": "synthetic-status-disclosure",
+      "markers": ["synthetic demonstration", "synthetic-data", "synthetic data"]
+    },
+    {
+      "id": "human-review-disclosure",
+      "markers": ["human review", "human-supervised", "clinician-supportive"]
+    }
+  ]
+}

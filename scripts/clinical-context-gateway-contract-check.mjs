@@ -144,7 +144,7 @@ requireIncludes("hub route registry", contents.hub, [
 ]);
 
 requireIncludes("navigation audit", contents.navigation, [
-  "expectedApiRoutePatternCount = 443"
+  "expectedApiRoutePatternCount = 448"
 ]);
 
 requireIncludes("clinical context gateway docs", contents.docs, [

@@ -1,7 +1,7 @@
 create table if not exists private.p32_candidate_review_assignments (
   id uuid primary key,
   tenant_id uuid not null references public.pilot_tenants(id) on delete restrict,
-  workspace_id uuid not null references public.pilot_workspaces(id) on delete restrict,
+  workspace_id uuid not null,
   idempotency_key uuid not null,
   reviewer_identity_hash text not null check (reviewer_identity_hash ~ '^[0-9a-f]{64}$'),
   reviewer_role text not null check (reviewer_role = 'principal-engineer'),
@@ -22,6 +22,11 @@ create table if not exists private.p32_candidate_review_assignments (
   audit_hash text not null unique check (audit_hash ~ '^[0-9a-f]{64}$'),
   created_at timestamptz not null default now(),
   unique (workspace_id, idempotency_key),
+  unique (id, tenant_id, workspace_id),
+  constraint p32_candidate_review_assignments_workspace_tenant_fk
+    foreign key (workspace_id, tenant_id)
+    references public.pilot_workspaces(id, tenant_id)
+    on delete restrict,
   check (reviewer_identity_hash <> assigner_identity_hash),
   check (expires_at > assigned_at),
   check (expires_at <= assigned_at + interval '7 days')
@@ -29,9 +34,9 @@ create table if not exists private.p32_candidate_review_assignments (
 
 create table if not exists private.p32_candidate_review_decisions (
   id uuid primary key,
-  assignment_id uuid not null unique references private.p32_candidate_review_assignments(id) on delete restrict,
+  assignment_id uuid not null unique,
   tenant_id uuid not null references public.pilot_tenants(id) on delete restrict,
-  workspace_id uuid not null references public.pilot_workspaces(id) on delete restrict,
+  workspace_id uuid not null,
   idempotency_key uuid not null,
   reviewer_identity_hash text not null check (reviewer_identity_hash ~ '^[0-9a-f]{64}$'),
   decision text not null check (decision in ('approved', 'rejected')),
@@ -53,7 +58,15 @@ create table if not exists private.p32_candidate_review_decisions (
   previous_audit_hash text check (previous_audit_hash is null or previous_audit_hash ~ '^[0-9a-f]{64}$'),
   audit_hash text not null unique check (audit_hash ~ '^[0-9a-f]{64}$'),
   created_at timestamptz not null default now(),
-  unique (workspace_id, idempotency_key)
+  unique (workspace_id, idempotency_key),
+  constraint p32_candidate_review_decisions_workspace_tenant_fk
+    foreign key (workspace_id, tenant_id)
+    references public.pilot_workspaces(id, tenant_id)
+    on delete restrict,
+  constraint p32_candidate_review_decisions_assignment_scope_fk
+    foreign key (assignment_id, tenant_id, workspace_id)
+    references private.p32_candidate_review_assignments(id, tenant_id, workspace_id)
+    on delete restrict
 );
 
 create index if not exists p32_candidate_review_assignments_workspace_created_idx

@@ -1,0 +1,34 @@
+{
+  "version": "2026-07-23.pending-migrations-v1",
+  "productionObservation": {
+    "observedAt": "2026-07-23",
+    "observedThroughMigrationName": "scrimed_work_completion_evidence",
+    "source": "connected Supabase migration registry",
+    "authorizesApplication": false
+  },
+  "disposableDatabaseDryRunPassed": false,
+  "productionApplicationAuthorized": false,
+  "migrations": [
+    {
+      "path": "supabase/migrations/20260718153148_clinical_assurance_control_plane.sql",
+      "name": "clinical_assurance_control_plane",
+      "sha256": "5cdc5be2794b233476687e5930546746802ee5b57de3011afc1a781fa7d3902b",
+      "status": "READY",
+      "authorizationRecommendation": "AUTHORIZE_DISPOSABLE_DRY_RUN_ONLY"
+    },
+    {
+      "path": "supabase/migrations/20260721173000_p32_evidence_attestation_issuances.sql",
+      "name": "p32_evidence_attestation_issuances",
+      "sha256": "18ca2d9df239d8eb1925b46ca7a85647ba9e6bfb513918e0720578bffafeb4fb",
+      "status": "READY",
+      "authorizationRecommendation": "AUTHORIZE_DISPOSABLE_DRY_RUN_ONLY"
+    },
+    {
+      "path": "supabase/migrations/20260722120000_p32_candidate_review_control_plane.sql",
+      "name": "p32_candidate_review_control_plane",
+      "sha256": "78063e93d1fff9e0faa235d134b4475083f28aeac42b9351bba4b002d8134a37",
+      "status": "READY",
+      "authorizationRecommendation": "AUTHORIZE_DISPOSABLE_DRY_RUN_ONLY"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { faithCoreNeutralityStatement } from "../lib/legalPolicies";
 import { getMarketActivationSummary } from "../lib/marketActivation";
 import { operatingContext } from "../lib/operatingContext";
 
@@ -16,6 +17,7 @@ export default function FaithCorePage() {
         <p className="hero-text">
           {faithCore?.role} FaithCore supports whole-person dignity while preserving clinician authority, clinical excellence, consent, safety, and professional standards.
         </p>
+        <p className="section-copy">{faithCoreNeutralityStatement}</p>
       </section>
 
       <section className="section-band split-band">
@@ -46,7 +48,7 @@ export default function FaithCorePage() {
       <section className="table-section" aria-label="FaithCore market programs">
         <div className="section-heading">
           <p className="eyebrow">FaithCore programs</p>
-          <h2>FaithCore is sellable only as opt-in trust, dignity, and encouragement support with explicit clinical boundaries.</h2>
+          <h2>FaithCore is available only as an optional, explicitly consented experience with clear clinical boundaries.</h2>
           <p className="section-copy">
             These programs strengthen SCRIMED&apos;s message for faith-aligned communities while protecting consent, clinical authority, cultural sensitivity, and professional standards.
           </p>

@@ -23,6 +23,18 @@ export type SiteNavigationJourney = {
 
 export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
   {
+    label: "Validation and Evidence",
+    href: "/validation-evidence",
+    description: "Current technical evidence, governance methods, pilot methodology, limitations, and product status.",
+    boundary: "Synthetic and methodological evidence only; not clinical validation, certification, customer proof, or production authorization."
+  },
+  {
+    label: "Legal and Policy Center",
+    href: "/legal",
+    description: "Interim privacy, terms, cookie, accessibility, refund, healthcare, and AI policies.",
+    boundary: "Interim policy drafts require qualified legal review before commercial healthcare deployment."
+  },
+  {
     label: "Demos",
     href: "/demos",
     description: "Public no-PHI product demos for healthcare workflow buyers."

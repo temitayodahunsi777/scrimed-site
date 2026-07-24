@@ -243,7 +243,7 @@ export default function PilotIntakeForm({
               placeholder="Example: Epic EHR, FHIR integration planning, claims queue, referral inbox, scheduling system, analytics warehouse."
               value={form.interoperabilityContext}
             />
-            <small>Do not include PHI, patient identifiers, copied chart text, member IDs, or clinical records.</small>
+            <small>Do not include PHI, medical records, diagnoses, treatment information, or emergency details.</small>
             <FieldErrorMessage message={getFieldError(fieldErrors, "interoperabilityContext")} />
           </label>
           <label className="form-field form-field-wide">
@@ -281,7 +281,8 @@ export default function PilotIntakeForm({
             />
             <span>
               I agree SCRIMED may use this business-contact and workflow-scope information to respond about an
-              enterprise pilot, assessment, or governance review.
+              enterprise pilot, assessment, or governance review, subject to the{" "}
+              <Link href="/legal/privacy">interim privacy notice</Link>.
             </span>
           </label>
           <FieldErrorMessage message={getFieldError(fieldErrors, "contactConsent")} />

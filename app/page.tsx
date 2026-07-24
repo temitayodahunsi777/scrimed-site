@@ -1,8 +1,14 @@
 import Link from "next/link";
+import {
+  aiLimitationStatement,
+  medicalDisclaimer,
+  publicHealthcareDataBoundary
+} from "./lib/legalPolicies";
+import { currentProductStatusStatement } from "./lib/validationEvidence";
 const platformModules = [
   {
     name: "Clinical Copilot",
-    summary: "Clinician decision support, patient summarization, and documentation assistance."
+    summary: "Synthetic clinician-support workflow evaluation, source-grounded summarization, and draft documentation assistance."
   },
   {
     name: "DocuTwin",
@@ -10,11 +16,11 @@ const platformModules = [
   },
   {
     name: "CarePath AI",
-    summary: "Patient intake, triage support, navigation, and care pathway optimization."
+    summary: "Synthetic intake, navigation, missing-context review, and human escalation workflow planning."
   },
   {
     name: "TrialCore",
-    summary: "Clinical trial discovery and patient matching for research operations."
+    summary: "Synthetic preliminary trial-screening workflow support with coordinator confirmation and no enrollment authority."
   },
   {
     name: "Watchtower",
@@ -70,19 +76,19 @@ const buyerOutcomeCards = [
 const buyerPurchaseOptions = [
   {
     name: "Workflow Intelligence Assessment",
-    price: "$25k-$150k",
+    price: "Illustrative planning range: $25k-$150k",
     pitch: "A fast, finite way to identify where SCRIMED can reduce workflow friction and prepare a buyer-ready pilot decision.",
     href: "/pilot?offer=workflow-intelligence-assessment"
   },
   {
     name: "Synthetic Pilot Evaluation",
-    price: "$125k-$500k",
+    price: "Illustrative planning range: $125k-$500k",
     pitch: "A 45-90 day no-PHI pilot that gives enterprise sponsors proof, governance evidence, workflow metrics, and an expansion decision.",
     href: "/pilot?offer=synthetic-pilot-evaluation"
   },
   {
     name: "Protected Enterprise Pilot",
-    price: "$400k-$2M+",
+    price: "Illustrative planning range: $400k-$2M+",
     pitch: "A controlled enterprise activation path for buyers who need protected proof, diligence rooms, onboarding, and production-readiness planning.",
     href: "/pilot?offer=protected-enterprise-pilot"
   }
@@ -250,7 +256,7 @@ const readinessSignals = [
   { label: "Company", value: "/api/company-assessment" },
   { label: "Clinical Prod", value: "/api/clinical-production-readiness" },
   { label: "Demo Pricing", value: "/api/pilot-demo-commercial-readiness" },
-  { label: "Deployment", value: "Ready" },
+  { label: "Operating Mode", value: "Synthetic only" },
   { label: "Product", value: "/product" },
   { label: "Delivery", value: "/api/service-delivery" },
   { label: "Launch", value: "/api/launch-readiness" },
@@ -314,25 +320,25 @@ export default function Home() {
       <section className="hero-shell">
         <div className="hero-grid" id="top">
           <div className="hero-copy">
-            <p className="eyebrow">Buy governed healthcare AI with proof before production risk</p>
-            <h1>SCRIMED helps healthcare leaders turn messy workflows into governed AI pilots buyers can trust.</h1>
+            <p className="eyebrow">Atlas-first healthcare intelligence</p>
+            <h1>Trustworthy AI-enabled workflows, evaluated before production exposure.</h1>
             <p className="hero-text">
-              Launch a no-PHI product demo, choose the right pilot package, see market-aligned pricing, and give your buying committee the proof, trust boundaries, and implementation path needed to move forward.
+              SCRIMED is a healthcare intelligence platform developing trustworthy AI-enabled workflows for
+              clinicians, care teams, health systems, payers, researchers, and patients.
             </p>
             <div className="hero-actions" aria-label="Primary calls to action">
-              <Link className="primary-action" href="/pilot-demo-commercial-readiness">Find Your Pilot Path</Link>
-              <Link className="secondary-action" href="/demos">Watch Product Demos</Link>
-              <Link className="secondary-action" href="/offerings">See What You Can Buy</Link>
-              <Link className="secondary-action" href="/pricing">Review Pricing</Link>
-              <Link className="secondary-action" href="/pilot">Request a Pilot</Link>
-              <Link className="secondary-action" href="/investor-audience-readiness">Investor Readiness</Link>
+              <Link className="primary-action" href="/validation-evidence">Review Validation and Evidence</Link>
+              <Link className="secondary-action" href="/demos">Explore Synthetic Demos</Link>
+              <Link className="secondary-action" href="/pilot">Request a No-PHI Evaluation</Link>
+              <Link className="secondary-action" href="/atlas">Enterprise / Atlas</Link>
+              <Link className="secondary-action" href="/faithcore">Optional FaithCore</Link>
             </div>
           </div>
 
           <aside className="command-surface" aria-label="SCRIMED command surface preview">
             <div className="surface-header">
               <span>Buyer Proof Center</span>
-              <strong>Ready to evaluate</strong>
+              <strong>Pre-commercial evaluation</strong>
             </div>
             <div className="signal-grid">
               {readinessSignals.slice(0, 10).map((signal) => (
@@ -363,10 +369,27 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section-band" aria-label="SCRIMED validation and evidence">
+        <div className="section-heading">
+          <p className="eyebrow">Validation and Evidence</p>
+          <h2>Building with clinicians, health systems, and innovators.</h2>
+          <p className="section-copy">
+            SCRIMED is developing trustworthy healthcare intelligence designed to support clinicians, care
+            teams, health systems, and patients. Verified pilot outcomes, case studies, and customer success
+            stories will be published only when supporting evidence and publication permissions are available.
+          </p>
+          <p className="section-copy">{currentProductStatusStatement}</p>
+          <div className="hero-actions">
+            <Link className="primary-action" href="/validation-evidence">Inspect current evidence</Link>
+            <Link className="secondary-action" href="/claims">Review public claims</Link>
+          </div>
+        </div>
+      </section>
+
       <section className="section-band" aria-label="SCRIMED buyer outcomes">
         <div className="section-heading">
-          <p className="eyebrow">Why buyers choose SCRIMED</p>
-          <h2>Healthcare AI is crowded. SCRIMED sells the missing layer: governed workflow intelligence with proof before production exposure.</h2>
+          <p className="eyebrow">Why teams evaluate SCRIMED</p>
+          <h2>Governed workflow intelligence with inspectable boundaries before production exposure.</h2>
         </div>
         <div className="principle-grid">
           {buyerOutcomeCards.map((card) => (
@@ -381,10 +404,11 @@ export default function Home() {
 
       <section className="table-section" aria-label="SCRIMED purchase options">
         <div className="section-heading">
-          <p className="eyebrow">What you can buy now</p>
-          <h2>Start with a clear commercial package, then expand only when the proof supports it.</h2>
+          <p className="eyebrow">Illustrative engagement paths</p>
+          <h2>Plan a bounded evaluation, then expand only when evidence and approvals support it.</h2>
           <p className="section-copy">
-            Public demos are free and no-PHI. Paid work begins when SCRIMED starts doing buyer-specific assessment, pilot, diligence, or protected evidence work.
+            Public demos are no-PHI and synthetic. Ranges are non-binding planning estimates, not checkout
+            prices or offers. Any paid work requires a separately reviewed agreement and approved scope.
           </p>
         </div>
         {buyerPurchaseOptions.map((option) => (
@@ -395,7 +419,7 @@ export default function Home() {
             </div>
             <p>{option.pitch}</p>
             <Link className="module-link" href={option.href}>
-              Scope this package
+              Discuss this path
             </Link>
           </article>
         ))}
@@ -514,6 +538,19 @@ export default function Home() {
             <h3>Workflow systems</h3>
             <p>Bring DocuTwin, CarePath, TrialCore, and reporting workflows into validated product paths.</p>
           </article>
+        </div>
+      </section>
+
+      <section className="section-band" aria-label="Public healthcare and AI boundaries">
+        <div className="section-heading">
+          <p className="eyebrow">Required public boundaries</p>
+          <h2>Human-supervised, synthetic-data and no-PHI by default.</h2>
+          <p className="section-copy">{publicHealthcareDataBoundary}</p>
+          <p className="section-copy">{medicalDisclaimer}</p>
+          <p className="section-copy">{aiLimitationStatement}</p>
+          <Link className="module-link" href="/legal/healthcare-ai-disclaimer">
+            Read the healthcare and AI disclaimer
+          </Link>
         </div>
       </section>
     </main>

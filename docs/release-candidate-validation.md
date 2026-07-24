@@ -30,6 +30,13 @@ The strict command executes:
 9. `node scripts/check-generated-integrity.mjs`
 10. Investor-deck review whenever the bounded deck is present, including when its exact output path is intentionally excluded from the application source candidate
 
+When `npm` is unavailable in a constrained desktop runtime, the validator executes
+the same repository-owned entrypoints through the current Node binary. The fallback
+retains secret scanning, SBOM verification, migration evidence, generated integrity,
+typecheck, lint, nonsecret tests, prebuild provenance, and the production build. Its
+use is recorded as `npm-unavailable-direct-node-fallback`; it does not skip or soften
+any release gate.
+
 The runner does not retain child-process output, raw diffs, paths, prompts, tokens, credentials, PHI, or slide text. It reports only command identifiers, exit state, normalized warning codes, candidate/source/artifact fingerprints, drift state, and a deterministic validation-evidence hash. The known macOS native-SWC/WASM fallback is therefore visible as a warning code without retaining the raw build log.
 
 ## Pass Meaning

@@ -68,8 +68,25 @@ const checks = [
     args: ["scripts/public-claims-integrity-contract-check.mjs"]
   },
   {
+    label: "public remediation contract",
+    args: ["scripts/public-remediation-contract-check.mjs"]
+  },
+  {
     label: "public-claims integrity policy self-test",
     args: ["scripts/public-claims-integrity-smoke.mjs", "--self-test"]
+  },
+  {
+    label: "public remediation policy tests",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/public-remediation-policy-test.mjs"
+    ]
+  },
+  {
+    label: "public release source verification",
+    args: ["scripts/verify-public-release.mjs"]
   },
   {
     label: "dependency security floor contract",
@@ -86,6 +103,14 @@ const checks = [
   {
     label: "SCRIMED migration evidence analyzer self-test",
     args: ["scripts/scrimed-migration-evidence-packet.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED pending-migration authorization self-test",
+    args: ["scripts/pending-migration-authorization-check.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED pending-migration static authorization check",
+    args: ["scripts/pending-migration-authorization-check.mjs", "--strict"]
   },
   {
     label: "AAL2 bearer-token policy",

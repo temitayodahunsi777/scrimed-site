@@ -65,7 +65,8 @@ for (const expected of [
   "npm run test:nonsecret",
   "npm run lint",
   "npm run typecheck",
-  "npm run build"
+  "npm run build",
+  "npm run verify:public-release"
 ]) {
   requireIncludes(".github/workflows/ci.yml", expected);
 }

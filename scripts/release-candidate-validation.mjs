@@ -8,6 +8,10 @@ const allowedArgs = new Set(["--json", "--strict", "--self-test"]);
 const unknownArgs = [...args].filter((arg) => !allowedArgs.has(arg));
 const commandTimeoutMs = 15 * 60 * 1000;
 const maximumCommandOutputBytes = 32 * 1024 * 1024;
+const directNode = (...commandArgs) => ({
+  executable: process.execPath,
+  args: commandArgs
+});
 
 if (unknownArgs.length > 0) {
   throw new Error(`Unsupported release candidate validation option: ${unknownArgs.join(", ")}`);
@@ -15,13 +19,63 @@ if (unknownArgs.length > 0) {
 
 const validationCommands = [
   { id: "git-diff-check", executable: "git", args: ["diff", "--check"], display: "git diff --check" },
-  { id: "secret-scan", executable: "npm", args: ["run", "security:secret-scan"], display: "npm run security:secret-scan" },
-  { id: "sbom", executable: "npm", args: ["run", "security:sbom"], display: "npm run security:sbom" },
-  { id: "migration-packet", executable: "npm", args: ["run", "release:migration-packet"], display: "npm run release:migration-packet" },
-  { id: "typecheck", executable: "npm", args: ["run", "typecheck"], display: "npm run typecheck" },
-  { id: "lint", executable: "npm", args: ["run", "lint"], display: "npm run lint" },
-  { id: "nonsecret-suite", executable: "npm", args: ["run", "test:nonsecret"], display: "npm run test:nonsecret" },
-  { id: "build", executable: "npm", args: ["run", "build"], display: "npm run build" },
+  {
+    id: "secret-scan",
+    executable: "npm",
+    args: ["run", "security:secret-scan"],
+    display: "npm run security:secret-scan",
+    fallbackStages: [directNode("scripts/scrimed-secret-scan.mjs")]
+  },
+  {
+    id: "sbom",
+    executable: "npm",
+    args: ["run", "security:sbom"],
+    display: "npm run security:sbom",
+    fallbackStages: [directNode("scripts/scrimed-sbom.mjs", "--verify")]
+  },
+  {
+    id: "migration-packet",
+    executable: "npm",
+    args: ["run", "release:migration-packet"],
+    display: "npm run release:migration-packet",
+    fallbackStages: [directNode("scripts/scrimed-migration-evidence-packet.mjs")]
+  },
+  {
+    id: "typecheck",
+    executable: "npm",
+    args: ["run", "typecheck"],
+    display: "npm run typecheck",
+    fallbackStages: [
+      directNode("scripts/check-generated-integrity.mjs"),
+      directNode("node_modules/typescript/bin/tsc", "--noEmit")
+    ]
+  },
+  {
+    id: "lint",
+    executable: "npm",
+    args: ["run", "lint"],
+    display: "npm run lint",
+    fallbackStages: [directNode("node_modules/eslint/bin/eslint.js", ".")]
+  },
+  {
+    id: "nonsecret-suite",
+    executable: "npm",
+    args: ["run", "test:nonsecret"],
+    display: "npm run test:nonsecret",
+    fallbackStages: [directNode("scripts/scrimed-nonsecret-test-suite.mjs")]
+  },
+  {
+    id: "build",
+    executable: "npm",
+    args: ["run", "build"],
+    display: "npm run build",
+    fallbackStages: [
+      directNode("scripts/clean-generated-cache.mjs"),
+      directNode("scripts/release-provenance-preflight.mjs", "--deployment-aware"),
+      directNode("scripts/check-generated-integrity.mjs"),
+      directNode("node_modules/next/dist/bin/next", "build", "--webpack")
+    ]
+  },
   {
     id: "generated-integrity",
     executable: process.execPath,
@@ -104,10 +158,11 @@ export function evaluateReleaseCandidateValidation(input) {
     artifactReviewRequired,
     candidateStable,
     sourceReviewReady,
-    checks: input.checkResults.map(({ id, passed, exitCode, warningCodes: checkWarnings = [] }) => ({
+    checks: input.checkResults.map(({ id, passed, exitCode, warningCodes: checkWarnings = [], executionMode = null }) => ({
       id,
       passed,
       exitCode,
+      executionMode,
       warningCodes: checkWarnings
     }))
   };
@@ -177,21 +232,59 @@ export function evaluateReleaseCandidateValidation(input) {
   };
 }
 
-function runCommand(executable, commandArgs) {
+function executeCommand(executable, commandArgs) {
   const resolvedExecutable = executable === "npm" && process.platform === "win32" ? "npm.cmd" : executable;
-  const result = spawnSync(resolvedExecutable, commandArgs, {
+  return spawnSync(resolvedExecutable, commandArgs, {
     encoding: "utf8",
     shell: false,
     timeout: commandTimeoutMs,
     maxBuffer: maximumCommandOutputBytes,
     env: process.env
   });
+}
+
+function summarizeCommandResult(result, inheritedWarnings = []) {
   const commandOutput = `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
   return {
     passed: result.status === 0 && !result.error,
     exitCode: Number.isInteger(result.status) ? result.status : null,
     timedOut: result.error?.code === "ETIMEDOUT",
-    warningCodes: classifyCommandWarnings(commandOutput)
+    warningCodes: [...new Set([...inheritedWarnings, ...classifyCommandWarnings(commandOutput)])]
+  };
+}
+
+function runCommand(command) {
+  const primary = executeCommand(command.executable, command.args);
+  if (
+    primary.error?.code !== "ENOENT"
+    || command.executable !== "npm"
+    || !Array.isArray(command.fallbackStages)
+  ) {
+    return {
+      ...summarizeCommandResult(primary),
+      executionMode: "package-manager"
+    };
+  }
+
+  let warningCodes = ["npm-unavailable-direct-node-fallback"];
+  for (const stage of command.fallbackStages) {
+    const result = executeCommand(stage.executable, stage.args);
+    const summary = summarizeCommandResult(result, warningCodes);
+    warningCodes = summary.warningCodes;
+    if (!summary.passed) {
+      return {
+        ...summary,
+        executionMode: "direct-node-fallback"
+      };
+    }
+  }
+
+  return {
+    passed: true,
+    exitCode: 0,
+    timedOut: false,
+    warningCodes,
+    executionMode: "direct-node-fallback"
   };
 }
 
@@ -225,14 +318,15 @@ async function validateCandidate({ quiet }) {
 
   for (const command of validationCommands) {
     if (!quiet) console.log(`run ${command.display}`);
-    const result = runCommand(command.executable, command.args);
+    const result = runCommand(command);
     checkResults.push({
       id: command.id,
       command: command.display,
       passed: result.passed,
       exitCode: result.exitCode,
       timedOut: result.timedOut,
-      warningCodes: result.warningCodes
+      warningCodes: result.warningCodes,
+      executionMode: result.executionMode
     });
     if (!quiet) console.log(`${result.passed ? "pass" : "fail"} ${command.id}`);
     if (!result.passed) break;

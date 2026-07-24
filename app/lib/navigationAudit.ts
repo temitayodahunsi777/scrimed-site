@@ -32,8 +32,8 @@ export type NavigationBottleneck = {
 
 export const navigationAuditProofStackStatus = "route-navigation-audit-active";
 export const navigationAuditBriefProofStackStatus = "route-navigation-audit-brief-ready";
-export const navigationAuditUpdatedAt = "2026-07-18";
-export const expectedApiRoutePatternCount = 443;
+export const navigationAuditUpdatedAt = "2026-07-23";
+export const expectedApiRoutePatternCount = 448;
 
 export const navigationAuditBoundary =
   "SCRIMED Navigation Audit organizes page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained approval boundaries into one operating map. It is an audit and navigation control surface only. It does not certify that every protected workflow has been executed, bypass AAL2, approve public release, authorize PHI processing, grant legal or clinical authority, certify security/compliance, or approve production connectors.";
@@ -103,6 +103,8 @@ export const pageRouteInventory = [
   "/investor-audience-readiness",
   "/investor-readiness",
   "/launch-readiness",
+  "/legal",
+  "/legal/[slug]",
   "/limitations-workarounds",
   "/market-activation",
   "/memory",
@@ -188,6 +190,7 @@ export const pageRouteInventory = [
   "/trust-center/[slug]",
   "/trust-os",
   "/trust-safety-operations",
+  "/validation-evidence",
   "/workflows",
   "/workflows/[slug]",
   "/workflows/audit-persistence",
@@ -207,6 +210,8 @@ export const pageRouteInventory = [
 ];
 
 export const smokeCoveredHtmlRoutes = [
+  "/validation-evidence",
+  "/legal",
   "/company-assessment",
   "/clinical-production-readiness",
   "/pilot-demo-commercial-readiness",

@@ -58,6 +58,10 @@ for (const expected of [
 for (const expected of [
   "private.p32_candidate_review_assignments",
   "private.p32_candidate_review_decisions",
+  "p32_candidate_review_assignments_workspace_tenant_fk",
+  "p32_candidate_review_decisions_workspace_tenant_fk",
+  "p32_candidate_review_decisions_assignment_scope_fk",
+  "references public.pilot_workspaces(id, tenant_id)",
   "array['tenant-admin', 'pilot-lead']",
   "array['reviewer']",
   "membership.status = 'active'",
