@@ -33,8 +33,16 @@ fallback executes the same repository-owned gates and does not authorize release
 - [ ] Shop/cart/store surfaces removed or separately authorized.
 - [ ] Desktop/mobile and canonical/metadata inspection complete.
 - [ ] `npm run smoke:wix-public-claims` passes against the published site.
+- [ ] `npm run smoke:wix-publication-verification` passes across the full Wix route, metadata,
+  structured-data, redirect, crawler, and commerce-boundary inventory.
+- [ ] `npm run smoke:public:local` passes and reports `server_stopped=true` plus generated
+  integrity, so no serving process remains attached to the build output.
 - [ ] DNS, redirects, TLS, sitemap, robots, cache, and build identifier verified.
 
 ## Authorization
+
+Record fingerprint-bound approvals only after the attributable candidate is committed, the
+worktree is clean, and candidate/source/artifact/validation fingerprints are regenerated.
+Earlier review preparation does not remain valid after the candidate identity changes.
 
 A passing checklist is engineering evidence only. Named Founder, legal, privacy, security, clinical/regulatory, marketing, deployment, and customer approvals remain separate where applicable.

@@ -33,6 +33,28 @@ node scripts/scrimed-local-quality-runner.mjs --preflight
 
 Where `npm` is available, `npm run quality:direct-node` invokes the same runner. The direct command remains canonical for constrained local environments.
 
+After a successful production build, run the public route smoke through the managed localhost-only lifecycle:
+
+```bash
+npm run smoke:public:local
+```
+
+This command owns the local Next server lifecycle: it rejects a busy port, starts the built
+application on `127.0.0.1`, waits for the operating-mode endpoint, runs the public smoke,
+shuts the server down on success or failure, and checks generated integrity afterward. It
+inherits only a small nonsecret environment allowlist, shadows every variable declared by
+local dotenv files, and forces PHI, protected-write, provider-call, clinical-execution,
+device, payer, EHR, and other consequential flags into their safe states. If serving the
+build produces duplicate-suffixed `.next` output, the runner fails, removes the corrupted
+generated output, and requires a clean rebuild instead of leaving later checks exposed to
+stale artifacts.
+
+Use a different unprivileged port when necessary:
+
+```bash
+node scripts/scrimed-local-public-smoke-runner.mjs --port=3051
+```
+
 ## Gate Order
 
 1. Generated-output cleanup

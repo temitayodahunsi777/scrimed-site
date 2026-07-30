@@ -3,18 +3,48 @@
 import { readFile, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-import {
+const rawArgs = process.argv.slice(2);
+const loaderActive = process.execArgv.some((value) =>
+  value.includes("ts-extension-loader.mjs")
+);
+
+if (!loaderActive) {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader",
+      fileURLToPath(new URL("./lib/ts-extension-loader.mjs", import.meta.url)),
+      fileURLToPath(import.meta.url),
+      ...rawArgs
+    ],
+    {
+      encoding: "utf8",
+      shell: false,
+      timeout: 20 * 60 * 1000,
+      maxBuffer: 32 * 1024 * 1024,
+      env: process.env
+    }
+  );
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  if (result.error) throw result.error;
+  process.exit(Number.isInteger(result.status) ? result.status : 1);
+}
+
+const {
   buildP32GateEvidencePacket,
   buildP32OperatorHandoff,
   buildP32OperatorHandoffMarkdown
-} from "../app/lib/scrimedP32GateEvidence.ts";
-import {
+} = await import("../app/lib/scrimedP32GateEvidence.ts");
+const {
   computeP32SupplementalEvidencePayloadHash,
   verifyP32SupplementalEvidenceAttestation
-} from "./lib/scrimed-p32-evidence-attestation.mjs";
+} = await import("./lib/scrimed-p32-evidence-attestation.mjs");
 
-const rawArgs = process.argv.slice(2);
 const flags = new Set(rawArgs.filter((arg) => !arg.startsWith("--evidence-file=")));
 const evidenceFileArg = rawArgs.find((arg) => arg.startsWith("--evidence-file="));
 const allowedFlags = new Set([
@@ -206,14 +236,22 @@ function runSelfTest() {
   if (!rejectedUnknownEvidence) throw new Error("SCRIMED p.32 evidence accepted an unregistered evidence type.");
   const handoff = buildP32OperatorHandoff(packet);
   const handoffMarkdown = buildP32OperatorHandoffMarkdown(handoff);
+  const commitAction = handoff.actions.find((action) => action.gateId === "clean-reviewed-source-commit");
   const deploymentAction = handoff.actions.find((action) => action.gateId === "deployment-authorization");
   const reviewerAction = handoff.actions.find((action) => action.gateId === "named-reviewer-approval");
+  const validationAction = handoff.actions.find((action) => action.gateId === "validation-evidence-integrity");
   if (
     !/^[0-9a-f]{64}$/.test(handoff.handoffHash) ||
     handoff.releasePromotionAllowed ||
     handoff.aggregateReleaseAuthorityGranted ||
     handoff.actionCount !== packet.unresolvedGates.length ||
-    reviewerAction?.executionState !== "READY_FOR_AUTHORIZED_OPERATOR" ||
+    handoff.readyActionCount !== 1 ||
+    commitAction?.executionState !== "READY_FOR_AUTHORIZED_OPERATOR" ||
+    commitAction.blockedByGateIds.length !== 0 ||
+    reviewerAction?.executionState !== "WAIT_FOR_PREREQUISITES" ||
+    !reviewerAction.blockedByGateIds.includes("clean-reviewed-source-commit") ||
+    validationAction?.executionState !== "WAIT_FOR_PREREQUISITES" ||
+    !validationAction.blockedByGateIds.includes("clean-reviewed-source-commit") ||
     deploymentAction?.executionState !== "WAIT_FOR_PREREQUISITES" ||
     deploymentAction.blockedByGateIds.length === 0 ||
     !handoffMarkdown.includes(packet.expectedFingerprints.sourceCommit) ||
@@ -221,6 +259,26 @@ function runSelfTest() {
     !handoffMarkdown.includes("Release promotion allowed: **false**")
   ) {
     throw new Error("SCRIMED p.32 operator handoff self-test failed.");
+  }
+
+  const cleanPacket = buildP32GateEvidencePacket({
+    ...input,
+    manifest: {
+      ...input.manifest,
+      dirtyEntryCount: 0,
+      strictProvenanceEligible: true
+    }
+  });
+  const cleanHandoff = buildP32OperatorHandoff(cleanPacket);
+  const cleanReviewerAction = cleanHandoff.actions.find(
+    (action) => action.gateId === "named-reviewer-approval"
+  );
+  if (
+    !cleanPacket.immutableProvenanceReady ||
+    cleanReviewerAction?.executionState !== "READY_FOR_AUTHORIZED_OPERATOR" ||
+    cleanReviewerAction.blockedByGateIds.length !== 0
+  ) {
+    throw new Error("SCRIMED p.32 clean-candidate approval sequencing self-test failed.");
   }
   console.log("pass SCRIMED p.32 candidate-bound release gate evidence self-test");
 }

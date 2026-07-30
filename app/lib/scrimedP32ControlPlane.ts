@@ -3,7 +3,11 @@ import {
   scrimedEvidenceOpsBenchmarkCard,
   scrimedBenchmarkLanes
 } from "./scrimedClinicalBenchmarkSuite";
-import { getConfiguredModelFitAliases } from "./scrimed-work/providerRegistry";
+import {
+  getConfiguredModelFitAliases,
+  scrimedDisabledModelEvaluationProfiles,
+  scrimedProviderConformanceVersion
+} from "./scrimed-work/providerRegistry";
 import { scrimedP32Boundary, scrimedP32ContractVersion } from "./scrimed-work/p32Contracts";
 import { getP32ReleaseGateCatalog, scrimedP32ReleaseGateBoundary } from "./scrimedP32ReleaseGates";
 import {
@@ -56,8 +60,43 @@ import {
   scrimedP32ArtifactLedgerVersion
 } from "./scrimedP32ArtifactLedger";
 import { scrimedP32RepoOpsBoundary, scrimedP32RepoOpsVersion } from "./scrimedP32RepoOps";
+import {
+  getHealthConversationFabricSummary,
+  scrimedP32HealthConversationFabricBoundary,
+  scrimedP32HealthConversationFabricVersion
+} from "./scrimedP32HealthConversationFabric";
+import {
+  getPatientRecordsSummary,
+  scrimedP32PatientRecordsBoundary,
+  scrimedP32PatientRecordsVersion
+} from "./scrimedP32PatientRecords";
+import {
+  getAgentExecutionSummary,
+  scrimedAgentExecutionBoundary,
+  scrimedAgentExecutionVersion
+} from "./scrimed-work/agentExecution";
+import {
+  getResearchIntelligenceSummary,
+  scrimedP32ResearchIntelligenceBoundary,
+  scrimedP32ResearchIntelligenceVersion
+} from "./scrimedP32ResearchIntelligence";
+import {
+  getOncologyIntelligenceSummary,
+  scrimedP32OncologyIntelligenceBoundary,
+  scrimedP32OncologyIntelligenceVersion
+} from "./scrimedP32OncologyIntelligence";
+import {
+  getNetworkIntelligenceSummary,
+  scrimedP32NetworkIntelligenceBoundary,
+  scrimedP32NetworkIntelligenceVersion
+} from "./scrimedP32NetworkIntelligence";
+import {
+  getImagingWorkflowIntelligenceSummary,
+  imagingWorkflowIntelligenceBoundary,
+  imagingWorkflowIntelligenceVersion
+} from "./imagingWorkflowIntelligence";
 
-export const scrimedP32ControlPlaneVersion = "scrimed-p32-control-plane-v2-2026-07-20";
+export const scrimedP32ControlPlaneVersion = "scrimed-p32-control-plane-v3-2026-07-28";
 
 export function getScrimedP32FeatureFlags(env: NodeJS.ProcessEnv = process.env) {
   return {
@@ -79,6 +118,16 @@ export function getScrimedP32FeatureFlags(env: NodeJS.ProcessEnv = process.env) 
     multimodalNormalizationEnabled: true,
     artifactLedgerEnabled: true,
     applicationRationalizationEnabled: true,
+    healthConversationFabricEnabled: env.SCRIMED_HEALTH_CONVERSATION_FABRIC_ENABLED !== "false",
+    containedAgentExecutionEnabled: env.SCRIMED_CONTAINED_AGENT_EXECUTION_ENABLED === "true",
+    ambientDocumentationEnabled: env.SCRIMED_AMBIENT_DOCUMENTATION_ENABLED === "true",
+    patientControlledRecordsEnabled: env.SCRIMED_PATIENT_CONTROLLED_RECORDS_ENABLED === "true",
+    trialFailureIntelligenceEnabled: env.SCRIMED_TRIAL_FAILURE_INTELLIGENCE_ENABLED === "true",
+    biologicalSignatureRetrievalEnabled: env.SCRIMED_BIOLOGICAL_SIGNATURE_RETRIEVAL_ENABLED === "true",
+    imagingQueueRecommendationsEnabled: env.SCRIMED_IMAGING_QUEUE_RECOMMENDATIONS_ENABLED === "true",
+    mrdIntelligenceEnabled: env.SCRIMED_MRD_INTELLIGENCE_ENABLED === "true",
+    providerConformanceEnabled: env.SCRIMED_PROVIDER_CONFORMANCE_ENABLED !== "false",
+    networkIntelligenceEnabled: env.SCRIMED_NETWORK_INTELLIGENCE_ENABLED === "true",
     rcmVoiceEnabled: isP32RcmVoiceEnabled(env),
     rcmVoiceExternalCallsEnabled: false,
     rcmVoiceWritebackEnabled: false
@@ -124,7 +173,31 @@ export function getScrimedP32ControlPlaneSummary(env: NodeJS.ProcessEnv = proces
       "ExecutionGrant",
       "NormalizedMultimodalFact",
       "ArtifactRevision",
-      "DeveloperSessionReceipt"
+      "DeveloperSessionReceipt",
+      "PatientCopilotPolicy",
+      "ClinicianCopilotPolicy",
+      "HealthContextBoundary",
+      "ContextGrant",
+      "SharedEncounterBrief",
+      "ConversationHandoff",
+      "ActionPolicy",
+      "ActionAuthorization",
+      "AgentEnvironmentSpec",
+      "SnapshotManifest",
+      "ForkGrant",
+      "WorkloadIdentity",
+      "CapabilityLease",
+      "RunReceipt",
+      "AgentTrace",
+      "AmbientEncounterDraft",
+      "PatientDataGrant",
+      "TrialFailureInvestigation",
+      "BiologicalEmbeddingProvider",
+      "ImagingModelCard",
+      "MRDTestProfile",
+      "ProviderConformanceRun",
+      "FacilityPerformanceNode",
+      "PriorAuthorizationProportionalityAnalysis"
     ],
     clinicalSearchFabric: {
       version: clinicalSearchFabricVersion,
@@ -157,6 +230,8 @@ export function getScrimedP32ControlPlaneSummary(env: NodeJS.ProcessEnv = proces
     },
     modelFit: {
       aliases: modelFitAliases,
+      providerConformanceVersion: scrimedProviderConformanceVersion,
+      disabledEvaluationProfiles: scrimedDisabledModelEvaluationProfiles,
       routeBasis: [
         "clinical risk",
         "tenant policy",
@@ -169,6 +244,46 @@ export function getScrimedP32ControlPlaneSummary(env: NodeJS.ProcessEnv = proces
       ],
       silentFallbackAllowed: false,
       unmeasuredClinicalPromotionAllowed: false
+    },
+    healthConversationFabric: {
+      ...getHealthConversationFabricSummary(),
+      version: scrimedP32HealthConversationFabricVersion,
+      enabled: featureFlags.healthConversationFabricEnabled,
+      boundary: scrimedP32HealthConversationFabricBoundary
+    },
+    containedAgentExecution: {
+      ...getAgentExecutionSummary(),
+      version: scrimedAgentExecutionVersion,
+      enabled: featureFlags.containedAgentExecutionEnabled,
+      boundary: scrimedAgentExecutionBoundary
+    },
+    patientRecords: {
+      ...getPatientRecordsSummary(),
+      version: scrimedP32PatientRecordsVersion,
+      ambientDocumentationEnabled: featureFlags.ambientDocumentationEnabled,
+      patientControlledRecordsEnabled: featureFlags.patientControlledRecordsEnabled,
+      boundary: scrimedP32PatientRecordsBoundary
+    },
+    researchIntelligence: {
+      ...getResearchIntelligenceSummary(env),
+      version: scrimedP32ResearchIntelligenceVersion,
+      boundary: scrimedP32ResearchIntelligenceBoundary
+    },
+    imagingControlPlane: {
+      ...getImagingWorkflowIntelligenceSummary(),
+      version: imagingWorkflowIntelligenceVersion,
+      queueRecommendationsEnabled: featureFlags.imagingQueueRecommendationsEnabled,
+      boundary: imagingWorkflowIntelligenceBoundary
+    },
+    oncologyIntelligence: {
+      ...getOncologyIntelligenceSummary(env),
+      version: scrimedP32OncologyIntelligenceVersion,
+      boundary: scrimedP32OncologyIntelligenceBoundary
+    },
+    networkIntelligence: {
+      ...getNetworkIntelligenceSummary(env),
+      version: scrimedP32NetworkIntelligenceVersion,
+      boundary: scrimedP32NetworkIntelligenceBoundary
     },
     workflowControls: {
       version: scrimedP32WorkflowControlsVersion,

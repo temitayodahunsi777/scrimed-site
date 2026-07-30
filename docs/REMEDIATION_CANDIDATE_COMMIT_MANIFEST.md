@@ -62,16 +62,26 @@ generated cache, build output, or local environment state.
 
 - `.github/workflows/ci.yml`
 - `package.json`
+- `config/wix-publication-policy.json`
 - `scripts/lib/public-claims-policy.mjs`
+- `scripts/lib/wix-publication-policy.mjs`
 - `scripts/pending-migration-authorization-check.mjs`
 - `scripts/public-claims-integrity-smoke.mjs`
 - `scripts/public-production-smoke.mjs`
 - `scripts/release-candidate-validation.mjs`
+- `app/lib/scrimedP32GateEvidence.ts`
 - `scripts/scrimed-nonsecret-test-suite.mjs`
 - `scripts/verify-public-release.mjs`
+- `scripts/wix-publication-verification.mjs`
+- `scripts/wix-publication-verification-contract-check.mjs`
+- `scripts/scrimed-local-public-smoke-runner.mjs`
+- `scripts/scrimed-local-public-smoke-runner-contract-check.mjs`
 - `docs/release-candidate-validation.md`
+- `docs/local-quality-runner.md`
 - `docs/REMEDIATION_DEPLOYMENT_AUTHORIZATION_PACKAGE.md`
 - `docs/RELEASE_VERIFICATION_CHECKLIST.md`
+- `docs/WIX_OPERATOR_EXECUTION_PACKET.md`
+- `docs/WIX_PUBLICATION_VERIFICATION_REPORT.md`
 
 ## Governance Documentation
 

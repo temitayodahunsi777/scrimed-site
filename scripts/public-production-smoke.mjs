@@ -4,7 +4,10 @@ import { readdir } from "node:fs/promises";
 import { redactSensitive } from "./lib/aal2-token-policy.mjs";
 
 const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.com").replace(/\/$/, "");
-const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG ?? "atlas-synthetic-evaluation";
+const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG?.trim() || "atlas-synthetic-evaluation";
+if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(workspaceSlug)) {
+  throw new Error("SCRIMED_WORKSPACE_SLUG must be a bounded lowercase workspace slug.");
+}
 
 function endpoint(path) {
   return `${baseUrl}${path}`;

@@ -1,31 +1,31 @@
 # External System Actions Required
 
-## P0 - Wix Marketing Site
+## P0 - Wix Marketing Site — Resolved And Expanded 2026-07-27
 
-**Owner:** Founder/site owner with Legal, Privacy, Clinical Safety, and Marketing review.
+**Owner:** Founder/site owner.
 
-Cache-bypassed verification on 2026-07-23 confirmed that the published Wix homepage no longer
-renders the named testimonial, street address, or Shop navigation in its current page body.
-The visible hero now uses governed, no-PHI, human-review language. The published HTML still
-contains faith-first title/description metadata, unverified Atlanta/telephone Organization
-JSON-LD, and an unsafe vitals blog excerpt injected by the homepage post list. Static Wix Editor
-SEO fields are not controlled by this repository, and the documented Wix REST API exposes tag
-resolution rather than safe mutation of those fields.
+The Wix-controlled public-claims remediation was completed through the authenticated Editor,
+published, and directly verified. The production site now has:
 
-Required actions:
+- Atlas-first homepage SEO and Open Graph metadata;
+- conservative Organization JSON-LD without address or telephone;
+- synthetic-only Vitals language and explicit clinical boundaries;
+- optional, clinically neutral FaithCore positioning;
+- no named testimonial, review/rating schema, template store products, or active store category;
+- canonical HTTPS www URLs and consistent redirects;
+- clean desktop and 390px mobile About-page rendering;
+- a passing strict publication smoke across 17 pages, six crawler files, redirects, retired
+  store routes, and noindexed Booking system routes.
 
-1. Set the homepage SEO title to `SCRIMED | Governed Healthcare Intelligence`.
-2. Set the homepage description to `SCRIMED develops trustworthy, interoperable, human-supervised healthcare intelligence workflows. Synthetic demonstration only; do not submit PHI.`
-3. Remove the Organization JSON-LD `telephone` and `address` values unless Founder and counsel verify them. Retain only name, canonical URL, verified email, and formally approved social profiles.
-4. Replace or unpublish the vitals post excerpt that promises `real-time, predictive, and faith-centered patient monitoring`; use the synthetic-only copy in `docs/WIX_METADATA_IMPLEMENTATION_CHECKLIST.md`.
-5. Keep the current testimonial-free Validation and Evidence section. Add customer outcomes only after evidence and publication permission exist.
-6. Keep Shop/cart/checkout surfaces unpublished. Review whether the installed Wix Stores app has dependencies before an authorized site owner removes it.
-7. Keep FaithCore on a distinct optional page/path and use the exact neutrality statement from `app/lib/legalPolicies.ts`.
-8. Add no-PHI warnings and privacy consent to all Forms, Chat, Bookings, uploads, and free-text fields. Keep unrestricted voice intake disabled.
-9. Add or link the interim legal pages, then replace them only after counsel approval.
-10. Preview desktop/mobile, inspect Wix change history for unrelated drafts, obtain named approval, publish, purge cache if needed, and run `npm run smoke:wix-public-claims`.
+The detailed execution and verification evidence is in:
 
-The exact field-by-field procedure is in `docs/WIX_METADATA_IMPLEMENTATION_CHECKLIST.md`.
+- `docs/WIX_OPERATOR_EXECUTION_PACKET.md`
+- `docs/WIX_PUBLICATION_VERIFICATION_REPORT.md`
+
+Wix Bookings retains noindexed `/cart-page` and `/thank-you-page` system routes. They are not
+Wix Stores catalog pages and are absent from the sitemap. Removing them would require removing
+the legitimate Book Online flow, so no removal is required unless the Founder chooses to retire
+public booking.
 
 ## P0 - Legal And Business Identity
 
@@ -33,11 +33,15 @@ The exact field-by-field procedure is in `docs/WIX_METADATA_IMPLEMENTATION_CHECK
 
 Verify legal entity, public address decision, jurisdiction, governing law, privacy posture, terms, cookie inventory, refund terms, accessibility scope, healthcare disclaimer, processors, retention, and international coverage.
 
-## P1 - Domain, DNS, CDN, And SEO
+## P1 - Domain Ownership And External Records
 
 **Owner:** Founder + domain/deployment administrator.
 
-Verify `https://www.scrimedsolutions.com` and `https://scrimedsolutions.com` redirect/canonical behavior, HTTPS, DNS ownership, Wix/Vercel responsibilities, sitemap, robots, Open Graph, structured data, stale service workers, and cache purge. Do not change registrar records without a reviewed rollback plan.
+Published HTTP/HTTPS, www/non-www redirects, canonical URLs, Open Graph, structured data,
+robots, and nested sitemaps passed the direct 2026-07-27 verification. The Founder and domain
+administrator must still maintain registrar ownership, renewal, recovery contacts, DNS-change
+control, and the Wix/Vercel responsibility map. Do not change registrar records without a
+reviewed rollback plan.
 
 ## P1 - Vercel, GitHub, And Supabase
 

@@ -199,6 +199,21 @@ Gate states are `PASS`, `FAIL`, `BLOCKED`, `OPERATOR_REQUIRED`, or `NOT_APPLICAB
 | EHR writeback | Blocked | Connector certification decision, customer approval, safety validation, rollback |
 | Certification or customer go-live claims | Blocked | Exact issued evidence and named authority approval |
 
+## Role-Specific Clinical Operations Extension
+
+The July 2026 clinical-operations extension remains inside the p.32 control plane:
+
+- `scrimedP32HealthConversationFabric.ts` separates MyVitals AI/CareExplain patient authority from Sanar AI/Perfect Chart clinician authority and requires revocable grants for cross-domain context.
+- `scrimed-work/agentExecution.ts` adds synthetic contained execution with default-deny egress, fresh fork identities, short-lived leases, snapshot scrubbing, causal traces, and emergency revocation.
+- `scrimedP32PatientRecords.ts` adds consent, audio retention, clinician-reviewed ambient drafts, revocable patient data grants, and source-preserving longitudinal manifests.
+- `scrimedP32ResearchIntelligence.ts` extends TrialCore evidence semantics and adds research-only biological similarity with study-level leakage controls.
+- `imagingWorkflowIntelligence.ts` adds offline/shadow model admission, DICOM contracts, site validation, recommendation-only queue safeguards, and radiologist override.
+- `scrimedP32OncologyIntelligence.ts` preserves MRD assay-specific provenance and blocks invalid cross-assay trend construction.
+- The existing provider registry and router now support exact artifact manifests, conformance evidence, task-specific promotion, safe abstention, and rollback.
+- `scrimedP32NetworkIntelligence.ts` preserves site and subgroup variance and limits prior-authorization analysis to human-reviewable policy research.
+
+Higher-risk functions default off. The extension creates no live connector, database migration, clinical authority, payer mutation, EHR writeback, production deployment, or customer activation path. The full contract and operator boundaries are documented in `docs/scrimed-p32-clinical-operations.md`.
+
 ## Rollback
 
 - Model routes: open the provider circuit, activate the global/workflow kill switch, preserve the route decision, and hand off safely. Never downgrade privacy or evidence checks.

@@ -15,6 +15,16 @@ export type ScrimedWorkFeatureFlags = {
   clinicalAssuranceDurableStoreEnabled: boolean;
   supplierContinuityAutomationEnabled: boolean;
   externalImagingAdaptersEnabled: boolean;
+  healthConversationFabricEnabled: boolean;
+  containedAgentExecutionEnabled: boolean;
+  ambientDocumentationEnabled: boolean;
+  patientControlledRecordsEnabled: boolean;
+  trialFailureIntelligenceEnabled: boolean;
+  biologicalSignatureRetrievalEnabled: boolean;
+  imagingQueueRecommendationsEnabled: boolean;
+  mrdIntelligenceEnabled: boolean;
+  providerConformanceEnabled: boolean;
+  networkIntelligenceEnabled: boolean;
   consequentialActionsEnabled: boolean;
 };
 
@@ -43,6 +53,16 @@ export function getScrimedWorkFeatureFlags(env: NodeJS.ProcessEnv = process.env)
     clinicalAssuranceDurableStoreEnabled: envBoolean("SCRIMED_CLINICAL_ASSURANCE_DURABLE_STORE_ENABLED", false, env),
     supplierContinuityAutomationEnabled: envBoolean("SCRIMED_SUPPLIER_CONTINUITY_AUTOMATION_ENABLED", false, env),
     externalImagingAdaptersEnabled: envBoolean("SCRIMED_EXTERNAL_IMAGING_ADAPTERS_ENABLED", false, env),
+    healthConversationFabricEnabled: envBoolean("SCRIMED_HEALTH_CONVERSATION_FABRIC_ENABLED", true, env),
+    containedAgentExecutionEnabled: envBoolean("SCRIMED_CONTAINED_AGENT_EXECUTION_ENABLED", false, env),
+    ambientDocumentationEnabled: envBoolean("SCRIMED_AMBIENT_DOCUMENTATION_ENABLED", false, env),
+    patientControlledRecordsEnabled: envBoolean("SCRIMED_PATIENT_CONTROLLED_RECORDS_ENABLED", false, env),
+    trialFailureIntelligenceEnabled: envBoolean("SCRIMED_TRIAL_FAILURE_INTELLIGENCE_ENABLED", false, env),
+    biologicalSignatureRetrievalEnabled: envBoolean("SCRIMED_BIOLOGICAL_SIGNATURE_RETRIEVAL_ENABLED", false, env),
+    imagingQueueRecommendationsEnabled: envBoolean("SCRIMED_IMAGING_QUEUE_RECOMMENDATIONS_ENABLED", false, env),
+    mrdIntelligenceEnabled: envBoolean("SCRIMED_MRD_INTELLIGENCE_ENABLED", false, env),
+    providerConformanceEnabled: envBoolean("SCRIMED_PROVIDER_CONFORMANCE_ENABLED", true, env),
+    networkIntelligenceEnabled: envBoolean("SCRIMED_NETWORK_INTELLIGENCE_ENABLED", false, env),
     consequentialActionsEnabled: envBoolean("SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED", false, env)
   };
 }
@@ -65,6 +85,16 @@ export function scrimedWorkFeatureFlagHeaders(flags = getScrimedWorkFeatureFlags
     "X-SCRIMED-Clinical-Assurance-Durable-Store": flags.clinicalAssuranceDurableStoreEnabled ? "enabled" : "disabled",
     "X-SCRIMED-Supplier-Continuity-Automation": flags.supplierContinuityAutomationEnabled ? "enabled" : "disabled",
     "X-SCRIMED-External-Imaging-Adapters": flags.externalImagingAdaptersEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Health-Conversation-Fabric": flags.healthConversationFabricEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Contained-Agent-Execution": flags.containedAgentExecutionEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Ambient-Documentation": flags.ambientDocumentationEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Patient-Controlled-Records": flags.patientControlledRecordsEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Trial-Failure-Intelligence": flags.trialFailureIntelligenceEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Biological-Signature-Retrieval": flags.biologicalSignatureRetrievalEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Imaging-Queue-Recommendations": flags.imagingQueueRecommendationsEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-MRD-Intelligence": flags.mrdIntelligenceEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Provider-Conformance": flags.providerConformanceEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Network-Intelligence": flags.networkIntelligenceEnabled ? "enabled" : "disabled",
     "X-SCRIMED-Consequential-Actions-Enabled": flags.consequentialActionsEnabled ? "true" : "false"
   };
 }

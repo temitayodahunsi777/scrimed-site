@@ -1,0 +1,203 @@
+{
+  "version": "2026-07-27.wix-publication-v1",
+  "baseUrl": "https://www.scrimedsolutions.com",
+  "scanRoutes": [
+    "/",
+    "/vitals-monitoring",
+    "/faithcore",
+    "/partner-with-scrimed",
+    "/request-a-demo",
+    "/about-scrimed",
+    "/blog",
+    "/blank",
+    "/blank-1",
+    "/blank-2",
+    "/blank-3",
+    "/book-online",
+    "/service-page/ai-vitals-monitoring",
+    "/service-page/faithcore-integration",
+    "/service-page/voice-intake-assistants",
+    "/post/ai-vitals-monitoring-sensor-integrations-alert-thresholds-trend-dashboards-faithcore-overlay",
+    "/post/introducing-faithcore-where-spiritual-support-meets-clinical-care"
+  ],
+  "requiredMetadata": [
+    {
+      "path": "/",
+      "title": "SCRIMED | Trustworthy Healthcare Intelligence and AI-Enabled Workflows",
+      "description": "SCRIMED develops trustworthy, human-supervised healthcare intelligence and AI-enabled workflows for clinicians, care teams, health systems, payers, researchers, and patients. Current public experiences are demonstration and synthetic-data environments unless separately validated and approved.",
+      "ogTitle": "SCRIMED | Trustworthy Healthcare Intelligence",
+      "ogDescription": "Human-supervised healthcare intelligence and AI-enabled workflows designed to support clinicians, care teams, health systems, payers, researchers, and patients."
+    },
+    {
+      "path": "/vitals-monitoring",
+      "title": "SCRIMED Vitals Monitoring | Synthetic Demonstration",
+      "description": "SCRIMED Vitals Monitoring is a synthetic-data demonstration and workflow concept for visualizing configured test signals and reviewable trends. It is not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making.",
+      "ogTitle": "SCRIMED Vitals Monitoring | Synthetic Demonstration",
+      "ogDescription": "SCRIMED Vitals Monitoring is a synthetic-data demonstration and workflow concept for visualizing configured test signals and reviewable trends. It is not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making."
+    },
+    {
+      "path": "/faithcore",
+      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+      "description": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
+      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+      "ogDescription": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
+    },
+    {
+      "path": "/partner-with-scrimed",
+      "title": "Partner With SCRIMED | Governed Healthcare AI Pilots",
+      "description": "Explore governed, no-PHI SCRIMED demonstrations and synthetic pilots for healthcare organizations, research teams, and technology partners. Human review remains required for consequential actions.",
+      "ogTitle": "Partner With SCRIMED | Governed Healthcare AI Pilots",
+      "ogDescription": "Explore governed, no-PHI SCRIMED demonstrations and synthetic pilots for healthcare organizations, research teams, and technology partners. Human review remains required for consequential actions."
+    },
+    {
+      "path": "/request-a-demo",
+      "title": "Request a SCRIMED Demo | No-PHI Synthetic Evaluation",
+      "description": "Request a non-clinical SCRIMED demonstration using synthetic data. Do not submit PHI, medical records, diagnoses, treatment information, or emergency details.",
+      "ogTitle": "Request a SCRIMED Demo | No-PHI Synthetic Evaluation",
+      "ogDescription": "Request a non-clinical SCRIMED demonstration using synthetic data. Do not submit PHI, medical records, diagnoses, treatment information, or emergency details."
+    },
+    {
+      "path": "/about-scrimed",
+      "title": "About SCRIMED | Trustworthy Healthcare Intelligence",
+      "description": "Learn how SCRIMED is developing trustworthy, interoperable, and human-supervised healthcare intelligence for clinicians, care teams, health systems, payers, researchers, and patients.",
+      "ogTitle": "About SCRIMED | Trustworthy Healthcare Intelligence",
+      "ogDescription": "Learn how SCRIMED is developing trustworthy, interoperable, and human-supervised healthcare intelligence for clinicians, care teams, health systems, payers, researchers, and patients."
+    },
+    {
+      "path": "/blog",
+      "title": "SCRIMED Insights | Healthcare AI Governance and Workflows",
+      "description": "Read SCRIMED perspectives on governed healthcare AI, interoperability, synthetic workflow demonstrations, clinical safety, and human-supervised operations.",
+      "ogTitle": "SCRIMED Insights | Healthcare AI Governance and Workflows",
+      "ogDescription": "Read SCRIMED perspectives on governed healthcare AI, interoperability, synthetic workflow demonstrations, clinical safety, and human-supervised operations."
+    },
+    {
+      "path": "/blank",
+      "title": "Privacy Policy | SCRIMED",
+      "description": "Review SCRIMED's interim privacy policy for public demonstration experiences. Do not submit PHI, medical records, diagnoses, treatment information, or emergency details.",
+      "ogTitle": "Privacy Policy | SCRIMED",
+      "ogDescription": "Review SCRIMED's interim privacy policy for public demonstration experiences. Do not submit PHI, medical records, diagnoses, treatment information, or emergency details."
+    },
+    {
+      "path": "/blank-1",
+      "title": "Accessibility Statement | SCRIMED",
+      "description": "Review SCRIMED's accessibility statement and commitment to inclusive public digital experiences.",
+      "ogTitle": "Accessibility Statement | SCRIMED",
+      "ogDescription": "Review SCRIMED's accessibility statement and commitment to inclusive public digital experiences."
+    },
+    {
+      "path": "/blank-2",
+      "title": "Terms and Conditions | SCRIMED",
+      "description": "Review interim terms for SCRIMED's public synthetic-data demonstrations and workflow tools. SCRIMED does not provide medical advice or autonomous clinical care.",
+      "ogTitle": "Terms and Conditions | SCRIMED",
+      "ogDescription": "Review interim terms for SCRIMED's public synthetic-data demonstrations and workflow tools. SCRIMED does not provide medical advice or autonomous clinical care."
+    },
+    {
+      "path": "/blank-3",
+      "title": "Refund Policy | SCRIMED",
+      "description": "Review SCRIMED's interim refund policy for eligible consultations and demonstration services. Subject to legal review before commercial healthcare deployment.",
+      "ogTitle": "Refund Policy | SCRIMED",
+      "ogDescription": "Review SCRIMED's interim refund policy for eligible consultations and demonstration services. Subject to legal review before commercial healthcare deployment."
+    },
+    {
+      "path": "/book-online",
+      "title": "Book a SCRIMED Demonstration | No-PHI Evaluation",
+      "description": "Schedule a non-clinical SCRIMED demonstration using synthetic data. Do not submit PHI, medical records, diagnoses, treatment information, or emergency details.",
+      "ogTitle": "Book a SCRIMED Demonstration | No-PHI Evaluation",
+      "ogDescription": "Schedule a non-clinical SCRIMED demonstration using synthetic data. Do not submit PHI, medical records, diagnoses, treatment information, or emergency details."
+    },
+    {
+      "path": "/service-page/ai-vitals-monitoring",
+      "title": "SCRIMED Vitals Monitoring | Synthetic Demonstration",
+      "description": "A synthetic-data workflow concept for visualizing configured test signals and reviewable trends. Not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making.",
+      "ogTitle": "SCRIMED Vitals Monitoring | Synthetic Demonstration",
+      "ogDescription": "A synthetic-data workflow concept for visualizing configured test signals and reviewable trends. Not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making."
+    },
+    {
+      "path": "/service-page/faithcore-integration",
+      "title": "FaithCore Integration by SCRIMED | Optional Faith-Aligned Experience",
+      "description": "An optional, user-selected faith-aligned engagement experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
+      "ogTitle": "FaithCore Integration by SCRIMED | Optional Faith-Aligned Experience",
+      "ogDescription": "An optional, user-selected faith-aligned engagement experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
+    },
+    {
+      "path": "/service-page/voice-intake-assistants",
+      "title": "SCRIMED Voice Intake | Synthetic Workflow Demonstration",
+      "description": "A synthetic-data concept for multilingual administrative intake workflows. It does not accept PHI, make clinical decisions, or replace human review.",
+      "ogTitle": "SCRIMED Voice Intake | Synthetic Workflow Demonstration",
+      "ogDescription": "A synthetic-data concept for multilingual administrative intake workflows. It does not accept PHI, make clinical decisions, or replace human review."
+    },
+    {
+      "path": "/post/ai-vitals-monitoring-sensor-integrations-alert-thresholds-trend-dashboards-faithcore-overlay",
+      "title": "SCRIMED Vitals Monitoring | Synthetic Demonstration",
+      "description": "SCRIMED Vitals Monitoring is a synthetic-data demonstration and workflow concept for visualizing configured test signals and reviewable trends. It is not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making.",
+      "ogTitle": "SCRIMED Vitals Monitoring | Synthetic Demonstration",
+      "ogDescription": "SCRIMED Vitals Monitoring is a synthetic-data demonstration and workflow concept for visualizing configured test signals and reviewable trends. It is not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making."
+    },
+    {
+      "path": "/post/introducing-faithcore-where-spiritual-support-meets-clinical-care",
+      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+      "description": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
+      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+      "ogDescription": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
+    }
+  ],
+  "faithSpecificRoutes": [
+    "/faithcore",
+    "/service-page/faithcore-integration",
+    "/post/introducing-faithcore-where-spiritual-support-meets-clinical-care"
+  ],
+  "faithFirstEnterpriseMarkers": [
+    "faith-driven ai",
+    "faith-based healthcare",
+    "spiritual technology",
+    "spiritual governance"
+  ],
+  "forbiddenJsonLdTypes": [
+    "Review",
+    "AggregateRating",
+    "LocalBusiness",
+    "MedicalOrganization"
+  ],
+  "forbiddenJsonLdKeys": [
+    "address",
+    "telephone",
+    "geo",
+    "openingHours",
+    "aggregateRating",
+    "review"
+  ],
+  "retiredStoreRoutes": [
+    "/category/all-products",
+    "/product-page/i-m-a-product"
+  ],
+  "allowedRetiredRouteStatuses": [
+    404,
+    410
+  ],
+  "redirectSources": [
+    "https://scrimedsolutions.com/",
+    "http://scrimedsolutions.com/",
+    "http://www.scrimedsolutions.com/"
+  ],
+  "crawlerFiles": [
+    "/robots.txt",
+    "/sitemap.xml",
+    "/pages-sitemap.xml",
+    "/booking-services-sitemap.xml",
+    "/blog-posts-sitemap.xml",
+    "/blog-categories-sitemap.xml"
+  ],
+  "forbiddenCrawlerMarkers": [
+    "wixsite.com",
+    "editor.wix.com",
+    "store-products-sitemap",
+    "store-categories-sitemap",
+    "/category/all-products",
+    "/product-page/",
+    "/shop"
+  ],
+  "noIndexBookingSystemRoutes": [
+    "/cart-page",
+    "/thank-you-page"
+  ]
+}

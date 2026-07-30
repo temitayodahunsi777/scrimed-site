@@ -116,6 +116,7 @@ export * from "./scheduleDefinitions";
 export * from "./learningLoop";
 export * from "./foundry";
 export * from "./governedRuntime";
+export * from "./agentExecution";
 export * from "./migrationSet";
 export * from "./valueTelemetry";
 export * from "./audit";

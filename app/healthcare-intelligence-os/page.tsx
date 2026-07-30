@@ -278,6 +278,84 @@ export default function HealthcareIntelligenceOSPage() {
             </ul>
           </article>
           <article>
+            <span>{summary.p32ControlPlane.healthConversationFabric.enabled ? "policy active" : "disabled"}</span>
+            <h3>Role-specific health conversation fabric</h3>
+            <p>
+              MyVitals AI and CareExplain remain patient-facing, while Sanar AI and Perfect Chart remain clinician-facing.
+              Identity, memory, tools, grants, and actions stay isolated across roles and contexts.
+            </p>
+            <ul className="compact-list">
+              <li>Cross-domain default: {summary.p32ControlPlane.healthConversationFabric.crossDomainDefault}</li>
+              <li>Named clinician review: required</li>
+              <li>EHR writeback: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.containedAgentExecution.enabled ? "synthetic lab enabled" : "disabled by default"}</span>
+            <h3>Contained AgentOps</h3>
+            <p>
+              Ephemeral tenant isolation, default-deny egress, short-lived capability leases, fresh fork identities,
+              digest-only snapshots, and one causal trace constrain synthetic agent runs.
+            </p>
+            <ul className="compact-list">
+              <li>Isolation: {summary.p32ControlPlane.containedAgentExecution.isolation}</li>
+              <li>Emergency stop: enabled and tested</li>
+              <li>Production execution authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.patientRecords.ambientMode}</span>
+            <h3>Ambient and patient-controlled records</h3>
+            <p>
+              Consent, retention, source coverage, clinician edits, revocation, and deletion receipts support synthetic
+              documentation and longitudinal-record evaluation without autonomous record inclusion.
+            </p>
+            <ul className="compact-list">
+              <li>Raw audio default: {summary.p32ControlPlane.patientRecords.rawAudioDefault}</li>
+              <li>Patient grants: purpose-bound and revocable</li>
+              <li>Training and secondary use: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.researchIntelligence.trialFailureIntelligenceEnabled ? "synthetic lab enabled" : "disabled by default"}</span>
+            <h3>TrialCore failure and biological research</h3>
+            <p>
+              Registry evidence, contradictions, hypotheses, adversarial review, study-level holdouts, and deterministic
+              biological similarity remain clearly classified and separated from clinical action.
+            </p>
+            <ul className="compact-list">
+              <li>Evidence classes: {summary.p32ControlPlane.researchIntelligence.evidenceClassifications.length}</li>
+              <li>Independent human review: required</li>
+              <li>Enrollment and clinical action: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.imagingControlPlane.queueRecommendationsEnabled ? "synthetic recommendation enabled" : "disabled by default"}</span>
+            <h3>Imaging and MRD control planes</h3>
+            <p>
+              Imaging models require offline, shadow, contract, and site validation before recommendation-only queue use.
+              MRD observations retain assay-specific provenance and cannot be trended without validated comparability.
+            </p>
+            <ul className="compact-list">
+              <li>Radiologist override: retained</li>
+              <li>MRD comparability: required</li>
+              <li>Diagnosis, treatment, and ordering: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.networkIntelligence.enabled ? "synthetic analysis enabled" : "disabled by default"}</span>
+            <h3>Network and provider conformance</h3>
+            <p>
+              Site and subgroup variance remains visible while provider promotion depends on exact artifacts, task evidence,
+              conformance, canarying, and rollback rather than public leaderboard position.
+            </p>
+            <ul className="compact-list">
+              <li>Provider profiles: {summary.p32ControlPlane.modelFit.disabledEvaluationProfiles.length} disabled evaluation candidates</li>
+              <li>Coverage and payer mutation: prohibited</li>
+              <li>Silent model substitution: prohibited</li>
+            </ul>
+          </article>
+          <article>
             <span>{summary.p32ControlPlane.workflowControls.version}</span>
             <h3>Intent, trial, attention, and connector controls</h3>
             <p>

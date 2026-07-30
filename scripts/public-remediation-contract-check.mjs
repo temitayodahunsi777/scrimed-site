@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 
 const requiredFiles = [
   "config/public-claims-policy.json",
+  "config/wix-publication-policy.json",
   "config/pending-migration-authorization.json",
   ".env.example",
   "app/lib/companyIdentity.ts",
@@ -23,6 +24,8 @@ const requiredFiles = [
   "scripts/public-remediation-policy-test.mjs",
   "scripts/pending-migration-authorization-check.mjs",
   "scripts/verify-public-release.mjs",
+  "scripts/wix-publication-verification.mjs",
+  "scripts/wix-publication-verification-contract-check.mjs",
   "docs/CEO_APPROVED_REMEDIATION_PLAN.md",
   "docs/LEGAL_COUNSEL_REVIEW_REQUIRED.md",
   "docs/REGULATORY_INTENDED_USE_REGISTER.md",
@@ -35,7 +38,9 @@ const requiredFiles = [
   "docs/REMEDIATION_CANDIDATE_COMMIT_MANIFEST.md",
   "docs/REMEDIATION_DEPLOYMENT_AUTHORIZATION_PACKAGE.md",
   "docs/SUPABASE_SECURITY_OPERATOR_CHECKLIST.md",
-  "docs/WIX_METADATA_IMPLEMENTATION_CHECKLIST.md"
+  "docs/WIX_METADATA_IMPLEMENTATION_CHECKLIST.md",
+  "docs/WIX_OPERATOR_EXECUTION_PACKET.md",
+  "docs/WIX_PUBLICATION_VERIFICATION_REPORT.md"
 ];
 
 for (const pathname of requiredFiles) {

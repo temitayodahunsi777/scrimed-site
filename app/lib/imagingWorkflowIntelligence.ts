@@ -143,6 +143,144 @@ export type ImagingReviewEvent = {
   auditHash: string;
 };
 
+export type RegulatoryScope = {
+  jurisdiction: string;
+  status: "unverified" | "documented-requires-review" | "research-only";
+  intendedUseScope: string;
+  evidenceReferences: string[];
+  independentlyVerified: boolean;
+};
+
+export type ImagingModelCard = {
+  modelCardId: string;
+  modelId: string;
+  modelVersion: string;
+  artifactDigest: string;
+  intendedUse: string;
+  prohibitedUses: string[];
+  modalities: ImagingWorkflowInput["modality"][];
+  anatomy: string[];
+  regulatoryScopes: RegulatoryScope[];
+  evidenceGrade: "ungraded" | "preliminary" | "reviewed";
+  accountableOwner: string;
+  admittedModes: Array<"offline" | "shadow">;
+  clinicalApprovalGranted: false;
+  liveQueueMutationAllowed: false;
+  modelCardHash: string;
+};
+
+export type DICOMContract = {
+  contractId: string;
+  version: string;
+  acceptedTransferSyntaxUids: string[];
+  supportedModalities: ImagingWorkflowInput["modality"][];
+  pacsRisIntegrationMode: "fixture-only" | "offline-contract-test" | "shadow-metadata";
+  requiredFhirResources: Array<"ImagingStudy" | "DiagnosticReport" | "Observation" | "Provenance">;
+  tenantIsolationVerified: boolean;
+  noPixelDataInTelemetry: true;
+  ehrWritebackAllowed: false;
+  contractHash: string;
+};
+
+export type SiteValidationRun = {
+  validationRunId: string;
+  siteId: string;
+  modelCardId: string;
+  dicomContractId: string;
+  mode: "offline" | "shadow";
+  caseCount: number;
+  sensitivity: number;
+  specificity: number;
+  calibrationError: number;
+  falseNegativeCount: number;
+  subgroupChecksComplete: boolean;
+  integrationContractPassed: boolean;
+  humanReviewComplete: boolean;
+  status: "passed" | "failed" | "underpowered" | "pending";
+  clinicalQueueAuthorityGranted: false;
+  runHash: string;
+};
+
+export type QueuePolicy = {
+  policyId: string;
+  maximumDelayMinutesByPriority: Record<"routine" | "urgent" | "stat", number>;
+  recommendationOnly: true;
+  humanOverrideRequired: true;
+  preserveOriginalQueuePosition: true;
+  lowerRankedMaximumDelayEnforced: true;
+  policyHash: string;
+};
+
+export type QueueRecommendation = {
+  recommendationId: string;
+  siteId: string;
+  studyReferenceHash: string;
+  originalQueuePosition: number;
+  recommendedQueuePosition: number;
+  priorityClass: "routine" | "urgent" | "stat";
+  reasonCodes: string[];
+  evidenceReferences: string[];
+  generatedAt: string;
+  expiresAt: string;
+  maximumDelayAt: string;
+  siteValidationRunId: string | null;
+  status: "recommendation-ready" | "blocked-site-validation" | "blocked-maximum-delay";
+  humanReviewRequired: true;
+  liveQueueMutationAllowed: false;
+  auditHash: string;
+};
+
+export type DriftMonitor = {
+  monitorId: string;
+  modelCardId: string;
+  siteId: string;
+  windowStartsAt: string;
+  windowEndsAt: string;
+  observedCalibrationError: number;
+  observedOverrideRate: number;
+  observedFalseNegativeRate: number;
+  baselineCalibrationError: number;
+  driftStatus: "stable" | "review" | "blocked";
+  queueRecommendationsPaused: boolean;
+  monitorHash: string;
+};
+
+export type ImagingOverride = {
+  overrideId: string;
+  recommendationId: string;
+  radiologistIdentityHash: string;
+  disposition: "accept" | "modify" | "reject";
+  finalQueuePosition: number;
+  reasonCode: string;
+  occurredAt: string;
+  radiologistRetainsAuthority: true;
+  auditHash: string;
+};
+
+export type ImagingOutcomeLedger = {
+  ledgerId: string;
+  modelCardId: string;
+  siteId: string;
+  sensitivity: number;
+  specificity: number;
+  calibrationError: number;
+  falseNegativeRate: number;
+  medianTimeToDiagnosisMinutes: number | null;
+  medianTimeToReportMinutes: number;
+  subgroupResults: Array<{
+    subgroupId: string;
+    sampleSize: number;
+    sensitivity: number;
+    specificity: number;
+  }>;
+  workloadMinutes: number;
+  alertAcceptanceRate: number;
+  unintendedDelayCount: number;
+  measuredAt: string;
+  clinicalClaimsAllowed: false;
+  ledgerHash: string;
+};
+
 function safeReference(value: string) {
   return /^[a-z0-9][a-z0-9._:/-]{2,180}$/i.test(value) && !/token|secret|password|bearer/i.test(value);
 }
@@ -386,8 +524,262 @@ export function analyzeImagingFleetVariance(inputs: ImagingWorkflowInput[]) {
   }));
 }
 
+const imagingSha256Pattern = /^[0-9a-f]{64}$/i;
+
+function imagingUnitInterval(value: number) {
+  return Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
+function imagingCanonical(values: string[]) {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort();
+}
+
+export function createImagingModelCard(
+  input: Omit<ImagingModelCard, "clinicalApprovalGranted" | "liveQueueMutationAllowed" | "modelCardHash">
+): ImagingModelCard {
+  if (!imagingSha256Pattern.test(input.artifactDigest) || !input.accountableOwner.trim()) {
+    throw new Error("Imaging model card requires a content-addressed artifact and accountable owner");
+  }
+  if (!input.admittedModes.length || input.regulatoryScopes.some((scope) => scope.independentlyVerified && scope.status === "unverified")) {
+    throw new Error("Imaging model admission requires explicit offline or shadow scope and consistent regulatory metadata");
+  }
+  const base = {
+    ...input,
+    prohibitedUses: imagingCanonical(input.prohibitedUses),
+    modalities: [...new Set(input.modalities)].sort(),
+    anatomy: imagingCanonical(input.anatomy),
+    clinicalApprovalGranted: false as const,
+    liveQueueMutationAllowed: false as const
+  };
+  return { ...base, modelCardHash: createClinicalEvidenceHash({ type: "imaging-model-card", base }) };
+}
+
+export function createDicomContract(
+  input: Omit<DICOMContract, "noPixelDataInTelemetry" | "ehrWritebackAllowed" | "contractHash">
+): DICOMContract {
+  if (
+    !input.acceptedTransferSyntaxUids.length ||
+    !input.supportedModalities.length ||
+    !input.requiredFhirResources.includes("ImagingStudy") ||
+    !input.requiredFhirResources.includes("Provenance")
+  ) {
+    throw new Error("DICOM contract is missing required interoperability boundaries");
+  }
+  const base = {
+    ...input,
+    acceptedTransferSyntaxUids: imagingCanonical(input.acceptedTransferSyntaxUids),
+    supportedModalities: [...new Set(input.supportedModalities)].sort(),
+    requiredFhirResources: [...new Set(input.requiredFhirResources)].sort(),
+    noPixelDataInTelemetry: true as const,
+    ehrWritebackAllowed: false as const
+  };
+  return { ...base, contractHash: createClinicalEvidenceHash({ type: "dicom-contract", base }) };
+}
+
+export function evaluateImagingSiteValidation(
+  input: Omit<SiteValidationRun, "status" | "clinicalQueueAuthorityGranted" | "runHash"> & {
+    minimumCaseCount: number;
+    minimumSensitivity: number;
+    minimumSpecificity: number;
+    maximumCalibrationError: number;
+  }
+): SiteValidationRun {
+  for (const value of [
+    input.sensitivity,
+    input.specificity,
+    input.calibrationError
+  ]) {
+    if (!imagingUnitInterval(value)) throw new Error("Imaging validation metrics must be in [0, 1]");
+  }
+  const underpowered = input.caseCount < input.minimumCaseCount;
+  const passed =
+    !underpowered &&
+    input.sensitivity >= input.minimumSensitivity &&
+    input.specificity >= input.minimumSpecificity &&
+    input.calibrationError <= input.maximumCalibrationError &&
+    input.integrationContractPassed &&
+    input.subgroupChecksComplete &&
+    input.humanReviewComplete;
+  const status: SiteValidationRun["status"] = underpowered
+    ? "underpowered"
+    : passed
+      ? "passed"
+      : "failed";
+  const base = {
+    validationRunId: input.validationRunId,
+    siteId: input.siteId,
+    modelCardId: input.modelCardId,
+    dicomContractId: input.dicomContractId,
+    mode: input.mode,
+    caseCount: input.caseCount,
+    sensitivity: input.sensitivity,
+    specificity: input.specificity,
+    calibrationError: input.calibrationError,
+    falseNegativeCount: input.falseNegativeCount,
+    subgroupChecksComplete: input.subgroupChecksComplete,
+    integrationContractPassed: input.integrationContractPassed,
+    humanReviewComplete: input.humanReviewComplete,
+    status,
+    clinicalQueueAuthorityGranted: false as const
+  };
+  return { ...base, runHash: createClinicalEvidenceHash({ type: "imaging-site-validation", base }) };
+}
+
+export function createQueuePolicy(
+  input: Omit<
+    QueuePolicy,
+    "recommendationOnly" | "humanOverrideRequired" | "preserveOriginalQueuePosition" | "lowerRankedMaximumDelayEnforced" | "policyHash"
+  >
+): QueuePolicy {
+  if (
+    Object.values(input.maximumDelayMinutesByPriority).some(
+      (value) => !Number.isFinite(value) || value <= 0
+    )
+  ) {
+    throw new Error("Imaging queue maximum-delay safeguards must be positive");
+  }
+  const base = {
+    ...input,
+    recommendationOnly: true as const,
+    humanOverrideRequired: true as const,
+    preserveOriginalQueuePosition: true as const,
+    lowerRankedMaximumDelayEnforced: true as const
+  };
+  return { ...base, policyHash: createClinicalEvidenceHash({ type: "imaging-queue-policy", base }) };
+}
+
+export function buildQueueRecommendation(input: {
+  recommendationId: string;
+  siteId: string;
+  studyReferenceHash: string;
+  originalQueuePosition: number;
+  recommendedQueuePosition: number;
+  priorityClass: QueueRecommendation["priorityClass"];
+  reasonCodes: string[];
+  evidenceReferences: string[];
+  generatedAt: string;
+  expiresAt: string;
+  expectedDelayMinutes: number;
+  policy: QueuePolicy;
+  siteValidationRun: SiteValidationRun | null;
+}): QueueRecommendation {
+  if (
+    !imagingSha256Pattern.test(input.studyReferenceHash) ||
+    !isoTimestamp(input.generatedAt) ||
+    !isoTimestamp(input.expiresAt) ||
+    input.originalQueuePosition < 1 ||
+    input.recommendedQueuePosition < 1 ||
+    input.expectedDelayMinutes < 0
+  ) {
+    throw new Error("Imaging queue recommendation metadata is invalid");
+  }
+  const maximumDelayMinutes = input.policy.maximumDelayMinutesByPriority[input.priorityClass];
+  const validationPassed =
+    input.siteValidationRun?.status === "passed" &&
+    input.siteValidationRun.siteId === input.siteId;
+  const maximumDelayAt = new Date(Date.parse(input.generatedAt) + maximumDelayMinutes * 60_000).toISOString();
+  const delayBlocked = input.expectedDelayMinutes > maximumDelayMinutes;
+  const status: QueueRecommendation["status"] = !validationPassed
+    ? "blocked-site-validation"
+    : delayBlocked
+      ? "blocked-maximum-delay"
+      : "recommendation-ready";
+  const base = {
+    recommendationId: input.recommendationId,
+    siteId: input.siteId,
+    studyReferenceHash: input.studyReferenceHash,
+    originalQueuePosition: input.originalQueuePosition,
+    recommendedQueuePosition: status === "recommendation-ready"
+      ? input.recommendedQueuePosition
+      : input.originalQueuePosition,
+    priorityClass: input.priorityClass,
+    reasonCodes: imagingCanonical([
+      ...input.reasonCodes,
+      ...(!validationPassed ? ["SITE_VALIDATION_REQUIRED"] : []),
+      ...(delayBlocked ? ["MAXIMUM_DELAY_SAFEGUARD"] : [])
+    ]),
+    evidenceReferences: imagingCanonical(input.evidenceReferences),
+    generatedAt: input.generatedAt,
+    expiresAt: input.expiresAt,
+    maximumDelayAt,
+    siteValidationRunId: input.siteValidationRun?.validationRunId ?? null,
+    status,
+    humanReviewRequired: true as const,
+    liveQueueMutationAllowed: false as const
+  };
+  return { ...base, auditHash: createClinicalEvidenceHash({ type: "imaging-queue-recommendation", base }) };
+}
+
+export function recordImagingOverride(
+  input: Omit<ImagingOverride, "radiologistRetainsAuthority" | "auditHash">
+): ImagingOverride {
+  if (
+    !imagingSha256Pattern.test(input.radiologistIdentityHash) ||
+    !isoTimestamp(input.occurredAt) ||
+    input.finalQueuePosition < 1
+  ) {
+    throw new Error("Imaging override requires named radiologist attribution and valid queue metadata");
+  }
+  const base = { ...input, radiologistRetainsAuthority: true as const };
+  return { ...base, auditHash: createClinicalEvidenceHash({ type: "imaging-override", base }) };
+}
+
+export function buildImagingDriftMonitor(
+  input: Omit<DriftMonitor, "driftStatus" | "queueRecommendationsPaused" | "monitorHash"> & {
+    maximumCalibrationDelta: number;
+    maximumOverrideRate: number;
+    maximumFalseNegativeRate: number;
+  }
+): DriftMonitor {
+  const calibrationDelta = input.observedCalibrationError - input.baselineCalibrationError;
+  const blocked =
+    calibrationDelta > input.maximumCalibrationDelta ||
+    input.observedFalseNegativeRate > input.maximumFalseNegativeRate;
+  const review = !blocked && input.observedOverrideRate > input.maximumOverrideRate;
+  const base = {
+    monitorId: input.monitorId,
+    modelCardId: input.modelCardId,
+    siteId: input.siteId,
+    windowStartsAt: input.windowStartsAt,
+    windowEndsAt: input.windowEndsAt,
+    observedCalibrationError: input.observedCalibrationError,
+    observedOverrideRate: input.observedOverrideRate,
+    observedFalseNegativeRate: input.observedFalseNegativeRate,
+    baselineCalibrationError: input.baselineCalibrationError,
+    driftStatus: blocked ? ("blocked" as const) : review ? ("review" as const) : ("stable" as const),
+    queueRecommendationsPaused: blocked
+  };
+  return { ...base, monitorHash: createClinicalEvidenceHash({ type: "imaging-drift-monitor", base }) };
+}
+
+export function buildImagingOutcomeLedger(
+  input: Omit<ImagingOutcomeLedger, "clinicalClaimsAllowed" | "ledgerHash">
+): ImagingOutcomeLedger {
+  const rates = [
+    input.sensitivity,
+    input.specificity,
+    input.calibrationError,
+    input.falseNegativeRate,
+    input.alertAcceptanceRate,
+    ...input.subgroupResults.flatMap((result) => [result.sensitivity, result.specificity])
+  ];
+  if (rates.some((rate) => !imagingUnitInterval(rate)) || !isoTimestamp(input.measuredAt)) {
+    throw new Error("Imaging outcome ledger metrics are invalid");
+  }
+  const base = {
+    ...input,
+    subgroupResults: [...input.subgroupResults].sort((left, right) => left.subgroupId.localeCompare(right.subgroupId)),
+    clinicalClaimsAllowed: false as const
+  };
+  return { ...base, ledgerHash: createClinicalEvidenceHash({ type: "imaging-outcome-ledger", base }) };
+}
+
 export function isExternalImagingAdapterEnabled(env: NodeJS.ProcessEnv = process.env) {
   return env.SCRIMED_EXTERNAL_IMAGING_ADAPTERS_ENABLED?.toLowerCase() === "true";
+}
+
+export function isImagingQueueRecommendationEnabled(env: NodeJS.ProcessEnv = process.env) {
+  return env.SCRIMED_IMAGING_QUEUE_RECOMMENDATIONS_ENABLED?.toLowerCase() === "true";
 }
 
 export const syntheticImagingWorkflowFixture: ImagingWorkflowInput = {
@@ -449,8 +841,11 @@ export function getImagingWorkflowIntelligenceSummary() {
     version: imagingWorkflowIntelligenceVersion,
     status: "synthetic-metadata-adapter-ready",
     externalAdaptersEnabled: isExternalImagingAdapterEnabled(),
+    queueRecommendationsEnabled: isImagingQueueRecommendationEnabled(),
     supportedInputs: ["DICOM metadata", "DICOMweb metadata", "PACS/RIS preview", "VNA preview"],
     fhirOutputs: ["ImagingStudy", "DiagnosticReport preliminary", "Observation preliminary", "Provenance"],
+    modelAdmission: "offline-and-shadow-only-with-site-validation",
+    queueAuthority: "recommendation-only-radiologist-override",
     sample,
     boundary: imagingWorkflowIntelligenceBoundary
   };

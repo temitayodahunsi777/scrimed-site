@@ -13,13 +13,22 @@ git rev-parse HEAD^{tree}
 node scripts/release-candidate-manifest.mjs --strict --json
 node scripts/release-candidate-validation.mjs --strict --json
 node scripts/release-candidate-review-packet.mjs --strict --json
-node scripts/scrimed-p32-release-gate-evidence.mjs --strict --operator-packet
+npm run release:scrimed-p32-operator-packet
 node scripts/scrimed-sbom.mjs --verify
 node scripts/pending-migration-authorization-check.mjs --strict --json
 ```
 
 The deployment authorization must bind to the resulting commit, tree/source, candidate,
 validation, review, gate, SBOM, migration-set, and artifact fingerprints.
+
+## Fingerprint-Stability Rule
+
+When the worktree is dirty, the only immediately actionable release step is review and creation
+of the attributable local candidate commit. Creating that commit changes the authoritative
+commit and candidate identities. Candidate validation, AAL2 evidence, migration evidence, and
+all human approvals must therefore be generated or recorded only after the clean commit exists
+and exact source/artifact provenance has been regenerated. Pre-commit approvals are preparation,
+not reusable release evidence.
 
 ## Environment Changes
 

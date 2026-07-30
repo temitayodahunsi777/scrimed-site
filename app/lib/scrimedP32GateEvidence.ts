@@ -17,7 +17,7 @@ export const scrimedP32GateEvidenceBoundary =
   "SCRIMED p.32 Gate Evidence binds no-secret technical checks and metadata-only human decisions to one exact candidate. It never stores tokens, PHI, raw review documents, signatures, legal opinions, clinical records, or connector payloads, and it does not grant commit, migration, deployment, external-distribution, certification, clinical-care, or customer go-live authority.";
 
 export const scrimedP32OperatorHandoffVersion =
-  "scrimed-p32-operator-handoff-v2-2026-07-21";
+  "scrimed-p32-operator-handoff-v3-2026-07-27";
 
 export const scrimedP32OperatorHandoffBoundary =
   "This operator handoff orders unresolved evidence work for an exact candidate. It does not create identity evidence, reviewer approval, migration approval, deployment authority, production evidence, customer authorization, PHI authority, or clinical authority.";
@@ -425,10 +425,35 @@ function unresolvedGateIds(packet: P32GateEvidencePacket, phase: P32Gate["phase"
     .map((gate) => gate.gateId);
 }
 
+function unresolvedPrerequisites(packet: P32GateEvidencePacket, gateIds: string[]) {
+  const unresolved = new Set(
+    packet.registry.gates
+      .filter((candidate) => gateIds.includes(candidate.gateId) && candidate.status !== "PASS")
+      .map((candidate) => candidate.gateId)
+  );
+
+  return gateIds.filter((gateId) => unresolved.has(gateId));
+}
+
 function operatorPrerequisites(packet: P32GateEvidencePacket, gate: P32Gate) {
-  if (gate.phase === "candidate-review") return [];
+  const immutableCandidatePrerequisites = [
+    "clean-reviewed-source-commit",
+    "exact-source-artifact-provenance",
+    "validation-evidence-integrity"
+  ];
+
+  if (gate.gateId === "clean-reviewed-source-commit") return [];
+  if (
+    gate.gateId === "exact-source-artifact-provenance" ||
+    gate.gateId === "validation-evidence-integrity"
+  ) {
+    return unresolvedPrerequisites(packet, ["clean-reviewed-source-commit"]);
+  }
+  if (gate.phase === "candidate-review") {
+    return unresolvedPrerequisites(packet, immutableCandidatePrerequisites);
+  }
   if (gate.gateId === "aal2-cli-evidence" || gate.gateId === "migration-dry-run-and-approval") {
-    return [];
+    return unresolvedPrerequisites(packet, immutableCandidatePrerequisites);
   }
   if (gate.gateId === "deployment-authorization") {
     return [
@@ -550,7 +575,7 @@ export function buildP32OperatorHandoffMarkdown(handoff: P32OperatorHandoff) {
   for (const action of handoff.actions) {
     lines.push(
       "",
-      `### ${action.sequence}. ${action.gateId}`,
+      `### Phase ${action.sequence}: ${action.gateId}`,
       "",
       `- Owner: ${action.ownerRole}`,
       `- State: ${action.executionState}`,

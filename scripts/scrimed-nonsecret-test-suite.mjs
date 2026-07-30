@@ -16,6 +16,10 @@ const checks = [
     args: ["scripts/scrimed-local-quality-runner-contract-check.mjs"]
   },
   {
+    label: "managed local public smoke runner contract",
+    args: ["scripts/scrimed-local-public-smoke-runner-contract-check.mjs"]
+  },
+  {
     label: "CI workflow contract",
     args: ["scripts/ci-workflow-contract-check.mjs"]
   },
@@ -74,6 +78,14 @@ const checks = [
   {
     label: "public-claims integrity policy self-test",
     args: ["scripts/public-claims-integrity-smoke.mjs", "--self-test"]
+  },
+  {
+    label: "Wix publication verification contract",
+    args: ["scripts/wix-publication-verification-contract-check.mjs"]
+  },
+  {
+    label: "Wix publication verification policy self-test",
+    args: ["scripts/wix-publication-verification.mjs", "--self-test"]
   },
   {
     label: "public remediation policy tests",
@@ -196,6 +208,19 @@ const checks = [
       "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
       "scripts/scrimed-p32-release-hardening-policy-test.mjs"
     ]
+  },
+  {
+    label: "SCRIMED P32 clinical operations and contained-agent behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-clinical-operations-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 clinical operations repository contract",
+    args: ["scripts/scrimed-p32-clinical-operations-contract-check.mjs"]
   },
   {
     label: "SCRIMED P32 repository-native contract",

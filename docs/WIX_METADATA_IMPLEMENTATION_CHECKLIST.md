@@ -1,21 +1,23 @@
-# Wix Metadata Implementation Checklist
+# Wix Metadata Implementation Record
 
 **Owner:** Wix site owner
-**Required reviewers:** Founder, Marketing, Legal/Privacy, and Clinical Safety
-**Publication authority:** Not granted by this repository candidate
 
-Direct, cache-bypassed inspection of the published homepage on 2026-07-23 confirmed that
-the visible redesign is active, but stale metadata and one unsafe blog excerpt remain in the
-published HTML. Wix's supported REST surface can resolve static-page SEO tags but does not
-provide a documented mutation method for these Editor-managed fields. Apply the changes
-through Wix Editor and publish only after named review.
+**Execution status:** Published on 2026-07-24 and automatically revalidated on 2026-07-27 UTC
+
+**Evidence:** `docs/WIX_OPERATOR_EXECUTION_PACKET.md` and
+`docs/WIX_PUBLICATION_VERIFICATION_REPORT.md`
+
+The previously stale faith-first metadata, unverified Organization contact/location fields,
+and unsafe vitals excerpt were remediated through the authenticated Wix Editor. The resulting
+site was published, then checked directly on desktop and 390px mobile.
 
 ## Home Page SEO
 
-| Location | Current published value | Required replacement | Verification |
+| Location | Previous value | Published value | Verification |
 | --- | --- | --- | --- |
-| Pages & Menu > Home > SEO Basics > Title tag | `Scrimed Solutions \| faith-based healthcare solutions` | `SCRIMED \| Governed Healthcare Intelligence` | Inspect `<title>`, `og:title`, and the browser tab |
-| Pages & Menu > Home > SEO Basics > Meta description | `SCRIMED Solutions is a faith-based healthcare company using AI to improve patient care, streamline clinics, and integrate spiritual intelligence through tools like multilingual intake, vitals monitoring, and FaithCore.` | `SCRIMED develops trustworthy, interoperable, human-supervised healthcare intelligence workflows. Synthetic demonstration only; do not submit PHI.` | Inspect description, `og:description`, and `twitter:description` |
+| Pages & Menu > Home > SEO Basics > Title tag | `Scrimed Solutions \| faith-based healthcare solutions` | `SCRIMED \| Trustworthy Healthcare Intelligence and AI-Enabled Workflows` | PASS |
+| Pages & Menu > Home > SEO Basics > Meta description | Faith-first company description | `SCRIMED develops trustworthy, human-supervised healthcare intelligence and AI-enabled workflows for clinicians, care teams, health systems, payers, researchers, and patients. Current public experiences are demonstration and synthetic-data environments unless separately validated and approved.` | PASS |
+| Pages & Menu > Home > Social Share | Legacy inherited positioning | Approved Atlas-first Open Graph title and description | PASS |
 | Pages & Menu > Home > Advanced SEO > Canonical | `https://www.scrimedsolutions.com/` | Keep `https://www.scrimedsolutions.com/` | Confirm one canonical link and no conflicting domain |
 
 ## Organization Structured Data
@@ -23,44 +25,43 @@ through Wix Editor and publish only after named review.
 Open Home > SEO Basics > Advanced SEO > Structured data markup. If Wix regenerates the
 Organization object from Business Info, also update Settings > Business Info > Contact Info.
 
-| Field | Current published value | Required replacement |
+| Field | Previous value | Published value |
 | --- | --- | --- |
 | `@type` | `Organization` | Keep |
 | `name` | `SCRIMED SOLUTIONS` | Keep |
-| `url` | `https://www.scrimedsolutions.com/` | Keep |
-| `email` | `scrimedsolutions@gmail.com` | Keep only after Founder confirms it as the public privacy/business contact |
-| `telephone` | `+14049814427` | Remove unless Founder and counsel provide a verified publication record |
-| `address.addressLocality` | `Atlanta, GA` | Remove unless Founder and counsel provide a verified publication record |
-| `address.addressCountry` | `US` | Remove with the unverified address object |
-| `sameAs` | LinkedIn and X URLs | Keep only profiles formally controlled and approved by SCRIMED |
+| `url` | `https://www.scrimedsolutions.com/` | `https://www.scrimedsolutions.com` |
+| `email` | `scrimedsolutions@gmail.com` | Retained as the existing public SCRIMED email |
+| `telephone` | `+14049814427` | Removed |
+| `address` | Unverified Atlanta/locality object | Removed |
+| `sameAs` | Unverified or inherited profiles | Omitted |
 
-Do not add `Review`, `AggregateRating`, customer, deployment, certification, medical-device,
-or clinical-outcome schema.
+Published verification found no `Review`, `AggregateRating`, customer, deployment,
+certification, medical-device, or clinical-outcome schema.
 
 ## Vitals Blog Card On Home
 
-The homepage post list still exposes this unsafe source excerpt:
+The homepage post list previously exposed this unsafe source excerpt:
 
 `real-time, predictive, and faith-centered patient monitoring`
 
-Update the source post, remove it from the homepage feed, or unpublish it pending review.
-Approved replacement:
+The post and homepage excerpt now use synthetic-only language:
 
-- **Title:** `Synthetic Vitals Workflow Demonstration`
-- **Excerpt:** `A synthetic workflow concept for reviewing configured test signals, thresholds, and trend displays. Demonstration and research use only; not for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making.`
+- **Title:** `SCRIMED Vitals Monitoring | Synthetic Demonstration`
+- **Description:** `SCRIMED Vitals Monitoring is a synthetic-data demonstration and workflow concept for visualizing configured test signals and reviewable trends. It is not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making.`
 
 FaithCore may be linked only as a distinct optional experience and must not appear to govern
 clinical logic.
 
 ## Publish And Verify
 
-1. Preview desktop and 390px mobile.
-2. Review Wix change history for unrelated draft changes.
-3. Obtain named Founder, Marketing, Legal/Privacy, and Clinical Safety approval.
-4. Publish the reviewed Wix revision.
-5. Open the homepage with a cache-busting query and confirm the new `etag` or site revision.
-6. Inspect title, description, Open Graph, Twitter, canonical, and JSON-LD.
-7. Run `npm run smoke:wix-public-claims`.
-8. Confirm the check reports zero blocked claims and all no-PHI, synthetic, and human-review disclosures.
+1. PASS — desktop and 390px mobile preview and published-page checks.
+2. PASS — editor changes were limited to the approved Wix remediation scope.
+3. PASS — site published through the normal Wix production flow.
+4. PASS — title, description, Open Graph, canonical, and JSON-LD checked directly.
+5. PASS — strict multi-page Wix verification reported 17 pages, two retired store routes, two
+   noindexed Booking routes, three redirects, six crawler files, and zero failures.
+6. PASS — domain variants redirect to the preferred HTTPS www domain.
 
-Until step 4 occurs, the published Wix surface remains an external release blocker.
+The Wix metadata/public-claims remediation is no longer an external release blocker. This
+record does not resolve the separate legal, PHI, clinical activation, certification, deployment,
+or customer go-live gates.

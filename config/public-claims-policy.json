@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-23.public-claims-v3",
+  "version": "2026-07-27.public-claims-v4",
   "blockedRules": [
     {
       "id": "unsubstantiated-named-testimonial",
@@ -15,13 +15,17 @@
     },
     {
       "id": "unverified-physical-location",
-      "markers": ["500 innovation way", "500 terry francine street"],
+      "markers": ["500 innovation way", "500 terry francine street", "san francisco, ca"],
       "reason": "A published business location requires an owner-verified address record.",
       "allowNegated": false
     },
     {
       "id": "unverified-spiritual-governance-superlative",
-      "markers": ["world's first spiritually governed healthtech platform", "world’s first spiritually governed healthtech platform"],
+      "markers": [
+        "world's first spiritually governed healthtech platform",
+        "world’s first spiritually governed healthtech platform",
+        "spiritually governed healthtech platform"
+      ],
       "reason": "Novelty and spiritual-governance claims require substantiation and must not appear in Atlas-first enterprise positioning.",
       "allowNegated": false
     },
@@ -79,7 +83,10 @@
         "predictive alerts",
         "real-time patient condition insights",
         "real-time insight into patient conditions",
-        "real-time, predictive, and faith-centered patient monitoring"
+        "real-time, accurate patient data analysis",
+        "real-time, predictive, and faith-centered patient monitoring",
+        "actionable clinical trends",
+        "patient-condition insights"
       ],
       "reason": "Vitals experiences remain synthetic workflow demonstrations and are not emergency or patient-monitoring services.",
       "allowNegated": false

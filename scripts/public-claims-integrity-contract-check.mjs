@@ -34,7 +34,11 @@ requireText("scripts/lib/public-claims-policy.mjs", [
 requireText("config/public-claims-policy.json", [
   "unsubstantiated-named-testimonial",
   "unverified-physical-location",
+  "spiritually governed healthtech platform",
   "unsupported-vitals-alert-claim",
+  "actionable clinical trends",
+  "patient-condition insights",
+  "real-time, accurate patient data analysis",
   "unsupported-autonomous-care-claim",
   "no-phi-disclosure",
   "synthetic-status-disclosure",

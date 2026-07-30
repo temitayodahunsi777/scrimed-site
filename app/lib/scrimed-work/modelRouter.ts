@@ -1,7 +1,11 @@
 import { evaluateCostApiGuardrail } from "../costApiGuardrails";
 import { evaluateScrimedSafetyGate } from "../scrimedSafetyGovernance";
 import { createAuditHash } from "./audit";
-import { selectProviderCandidates, type ScrimedWorkProvider } from "./providerRegistry";
+import {
+  selectProviderCandidates,
+  type ProviderConformanceRun,
+  type ScrimedWorkProvider
+} from "./providerRegistry";
 import type {
   DataClassification,
   ModelRouteDecision,
@@ -49,6 +53,7 @@ export type ScrimedWorkModelRouteInput = {
   providerHealth?: Record<string, ScrimedWorkProvider["healthStatus"]>;
   workflowAcceptanceByModel?: Record<string, number>;
   minimumHumanAcceptance?: number;
+  providerConformanceRuns?: ProviderConformanceRun[];
   resourceAdmission?: {
     state: ModelRouteDecision["runtimeState"];
     allowedModelIds: string[];
@@ -113,6 +118,14 @@ export function routeScrimedWorkModel(input: ScrimedWorkModelRouteInput): ModelR
       input.minimumHumanAcceptance !== undefined &&
       (input.workflowAcceptanceByModel?.[candidate.modelId] ?? 0) < input.minimumHumanAcceptance
     ) return false;
+    const conformance = input.providerConformanceRuns?.find(
+      (run) => run.providerId === candidate.providerId && run.modelId === candidate.modelId
+    );
+    const verifiedSyntheticNoCall =
+      candidate.artifactSignatureStatus === "verified-synthetic" &&
+      candidate.policyTags.includes("no-external-call");
+    if (input.providerConformanceRuns && (!conformance || conformance.status !== "pass")) return false;
+    if (!input.providerConformanceRuns && !verifiedSyntheticNoCall) return false;
     return true;
   });
   const domainCells = input.validatedDomainCells ?? [];
@@ -236,6 +249,7 @@ export function routeScrimedWorkModel(input: ScrimedWorkModelRouteInput): ModelR
       `provider-blocked:${input.blockedProviderIds?.join(",") ?? "none"}`,
       `provider-health-overrides:${Object.keys(input.providerHealth ?? {}).sort().join(",") || "none"}`,
       `workflow-acceptance-threshold:${input.minimumHumanAcceptance ?? "not-required"}`,
+      `provider-conformance:${input.providerConformanceRuns ? "verified-run-required" : "verified-synthetic-no-call-only"}`,
       `runtime-state:${input.resourceAdmission?.state ?? "NORMAL"}`,
       `resource-admission:${input.resourceAdmission?.auditHash ?? "not-supplied"}`,
       `audit:${createAuditHash({ input, selected: selected?.providerId ?? "none" }).slice(0, 12)}`

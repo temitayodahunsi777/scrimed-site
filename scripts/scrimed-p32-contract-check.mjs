@@ -19,6 +19,12 @@ const requiredFiles = [
   "app/lib/scrimedP32MultimodalNormalization.ts",
   "app/lib/scrimedP32ArtifactLedger.ts",
   "app/lib/scrimedP32RepoOps.ts",
+  "app/lib/scrimedP32HealthConversationFabric.ts",
+  "app/lib/scrimedP32PatientRecords.ts",
+  "app/lib/scrimed-work/agentExecution.ts",
+  "app/lib/scrimedP32ResearchIntelligence.ts",
+  "app/lib/scrimedP32OncologyIntelligence.ts",
+  "app/lib/scrimedP32NetworkIntelligence.ts",
   "app/lib/scrimedP32ReleaseGates.ts",
   "app/lib/scrimedP32GateEvidence.ts",
   "app/lib/scrimedP32EvidenceAttestation.ts",
@@ -37,6 +43,8 @@ const requiredFiles = [
   "scripts/scrimed-p32-policy-test.mjs",
   "scripts/scrimed-p32-execution-harness-policy-test.mjs",
   "scripts/scrimed-p32-release-hardening-policy-test.mjs",
+  "scripts/scrimed-p32-clinical-operations-policy-test.mjs",
+  "scripts/scrimed-p32-clinical-operations-contract-check.mjs",
   "scripts/scrimed-secret-scan.mjs",
   "scripts/scrimed-sbom.mjs",
   "scripts/scrimed-migration-evidence-packet.mjs",
@@ -201,6 +209,50 @@ for (const text of [
 ]) requireIncludes("app/lib/scrimedP32RepoOps.ts", text);
 
 for (const text of [
+  "PatientCopilotPolicy",
+  "ContextGrant",
+  "SharedEncounterBrief",
+  "PATIENT_AGENT_CLINICIAN_ACTION_DENIED",
+  "recordWritebackAllowed: false"
+]) requireIncludes("app/lib/scrimedP32HealthConversationFabric.ts", text);
+
+for (const text of [
+  "AmbientEncounterDraft",
+  "PatientDataGrant",
+  "evaluateAudioRetention",
+  "trainingUseAllowed: false",
+  "ehrWritebackAllowed: false"
+]) requireIncludes("app/lib/scrimedP32PatientRecords.ts", text);
+
+for (const text of [
+  "AgentEnvironmentSpec",
+  "CapabilityLease",
+  "EmergencyRevocation",
+  "UNVERIFIED_EGRESS_DENIED",
+  "protectedChainOfThoughtStored: false"
+]) requireIncludes("app/lib/scrimed-work/agentExecution.ts", text);
+
+for (const text of [
+  "TrialFailureInvestigation",
+  "BiologicalEmbeddingProvider",
+  "STUDY_LEVEL_LEAKAGE_DETECTED",
+  "clinicalActionAllowed: false"
+]) requireIncludes("app/lib/scrimedP32ResearchIntelligence.ts", text);
+
+for (const text of [
+  "MRDTestProfile",
+  "blocked-incompatible-assays",
+  "payerSubmissionAllowed: false"
+]) requireIncludes("app/lib/scrimedP32OncologyIntelligence.ts", text);
+
+for (const text of [
+  "FacilityPerformanceNode",
+  "PriorAuthorizationProportionalityAnalysis",
+  "siteAndSubgroupVariancePreserved: true",
+  "payerMutationAllowed: false"
+]) requireIncludes("app/lib/scrimedP32NetworkIntelligence.ts", text);
+
+for (const text of [
   "evaluateRcmVoiceWorkItem",
   "SCRIMED_P32_RCM_VOICE_ENABLED",
   "human-exception-queue",
@@ -308,6 +360,7 @@ for (const text of [
   "blockedProviderIds",
   "workflowAcceptanceByModel",
   "minimumHumanAcceptance",
+  "providerConformanceRuns",
   "silentFallbackAllowed: false",
   "runtimeState",
   "resourceAdmission"
@@ -353,7 +406,9 @@ for (const text of [
   "Use either --json or --operator-packet",
   "buildP32OperatorHandoffMarkdown",
   "SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON",
-  "verifyP32SupplementalEvidenceAttestation"
+  "verifyP32SupplementalEvidenceAttestation",
+  "ts-extension-loader.mjs",
+  "loaderActive"
 ]) requireIncludes("scripts/scrimed-p32-release-gate-evidence.mjs", text);
 
 requireIncludes(".env.example", "SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON=");
@@ -374,6 +429,8 @@ for (const text of [
   "scripts/scrimed-p32-policy-test.mjs",
   "scripts/scrimed-p32-execution-harness-policy-test.mjs",
   "scripts/scrimed-p32-release-hardening-policy-test.mjs",
+  "scripts/scrimed-p32-clinical-operations-policy-test.mjs",
+  "scripts/scrimed-p32-clinical-operations-contract-check.mjs",
   "scripts/scrimed-p32-contract-check.mjs",
   "scripts/scrimed-p32-evidence-attestation-policy-test.mjs",
   "scripts/scrimed-p32-release-gate-evidence.mjs"
@@ -398,7 +455,13 @@ for (const path of [
   "app/lib/scrimedP32ResourceAdmission.ts",
   "app/lib/scrimedP32ClinicalDataViews.ts",
   "app/lib/scrimedP32RcmVoice.ts",
-  "app/lib/scrimedP32ApplicationRationalization.ts"
+  "app/lib/scrimedP32ApplicationRationalization.ts",
+  "app/lib/scrimedP32HealthConversationFabric.ts",
+  "app/lib/scrimedP32PatientRecords.ts",
+  "app/lib/scrimed-work/agentExecution.ts",
+  "app/lib/scrimedP32ResearchIntelligence.ts",
+  "app/lib/scrimedP32OncologyIntelligence.ts",
+  "app/lib/scrimedP32NetworkIntelligence.ts"
 ]) {
   if (/\bfetch\s*\(/.test(files[path])) throw new Error(`${path} must not perform external network calls in the p.32 control plane.`);
 }
