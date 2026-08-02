@@ -20,6 +20,20 @@ if (canonicalOrigin !== new URL(publicationPolicy.baseUrl).origin) {
   throw new Error("Live mobile verification is restricted to the governed Wix canonical origin.");
 }
 
+function normalizeExecutablePath(value) {
+  if (!value) return undefined;
+  if (!path.isAbsolute(value) || !/(?:chrome|chromium)/i.test(path.basename(value))) {
+    throw new Error(
+      "SCRIMED_PLAYWRIGHT_EXECUTABLE_PATH must be an absolute Chrome/Chromium path."
+    );
+  }
+  return value;
+}
+
+const executablePath = normalizeExecutablePath(
+  process.env.SCRIMED_PLAYWRIGHT_EXECUTABLE_PATH
+);
+
 export function evaluateMobilePage(snapshot) {
   const failures = [];
   if (snapshot.status !== 200) failures.push(`route-status:${snapshot.path}:${snapshot.status}`);
@@ -46,6 +60,7 @@ if (flags.has("--self-test")) {
   assert.deepEqual(evaluateMobilePage(safe), []);
   assert.deepEqual(evaluateMobilePage({ ...safe, documentWidth: 980 }), ["horizontal-overflow:/:980"]);
   assert.throws(() => new URL("not-a-url"));
+  assert.throws(() => normalizeExecutablePath("relative/browser"));
   console.log("pass SCRIMED live mobile verifier self-test");
   process.exit(0);
 }
@@ -78,7 +93,29 @@ const routes = publicationPolicy.scanRoutes.filter((route) => routeSet.has(route
 const outputDirectory = path.resolve(valueArg("output-dir", "artifacts/live-mobile"));
 await mkdir(outputDirectory, { recursive: true });
 
-const browser = await chromium.launch({ headless: true });
+let browser;
+try {
+  browser = await chromium.launch({
+    headless: true,
+    ...(executablePath ? { executablePath } : {})
+  });
+} catch {
+  const blocked = {
+    schemaVersion: "scrimed-live-mobile-verification-v1-2026-08-01",
+    status: "BLOCKED_ENVIRONMENT",
+    reasonCode: "browser-launch-failed",
+    canonicalOrigin,
+    approvedExecutableConfigured: Boolean(executablePath),
+    productionEvidenceAccepted: false
+  };
+  if (flags.has("--json")) console.log(JSON.stringify(blocked, null, 2));
+  else {
+    console.error(
+      "blocked live mobile verification: approved Chrome/Chromium could not start in this environment."
+    );
+  }
+  process.exit(2);
+}
 const results = [];
 try {
   const context = await browser.newContext({

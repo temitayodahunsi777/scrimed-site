@@ -74,6 +74,13 @@ requireText("scripts/generate-preproduction-assurance.mjs", [
   "PRODUCTION_AUTHORIZATION_REQUIRED",
   "productionAuthorityGranted: false"
 ]);
+requireText("scripts/verify-live-mobile.mjs", [
+  "SCRIMED_PLAYWRIGHT_EXECUTABLE_PATH",
+  "absolute Chrome/Chromium path",
+  "...(executablePath ? { executablePath } : {})",
+  "BLOCKED_ENVIRONMENT",
+  "browser-launch-failed"
+]);
 requireText("package.json", [
   "test:preproduction-assurance",
   "contract:preproduction-assurance",
