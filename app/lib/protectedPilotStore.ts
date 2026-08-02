@@ -202,6 +202,11 @@ type WorkspaceRow = {
   pilot_tenants: { name: string } | Array<{ name: string }> | null;
 };
 
+type PilotMembershipAccessRow = {
+  role: PilotWorkspaceRole;
+  status: "active" | "inactive";
+};
+
 type SessionRow = {
   id: string;
   workspace_id: string;
@@ -2470,6 +2475,33 @@ export async function getAccessiblePilotWorkspace(client: SupabaseClient, worksp
 
   return {
     workspace: data ? mapWorkspace(data as unknown as WorkspaceRow) : null,
+    error
+  };
+}
+
+export async function getPilotWorkspaceMembershipAccess(
+  client: SupabaseClient,
+  tenantId: string,
+  userId: string
+) {
+  const { data, error } = await client
+    .from("pilot_memberships")
+    .select("role, status")
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const row = data as PilotMembershipAccessRow | null;
+  const validRole =
+    row?.role === "tenant-admin" ||
+    row?.role === "pilot-lead" ||
+    row?.role === "reviewer" ||
+    row?.role === "observer";
+
+  return {
+    membership:
+      row && row.status === "active" && validRole
+        ? { role: row.role, status: row.status }
+        : null,
     error
   };
 }

@@ -7,6 +7,7 @@ const files = {
     "app/api/pilot-workspaces/[workspaceSlug]/qa-evidence/p32-attestation/route.ts",
     "utf8"
   ),
+  client: await readFile("scripts/scrimed-p32-evidence-issuer-client.mjs", "utf8"),
   issuer: await readFile("app/lib/scrimedP32EvidenceIssuer.ts", "utf8"),
   store: await readFile("app/lib/protectedPilotStore.ts", "utf8"),
   migration: await readFile(
@@ -25,12 +26,22 @@ for (const expected of [
   "getAccessiblePilotWorkspace",
   "listQaManualRunEvidencePackets",
   "recordP32EvidenceAttestationIssuance",
+  "evaluateScrimedWorkWriteRequestProvenance(request)",
+  "p32-evidence-issuer-csrf-denied",
+  "X-SCRIMED-CSRF-Protection",
   "idempotency-key",
   "releaseAuthorityGranted: false",
   "runtime = \"nodejs\"",
   "rateLimit"
 ]) {
   requireIncludes("protected issuer route", files.route, expected);
+}
+
+for (const expected of [
+  '"X-SCRIMED-Request-Context": "operator-smoke-v1"',
+  '"Idempotency-Key": randomUUID()'
+]) {
+  requireIncludes("protected issuer client", files.client, expected);
 }
 
 for (const expected of [

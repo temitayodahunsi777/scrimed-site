@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   aiLimitationStatement,
@@ -5,6 +6,26 @@ import {
   publicHealthcareDataBoundary
 } from "./lib/legalPolicies";
 import { currentProductStatusStatement } from "./lib/validationEvidence";
+import { applicationUrl } from "./lib/companyIdentity";
+
+const homepageDescription =
+  "SCRIMED is a pre-commercial healthcare intelligence platform developing trustworthy, interoperable, human-supervised workflows through no-PHI synthetic demonstrations.";
+
+export const metadata: Metadata = {
+  title: "SCRIMED | Governed Healthcare Intelligence",
+  description: homepageDescription,
+  alternates: {
+    canonical: applicationUrl("/")
+  },
+  openGraph: {
+    type: "website",
+    title: "SCRIMED | Governed Healthcare Intelligence",
+    description:
+      "Pre-commercial, Atlas-first healthcare intelligence with synthetic demonstrations, human review, and explicit clinical safety boundaries.",
+    url: applicationUrl("/")
+  }
+};
+
 const platformModules = [
   {
     name: "Clinical Copilot",

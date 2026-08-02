@@ -25,6 +25,11 @@ export type ScrimedWorkFeatureFlags = {
   mrdIntelligenceEnabled: boolean;
   providerConformanceEnabled: boolean;
   networkIntelligenceEnabled: boolean;
+  agentCheckpointForkEnabled: boolean;
+  localOpenModelEvaluationEnabled: boolean;
+  tenantSafeCacheEnabled: boolean;
+  scientificCampaignsEnabled: boolean;
+  specialtyModelLanesEnabled: boolean;
   consequentialActionsEnabled: boolean;
 };
 
@@ -63,6 +68,11 @@ export function getScrimedWorkFeatureFlags(env: NodeJS.ProcessEnv = process.env)
     mrdIntelligenceEnabled: envBoolean("SCRIMED_MRD_INTELLIGENCE_ENABLED", false, env),
     providerConformanceEnabled: envBoolean("SCRIMED_PROVIDER_CONFORMANCE_ENABLED", true, env),
     networkIntelligenceEnabled: envBoolean("SCRIMED_NETWORK_INTELLIGENCE_ENABLED", false, env),
+    agentCheckpointForkEnabled: envBoolean("SCRIMED_AGENT_CHECKPOINT_FORK_ENABLED", false, env),
+    localOpenModelEvaluationEnabled: envBoolean("SCRIMED_LOCAL_OPEN_MODEL_EVALUATION_ENABLED", false, env),
+    tenantSafeCacheEnabled: envBoolean("SCRIMED_TENANT_SAFE_CACHE_ENABLED", false, env),
+    scientificCampaignsEnabled: envBoolean("SCRIMED_SCIENTIFIC_CAMPAIGNS_ENABLED", false, env),
+    specialtyModelLanesEnabled: envBoolean("SCRIMED_SPECIALTY_MODEL_LANES_ENABLED", false, env),
     consequentialActionsEnabled: envBoolean("SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED", false, env)
   };
 }
@@ -95,6 +105,11 @@ export function scrimedWorkFeatureFlagHeaders(flags = getScrimedWorkFeatureFlags
     "X-SCRIMED-MRD-Intelligence": flags.mrdIntelligenceEnabled ? "enabled" : "disabled",
     "X-SCRIMED-Provider-Conformance": flags.providerConformanceEnabled ? "enabled" : "disabled",
     "X-SCRIMED-Network-Intelligence": flags.networkIntelligenceEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Agent-Checkpoint-Fork": flags.agentCheckpointForkEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Local-Open-Model-Evaluation": flags.localOpenModelEvaluationEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Tenant-Safe-Cache": flags.tenantSafeCacheEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Scientific-Campaigns": flags.scientificCampaignsEnabled ? "enabled" : "disabled",
+    "X-SCRIMED-Specialty-Model-Lanes": flags.specialtyModelLanesEnabled ? "enabled" : "disabled",
     "X-SCRIMED-Consequential-Actions-Enabled": flags.consequentialActionsEnabled ? "true" : "false"
   };
 }

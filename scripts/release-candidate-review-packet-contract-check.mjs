@@ -27,7 +27,9 @@ const suite = files["scripts/scrimed-nonsecret-test-suite.mjs"];
 
 for (const expected of [
   "buildCandidateReviewPacket",
+  "buildReviewBatchExport",
   "ready-for-named-reviewer-disposition",
+  "ready-for-assigned-reviewers",
   "review-packet-failed-closed",
   "candidateReviewPacketSha256",
   "Release steward",
@@ -36,6 +38,24 @@ for (const expected of [
   "Claims and legal reviewer",
   "fileCountMatchesManifest",
   "sourceFileCountMatchesManifest",
+  "reviewBatches",
+  "reviewBatchCoverageComplete",
+  "review-batch-coverage-incomplete",
+  "batchDigestSha256",
+  "reviewBatchExportSha256",
+  "parentReviewPacketSha256",
+  "recommendedReviewOrder",
+  "release-security-data",
+  "runtime-clinical-api",
+  "product-claims-ui",
+  "quality-evidence",
+  "documentation-operations",
+  "pending-named-reviewers",
+  "approvalAuthority: false",
+  "leastDisclosureBatchOnly: true",
+  "batchApproved: false",
+  "A batch export requires either --json or --markdown",
+  "Unknown review batch",
   "candidate-files-withheld-or-unreviewable",
   "defaultOutputContainsPaths: false",
   "fileContentsIncluded: false",
@@ -59,7 +79,13 @@ for (const expected of [
   "candidate, source, and review-packet SHA-256",
   "does not authorize review approval, a commit, deployment, migration, release promotion, or external distribution",
   "Any source change invalidates the packet",
-  "validated base-to-`HEAD` change set"
+  "validated base-to-`HEAD` change set",
+  "risk-ordered review batches",
+  "batch SHA-256",
+  "least-disclosure batch",
+  "--batch=release-security-data",
+  "parent packet SHA-256",
+  "not reviewer disposition or approval evidence"
 ]) {
   requireIncludes("docs/release-candidate-validation.md", docs, expected);
 }

@@ -166,10 +166,10 @@ export default async function DemoDetailPage({
             <strong>Compare pilot programs</strong>
             <p>Choose a structured engagement with outcomes, inputs, gates, and exclusions.</p>
           </Link>
-          <Link className="action-card" href="/pilot-demo-commercial-readiness">
-            <span>Accelerator</span>
-            <strong>Map price and pilot path</strong>
-            <p>Use market-aligned packaging before custom buyer work expands.</p>
+          <Link className="action-card" href="/pilot-demo-commercial-readiness#demo-session-planner">
+            <span>Presentation</span>
+            <strong>Build the demo run of show</strong>
+            <p>Choose an audience, focus, and meeting length before the buyer conversation.</p>
           </Link>
           <Link className="action-card" href="/pilot?offer=synthetic-pilot-evaluation">
             <span>Request</span>

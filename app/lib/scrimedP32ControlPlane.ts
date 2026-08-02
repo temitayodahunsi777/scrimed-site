@@ -95,8 +95,43 @@ import {
   imagingWorkflowIntelligenceBoundary,
   imagingWorkflowIntelligenceVersion
 } from "./imagingWorkflowIntelligence";
+import {
+  getP32GovernanceRecordsSummary,
+  scrimedP32GovernanceRecordsBoundary,
+  scrimedP32GovernanceRecordsVersion
+} from "./scrimed-work/p32GovernanceRecords";
+import {
+  getP32ApprovedActionsSummary,
+  scrimedP32ApprovedActionsBoundary,
+  scrimedP32ApprovedActionsVersion
+} from "./scrimed-work/p32ApprovedActions";
+import {
+  getP32TechnicalGateSummary,
+  scrimedP32TechnicalGateBoundary,
+  scrimedP32TechnicalGateVersion
+} from "./scrimed-work/p32TechnicalGates";
+import {
+  getP32AgentGovernanceSummary,
+  scrimedP32AgentGovernanceBoundary,
+  scrimedP32AgentGovernanceVersion
+} from "./scrimed-work/p32AgentGovernance";
+import {
+  getP32ArtifactAdmissionSummary,
+  scrimedP32ArtifactAdmissionBoundary,
+  scrimedP32ArtifactAdmissionVersion
+} from "./scrimed-work/p32ArtifactAdmission";
+import {
+  getP32InteroperabilityControlsSummary,
+  scrimedP32InteroperabilityBoundary,
+  scrimedP32InteroperabilityControlsVersion
+} from "./scrimed-work/p32InteroperabilityControls";
+import {
+  getP32HumanGovernanceSummary,
+  scrimedP32HumanGovernanceBoundary,
+  scrimedP32HumanGovernanceVersion
+} from "./scrimed-work/p32HumanGovernance";
 
-export const scrimedP32ControlPlaneVersion = "scrimed-p32-control-plane-v3-2026-07-28";
+export const scrimedP32ControlPlaneVersion = "scrimed-p32-control-plane-v5-2026-07-30";
 
 export function getScrimedP32FeatureFlags(env: NodeJS.ProcessEnv = process.env) {
   return {
@@ -128,6 +163,12 @@ export function getScrimedP32FeatureFlags(env: NodeJS.ProcessEnv = process.env) 
     mrdIntelligenceEnabled: env.SCRIMED_MRD_INTELLIGENCE_ENABLED === "true",
     providerConformanceEnabled: env.SCRIMED_PROVIDER_CONFORMANCE_ENABLED !== "false",
     networkIntelligenceEnabled: env.SCRIMED_NETWORK_INTELLIGENCE_ENABLED === "true",
+    agentCheckpointForkEnabled: env.SCRIMED_AGENT_CHECKPOINT_FORK_ENABLED === "true",
+    localOpenModelEvaluationEnabled: env.SCRIMED_LOCAL_OPEN_MODEL_EVALUATION_ENABLED === "true",
+    tenantSafeCacheEnabled: env.SCRIMED_TENANT_SAFE_CACHE_ENABLED === "true",
+    scientificCampaignsEnabled: env.SCRIMED_SCIENTIFIC_CAMPAIGNS_ENABLED === "true",
+    specialtyModelLanesEnabled: env.SCRIMED_SPECIALTY_MODEL_LANES_ENABLED === "true",
+    consolidatedGovernanceKernelEnabled: true,
     rcmVoiceEnabled: isP32RcmVoiceEnabled(env),
     rcmVoiceExternalCallsEnabled: false,
     rcmVoiceWritebackEnabled: false
@@ -197,7 +238,45 @@ export function getScrimedP32ControlPlaneSummary(env: NodeJS.ProcessEnv = proces
       "MRDTestProfile",
       "ProviderConformanceRun",
       "FacilityPerformanceNode",
-      "PriorAuthorizationProportionalityAnalysis"
+      "PriorAuthorizationProportionalityAnalysis",
+      "AgentJobManifest",
+      "ApprovedActionRegistry",
+      "DelegationEnvelope",
+      "HumanOversightPlan",
+      "ReviewerCapacityBudget",
+      "AIArtifactManifest",
+      "ArtifactAttestation",
+      "RollbackPlan",
+      "TaskScopedToolContract",
+      "ContextCoverageManifest",
+      "SummaryCoverageManifest",
+      "EvidenceSynthesisRecord",
+      "EvidenceLedger",
+      "AgentRiskProfile",
+      "AgentExecutionReceipt",
+      "ClinicalResponseEvaluation",
+      "DeidentificationRiskAssessment",
+      "DeidentificationRelease",
+      "GovernedSkillRunbook",
+      "ModelChangeSet",
+      "WorkloadPlacementDecision",
+      "ProtectionLevelAgreement",
+      "PostImplementationReview",
+      "CorrectableClinicalOutput",
+      "DecisionProvenanceRecord",
+      "IntegrationChangeSet",
+      "MigrationRunbook",
+      "ReconciliationReport",
+      "ApplicationLifecycleAssessment",
+      "PatientConsentGrant",
+      "EngagementObjective",
+      "CommunicationDeliveryPolicy",
+      "ClinicalCapabilityRegistry",
+      "ClinicalLaunchCell",
+      "AIValueCase",
+      "BenefitsRealizationReview",
+      "BoardOutcomeSnapshot",
+      "MarketSignal"
     ],
     clinicalSearchFabric: {
       version: clinicalSearchFabricVersion,
@@ -315,6 +394,43 @@ export function getScrimedP32ControlPlaneSummary(env: NodeJS.ProcessEnv = proces
       consequentialActionsDefault: "deny-or-human-review",
       productionExecutionAuthority: false,
       boundary: scrimedGovernedRuntimeBoundary
+    },
+    consolidatedGovernance: {
+      records: {
+        ...getP32GovernanceRecordsSummary(),
+        version: scrimedP32GovernanceRecordsVersion,
+        boundary: scrimedP32GovernanceRecordsBoundary
+      },
+      approvedActions: {
+        ...getP32ApprovedActionsSummary(),
+        version: scrimedP32ApprovedActionsVersion,
+        boundary: scrimedP32ApprovedActionsBoundary
+      },
+      technicalGates: {
+        ...getP32TechnicalGateSummary(),
+        version: scrimedP32TechnicalGateVersion,
+        boundary: scrimedP32TechnicalGateBoundary
+      },
+      agentGovernance: {
+        ...getP32AgentGovernanceSummary(),
+        version: scrimedP32AgentGovernanceVersion,
+        boundary: scrimedP32AgentGovernanceBoundary
+      },
+      artifactAdmission: {
+        ...getP32ArtifactAdmissionSummary(),
+        version: scrimedP32ArtifactAdmissionVersion,
+        boundary: scrimedP32ArtifactAdmissionBoundary
+      },
+      interoperabilityControls: {
+        ...getP32InteroperabilityControlsSummary(),
+        version: scrimedP32InteroperabilityControlsVersion,
+        boundary: scrimedP32InteroperabilityBoundary
+      },
+      humanGovernance: {
+        ...getP32HumanGovernanceSummary(),
+        version: scrimedP32HumanGovernanceVersion,
+        boundary: scrimedP32HumanGovernanceBoundary
+      }
     },
     careContextAutonomy: {
       version: scrimedP32CarePolicyVersion,

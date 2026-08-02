@@ -17,7 +17,7 @@ and composite workspace/tenant binding.
 | --- | --- | --- | --- |
 | 1 | `20260718153148_clinical_assurance_control_plane.sql` | `5cdc5be2794b233476687e5930546746802ee5b57de3011afc1a781fa7d3902b` | READY |
 | 2 | `20260721173000_p32_evidence_attestation_issuances.sql` | `18ca2d9df239d8eb1925b46ca7a85647ba9e6bfb513918e0720578bffafeb4fb` | READY |
-| 3 | `20260722120000_p32_candidate_review_control_plane.sql` | `78063e93d1fff9e0faa235d134b4475083f28aeac42b9351bba4b002d8134a37` | READY |
+| 3 | `20260722120000_p32_candidate_review_control_plane.sql` | `cdf380a8ae13d1134d9a33bdf872107e59effa295436e4dc3acba023b0283815` | READY |
 
 `READY` means ready for a separately authorized disposable-database dry-run. It does not
 mean ready to apply to production.
@@ -72,8 +72,9 @@ mean ready to apply to production.
   decisions for audit, and forward-recover.
 - **Locking/downtime:** New empty-table and function DDL; expected low risk. Composite foreign
   keys and function behavior require dry-run verification.
-- **Security:** Separation of duties, active reviewer membership, exact candidate hashes,
-  bounded approvals, idempotency, append-only evidence, and release authority fixed false.
+- **Security:** Separation of duties, active reviewer membership, exact candidate and signed
+  review-packet hashes, bounded approvals, idempotency, append-only evidence, and release
+  authority fixed false.
 - **Dependencies:** Migrations 1 and 2, `pilot_memberships`, `auth.users`,
   `require_governance_workspace`, and trusted signing-key runtime configuration.
 - **Rollback:** Feature off, revoke execute, preserve immutable review history, and use an

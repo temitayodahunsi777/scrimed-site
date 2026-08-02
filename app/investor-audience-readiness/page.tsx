@@ -50,7 +50,7 @@ export default function InvestorAudienceReadinessPage() {
           <strong>{summary.audiencePacketCount}</strong>
         </article>
         <article>
-          <span>Ready now</span>
+          <span>Audience prep ready</span>
           <strong>{summary.readyNowAudienceCount}</strong>
         </article>
         <article>
@@ -78,7 +78,7 @@ export default function InvestorAudienceReadinessPage() {
           <strong>{summary.strategicMeetingPacketCount}</strong>
         </article>
         <article>
-          <span>Diligence ready</span>
+          <span>Evidence-ready items</span>
           <strong>{summary.diligenceEvidenceReadyCount}</strong>
         </article>
         <article>
@@ -115,6 +115,51 @@ export default function InvestorAudienceReadinessPage() {
             <strong>{summary.authority.phiAuthority}</strong>
           </div>
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Parallel funding and candidate review track">
+        <div className="section-heading">
+          <p className="eyebrow">Parallel capital track</p>
+          <h2>Public proof can start a conversation; reviewed provenance unlocks diligence.</h2>
+          <p className="section-copy">
+            {summary.strategicInvestorOutreach.parallelFundingTrack.boundary} Current proof includes{" "}
+            {summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.executableDemoCount} executable synthetic demos and{" "}
+            {summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.pilotCount} governed pilot offers.
+          </p>
+        </div>
+        {summary.strategicInvestorOutreach.parallelFundingTrack.decisions.map((decision) => (
+          <article className="module-row" key={decision.action}>
+            <div>
+              <span>{decision.decision}</span>
+              <h2>{decision.action.replaceAll("-", " ")}</h2>
+            </div>
+            <p>{decision.readiness}</p>
+            <div>
+              <strong>
+                {decision.humanApprovalRequired
+                  ? "Named human action required"
+                  : "Internal preparation only"}
+              </strong>
+              <ul className="compact-list">
+                <li>Reasons: {decision.reasonCodes.join(", ")}</li>
+                <li>
+                  Candidate binding:{" "}
+                  {decision.candidateBinding.required
+                    ? decision.candidateBinding.verified
+                      ? "verified"
+                      : "required and not verified"
+                    : "not required"}
+                </li>
+                <li>
+                  Allowed: {decision.allowedAssets.length
+                    ? decision.allowedAssets.join(", ")
+                    : "none until gates close"}
+                </li>
+                <li>External action executed: {decision.externalActionExecuted ? "yes" : "no"}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Strategic investor ecosystem targets">

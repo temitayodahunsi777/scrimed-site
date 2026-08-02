@@ -16,6 +16,8 @@ npm run release:scrimed-p32-operator-packet
 
 When the working tree is clean, the candidate manifest and review packet evaluate a committed base-to-`HEAD` change set rather than an empty working-tree diff. Candidate, source, commit-tree, validation, and review-packet fingerprints therefore remain attributable after local commit promotion.
 
+For a mixed dirty worktree, `npm run evidence:scrimed-p32-worktree` produces local `NON_CANDIDATE` attribution evidence without granting promotion authority. The collector accepts only bounded regular files inside the repository, rejects symbolic links and path traversal, and records file mode and size with each SHA-256 digest. This prevents a worktree entry from redirecting evidence collection to external machine content. Its final attribution and non-candidate fingerprint outputs remain on disk but are narrowly ignored because they are self-referential generated evidence, not application source. The initial attribution, architecture crosswalk, and other deliberate evidence artifacts remain review-visible. A human still must review the attribution and create the clean candidate commit through the normal workflow.
+
 If promotion spans more than one local commit, export `SCRIMED_RELEASE_CANDIDATE_BASE_REF` with the exact reviewed ancestor for every evidence command. This prevents a follow-up commit from narrowing review coverage to only its immediate parent diff.
 
 ## Operator Gates
@@ -61,6 +63,10 @@ npm run release:scrimed-p32-evidence:strict -- \
 ```
 
 The client reruns bounded candidate validation, never prints the bearer token, requires an absolute output path outside Git, creates the transfer file with mode `0600`, and refuses to overwrite an existing file. Remove the short-lived token after the run. A valid issuer signature can satisfy only the AAL2 technical gate; all named approvals, deployment authority, post-deployment evidence, and customer go-live remain separate. `release:scrimed-p32-evidence:all-gates` must therefore remain nonzero until those independent gates are also satisfied.
+
+The protected issuer and candidate-review routes enforce the same mutation-provenance policy as SCRIMED Work. Browser requests must be exact same-origin requests. The bounded CLI sets `X-SCRIMED-Request-Context: operator-smoke-v1`; this header is not an authorization credential and never bypasses bearer, AAL2, RBAC, tenant, feature-flag, idempotency, or durable-ledger controls.
+
+Candidate-review readiness also resolves the authenticated actor's active workspace role from the actor's own row-level-security-scoped membership record. Tenant admins and pilot leads receive assignment controls, reviewers receive identity and disposition controls, and observers receive a read-only fingerprint view. The API enforces the same stage capability before cryptographic work, and the database independently enforces role and separation of duties.
 
 ## Migration Packet
 

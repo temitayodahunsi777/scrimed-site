@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   createP32CandidateReviewAssignment,
+  getP32CandidateReviewActorCapabilities,
   getP32CandidateReviewSummary,
   isP32CandidateReviewEnabled,
   P32CandidateReviewError,
@@ -14,6 +15,7 @@ import {
   createP32CandidateReviewAssignmentReceipt,
   getAccessiblePilotWorkspace,
   getAuthenticatedGovernanceContext,
+  getPilotWorkspaceMembershipAccess,
   recordP32CandidateReviewDecisionReceipt
 } from "../../../../../lib/protectedPilotStore";
 import {
@@ -24,6 +26,10 @@ import {
   enforceRequestRateLimit,
   rateLimitHeaders
 } from "../../../../../lib/requestRateLimit";
+import {
+  evaluateScrimedWorkWriteRequestProvenance,
+  scrimedWorkCsrfPolicyVersion
+} from "../../../../../lib/scrimed-work/csrfProtection";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -37,6 +43,7 @@ const routeHeaders = {
   "X-SCRIMED-Clinical-Care-Authority": "not-authorized-live-care",
   "X-SCRIMED-Data-Boundary": "synthetic-metadata-only",
   "X-SCRIMED-P32-Candidate-Review": "exact-candidate-human-review-only",
+  "X-SCRIMED-CSRF-Protection": scrimedWorkCsrfPolicyVersion,
   "X-SCRIMED-Release-Authority": "not-granted"
 };
 
@@ -55,15 +62,47 @@ function controlledError(
 
 async function authenticatedWorkspace(request: Request, workspaceSlug: string) {
   const context = await getAuthenticatedGovernanceContext(request);
-  if (!context.ok) return { context, workspace: null } as const;
+  if (!context.ok) {
+    return { context, workspace: null, membership: null, membershipError: null } as const;
+  }
   const workspaceResult = await getAccessiblePilotWorkspace(
     context.client,
     workspaceSlug
   );
   if (workspaceResult.error || !workspaceResult.workspace) {
-    return { context, workspace: null } as const;
+    return { context, workspace: null, membership: null, membershipError: null } as const;
   }
-  return { context, workspace: workspaceResult.workspace } as const;
+  const membershipResult = await getPilotWorkspaceMembershipAccess(
+    context.client,
+    workspaceResult.workspace.tenantId,
+    context.user.id
+  );
+  return {
+    context,
+    workspace: workspaceResult.workspace,
+    membership: membershipResult.membership,
+    membershipError: membershipResult.error
+  } as const;
+}
+
+function membershipFailureResponse(
+  queryFailed: boolean,
+  headers: HeadersInit
+) {
+  return NextResponse.json(
+    {
+      error: {
+        code: queryFailed
+          ? "p32-candidate-review-membership-unavailable"
+          : "p32-candidate-review-role-denied",
+        message: queryFailed
+          ? "Candidate-review membership could not be verified. The workflow failed closed."
+          : "An active workspace role is required for candidate-review access."
+      },
+      boundary: scrimedP32CandidateReviewBoundary
+    },
+    { status: queryFailed ? 503 : 403, headers }
+  );
 }
 
 export async function GET(request: Request, { params }: RouteContext) {
@@ -124,6 +163,9 @@ export async function GET(request: Request, { params }: RouteContext) {
       { status: 404, headers }
     );
   }
+  if (!resolved.membership) {
+    return membershipFailureResponse(Boolean(resolved.membershipError), headers);
+  }
 
   try {
     return NextResponse.json(
@@ -133,7 +175,10 @@ export async function GET(request: Request, { params }: RouteContext) {
         ...getP32CandidateReviewSummary({
           tenantId: resolved.workspace.tenantId,
           userId: resolved.context.user.id
-        })
+        }),
+        actorCapabilities: getP32CandidateReviewActorCapabilities(
+          resolved.membership.role
+        )
       },
       { status: 200, headers }
     );
@@ -185,6 +230,19 @@ export async function POST(request: Request, { params }: RouteContext) {
         boundary: scrimedP32CandidateReviewBoundary
       },
       { status: 503, headers }
+    );
+  }
+  const provenance = evaluateScrimedWorkWriteRequestProvenance(request);
+  if (!provenance.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "p32-candidate-review-csrf-denied",
+          message: "Protected candidate review rejected an unverifiable mutation origin."
+        },
+        boundary: scrimedP32CandidateReviewBoundary
+      },
+      { status: 403, headers }
     );
   }
   if (action !== "assign" && action !== "decide") {
@@ -262,6 +320,29 @@ export async function POST(request: Request, { params }: RouteContext) {
         boundary: protectedPilotBoundary
       },
       { status: 404, headers }
+    );
+  }
+  if (!resolved.membership) {
+    return membershipFailureResponse(Boolean(resolved.membershipError), headers);
+  }
+
+  const actorCapabilities = getP32CandidateReviewActorCapabilities(
+    resolved.membership.role
+  );
+  if (
+    (action === "assign" && !actorCapabilities.canAssignReview) ||
+    (action === "decide" && !actorCapabilities.canRecordDecision)
+  ) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "p32-candidate-review-stage-forbidden",
+          message: "The authenticated workspace role cannot perform this candidate-review stage."
+        },
+        actorCapabilities,
+        boundary: scrimedP32CandidateReviewBoundary
+      },
+      { status: 403, headers }
     );
   }
 

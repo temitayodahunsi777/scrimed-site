@@ -1,6 +1,6 @@
 import type { ModelRouteDecision, RiskLevel } from "./types";
 
-export const scrimedP32ContractVersion = "scrimed-p32-contracts-v1-2026-07-20";
+export const scrimedP32ContractVersion = "scrimed-p32-contracts-v2-2026-07-30";
 
 export const scrimedP32Boundary =
   "SCRIMED p.32 operates on public, synthetic, deidentified, or metadata-only inputs. It does not authorize live PHI, autonomous diagnosis or treatment, trial enrollment, patient outreach, payer submission, EHR writeback, production migration, certification claims, or customer go-live.";
@@ -378,6 +378,7 @@ export type ApprovalEvidence = {
   sourceTreeFingerprint: string;
   artifactFingerprint: string;
   validationEvidenceFingerprint: string;
+  reviewPacketFingerprint: string | null;
   evidencePointer: string;
   approvedAt: string;
   expiresAt: string;
@@ -397,6 +398,7 @@ export type ReleaseGateResult = {
     sourceTree: string;
     artifact: string;
     validationEvidence: string;
+    reviewPacket: string;
   };
   status: "PASS" | "FAIL" | "BLOCKED" | "OPERATOR_REQUIRED" | "NOT_APPLICABLE";
   reason: string;

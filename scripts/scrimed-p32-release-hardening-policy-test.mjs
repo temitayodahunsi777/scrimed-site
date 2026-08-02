@@ -295,7 +295,8 @@ const expectedFingerprints = {
   sourceCommit: "a".repeat(40),
   sourceTree: "b".repeat(64),
   artifact: "c".repeat(64),
-  validationEvidence: "d".repeat(64)
+  validationEvidence: "d".repeat(64),
+  reviewPacket: "e".repeat(64)
 };
 const candidateEvidence = createP32AutomatedGateEvidence({
   evidenceId: "candidate-validation",
@@ -304,6 +305,7 @@ const candidateEvidence = createP32AutomatedGateEvidence({
   sourceTreeFingerprint: expectedFingerprints.sourceTree,
   artifactFingerprint: expectedFingerprints.artifact,
   validationEvidenceFingerprint: expectedFingerprints.validationEvidence,
+  reviewPacketFingerprint: expectedFingerprints.reviewPacket,
   identityAssurance: "local-deterministic-runner",
   generatedAt: issuedAt,
   checkedAt: issuedAt,

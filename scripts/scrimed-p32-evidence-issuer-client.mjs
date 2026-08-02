@@ -114,7 +114,8 @@ try {
       headers: {
         Authorization: `Bearer ${bearerToken}`,
         "Content-Type": "application/json",
-        "Idempotency-Key": randomUUID()
+        "Idempotency-Key": randomUUID(),
+        "X-SCRIMED-Request-Context": "operator-smoke-v1"
       },
       body: JSON.stringify(requestBody)
     }

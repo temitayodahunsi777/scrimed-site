@@ -5,7 +5,10 @@ import { lstat, readFile, readlink } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-const args = new Set(process.argv.slice(2));
+const rawArgs = process.argv.slice(2);
+const batchArgs = rawArgs.filter((arg) => arg.startsWith("--batch="));
+const requestedBatchId = batchArgs[0]?.slice("--batch=".length) ?? null;
+const args = new Set(rawArgs.filter((arg) => !arg.startsWith("--batch=")));
 const allowedArgs = new Set(["--json", "--markdown", "--strict", "--self-test"]);
 const unknownArgs = [...args].filter((arg) => !allowedArgs.has(arg));
 const maximumHashFileBytes = 32 * 1024 * 1024;
@@ -15,8 +18,20 @@ if (unknownArgs.length > 0) {
   throw new Error(`Unsupported release candidate review packet option: ${unknownArgs.join(", ")}`);
 }
 
+if (batchArgs.length > 1 || (batchArgs.length === 1 && !requestedBatchId)) {
+  throw new Error("Provide exactly one non-empty --batch=<batch-id> value.");
+}
+
 if (args.has("--json") && args.has("--markdown")) {
   throw new Error("Choose either --json or --markdown, not both.");
+}
+
+if (requestedBatchId && !args.has("--json") && !args.has("--markdown")) {
+  throw new Error("A batch export requires either --json or --markdown.");
+}
+
+if (requestedBatchId && args.has("--self-test")) {
+  throw new Error("Batch export cannot be combined with --self-test.");
 }
 
 const reviewerResponsibilities = {
@@ -32,6 +47,44 @@ const reviewerResponsibilities = {
   "Product and UI owner": "Review user-facing behavior, accessibility, navigation, and product consistency.",
   "Documentation owner": "Review operational accuracy, limitations, runbooks, and documentation consistency."
 };
+
+const reviewBatchDefinitions = [
+  {
+    id: "release-security-data",
+    order: 1,
+    title: "Release, security, identity, configuration, and data controls",
+    focus:
+      "Review migrations, identity boundaries, release controls, dependency/configuration changes, and fail-closed security behavior first."
+  },
+  {
+    id: "runtime-clinical-api",
+    order: 2,
+    title: "Runtime policy, clinical boundaries, and API contracts",
+    focus:
+      "Review domain logic, protected runtime behavior, clinical safety boundaries, authorization contracts, and API compatibility."
+  },
+  {
+    id: "product-claims-ui",
+    order: 3,
+    title: "Product experience, public claims, and commercial surfaces",
+    focus:
+      "Review user-facing behavior, accessibility, commercial and investor claims, navigation, and retained authority boundaries."
+  },
+  {
+    id: "quality-evidence",
+    order: 4,
+    title: "Quality, security tests, and validation evidence",
+    focus:
+      "Review policy tests, contract checks, smoke coverage, generated-integrity controls, and validation behavior."
+  },
+  {
+    id: "documentation-operations",
+    order: 5,
+    title: "Documentation, runbooks, and operating guidance",
+    focus:
+      "Review implementation records, runbooks, limitations, operator instructions, and documentation accuracy."
+  }
+];
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -158,6 +211,71 @@ function buildLane(role, files) {
   };
 }
 
+function reviewBatchIdForFile(file) {
+  if (
+    file.category === "database"
+    || file.category === "release-infrastructure"
+    || file.category === "configuration"
+    || file.riskTags.includes("security-identity")
+    || file.riskTags.includes("release-pipeline")
+  ) {
+    return "release-security-data";
+  }
+
+  if (
+    file.category === "api"
+    || file.category === "core-policy"
+    || file.riskTags.includes("clinical-safety")
+    || file.riskTags.includes("api-contract")
+  ) {
+    return "runtime-clinical-api";
+  }
+
+  if (
+    file.category === "application-ui"
+    || file.riskTags.includes("public-claims")
+    || file.riskTags.includes("user-interface")
+  ) {
+    return "product-claims-ui";
+  }
+
+  if (file.category === "quality-security") {
+    return "quality-evidence";
+  }
+
+  return "documentation-operations";
+}
+
+function buildReviewBatches(files) {
+  return reviewBatchDefinitions.map((definition) => {
+    const batchFiles = files.filter((file) => reviewBatchIdForFile(file) === definition.id);
+    const fileRefs = batchFiles.map((file) => ({
+      fileId: file.fileId,
+      path: file.path,
+      pathHashSha256: file.pathHashSha256,
+      status: file.status,
+      contentSha256: file.contentSha256
+    }));
+    const requiredReviewerRoles = [...new Set(batchFiles.flatMap((file) => file.reviewerRoles))].sort();
+    const batchDigestSha256 = sha256(stableJson({
+      id: definition.id,
+      order: definition.order,
+      fileRefs,
+      requiredReviewerRoles
+    }));
+
+    return {
+      ...definition,
+      fileCount: batchFiles.length,
+      fileRefs,
+      requiredReviewerRoles,
+      batchDigestSha256,
+      disposition: "pending-named-reviewers",
+      approvalAuthority: false
+    };
+  });
+}
+
 function redactPath(filePath) {
   return {
     path: null,
@@ -214,6 +332,13 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
   const rejectedFiles = files.filter((file) => !file.reviewable);
   const reviewerRoles = [...new Set(reviewableFiles.flatMap((file) => file.reviewerRoles))].sort();
   const lanes = reviewerRoles.map((role) => buildLane(role, reviewableFiles.filter((file) => file.reviewerRoles.includes(role))));
+  const reviewBatches = buildReviewBatches(reviewableFiles);
+  const batchedFileIds = reviewBatches.flatMap((batch) => batch.fileRefs.map((file) => file.fileId));
+  const uniqueBatchedFileIds = new Set(batchedFileIds);
+  const reviewBatchCoverageComplete =
+    batchedFileIds.length === reviewableFiles.length
+    && uniqueBatchedFileIds.size === reviewableFiles.length
+    && reviewableFiles.every((file) => uniqueBatchedFileIds.has(file.fileId));
   const requiredBaseCoverage = reviewableFiles.every((file) => (
     file.reviewerRoles.includes("Release steward") && file.reviewerRoles.includes("Principal engineer")
   ));
@@ -235,6 +360,7 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
   if (!fileCountMatchesManifest) blockers.push("candidate-file-count-mismatch");
   if (!sourceFileCountMatchesManifest) blockers.push("source-file-count-mismatch");
   if (!requiredBaseCoverage || !manifestReviewerCoverage) blockers.push("reviewer-lane-coverage-incomplete");
+  if (!reviewBatchCoverageComplete) blockers.push("review-batch-coverage-incomplete");
   if (duplicateFileIds > 0) blockers.push("duplicate-file-identity");
   if (rejectedFiles.length > 0) blockers.push("candidate-files-withheld-or-unreviewable");
 
@@ -256,6 +382,9 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
     categoryCounts,
     reviewerRoles,
     lanes,
+    reviewBatches,
+    reviewBatchCoverageComplete,
+    recommendedReviewOrder: reviewBatches.map((batch) => batch.id),
     files,
     blockers,
     completeCoverage
@@ -313,6 +442,7 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
     nextActions: completeCoverage
       ? [
         "Provide the internal JSON or Markdown packet to the named reviewers through the approved access-controlled channel.",
+        "Review the deterministic batches in recommended order and record specialist dispositions against each batch digest.",
         "Record each reviewer disposition against the exact candidate, source, and packet SHA-256 values.",
         "Rerun candidate validation after any source change; stale review evidence must be rejected.",
         "Only an authorized release steward may advance a fully reviewed candidate into the approved commit workflow."
@@ -322,6 +452,93 @@ export function buildCandidateReviewPacket({ manifest, inspectedFiles, generated
         "Regenerate the candidate manifest and review packet after remediation."
       ],
     boundary: "This packet partitions a local candidate for human review. It includes hashes and internal path metadata only, grants no approval or release authority, and never commits, deploys, applies migrations, distributes artifacts, enables PHI, or authorizes clinical care."
+  };
+}
+
+export function buildReviewBatchExport(packet, batchId) {
+  if (typeof batchId !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(batchId)) {
+    throw new Error("Review batch id must use lowercase kebab-case.");
+  }
+
+  if (!packet.completeCoverage || !packet.reviewBatchCoverageComplete) {
+    throw new Error("Review batch export requires a complete parent review packet.");
+  }
+
+  const batch = packet.reviewBatches.find((candidate) => candidate.id === batchId);
+  if (!batch) {
+    throw new Error(`Unknown review batch: ${batchId}.`);
+  }
+
+  const batchFileIds = new Set(batch.fileRefs.map((file) => file.fileId));
+  const files = packet.files.filter((file) => batchFileIds.has(file.fileId));
+  const selectedFileIds = new Set(files.map((file) => file.fileId));
+  if (
+    files.length !== batch.fileCount
+    || selectedFileIds.size !== batch.fileCount
+    || batch.fileRefs.some((file) => !selectedFileIds.has(file.fileId))
+    || files.some((file) => !file.reviewable)
+  ) {
+    throw new Error(`Review batch ${batchId} failed file coverage verification.`);
+  }
+
+  const exportCore = {
+    schemaVersion: "1.0.0",
+    candidateDigestSha256: packet.candidateDigestSha256,
+    sourceCandidateDigestSha256: packet.sourceCandidateDigestSha256,
+    parentReviewPacketSha256: packet.candidateReviewPacketSha256,
+    baseHeadSha: packet.baseHeadSha,
+    riskClass: packet.riskClass,
+    batch,
+    files
+  };
+  const reviewBatchExportSha256 = sha256(stableJson(exportCore));
+
+  return {
+    service: "scrimed-release-candidate-review-batch-export",
+    status: "ready-for-assigned-reviewers",
+    ...exportCore,
+    reviewBatchExportSha256,
+    dispositionTemplate: {
+      status: "unrecorded",
+      batchId,
+      batchDigestSha256: batch.batchDigestSha256,
+      candidateDigestSha256: packet.candidateDigestSha256,
+      sourceCandidateDigestSha256: packet.sourceCandidateDigestSha256,
+      parentReviewPacketSha256: packet.candidateReviewPacketSha256,
+      reviewerRole: null,
+      reviewerIdentityHashSha256: null,
+      decision: null,
+      decidedAt: null,
+      expiresAt: null,
+      evidencePointer: null,
+      decisionHashSha256: null
+    },
+    authority: {
+      batchApproved: false,
+      parentPacketApproved: false,
+      sourceCommitAuthorized: false,
+      releasePromotionAllowed: false,
+      deploymentAuthorized: false,
+      migrationApplyAuthorized: false,
+      externalDistributionAuthorized: false,
+      phiProcessingAuthorized: false,
+      autonomousClinicalCareAuthorized: false
+    },
+    handling: {
+      leastDisclosureBatchOnly: true,
+      fileContentsIncluded: false,
+      rawDiffIncluded: false,
+      secretsIncluded: false,
+      phiIncluded: false,
+      approvedChannelRequired: true
+    },
+    nextActions: [
+      "Review only the assigned batch against its focus, required roles, exact file identities, and parent candidate fingerprints.",
+      "Record any disposition through the approved protected workflow; this export is not approval evidence.",
+      "Reject the export if any candidate, source, parent packet, batch, or export fingerprint differs from the protected review record."
+    ],
+    boundary:
+      "This least-disclosure batch export is a derivative internal review aid. It does not approve the batch or parent candidate, authorize a commit, release, deployment, migration, external distribution, PHI processing, or clinical care."
   };
 }
 
@@ -466,6 +683,9 @@ function escapeMarkdown(value) {
 }
 
 function renderMarkdown(packet) {
+  const batchByFileId = new Map(
+    packet.reviewBatches.flatMap((batch) => batch.fileRefs.map((file) => [file.fileId, batch.id]))
+  );
   const lines = [
     "# SCRIMED Release Candidate Review Packet",
     "",
@@ -486,11 +706,25 @@ function renderMarkdown(packet) {
     "| --- | ---: | --- |",
     ...packet.lanes.map((lane) => `| ${escapeMarkdown(lane.reviewerRole)} | ${lane.fileCount} | ${lane.disposition} |`),
     "",
+    "## Risk-Ordered Review Batches",
+    "",
+    "| Order | Batch | Files | Required reviewers | Batch SHA-256 |",
+    "| ---: | --- | ---: | --- | --- |",
+    ...packet.reviewBatches.map((batch) => `| ${batch.order} | ${escapeMarkdown(batch.title)} | ${batch.fileCount} | ${escapeMarkdown(batch.requiredReviewerRoles.join("; ") || "none")} | ${batch.batchDigestSha256} |`),
+    "",
+    ...packet.reviewBatches.flatMap((batch) => [
+      `### ${batch.order}. ${batch.title}`,
+      "",
+      batch.focus,
+      "",
+      `Disposition: ${batch.disposition}. Approval authority: ${batch.approvalAuthority}.`,
+      ""
+    ]),
     "## Candidate Files",
     "",
-    "| File | Status | Category | Content SHA-256 | Required reviewers |",
-    "| --- | --- | --- | --- | --- |",
-    ...packet.files.map((file) => `| ${escapeMarkdown(file.path ?? `[withheld:${file.pathHashSha256.slice(0, 12)}]`)} | ${file.status} | ${file.category} | ${file.contentSha256 ?? "deleted/unavailable"} | ${escapeMarkdown(file.reviewerRoles.join("; ") || "blocked")} |`),
+    "| File | Status | Category | Review batch | Content SHA-256 | Required reviewers |",
+    "| --- | --- | --- | --- | --- | --- |",
+    ...packet.files.map((file) => `| ${escapeMarkdown(file.path ?? `[withheld:${file.pathHashSha256.slice(0, 12)}]`)} | ${file.status} | ${file.category} | ${batchByFileId.get(file.fileId) ?? "blocked"} | ${file.contentSha256 ?? "deleted/unavailable"} | ${escapeMarkdown(file.reviewerRoles.join("; ") || "blocked")} |`),
     "",
     "## Blockers",
     "",
@@ -499,6 +733,40 @@ function renderMarkdown(packet) {
     "## Boundary",
     "",
     packet.boundary
+  ];
+  return `${lines.join("\n")}\n`;
+}
+
+function renderBatchMarkdown(batchExport) {
+  const lines = [
+    "# SCRIMED Release Candidate Review Batch",
+    "",
+    `- Status: \`${batchExport.status}\``,
+    `- Candidate SHA-256: \`${batchExport.candidateDigestSha256}\``,
+    `- Source SHA-256: \`${batchExport.sourceCandidateDigestSha256}\``,
+    `- Parent review packet SHA-256: \`${batchExport.parentReviewPacketSha256}\``,
+    `- Batch: \`${batchExport.batch.id}\``,
+    `- Batch SHA-256: \`${batchExport.batch.batchDigestSha256}\``,
+    `- Batch export SHA-256: \`${batchExport.reviewBatchExportSha256}\``,
+    `- Files: ${batchExport.batch.fileCount}`,
+    "",
+    "> Internal least-disclosure reviewer metadata only. This export grants no approval, commit, release, deployment, migration, distribution, PHI, or clinical authority.",
+    "",
+    `## ${batchExport.batch.order}. ${batchExport.batch.title}`,
+    "",
+    batchExport.batch.focus,
+    "",
+    `Required reviewer roles: ${batchExport.batch.requiredReviewerRoles.join("; ") || "none"}`,
+    "",
+    "## Files",
+    "",
+    "| File | Status | Category | Content SHA-256 | Required reviewers |",
+    "| --- | --- | --- | --- | --- |",
+    ...batchExport.files.map((file) => `| ${escapeMarkdown(file.path ?? `[withheld:${file.pathHashSha256.slice(0, 12)}]`)} | ${file.status} | ${file.category} | ${file.contentSha256 ?? "deleted/unavailable"} | ${escapeMarkdown(file.reviewerRoles.join("; ") || "blocked")} |`),
+    "",
+    "## Boundary",
+    "",
+    batchExport.boundary
   ];
   return `${lines.join("\n")}\n`;
 }
@@ -597,6 +865,20 @@ function runSelfTest() {
     ],
     generatedAt
   });
+  const batchExport = buildReviewBatchExport(ready, "release-security-data");
+  const repeatedBatchExport = buildReviewBatchExport(repeated, "release-security-data");
+  let rejectedUnknownBatch = false;
+  let rejectedIncompleteParent = false;
+  try {
+    buildReviewBatchExport(ready, "unknown-batch");
+  } catch {
+    rejectedUnknownBatch = true;
+  }
+  try {
+    buildReviewBatchExport(blocked, "release-security-data");
+  } catch {
+    rejectedIncompleteParent = true;
+  }
 
   if (
     ready.status !== "ready-for-named-reviewer-disposition"
@@ -607,6 +889,22 @@ function runSelfTest() {
     || ready.headTreeSha !== manifest.headTreeSha
     || !ready.completeCoverage
     || !ready.requiredBaseCoverage
+    || !ready.reviewBatchCoverageComplete
+    || ready.reviewBatches.length !== reviewBatchDefinitions.length
+    || ready.reviewBatches.reduce((count, batch) => count + batch.fileCount, 0) !== ready.reviewableFileCount
+    || ready.reviewBatches.some((batch) => !isSha(batch.batchDigestSha256, 64) || batch.approvalAuthority)
+    || ready.recommendedReviewOrder[0] !== "release-security-data"
+    || batchExport.status !== "ready-for-assigned-reviewers"
+    || batchExport.batch.id !== "release-security-data"
+    || batchExport.files.length !== batchExport.batch.fileCount
+    || batchExport.parentReviewPacketSha256 !== ready.candidateReviewPacketSha256
+    || batchExport.reviewBatchExportSha256 !== repeatedBatchExport.reviewBatchExportSha256
+    || batchExport.authority.batchApproved
+    || batchExport.authority.releasePromotionAllowed
+    || !batchExport.handling.leastDisclosureBatchOnly
+    || batchExport.handling.fileContentsIncluded
+    || !rejectedUnknownBatch
+    || !rejectedIncompleteParent
     || ready.reviewableFileCount !== 3
     || ready.authority.releasePromotionAllowed
     || ready.authority.sourceCommitAuthorized
@@ -631,16 +929,17 @@ if (args.has("--self-test")) {
 }
 
 const packet = await inspectCurrentCandidate();
+const batchExport = requestedBatchId ? buildReviewBatchExport(packet, requestedBatchId) : null;
 
 if (args.has("--json")) {
-  console.log(JSON.stringify(packet, null, 2));
+  console.log(JSON.stringify(batchExport ?? packet, null, 2));
 } else if (args.has("--markdown")) {
-  console.log(renderMarkdown(packet));
+  console.log(batchExport ? renderBatchMarkdown(batchExport) : renderMarkdown(packet));
 } else {
   console.log(`report SCRIMED release candidate review packet: ${packet.status}`);
   console.log(`base_head=${packet.baseHeadSha?.slice(0, 12) ?? "unavailable"} candidate_fingerprint=${packet.candidateDigestSha256?.slice(0, 16) ?? "unavailable"} source_fingerprint=${packet.sourceCandidateDigestSha256?.slice(0, 16) ?? "unavailable"}`);
   console.log(`review_packet_fingerprint=${packet.candidateReviewPacketSha256.slice(0, 16)} changed_files=${packet.changedFileCount} reviewable_files=${packet.reviewableFileCount} rejected_files=${packet.rejectedFileCount}`);
-  console.log(`reviewer_lanes=${packet.lanes.length} complete_coverage=${packet.completeCoverage} risk=${packet.riskClass}`);
+  console.log(`reviewer_lanes=${packet.lanes.length} review_batches=${packet.reviewBatches.length} batch_coverage=${packet.reviewBatchCoverageComplete} complete_coverage=${packet.completeCoverage} risk=${packet.riskClass}`);
   console.log(`blockers=${packet.blockers.length > 0 ? packet.blockers.join(";") : "none"}`);
   console.log(packet.boundary);
   console.log("release_promotion_allowed=false");

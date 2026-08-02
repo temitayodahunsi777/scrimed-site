@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 
 import {
   buildStrategicInvestorMeetingBrief,
+  evaluateInvestorEngagementAction,
+  getParallelFundingTrack,
   getStrategicInvestorMeetingProfile,
   strategicFundingReadinessControls,
   strategicInvestorMeetingProfiles
@@ -70,6 +72,90 @@ assert.equal(
   true
 );
 
+const preview = getParallelFundingTrack();
+assert.equal(preview.status, "parallel-pre-fundraise-and-candidate-review");
+assert.equal(preview.evidenceClass, "synthetic-readiness-preview");
+assert.equal(preview.commercialProof.executableDemoCount, 6);
+assert.equal(preview.commercialProof.pilotCount, 4);
+assert.equal(preview.controls.candidateReviewContinues, true);
+assert.equal(preview.controls.externalOutreachSent, false);
+assert.equal(preview.controls.investorDeckReleased, false);
+assert.equal(
+  preview.decisions.find((decision) => decision.action === "prepare-internal-materials")?.decision,
+  "ALLOW"
+);
+assert.equal(
+  preview.decisions.find((decision) => decision.action === "public-discovery-conversation")?.decision,
+  "REQUIRE_HUMAN"
+);
+assert.equal(
+  preview.decisions.find((decision) => decision.action === "share-investor-deck")?.decision,
+  "BLOCK"
+);
+assert.equal(
+  preview.decisions.find((decision) => decision.action === "open-diligence-room")?.readiness,
+  "candidate-review-required"
+);
+assert.equal(
+  preview.decisions.every((decision) => decision.externalActionExecuted === false),
+  true
+);
+
+const verifiedEvidence = {
+  evidenceClass: "verified-operator-evidence",
+  publicClaimsGuardPassed: true,
+  publicMaterialsOnly: true,
+  founderApprovalRecorded: true,
+  cleanCandidate: true,
+  namedReviewerApprovalRecorded: true,
+  candidateFingerprint: "a".repeat(64),
+  sourceFingerprint: "b".repeat(64),
+  reviewPacketFingerprint: "c".repeat(64),
+  investorDeckFingerprint: "d".repeat(64),
+  investorDeckFounderApproved: true,
+  investorDeckCounselApproved: true,
+  investorDeckFinanceApproved: true,
+  releaseStewardApprovalRecorded: true,
+  customerEvidenceIncluded: false,
+  customerEvidencePermissionRecorded: false,
+  securitiesCounselApprovalRecorded: true
+};
+const fullyBoundDeck = evaluateInvestorEngagementAction("share-investor-deck", verifiedEvidence);
+assert.equal(fullyBoundDeck.decision, "REQUIRE_HUMAN");
+assert.equal(fullyBoundDeck.candidateBinding.verified, true);
+assert.equal(fullyBoundDeck.externalActionExecuted, false);
+
+const malformedCandidate = evaluateInvestorEngagementAction("share-investor-deck", {
+  ...verifiedEvidence,
+  candidateFingerprint: "not-a-sha256"
+});
+assert.equal(malformedCandidate.decision, "BLOCK");
+assert.equal(
+  malformedCandidate.reasonCodes.includes("CLEAN_CANDIDATE_AND_NAMED_REVIEW_REQUIRED"),
+  true
+);
+
+const unpermissionedCustomerEvidence = evaluateInvestorEngagementAction("open-diligence-room", {
+  ...verifiedEvidence,
+  customerEvidenceIncluded: true,
+  customerEvidencePermissionRecorded: false
+});
+assert.equal(unpermissionedCustomerEvidence.decision, "BLOCK");
+assert.equal(
+  unpermissionedCustomerEvidence.reasonCodes.includes("CUSTOMER_EVIDENCE_PERMISSION_REQUIRED"),
+  true
+);
+
+const missingCounsel = evaluateInvestorEngagementAction("securities-solicitation", {
+  ...verifiedEvidence,
+  securitiesCounselApprovalRecorded: false
+});
+assert.equal(missingCounsel.decision, "BLOCK");
+assert.equal(
+  missingCounsel.reasonCodes.includes("SECURITIES_COUNSEL_APPROVAL_REQUIRED"),
+  true
+);
+
 console.log(
-  "pass strategic investor meeting policy (official-source lanes, internal preparation, weakest-link funding controls, no implied relationship)"
+  "pass strategic investor meeting policy (parallel discovery, fingerprint-bound diligence, weakest-link funding controls, no implied relationship)"
 );

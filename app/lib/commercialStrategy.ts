@@ -1,5 +1,17 @@
 export type PricingTierStatus = "public-preview" | "sellable-now" | "protected-pilot" | "enterprise-license" | "strategic";
 export type SalesMotionPhase = "discover" | "evaluate" | "pilot" | "license" | "expand";
+export type CommercialPriceCadence = "no-charge" | "one-time" | "annual" | "multi-year";
+export type CommercialPricingAuthority =
+  | "public-no-charge"
+  | "non-binding-planning-range"
+  | "human-approved-proposal-required";
+export type CommercialEngagementGoal = "assessment" | "synthetic-pilot" | "protected-pilot";
+
+export type CommercialPriceRange = {
+  minimumUsd: number;
+  maximumUsd: number;
+  cadence: CommercialPriceCadence;
+};
 
 export type ProductAccessRoute = {
   surface: string;
@@ -12,6 +24,9 @@ export type PricingTier = {
   name: string;
   status: PricingTierStatus;
   recommendedDisplayPrice: string;
+  priceRange: CommercialPriceRange;
+  pricingAuthority: CommercialPricingAuthority;
+  proposalGate: string;
   buyer: string;
   entryCriteria: string[];
   includes: string[];
@@ -49,8 +64,33 @@ export type CommercialGuardrail = {
 export type MarketPricingBenchmark = {
   segment: string;
   publicSignal: string;
-  source: string;
+  sourceName: string;
+  sourceUrl: string;
+  lastVerified: string;
+  reviewDue: string;
+  evidenceStatus: "first-party-public" | "public-research";
+  comparisonBoundary: string;
   scrimedImplication: string;
+};
+
+export type MarketPricingEvidenceFreshness = "current" | "review-due" | "stale";
+
+export type MarketPricingEvidenceItem = MarketPricingBenchmark & {
+  freshness: MarketPricingEvidenceFreshness;
+  daysUntilReview: number;
+};
+
+export type MarketPricingEvidenceReview = {
+  asOfDate: string;
+  status: "current" | "review-required";
+  currentCount: number;
+  reviewDueCount: number;
+  staleCount: number;
+  competitiveComparisonAllowed: boolean;
+  humanReviewRequired: true;
+  nextReviewDue: string;
+  items: MarketPricingEvidenceItem[];
+  decisionRule: string;
 };
 
 export type PricingAlignmentDecision = {
@@ -67,41 +107,137 @@ export type PremiumPricingPrinciple = {
   guardrail: string;
 };
 
+export type CommercialReadinessControl = {
+  dimension: "value" | "competitive-evidence" | "global-positioning" | "safety" | "privacy" | "governance";
+  status: "enforced-in-code" | "evidence-route-available" | "external-review-required";
+  currentEvidence: string;
+  decisionRule: string;
+  proofRoute: string;
+};
+
+export type CompetitivePositioningPillar = {
+  pillar: string;
+  buyerValue: string;
+  inspectableProof: string;
+  proofRoute: string;
+  blockedClaim: string;
+};
+
+export type GlobalCommercialProfile = {
+  regionProfile: string;
+  buyerFit: string;
+  entryMotion: string;
+  pricingPolicy: string;
+  requiredLocalization: string[];
+  retainedGates: string[];
+  proofRoute: string;
+};
+
+export type CommercialValueScenarioInput = {
+  engagementGoal: CommercialEngagementGoal;
+  annualWorkflowVolume: number;
+  baselineMinutesPerWorkflow: number;
+  loadedHourlyCostUsd: number;
+  eligibleCaptureRate: number;
+  expectedEfficiencyRate: number;
+  verifiedTaskRate: number;
+  plannedSpendUsd: number;
+};
+
+export type CommercialValueScenario = {
+  status: "value-hypothesis-supported-by-inputs" | "value-hypothesis-not-yet-supported-by-inputs";
+  engagementGoal: CommercialEngagementGoal;
+  annualManualCostBaselineUsd: number;
+  estimatedVerifiedCapacityValueUsd: number;
+  estimatedNetPlanningValueUsd: number;
+  valueToCostRatio: number;
+  estimatedBreakEvenMonths: number | null;
+  estimatedVerifiedWorkflowCount: number;
+  costPerVerifiedWorkflowUsd: number;
+  pricingAuthority: "non-binding-planning-model";
+  humanReviewRequired: true;
+  assumptions: string[];
+  blockedUses: string[];
+};
+
+export type CommercialScopeInput = {
+  engagementGoal: CommercialEngagementGoal;
+  workflowCount: number;
+  siteCount: number;
+  regionCount: number;
+  protectedEnvironmentRequested: boolean;
+};
+
+export type CommercialScopeDecision = {
+  status: "ready-for-human-scoping" | "scope-mismatch-requires-human-rescoping";
+  recommendedTier: string;
+  priceRange: CommercialPriceRange;
+  reason: string;
+  requiredGates: string[];
+  bindingQuoteAuthorized: false;
+  productionAuthorityGranted: false;
+  humanReviewRequired: true;
+};
+
 export const commercialBoundary =
-  "SCRIMED pricing and sales motions currently sell governed synthetic evaluations, readiness assessments, and protected enterprise pilots. Pricing does not imply live clinical execution, autonomous diagnosis, payer submission, reimbursement guarantees, or production medical-record processing.";
+  "SCRIMED pricing is a pre-commercial, non-binding planning model for governed synthetic evaluations, readiness assessments, and protected enterprise pilot planning. Displayed ranges are not quotes, contracts, forecasts, or guarantees. Pricing does not imply live clinical execution, autonomous diagnosis, payer submission, EHR writeback, reimbursement outcomes, production medical-record processing, certification, deployment authorization, or customer go-live.";
 
 export const marketPricingBenchmarks: MarketPricingBenchmark[] = [
   {
-    segment: "Individual AI scribe subscriptions",
+    segment: "Self-serve clinical documentation",
     publicSignal:
-      "Freed, Tali, and Heidi show free or low monthly clinician entry points for narrow documentation workflows.",
-    source: "Public competitor pricing pages and plan pages",
+      "Freed publicly starts its AI scribe at $39 per month; this is a narrow self-serve entry point, not an enterprise workflow-program comparison.",
+    sourceName: "Freed official website",
+    sourceUrl: "https://www.getfreed.ai/",
+    lastVerified: "2026-08-01",
+    reviewDue: "2026-10-30",
+    evidenceStatus: "first-party-public",
+    comparisonBoundary:
+      "Public list price is a market signal only; plan scope, contractual terms, implementation, and measured outcomes are not assumed equivalent to SCRIMED.",
     scrimedImplication:
       "SCRIMED should not compete as a low-cost per-seat scribe; free demos are the entry point, while paid work is enterprise workflow, governance, interoperability, and proof packaging."
   },
   {
-    segment: "Enterprise clinical AI assistants",
+    segment: "Clinician and practice subscriptions",
     publicSignal:
-      "Suki, Ambience, Abridge, and similar vendors lead with workflow breadth, EHR adjacency, specialty support, and sales-led enterprise pricing.",
-    source: "Public enterprise product pages and case-study positioning",
+      "Heidi publicly lists a free plan, a $110 per-user monthly Clinician plan, a $180 per-user monthly Practice plan billed annually, and sales-led enterprise options.",
+    sourceName: "Heidi official pricing page",
+    sourceUrl: "https://www.heidihealth.com/pricing",
+    lastVerified: "2026-08-01",
+    reviewDue: "2026-10-30",
+    evidenceStatus: "first-party-public",
+    comparisonBoundary:
+      "Self-serve and team subscription prices are not evidence for enterprise implementation, security review, governance, or integration cost.",
     scrimedImplication:
-      "SCRIMED pilot pricing should scale by workflow family, departments, governance burden, proof depth, implementation complexity, and protected controls."
+      "Keep public proof friction low, but price multi-workflow evaluation, governance, and buyer-specific diligence as scoped enterprise work rather than a seat bundle."
   },
   {
-    segment: "Healthcare integration infrastructure",
+    segment: "Enterprise clinical intelligence platforms",
     publicSignal:
-      "Redox-style integration platforms use custom pricing because EHR connectivity, uptime, security, data exchange, and trading-partner requirements drive cost.",
-    source: "Public healthcare integration product and pricing-positioning pages",
+      "Abridge presents an enterprise clinical-conversation platform with EHR-integrated workflows, linked evidence, governance controls, and a contact-sales motion; no public enterprise list price was observed.",
+    sourceName: "Abridge official product page",
+    sourceUrl: "https://www.abridge.com/product",
+    lastVerified: "2026-08-01",
+    reviewDue: "2026-10-30",
+    evidenceStatus: "first-party-public",
+    comparisonBoundary:
+      "Product positioning is observable; customer economics, private contract terms, and clinical performance are not inferred.",
     scrimedImplication:
-      "Connector and production data-exchange work must remain outside standard demo and synthetic-pilot prices until separately reviewed and priced."
+      "SCRIMED pilot pricing should scale by workflow family, governance burden, evidence depth, implementation complexity, and protected controls, with claims tied to SCRIMED's own proof."
   },
   {
-    segment: "Health-system-owned AI infrastructure",
+    segment: "Healthcare interoperability infrastructure",
     publicSignal:
-      "The 2026 Berta open-source scribe paper reports commercial AI scribes at $99-$600 per physician per month and internal operating costs below $30 per physician per month.",
-    source: "Berta arXiv paper",
+      "Redox uses a consultation-led enterprise motion and describes integration scope across EHRs, FHIR, HL7 v2, X12, cloud destinations, security, and managed implementation services.",
+    sourceName: "Redox official website",
+    sourceUrl: "https://redoxengine.com/",
+    lastVerified: "2026-08-01",
+    reviewDue: "2026-10-30",
+    evidenceStatus: "first-party-public",
+    comparisonBoundary:
+      "SCRIMED does not inherit Redox connectivity, certifications, uptime, network reach, implementation timelines, or customer proof.",
     scrimedImplication:
-      "SCRIMED must defend enterprise price through proof, governance, safety, workflow redesign, interoperability readiness, and margin-transparent implementation."
+      "Connector and production data-exchange work must remain outside standard demonstration and synthetic-pilot ranges until independently scoped, authorized, and priced."
   }
 ];
 
@@ -195,6 +331,13 @@ export const pricingTiers: PricingTier[] = [
     name: "Public Product Preview",
     status: "public-preview",
     recommendedDisplayPrice: "Free public access",
+    priceRange: {
+      minimumUsd: 0,
+      maximumUsd: 0,
+      cadence: "no-charge"
+    },
+    pricingAuthority: "public-no-charge",
+    proposalGate: "No quote or contract is created; any buyer-specific work is separately scoped.",
     buyer: "Website visitors, investors, advisors, and early enterprise evaluators",
     entryCriteria: [
       "No account required",
@@ -220,6 +363,13 @@ export const pricingTiers: PricingTier[] = [
     status: "sellable-now",
     recommendedDisplayPrice:
       "Standard $25k-$75k; mission-clinic access path $12.5k-$25k for one no-PHI workflow; enterprise assessment $75k-$150k",
+    priceRange: {
+      minimumUsd: 12_500,
+      maximumUsd: 150_000,
+      cadence: "one-time"
+    },
+    pricingAuthority: "non-binding-planning-range",
+    proposalGate: "Founder or delegated commercial owner and finance reviewer approve the exact scoped proposal.",
     buyer: "Hospitals, clinics, payers, and transformation teams validating workflow opportunity before a pilot",
     entryCriteria: [
       "Executive or operational sponsor identified",
@@ -246,6 +396,13 @@ export const pricingTiers: PricingTier[] = [
     status: "sellable-now",
     recommendedDisplayPrice:
       "Standard $125k-$350k for 45-90 days; $350k-$500k when multiple workflows, diligence, or executive proof packets expand scope",
+    priceRange: {
+      minimumUsd: 125_000,
+      maximumUsd: 500_000,
+      cadence: "one-time"
+    },
+    pricingAuthority: "non-binding-planning-range",
+    proposalGate: "Named sponsor, acceptance criteria, scope cap, commercial approval, and no-PHI boundary are required.",
     buyer: "Enterprise buyers who want to evaluate SCRIMED against synthetic workflows before live integration",
     entryCriteria: [
       "Named sponsor and review team",
@@ -273,6 +430,14 @@ export const pricingTiers: PricingTier[] = [
     status: "protected-pilot",
     recommendedDisplayPrice:
       "Standard $400k-$1.25M for 90-180 days; $1.25M-$2M+ for multi-site, protected diligence, sandbox planning, or expanded scope",
+    priceRange: {
+      minimumUsd: 400_000,
+      maximumUsd: 2_000_000,
+      cadence: "one-time"
+    },
+    pricingAuthority: "human-approved-proposal-required",
+    proposalGate:
+      "Founder, finance, legal, security, privacy, and delivery owners review scope; production and PHI authority remain separate gates.",
     buyer: "Health systems, payers, public-sector programs, and enterprise operators preparing controlled deployment",
     entryCriteria: [
       "Security, privacy, compliance, and legal review underway",
@@ -301,6 +466,14 @@ export const pricingTiers: PricingTier[] = [
     status: "enterprise-license",
     recommendedDisplayPrice:
       "Initial annual operating layer $1.5M-$6M; multi-department or multi-region expansion $6M-$12M+",
+    priceRange: {
+      minimumUsd: 1_500_000,
+      maximumUsd: 12_000_000,
+      cadence: "annual"
+    },
+    pricingAuthority: "human-approved-proposal-required",
+    proposalGate:
+      "Validated pilot evidence plus founder, finance, legal, clinical, security, privacy, deployment, and customer authorization are required.",
     buyer: "Large hospitals, payers, government health agencies, and multi-site healthcare organizations",
     entryCriteria: [
       "Protected pilot validated",
@@ -327,6 +500,14 @@ export const pricingTiers: PricingTier[] = [
     name: "Strategic Platform Partnership",
     status: "strategic",
     recommendedDisplayPrice: "Multi-year partnerships $8M-$25M+, sales-led, region-aware, and external-review-gated",
+    priceRange: {
+      minimumUsd: 8_000_000,
+      maximumUsd: 25_000_000,
+      cadence: "multi-year"
+    },
+    pricingAuthority: "human-approved-proposal-required",
+    proposalGate:
+      "Founder, board or delegated authority, finance, counsel, regional reviewers, and counterparties approve exact terms and evidence.",
     buyer: "Governments, national health systems, major payers, strategic hospital networks, and global partners",
     entryCriteria: [
       "Multi-organization mandate",
@@ -494,24 +675,451 @@ export const commercialGuardrails: CommercialGuardrail[] = [
   }
 ];
 
-export function getCommercialStrategySummary() {
+export const competitivePositioningPillars: CompetitivePositioningPillar[] = [
+  {
+    pillar: "Governed workflow proof",
+    buyerValue:
+      "Evaluate a bounded healthcare workflow with policy decisions, review checkpoints, evidence, and outcome definitions before protected implementation.",
+    inspectableProof: "Synthetic workflow packets, Trust Cards, audit metadata, and explicit blocked actions.",
+    proofRoute: "/evaluation",
+    blockedClaim: "No production performance, clinical superiority, or customer outcome is inferred from synthetic proof."
+  },
+  {
+    pillar: "Model-independent control plane",
+    buyerValue:
+      "Route work by measured task fitness, privacy, latency, cost, and risk without making a single model vendor the product strategy.",
+    inspectableProof: "Provider-neutral model registry, route reasons, fallback rules, and no-eligible-model abstention.",
+    proofRoute: "/scrimed-compute-fabric",
+    blockedClaim: "No provider availability, BAA coverage, residency approval, or model validation is assumed."
+  },
+  {
+    pillar: "Evidence and verification first",
+    buyerValue:
+      "Make source provenance, uncertainty, human validation, failed checks, and release constraints visible to reviewers.",
+    inspectableProof: "Atlas evidence packets, verification gates, benchmark cards, and review queues.",
+    proofRoute: "/trust-os",
+    blockedClaim: "Governance controls are not a certification, clinical validation, or legal compliance conclusion."
+  },
+  {
+    pillar: "Interoperability readiness without writeback risk",
+    buyerValue:
+      "Scope FHIR, HL7, DICOM, X12, RIS, HIS, PACS, identity, network, and connector prerequisites before live integration.",
+    inspectableProof: "Synthetic conformance fixtures, connector contracts, and minimum-necessary data boundaries.",
+    proofRoute: "/interoperability",
+    blockedClaim: "No live connector, EHR writeback, payer submission, or exchange participation is authorized."
+  },
+  {
+    pillar: "Workflow breadth with shared governance",
+    buyerValue:
+      "Apply one oversight model across clinical support, documentation, patient access, research, revenue cycle, and operations.",
+    inspectableProof: "Agent registry, tool scopes, approval policies, flight recorder, and outcome taxonomy.",
+    proofRoute: "/scrimed-work",
+    blockedClaim: "Workflow breadth does not grant autonomous clinical, financial, or external communication authority."
+  },
+  {
+    pillar: "Optional FaithCore separation",
+    buyerValue:
+      "Offer a user-selected faith-aligned experience where appropriate without changing enterprise clinical logic or access decisions.",
+    inspectableProof: "Dedicated FaithCore route, opt-in language, and a faith-neutral Atlas enterprise default.",
+    proofRoute: "/faithcore",
+    blockedClaim: "FaithCore never influences diagnosis, treatment, eligibility, prioritization, or access to care."
+  }
+];
+
+export const globalCommercialProfiles: GlobalCommercialProfile[] = [
+  {
+    regionProfile: "United States health systems and payers",
+    buyerFit: "Enterprise workflow, governance, interoperability, access, documentation, and revenue-cycle evaluation.",
+    entryMotion: "No-PHI workflow assessment followed by a synthetic pilot with named operational and review owners.",
+    pricingPolicy:
+      "Use USD planning ranges; separate implementation, connector, security, legal, and protected-environment work from the base scope.",
+    requiredLocalization: [
+      "state and federal legal review",
+      "buyer security and privacy review",
+      "payer and EHR contract review",
+      "accessible English and buyer-approved language support"
+    ],
+    retainedGates: ["BAA and data-use authority", "clinical signoff", "production deployment", "payer and EHR actions"],
+    proofRoute: "/pilot-demo-commercial-readiness"
+  },
+  {
+    regionProfile: "United Kingdom and European Economic Area",
+    buyerFit: "Evidence-led evaluation, public-sector diligence, multilingual workflows, and privacy-sensitive deployment planning.",
+    entryMotion: "Synthetic evaluation and localized governance workshop before any protected data or clinical workflow discussion.",
+    pricingPolicy:
+      "Keep public ranges in USD as planning references; quote currency, taxes, procurement terms, hosting, and residency only after qualified review.",
+    requiredLocalization: [
+      "country-specific privacy counsel",
+      "AI and medical-software intended-use review",
+      "data residency and subprocessors",
+      "public procurement and accessibility"
+    ],
+    retainedGates: ["regional legal approval", "data residency", "clinical safety review", "customer deployment authorization"],
+    proofRoute: "/global-enterprise-command"
+  },
+  {
+    regionProfile: "Gulf Cooperation Council strategic programs",
+    buyerFit: "Sovereignty planning, Arabic and English workflows, health-system modernization, and governed partner evaluation.",
+    entryMotion: "Executive no-PHI briefing, local partner qualification, and synthetic interoperability proof.",
+    pricingPolicy:
+      "Price regional programs by governed workflow scope, localization, sovereign architecture review, implementation, and support; require human-approved proposals.",
+    requiredLocalization: [
+      "country-specific counsel",
+      "Arabic clinical and business review",
+      "hosting and sovereignty requirements",
+      "authorized channel and procurement structure"
+    ],
+    retainedGates: ["government procurement", "regional clinical approval", "local hosting authority", "partner authorization"],
+    proofRoute: "/global-reach"
+  },
+  {
+    regionProfile: "Resource-constrained and mission-oriented care organizations",
+    buyerFit: "Focused workflow assessments, access improvement, documentation burden, education, and local-first readiness.",
+    entryMotion: "One no-PHI workflow with a reduced scope, explicit owner, measurable baseline, and optional FaithCore pathway.",
+    pricingPolicy:
+      "Use the mission-clinic access range only by reducing scope and services; do not weaken safety, privacy, evidence, or review controls.",
+    requiredLocalization: [
+      "local workflow ownership",
+      "language and accessibility",
+      "connectivity and device constraints",
+      "local legal, clinical, and community review"
+    ],
+    retainedGates: ["live patient data", "clinical authority", "external funding commitment", "production activation"],
+    proofRoute: "/healthcare-value-realization"
+  }
+];
+
+export const commercialReadinessControls: CommercialReadinessControl[] = [
+  {
+    dimension: "value",
+    status: "evidence-route-available",
+    currentEvidence:
+      "Synthetic value metrics and a buyer-input planning model calculate cost per verified workflow without presenting an ROI guarantee.",
+    decisionRule: "No value claim becomes sales collateral until its baseline, method, owner, and review evidence are recorded.",
+    proofRoute: "/healthcare-value-realization"
+  },
+  {
+    dimension: "competitive-evidence",
+    status: "evidence-route-available",
+    currentEvidence: "Market signals are tied to dated first-party public URLs and explicit comparison boundaries.",
+    decisionRule: "Competitor claims inform strategy only; they do not establish SCRIMED performance, parity, or superiority.",
+    proofRoute: "/competitive-intelligence"
+  },
+  {
+    dimension: "global-positioning",
+    status: "external-review-required",
+    currentEvidence: "Regional buyer paths, localization needs, and retained authority gates are mapped for synthetic outreach.",
+    decisionRule: "Country-specific pricing, legal, privacy, clinical, procurement, tax, and hosting claims require qualified review.",
+    proofRoute: "/global-enterprise-command"
+  },
+  {
+    dimension: "safety",
+    status: "enforced-in-code",
+    currentEvidence: "Clinical care, diagnosis, treatment, payer submission, EHR writeback, and customer activation remain blocked.",
+    decisionRule: "Commercial scope cannot compensate for or bypass a failed safety gate.",
+    proofRoute: "/clinical-authority-readiness"
+  },
+  {
+    dimension: "privacy",
+    status: "enforced-in-code",
+    currentEvidence: "Public pricing and planning use synthetic or business metadata only and do not collect patient information.",
+    decisionRule: "Protected data requires separate identity, tenant, purpose, legal, security, privacy, and retention authority.",
+    proofRoute: "/trust-center"
+  },
+  {
+    dimension: "governance",
+    status: "enforced-in-code",
+    currentEvidence: "Pricing ranges are non-binding, proposal approval is human-controlled, and API authority headers fail closed.",
+    decisionRule: "Only a named authorized commercial owner may issue a quote, contract, discount, or external commitment.",
+    proofRoute: "/scrimed-agent-governance"
+  }
+];
+
+const tierNameByEngagementGoal: Record<CommercialEngagementGoal, string> = {
+  assessment: "Workflow Intelligence Assessment",
+  "synthetic-pilot": "Synthetic Pilot Evaluation",
+  "protected-pilot": "Protected Enterprise Pilot"
+};
+
+function requireFiniteRange(name: string, value: number, minimum: number, maximum: number) {
+  if (!Number.isFinite(value) || value < minimum || value > maximum) {
+    throw new Error(`${name} must be a finite number between ${minimum} and ${maximum}.`);
+  }
+
+  return value;
+}
+
+function requireFiniteIntegerRange(name: string, value: number, minimum: number, maximum: number) {
+  const boundedValue = requireFiniteRange(name, value, minimum, maximum);
+
+  if (!Number.isSafeInteger(boundedValue)) {
+    throw new Error(`${name} must be a whole number between ${minimum} and ${maximum}.`);
+  }
+
+  return boundedValue;
+}
+
+function roundCurrency(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+function parseIsoCalendarDate(value: string, label: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new Error(`${label} must use YYYY-MM-DD format.`);
+  }
+
+  const timestamp = Date.parse(`${value}T00:00:00.000Z`);
+  if (!Number.isFinite(timestamp) || new Date(timestamp).toISOString().slice(0, 10) !== value) {
+    throw new Error(`${label} must be a valid calendar date.`);
+  }
+
+  return timestamp;
+}
+
+function currentIsoCalendarDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function assessMarketPricingEvidence(
+  asOfDate = currentIsoCalendarDate(),
+  benchmarks: ReadonlyArray<MarketPricingBenchmark> = marketPricingBenchmarks
+): MarketPricingEvidenceReview {
+  const asOfTimestamp = parseIsoCalendarDate(asOfDate, "asOfDate");
+  const millisecondsPerDay = 24 * 60 * 60 * 1_000;
+  const items = benchmarks.map((benchmark) => {
+    const lastVerifiedTimestamp = parseIsoCalendarDate(
+      benchmark.lastVerified,
+      `${benchmark.segment}.lastVerified`
+    );
+    const reviewDueTimestamp = parseIsoCalendarDate(benchmark.reviewDue, `${benchmark.segment}.reviewDue`);
+
+    if (reviewDueTimestamp < lastVerifiedTimestamp) {
+      throw new Error(`${benchmark.segment}.reviewDue cannot precede lastVerified.`);
+    }
+
+    const daysUntilReview = Math.ceil((reviewDueTimestamp - asOfTimestamp) / millisecondsPerDay);
+    const freshness: MarketPricingEvidenceFreshness =
+      daysUntilReview < 0 ? "stale" : daysUntilReview <= 14 ? "review-due" : "current";
+
+    return {
+      ...benchmark,
+      freshness,
+      daysUntilReview
+    };
+  });
+  const currentCount = items.filter((item) => item.freshness === "current").length;
+  const reviewDueCount = items.filter((item) => item.freshness === "review-due").length;
+  const staleCount = items.filter((item) => item.freshness === "stale").length;
+  const nextReviewDue = items
+    .map((item) => item.reviewDue)
+    .sort((left, right) => left.localeCompare(right))[0] ?? asOfDate;
+
+  return {
+    asOfDate,
+    status: staleCount === 0 ? "current" : "review-required",
+    currentCount,
+    reviewDueCount,
+    staleCount,
+    competitiveComparisonAllowed: staleCount === 0,
+    humanReviewRequired: true,
+    nextReviewDue,
+    items,
+    decisionRule:
+      "Stale first-party market evidence cannot be used in buyer-facing comparisons or pricing justification until a human owner reverifies the source and updates the evidence date."
+  };
+}
+
+export function getCommercialPlanningTier(goal: CommercialEngagementGoal) {
+  const tier = pricingTiers.find((candidate) => candidate.name === tierNameByEngagementGoal[goal]);
+
+  if (!tier) {
+    throw new Error(`No commercial planning tier is configured for ${goal}.`);
+  }
+
+  return tier;
+}
+
+export function calculateCommercialValueScenario(
+  input: CommercialValueScenarioInput
+): CommercialValueScenario {
+  const annualWorkflowVolume = requireFiniteIntegerRange(
+    "annualWorkflowVolume",
+    input.annualWorkflowVolume,
+    1,
+    10_000_000
+  );
+  const baselineMinutesPerWorkflow = requireFiniteRange(
+    "baselineMinutesPerWorkflow",
+    input.baselineMinutesPerWorkflow,
+    1,
+    480
+  );
+  const loadedHourlyCostUsd = requireFiniteRange(
+    "loadedHourlyCostUsd",
+    input.loadedHourlyCostUsd,
+    1,
+    2_000
+  );
+  const eligibleCaptureRate = requireFiniteRange("eligibleCaptureRate", input.eligibleCaptureRate, 0, 1);
+  const expectedEfficiencyRate = requireFiniteRange("expectedEfficiencyRate", input.expectedEfficiencyRate, 0, 1);
+  const verifiedTaskRate = requireFiniteRange("verifiedTaskRate", input.verifiedTaskRate, 0, 1);
+  const plannedSpendUsd = requireFiniteRange("plannedSpendUsd", input.plannedSpendUsd, 0, 100_000_000);
+
+  getCommercialPlanningTier(input.engagementGoal);
+
+  const annualManualCostBaselineUsd =
+    annualWorkflowVolume * (baselineMinutesPerWorkflow / 60) * loadedHourlyCostUsd;
+  const estimatedVerifiedWorkflowCount = annualWorkflowVolume * eligibleCaptureRate * verifiedTaskRate;
+  const estimatedVerifiedCapacityValueUsd =
+    annualManualCostBaselineUsd * eligibleCaptureRate * expectedEfficiencyRate * verifiedTaskRate;
+  const estimatedNetPlanningValueUsd = estimatedVerifiedCapacityValueUsd - plannedSpendUsd;
+  const valueToCostRatio = plannedSpendUsd > 0 ? estimatedVerifiedCapacityValueUsd / plannedSpendUsd : 0;
+  const estimatedBreakEvenMonths =
+    estimatedVerifiedCapacityValueUsd > 0 && plannedSpendUsd > 0
+      ? plannedSpendUsd / (estimatedVerifiedCapacityValueUsd / 12)
+      : null;
+  const costPerVerifiedWorkflowUsd =
+    estimatedVerifiedWorkflowCount > 0 ? plannedSpendUsd / estimatedVerifiedWorkflowCount : plannedSpendUsd;
+
+  return {
+    status:
+      estimatedVerifiedCapacityValueUsd >= plannedSpendUsd
+        ? "value-hypothesis-supported-by-inputs"
+        : "value-hypothesis-not-yet-supported-by-inputs",
+    engagementGoal: input.engagementGoal,
+    annualManualCostBaselineUsd: roundCurrency(annualManualCostBaselineUsd),
+    estimatedVerifiedCapacityValueUsd: roundCurrency(estimatedVerifiedCapacityValueUsd),
+    estimatedNetPlanningValueUsd: roundCurrency(estimatedNetPlanningValueUsd),
+    valueToCostRatio: Math.round(valueToCostRatio * 100) / 100,
+    estimatedBreakEvenMonths:
+      estimatedBreakEvenMonths === null ? null : Math.round(estimatedBreakEvenMonths * 10) / 10,
+    estimatedVerifiedWorkflowCount: Math.round(estimatedVerifiedWorkflowCount),
+    costPerVerifiedWorkflowUsd: roundCurrency(costPerVerifiedWorkflowUsd),
+    pricingAuthority: "non-binding-planning-model",
+    humanReviewRequired: true,
+    assumptions: [
+      "All inputs are buyer-provided planning assumptions and have not been independently validated.",
+      "Capacity value is not cash savings, revenue, staffing reduction, reimbursement, or audited ROI.",
+      "Verified task rate must be measured against agreed acceptance criteria during a governed pilot.",
+      "Implementation, integration, security, legal, support, taxes, and change-management costs may be separate."
+    ],
+    blockedUses: [
+      "binding quote or contract",
+      "revenue, profit, ROI, reimbursement, or valuation guarantee",
+      "staffing reduction decision",
+      "clinical, payer, EHR, deployment, or customer activation authority"
+    ]
+  };
+}
+
+export function buildCommercialScopeDecision(input: CommercialScopeInput): CommercialScopeDecision {
+  const workflowCount = requireFiniteIntegerRange("workflowCount", input.workflowCount, 1, 100);
+  const siteCount = requireFiniteIntegerRange("siteCount", input.siteCount, 1, 1_000);
+  const regionCount = requireFiniteIntegerRange("regionCount", input.regionCount, 1, 50);
+  const tier = getCommercialPlanningTier(input.engagementGoal);
+  const scopeMismatch =
+    (input.protectedEnvironmentRequested && input.engagementGoal !== "protected-pilot") ||
+    (input.engagementGoal === "assessment" && (workflowCount > 3 || siteCount > 3 || regionCount > 1));
+
+  const requiredGates = [
+    "named commercial owner",
+    "buyer sponsor and workflow owner",
+    "written acceptance criteria",
+    "no-PHI intake boundary",
+    "human-approved scope and pricing"
+  ];
+
+  if (input.protectedEnvironmentRequested || input.engagementGoal === "protected-pilot") {
+    requiredGates.push(
+      "security and privacy review",
+      "legal and data-use review",
+      "identity, tenant, audit, retention, and rollback design",
+      "separate production and PHI authorization"
+    );
+  }
+
+  if (regionCount > 1) {
+    requiredGates.push("regional counsel, residency, localization, tax, and procurement review");
+  }
+
+  return {
+    status: scopeMismatch ? "scope-mismatch-requires-human-rescoping" : "ready-for-human-scoping",
+    recommendedTier: tier.name,
+    priceRange: tier.priceRange,
+    reason: scopeMismatch
+      ? "Requested scope exceeds the selected planning lane or introduces protected-environment requirements. A human owner must rescope it."
+      : `${tier.name} matches the selected engagement goal; exact scope, price, terms, and authority still require human approval.`,
+    requiredGates,
+    bindingQuoteAuthorized: false,
+    productionAuthorityGranted: false,
+    humanReviewRequired: true
+  };
+}
+
+export function getCommercialStrategySummary(asOfDate = currentIsoCalendarDate()) {
+  const marketEvidenceReview = assessMarketPricingEvidence(asOfDate);
+  const sampleValueScenario = calculateCommercialValueScenario({
+    engagementGoal: "synthetic-pilot",
+    annualWorkflowVolume: 50_000,
+    baselineMinutesPerWorkflow: 25,
+    loadedHourlyCostUsd: 75,
+    eligibleCaptureRate: 0.8,
+    expectedEfficiencyRate: 0.3,
+    verifiedTaskRate: 0.8,
+    plannedSpendUsd: 237_500
+  });
+
   return {
     service: "scrimed-commercial-strategy",
     route: "/pricing",
     apiRoute: "/api/commercial/pricing",
-    status: "pricing-and-sales-motion-ready",
+    status: "commercial-planning-model-active-pre-commercial",
     recommendedModel:
       "Hybrid enterprise model: free public preview, paid assessment, paid synthetic pilot, protected enterprise pilot, annual platform license, and custom strategic partnerships.",
     recommendedAppDomain: "app.scrimedsolutions.com",
     boundary: commercialBoundary,
+    authority: {
+      pricingAuthority: "non-binding-planning-ranges",
+      quoteAuthority: "named-human-commercial-owner-required",
+      contractAuthority: "not-granted",
+      revenueAuthority: "not-revenue-guarantee",
+      roiAuthority: "not-roi-guarantee",
+      phiAuthority: "not-authorized-production-phi",
+      clinicalCareAuthority: "not-authorized-live-care",
+      payerAuthority: "not-authorized",
+      ehrWritebackAuthority: "not-authorized",
+      productionAuthority: "not-production-authorized",
+      customerActivationAuthority: "not-customer-go-live-approval"
+    },
     productAccessRoutes,
     pricingTiers,
     premiumPricingPrinciples,
     salesMotion,
     valueMetrics,
     commercialGuardrails,
-    marketPricingBenchmarks,
+    marketPricingBenchmarks: marketEvidenceReview.items,
+    marketEvidenceReview,
     pricingAlignmentDecisions,
-    updated: "2026-06-26"
+    competitivePositioningPillars,
+    globalCommercialProfiles,
+    commercialReadinessControls,
+    valuePlanner: {
+      status: "browser-only-no-data-persistence",
+      supportedGoals: Object.keys(tierNameByEngagementGoal) as CommercialEngagementGoal[],
+      model: "buyer-input-capacity-value-hypothesis",
+      pricingAuthority: "non-binding-planning-model",
+      humanReviewRequired: true,
+      sampleScenario: sampleValueScenario
+    },
+    sourceCounts: {
+      pricingTierCount: pricingTiers.length,
+      marketBenchmarkCount: marketPricingBenchmarks.length,
+      currentMarketBenchmarkCount: marketEvidenceReview.currentCount,
+      staleMarketBenchmarkCount: marketEvidenceReview.staleCount,
+      competitivePillarCount: competitivePositioningPillars.length,
+      globalProfileCount: globalCommercialProfiles.length,
+      readinessControlCount: commercialReadinessControls.length
+    },
+    updated: "2026-08-01"
   };
 }

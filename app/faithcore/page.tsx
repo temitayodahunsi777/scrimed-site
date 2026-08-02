@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { applicationUrl } from "../lib/companyIdentity";
 import { faithCoreNeutralityStatement } from "../lib/legalPolicies";
 import { getMarketActivationSummary } from "../lib/marketActivation";
 import { operatingContext } from "../lib/operatingContext";
 
 const faithCore = operatingContext.operatingModels.find((model) => model.name === "FaithCore");
+
+const faithCoreDescription =
+  "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.";
+
+export const metadata: Metadata = {
+  title: "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+  description: faithCoreDescription,
+  alternates: {
+    canonical: applicationUrl("/faithcore")
+  },
+  openGraph: {
+    type: "website",
+    title: "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+    description: faithCoreDescription,
+    url: applicationUrl("/faithcore")
+  }
+};
 
 export default function FaithCorePage() {
   const marketActivation = getMarketActivationSummary();

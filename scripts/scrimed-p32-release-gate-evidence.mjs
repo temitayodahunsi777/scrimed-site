@@ -142,6 +142,7 @@ function syntheticReports() {
   const sourceFingerprint = "c".repeat(64);
   const artifactFingerprint = "d".repeat(64);
   const validationEvidenceFingerprint = "e".repeat(64);
+  const reviewPacketFingerprint = "f".repeat(64);
   return {
     manifest: {
       baseHeadSha: sourceCommit,
@@ -168,6 +169,13 @@ function syntheticReports() {
       artifactFingerprintSha256: artifactFingerprint,
       automatedReviewPassed: true,
       humanReleaseReviewRequired: true
+    },
+    candidateReview: {
+      baseHeadSha: sourceCommit,
+      candidateDigestSha256: candidateFingerprint,
+      sourceCandidateDigestSha256: sourceFingerprint,
+      candidateReviewPacketSha256: reviewPacketFingerprint,
+      completeCoverage: true
     }
   };
 }
@@ -205,6 +213,21 @@ function runSelfTest() {
     rejectedTamper = true;
   }
   if (!rejectedTamper) throw new Error("SCRIMED p.32 evidence accepted a mismatched artifact fingerprint.");
+  let rejectedReviewPacketTamper = false;
+  try {
+    buildP32GateEvidencePacket({
+      ...input,
+      candidateReview: {
+        ...input.candidateReview,
+        candidateDigestSha256: "0".repeat(64)
+      }
+    });
+  } catch {
+    rejectedReviewPacketTamper = true;
+  }
+  if (!rejectedReviewPacketTamper) {
+    throw new Error("SCRIMED p.32 evidence accepted a review packet bound to a different candidate.");
+  }
   let rejectedUnknownEvidence = false;
   const unknownAutomatedEvidence = [{ evidenceId: "unregistered-evidence" }];
   try {
@@ -255,6 +278,7 @@ function runSelfTest() {
     deploymentAction?.executionState !== "WAIT_FOR_PREREQUISITES" ||
     deploymentAction.blockedByGateIds.length === 0 ||
     !handoffMarkdown.includes(packet.expectedFingerprints.sourceCommit) ||
+    !handoffMarkdown.includes(packet.expectedFingerprints.reviewPacket) ||
     !handoffMarkdown.includes(packet.candidateFingerprint) ||
     !handoffMarkdown.includes("Release promotion allowed: **false**")
   ) {
@@ -289,14 +313,21 @@ if (flags.has("--self-test")) {
 }
 
 const validation = readJsonCommand("scripts/release-candidate-validation.mjs", ["--json"]);
+if (validation?.automatedValidationPassed !== true) {
+  throw new Error(
+    `SCRIMED p.32 evidence requires passing candidate validation before packet construction: ${validation?.status ?? "validation-output-unavailable"}.`
+  );
+}
 const manifest = readJsonCommand("scripts/release-candidate-manifest.mjs", ["--json"]);
 const investorDeckReview = readJsonCommand("scripts/investor-deck-review.mjs", ["--json", "--strict"]);
+const candidateReview = readJsonCommand("scripts/release-candidate-review-packet.mjs", ["--json"]);
 const evaluatedAt = new Date().toISOString();
 const supplementalEvidence = await readSupplementalEvidence(evaluatedAt);
 const packet = buildP32GateEvidencePacket({
   manifest,
   validation,
   investorDeckReview,
+  candidateReview,
   supplementalEvidence,
   evaluatedAt
 });

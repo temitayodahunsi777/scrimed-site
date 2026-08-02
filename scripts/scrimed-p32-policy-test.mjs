@@ -606,7 +606,8 @@ const expectedFingerprints = {
   sourceCommit: "a".repeat(40),
   sourceTree: "b".repeat(64),
   artifact: "c".repeat(64),
-  validationEvidence: "d".repeat(64)
+  validationEvidence: "d".repeat(64),
+  reviewPacket: "9".repeat(64)
 };
 const staleApproval = createP32ApprovalEvidence({
   approvalId: "approval-stale",
@@ -620,6 +621,7 @@ const staleApproval = createP32ApprovalEvidence({
   sourceTreeFingerprint: "e".repeat(64),
   artifactFingerprint: expectedFingerprints.artifact,
   validationEvidenceFingerprint: expectedFingerprints.validationEvidence,
+  reviewPacketFingerprint: expectedFingerprints.reviewPacket,
   evidencePointer: "controlled-review-record-001",
   approvedAt: "2026-07-19T12:00:00.000Z",
   expiresAt: "2026-07-21T12:00:00.000Z",
@@ -639,12 +641,27 @@ const exactApproval = createP32ApprovalEvidence({
   sourceTreeFingerprint: expectedFingerprints.sourceTree,
   artifactFingerprint: expectedFingerprints.artifact,
   validationEvidenceFingerprint: expectedFingerprints.validationEvidence,
+  reviewPacketFingerprint: expectedFingerprints.reviewPacket,
   evidencePointer: "controlled-review-record-001",
   approvedAt: "2026-07-19T12:00:00.000Z",
   expiresAt: "2026-07-21T12:00:00.000Z",
   releaseAuthorityGranted: false
 });
 assert.equal(evaluateP32ApprovalEvidence(exactApproval, { expectedFingerprints, evaluatedAt }).valid, true);
+const exactApprovalPayload = { ...exactApproval };
+delete exactApprovalPayload.decisionHash;
+const staleReviewPacketApproval = createP32ApprovalEvidence({
+  ...exactApprovalPayload,
+  reviewPacketFingerprint: "8".repeat(64)
+});
+assert.equal(
+  evaluateP32ApprovalEvidence(staleReviewPacketApproval, { expectedFingerprints, evaluatedAt }).valid,
+  false
+);
+assert.equal(
+  evaluateP32ApprovalEvidence(staleReviewPacketApproval, { expectedFingerprints, evaluatedAt }).stale,
+  true
+);
 assert.equal(
   evaluateP32ApprovalEvidence(
     { ...exactApproval, decisionHash: "f".repeat(64) },
@@ -652,8 +669,6 @@ assert.equal(
   ).valid,
   false
 );
-const exactApprovalPayload = { ...exactApproval };
-delete exactApprovalPayload.decisionHash;
 const mislabeledReviewerApproval = createP32ApprovalEvidence({
   ...exactApprovalPayload,
   identityAssurance: "qualified-external-reference"

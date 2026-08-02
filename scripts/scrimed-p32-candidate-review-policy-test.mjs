@@ -5,6 +5,7 @@ import { generateKeyPairSync } from "node:crypto";
 import {
   createP32CandidateReviewAssignment,
   createP32CandidateReviewerIdentityHash,
+  getP32CandidateReviewActorCapabilities,
   getP32CandidateReviewSummary,
   P32CandidateReviewError,
   recordP32CandidateReviewDecision,
@@ -16,6 +17,11 @@ import {
   p32EvidenceTrustRegistryVersion,
   verifyP32SupplementalEvidenceAttestation
 } from "./lib/scrimed-p32-evidence-attestation.mjs";
+import {
+  evaluateScrimedWorkWriteRequestProvenance,
+  scrimedWorkOperatorSmokeContext,
+  scrimedWorkRequestContextHeader
+} from "../app/lib/scrimed-work/csrfProtection.ts";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -84,6 +90,18 @@ const env = {
   SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON: trustedPublicKeysJson
 };
 
+for (const [role, expected] of [
+  ["tenant-admin", [true, false, "assign-review"]],
+  ["pilot-lead", [true, false, "assign-review"]],
+  ["reviewer", [false, true, "record-review"]],
+  ["observer", [false, false, "read-only"]]
+]) {
+  const capabilities = getP32CandidateReviewActorCapabilities(role);
+  assert(capabilities.canAssignReview === expected[0], `${role} assignment capability drifted.`);
+  assert(capabilities.canRecordDecision === expected[1], `${role} decision capability drifted.`);
+  assert(capabilities.accessMode === expected[2], `${role} access mode drifted.`);
+}
+
 const reviewerIdentityHash = createP32CandidateReviewerIdentityHash(reviewerUserId);
 const summary = getP32CandidateReviewSummary({
   env,
@@ -148,6 +166,11 @@ const decision = await recordP32CandidateReviewDecision({
 assert(decision.evidenceFile.automatedEvidence.length === 0, "Candidate review signed automated evidence.");
 assert(decision.evidenceFile.approvals.length === 1, "Candidate review did not sign exactly one approval.");
 assert(decision.evidenceFile.approvals[0].reviewerId === reviewerIdentityHash, "Decision lost reviewer identity.");
+assert(
+  decision.evidenceFile.approvals[0].reviewPacketFingerprint ===
+    fingerprints.reviewPacketFingerprint,
+  "Signed reviewer approval lost review-packet binding."
+);
 assert(decision.evidenceFile.approvals[0].releaseAuthorityGranted === false, "Decision improperly granted release authority.");
 assert(decisionInput?.reviewPacketFingerprint === fingerprints.reviewPacketFingerprint, "Decision receipt lost review-packet binding.");
 assert(!JSON.stringify(decision).includes("PRIVATE KEY"), "Candidate review exposed private signing material.");
@@ -170,12 +193,31 @@ const approvalEvaluation = evaluateP32ApprovalEvidence(
       sourceCommit: fingerprints.sourceCommit,
       sourceTree: fingerprints.sourceTreeFingerprint,
       artifact: fingerprints.artifactFingerprint,
-      validationEvidence: fingerprints.validationEvidenceFingerprint
+      validationEvidence: fingerprints.validationEvidenceFingerprint,
+      reviewPacket: fingerprints.reviewPacketFingerprint
     },
     evaluatedAt: "2026-07-22T14:01:00.000Z"
   }
 );
 assert(approvalEvaluation.valid, "Exact signed reviewer approval did not satisfy the p.32 approval contract.");
+
+const stalePacketApproval = {
+  ...decision.evidenceFile.approvals[0],
+  reviewPacketFingerprint: "7".repeat(64)
+};
+assert(
+  !evaluateP32ApprovalEvidence(stalePacketApproval, {
+    expectedFingerprints: {
+      sourceCommit: fingerprints.sourceCommit,
+      sourceTree: fingerprints.sourceTreeFingerprint,
+      artifact: fingerprints.artifactFingerprint,
+      validationEvidence: fingerprints.validationEvidenceFingerprint,
+      reviewPacket: fingerprints.reviewPacketFingerprint
+    },
+    evaluatedAt: "2026-07-22T14:01:00.000Z"
+  }).valid,
+  "A reviewer approval replayed against a different review packet was accepted."
+);
 
 const rejected = await recordP32CandidateReviewDecision({
   env,
@@ -206,7 +248,8 @@ const rejectedEvaluation = evaluateP32ApprovalEvidence(
       sourceCommit: fingerprints.sourceCommit,
       sourceTree: fingerprints.sourceTreeFingerprint,
       artifact: fingerprints.artifactFingerprint,
-      validationEvidence: fingerprints.validationEvidenceFingerprint
+      validationEvidence: fingerprints.validationEvidenceFingerprint,
+      reviewPacket: fingerprints.reviewPacketFingerprint
     },
     evaluatedAt: "2026-07-22T14:01:00.000Z"
   }
@@ -339,5 +382,46 @@ await expectReviewError(
       reasonCode: "material-changes-required"
     })
 );
+
+const candidateReviewEndpoint =
+  "https://app.scrimedsolutions.com/api/pilot-workspaces/atlas-synthetic-evaluation/qa-evidence/p32-candidate-review?action=decide";
+const sameOriginMutation = evaluateScrimedWorkWriteRequestProvenance(
+  new Request(candidateReviewEndpoint, {
+    method: "POST",
+    headers: {
+      origin: "https://app.scrimedsolutions.com",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin"
+    }
+  })
+);
+assert(sameOriginMutation.allowed, "Candidate review rejected a valid same-origin browser mutation.");
+
+const crossOriginMutation = evaluateScrimedWorkWriteRequestProvenance(
+  new Request(candidateReviewEndpoint, {
+    method: "POST",
+    headers: {
+      origin: "https://untrusted.example",
+      [scrimedWorkRequestContextHeader]: scrimedWorkOperatorSmokeContext
+    }
+  })
+);
+assert(!crossOriginMutation.allowed, "Candidate review accepted a cross-origin browser mutation.");
+
+const explicitOperatorMutation = evaluateScrimedWorkWriteRequestProvenance(
+  new Request(candidateReviewEndpoint, {
+    method: "POST",
+    headers: {
+      [scrimedWorkRequestContextHeader]: scrimedWorkOperatorSmokeContext
+    }
+  })
+);
+assert(explicitOperatorMutation.allowed, "Candidate review rejected the explicit non-browser operator context.");
+
+const ambiguousMutation = evaluateScrimedWorkWriteRequestProvenance(
+  new Request(candidateReviewEndpoint, { method: "POST" })
+);
+assert(!ambiguousMutation.allowed, "Candidate review accepted an ambiguous non-browser mutation.");
 
 console.log("pass SCRIMED p.32 protected candidate-review policy behavior");

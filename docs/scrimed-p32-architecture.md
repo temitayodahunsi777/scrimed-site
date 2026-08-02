@@ -36,6 +36,34 @@ flowchart LR
 
 Consequential attribution includes tenant, authenticated actor or agent, purpose, workflow, input classification, model/provider/version, evidence, policy, decision, approval state, timestamp, correlation ID, and idempotency key.
 
+## Approved-Actions Kernel
+
+`app/lib/scrimed-work/p32GovernanceRecords.ts` and `p32ApprovedActions.ts` extend the existing SCRIMED Work runtime with one shared decision contract for API, UI, chat, voice, background jobs, agents, browser bridges, and integration adapters.
+
+The governed records add bounded `TaskScopedToolContract`, `ContextCoverageManifest`, `EvidenceSynthesisRecord`, `AgentRiskProfile`, `AgentExecutionReceipt`, `ClinicalResponseEvaluation`, `DeidentificationRelease`, `GovernedSkillRunbook`, `ModelChangeSet`, `WorkloadPlacementDecision`, `ProtectionLevelAgreement`, `PostImplementationReview`, and `CorrectableClinicalOutput` contracts. Cross-record integrity references use SHA-256 fingerprints; telemetry and receipts remain digest-only and PHI/secret-redacted.
+
+The kernel classifies actions as `READ`, `DRAFT`, `RECOMMEND`, `REQUEST_APPROVAL`, `EXECUTE`, or `PROHIBITED`. Scope evaluation enforces declared resources, fields, row filters, actions, destinations, data classes, budgets, expiry, and revocation. Wildcard mutation scopes and undeclared schema fields are rejected. Drafts and recommendations require provenance and correctability. Execution delegates to the existing candidate-bound `ExecutionGrant` verifier and requires an independent human approval, idempotency, exact candidate and source fingerprints, and nonce replay protection.
+
+Voice receives exactly the same authority as text. Browser automation cannot bypass MFA, APIs, permissions, or identity. Agents cannot approve themselves, circularly approve one another, lower their own risk tier, admit a model, activate clinical behavior, or authorize deployment. Diagnosis, treatment, prescribing, autonomous care, payer submission, EHR/RCM writeback, live self-learning, production mutation, and customer activation remain hard blocks.
+
+Clinical outputs preserve an immutable original with `accept`, `edit`, `reject`, and `reroute` actions. Corrections enter a quarantined review state and cannot self-train or change production behavior. Evidence records keep `FACT`, `INFERENCE`, and `HYPOTHESIS` distinct, preserve contradictions, and explicitly state that model confidence is not proof of correctness.
+
+De-identification records do not encode a universal k, l, t, or risk threshold. The workflow records the approved policy reference, intended population, threat model, transformations, linkage/small-cell analysis, and utility loss. Software refuses to declare an expert determination without a qualified external expert signature verified through a trusted external verifier.
+
+## Technical Gate Profiles
+
+`app/lib/scrimed-work/p32TechnicalGates.ts` adds a technical sub-registry for the consolidated p.32 controls while preserving `scrimedP32ReleaseGates.ts` as the only authority for external release evidence. Automated evidence is bound to exact candidate/source fingerprints, evaluator identity, time, expiry, and an integrity hash. Tampered, stale, failed, or mismatched evidence fails.
+
+The development profile can pass only when all automated gates have evidence and the posture is synthetic-only, deidentified-fixtures-only, read-only, local/mock, with provider calls and production mutations disabled. The production-release profile remains false while any gate is missing. Human clinical, privacy, legal, security, AAL2, migration, deployment, post-deployment, or customer approval cannot be inserted into this sub-registry; those gates remain `PENDING_HUMAN` until the canonical fingerprint-bound release workflow verifies them.
+
+```bash
+npm run test:scrimed-p32-consolidated-governance
+npm run contract:scrimed-p32-consolidated-governance
+npm run gate:scrimed-p32-consolidated-governance:self-test
+```
+
+Rollback is additive: disable callers of the consolidated kernel, retain the existing governed runtime and release registry, discard no audit/evidence records, and return to the last admitted model/tool/policy configuration. There is no database migration, live provider adapter, production mutation, or feature activation in this slice.
+
 ## Governed Agent Runtime
 
 `app/lib/scrimed-work/governedRuntime.ts` extends the existing SCRIMED Work tool registry with candidate-bound authorization rather than introducing a second orchestrator. A `CapabilityManifest` limits actor, tenant, purpose, tools, resources, data classes, risk, rate, tokens, time, spend, and tool calls. An `ExecutionGrant` binds issuer, audience, subject, exact action scope, candidate/source fingerprints, environment, nonce, expiry, and approval references.
@@ -214,6 +242,19 @@ The July 2026 clinical-operations extension remains inside the p.32 control plan
 
 Higher-risk functions default off. The extension creates no live connector, database migration, clinical authority, payer mutation, EHR writeback, production deployment, or customer activation path. The full contract and operator boundaries are documented in `docs/scrimed-p32-clinical-operations.md`.
 
+## Consolidated Control-Plane Closure
+
+The July 30 closure pass keeps the existing runtime and adds four bounded record families:
+
+- `p32AgentGovernance.ts` binds jobs to explicit action classes, tenant scope, delegation lineage, reviewer competence, review SLA, workload ceilings, abstention, and emergency stop state. Reviewer overload pauses work.
+- `p32ArtifactAdmission.ts` binds models, prompts, tools, skills, runtimes, datasets, and dependencies to exact digests, license and intended-use evidence, SBOM/model-BOM/data-BOM references, independent attestation, vulnerability evidence, and a tested atomic rollback target. Public leaderboards and vendor announcements cannot admit artifacts.
+- `p32InteroperabilityControls.ts` preserves unknown fields, extensions, and provenance through versioned mappings. `READ_ONLY` and `DRAFT` remain the only effective local modes; document posting, structured writes, and browser-control bypass remain blocked.
+- `p32HumanGovernance.ts` reuses patient data grants for consent, adds quiet hours and fatigue budgets, requires human authorization for communication, requires a multidisciplinary clinical launch cell, and prevents unsigned board metrics or market signals from becoming approved claims.
+
+Clinical-facing outputs now expose `accept`, `edit`, `reject`, `reroute`, and `escalate`. A `DecisionProvenanceRecord` preserves the original output, evidence ledger, model/configuration, reviewer competency, correction, downstream consumers, and later supersession without allowing production self-training.
+
+`DeidentificationRiskAssessment` records quasi-identifiers, uniqueness, k-anonymity, l-diversity, transformations, utility loss, threat model, population, and release context. These technical measurements never declare legal safety. Test-only evidence remains blocked, and expert determination remains a qualified external approval.
+
 ## Rollback
 
 - Model routes: open the provider circuit, activate the global/workflow kill switch, preserve the route decision, and hand off safely. Never downgrade privacy or evidence checks.
@@ -254,6 +295,7 @@ Feature flags:
 - `SCRIMED_GROWTH_OS_ENABLED=false` by default; enabling retains no-send and public-material-only boundaries.
 - `SCRIMED_P32_RCM_VOICE_ENABLED=false` by default; enabling permits synthetic state-machine evaluation only and never enables a live call or writeback.
 - `SCRIMED_P32_EVIDENCE_ISSUER_ENABLED=false` by default. Enabling requires a server-only Ed25519 key, exact candidate fingerprints, an applied protected issuance-ledger migration, current retained no-PHI QA evidence, AAL2, and a database-authorized tenant-admin or pilot-lead. It signs only short-lived AAL2 technical evidence and grants no human or release authority.
+- `SCRIMED_AGENT_CHECKPOINT_FORK_ENABLED=false`, `SCRIMED_LOCAL_OPEN_MODEL_EVALUATION_ENABLED=false`, `SCRIMED_TENANT_SAFE_CACHE_ENABLED=false`, `SCRIMED_SCIENTIFIC_CAMPAIGNS_ENABLED=false`, and `SCRIMED_SPECIALTY_MODEL_LANES_ENABLED=false` keep experimental execution, caching, research, and specialty lanes disabled by default.
 - Provider calls, connector writes, trial enrollment, automatic outreach, live PHI, payer submission, and EHR writeback remain disabled.
 
 ## External References

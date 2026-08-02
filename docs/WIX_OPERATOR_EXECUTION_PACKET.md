@@ -1,5 +1,12 @@
 # Wix Operator Execution Packet
 
+> **Current-state notice — 2026-08-01:** This file retains the July execution history below, but
+> later published-site inspection found FaithCore drift and inconsistent publication of the safe
+> Vitals draft. The exact FaithCore replacement copy and CTA are now saved in the authenticated
+> Wix Editor as an unpublished draft. No new publication occurred. Current completion is governed
+> by `docs/operators/WIX_FAITHCORE_FINAL_ACTION.md`, and the Wix gate remains open until founder-
+> authorized publication plus fresh strict live and 390px mobile verification.
+
 **Execution date:** 2026-07-24 and 2026-07-27 UTC
 
 **Published domain:** `https://www.scrimedsolutions.com`
@@ -78,5 +85,9 @@ Until then, retain the noindexed system pages.
 
 ## Remaining Blockers
 
-None for this Wix remediation scope. Legal adoption, live clinical activation, PHI processing,
-medical-device connectivity, certifications, and customer go-live remain separate NO-GO gates.
+- Founder interim acceptance for publication of the exact saved FaithCore draft.
+- Wix owner publication through the normal owner flow.
+- Fresh strict published-site and true 390px mobile evidence.
+
+Legal adoption, live clinical activation, PHI processing, medical-device connectivity,
+certifications, and customer go-live remain separate NO-GO gates.

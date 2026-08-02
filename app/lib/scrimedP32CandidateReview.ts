@@ -13,6 +13,7 @@ import {
   type P32SupplementalEvidenceFile
 } from "./scrimedP32EvidenceAttestation";
 import { createP32ApprovalEvidence } from "./scrimedP32ReleaseGates";
+import type { PilotWorkspaceRole } from "./protectedPilotWorkspace";
 
 export const scrimedP32CandidateReviewStatus =
   "protected-p32-candidate-review-control-plane-ready";
@@ -47,6 +48,42 @@ export type P32CandidateReviewDecisionRequest = {
     | "review-complete-no-material-blockers"
     | "material-changes-required";
 };
+
+export type P32CandidateReviewActorCapabilities = {
+  workspaceRole: PilotWorkspaceRole;
+  accessMode: "assign-review" | "record-review" | "read-only";
+  canAssignReview: boolean;
+  canRecordDecision: boolean;
+};
+
+export function getP32CandidateReviewActorCapabilities(
+  workspaceRole: PilotWorkspaceRole
+): P32CandidateReviewActorCapabilities {
+  if (workspaceRole === "tenant-admin" || workspaceRole === "pilot-lead") {
+    return {
+      workspaceRole,
+      accessMode: "assign-review",
+      canAssignReview: true,
+      canRecordDecision: false
+    };
+  }
+
+  if (workspaceRole === "reviewer") {
+    return {
+      workspaceRole,
+      accessMode: "record-review",
+      canAssignReview: false,
+      canRecordDecision: true
+    };
+  }
+
+  return {
+    workspaceRole,
+    accessMode: "read-only",
+    canAssignReview: false,
+    canRecordDecision: false
+  };
+}
 
 export type P32CandidateReviewAssignmentReceiptInput =
   P32CandidateReviewFingerprints & {
@@ -627,6 +664,7 @@ export async function recordP32CandidateReviewDecision({
     artifactFingerprint: configuration.fingerprints.artifactFingerprint,
     validationEvidenceFingerprint:
       configuration.fingerprints.validationEvidenceFingerprint,
+    reviewPacketFingerprint: configuration.fingerprints.reviewPacketFingerprint,
     evidencePointer,
     approvedAt,
     expiresAt: approvalExpiresAt,

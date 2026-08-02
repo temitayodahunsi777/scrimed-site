@@ -1,3 +1,6 @@
+import { getDemoPilotProgramSummary } from "./demoPilotPrograms";
+import type { PolicyDecision } from "./scrimed-work/p32Contracts";
+
 export type StrategicOutreachTarget = {
   id: "openai" | "nvidia" | "anthropic" | "microsoft";
   organization: string;
@@ -112,9 +115,62 @@ export type StrategicFundingReadinessControl = {
   completionRule: string;
 };
 
+export type InvestorEngagementAction =
+  | "prepare-internal-materials"
+  | "public-discovery-conversation"
+  | "share-public-demo-links"
+  | "submit-startup-program-application"
+  | "share-investor-deck"
+  | "open-diligence-room"
+  | "securities-solicitation";
+
+export type InvestorEngagementEvidence = {
+  evidenceClass: "synthetic-readiness-preview" | "verified-operator-evidence";
+  publicClaimsGuardPassed: boolean;
+  publicMaterialsOnly: boolean;
+  founderApprovalRecorded: boolean;
+  cleanCandidate: boolean;
+  namedReviewerApprovalRecorded: boolean;
+  candidateFingerprint: string | null;
+  sourceFingerprint: string | null;
+  reviewPacketFingerprint: string | null;
+  investorDeckFingerprint: string | null;
+  investorDeckFounderApproved: boolean;
+  investorDeckCounselApproved: boolean;
+  investorDeckFinanceApproved: boolean;
+  releaseStewardApprovalRecorded: boolean;
+  customerEvidenceIncluded: boolean;
+  customerEvidencePermissionRecorded: boolean;
+  securitiesCounselApprovalRecorded: boolean;
+};
+
+export type InvestorEngagementDecision = {
+  action: InvestorEngagementAction;
+  decision: PolicyDecision;
+  readiness:
+    | "internal-preparation-ready"
+    | "public-discovery-ready-human-controlled"
+    | "candidate-review-required"
+    | "qualified-review-required";
+  reasonCodes: string[];
+  allowedAssets: string[];
+  blockedAssets: string[];
+  humanApprovalRequired: boolean;
+  externalActionExecuted: false;
+  candidateBinding: {
+    required: boolean;
+    verified: boolean;
+    candidateFingerprint: string | null;
+    sourceFingerprint: string | null;
+    reviewPacketFingerprint: string | null;
+    investorDeckFingerprint: string | null;
+  };
+  retainedBoundaries: string[];
+};
+
 export const strategicInvestorOutreachStatus =
   "strategic-investor-outreach-packets-research-ready-no-solicitation";
-export const strategicInvestorOutreachUpdatedAt = "2026-07-18";
+export const strategicInvestorOutreachUpdatedAt = "2026-07-30";
 export const strategicInvestorOutreachBoundary =
   "SCRIMED Strategic Investor Outreach is an internal, evidence-based preparation layer. It does not imply that any named organization has reviewed, endorsed, partnered with, funded, accepted, or committed to SCRIMED. Official startup and partner programs are ecosystem paths, not assumed investment offers. External decks, financial claims, valuation language, customer proof, securities communications, and partnership terms require founder approval plus qualified legal, finance, accounting, customer-permission, and claim review as applicable.";
 
@@ -630,6 +686,252 @@ export const strategicFundingReadinessControls: StrategicFundingReadinessControl
   }
 ];
 
+const publicDiscoveryActions = new Set<InvestorEngagementAction>([
+  "public-discovery-conversation",
+  "share-public-demo-links",
+  "submit-startup-program-application"
+]);
+
+const candidateBoundActions = new Set<InvestorEngagementAction>([
+  "share-investor-deck",
+  "open-diligence-room",
+  "securities-solicitation"
+]);
+
+const retainedInvestorBoundaries = [
+  "No PHI, secrets, raw connector payloads, protected customer evidence, or security-sensitive internals.",
+  "No investment, endorsement, partnership, customer, certification, clinical-validation, or production-readiness implication.",
+  "No external communication, application submission, deck distribution, data-room access, or securities activity without the required human authority.",
+  "Candidate review, legal review, finance review, clinical boundaries, and production NO-GO controls remain independent gates."
+];
+
+function isSha256(value: string | null) {
+  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
+}
+
+export function evaluateInvestorEngagementAction(
+  action: InvestorEngagementAction,
+  evidence: InvestorEngagementEvidence
+): InvestorEngagementDecision {
+  const candidateBindingRequired = candidateBoundActions.has(action);
+  const candidateBindingVerified =
+    evidence.evidenceClass === "verified-operator-evidence" &&
+    evidence.cleanCandidate &&
+    evidence.namedReviewerApprovalRecorded &&
+    isSha256(evidence.candidateFingerprint) &&
+    isSha256(evidence.sourceFingerprint) &&
+    isSha256(evidence.reviewPacketFingerprint);
+  const deckBindingVerified =
+    isSha256(evidence.investorDeckFingerprint) &&
+    evidence.investorDeckFounderApproved &&
+    evidence.investorDeckCounselApproved &&
+    evidence.investorDeckFinanceApproved &&
+    evidence.releaseStewardApprovalRecorded;
+  const reasonCodes: string[] = [];
+
+  if (action === "prepare-internal-materials") {
+    return {
+      action,
+      decision: "ALLOW",
+      readiness: "internal-preparation-ready",
+      reasonCodes: ["INTERNAL_PREPARATION_ONLY", "NO_EXTERNAL_ACTION"],
+      allowedAssets: [
+        "Internal target research",
+        "Internal meeting notes",
+        "Synthetic demo rehearsal",
+        "Draft milestone and use-of-funds questions"
+      ],
+      blockedAssets: [
+        "Externally released investor deck",
+        "Controlled diligence room",
+        "Securities terms",
+        "Protected customer evidence"
+      ],
+      humanApprovalRequired: false,
+      externalActionExecuted: false,
+      candidateBinding: {
+        required: false,
+        verified: false,
+        candidateFingerprint: evidence.candidateFingerprint,
+        sourceFingerprint: evidence.sourceFingerprint,
+        reviewPacketFingerprint: evidence.reviewPacketFingerprint,
+        investorDeckFingerprint: evidence.investorDeckFingerprint
+      },
+      retainedBoundaries: retainedInvestorBoundaries
+    };
+  }
+
+  if (!evidence.publicClaimsGuardPassed) {
+    reasonCodes.push("PUBLIC_CLAIMS_GUARD_REQUIRED");
+  }
+
+  if (publicDiscoveryActions.has(action) && !evidence.publicMaterialsOnly) {
+    reasonCodes.push("PUBLIC_MATERIALS_ONLY_REQUIRED");
+  }
+
+  if (
+    action === "submit-startup-program-application" &&
+    !evidence.founderApprovalRecorded
+  ) {
+    reasonCodes.push("FOUNDER_APPLICATION_APPROVAL_REQUIRED");
+  }
+
+  if (candidateBindingRequired && !candidateBindingVerified) {
+    reasonCodes.push("CLEAN_CANDIDATE_AND_NAMED_REVIEW_REQUIRED");
+  }
+
+  if (candidateBindingRequired && !deckBindingVerified) {
+    reasonCodes.push("FINGERPRINT_BOUND_DECK_APPROVALS_REQUIRED");
+  }
+
+  if (
+    candidateBindingRequired &&
+    evidence.customerEvidenceIncluded &&
+    !evidence.customerEvidencePermissionRecorded
+  ) {
+    reasonCodes.push("CUSTOMER_EVIDENCE_PERMISSION_REQUIRED");
+  }
+
+  if (
+    action === "securities-solicitation" &&
+    !evidence.securitiesCounselApprovalRecorded
+  ) {
+    reasonCodes.push("SECURITIES_COUNSEL_APPROVAL_REQUIRED");
+  }
+
+  const hardBlocked =
+    reasonCodes.includes("PUBLIC_CLAIMS_GUARD_REQUIRED") ||
+    reasonCodes.includes("PUBLIC_MATERIALS_ONLY_REQUIRED") ||
+    reasonCodes.includes("CLEAN_CANDIDATE_AND_NAMED_REVIEW_REQUIRED") ||
+    reasonCodes.includes("FINGERPRINT_BOUND_DECK_APPROVALS_REQUIRED") ||
+    reasonCodes.includes("CUSTOMER_EVIDENCE_PERMISSION_REQUIRED") ||
+    reasonCodes.includes("SECURITIES_COUNSEL_APPROVAL_REQUIRED");
+  const decision: PolicyDecision = hardBlocked ? "BLOCK" : "REQUIRE_HUMAN";
+  const readiness = hardBlocked
+    ? reasonCodes.includes("CLEAN_CANDIDATE_AND_NAMED_REVIEW_REQUIRED")
+      ? "candidate-review-required"
+      : "qualified-review-required"
+    : publicDiscoveryActions.has(action)
+      ? "public-discovery-ready-human-controlled"
+      : "qualified-review-required";
+
+  if (!hardBlocked) {
+    reasonCodes.push(
+      publicDiscoveryActions.has(action)
+        ? "HUMAN_CONTROLLED_PUBLIC_DISCOVERY"
+        : "EXTERNAL_RELEASE_REQUIRES_SCOPED_HUMAN_ACTION"
+    );
+  }
+
+  return {
+    action,
+    decision,
+    readiness,
+    reasonCodes,
+    allowedAssets:
+      decision === "BLOCK"
+        ? []
+        : publicDiscoveryActions.has(action)
+          ? [
+              "Published SCRIMED demo routes",
+              "Published SCRIMED pilot routes",
+              "Published trust and safety boundaries",
+              "Human-reviewed non-confidential meeting agenda"
+            ]
+          : [
+              "Exact fingerprint-bound investor deck",
+              "Exact fingerprint-bound diligence manifest",
+              "Permissioned evidence approved for the named recipient"
+            ],
+    blockedAssets: [
+      "PHI or patient data",
+      "Secrets or credentials",
+      "Unreviewed financial or valuation claims",
+      "Unpermissioned customer evidence",
+      "Unreviewed source or security-sensitive artifacts",
+      "Production, clinical-validation, certification, or partnership claims"
+    ],
+    humanApprovalRequired: true,
+    externalActionExecuted: false,
+    candidateBinding: {
+      required: candidateBindingRequired,
+      verified: candidateBindingVerified && deckBindingVerified,
+      candidateFingerprint: evidence.candidateFingerprint,
+      sourceFingerprint: evidence.sourceFingerprint,
+      reviewPacketFingerprint: evidence.reviewPacketFingerprint,
+      investorDeckFingerprint: evidence.investorDeckFingerprint
+    },
+    retainedBoundaries: retainedInvestorBoundaries
+  };
+}
+
+export function getParallelFundingTrack() {
+  const demoPilotSummary = getDemoPilotProgramSummary();
+  const previewEvidence: InvestorEngagementEvidence = {
+    evidenceClass: "synthetic-readiness-preview",
+    publicClaimsGuardPassed: true,
+    publicMaterialsOnly: true,
+    founderApprovalRecorded: false,
+    cleanCandidate: false,
+    namedReviewerApprovalRecorded: false,
+    candidateFingerprint: null,
+    sourceFingerprint: null,
+    reviewPacketFingerprint: null,
+    investorDeckFingerprint: null,
+    investorDeckFounderApproved: false,
+    investorDeckCounselApproved: false,
+    investorDeckFinanceApproved: false,
+    releaseStewardApprovalRecorded: false,
+    customerEvidenceIncluded: false,
+    customerEvidencePermissionRecorded: false,
+    securitiesCounselApprovalRecorded: false
+  };
+
+  return {
+    status: "parallel-pre-fundraise-and-candidate-review",
+    evidenceClass: previewEvidence.evidenceClass,
+    boundary:
+      "This deterministic preview demonstrates policy behavior. It is not current approval evidence and must be reevaluated with exact operator-supplied fingerprints before any external release.",
+    commercialProof: {
+      status: demoPilotSummary.status,
+      executableDemoCount: demoPilotSummary.executableDemos,
+      pilotCount: demoPilotSummary.pilotCount,
+      sellableSyntheticPilotCount: demoPilotSummary.sellableNow,
+      protectedPilotCount: demoPilotSummary.protectedPilots,
+      proofRoutes: [
+        demoPilotSummary.demoRoute,
+        demoPilotSummary.pilotRoute,
+        "/pilot-demo-commercial-readiness"
+      ],
+      retainedBoundary: demoPilotSummary.boundary
+    },
+    decisions: [
+      evaluateInvestorEngagementAction("prepare-internal-materials", previewEvidence),
+      evaluateInvestorEngagementAction("public-discovery-conversation", previewEvidence),
+      evaluateInvestorEngagementAction("share-public-demo-links", previewEvidence),
+      evaluateInvestorEngagementAction("submit-startup-program-application", previewEvidence),
+      evaluateInvestorEngagementAction("share-investor-deck", previewEvidence),
+      evaluateInvestorEngagementAction("open-diligence-room", previewEvidence)
+    ],
+    controls: {
+      candidateReviewContinues: true,
+      publicDiscoveryMustRemainHumanControlled: true,
+      externalOutreachSent: false,
+      startupApplicationSubmitted: false,
+      investorDeckReleased: false,
+      diligenceRoomOpened: false,
+      securitiesSolicitationAuthorized: false
+    },
+    sequence: [
+      "Continue clean-candidate preparation and named independent review.",
+      "Prepare target research, meeting agendas, and synthetic demo rehearsals internally.",
+      "Permit a named human to conduct public-safe discovery using published routes after rerunning Claim Guard.",
+      "Block deck distribution and diligence until clean candidate, named review, deck approvals, and exact fingerprints exist.",
+      "Keep any securities process behind founder and qualified-counsel authorization."
+    ]
+  };
+}
+
 export function getStrategicInvestorMeetingProfile(targetId: string) {
   return strategicInvestorMeetingProfiles.find((profile) => profile.targetId === targetId) ?? null;
 }
@@ -704,6 +1006,7 @@ export function buildStrategicInvestorMeetingBrief(targetId: string) {
 }
 
 export function getStrategicInvestorOutreachSummary() {
+  const parallelFundingTrack = getParallelFundingTrack();
   const statusCounts = strategicDiligenceManifest.reduce(
     (counts, item) => ({ ...counts, [item.status]: counts[item.status] + 1 }),
     {
@@ -744,6 +1047,7 @@ export function getStrategicInvestorOutreachSummary() {
     outreachStages: strategicOutreachStages,
     meetingProfiles: strategicInvestorMeetingProfiles,
     fundingReadinessControls: strategicFundingReadinessControls,
+    parallelFundingTrack,
     meetingPacketRoute: "/api/investor-audience-readiness/meeting-packet",
     meetingPreparationReady: true,
     externalFundraisingReleaseAuthorized: false,

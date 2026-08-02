@@ -2,6 +2,23 @@
 
 SCRIMED Work is a synthetic/no-PHI, verification-first control plane for long-running healthcare work sessions. It consolidates workspaces, Definition-of-Done contracts, model and tool routing, multi-agent orchestration, healthcare context retrieval, approval gates, artifact generation, disabled schedule definitions, voice-session simulation, learning-loop proposals, rollback metadata, audit records, and value telemetry.
 
+## Independent Review And Gap Closure
+
+The control plane exposes twelve independently scoped AI-assisted review lanes. Review packets
+bind candidate/source fingerprints, reviewer and model identity, prompt version, line-bounded
+evidence, rubric results, findings, disposition, expiration, and a deterministic audit hash.
+Self-review, tampering, stale evidence, candidate/model mismatch, duplicate/conflicting lanes,
+unresolved critical findings, and human-approval impersonation fail closed.
+
+Agent teams also carry explicit cost, runtime, action, tool, egress, stop, retry, audit,
+idempotency, and circuit-breaker limits. The default network allowlist is empty and retrieved
+content remains data, never executable instructions. Unverified model candidates remain disabled
+until official model identity and offline qualification evidence are reviewed.
+
+Portable commands support direct-live Wix verification, preview desktop/exact-390px checks, and
+exact-set disposable migration preflight. Live external evidence and qualified human approvals
+remain separate gates; these utilities grant no production authority.
+
 ## Safety Boundary
 
 SCRIMED Work does not authorize live PHI, autonomous clinical care, diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, final imaging interpretation, production connector approval, certification claims, customer go-live, or external model calls.
@@ -246,6 +263,27 @@ The evidence ID is authenticated with a domain-separated HMAC backed by the exis
 
 The gate intentionally does not apply migrations, verify production readiness, expose credential values, or authorize buyer-facing protected mutations.
 Both the API and `/scrimed-work` control-plane page are dynamically rendered so freshness cannot remain frozen at build time.
+
+## Agent Team, Qualification, And Impact Governance
+
+`app/lib/scrimed-work/agentTeams.ts` defines ten bounded planner, specialist, reviewer, and
+release-verifier teams. Every team requires independent evidence review and a human gateway;
+agents cannot self-approve, expand permissions, communicate externally, deploy, or gain clinical
+authority.
+
+`app/lib/scrimed-work/modelQualification.ts` maintains hashed provider and agent approval
+passports plus bounded offline effort routing. Unverified providers and model names remain
+disabled. The deterministic synthetic fallback is the only model profile approved for local
+synthetic evaluation, and no profile grants PHI, clinical, provider-call, or release authority.
+
+`app/lib/scrimed-work/impactGovernance.ts` provides evidence-tagged Verified Intelligence Yield,
+Healthcare Value Returned, workforce transition, procurement, and sovereign architecture
+readiness contracts. Current dashboard values are simulated planning evidence, not customer
+outcomes, audited ROI, procurement approval, employment authority, clinical validation, or
+deployment authorization.
+
+Run `npm run test:scrimed-qualification-impact` and
+`npm run contract:scrimed-qualification-impact` for focused validation.
 
 ## Feature Flags
 

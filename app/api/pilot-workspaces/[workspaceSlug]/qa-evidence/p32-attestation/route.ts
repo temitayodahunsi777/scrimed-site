@@ -21,6 +21,10 @@ import {
   enforceRequestRateLimit,
   rateLimitHeaders
 } from "../../../../../lib/requestRateLimit";
+import {
+  evaluateScrimedWorkWriteRequestProvenance,
+  scrimedWorkCsrfPolicyVersion
+} from "../../../../../lib/scrimed-work/csrfProtection";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -34,6 +38,7 @@ const routeHeaders = {
   "X-SCRIMED-Clinical-Care-Authority": "not-authorized-live-care",
   "X-SCRIMED-Data-Boundary": "synthetic-metadata-only",
   "X-SCRIMED-Evidence-Issuer": "candidate-bound-aal2-technical-evidence-only",
+  "X-SCRIMED-CSRF-Protection": scrimedWorkCsrfPolicyVersion,
   "X-SCRIMED-Release-Authority": "not-granted"
 };
 
@@ -78,6 +83,20 @@ export async function POST(request: Request, { params }: RouteContext) {
         boundary: scrimedP32EvidenceIssuerBoundary
       },
       { status: 503, headers }
+    );
+  }
+
+  const provenance = evaluateScrimedWorkWriteRequestProvenance(request);
+  if (!provenance.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "p32-evidence-issuer-csrf-denied",
+          message: "Protected p.32 evidence issuance rejected an unverifiable mutation origin."
+        },
+        boundary: scrimedP32EvidenceIssuerBoundary
+      },
+      { status: 403, headers }
     );
   }
 

@@ -1,6 +1,118 @@
 # SCRIMED Project Status
 
-Updated: 2026-07-17
+Updated: 2026-08-01
+
+## Latest Preproduction Review And Gate Closure Release
+
+- Added a deterministic independent-review orchestrator with 12 bounded lanes, evidence-linked
+  dispositions, packet hashing, expiry, conflict detection, self-review denial, and explicit
+  separation between AI-assisted review and accountable human approval.
+- Hardened the governed agent teams with cost, runtime, action, retry, delegation, tool, network,
+  idempotency, circuit-breaker, and safe-stop limits. Retrieved untrusted content remains data and
+  cannot expand permissions, mutate policy, or authorize external action.
+- Hardened model qualification and effort routing with disabled unverified-model admission,
+  safety-tier-preserving fallback, explicit fallback exhaustion, bounded cost/token/latency/tool
+  budgets, and human authorization for maximum effort.
+- Added portable, read-only Wix publication and desktop/390px preview verification scripts plus a
+  disposable-migration preflight that refuses production connections and requires authorization
+  bound to the exact three-migration set.
+- Added founder interim-governance policy, nine concise human sign-off packets, three adversarial
+  reviews, finance review, gate closure, worktree attribution, preview, dependency, Wix, Supabase,
+  model-admission, and migration operator records.
+- Current work remains `NON_CANDIDATE`: the dirty tree contains one preserved pre-existing user
+  file whose attribution must be resolved before a clean immutable candidate commit can safely be
+  created. No AI review, test, document, or founder interim acceptance grants production authority.
+- Preserved retained boundaries: no PHI, live clinical execution, diagnosis, treatment,
+  prescribing, payer submission, EHR or medical-device connectivity, migration, deployment,
+  certification claim, customer activation, external distribution, or provider call is authorized.
+
+## Latest Qualification And Impact Governance Release
+
+- Added ten deterministic agent-team templates for remediation, security, regulatory, investor,
+  partnership, policy, evidence, product, public-claims, and synthetic-workflow tasks.
+- Enforced bounded delegation and retries, independent implementation/review identities,
+  evidence requirements, human conflict escalation, and no agent self-approval or external,
+  clinical, migration, deployment, release, or customer-go-live authority.
+- Added hashed approval passports for all configured model providers and registered agents,
+  including exact intended/prohibited uses, qualification gates, economics evidence, review
+  dates, rollback, fallback, and retained PHI/clinical boundaries.
+- Recorded Claude Opus 5 as disabled and unverified because no official model ID was admitted;
+  the candidate permits no provider call or public performance claim.
+- Added bounded offline effort routing, Verified Intelligence Yield, Healthcare Value Returned,
+  workforce transition review, public-benefit procurement evidence, and sovereign architecture
+  readiness with simulated values visibly separated from verified outcomes.
+- Integrated summaries into SCRIMED Work, provider and agent APIs, documentation, and policy
+  tests without adding a dependency, migration, external call, production mutation, or authority.
+
+## Latest Least-Disclosure Candidate Review Export Release
+
+- Added deterministic JSON and Markdown exports for each assigned candidate-review batch so specialist reviewers receive only the file references, risk context, focus, identities, and disposition fields required for their bounded lane.
+- Bound every export to the exact candidate, source, base commit, parent review packet, review batch, and batch-export SHA-256 fingerprints; stale or unknown batch requests fail closed.
+- Revalidated selected-file coverage against the parent packet before export and rejected incomplete parent packets, missing references, duplicate references, and non-reviewable file leakage.
+- Added a visibly unrecorded disposition template while keeping batch approval, parent-packet approval, reviewed-source status, release, deployment, migration, external distribution, PHI, and autonomous clinical authority false.
+- Preserved least-disclosure handling: exports contain no source contents, raw diffs, secrets, credentials, tokens, or PHI and remain internal review aids that must use an approved channel.
+- Added CLI examples, deterministic self-tests, and contract coverage for all five review lanes without changing the existing independent named-reviewer gate.
+
+## Latest Risk-Ordered Candidate Review Release
+
+- Extended the existing candidate review packet with five deterministic review batches ordered by release risk: release/security/data, runtime/clinical/API, product claims/UI, quality evidence, and documentation/operations.
+- Assigned every reviewable candidate file to exactly one batch and added batch-level SHA-256 identity, required specialist roles, file references, review focus, pending disposition, and explicit no-approval authority.
+- Added fail-closed coverage checks so a missing or duplicated file prevents the complete packet from becoming ready for named reviewer disposition.
+- Updated internal Markdown output with batch summaries, review focus, batch identity, and per-file batch membership while retaining the existing no-file-content, no-raw-diff, no-secret, and no-PHI handling boundary.
+- Verified the current candidate partitions into five bounded passes with complete coverage and no rejected files, reducing reviewer context switching without reducing any required reviewer role.
+- Preserved retained boundaries: batching grants no review approval, commit authority, deployment, migration, release promotion, external distribution, PHI processing, or clinical authority.
+
+## Latest Governed Commercial Scope And Evidence Freshness Release
+
+- Added an operator-facing governed scope guard to `/pricing` using bounded structured inputs for engagement goal, workflow count, site count, region count, and protected-environment intent.
+- Reused the existing commercial scope decision engine to return a planning lane, non-binding range, scope mismatch state, and explicit human gates without storing buyer data or creating a quote, contract, discount, customer record, or production authority.
+- Hardened commercial number validation so annual workflow volume, workflow count, site count, and region count must be finite whole numbers at the domain layer, not only in browser controls.
+- Added review-due dates and automatic `current`, `review-due`, or `stale` classification to first-party market evidence; stale evidence blocks buyer-facing competitive comparison until human reverification.
+- Exposed market-evidence and competitive-comparison posture through the pricing API, UI, contract tests, policy tests, public smoke, and commercial operating documentation.
+- Preserved retained boundaries: pricing remains pre-commercial and non-binding, with no PHI, clinical, payer, EHR, revenue, ROI, contract, production, deployment, customer-activation, or external-send authority.
+
+## Latest Canonical Demo Handoff Release
+
+- Added a bounded metadata-only handoff from the completed public rehearsal into the existing protected Sales Operations buyer-demo workflow, eliminating manual re-entry of the canonical demo, audience, focus, duration, plan identity, and evidence fingerprints.
+- Revalidates every draft against the governed demo catalog and rejects missing, duplicate, unknown, oversized, malformed, plan-mismatched, fingerprint-tampered, buyer-data, or automatic-persistence fields.
+- Labels the handoff as untrusted public-origin metadata and preserves client preflight and rehearsal fingerprints as references rather than independent verification.
+- Requires the existing AAL2 operator, tenant-scoped opportunity, explicit Record Demo Session action, guarded database RPC, and audited packet before anything persists; invalid drafts disable recording.
+- Reuses the existing session path snapshot instead of adding a database dependency or migration, while retaining backward compatibility for sessions recorded before handoff metadata existed.
+- Preserved retained boundaries: no free text, buyer data, PHI, credential, external send, automatic persistence, binding quote, clinical authority, payer submission, EHR writeback, deployment, release, or customer go-live authority.
+
+## Latest Buyer Demo Proof Preflight Release
+
+- Added an operator-triggered, same-origin proof preflight that checks every deduplicated route in the generated demo plan with bounded read-only `HEAD` requests before proof review can satisfy the rehearsal gate.
+- Restricted the preflight to canonical relative routes, a maximum of eight targets, a five-second timeout, no request body, no external network target, no buyer-data storage, and no protected-workspace import.
+- Bound the route-status evidence into the rehearsal audit hash and local Markdown receipt while keeping evidence meaning and talk-track support under explicit operator review.
+- Added deterministic coverage across all 360 demo-plan combinations plus unsafe URL, path traversal, identity mismatch, HTTP failure, timing independence, and self-attestation bypass cases.
+- Preserved retained boundaries: route reachability is not clinical correctness, independent validation, buyer acceptance, pilot launch, external-send authority, production release, PHI authority, payer submission, EHR writeback, or customer go-live approval.
+
+## Latest Governed Demo Rehearsal and Protected Handoff Release
+
+- Added a deterministic rehearsal evaluator that fails closed until all five presentation steps are practiced and proof, safety-boundary, and pilot-close controls are self-attested.
+- Added a weighted readiness score, visible blockers, stable rehearsal audit hash, and browser-local Markdown rehearsal record with explicit evidence limitations.
+- Added a protected handoff link that appears only after the local rehearsal reaches 100%; it opens the existing AAL2 Sales Operations buyer-demo workflow and does not transfer or persist public planner state.
+- Added policy coverage across all 360 demo-plan combinations, including incomplete, complete, order-independent, unknown-input, receipt, and denied-authority paths.
+- Preserved retained boundaries: operator self-attestation is not independent validation, buyer approval, binding quote, external-send authority, pilot launch, production release, PHI authority, clinical authority, payer submission, EHR writeback, or customer go-live approval.
+
+## Latest Interactive Demo Session Planner Release
+
+- Added a typed, deterministic presentation planner to `/pilot-demo-commercial-readiness` so an operator can select one of six canonical demos, five buyer audiences, four evidence focuses, and a 15-, 30-, or 45-minute meeting format.
+- Generated a five-step run of show with exact timing, presenter focus, executable proof links, production-boundary evidence, buyer questions, pilot acceptance criteria, accountable owners, pricing guidance, and a direct no-PHI intake handoff.
+- Added browser-local Markdown export with stable plan identity and audit hash; the planner accepts no free text, stores no buyer data, makes no provider call, and sends nothing externally.
+- Added exhaustive deterministic policy coverage for all 360 planner combinations plus public API, brief, contract, and nonsecret-suite coverage.
+- Improved Demo Center and demo-detail handoffs so presentation preparation is one click from the product proof surface.
+- Preserved retained boundaries: no PHI, clinical care, diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, production connector, binding quote, external distribution, certification, release, or customer go-live authority.
+
+## Latest Protected Review UX and Dependency Security Hardening
+
+- Made the p.32 candidate-review dashboard role-aware: tenant admins and pilot leads see assignment controls, reviewers see identity and disposition controls, and observers receive a read-only candidate-fingerprint view.
+- Added an RLS-scoped self-membership lookup and API preflight so wrong-stage roles fail before cryptographic signing work; database role checks and separation of duties remain independently authoritative.
+- Upgraded Next.js and `eslint-config-next` to `16.2.12`, PostCSS to `8.5.25`, Sharp to `0.35.3`, and vulnerable transitive YAML/glob packages to patched releases without adding a new product dependency.
+- Raised the deterministic dependency-floor contract to reject regressions below the reviewed Next.js, PostCSS, Sharp, `brace-expansion`, and `js-yaml` versions.
+- Verified the resulting dependency graph with `npm audit --audit-level=moderate`: zero known vulnerabilities at verification time. Live vulnerability intelligence remains time-sensitive and must be rerun for each candidate.
+- Preserved all retained boundaries: no live PHI, autonomous clinical care, payer submission, EHR writeback, migration, deployment, certification, customer activation, or release authority.
 
 ## Latest SCRIMED Work Distributed Mutation Abuse Control
 

@@ -53,6 +53,8 @@ const entrypoints = {
   cleanup: "scripts/clean-generated-cache.mjs",
   integrity: "scripts/check-generated-integrity.mjs",
   next: "node_modules/next/dist/bin/next",
+  postflight: "scripts/generated-output-postflight.mjs",
+  publicReleaseVerifier: "scripts/verify-public-release.mjs",
   smoke: "scripts/public-production-smoke.mjs"
 };
 
@@ -394,10 +396,28 @@ if (options.selfTest) {
 }
 
 await assertEntrypoints();
-await assertLocalPortAvailable(options.port);
-
 const environment = createNonsecretEnvironment(options.port, localEnvironmentNames);
 const baseUrl = environment.SCRIMED_BASE_URL;
+
+runNodeStage("pre-smoke generated-output postflight", [entrypoints.postflight], environment, 60_000);
+runNodeStage("pre-smoke generated integrity", [entrypoints.integrity], environment, 30_000);
+runNodeStage(
+  "built public release verification",
+  [entrypoints.publicReleaseVerifier, "--require-build"],
+  environment,
+  60_000
+);
+
+try {
+  await assertLocalPortAvailable(options.port);
+} catch (error) {
+  console.error(
+    `fail SCRIMED local public smoke runner: ${error instanceof Error ? error.message : String(error)} ` +
+      "Rendered build verification passed, but it is not equivalent to loopback HTTP verification. Run this command in an environment that permits local listeners."
+  );
+  process.exit(1);
+}
+
 let outputTail = "";
 let runError = null;
 let server = null;
@@ -431,6 +451,18 @@ try {
       runError ??= error;
     }
   }
+}
+
+const postflight = runNodeStage(
+  "post-smoke generated-output postflight",
+  [entrypoints.postflight],
+  environment,
+  60_000,
+  true
+);
+
+if (!postflight.ok) {
+  runError ??= new Error(`${postflight.message} Generated output remains untrusted.`);
 }
 
 const integrity = runNodeStage(

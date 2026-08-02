@@ -352,6 +352,7 @@ function safeHtml(route) {
     route === "/"
       ? "No-PHI synthetic demonstration. Human-supervised workflows require human review."
       : "";
+  const requiredVisibleText = (metadata?.requiredVisibleText ?? []).join(" ");
 
   return `<!doctype html>
 <html>
@@ -364,7 +365,7 @@ function safeHtml(route) {
     <link rel="canonical" href="${expectedUrl}">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"SCRIMED SOLUTIONS","url":"${wixPublicationPolicy.baseUrl}"}</script>
   </head>
-  <body>${disclosure}</body>
+  <body>${disclosure} ${requiredVisibleText}</body>
 </html>`;
 }
 

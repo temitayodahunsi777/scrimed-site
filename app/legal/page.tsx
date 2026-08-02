@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { applicationUrl } from "../lib/companyIdentity";
-import { getInterimLegalSummary, interimLegalNotice } from "../lib/legalPolicies";
+import {
+  aiLimitationStatement,
+  getInterimLegalSummary,
+  interimLegalNotice,
+  publicHealthcareDataBoundary
+} from "../lib/legalPolicies";
 
 export const metadata: Metadata = {
   title: "Legal and Policy Center | SCRIMED",
   description: "Interim SCRIMED privacy, terms, cookie, accessibility, refund, healthcare, and AI policies.",
   alternates: {
     canonical: applicationUrl("/legal")
+  },
+  openGraph: {
+    type: "website",
+    title: "Legal and Policy Center | SCRIMED",
+    description: "Interim SCRIMED privacy, terms, cookie, accessibility, refund, healthcare, and AI policies.",
+    url: applicationUrl("/legal")
   }
 };
 
@@ -21,6 +32,8 @@ export default function LegalCenterPage() {
         <p className="eyebrow">Legal and Policy Center</p>
         <h1>Interim policies for SCRIMED&apos;s pre-commercial, synthetic-only experience.</h1>
         <p className="hero-text">{interimLegalNotice}</p>
+        <p className="section-copy">{publicHealthcareDataBoundary}</p>
+        <p className="section-copy">{aiLimitationStatement}</p>
       </section>
 
       <section className="table-section" aria-label="Interim SCRIMED policies">

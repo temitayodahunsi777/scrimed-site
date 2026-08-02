@@ -62,6 +62,22 @@ export default function ScrimedWorkPage() {
           <strong>{summary.providers.length}</strong>
         </article>
         <article>
+          <span>Agent teams</span>
+          <strong>{summary.agentTeams.templateCount}</strong>
+        </article>
+        <article>
+          <span>Approval passports</span>
+          <strong>{summary.modelQualification.passportCount}</strong>
+        </article>
+        <article>
+          <span>Independent review lanes</span>
+          <strong>{summary.reviewOrchestrator.laneCount}</strong>
+        </article>
+        <article>
+          <span>Risk-tiered actions</span>
+          <strong>{summary.reviewPolicy.requirementCount}</strong>
+        </article>
+        <article>
           <span>Schedules</span>
           <strong>{summary.scheduleDefinitions.length}</strong>
         </article>
@@ -402,6 +418,111 @@ export default function ScrimedWorkPage() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="table-section" aria-label="Qualification and impact governance">
+        <div className="section-heading">
+          <p className="eyebrow">Qualification + Impact Governance</p>
+          <h2>Models, agent teams, value evidence, workforce effects, and procurement claims remain independently reviewable.</h2>
+        </div>
+        <article className="module-row">
+          <div>
+            <span>Model and agent passports</span>
+            <h2>{summary.modelQualification.passportCount} governed subjects</h2>
+          </div>
+          <p>{summary.modelQualification.boundary}</p>
+          <div>
+            <strong>Qualification posture</strong>
+            <ul className="compact-list">
+              <li>Model passports: {summary.modelQualification.modelPassportCount}</li>
+              <li>Agent passports: {summary.modelQualification.agentPassportCount}</li>
+              <li>Provider calls: disabled</li>
+              <li>PHI authority: none</li>
+              <li>Clinical authority: none</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Unverified candidates</strong>
+            <ul className="compact-list">
+              {summary.modelQualification.unverifiedCandidates.map((candidate) => (
+                <li key={candidate.candidateId}>
+                  {candidate.requestedCandidateName}: {candidate.verificationStatus}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
+        <article className="module-row">
+          <div>
+            <span>Governed agent teams</span>
+            <h2>{summary.agentTeams.templateCount} bounded templates</h2>
+          </div>
+          <p>{summary.agentTeams.boundary}</p>
+          <div>
+            <strong>Team controls</strong>
+            <ul className="compact-list">
+              <li>Independent review: required</li>
+              <li>Human conflict escalation: required</li>
+              <li>Cost, runtime, and actions: bounded</li>
+              <li>Network: default deny</li>
+              <li>Audit and idempotency: required</li>
+              <li>External execution: disabled</li>
+              <li>Release authority: none</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Templates</strong>
+            <p>{summary.agentTeams.templates.map((template) => template.title).join(", ")}</p>
+          </div>
+        </article>
+        <article className="module-row">
+          <div>
+            <span>AI-assisted review</span>
+            <h2>{summary.reviewOrchestrator.laneCount} independent lanes</h2>
+          </div>
+          <p>{summary.reviewOrchestrator.boundary}</p>
+          <div>
+            <strong>Review controls</strong>
+            <ul className="compact-list">
+              <li>Self-review: prohibited</li>
+              <li>Evidence references: required</li>
+              <li>Stale review: rejected</li>
+              <li>Human approval impersonation: prohibited</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Accountable sign-off</strong>
+            <p>Legal, clinical, privacy, security, database, finance, and release authority remain human-controlled.</p>
+          </div>
+        </article>
+        <article className="module-row">
+          <div>
+            <span>{summary.impactGovernance.intelligenceYield.evidenceStatus}</span>
+            <h2>Verified Intelligence Yield</h2>
+          </div>
+          <p>{summary.impactGovernance.boundary}</p>
+          <div>
+            <strong>Synthetic planning evidence</strong>
+            <ul className="compact-list">
+              <li>
+                Accepted outputs per burden dollar: {summary.impactGovernance.intelligenceYield.yieldPerUsd?.toFixed(2) ?? "unavailable"}
+              </li>
+              <li>
+                Healthcare value evidence: {summary.impactGovernance.healthcareValueReturned.evidenceStatus}
+              </li>
+              <li>Workforce transition: {summary.impactGovernance.workforceTransition.decision}</li>
+              <li>Procurement: {summary.impactGovernance.procurement.status}</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Sovereign profile</strong>
+            <ul className="compact-list">
+              <li>Status: {summary.impactGovernance.sovereignDeployment.status}</li>
+              <li>Production activation: disabled</li>
+              <li>PHI authority: none</li>
+            </ul>
+          </div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="Schedules and voice simulation">

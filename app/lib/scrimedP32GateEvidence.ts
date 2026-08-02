@@ -11,13 +11,13 @@ import {
 import type { ApprovalEvidence } from "./scrimed-work/p32Contracts";
 
 export const scrimedP32GateEvidencePacketVersion =
-  "scrimed-p32-gate-evidence-v2-2026-07-21";
+  "scrimed-p32-gate-evidence-v3-2026-07-30";
 
 export const scrimedP32GateEvidenceBoundary =
   "SCRIMED p.32 Gate Evidence binds no-secret technical checks and metadata-only human decisions to one exact candidate. It never stores tokens, PHI, raw review documents, signatures, legal opinions, clinical records, or connector payloads, and it does not grant commit, migration, deployment, external-distribution, certification, clinical-care, or customer go-live authority.";
 
 export const scrimedP32OperatorHandoffVersion =
-  "scrimed-p32-operator-handoff-v3-2026-07-27";
+  "scrimed-p32-operator-handoff-v4-2026-07-30";
 
 export const scrimedP32OperatorHandoffBoundary =
   "This operator handoff orders unresolved evidence work for an exact candidate. It does not create identity evidence, reviewer approval, migration approval, deployment authority, production evidence, customer authorization, PHI authority, or clinical authority.";
@@ -51,6 +51,14 @@ export type InvestorDeckReviewReport = {
   humanReleaseReviewRequired: boolean;
 };
 
+export type ReleaseCandidateReviewPacketReport = {
+  baseHeadSha: string | null;
+  candidateDigestSha256: string | null;
+  sourceCandidateDigestSha256: string | null;
+  candidateReviewPacketSha256: string | null;
+  completeCoverage: boolean;
+};
+
 export type P32SupplementalGateEvidence = {
   automatedEvidence: AutomatedGateEvidence[];
   approvals: ApprovalEvidence[];
@@ -74,6 +82,7 @@ export type P32GateEvidencePacketInput = {
   manifest: ReleaseCandidateManifestReport;
   validation: ReleaseCandidateValidationReport;
   investorDeckReview: InvestorDeckReviewReport;
+  candidateReview: ReleaseCandidateReviewPacketReport;
   supplementalEvidence?: Partial<P32SupplementalGateEvidence>;
   evaluatedAt: string;
   evidenceTtlHours?: number;
@@ -172,11 +181,16 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
   requireValidInput(isSha256(input.validation.artifactFingerprintSha256), "validation artifact fingerprint is missing or malformed");
   requireValidInput(isSha256(input.validation.validationEvidenceHashSha256), "validation evidence fingerprint is missing or malformed");
   requireValidInput(isSha256(input.investorDeckReview.artifactFingerprintSha256), "investor artifact fingerprint is missing or malformed");
+  requireValidInput(isGitCommitSha(input.candidateReview.baseHeadSha), "review packet source commit is missing or malformed");
+  requireValidInput(isSha256(input.candidateReview.candidateDigestSha256), "review packet candidate fingerprint is missing or malformed");
+  requireValidInput(isSha256(input.candidateReview.sourceCandidateDigestSha256), "review packet source fingerprint is missing or malformed");
+  requireValidInput(isSha256(input.candidateReview.candidateReviewPacketSha256), "review packet fingerprint is missing or malformed");
   const sourceCommit = input.manifest.baseHeadSha as string;
   const candidateFingerprint = input.manifest.candidateDigestSha256 as string;
   const sourceFingerprint = input.manifest.sourceCandidateDigestSha256 as string;
   const artifactFingerprint = input.validation.artifactFingerprintSha256 as string;
   const validationEvidenceFingerprint = input.validation.validationEvidenceHashSha256 as string;
+  const reviewPacketFingerprint = input.candidateReview.candidateReviewPacketSha256 as string;
 
   const integrityChecks: IntegrityCheck[] = [
     {
@@ -213,6 +227,26 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
       id: "investor-artifact-review",
       passed: input.investorDeckReview.automatedReviewPassed && input.investorDeckReview.humanReleaseReviewRequired,
       evidence: "Automated deck review passed and human release review remains required."
+    },
+    {
+      id: "review-packet-source-commit-alignment",
+      passed: input.candidateReview.baseHeadSha === sourceCommit,
+      evidence: "The candidate review packet is bound to the same full source commit."
+    },
+    {
+      id: "review-packet-candidate-alignment",
+      passed: input.candidateReview.candidateDigestSha256 === candidateFingerprint,
+      evidence: "The candidate review packet and candidate manifest fingerprints match."
+    },
+    {
+      id: "review-packet-source-alignment",
+      passed: input.candidateReview.sourceCandidateDigestSha256 === sourceFingerprint,
+      evidence: "The candidate review packet and source-tree fingerprints match."
+    },
+    {
+      id: "review-packet-coverage",
+      passed: input.candidateReview.completeCoverage,
+      evidence: "The candidate review packet covers every intentional candidate file."
     }
   ];
   const failedIntegrityChecks = integrityChecks.filter((check) => !check.passed);
@@ -225,7 +259,8 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
     sourceCommit,
     sourceTree: sourceFingerprint,
     artifact: artifactFingerprint,
-    validationEvidence: validationEvidenceFingerprint
+    validationEvidence: validationEvidenceFingerprint,
+    reviewPacket: reviewPacketFingerprint
   };
   const expiresAt = addHours(input.evaluatedAt, evidenceTtlHours);
   const nonsecretSuitePassed = input.validation.checks.some(
@@ -362,6 +397,7 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
   const candidateReviewPacketReady = input.manifest.sourceReviewReady &&
     input.validation.automatedValidationPassed &&
     input.investorDeckReview.automatedReviewPassed &&
+    input.candidateReview.completeCoverage &&
     nonsecretSuitePassed;
   const allGateEvidenceSatisfied = registry.gates.every((gate) => gate.status === "PASS");
   const packetWithoutHash = {
@@ -557,6 +593,7 @@ export function buildP32OperatorHandoffMarkdown(handoff: P32OperatorHandoff) {
     `- Source fingerprint: \`${handoff.expectedFingerprints.sourceTree}\``,
     `- Artifact fingerprint: \`${handoff.expectedFingerprints.artifact}\``,
     `- Validation fingerprint: \`${handoff.expectedFingerprints.validationEvidence}\``,
+    `- Review packet fingerprint: \`${handoff.expectedFingerprints.reviewPacket}\``,
     `- Gate packet: \`${handoff.generatedFromGatePacketHash}\``,
     `- Operator handoff: \`${handoff.handoffHash}\``,
     `- Evidence expires: \`${handoff.expiresAt}\``,

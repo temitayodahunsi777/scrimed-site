@@ -20,6 +20,17 @@ if (unknownArgs.length > 0) {
 const validationCommands = [
   { id: "git-diff-check", executable: "git", args: ["diff", "--check"], display: "git diff --check" },
   {
+    id: "workspace-hygiene",
+    executable: "npm",
+    args: ["run", "hygiene:workspace"],
+    display: "npm run hygiene:workspace",
+    fallbackStages: [
+      directNode("scripts/clean-generated-cache.mjs", "--preserve-next-cache"),
+      directNode("scripts/workspace-hygiene-contract-check.mjs"),
+      directNode("scripts/script-registry-contract-check.mjs")
+    ]
+  },
+  {
     id: "secret-scan",
     executable: "npm",
     args: ["run", "security:secret-scan"],
@@ -70,10 +81,13 @@ const validationCommands = [
     args: ["run", "build"],
     display: "npm run build",
     fallbackStages: [
-      directNode("scripts/clean-generated-cache.mjs"),
+      directNode("scripts/clean-generated-cache.mjs", "--preserve-next-cache"),
       directNode("scripts/release-provenance-preflight.mjs", "--deployment-aware"),
       directNode("scripts/check-generated-integrity.mjs"),
-      directNode("node_modules/next/dist/bin/next", "build", "--webpack")
+      directNode("node_modules/next/dist/bin/next", "build", "--webpack"),
+      directNode("scripts/generated-output-postflight.mjs"),
+      directNode("scripts/verify-public-release.mjs", "--require-build"),
+      directNode("scripts/check-generated-integrity.mjs")
     ]
   },
   {

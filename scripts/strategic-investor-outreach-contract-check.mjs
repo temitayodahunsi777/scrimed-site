@@ -44,6 +44,14 @@ for (const expected of [
   "strategicOutreachStages",
   "strategicInvestorMeetingProfiles",
   "strategicFundingReadinessControls",
+  "evaluateInvestorEngagementAction",
+  "getParallelFundingTrack",
+  "parallel-pre-fundraise-and-candidate-review",
+  "public-discovery-conversation",
+  "share-investor-deck",
+  "open-diligence-room",
+  "CLEAN_CANDIDATE_AND_NAMED_REVIEW_REQUIRED",
+  "externalActionExecuted: false",
   "no-public-direct-investment-application-verified",
   "externalFundraisingReleaseAuthorized: false",
   "externalReleaseAuthorized: false",
@@ -66,6 +74,16 @@ for (const expected of [
   requireIncludes("app/lib/investorAudienceReadiness.ts", expected);
 }
 
+for (const routePath of [
+  "app/api/investor-audience-readiness/route.ts",
+  "app/api/investor-audience-readiness/brief/route.ts"
+]) {
+  requireIncludes(routePath, "X-SCRIMED-Investor-Diligence");
+  requireIncludes(routePath, "candidate-review-required");
+  requireIncludes(routePath, "X-SCRIMED-Investor-Discovery");
+  requireIncludes(routePath, "human-controlled-public-materials-only");
+}
+
 for (const expected of [
   "Four company-specific theses replace generic logo outreach.",
   "Strategic diligence manifest",
@@ -78,6 +96,8 @@ for (const expected of [
 for (const expected of [
   "Strategic investor meeting room",
   "Funding release controls",
+  "Public proof can start a conversation; reviewed provenance unlocks diligence.",
+  "Candidate binding:",
   "direct investment path is not assumed",
   "Download {profile.organization} Meeting Brief"
 ]) {
@@ -109,6 +129,8 @@ requireIncludes("docs/investor-audience-readiness.md", "Strategic Ecosystem Outr
 requireIncludes("docs/investor-audience-readiness.md", "not claimed investors or partners");
 requireIncludes("docs/investor-audience-readiness.md", "Strategic Meeting Room");
 requireIncludes("docs/investor-audience-readiness.md", "Funding Release Ledger");
+requireIncludes("docs/investor-audience-readiness.md", "Parallel Pre-Fundraise Lane");
+requireIncludes("docs/investor-audience-readiness.md", "Even fully satisfied external-release inputs return `REQUIRE_HUMAN`");
 
 const combined = Object.values(files).join("\n");
 for (const forbidden of [

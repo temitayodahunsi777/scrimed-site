@@ -40,7 +40,13 @@
       "title": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
       "description": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
       "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
-      "ogDescription": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
+      "ogDescription": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
+      "requiredVisibleText": [
+        "FaithCore is an optional, user-selected experience",
+        "does not influence diagnosis",
+        "FaithCore is not a medical service",
+        "Explore Optional FaithCore Experience"
+      ]
     },
     {
       "path": "/partner-with-scrimed",

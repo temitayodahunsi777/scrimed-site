@@ -5975,6 +5975,111 @@ async function checkReadiness() {
   console.log("pass protected pilot readiness");
 }
 
+async function checkCommercialPricing() {
+  const result = await request("/api/commercial/pricing");
+  requireStatus("commercial pricing", result.response.status, 200);
+  requireContentType("commercial pricing", result.response, "application/json");
+  requirePilotValueEvidenceBoundary("commercial pricing", result.response);
+  if (result.response.headers.get("x-scrimed-market-evidence") !== "current") {
+    throw new Error("commercial pricing market evidence header is not current.");
+  }
+  if (result.response.headers.get("x-scrimed-competitive-comparison") !== "current-first-party-evidence-only") {
+    throw new Error("commercial pricing competitive comparison header lost its freshness boundary.");
+  }
+  const body = requireJson("commercial pricing", result.body);
+
+  if (body.service !== "scrimed-commercial-strategy") {
+    throw new Error(`commercial pricing expected scrimed-commercial-strategy but received ${body.service}.`);
+  }
+
+  if (body.status !== "commercial-planning-model-active-pre-commercial") {
+    throw new Error(`commercial pricing expected pre-commercial planning status but received ${body.status}.`);
+  }
+
+  if (
+    body.authority?.pricingAuthority !== "non-binding-planning-ranges" ||
+    body.authority?.contractAuthority !== "not-granted" ||
+    body.authority?.productionAuthority !== "not-production-authorized" ||
+    body.authority?.customerActivationAuthority !== "not-customer-go-live-approval"
+  ) {
+    throw new Error("commercial pricing lost a quote, contract, production, or customer-activation boundary.");
+  }
+
+  if (!Array.isArray(body.pricingTiers) || body.pricingTiers.length < 6) {
+    throw new Error("commercial pricing expected a complete pricing ladder.");
+  }
+
+  if (
+    !body.pricingTiers.every(
+      (tier) =>
+        tier.priceRange?.minimumUsd >= 0 &&
+        tier.priceRange?.maximumUsd >= tier.priceRange?.minimumUsd &&
+        tier.proposalGate &&
+        tier.pricingAuthority
+    )
+  ) {
+    throw new Error("commercial pricing expected machine-readable ranges and proposal gates.");
+  }
+
+  if (
+    body.valuePlanner?.status !== "browser-only-no-data-persistence" ||
+    body.valuePlanner?.pricingAuthority !== "non-binding-planning-model" ||
+    body.valuePlanner?.humanReviewRequired !== true
+  ) {
+    throw new Error("commercial pricing value planner lost its no-storage or human-review boundary.");
+  }
+
+  if (!Array.isArray(body.marketPricingBenchmarks) || body.marketPricingBenchmarks.length < 4) {
+    throw new Error("commercial pricing expected dated market evidence.");
+  }
+
+  if (
+    !body.marketPricingBenchmarks.every(
+      (benchmark) =>
+        benchmark.evidenceStatus === "first-party-public" &&
+        benchmark.sourceUrl?.startsWith("https://") &&
+        benchmark.lastVerified === "2026-08-01" &&
+        benchmark.reviewDue === "2026-10-30" &&
+        ["current", "review-due"].includes(benchmark.freshness) &&
+        benchmark.comparisonBoundary
+    )
+  ) {
+    throw new Error("commercial pricing expected first-party market evidence with comparison boundaries.");
+  }
+
+  if (
+    body.marketEvidenceReview?.status !== "current" ||
+    body.marketEvidenceReview?.competitiveComparisonAllowed !== true ||
+    body.marketEvidenceReview?.staleCount !== 0 ||
+    body.marketEvidenceReview?.humanReviewRequired !== true ||
+    body.sourceCounts?.currentMarketBenchmarkCount !== body.marketPricingBenchmarks.length
+  ) {
+    throw new Error("commercial pricing market evidence is stale, incomplete, or missing its human review gate.");
+  }
+
+  if (!Array.isArray(body.competitivePositioningPillars) || body.competitivePositioningPillars.length < 6) {
+    throw new Error("commercial pricing expected competitive positioning pillars.");
+  }
+
+  if (!Array.isArray(body.globalCommercialProfiles) || body.globalCommercialProfiles.length < 4) {
+    throw new Error("commercial pricing expected global commercial profiles.");
+  }
+
+  if (
+    !Array.isArray(body.commercialReadinessControls) ||
+    !body.commercialReadinessControls.some(
+      (control) => control.dimension === "safety" && control.status === "enforced-in-code"
+    ) ||
+    !body.commercialReadinessControls.some(
+      (control) => control.dimension === "privacy" && control.status === "enforced-in-code"
+    )
+  ) {
+    throw new Error("commercial pricing expected enforced safety and privacy controls.");
+  }
+
+  console.log("pass commercial pricing");
+}
+
 async function checkCompetitiveEdgeApi() {
   const result = await request("/api/competitive-edge");
   requireStatus("competitive edge", result.response.status, 200);
@@ -9110,6 +9215,30 @@ async function checkPilotDemoCommercialReadiness() {
   requireStatus("Pilot Demo Commercial Readiness", result.response.status, 200);
   requireContentType("Pilot Demo Commercial Readiness", result.response, "application/json");
   requirePilotDemoCommercialReadinessBoundary("Pilot Demo Commercial Readiness", result.response);
+  if (result.response.headers.get("x-scrimed-demo-session-planner") !== "interactive-synthetic-session-planner-active") {
+    throw new Error("Pilot Demo Commercial Readiness missing session-planner evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-rehearsal-gate") !== "proof-preflight-rehearsal-gate-active") {
+    throw new Error("Pilot Demo Commercial Readiness missing rehearsal-gate evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-proof-preflight") !== "same-origin-read-only-operator-triggered") {
+    throw new Error("Pilot Demo Commercial Readiness missing proof-preflight evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-protected-handoff") !== "aal2-sales-operations-only") {
+    throw new Error("Pilot Demo Commercial Readiness must retain the protected AAL2 handoff boundary.");
+  }
+  if (
+    result.response.headers.get("x-scrimed-demo-handoff-draft") !==
+    "canonical-metadata-no-automatic-persistence"
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness must expose its bounded metadata-only handoff contract.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-session-storage") !== "no-buyer-data-stored") {
+    throw new Error("Pilot Demo Commercial Readiness missing no-storage evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-session-send-authority") !== "not-authorized-external-send") {
+    throw new Error("Pilot Demo Commercial Readiness must not authorize external sending.");
+  }
   const body = requireJson("Pilot Demo Commercial Readiness", result.body);
 
   if (body.service !== "scrimed-pilot-demo-commercial-readiness") {
@@ -9160,6 +9289,118 @@ async function checkPilotDemoCommercialReadiness() {
     )
   ) {
     throw new Error("Pilot Demo Commercial Readiness buyer conversion packets must include intake fields, disqualifiers, and audit hashes.");
+  }
+
+  const sessionPlanner = body.sessionPlanner;
+  if (sessionPlanner?.status !== "interactive-synthetic-session-planner-active") {
+    throw new Error("Pilot Demo Commercial Readiness expected the interactive session planner.");
+  }
+
+  if (!Array.isArray(sessionPlanner.catalog) || sessionPlanner.catalog.length !== body.demoOfferPaths.length) {
+    throw new Error("Pilot Demo Commercial Readiness session planner must cover every demo offer path.");
+  }
+
+  if (sessionPlanner.defaultPlan?.status !== "ready-for-synthetic-guided-demo") {
+    throw new Error("Pilot Demo Commercial Readiness expected a synthetic guided-demo default plan.");
+  }
+
+  if (
+    sessionPlanner.defaultPlan?.syntheticOnly !== true ||
+    sessionPlanner.defaultPlan?.humanReviewRequired !== true ||
+    sessionPlanner.defaultPlan?.bindingQuoteAuthorized !== false ||
+    sessionPlanner.defaultPlan?.externalSendAuthorized !== false ||
+    sessionPlanner.defaultPlan?.releaseAuthorityGranted !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness session planner lost a commercial or safety boundary.");
+  }
+
+  if (!Array.isArray(sessionPlanner.defaultPlan?.agenda) || sessionPlanner.defaultPlan.agenda.length !== 5) {
+    throw new Error("Pilot Demo Commercial Readiness expected a five-step default run of show.");
+  }
+
+  const plannedMinutes = sessionPlanner.defaultPlan.agenda.reduce((total, step) => total + step.minutes, 0);
+  if (plannedMinutes !== sessionPlanner.defaultPlan.durationMinutes) {
+    throw new Error("Pilot Demo Commercial Readiness default run of show does not fit its meeting length.");
+  }
+
+  if (
+    sessionPlanner.storesBuyerData !== false ||
+    sessionPlanner.acceptsFreeText !== false ||
+    sessionPlanner.externalSendAuthorized !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness planner must remain local, structured, and no-send.");
+  }
+
+  const rehearsalGate = sessionPlanner.rehearsalGate;
+  if (rehearsalGate?.status !== "proof-preflight-rehearsal-gate-active") {
+    throw new Error("Pilot Demo Commercial Readiness expected a governed local rehearsal gate.");
+  }
+
+  if (!Array.isArray(rehearsalGate.controls) || rehearsalGate.controls.length !== 3) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate expected three operator controls.");
+  }
+
+  if (
+    rehearsalGate.defaultEvaluation?.status !== "rehearsal-incomplete" ||
+    rehearsalGate.defaultEvaluation?.readinessScore !== 0 ||
+    !Array.isArray(rehearsalGate.defaultEvaluation?.blockers) ||
+    rehearsalGate.defaultEvaluation.blockers.length !== 4
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate must fail closed before self-attestation.");
+  }
+
+  if (
+    rehearsalGate.protectedHandoffRoute !== "/sales-operations#authenticated-buyer-demo-execution" ||
+    rehearsalGate.completionStatus !== "ready-for-protected-handoff" ||
+    rehearsalGate.evidenceBasis !== "automated-route-preflight-plus-operator-self-attestation" ||
+    rehearsalGate.persistent !== false ||
+    rehearsalGate.importsAutomatically !== false ||
+    rehearsalGate.humanReviewRequired !== true ||
+    rehearsalGate.pilotLaunchAuthorized !== false ||
+    rehearsalGate.defaultEvaluation?.externalSendAuthorized !== false ||
+    rehearsalGate.defaultEvaluation?.releaseAuthorityGranted !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate lost a handoff or authority boundary.");
+  }
+
+  const protectedHandoff = rehearsalGate.protectedHandoff;
+  if (
+    protectedHandoff?.status !== "canonical-metadata-draft-handoff-active" ||
+    protectedHandoff.transport !== "same-origin-query-metadata" ||
+    protectedHandoff.sourceTrust !== "untrusted-public-origin-draft" ||
+    protectedHandoff.canonicalPlanValidationRequired !== true ||
+    !Number.isInteger(protectedHandoff.maximumQueryLength) ||
+    protectedHandoff.maximumQueryLength < 1 ||
+    protectedHandoff.maximumQueryLength > 1_800 ||
+    protectedHandoff.acceptsFreeText !== false ||
+    protectedHandoff.storesBuyerData !== false ||
+    protectedHandoff.automaticPersistenceAuthorized !== false ||
+    protectedHandoff.aal2RecordRequired !== true ||
+    protectedHandoff.externalSendAuthorized !== false ||
+    protectedHandoff.releaseAuthorityGranted !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness protected handoff lost a validation or authority boundary.");
+  }
+
+  if (
+    rehearsalGate.proofPreflight?.status !== "same-origin-read-only-proof-preflight-active" ||
+    rehearsalGate.proofPreflight?.method !== "HEAD" ||
+    rehearsalGate.proofPreflight?.credentials !== "omit" ||
+    rehearsalGate.proofPreflight?.sameOriginOnly !== true ||
+    rehearsalGate.proofPreflight?.operatorTriggered !== true ||
+    rehearsalGate.proofPreflight?.externalNetworkAllowed !== false ||
+    rehearsalGate.proofPreflight?.requestBodyAllowed !== false ||
+    rehearsalGate.proofPreflight?.storesBuyerData !== false ||
+    rehearsalGate.proofPreflight?.defaultResult?.status !== "not-run" ||
+    !Array.isArray(rehearsalGate.proofPreflight?.defaultResult?.routeChecks) ||
+    rehearsalGate.proofPreflight.defaultResult.routeChecks.length < 1 ||
+    rehearsalGate.proofPreflight.defaultResult.routeChecks.length > rehearsalGate.proofPreflight.maximumTargets
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness proof preflight lost its bounded read-only boundary.");
+  }
+
+  if (!rehearsalGate.defaultEvaluation?.criteria?.some((criterion) => criterion.id === "agenda-coverage")) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate is missing agenda coverage.");
   }
 
   if (!Array.isArray(body.conversionSteps) || body.conversionSteps.length < 6) {
@@ -9217,6 +9458,22 @@ async function checkPilotDemoCommercialReadiness() {
 
   if (!brief.body.text.includes("Buyer Conversion Packets")) {
     throw new Error("Pilot Demo Commercial Readiness brief missing buyer conversion packet section.");
+  }
+
+  if (!brief.body.text.includes("Guided Demo Session Plan")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing guided session plan section.");
+  }
+
+  if (!brief.body.text.includes("stores no buyer data")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing no-storage boundary.");
+  }
+
+  if (!brief.body.text.includes("Governed Rehearsal Gate")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing rehearsal-gate section.");
+  }
+
+  if (!brief.body.text.includes("Route reachability is checked automatically")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing proof-preflight evidence limitation.");
   }
 
   console.log("pass pilot demo commercial readiness");
@@ -15411,6 +15668,24 @@ async function checkProtectedPostFailClosed(path, label, payload) {
   console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
 }
 
+async function checkP32ProtectedPostFailClosed(path, label, payload) {
+  const result = await postJson(path, payload);
+  requireStatus(label, result.response.status, [401, 403, 503]);
+  requireContentType(label, result.response, "application/json");
+  const dataBoundary = result.response.headers.get("x-scrimed-data-boundary");
+  if (dataBoundary !== "synthetic-metadata-only") {
+    throw new Error(`${label} expected synthetic-metadata-only boundary but received ${dataBoundary}.`);
+  }
+  requireNoClinicalCareAuthority(label, result.response);
+  if (!result.response.headers.get("x-scrimed-csrf-protection")) {
+    throw new Error(`${label} missing protected mutation provenance policy header.`);
+  }
+  if (result.response.headers.get("x-scrimed-release-authority") !== "not-granted") {
+    throw new Error(`${label} must not grant release authority.`);
+  }
+  console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
+}
+
 async function checkSalesProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -15423,6 +15698,7 @@ await checkSiteNavigationShell();
 await checkBuyerTrustReliabilitySafetyMessaging();
 await checkHtml("/company-assessment");
 await checkHtml("/clinical-production-readiness");
+await checkHtml("/pricing");
 await checkHtml("/pilot-demo-commercial-readiness");
 await checkHtml("/pilot-workspace/access");
 await checkHtml("/sales-operations");
@@ -15552,6 +15828,7 @@ await checkBoundaryResolution();
 await checkBoundaryReleaseApprovalMatrix();
 await checkProductConsole();
 await checkReadiness();
+await checkCommercialPricing();
 await checkCompetitiveEdgeApi();
 await checkCompetitiveIntelligenceApi();
 await checkScrimedMarketExecutionApi();
@@ -16204,6 +16481,21 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/aal2-run-evidence`,
   "QA AAL2 Run Evidence protected API"
+);
+await checkP32ProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/p32-attestation`,
+  "P.32 Evidence Attestation protected API",
+  {
+    sourceCommit: "0".repeat(40),
+    sourceTreeFingerprint: "1".repeat(64),
+    artifactFingerprint: "2".repeat(64),
+    validationEvidenceFingerprint: "3".repeat(64)
+  }
+);
+await checkP32ProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/p32-candidate-review?action=assign`,
+  "P.32 Candidate Review protected API",
+  { reviewerIdentityHash: "4".repeat(64) }
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,

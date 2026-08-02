@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { OperatingModeBanner } from "./components/OperatingModeBanner";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteNavigation } from "./components/SiteNavigation";
-import { applicationUrl, companyIdentity } from "./lib/companyIdentity";
+import { companyIdentity } from "./lib/companyIdentity";
 import { assertSafeScrimedOperatingMode } from "./lib/operatingMode";
 
 export const metadata: Metadata = {
@@ -25,8 +25,7 @@ export const metadata: Metadata = {
     siteName: companyIdentity.displayName,
     title: "SCRIMED | Governed Healthcare Intelligence",
     description:
-      "Pre-commercial, Atlas-first healthcare intelligence with synthetic demonstrations, human review, and explicit clinical safety boundaries.",
-    url: applicationUrl("/")
+      "Pre-commercial, Atlas-first healthcare intelligence with synthetic demonstrations, human review, and explicit clinical safety boundaries."
   }
 };
 

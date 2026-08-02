@@ -1,6 +1,7 @@
 import { evaluateScrimedSafetyGate, scrimedSafetyHeaders } from "../scrimedSafetyGovernance";
 import { getAuthenticatedGovernanceContext } from "../protectedPilotStore";
 import { scrimedWorkAgents } from "./agentRegistry";
+import { getScrimedAgentTeamSummary } from "./agentTeams";
 import { buildScrimedWorkArtifact, scrimedWorkArtifactTemplates } from "./artifactEngine";
 import { evaluateArtifactReview, parseArtifactReviewInput } from "./artifactReview";
 import { createAuditEvent, createAuditHash, envelope, errorEnvelope, scrimedWorkAuditBoundary, scrimedWorkPolicyVersion } from "./audit";
@@ -47,6 +48,7 @@ import {
 } from "./completionEvidence";
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
 import { sampleLearningLoopArtifacts, sampleOutcomeLearningControllers } from "./learningLoop";
+import { getScrimedImpactGovernanceSummary } from "./impactGovernance";
 import { priorAuthorizationFoundryBlueprint } from "./foundry";
 import { getClinicalAgentSreSummary } from "../clinicalAgentSre";
 import { getClinicalAssuranceControlPlaneSummary } from "../clinicalAssuranceControlPlane";
@@ -57,6 +59,7 @@ import {
   payerIqProtectedHandoffAuthority
 } from "./payerIqHandoff";
 import { sampleModelRouteInputs, routeScrimedWorkModel } from "./modelRouter";
+import { getScrimedModelQualificationSummary } from "./modelQualification";
 import { previewOrchestration } from "./orchestrationEngine";
 import { getScrimedWorkProductionHardeningGate } from "./productionHardening";
 import { scrimedWorkProviderRegistry } from "./providerRegistry";
@@ -70,6 +73,8 @@ import {
   scrimedWorkReviewQueueBoundary,
   scrimedWorkReviewQueuePolicyVersion
 } from "./reviewQueue";
+import { getScrimedReviewOrchestratorSummary } from "./reviewOrchestrator";
+import { getReviewRequirementsSummary } from "./reviewPolicyEngine";
 import { containsPhiRisk, containsTokenLikeField, parseArtifactRequest, parseWorkSessionCreateInput } from "./schemas";
 import { scrimedWorkScheduleDefinitions } from "./scheduleDefinitions";
 import {
@@ -98,6 +103,7 @@ export * from "./productionHardening";
 export * from "./rateLimitPolicy";
 export * from "./toolRegistry";
 export * from "./agentRegistry";
+export * from "./agentTeams";
 export * from "./orchestrationEngine";
 export * from "./contextEngine";
 export * from "./csrfProtection";
@@ -110,10 +116,17 @@ export * from "./canaryAttestation";
 export * from "./completionEvidence";
 export * from "./completionQueue";
 export * from "./reviewQueue";
+export * from "./reviewOrchestrator";
+export * from "./reviewPolicyEngine";
+export * from "./assuranceManifest";
+export * from "./controlAttestations";
+export * from "./reviewConfidence";
+export * from "./founderInterimAcceptance";
 export * from "./reviewPreparation";
 export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
+export * from "./impactGovernance";
 export * from "./foundry";
 export * from "./governedRuntime";
 export * from "./agentExecution";
@@ -122,9 +135,17 @@ export * from "./valueTelemetry";
 export * from "./audit";
 export * from "./featureFlags";
 export * from "./voiceWorkflow";
+export * from "./modelQualification";
 export * from "./durableStore";
 export * from "./sessionLifecycle";
 export * from "./p32Contracts";
+export * from "./p32GovernanceRecords";
+export * from "./p32ApprovedActions";
+export * from "./p32TechnicalGates";
+export * from "./p32AgentGovernance";
+export * from "./p32ArtifactAdmission";
+export * from "./p32InteroperabilityControls";
+export * from "./p32HumanGovernance";
 
 export const scrimedWorkRoute = "/scrimed-work";
 export const scrimedWorkApiRoute = "/api/scrimed-work";
@@ -175,6 +196,11 @@ export function getScrimedWorkSummary() {
     limit: 4
   });
   const mutationRateLimit = getScrimedWorkRateLimitPosture();
+  const agentTeams = getScrimedAgentTeamSummary();
+  const modelQualification = getScrimedModelQualificationSummary();
+  const impactGovernance = getScrimedImpactGovernanceSummary();
+  const reviewOrchestrator = getScrimedReviewOrchestratorSummary();
+  const reviewPolicy = getReviewRequirementsSummary();
 
   return {
     service: "scrimed-work-intelligence-platform",
@@ -200,8 +226,10 @@ export function getScrimedWorkSummary() {
       ["active", "awaiting_approval", "verifying", "paused"].includes(session.statusHistory.at(-1)?.status ?? "")
     ).length,
     agents: scrimedWorkAgents,
+    agentTeams,
     tools: getScrimedWorkTools(),
     providers: scrimedWorkProviderRegistry,
+    modelQualification,
     modelRoutes: sampleModelRouteInputs.map(routeScrimedWorkModel),
     context: sampleContext,
     ontology: getHealthcareOntologyRegistry(),
@@ -237,6 +265,9 @@ export function getScrimedWorkSummary() {
       sessionId: session.id,
       telemetry: session.valueTelemetry
     })),
+    impactGovernance,
+    reviewOrchestrator,
+    reviewPolicy,
     lifecycle: sessions.map(getWorkSessionLifecycleSnapshot),
     governanceStatus: {
       definitionOfDoneRequired: true,

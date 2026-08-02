@@ -1,7 +1,7 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
 import type { ApprovalEvidence, ReleaseGateResult } from "./scrimed-work/p32Contracts";
 
-export const scrimedP32ReleaseGateVersion = "scrimed-p32-release-gates-v1-2026-07-20";
+export const scrimedP32ReleaseGateVersion = "scrimed-p32-release-gates-v2-2026-07-30";
 
 export const scrimedP32ReleaseGateBoundary =
   "SCRIMED p.32 release gates bind technical and human evidence to exact fingerprints. Passing a technical gate does not grant legal, clinical, privacy, regulatory, deployment, production, or customer go-live authority.";
@@ -29,6 +29,7 @@ export type P32ReleaseGateContext = {
     sourceTree: string;
     artifact: string;
     validationEvidence: string;
+    reviewPacket: string;
   };
   worktreeClean: boolean;
   automatedEvidence: AutomatedGateEvidence[];
@@ -362,7 +363,7 @@ export function createP32ApprovalEvidence(
   };
 }
 
-function fingerprintMatches(
+function baseFingerprintMatches(
   evidence: Pick<ApprovalEvidence, "sourceCommit" | "sourceTreeFingerprint" | "artifactFingerprint" | "validationEvidenceFingerprint">,
   expected: P32ReleaseGateContext["expectedFingerprints"]
 ) {
@@ -377,7 +378,7 @@ export function evaluateP32AutomatedGateEvidence(
   context: Pick<P32ReleaseGateContext, "expectedFingerprints" | "evaluatedAt">
 ) {
   const { evidenceHash, ...hashPayload } = evidence;
-  const exactFingerprintMatch = fingerprintMatches(evidence, context.expectedFingerprints);
+  const exactFingerprintMatch = baseFingerprintMatches(evidence, context.expectedFingerprints);
   const structurallyValid = isGitCommitSha(evidence.sourceCommit) &&
     isSha256(evidence.sourceTreeFingerprint) &&
     isSha256(evidence.artifactFingerprint) &&
@@ -416,11 +417,22 @@ export function evaluateP32ApprovalEvidence(
   context: Pick<P32ReleaseGateContext, "expectedFingerprints" | "evaluatedAt">
 ) {
   const { decisionHash, ...hashPayload } = evidence;
-  const exactFingerprintMatch = fingerprintMatches(evidence, context.expectedFingerprints);
+  const exactFingerprintMatch =
+    baseFingerprintMatches(evidence, context.expectedFingerprints) &&
+    (evidence.gateId !== "named-reviewer-approval" ||
+      (isSha256(context.expectedFingerprints.reviewPacket) &&
+        evidence.reviewPacketFingerprint === context.expectedFingerprints.reviewPacket));
+  const reviewPacketBindingValid =
+    evidence.gateId === "named-reviewer-approval"
+      ? typeof evidence.reviewPacketFingerprint === "string" &&
+        isSha256(evidence.reviewPacketFingerprint)
+      : evidence.reviewPacketFingerprint === null ||
+        evidence.reviewPacketFingerprint === undefined;
   const structurallyValid = isGitCommitSha(evidence.sourceCommit) &&
     isSha256(evidence.sourceTreeFingerprint) &&
     isSha256(evidence.artifactFingerprint) &&
     isSha256(evidence.validationEvidenceFingerprint) &&
+    reviewPacketBindingValid &&
     isSha256(evidence.reviewerId) &&
     isSha256(evidence.tenantScopeHash) &&
     isSha256(decisionHash) &&

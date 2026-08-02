@@ -26,8 +26,17 @@ function requireIncludes(label, value, expected) {
 for (const expected of [
   "getAuthenticatedGovernanceContext(request)",
   "getAccessiblePilotWorkspace",
+  "getPilotWorkspaceMembershipAccess",
+  "getP32CandidateReviewActorCapabilities",
+  "actorCapabilities",
+  "canAssignReview",
+  "canRecordDecision",
+  "p32-candidate-review-stage-forbidden",
   "createP32CandidateReviewAssignmentReceipt",
   "recordP32CandidateReviewDecisionReceipt",
+  "evaluateScrimedWorkWriteRequestProvenance(request)",
+  "p32-candidate-review-csrf-denied",
+  "X-SCRIMED-CSRF-Protection",
   "idempotency-key",
   "action !== \"assign\" && action !== \"decide\"",
   "releaseAuthorityGranted",
@@ -40,9 +49,11 @@ for (const expected of [
 for (const expected of [
   "SCRIMED_P32_CANDIDATE_REVIEW_ENABLED",
   "createP32CandidateReviewerIdentityHash",
+  "getP32CandidateReviewActorCapabilities",
   "createP32CandidateTenantScopeHash",
   "p32-candidate-review-separation-of-duties-required",
   "gateId: \"named-reviewer-approval\"",
+  "reviewPacketFingerprint: configuration.fingerprints.reviewPacketFingerprint",
   "reviewerRole: \"principal-engineer\"",
   "identityAssurance: \"aal2-protected-workspace\"",
   "releaseAuthorityGranted: false",
@@ -67,6 +78,7 @@ for (const expected of [
   "membership.status = 'active'",
   "p32-candidate-review-separation-of-duties-required",
   "p32-candidate-review-idempotency-replay",
+  "approval ->> 'reviewPacketFingerprint' <> normalized ->> 'reviewPacketFingerprint'",
   "before update or delete",
   "previous_audit_hash",
   "release_authority_granted = false",
@@ -78,6 +90,9 @@ for (const expected of [
 }
 
 for (const expected of [
+  "getPilotWorkspaceMembershipAccess",
+  '.from("pilot_memberships")',
+  '.select("role, status")',
   "create_p32_candidate_review_assignment",
   "record_p32_candidate_review_decision",
   "P32CandidateReviewAssignmentReceiptInput",
@@ -91,6 +106,11 @@ for (const expected of [
   "Approve Source Review",
   "Reject Candidate",
   "Copy Identity Hash",
+  "Copy Assignment ID",
+  "actorCapabilities.canAssignReview",
+  "actorCapabilities.canRecordDecision",
+  "Read-only candidate evidence",
+  "assignmentIdPattern",
   "Download Review Evidence",
   "crypto.randomUUID()"
 ]) {
@@ -111,6 +131,7 @@ for (const expected of [
   "does not authorize deployment",
   "AAL2",
   "append-only",
+  "inside the signed evidence payload",
   "allowedApprovalGateIds",
   "npm run test:scrimed-p32-candidate-review"
 ]) {

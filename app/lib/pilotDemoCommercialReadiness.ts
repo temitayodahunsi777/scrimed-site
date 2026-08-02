@@ -7,6 +7,29 @@ import {
 } from "./demoPilotPrograms";
 import { getCommercialStrategySummary } from "./commercialStrategy";
 import { generateScrimedAuditHash } from "./scrimedIntelligencePlatform";
+import {
+  buildPilotDemoSessionPlan,
+  pilotDemoSessionAudienceOptions,
+  pilotDemoSessionFocusOptions,
+  pilotDemoSessionLengthOptions,
+  type PilotDemoSessionCatalogEntry
+} from "./pilotDemoSessionPlanner";
+import {
+  buildPendingPilotDemoProofPreflight,
+  pilotDemoProofPreflightMaximumTargets,
+  pilotDemoProofPreflightStatus,
+  pilotDemoProofPreflightTimeoutMs
+} from "./pilotDemoProofPreflight";
+import {
+  evaluatePilotDemoRehearsal,
+  pilotDemoProtectedHandoffRoute,
+  pilotDemoRehearsalControls,
+  pilotDemoRehearsalStatus
+} from "./pilotDemoRehearsal";
+import {
+  pilotDemoProtectedHandoffMaximumQueryLength,
+  pilotDemoProtectedHandoffStatus
+} from "./pilotDemoProtectedHandoff";
 
 export type PilotDemoAcceleratorStatus =
   | "active"
@@ -89,7 +112,7 @@ export const pilotDemoCommercialReadinessStatus =
   "pilot-demo-commercial-accelerator-active";
 export const pilotDemoCommercialReadinessBriefStatus =
   "pilot-demo-commercial-brief-ready-no-guarantee";
-export const pilotDemoCommercialReadinessUpdatedAt = "2026-06-26";
+export const pilotDemoCommercialReadinessUpdatedAt = "2026-07-31";
 
 export const pilotDemoCommercialReadinessBoundary =
   "SCRIMED Pilot Demo Commercial Readiness turns demos, pilot programs, pricing tiers, market benchmarks, proof routes, onboarding steps, and margin controls into a seamless no-PHI buyer path. It is commercial readiness and pricing guidance only. It does not create a signed quote, contract, legal advice, accounting advice, tax advice, audited financial reporting, securities material, investment advice, valuation assurance, revenue guarantee, profit guarantee, ROI guarantee, reimbursement guarantee, customer permission, procurement approval, security certification, PHI processing authority, production connector approval, EHR writeback approval, payer submission approval, or live clinical care authorization.";
@@ -673,12 +696,58 @@ export function buildPilotDemoBuyerConversionPackets(): PilotDemoBuyerConversion
   });
 }
 
+export function buildPilotDemoSessionCatalog(): PilotDemoSessionCatalogEntry[] {
+  const packetsByDemo = new Map(
+    buildPilotDemoBuyerConversionPackets().map((packet) => [packet.demoSlug, packet])
+  );
+
+  return demoOfferPaths.flatMap((path) => {
+    const demo = getProductDemoBySlug(path.slug);
+    const packet = packetsByDemo.get(path.slug);
+
+    if (!demo || !packet) return [];
+
+    return [{
+      demoSlug: demo.slug,
+      demoName: demo.name,
+      demoRoute: demo.route,
+      runRoute: demo.runRoute,
+      runLabel: demo.runLabel,
+      buyerFit: path.buyerFit,
+      sponsorRole: packet.sponsorRole,
+      workflowOwnerRole: packet.workflowOwnerRole,
+      recommendedPilotName: path.recommendedPilotName,
+      recommendedPilotRoute: path.recommendedPilotRoute,
+      pricingBand: path.pricingBand,
+      proofRoutes: demo.proofRoutes,
+      acceptanceCriteria: packet.acceptanceCriteria,
+      closePlan: packet.closePlan,
+      retainedBoundary: path.retainedBoundary,
+      noPhiIntakeRoute: path.fastPathCta
+    }];
+  });
+}
+
 export function getPilotDemoCommercialReadinessSummary() {
   const demoPilotSummary = getDemoPilotProgramSummary();
   const commercialSummary = getCommercialStrategySummary();
   const coveredDemoSlugs = new Set(demoOfferPaths.map((path) => path.slug));
   const uncoveredDemos = productDemos.filter((demo) => !coveredDemoSlugs.has(demo.slug));
   const buyerConversionPackets = buildPilotDemoBuyerConversionPackets();
+  const sessionPlannerCatalog = buildPilotDemoSessionCatalog();
+  const defaultSessionPlan = buildPilotDemoSessionPlan(sessionPlannerCatalog, {
+    demoSlug: sessionPlannerCatalog[0]?.demoSlug ?? "carepath-access-operations",
+    audience: "executive-sponsor",
+    focus: "workflow-proof",
+    durationMinutes: 30
+  });
+  const defaultProofPreflight = buildPendingPilotDemoProofPreflight(defaultSessionPlan);
+  const defaultRehearsalEvaluation = evaluatePilotDemoRehearsal({
+    plan: defaultSessionPlan,
+    completedStepIds: [],
+    confirmedControlIds: [],
+    proofPreflight: defaultProofPreflight
+  });
   const pilotPriceBands = pilotPrograms.map((pilot) => ({
     slug: pilot.slug,
     name: pilot.name,
@@ -734,6 +803,57 @@ export function getPilotDemoCommercialReadinessSummary() {
       "Keep public demos free, guided standard demos no-cost for qualified buyers, assessments at $25k-$150k depending on scope, synthetic pilots at $125k-$500k, protected pilots at $400k-$2M+, annual licenses at $1.5M-$12M+, and strategic partnerships at $8M-$25M+.",
     demoOfferPaths: getDemoPathCoverage(),
     buyerConversionPackets,
+    sessionPlanner: {
+      status: "interactive-synthetic-session-planner-active",
+      catalog: sessionPlannerCatalog,
+      audienceOptions: pilotDemoSessionAudienceOptions,
+      focusOptions: pilotDemoSessionFocusOptions,
+      lengthOptions: pilotDemoSessionLengthOptions,
+      defaultPlan: defaultSessionPlan,
+      rehearsalGate: {
+        status: pilotDemoRehearsalStatus,
+        completionStatus: "ready-for-protected-handoff",
+        controls: pilotDemoRehearsalControls,
+        defaultEvaluation: defaultRehearsalEvaluation,
+        proofPreflight: {
+          status: pilotDemoProofPreflightStatus,
+          defaultResult: defaultProofPreflight,
+          method: "HEAD",
+          credentials: "omit",
+          sameOriginOnly: true,
+          operatorTriggered: true,
+          timeoutMs: pilotDemoProofPreflightTimeoutMs,
+          maximumTargets: pilotDemoProofPreflightMaximumTargets,
+          externalNetworkAllowed: false,
+          requestBodyAllowed: false,
+          storesBuyerData: false
+        },
+        protectedHandoffRoute: pilotDemoProtectedHandoffRoute,
+        protectedHandoff: {
+          status: pilotDemoProtectedHandoffStatus,
+          transport: "same-origin-query-metadata",
+          sourceTrust: "untrusted-public-origin-draft",
+          canonicalPlanValidationRequired: true,
+          maximumQueryLength: pilotDemoProtectedHandoffMaximumQueryLength,
+          acceptsFreeText: false,
+          storesBuyerData: false,
+          automaticPersistenceAuthorized: false,
+          aal2RecordRequired: true,
+          externalSendAuthorized: false,
+          releaseAuthorityGranted: false
+        },
+        evidenceBasis: "automated-route-preflight-plus-operator-self-attestation",
+        persistent: false,
+        importsAutomatically: false,
+        humanReviewRequired: true,
+        pilotLaunchAuthorized: false
+      },
+      storesBuyerData: false,
+      acceptsFreeText: false,
+      externalSendAuthorized: false,
+      bindingQuoteAuthorized: false,
+      releaseAuthorityGranted: false
+    },
     pilotPriceBands,
     conversionSteps: pilotDemoConversionSteps,
     pricingTierAlignments: pilotDemoPricingTierAlignments,
@@ -794,6 +914,23 @@ export function buildPilotDemoCommercialReadinessBrief() {
       (path) =>
         `- ${path.name}: recommend ${path.recommendedPilotName} (${path.pricingBand}). CTA: ${path.fastPathCta}. Boundary: ${path.retainedBoundary}`
     ),
+    "",
+    "## Guided Demo Session Plan",
+    `- Default audience: ${summary.sessionPlanner.defaultPlan.audienceLabel}`,
+    `- Default focus: ${summary.sessionPlanner.defaultPlan.focusLabel}`,
+    `- Default duration: ${summary.sessionPlanner.defaultPlan.durationMinutes} minutes`,
+    `- Agenda steps: ${summary.sessionPlanner.defaultPlan.agenda.length}`,
+    `- Recommended pilot: ${summary.sessionPlanner.defaultPlan.recommendedPilotName}`,
+    `- Audit hash: ${summary.sessionPlanner.defaultPlan.auditHash}`,
+    "- The planner stores no buyer data, accepts no free text, sends nothing externally, and grants no quote or release authority.",
+    "",
+    "## Governed Rehearsal Gate",
+    `- Status: ${summary.sessionPlanner.rehearsalGate.status}`,
+    `- Criteria: ${summary.sessionPlanner.rehearsalGate.defaultEvaluation.totalCriteriaCount}`,
+    `- Proof preflight: ${summary.sessionPlanner.rehearsalGate.proofPreflight.status}; ${summary.sessionPlanner.rehearsalGate.proofPreflight.method}; same-origin only; ${summary.sessionPlanner.rehearsalGate.proofPreflight.timeoutMs}ms timeout`,
+    `- Protected handoff: ${summary.sessionPlanner.rehearsalGate.protectedHandoffRoute}`,
+    `- Protected handoff draft: ${summary.sessionPlanner.rehearsalGate.protectedHandoff.status}; ${summary.sessionPlanner.rehearsalGate.protectedHandoff.sourceTrust}; canonical plan validation required; no automatic persistence`,
+    "- Route reachability is checked automatically and evidence meaning remains operator-reviewed. The local record does not import automatically, independently validate clinical claims, launch a pilot, or grant production authority.",
     "",
     "## Buyer Conversion Packets",
     ...summary.buyerConversionPackets.map(

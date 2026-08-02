@@ -17,6 +17,8 @@ if (unknownOptions.length > 0) {
 const entrypoints = {
   cleanup: "scripts/clean-generated-cache.mjs",
   integrity: "scripts/check-generated-integrity.mjs",
+  postflight: "scripts/generated-output-postflight.mjs",
+  publicReleaseVerifier: "scripts/verify-public-release.mjs",
   workspaceHygiene: "scripts/workspace-hygiene-contract-check.mjs",
   nonsecret: "scripts/scrimed-nonsecret-test-suite.mjs",
   typescript: "node_modules/typescript/bin/tsc",
@@ -167,7 +169,7 @@ const stages = [
   {
     id: "cleanup",
     label: "generated-output cleanup",
-    args: [entrypoints.cleanup],
+    args: [entrypoints.cleanup, "--preserve-next-cache"],
     timeoutMs: 30_000
   },
   {
@@ -208,6 +210,18 @@ if (!requestedOptions.has("--no-build")) {
     label: "Next.js production build",
     args: [entrypoints.next, "build", "--webpack"],
     timeoutMs: 600_000
+  });
+  stages.push({
+    id: "postflight",
+    label: "generated-output postflight",
+    args: [entrypoints.postflight],
+    timeoutMs: 60_000
+  });
+  stages.push({
+    id: "built-public-release-verification",
+    label: "built public release verification",
+    args: [entrypoints.publicReleaseVerifier, "--require-build"],
+    timeoutMs: 60_000
   });
 }
 

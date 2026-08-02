@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-23.pending-migrations-v1",
+  "version": "2026-07-31.pending-migrations-v2",
   "productionObservation": {
     "observedAt": "2026-07-23",
     "observedThroughMigrationName": "scrimed_work_completion_evidence",
@@ -26,7 +26,7 @@
     {
       "path": "supabase/migrations/20260722120000_p32_candidate_review_control_plane.sql",
       "name": "p32_candidate_review_control_plane",
-      "sha256": "78063e93d1fff9e0faa235d134b4475083f28aeac42b9351bba4b002d8134a37",
+      "sha256": "cdf380a8ae13d1134d9a33bdf872107e59effa295436e4dc3acba023b0283815",
       "status": "READY",
       "authorizationRecommendation": "AUTHORIZE_DISPOSABLE_DRY_RUN_ONLY"
     }

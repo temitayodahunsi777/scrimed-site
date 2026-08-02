@@ -77,14 +77,37 @@ requireIncludes(".env.example", [
   "SCRIMED_FAITH_AFFECTS_CLINICAL_LOGIC=false"
 ]);
 requireIncludes("app/page.tsx", [
+  "export const metadata",
+  "canonical: applicationUrl(\"/\")",
+  "url: applicationUrl(\"/\")",
   "Atlas-first healthcare intelligence",
   "Building with clinicians, health systems, and innovators.",
   "Illustrative engagement paths",
   "Required public boundaries"
 ]);
 requireIncludes("app/faithcore/page.tsx", [
+  "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+  "canonical: applicationUrl(\"/faithcore\")",
+  "url: applicationUrl(\"/faithcore\")",
   "faithCoreNeutralityStatement",
   "optional, explicitly consented experience"
+]);
+requireIncludes("app/validation-evidence/page.tsx", [
+  "canonical: applicationUrl(\"/validation-evidence\")",
+  "url: applicationUrl(\"/validation-evidence\")"
+]);
+requireIncludes("app/legal/page.tsx", [
+  "canonical: applicationUrl(\"/legal\")",
+  "url: applicationUrl(\"/legal\")",
+  "publicHealthcareDataBoundary"
+]);
+requireIncludes("scripts/verify-public-release.mjs", [
+  "renderedBuildContracts",
+  "crawlerBuildContracts",
+  "rendered-canonical",
+  "rendered-open-graph-url",
+  "rendered-build-public-claims",
+  "rendered artifacts"
 ]);
 requireIncludes("app/lib/legalPolicies.ts", [
   "Interim policy draft",

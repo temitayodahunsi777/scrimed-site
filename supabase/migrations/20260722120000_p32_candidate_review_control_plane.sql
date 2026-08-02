@@ -367,6 +367,7 @@ begin
       'sourceTreeFingerprint',
       'artifactFingerprint',
       'validationEvidenceFingerprint',
+      'reviewPacketFingerprint',
       'evidencePointer',
       'approvedAt',
       'expiresAt',
@@ -430,7 +431,8 @@ begin
     and assignment.source_commit = approval ->> 'sourceCommit'
     and assignment.source_tree_fingerprint = approval ->> 'sourceTreeFingerprint'
     and assignment.artifact_fingerprint = approval ->> 'artifactFingerprint'
-    and assignment.validation_evidence_fingerprint = approval ->> 'validationEvidenceFingerprint';
+    and assignment.validation_evidence_fingerprint = approval ->> 'validationEvidenceFingerprint'
+    and assignment.review_packet_fingerprint = approval ->> 'reviewPacketFingerprint';
 
   if selected_assignment.id is null then
     raise exception 'p32-candidate-review-assignment-not-found-or-candidate-mismatch';
@@ -450,6 +452,8 @@ begin
     or approval ->> 'identityAssurance' <> 'aal2-protected-workspace'
     or approval ->> 'tenantScopeHash' <> tenant_scope_hash_value
     or approval ->> 'decision' not in ('approved', 'rejected')
+    or approval ->> 'reviewPacketFingerprint' !~ '^[0-9a-f]{64}$'
+    or approval ->> 'reviewPacketFingerprint' <> normalized ->> 'reviewPacketFingerprint'
     or (approval ->> 'decision' = 'approved'
       and normalized ->> 'reasonCode' <> 'review-complete-no-material-blockers')
     or (approval ->> 'decision' = 'rejected'

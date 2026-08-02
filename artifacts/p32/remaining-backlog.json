@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "scrimed-p32-remaining-backlog-v1",
+  "evidenceClass": "NON_CANDIDATE",
+  "items": [
+    {
+      "id": "disposable-postgres-dry-run",
+      "priority": "P0",
+      "state": "BLOCKED_ENVIRONMENT",
+      "ownerRole": "database-owner",
+      "nextAction": "Authorize and run the exact three-migration set against an isolated disposable PostgreSQL/Supabase environment."
+    },
+    {
+      "id": "clean-attributable-candidate",
+      "priority": "P0",
+      "state": "PENDING_HUMAN",
+      "ownerRole": "release-steward",
+      "nextAction": "Review attribution and create a clean immutable candidate through the normal repository workflow."
+    },
+    {
+      "id": "independent-candidate-review",
+      "priority": "P0",
+      "state": "PENDING_HUMAN",
+      "ownerRole": "principal-reviewer",
+      "nextAction": "Review and sign the exact clean candidate after it exists."
+    },
+    {
+      "id": "provider-documentary-admission",
+      "priority": "P1",
+      "state": "PENDING_HUMAN",
+      "ownerRole": "privacy-security-counsel",
+      "nextAction": "Verify BAA/DPA, subprocessors, residency, retention, logging, training, availability, and rollback evidence before any provider receives protected data."
+    },
+    {
+      "id": "external-release-approvals",
+      "priority": "P1",
+      "state": "PENDING_HUMAN",
+      "ownerRole": "release-governance",
+      "nextAction": "Complete all candidate-bound intended-use, clinical, privacy, legal, security, deployment, post-deployment, and customer-specific approvals."
+    }
+  ],
+  "productionReleaseAllowed": false
+}

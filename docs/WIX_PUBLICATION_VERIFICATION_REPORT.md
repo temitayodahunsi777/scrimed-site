@@ -6,7 +6,14 @@
 
 **Environment:** Published Wix production site
 
-**Status:** Wix remediation complete for the defined public-claims scope
+**Status:** Historical verification evidence; current publication gate open
+
+> **Superseding current-state notice — 2026-08-01:** A later editor/live comparison found that
+> published FaithCore copy no longer matched the approved clinically neutral content and that the
+> safe Vitals content existed in the editor draft without consistent published evidence. The exact
+> FaithCore replacement is saved as an unpublished draft. No new publication occurred. The July
+> results below remain valid only for their recorded observation time and do not close the current
+> gate.
 
 **Verifier hardening note:** The direct published-site evidence below was collected at the
 timestamp above after same-origin redirect enforcement, HTTPS-downgrade rejection, streamed
@@ -141,6 +148,8 @@ Published surfaces preserve:
 
 ## Final Result
 
-Wix production publication and direct verification succeeded for the defined remediation
-scope. This report does not authorize PHI processing, clinical deployment, medical-device
-connectivity, regulatory claims, certification claims, or customer go-live.
+Wix production publication and direct verification succeeded at the historical observation time.
+Current status is not complete: founder-authorized publication of the saved FaithCore draft and
+fresh strict live/mobile verification are required. This report does not authorize PHI
+processing, clinical deployment, medical-device connectivity, regulatory claims, certification
+claims, or customer go-live.

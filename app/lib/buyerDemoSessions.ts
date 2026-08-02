@@ -1,5 +1,13 @@
 import type { BuyerDemoExecutionPath } from "./buyerDemoExecutionPath";
+import type {
+  PilotDemoProtectedHandoff,
+  ValidatedPilotDemoProtectedHandoff
+} from "./pilotDemoProtectedHandoff";
 import type { SalesAuditEvent, SalesOpportunity } from "./salesOperations";
+
+export type SalesBuyerDemoSessionPathSnapshot = BuyerDemoExecutionPath & {
+  rehearsalHandoff?: ValidatedPilotDemoProtectedHandoff | null;
+};
 
 export type SalesBuyerDemoSessionStatus =
   | "recorded"
@@ -37,7 +45,7 @@ export type SalesBuyerDemoSession = {
   targetAudiences: string[];
   revenuePath: string[];
   demoRunbook: string[];
-  pathSnapshot: BuyerDemoExecutionPath;
+  pathSnapshot: SalesBuyerDemoSessionPathSnapshot;
   lastPacketGeneratedAt: string | null;
   createdAt: string;
   createdBy: string;
@@ -60,6 +68,7 @@ export type SalesBuyerDemoSessionInput = {
   selectedPacketRoutes?: string[];
   nextActions?: string[];
   followUpPlan?: SalesBuyerDemoSession["followUpPlan"];
+  rehearsalHandoff?: PilotDemoProtectedHandoff;
 };
 
 export const buyerDemoSessionProofStackStatus = "aal2-persisted-buyer-demo-sessions";
@@ -124,10 +133,12 @@ function selectedDefaultPacketRoutes(path: BuyerDemoExecutionPath) {
 
 export function buildBuyerDemoSessionPayload({
   path,
-  input
+  input,
+  validatedRehearsalHandoff = null
 }: {
   path: BuyerDemoExecutionPath;
   input: SalesBuyerDemoSessionInput;
+  validatedRehearsalHandoff?: ValidatedPilotDemoProtectedHandoff | null;
 }) {
   const selectedStepIds = cleanList(input.selectedStepIds, 24, 120);
   const selectedPacketRoutes = cleanList(input.selectedPacketRoutes, 24, 500);
@@ -169,7 +180,10 @@ export function buildBuyerDemoSessionPayload({
     targetAudiences: path.targetAudiences,
     revenuePath: path.revenuePath,
     demoRunbook: path.demoRunbook,
-    pathSnapshot: path
+    pathSnapshot: {
+      ...path,
+      rehearsalHandoff: validatedRehearsalHandoff
+    }
   };
 }
 
@@ -239,6 +253,23 @@ export function buildBuyerDemoSessionPacket({
 - Workspace mapping mode: ${session.workspaceMappingMode}
 - Last packet generated: ${session.lastPacketGeneratedAt ?? "not previously generated"}
 - Created: ${session.createdAt}
+
+## Rehearsal Handoff
+${session.pathSnapshot.rehearsalHandoff
+  ? `- Status: ${session.pathSnapshot.rehearsalHandoff.validationStatus}
+- Evidence status: ${session.pathSnapshot.rehearsalHandoff.evidenceStatus}
+- Demo: ${session.pathSnapshot.rehearsalHandoff.canonicalDemoName}
+- Audience: ${session.pathSnapshot.rehearsalHandoff.canonicalAudienceLabel}
+- Focus: ${session.pathSnapshot.rehearsalHandoff.canonicalFocusLabel}
+- Duration: ${session.pathSnapshot.rehearsalHandoff.durationMinutes} minutes
+- Plan ID: ${session.pathSnapshot.rehearsalHandoff.planId}
+- Plan audit hash: ${session.pathSnapshot.rehearsalHandoff.planAuditHash}
+- Proof preflight audit hash: ${session.pathSnapshot.rehearsalHandoff.proofPreflightAuditHash}
+- Rehearsal audit hash: ${session.pathSnapshot.rehearsalHandoff.rehearsalAuditHash}
+- Handoff fingerprint: ${session.pathSnapshot.rehearsalHandoff.handoffFingerprint}
+- Automatic persistence authorized: no
+- Human review required: yes`
+  : "- No public rehearsal metadata draft was attached to this protected session."}
 
 ## Operator Notes
 ${session.operatorNotes || "No operator notes recorded."}

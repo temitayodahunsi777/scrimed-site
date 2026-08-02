@@ -9,6 +9,13 @@ export const metadata: Metadata = {
     "Inspect SCRIMED research, technical validation, safety governance, pilot methodology, benchmarks, current product status, and evidence limitations.",
   alternates: {
     canonical: applicationUrl("/validation-evidence")
+  },
+  openGraph: {
+    type: "website",
+    title: "Validation and Evidence | SCRIMED",
+    description:
+      "Inspect SCRIMED research, technical validation, safety governance, pilot methodology, benchmarks, current product status, and evidence limitations.",
+    url: applicationUrl("/validation-evidence")
   }
 };
 

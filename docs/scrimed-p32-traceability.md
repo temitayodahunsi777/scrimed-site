@@ -84,3 +84,44 @@ The following validation snapshot was completed locally on 2026-07-20 immediatel
 - Release evidence: 14 gates total, zero passed, eight blocked, six operator-required, zero expired.
 
 That snapshot was ready for named review, not release promotion. Because this documentation update changes the dirty candidate, operators must regenerate the candidate manifest, validation evidence, and review packet before review. The worktree remains ineligible for immutable provenance, and no external approval is inferred from this evidence.
+
+## Consolidated p.32 Governance P0
+
+This P0 slice extends the existing SCRIMED Work runtime, clinical evidence controls, EvalCore worst-cell policy, agent execution, provider registry, and release-gate framework. It does not introduce a second orchestrator, approval store, model router, or release authority.
+
+The canonical additions are `TaskScopedToolContract`, `ContextCoverageManifest`, `EvidenceSynthesisRecord`, `EvidenceLedger`, `AgentRiskProfile`, `AgentExecutionReceipt`, `ClinicalResponseEvaluation`, `DeidentificationRiskAssessment`, `DeidentificationRelease`, `GovernedSkillRunbook`, `ModelChangeSet`, `WorkloadPlacementDecision`, `ProtectionLevelAgreement`, `PostImplementationReview`, `CorrectableClinicalOutput`, and `DecisionProvenanceRecord`.
+
+| Requirement | Existing component | Files changed | Verification | Gate identifier | Status | Activation / rollback |
+| --- | --- | --- | --- | --- | --- | --- |
+| Minimum-necessary tool authority | `CapabilityManifest`, `ExecutionGrant`, tool registry | `app/lib/scrimed-work/p32GovernanceRecords.ts`, `p32ApprovedActions.ts` | Wildcard, field, row, destination, tenant, expiry, and replay tests | `TOOL-MIN-01`, `ACT-01` | implemented | Kernel is always fail-closed; remove caller integration only, retain receipts |
+| Context coverage and parity | Clinical Context Gateway and context engine | `p32GovernanceRecords.ts` | Missing/stale/parity/source-span tests | `CTX-PARITY-01`, `summary:clinician-model-source-parity` | implemented | Synthetic/deidentified use only; stale or asymmetric context returns review/block |
+| Evidence semantics | Clinical Evidence Controls | `p32GovernanceRecords.ts` | FACT source requirement, contradiction, stale/insufficient tests | `EVID-GRADE-01` | implemented | Draft/review only; rollback to prior evidence builder without deleting evidence |
+| Agent risk and receipts | Governed runtime and contained AgentOps | `p32GovernanceRecords.ts`, `p32ApprovedActions.ts` | Self-assessment, self-approval, digest/redaction, execution-grant tests | `IAM-01`, `CHN-01`, `risk_tier_cannot_self_escalate` | implemented | Revoke lease/grant and preserve causal receipts |
+| Clinical evaluation | Production Harness and Worst-Cell EvalCore | `p32GovernanceRecords.ts` | Hard failure, subgroup, worst-cell, LLM-only judge tests | `RESP-EVAL-01`, `eval:trace-and-artifact-completeness` | implemented | Promotion remains false; restore prior admitted model |
+| De-identification refusal | On-device de-identification scaffold and privacy policy | `p32GovernanceRecords.ts` | Missing qualified signature and externally verified signature tests | `PRIV-DEID-01`, `PRIV-UTILITY-01` | partially implemented | Synthetic local evaluation only; qualified external expert and policy remain required |
+| Correctability | Artifact review and learning-loop quarantine | `p32GovernanceRecords.ts` | Accept/edit/reject/reroute/escalate, immutable original, downstream provenance, no self-training tests | `IMP-01`, `clinical_output_requires_correction_path`, `correction_cannot_self_train` | implemented | Corrections stay quarantined; no online behavior update |
+| Skill/model change governance | Foundry and provider registry | `p32GovernanceRecords.ts` | Unsigned skill, self-owned skill, self-approved model change tests | `SKILL-ADM-01`, `model_update_requires_revalidation` | implemented | Skills/models stay unadmitted; restore exact rollback target |
+| Shared approved-actions policy | Governed runtime and care-context policy | `p32ApprovedActions.ts` | UI/chat/voice parity, browser bypass, prohibited action, valid/replayed mutation tests | `ACT-01`, `ESC-01`, `multiagent_cannot_circularly_approve` | implemented | All channels call the same kernel; execution still requires existing runtime grant |
+| Technical gate report | Existing p.32 release registry | `p32TechnicalGates.ts`, gate CLI | Exact fingerprint, tamper, safe-development, production fail-closed tests | All consolidated technical IDs | implemented | Development requires all 66 automated gates; production authority remains false |
+| External approvals | Existing fingerprint-bound release evidence | Canonical release registry unchanged | Technical registry refuses to self-approve external evidence | 13 external gate IDs | blocked-external | `PENDING_HUMAN`; complete only through the existing named operator/reviewer workflow |
+
+## Consolidated p.32 Control-Plane Closure
+
+| Requirement | Reused owner | Additive implementation | Test evidence | Status |
+| --- | --- | --- | --- | --- |
+| Agent jobs and delegation | Governed runtime, contained AgentOps | `p32AgentGovernance.ts` adds `AgentJobManifest`, `ApprovedActionRegistry`, `DelegationEnvelope`, `HumanOversightPlan`, and `ReviewerCapacityBudget` | Bounded jobs, circular delegation, emergency stop, named competence, and overload pause | Implemented locally |
+| Artifact admission and rollback | Provider registry, artifact ledger, ModelFit | `p32ArtifactAdmission.ts` adds exact multi-artifact manifests, independent attestations, and tested rollback admission | Unsigned/revoked/self-attested/production artifact denial and nonproduction admission | Implemented locally |
+| Long-lived evidence and decisions | Context coverage, evidence synthesis, artifact review | `EvidenceLedger` and `DecisionProvenanceRecord` bind sources, original outputs, reviewer competency, corrections, downstream actions, and supersession | Digest-only ledger, original preservation, escalation, and no self-training | Implemented locally |
+| De-identification risk | Privacy policy and de-identification release | `DeidentificationRiskAssessment` records technical risk and utility measurements without a legal conclusion | Test-only and missing-expert evidence remain blocked | Implemented locally; external expert remains required |
+| Versioned interoperability | Existing standards registry and conformance controls | `p32InteroperabilityControls.ts` adds lossless mapping, migration runbook, reconciliation, access-mode, browser, and lifecycle gates | Unknown-field/provenance round trip, structured-write block, browser bypass block, retirement evidence block | Implemented locally |
+| Consent, engagement, launch, and value | Patient data grants and outcome telemetry | `p32HumanGovernance.ts` adds communication policy, capability registry, launch cell, value case, board evidence, and market-signal isolation | Consent/purpose, fatigue, unsafe outbound, launch-owner, signed board evidence, and market-claim tests | Implemented locally |
+| Experimental lanes | Existing snapshots/forks, provider registry, research and specialty modules | Five explicit feature flags default off | Default-off policy assertions | Implemented locally; no provider or production execution |
+
+The worktree evidence under `artifacts/p32/worktree/` is explicitly `NON_CANDIDATE`. It captures initial attribution, architecture crosswalk, validation, gate status, migration posture, and external approval actions without claiming immutable provenance.
+
+### Compatibility
+
+- No schema or data migration is introduced.
+- Existing `scrimed-work` exports and p.32 control-plane summary are extended additively.
+- External models, connectors, voice, browser bridges, live PHI, EHR/RCM writes, payer actions, production deployment, and customer activation remain disabled.
+- `scripts/scrimed-p32-preproduction-governance-gates.mjs` can demonstrate safe development posture, but cannot produce production authority or accept locally fabricated human approval evidence.

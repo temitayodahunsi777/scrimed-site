@@ -60,8 +60,11 @@ for (const expected of [
   "scripts/release-candidate-manifest.mjs",
   "scripts/investor-deck-review.mjs",
   "git diff --check",
+  "npm run hygiene:workspace",
   "npm run test:nonsecret",
-  "npm run build"
+  "npm run build",
+  "scripts/generated-output-postflight.mjs",
+  "scripts/verify-public-release.mjs"
 ]) {
   requireIncludes("scripts/release-candidate-validation.mjs", validator, expected);
 }

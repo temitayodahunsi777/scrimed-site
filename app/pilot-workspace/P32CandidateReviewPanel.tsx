@@ -18,6 +18,12 @@ type CandidateReviewSummary = {
     keyId: string;
     publicKeyFingerprint: string;
   };
+  actorCapabilities: {
+    workspaceRole: "tenant-admin" | "pilot-lead" | "reviewer" | "observer";
+    accessMode: "assign-review" | "record-review" | "read-only";
+    canAssignReview: boolean;
+    canRecordDecision: boolean;
+  };
   boundary: string;
 };
 
@@ -40,8 +46,15 @@ type Props = {
   workspace: PilotWorkspaceRecord;
 };
 
+const assignmentIdPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 function shortHash(value: string | undefined) {
   return value ? `${value.slice(0, 12)}...${value.slice(-8)}` : "Unavailable";
+}
+
+function displayWorkspaceRole(role: CandidateReviewSummary["actorCapabilities"]["workspaceRole"]) {
+  return role.split("-").map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join(" ");
 }
 
 export default function P32CandidateReviewPanel({ accessToken, workspace }: Props) {
@@ -64,7 +77,13 @@ export default function P32CandidateReviewPanel({ accessToken, workspace }: Prop
         cache: "no-store"
       });
       const body = (await response.json()) as CandidateReviewResponse;
-      if (!response.ok || !body.reviewerIdentityHash || !body.fingerprints || !body.issuer) {
+      if (
+        !response.ok ||
+        !body.reviewerIdentityHash ||
+        !body.fingerprints ||
+        !body.issuer ||
+        !body.actorCapabilities
+      ) {
         setSummary(null);
         setMessage(
           body.error?.message ??
@@ -73,9 +92,13 @@ export default function P32CandidateReviewPanel({ accessToken, workspace }: Prop
         return;
       }
       setSummary(body as CandidateReviewSummary);
-      setMessage(
-        "Candidate review is candidate-bound and ready for a distinct assigned reviewer."
-      );
+      if (body.actorCapabilities.canAssignReview) {
+        setMessage("Candidate-bound assignment controls are ready for a distinct reviewer.");
+      } else if (body.actorCapabilities.canRecordDecision) {
+        setMessage("Copy your protected identity hash, then use the assignment ID supplied by the administrator.");
+      } else {
+        setMessage("Candidate-review evidence is available in read-only mode for this workspace role.");
+      }
     } catch {
       setSummary(null);
       setMessage(
@@ -133,8 +156,21 @@ export default function P32CandidateReviewPanel({ accessToken, workspace }: Prop
     }
   }
 
+  async function copyAssignmentId() {
+    if (!assignmentIdPattern.test(assignmentId)) {
+      setMessage("Record a candidate-review assignment before copying its ID.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(assignmentId);
+      setMessage("Assignment ID copied. Send it only to the assigned reviewer.");
+    } catch {
+      setMessage("Select and copy the read-only assignment ID manually.");
+    }
+  }
+
   async function recordDecision(decision: "approved" | "rejected") {
-    if (!/^[0-9a-f-]{36}$/i.test(assignmentId)) {
+    if (!assignmentIdPattern.test(assignmentId)) {
       setMessage("Enter the candidate-review assignment ID supplied by the assigning administrator.");
       return;
     }
@@ -222,88 +258,117 @@ export default function P32CandidateReviewPanel({ accessToken, workspace }: Prop
               <span>Issuer key</span>
               <strong>{summary.issuer.keyId}</strong>
             </article>
+            <article>
+              <span>Your workspace role</span>
+              <strong>{displayWorkspaceRole(summary.actorCapabilities.workspaceRole)}</strong>
+            </article>
           </div>
 
-          <div className="form-section">
-            <label className="form-field">
-              <span>Your protected reviewer identity</span>
-              <input readOnly spellCheck={false} value={summary.reviewerIdentityHash} />
-              <small>Hashed workspace identity only; no email address or raw user ID.</small>
-            </label>
-            <div className="form-actions">
-              <button className="secondary-action" onClick={copyReviewerIdentity} type="button">
-                Copy Identity Hash
-              </button>
+          {summary.actorCapabilities.canRecordDecision ? (
+            <div className="form-section">
+              <label className="form-field">
+                <span>Your protected reviewer identity</span>
+                <input readOnly spellCheck={false} value={summary.reviewerIdentityHash} />
+                <small>Hashed workspace identity only; no email address or raw user ID.</small>
+              </label>
+              <div className="form-actions">
+                <button className="secondary-action" onClick={copyReviewerIdentity} type="button">
+                  Copy Identity Hash
+                </button>
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <div className="form-section">
-            <div>
-              <h3>Assign distinct reviewer</h3>
-              <p className="section-copy">
-                Tenant-admin or pilot-lead only. The database denies self-assignment and
-                requires an active reviewer membership.
-              </p>
+          {summary.actorCapabilities.canAssignReview ? (
+            <div className="form-section">
+              <div>
+                <h3>Assign distinct reviewer</h3>
+                <p className="section-copy">
+                  The database denies self-assignment and requires an active reviewer membership.
+                </p>
+              </div>
+              <label className="form-field">
+                <span>Reviewer identity hash</span>
+                <input
+                  autoComplete="off"
+                  maxLength={64}
+                  onChange={(event) => setReviewerHash(event.target.value.trim().toLowerCase())}
+                  placeholder="64-character SHA-256 identity hash"
+                  spellCheck={false}
+                  value={reviewerHash}
+                />
+              </label>
+              <div className="form-actions">
+                <button
+                  className="secondary-action"
+                  disabled={busy !== null}
+                  onClick={assignReviewer}
+                  type="button"
+                >
+                  {busy === "assigning" ? "Recording Assignment" : "Assign Candidate Review"}
+                </button>
+                <button
+                  className="secondary-action"
+                  disabled={busy !== null || !assignmentIdPattern.test(assignmentId)}
+                  onClick={copyAssignmentId}
+                  type="button"
+                >
+                  Copy Assignment ID
+                </button>
+              </div>
             </div>
-            <label className="form-field">
-              <span>Reviewer identity hash</span>
-              <input
-                autoComplete="off"
-                maxLength={64}
-                onChange={(event) => setReviewerHash(event.target.value.trim().toLowerCase())}
-                placeholder="64-character SHA-256 identity hash"
-                spellCheck={false}
-                value={reviewerHash}
-              />
-            </label>
-            <div className="form-actions">
-              <button
-                className="secondary-action"
-                disabled={busy !== null}
-                onClick={assignReviewer}
-                type="button"
-              >
-                {busy === "assigning" ? "Recording Assignment" : "Assign Candidate Review"}
-              </button>
-            </div>
-          </div>
+          ) : null}
 
-          <div className="form-section">
-            <div>
-              <h3>Reviewer disposition</h3>
-              <p className="section-copy">
-                Reviewer role only. The exact candidate and assignment must remain current.
-              </p>
+          {summary.actorCapabilities.canRecordDecision ? (
+            <div className="form-section">
+              <div>
+                <h3>Reviewer disposition</h3>
+                <p className="section-copy">
+                  The exact candidate and assignment must remain current.
+                </p>
+              </div>
+              <label className="form-field">
+                <span>Assignment ID</span>
+                <input
+                  autoComplete="off"
+                  onChange={(event) => setAssignmentId(event.target.value.trim())}
+                  pattern={assignmentIdPattern.source}
+                  placeholder="Candidate-review assignment UUID"
+                  spellCheck={false}
+                  value={assignmentId}
+                />
+              </label>
+              <div className="form-actions">
+                <button
+                  className="primary-action"
+                  disabled={busy !== null || !assignmentIdPattern.test(assignmentId)}
+                  onClick={() => recordDecision("approved")}
+                  type="button"
+                >
+                  Approve Source Review
+                </button>
+                <button
+                  className="secondary-action"
+                  disabled={busy !== null || !assignmentIdPattern.test(assignmentId)}
+                  onClick={() => recordDecision("rejected")}
+                  type="button"
+                >
+                  Reject Candidate
+                </button>
+              </div>
             </div>
-            <label className="form-field">
-              <span>Assignment ID</span>
-              <input
-                autoComplete="off"
-                onChange={(event) => setAssignmentId(event.target.value.trim())}
-                placeholder="Candidate-review assignment UUID"
-                spellCheck={false}
-                value={assignmentId}
-              />
-            </label>
-            <div className="form-actions">
-              <button
-                className="primary-action"
-                disabled={busy !== null}
-                onClick={() => recordDecision("approved")}
-                type="button"
-              >
-                Approve Source Review
-              </button>
-              <button
-                className="secondary-action"
-                disabled={busy !== null}
-                onClick={() => recordDecision("rejected")}
-                type="button"
-              >
-                Reject Candidate
-              </button>
+          ) : null}
+
+          {summary.actorCapabilities.accessMode === "read-only" ? (
+            <div className="form-section">
+              <div>
+                <h3>Read-only candidate evidence</h3>
+                <p className="section-copy">
+                  Observer access can inspect candidate fingerprints but cannot assign or decide a review.
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {evidenceFile ? (
             <div className="form-section">

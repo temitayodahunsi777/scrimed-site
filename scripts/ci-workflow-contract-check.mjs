@@ -6,11 +6,14 @@ const workflowPaths = [
   ".github/workflows/ci.yml",
   ".github/workflows/agent-workspace-governance-smoke.yml",
   ".github/workflows/authority-reference-qa-smoke.yml",
-  ".github/workflows/sales-demo-session-qa-smoke.yml"
+  ".github/workflows/sales-demo-session-qa-smoke.yml",
+  ".github/workflows/migration-dry-run.yml",
+  ".github/workflows/preview-validation.yml"
 ];
 const securityWorkflowPaths = [
   ".github/workflows/dependency-review.yml",
-  ".github/workflows/codeql.yml"
+  ".github/workflows/codeql.yml",
+  ".github/workflows/dependency-security.yml"
 ];
 
 const files = Object.fromEntries(
@@ -53,6 +56,9 @@ for (const pathname of workflowPaths) {
 
 for (const expected of [
   "npm ci",
+  "uses: actions/cache@v5",
+  "path: .next/cache",
+  "runner.os }}-next-${{ hashFiles('package-lock.json')",
   "npm run release:provenance:strict",
   "npm audit --audit-level=moderate",
   "npm run security:dependency-floor",
@@ -96,6 +102,36 @@ for (const expected of [
   "security-events: write"
 ]) {
   requireIncludes(".github/workflows/codeql.yml", expected);
+}
+
+for (const expected of [
+  "image: postgres:17",
+  "SCRIMED_DISPOSABLE_DATABASE: \"true\"",
+  "node scripts/verify-migration-dry-run.mjs --execute --strict",
+  "SCRIMED_DISPOSABLE_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/scrimed_migration_ci"
+]) {
+  requireIncludes(".github/workflows/migration-dry-run.yml", expected);
+}
+
+for (const expected of [
+  "SCRIMED_SYNTHETIC_ONLY: \"true\"",
+  "SCRIMED_ALLOW_PHI: \"false\"",
+  "SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: \"false\"",
+  "npm run test:preproduction-assurance",
+  "node scripts/verify-preview-ui.mjs --strict",
+  "retention-days: 7"
+]) {
+  requireIncludes(".github/workflows/preview-validation.yml", expected);
+}
+
+for (const expected of [
+  "npm audit --audit-level=high --json",
+  "npm audit --audit-level=critical",
+  "npm run security:dependency-floor",
+  "npm run security:sbom",
+  "actions/dependency-review-action@v4"
+]) {
+  requireIncludes(".github/workflows/dependency-security.yml", expected);
 }
 
 for (const pathname of [

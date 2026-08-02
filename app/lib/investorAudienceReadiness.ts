@@ -60,7 +60,7 @@ export const investorAudienceReadinessStatus =
   "investor-audience-readiness-control-plane-active";
 export const investorAudienceReadinessBriefStatus =
   "investor-audience-readiness-brief-ready-no-securities-offer";
-export const investorAudienceReadinessUpdatedAt = "2026-07-18";
+export const investorAudienceReadinessUpdatedAt = "2026-07-30";
 
 export const investorAudienceReadinessBoundary =
   "SCRIMED Investor and Audience Readiness organizes weakness relief, competitive differentiation, sellable value, and investor or buyer audience packets for readiness review. It is operating-readiness material only. It is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, accounting advice, solicitation, private placement approval, Form D filing, crowdfunding approval, nonprofit tax advice, donor advice, faith-based endorsement, customer revenue guarantee, profit guarantee, reimbursement assurance, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.";
@@ -713,6 +713,16 @@ export function buildInvestorAudienceReadinessBrief() {
     summary.boundary,
     "",
     "This brief is not investment advice, not securities offering material, not solicitation, not audited financial reporting, not valuation assurance, and not legal advice, tax advice, accounting advice, nonprofit tax advice, donor advice, faith-based endorsement, customer revenue guarantee, profit guarantee, reimbursement assurance, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.",
+    "",
+    "## Parallel Funding And Candidate Review Track",
+    `Status: ${summary.strategicInvestorOutreach.parallelFundingTrack.status}`,
+    `Evidence class: ${summary.strategicInvestorOutreach.parallelFundingTrack.evidenceClass}`,
+    `Commercial proof: ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.executableDemoCount} executable synthetic demos, ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.pilotCount} pilot offers, ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.sellableSyntheticPilotCount} sellable synthetic pilots, and ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.protectedPilotCount} protected pilot.`,
+    summary.strategicInvestorOutreach.parallelFundingTrack.boundary,
+    ...summary.strategicInvestorOutreach.parallelFundingTrack.decisions.map(
+      (decision) =>
+        `- ${decision.action}: ${decision.decision} (${decision.readiness}). Reasons: ${decision.reasonCodes.join(", ")}. Candidate binding required: ${decision.candidateBinding.required ? "yes" : "no"}. External action executed: no.`
+    ),
     "",
     "## Weakness Relief Tracks",
     ...summary.weaknessReliefTracks.map(

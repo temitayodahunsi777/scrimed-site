@@ -20,20 +20,22 @@ npm run release:scrimed-p32-evidence:all-gates
 The strict command executes:
 
 1. `git diff --check`
-2. `npm run security:secret-scan`
-3. `npm run security:sbom`
-4. `npm run release:migration-packet`
-5. `npm run typecheck`
-6. `npm run lint`
-7. `npm run test:nonsecret`
-8. `npm run build`
-9. `node scripts/check-generated-integrity.mjs`
-10. Investor-deck review whenever the bounded deck is present, including when its exact output path is intentionally excluded from the application source candidate
+2. `npm run hygiene:workspace`
+3. `npm run security:secret-scan`
+4. `npm run security:sbom`
+5. `npm run release:migration-packet`
+6. `npm run typecheck`
+7. `npm run lint`
+8. `npm run test:nonsecret`
+9. `npm run build`
+10. `node scripts/check-generated-integrity.mjs`
+11. Investor-deck review whenever the bounded deck is present, including when its exact output path is intentionally excluded from the application source candidate
 
 When `npm` is unavailable in a constrained desktop runtime, the validator executes
 the same repository-owned entrypoints through the current Node binary. The fallback
 retains secret scanning, SBOM verification, migration evidence, generated integrity,
-typecheck, lint, nonsecret tests, prebuild provenance, and the production build. Its
+typecheck, lint, nonsecret tests, prebuild provenance, generated-output postflight,
+rendered public-release verification, and the production build. Its
 use is recorded as `npm-unavailable-direct-node-fallback`; it does not skip or soften
 any release gate.
 
@@ -64,6 +66,20 @@ Any source or artifact change invalidates candidate-specific validation and requ
 ## Candidate Reviewer Packet
 
 `npm run release:candidate-review-packet:strict` converts the current reviewable candidate into a deterministic, internal reviewer handoff. For a dirty candidate it reviews the working-tree delta; for a clean immutable candidate it reviews the validated base-to-`HEAD` change set (`HEAD^` by default) and binds the commit tree. It hashes each file without following symbolic links, verifies candidate and source file counts against the candidate manifest, assigns every file to the release steward and principal engineer, and adds specialist lanes for API, database, security and identity, clinical safety, claims and legal, platform, UI, and documentation review.
+
+The packet also assigns every reviewable file to exactly one of five risk-ordered review batches: release/security/data controls, runtime/clinical/API contracts, product claims/UI, quality/validation evidence, and documentation/operations. Every batch includes its exact file references, required specialist roles, and a deterministic batch SHA-256. Missing or duplicate batch coverage fails the complete packet. Batch order reduces reviewer context switching; it does not let one batch approve another, remove a required reviewer, authorize a commit, or grant release authority.
+
+Authorized reviewers can export one least-disclosure batch instead of receiving the complete path inventory:
+
+```bash
+node scripts/release-candidate-review-packet.mjs --markdown --batch=release-security-data
+node scripts/release-candidate-review-packet.mjs --markdown --batch=runtime-clinical-api
+node scripts/release-candidate-review-packet.mjs --markdown --batch=product-claims-ui
+node scripts/release-candidate-review-packet.mjs --markdown --batch=quality-evidence
+node scripts/release-candidate-review-packet.mjs --markdown --batch=documentation-operations
+```
+
+Use `--json` instead of `--markdown` for an approved structured review workflow. Each derivative export contains only the selected batch, its exact files, required roles, batch SHA-256, parent packet SHA-256, and candidate/source fingerprints. Unknown batches and incomplete parent packets fail closed. The export is a review aid, not reviewer disposition or approval evidence; decisions must still be recorded through the approved protected workflow.
 
 For a multi-commit candidate, set `SCRIMED_RELEASE_CANDIDATE_BASE_REF` to the exact previously reviewed ancestor before running manifest, validation, review-packet, or gate-evidence commands. The tool resolves the reference to a commit, verifies it is an ancestor of `HEAD`, records the full base SHA, and rejects unsafe, unresolved, descendant, or same-commit values.
 

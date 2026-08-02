@@ -88,6 +88,16 @@ function extractTitle(html) {
   return decodeHtml(match?.[1]?.replace(/<[^>]+>/g, "") ?? "");
 }
 
+function extractVisibleText(html) {
+  return decodeHtml(
+    html
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+  );
+}
+
 function extractMeta(html, attributeName, attributeValue) {
   const target = attributeValue.toLowerCase();
   const tag = extractTags(html, "meta").find(
@@ -298,6 +308,12 @@ export function inspectWixPublicationPage(page) {
       if (actual !== required[field]) failures.push(`metadata:${page.path}:${field}`);
     }
     if (!ogUrl) failures.push(`metadata:${page.path}:ogUrl`);
+    const visibleText = extractVisibleText(html).toLowerCase();
+    for (const requiredText of required.requiredVisibleText ?? []) {
+      if (!visibleText.includes(requiredText.toLowerCase())) {
+        failures.push(`visible-copy:${page.path}:${requiredText}`);
+      }
+    }
   }
 
   for (const claim of claims.blockedClaims) {
