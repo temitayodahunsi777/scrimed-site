@@ -16,8 +16,9 @@
 
 ## Findings
 
-1. **RC-01, open condition:** the dirty worktree has no immutable candidate fingerprint. Human
-   attribution of the pre-existing governance-gates script is required before commit creation.
+1. **RC-01, resolved by repository evidence:** the uncertain pre-existing governance script was
+   preserved and excluded, an attributable equivalent was added, and a clean local candidate was
+   created. Named review remains required and must bind to the current assurance fingerprints.
 2. **RC-02, open condition:** disposable database execution is unavailable in this environment;
    static readiness is not a dry-run pass.
 3. **RC-03, open condition:** fresh Wix, preview browser/mobile, and advisory-network evidence is

@@ -2,7 +2,7 @@
 
 - **Decision:** Accept or reject technical architecture and candidate integrity for review.
 - **Why needed:** Accountable engineering judgment cannot be supplied by the implementation agent.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** typed contracts, API/data compatibility, agent/model controls, tests, rollback.
 - **Evidence:** source/review packets, typecheck/lint/build/nonsecret results, generated integrity,
   adversarial completeness and operational reviews.

@@ -83,7 +83,9 @@ The following validation snapshot was completed locally on 2026-07-20 immediatel
 - Automated candidate validation: six of six checks passed with one retained warning, `next-swc-native-binding-unavailable-wasm-fallback`.
 - Release evidence: 14 gates total, zero passed, eight blocked, six operator-required, zero expired.
 
-That snapshot was ready for named review, not release promotion. Because this documentation update changes the dirty candidate, operators must regenerate the candidate manifest, validation evidence, and review packet before review. The worktree remains ineligible for immutable provenance, and no external approval is inferred from this evidence.
+That snapshot is historical and did not grant release promotion. The current clean candidate must
+always be identified through freshly generated candidate, validation, review, and assurance
+fingerprints. No external approval is inferred from either snapshot.
 
 ## Consolidated p.32 Governance P0
 

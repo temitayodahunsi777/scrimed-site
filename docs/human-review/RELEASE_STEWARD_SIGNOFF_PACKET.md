@@ -2,7 +2,7 @@
 
 - **Decision:** Admit or reject the exact immutable candidate into the next authorized stage.
 - **Why needed:** Promotion must bind source, artifacts, validation, approvals and rollback.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** attribution, commit, fingerprints, packets, checks, external gates, preview/migration state.
 - **Evidence:** final candidate/review/gate/SBOM/migration packets and worktree report.
 - **Residual risks:** all missing professional/operator/production evidence must remain visible.

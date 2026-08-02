@@ -2,7 +2,7 @@
 
 - **Decision:** Accept or reject decision-support boundaries for synthetic demonstrations.
 - **Why needed:** Clinical safety approval requires qualified clinical judgment.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** evidence, confidence/abstention, human review, clinical language, prohibited actions.
 - **Evidence:** clinical policy/evaluation tests, intended-use register, public claims scan,
   adversarial security/safety review.

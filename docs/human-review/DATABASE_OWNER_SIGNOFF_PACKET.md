@@ -2,7 +2,7 @@
 
 - **Decision:** First authorize/review disposable dry run; later separately decide production use.
 - **Why needed:** Migration locking, recovery, RLS and operational risk need accountable ownership.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** exact three migrations and hashes in the pending-migration manifest.
 - **Evidence:** static packet, disposable preflight report, schema/RLS/grant/trigger/invariant output.
 - **Residual risks:** executable dry run has not occurred; lock duration and recovery are unverified.

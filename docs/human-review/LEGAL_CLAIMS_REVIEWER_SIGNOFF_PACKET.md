@@ -2,7 +2,7 @@
 
 - **Decision:** Approve, qualify, remove, or defer exact public/legal copy.
 - **Why needed:** Engineering cannot adopt legal conclusions or external claims.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** legal pages, intended use, Atlas/FaithCore separation, claims, metadata and forms.
 - **Evidence:** public claims register/verifier, legal counsel register, Wix packet, source diff.
 - **Residual risks:** entity, jurisdiction, address posture, privacy contact, retention, processors,

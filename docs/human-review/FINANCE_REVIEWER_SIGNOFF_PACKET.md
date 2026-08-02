@@ -2,7 +2,7 @@
 
 - **Decision:** Accept or reject model/agent cost controls and external economic claim posture.
 - **Why needed:** Material spend and ROI representations require accountable finance review.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** spend ceilings, effort escalation, retries, provider concentration, per-task economics.
 - **Evidence:** finance AI review, model/team policies/tests, pricing and public claims registers.
 - **Residual risks:** provider contracts/prices and customer baselines are not verified.

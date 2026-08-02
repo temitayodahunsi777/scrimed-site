@@ -2,7 +2,7 @@
 
 - **Decision:** Accept or reject the candidate's pre-production security posture.
 - **Why needed:** Production security risk acceptance must be accountable and independent.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** identity, authorization, tenant isolation, egress, secrets/PHI redaction, supply chain,
   replay/idempotency, incident controls, rollback.
 - **Evidence:** secret scan, SBOM, dependency floor, policy tests, security adversarial review,

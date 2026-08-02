@@ -2,7 +2,7 @@
 
 - **Decision:** Interim acceptance for synthetic pre-production development or preview only.
 - **Why needed:** Founder owns scope, named reviewers, spend, preview, and company-level risk.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** P.32 governed agents, models, evidence, public-claims, demos, and release controls.
 - **Critical controls/evidence:** final validation, SBOM, gate packet, worktree attribution,
   adversarial reviews, founder policy.

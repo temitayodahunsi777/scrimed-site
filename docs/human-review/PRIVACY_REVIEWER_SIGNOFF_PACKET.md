@@ -2,7 +2,7 @@
 
 - **Decision:** Accept or reject synthetic/no-PHI purpose, minimization, retention, and disclosure.
 - **Why needed:** Privacy policy and processor scope require accountable review.
-- **Candidate fingerprint:** `[FINAL 64-HEX; current dirty worktree has none]`
+- **Candidate fingerprint:** `[INSERT exact 64-HEX from the current assurance manifest]`
 - **Scope:** public forms, telemetry/evidence, tenant boundaries, consent, retention, processors.
 - **Evidence:** no-PHI tests, legal/privacy registers, public-form contracts, Supabase/Wix packets.
 - **Residual risks:** legal entity, privacy contact, retention, cookie/analytics, processor and

@@ -22,4 +22,8 @@ SCRIMED already had SCRIMED Work orchestration, tool policies, approval checkpoi
 
 ## Consequences
 
-Consequential execution remains unavailable without a valid grant and current approvals, and current policy still hard-blocks live PHI, autonomous care, payer submission, EHR writeback, production mutation, deployment, and external distribution. The mixed dirty worktree remains ineligible for immutable provenance and local candidate commit until an authorized operator establishes attribution and review.
+Consequential execution remains unavailable without a valid grant and current approvals, and
+current policy still hard-blocks live PHI, autonomous care, payer submission, EHR writeback,
+production mutation, deployment, and external distribution. The current candidate has completed
+worktree attribution and local commit creation; named review and every activation-specific
+authorization remain external and fail closed.
