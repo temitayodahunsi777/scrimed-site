@@ -6,7 +6,7 @@
 
 **Environment:** Published Wix production site
 
-**Status:** Historical verification evidence; current publication gate open
+**Status:** BLOCKED — current publication gate open
 
 > **Superseding current-state notice — 2026-08-01:** A later editor/live comparison found that
 > published FaithCore copy no longer matched the approved clinically neutral content and that the
@@ -14,6 +14,38 @@
 > FaithCore replacement is saved as an unpublished draft. No new publication occurred. The July
 > results below remain valid only for their recorded observation time and do not close the current
 > gate.
+
+## Current Direct-Live Verification
+
+**Captured:** `2026-08-03T01:26:35.867Z`
+
+**Policy:** `2026-08-02.wix-publication-v3`
+
+The current strict verifier reached all 17 configured pages, two retired routes, two noindexed
+Booking routes, three canonical-domain redirects, and six crawler files. Fourteen pages passed.
+The result is blocked by 16 FaithCore-only mismatches:
+
+- `/faithcore`: stale title, description, Open Graph title, and Open Graph description;
+- `/faithcore`: the approved opt-in body, clinical-neutrality statement, supporting statement,
+  and CTA are absent from published HTML;
+- `/service-page/faithcore-integration`: noncanonical title, description, and Open Graph values;
+- `/post/introducing-faithcore-where-spiritual-support-meets-clinical-care`: stale title,
+  description, and Open Graph values.
+
+Homepage, Vitals, About, Partner, Demo, Blog, legal, booking, voice-intake, canonical, JSON-LD,
+redirect, sitemap/robots, retired-commerce, and noindexed Booking checks passed in this current
+observation. The strengthened visible Shop/Cart label and known unverified/placeholder telephone
+checks also passed. The saved editor draft has not been published. A true 390px mobile
+verification is still required after owner-authorized publication.
+
+```text
+blocked SCRIMED Wix publication verification: blocked
+policy=2026-08-02.wix-publication-v3 evidence_source=direct-network-fetch network_available=true
+pages=17 retired_routes=2 booking_routes=2 redirects=3 crawler_files=6
+failure_codes=16 FaithCore metadata/visible-copy mismatches
+```
+
+The historical evidence below is retained for audit context only.
 
 **Verifier hardening note:** The direct published-site evidence below was collected at the
 timestamp above after same-origin redirect enforcement, HTTPS-downgrade rejection, streamed
@@ -148,8 +180,8 @@ Published surfaces preserve:
 
 ## Final Result
 
-Wix production publication and direct verification succeeded at the historical observation time.
-Current status is not complete: founder-authorized publication of the saved FaithCore draft and
-fresh strict live/mobile verification are required. This report does not authorize PHI
+Wix production publication and direct verification succeeded only at the historical observation
+time. The current gate is blocked: founder-authorized publication of the saved FaithCore draft
+and fresh strict live/mobile verification are required. This report does not authorize PHI
 processing, clinical deployment, medical-device connectivity, regulatory claims, certification
 claims, or customer go-live.

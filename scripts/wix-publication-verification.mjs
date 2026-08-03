@@ -172,9 +172,24 @@ async function fetchResource(url, evidenceLabel) {
 }
 
 async function collectLiveEvidence() {
+  const collectionFailures = [];
+
+  async function collectSafely(label, worker) {
+    try {
+      return await worker();
+    } catch (error) {
+      const publicationError =
+        error instanceof PublicationEvidenceError
+          ? error
+          : new PublicationEvidenceError(`evidence-unavailable:${label}`, false);
+      collectionFailures.push(publicationError.code);
+      return null;
+    }
+  }
+
   const pages = await mapWithConcurrency(
     wixPublicationPolicy.scanRoutes,
-    async (route) => {
+    (route) => collectSafely(`page:${route}`, async () => {
       const result = await fetchResource(
         `${wixPublicationPolicy.baseUrl}${route}`,
         `page:${route}`
@@ -185,21 +200,21 @@ async function collectLiveEvidence() {
         finalUrl: result.finalUrl,
         html: result.content
       };
-    }
+    })
   );
   const retiredRoutes = await mapWithConcurrency(
     wixPublicationPolicy.retiredStoreRoutes,
-    async (route) => {
+    (route) => collectSafely(`retired:${route}`, async () => {
       const result = await fetchResource(
         `${wixPublicationPolicy.baseUrl}${route}`,
         `retired:${route}`
       );
       return { path: route, status: result.status };
-    }
+    })
   );
   const bookingRoutes = await mapWithConcurrency(
     wixPublicationPolicy.noIndexBookingSystemRoutes,
-    async (route) => {
+    (route) => collectSafely(`booking:${route}`, async () => {
       const result = await fetchResource(
         `${wixPublicationPolicy.baseUrl}${route}`,
         `booking:${route}`
@@ -209,24 +224,24 @@ async function collectLiveEvidence() {
         status: result.status,
         robots: extractRobots(result.content)
       };
-    }
+    })
   );
   const redirects = await mapWithConcurrency(
     wixPublicationPolicy.redirectSources,
-    async (source) => {
+    (source) => collectSafely(`redirect:${new URL(source).host}`, async () => {
       const result = await fetchResource(source, `redirect:${new URL(source).host}`);
       return { source, status: result.status, finalUrl: result.finalUrl };
-    }
+    })
   );
   const crawlerFiles = await mapWithConcurrency(
     wixPublicationPolicy.crawlerFiles,
-    async (route) => {
+    (route) => collectSafely(`crawler:${route}`, async () => {
       const result = await fetchResource(
         `${wixPublicationPolicy.baseUrl}${route}`,
         `crawler:${route}`
       );
       return { path: route, status: result.status, content: result.content };
-    }
+    })
   );
 
   return {
@@ -235,11 +250,12 @@ async function collectLiveEvidence() {
       baseUrl: wixPublicationPolicy.baseUrl,
       capturedAt: new Date().toISOString()
     },
-    pages,
-    retiredRoutes,
-    bookingRoutes,
-    redirects,
-    crawlerFiles
+    pages: pages.filter(Boolean),
+    retiredRoutes: retiredRoutes.filter(Boolean),
+    bookingRoutes: bookingRoutes.filter(Boolean),
+    redirects: redirects.filter(Boolean),
+    crawlerFiles: crawlerFiles.filter(Boolean),
+    collectionFailures
   };
 }
 
@@ -491,6 +507,30 @@ async function runSelfTest() {
     true
   );
 
+  const visibleStoreNavigation = structuredClone(safe);
+  visibleStoreNavigation.pages[0].html = visibleStoreNavigation.pages[0].html.replace(
+    "</body>",
+    "<nav><a href=\"/shop\">Shop</a></nav></body>"
+  );
+  assert.equal(
+    verifyWixPublicationEvidence(visibleStoreNavigation).failures.includes(
+      "visible-commerce-label:/:Shop"
+    ),
+    true
+  );
+
+  const visibleUnverifiedPhone = structuredClone(safe);
+  visibleUnverifiedPhone.pages[0].html = visibleUnverifiedPhone.pages[0].html.replace(
+    "</body>",
+    "<p>(404) 981-4427</p></body>"
+  );
+  assert.equal(
+    verifyWixPublicationEvidence(visibleUnverifiedPhone).failures.some((failure) =>
+      failure.includes("unverified-organization-contact-metadata")
+    ),
+    true
+  );
+
   const missingRoute = structuredClone(safe);
   missingRoute.pages = missingRoute.pages.filter((page) => page.path !== "/faithcore");
   assert.equal(
@@ -578,6 +618,15 @@ async function runSelfTest() {
   assert.equal(
     verifyWixPublicationEvidence(offlineEvidence).failures.includes(
       "published-evidence-must-be-direct-live-observation"
+    ),
+    true
+  );
+
+  const partialEvidence = structuredClone(safe);
+  partialEvidence.collectionFailures = ["network-timeout:booking:/cart-page"];
+  assert.equal(
+    verifyWixPublicationEvidence(partialEvidence).failures.includes(
+      "network-timeout:booking:/cart-page"
     ),
     true
   );

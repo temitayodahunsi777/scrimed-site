@@ -5,7 +5,7 @@
 **State:** FOUNDER INTERIM ACCEPTANCE REQUIRED for publication; OPERATOR ACTION REQUIRED until
 fresh published evidence passes
 
-## Current State — 2026-08-01
+## Current State — 2026-08-02
 
 - The exact replacement heading, body, supporting line, and CTA below were entered in the
   authenticated Wix Editor and saved as a draft.
@@ -13,8 +13,11 @@ fresh published evidence passes
 - The Vitals draft also contains the approved synthetic-only copy and clinical disclaimer.
 - No publication was performed because public Wix publication remains a Tier 1 founder interim
   decision bound to the exact candidate.
-- The currently published FaithCore page still contains stale visible language and must not be
-  represented as remediated. A fresh 390px mobile check is also pending after publication.
+- A fresh direct-live check captured at `2026-08-03T01:26:35.867Z` reached all configured Wix
+  surfaces. The currently published FaithCore page still lacks all four approved visible-copy
+  markers and uses the stale `Optional Faith-Aligned Care Experience` metadata wording. The
+  service page and introduction post also retain noncanonical FaithCore metadata. A fresh 390px
+  mobile check remains pending after publication.
 - The published-site gate therefore remains open. Historical July publication evidence does not
   close this later drift finding.
 
@@ -24,6 +27,8 @@ fresh published evidence passes
 - Body: `FaithCore is an optional, user-selected experience for individuals and organizations seeking faith-aligned engagement. It does not influence diagnosis, treatment, clinical recommendations, eligibility, prioritization, risk scoring, or access to care.`
 - Supporting line: `FaithCore is not a medical service and does not modify clinical logic or healthcare decisions.`
 - CTA: `Explore Optional FaithCore Experience`
+- SEO title: `FaithCore by SCRIMED | Optional Faith-Aligned Experience`
+- Meta description: `FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.`
 
 The replacement draft is saved. Before publication, inspect **Pages > FaithCore** in the mobile
 editor and confirm no mobile-only duplicate or hidden accessibility label retains clinic

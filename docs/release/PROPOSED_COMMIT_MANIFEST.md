@@ -1,8 +1,9 @@
 # Proposed Commit Manifest
 
-This is a review grouping, not a staged set. Exact paths and hashes come from the final worktree
-attribution JSON. The pre-existing untracked governance-gates script remains excluded; current
-package contracts use the newly attributable preproduction equivalent.
+This is a review grouping, not a staged set. The bounded phase began from a clean candidate;
+exact paths and hashes come from the final candidate manifest. The preserved governance-gates
+script remains excluded, and current package contracts use the attributable preproduction
+equivalent.
 
 | Group | Proposed contents |
 | --- | --- |
@@ -11,6 +12,7 @@ package contracts use the newly attributable preproduction equivalent.
 | Preproduction assurance | Risk-tier matrix, policy engine, founder acceptance, control attestations, confidence scoring, assurance generator |
 | Model governance | Qualification passports, unverified-model admission, bounded effort/cost/fallback controls |
 | Public claims | Homepage, legal, FaithCore, demos, validation copy and claims verifier |
+| FaithCore | Canonical neutrality policy service, exact public/Wix copy, CTA, API/service regression coverage |
 | Legal and compliance | Public-claims, intended-use, external-action, legal-review, founder-governance records |
 | Database | Three pending migration files and their static authorization/config evidence |
 | Forms | Pricing/demo/sales consent, scope, protected-handoff, and no-PHI controls |
@@ -26,5 +28,20 @@ package contracts use the newly attributable preproduction equivalent.
 is not attributed to this commit. See `PREEXISTING_SCRIPT_ATTRIBUTION_DECISION.md`. The candidate
 uses `scripts/scrimed-p32-preproduction-governance-gates.mjs`.
 
-Recommended message after attribution is resolved and validation passes:
-`feat(governance): establish risk-tiered preproduction assurance framework`
+The current bounded phase also adds the candidate baseline and final Wix/Supabase operator packets.
+
+## Exact Bounded Commit Contents
+
+| Group | Exact paths |
+| --- | --- |
+| FaithCore safety and public messaging | `app/lib/faithCorePolicy.ts`, `app/faithcore/page.tsx`, `app/lib/legalPolicies.ts`, `app/lib/operatingMode.ts` |
+| Public claims and Wix verification | `config/public-claims-policy.json`, `config/wix-publication-policy.json`, `scripts/lib/wix-publication-policy.mjs`, `scripts/wix-publication-verification.mjs`, `scripts/verify-public-release.mjs` |
+| Tests and contracts | `scripts/faithcore-neutrality-policy-test.mjs`, `scripts/scrimed-nonsecret-test-suite.mjs`, `scripts/public-remediation-contract-check.mjs`, `scripts/preproduction-assurance-contract-check.mjs`, `package.json` |
+| Wix and Supabase operator packets | `docs/WIX_PUBLICATION_VERIFICATION_REPORT.md`, `docs/operators/WIX_FAITHCORE_FINAL_ACTION.md`, `docs/operators/WIX_FULL_SITE_EXECUTION_PACKET.md`, `docs/operators/WIX_FINAL_EXECUTION_PACKET.md`, `docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md` |
+| Release attribution | `docs/release/CURRENT_CANDIDATE_BASELINE.md`, `docs/release/WORKTREE_ATTRIBUTION_REPORT.md`, `docs/release/PROPOSED_COMMIT_MANIFEST.md` |
+
+No environment file, secret, cache, log, build output, screenshot, machine-specific artifact, or
+unattributed file is included.
+
+Recommended message after attribution and validation pass:
+`feat(governance): finalize SCRIMED preproduction assurance candidate`

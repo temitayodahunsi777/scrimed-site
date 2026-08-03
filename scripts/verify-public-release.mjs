@@ -23,6 +23,7 @@ const sourcePaths = [
   "app/legal/page.tsx",
   "app/legal/[slug]/page.tsx",
   "app/lib/companyIdentity.ts",
+  "app/lib/faithCorePolicy.ts",
   "app/lib/legalPolicies.ts",
   "app/lib/operatingMode.ts",
   "app/components/SiteFooter.tsx",
@@ -56,10 +57,12 @@ const renderedBuildContracts = [
   {
     path: ".next/server/app/faithcore.html",
     canonical: `${canonicalApplicationOrigin}/faithcore`,
-    title: "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+    title: "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
     requiredText: [
-      "optional, explicitly consented experience",
-      "does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care"
+      "FaithCore — Optional Faith-Aligned Experience",
+      "does not influence diagnosis, treatment, clinical recommendations, eligibility, prioritization, risk scoring, or access to care",
+      "FaithCore is not a medical service and does not modify clinical logic or healthcare decisions",
+      "Explore Optional FaithCore Experience"
     ]
   },
   {
@@ -102,7 +105,7 @@ const requiredText = [
   "no live clinical execution",
   "require human review",
   "Interim policy draft",
-  "Optional spiritual or faith-based experiences are user-selected",
+  "FaithCore is not a medical service and does not modify clinical logic or healthcare decisions",
   "faithAffectsClinicalLogic: false",
   "liveClinicalExecution: false",
   "medicalDeviceConnections: false",

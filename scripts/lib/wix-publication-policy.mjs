@@ -98,6 +98,11 @@ function extractVisibleText(html) {
   );
 }
 
+function containsVisibleLabel(visibleText, label) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+  return new RegExp(`\\b${escaped}\\b`, "i").test(visibleText);
+}
+
 function extractMeta(html, attributeName, attributeValue) {
   const target = attributeValue.toLowerCase();
   const tag = extractTags(html, "meta").find(
@@ -250,6 +255,12 @@ function collectPolicyConfigurationFailures() {
     const duplicates = collectDuplicateKeys(values.map((value) => ({ value })), "value");
     for (const value of duplicates) failures.push(`policy-duplicate-${key}:${value}`);
   }
+  if (
+    !Array.isArray(wixPublicationPolicy.forbiddenVisibleCommerceLabels)
+    || wixPublicationPolicy.forbiddenVisibleCommerceLabels.length === 0
+  ) {
+    failures.push("policy-missing-visible-commerce-labels");
+  }
 
   return failures;
 }
@@ -286,6 +297,7 @@ export function inspectWixPublicationPage(page) {
   const required = wixPublicationPolicy.requiredMetadata.find((entry) => entry.path === page.path);
   const claims = evaluatePublicClaimsIntegrity(html);
   const jsonLd = extractJsonLd(html);
+  const visibleText = extractVisibleText(html);
 
   if (page.status !== 200) failures.push(`route-status:${page.path}:${page.status}`);
   if (!html) failures.push(`empty-html:${page.path}`);
@@ -308,11 +320,16 @@ export function inspectWixPublicationPage(page) {
       if (actual !== required[field]) failures.push(`metadata:${page.path}:${field}`);
     }
     if (!ogUrl) failures.push(`metadata:${page.path}:ogUrl`);
-    const visibleText = extractVisibleText(html).toLowerCase();
     for (const requiredText of required.requiredVisibleText ?? []) {
-      if (!visibleText.includes(requiredText.toLowerCase())) {
+      if (!visibleText.toLowerCase().includes(requiredText.toLowerCase())) {
         failures.push(`visible-copy:${page.path}:${requiredText}`);
       }
+    }
+  }
+
+  for (const label of wixPublicationPolicy.forbiddenVisibleCommerceLabels ?? []) {
+    if (containsVisibleLabel(visibleText, label)) {
+      failures.push(`visible-commerce-label:${page.path}:${label}`);
     }
   }
 
@@ -363,6 +380,13 @@ export function inspectWixPublicationPage(page) {
 
 export function verifyWixPublicationEvidence(evidence) {
   const failures = collectPolicyConfigurationFailures();
+  if (Array.isArray(evidence?.collectionFailures)) {
+    failures.push(
+      ...evidence.collectionFailures.filter(
+        (failure) => typeof failure === "string" && failure.length > 0
+      )
+    );
+  }
   const capture = evidence?.capture;
   const capturedAt = Date.parse(capture?.capturedAt ?? "");
   if (capture?.mode !== "live-http-observation") {

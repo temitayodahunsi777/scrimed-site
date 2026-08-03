@@ -9,10 +9,12 @@ const requiredFiles = [
   "app/lib/scrimed-work/controlAttestations.ts",
   "app/lib/scrimed-work/reviewConfidence.ts",
   "app/lib/scrimed-work/founderInterimAcceptance.ts",
+  "app/lib/faithCorePolicy.ts",
   "app/components/PreproductionDisclosure.tsx",
   "app/components/OperatingModeBanner.tsx",
   "app/layout.tsx",
   "scripts/preproduction-assurance-policy-test.mjs",
+  "scripts/faithcore-neutrality-policy-test.mjs",
   "scripts/generate-preproduction-assurance.mjs",
   "scripts/verify-migration-dry-run.mjs",
   "scripts/verify-live-mobile.mjs",
@@ -20,9 +22,12 @@ const requiredFiles = [
   ".github/workflows/preview-validation.yml",
   ".github/workflows/dependency-security.yml",
   "docs/assurance/ASSURANCE_MANIFEST_GUIDE.md",
+  "docs/release/CURRENT_CANDIDATE_BASELINE.md",
   "docs/governance/MINIMUM_DECISIONS_REQUIRED.md",
   "docs/release/PREEXISTING_SCRIPT_ATTRIBUTION_DECISION.md",
   "docs/operators/WIX_FAITHCORE_FINAL_ACTION.md",
+  "docs/operators/WIX_FINAL_EXECUTION_PACKET.md",
+  "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md",
   "docs/operators/MOBILE_VERIFICATION_RUNBOOK.md",
   "docs/database/MIGRATION_DRY_RUN_CI_GUIDE.md",
   "docs/security/DEPENDENCY_SECURITY_CI_GUIDE.md"
@@ -68,6 +73,13 @@ requireText("app/components/PreproductionDisclosure.tsx", [
 ]);
 requireText("app/components/OperatingModeBanner.tsx", ["PreproductionDisclosure"]);
 requireText("app/layout.tsx", ["OperatingModeBanner"]);
+requireText("app/lib/faithCorePolicy.ts", [
+  "FaithCore — Optional Faith-Aligned Experience",
+  "explicit-opt-in-required",
+  "clinical-influence-prohibited",
+  "clinicalDecisionAuthority: false",
+  "operationalDecisionAuthority: false"
+]);
 requireText("scripts/generate-preproduction-assurance.mjs", [
   "PASS_SAFE_BOUNDARY_ENFORCED",
   "OPERATOR_ACTION_REQUIRED",
@@ -86,7 +98,8 @@ requireText("package.json", [
   "contract:preproduction-assurance",
   "evidence:preproduction-assurance",
   "test:migration-dry-run-verifier",
-  "test:live-mobile-verifier"
+  "test:live-mobile-verifier",
+  "test:faithcore-neutrality"
 ]);
 
 console.log(`pass SCRIMED preproduction assurance repository contract (${requiredFiles.length} artifacts)`);

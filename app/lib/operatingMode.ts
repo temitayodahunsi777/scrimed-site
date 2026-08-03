@@ -1,3 +1,5 @@
+import { getFaithCoreBoundarySummary } from "./faithCorePolicy";
+
 export type ScrimedOperatingMode = {
   version: "2026-07-23.synthetic-default-v1";
   syntheticOnly: boolean;
@@ -179,6 +181,7 @@ export function getScrimedOperatingModeSummary() {
     status: validation.valid ? "synthetic-demonstration-only" : "startup-blocked",
     mode,
     validation,
+    faithCore: getFaithCoreBoundarySummary(),
     banner: "Synthetic demonstration environment — no PHI — no live clinical execution.",
     boundary:
       "No environment variable can authorize live PHI, live clinical execution, production EHR/device connections, emergency monitoring, autonomous care, payer decisions, or faith-influenced clinical logic in this release."

@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-27.public-claims-v4",
+  "version": "2026-08-02.public-claims-v5",
   "blockedRules": [
     {
       "id": "unsubstantiated-named-testimonial",
@@ -43,7 +43,13 @@
     },
     {
       "id": "unverified-organization-contact-metadata",
-      "markers": ["+14049814427", "atlanta, ga"],
+      "markers": [
+        "+14049814427",
+        "(404) 981-4427",
+        "404-981-4427",
+        "123-456-7890",
+        "atlanta, ga"
+      ],
       "reason": "Organization telephone and locality metadata require a founder-verified business identity record and counsel-approved publication posture.",
       "allowNegated": false
     },

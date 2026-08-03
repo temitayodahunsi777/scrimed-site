@@ -121,6 +121,15 @@ const checks = [
     ]
   },
   {
+    label: "FaithCore API, service, and public-copy neutrality",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/faithcore-neutrality-policy-test.mjs"
+    ]
+  },
+  {
     label: "public release source verification",
     args: ["scripts/verify-public-release.mjs"]
   },

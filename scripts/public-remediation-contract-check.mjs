@@ -8,6 +8,7 @@ const requiredFiles = [
   "config/pending-migration-authorization.json",
   ".env.example",
   "app/lib/companyIdentity.ts",
+  "app/lib/faithCorePolicy.ts",
   "app/lib/operatingMode.ts",
   "app/lib/legalPolicies.ts",
   "app/lib/validationEvidence.ts",
@@ -22,6 +23,7 @@ const requiredFiles = [
   "app/sitemap.ts",
   "app/robots.ts",
   "scripts/public-remediation-policy-test.mjs",
+  "scripts/faithcore-neutrality-policy-test.mjs",
   "scripts/pending-migration-authorization-check.mjs",
   "scripts/verify-public-release.mjs",
   "scripts/wix-publication-verification.mjs",
@@ -40,7 +42,10 @@ const requiredFiles = [
   "docs/SUPABASE_SECURITY_OPERATOR_CHECKLIST.md",
   "docs/WIX_METADATA_IMPLEMENTATION_CHECKLIST.md",
   "docs/WIX_OPERATOR_EXECUTION_PACKET.md",
-  "docs/WIX_PUBLICATION_VERIFICATION_REPORT.md"
+  "docs/WIX_PUBLICATION_VERIFICATION_REPORT.md",
+  "docs/release/CURRENT_CANDIDATE_BASELINE.md",
+  "docs/operators/WIX_FINAL_EXECUTION_PACKET.md",
+  "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md"
 ];
 
 for (const pathname of requiredFiles) {
@@ -86,11 +91,19 @@ requireIncludes("app/page.tsx", [
   "Required public boundaries"
 ]);
 requireIncludes("app/faithcore/page.tsx", [
-  "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+  "faithCorePublicCopy.heading",
+  "faithCorePublicCopy.body",
+  "faithCorePublicCopy.supportingStatement",
+  "faithCorePublicCopy.cta",
   "canonical: applicationUrl(\"/faithcore\")",
   "url: applicationUrl(\"/faithcore\")",
-  "faithCoreNeutralityStatement",
   "optional, explicitly consented experience"
+]);
+requireIncludes("app/lib/faithCorePolicy.ts", [
+  "FaithCore — Optional Faith-Aligned Experience",
+  "FaithCore is not a medical service and does not modify clinical logic or healthcare decisions.",
+  "clinical-influence-prohibited",
+  "operationalDecisionAuthority: false"
 ]);
 requireIncludes("app/validation-evidence/page.tsx", [
   "canonical: applicationUrl(\"/validation-evidence\")",
@@ -115,7 +128,7 @@ requireIncludes("app/lib/legalPolicies.ts", [
   "does not provide medical diagnosis",
   "AI-generated outputs may be incomplete",
   "contact emergency services immediately",
-  "do not affect clinical recommendations"
+  "faithCorePublicCopy.supportingStatement"
 ]);
 requireIncludes("app/api/pilot/intake/route.ts", [
   "evaluateOperatingModeAction",
@@ -130,6 +143,7 @@ requireIncludes("app/lib/pilotIntake.ts", [
 requireIncludes("app/lib/siteNavigation.ts", ["/validation-evidence", "/legal"]);
 requireIncludes("package.json", [
   '"test:public-remediation-policy"',
+  '"test:faithcore-neutrality"',
   '"verify:public-release"',
   '"contract:public-remediation"'
 ]);

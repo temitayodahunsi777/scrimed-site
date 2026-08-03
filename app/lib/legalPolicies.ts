@@ -1,4 +1,5 @@
 import { companyIdentity } from "./companyIdentity";
+import { faithCorePublicCopy } from "./faithCorePolicy";
 
 export type InterimLegalPolicySlug =
   | "privacy"
@@ -36,7 +37,7 @@ export const emergencyStatement =
   "If you believe you are experiencing a medical emergency, contact emergency services immediately.";
 
 export const faithCoreNeutralityStatement =
-  "Optional spiritual or faith-based experiences are user-selected and do not affect clinical recommendations, eligibility, prioritization, diagnosis, treatment, or access to care.";
+  faithCorePublicCopy.supportingStatement;
 
 const sharedBoundaries = [
   publicHealthcareDataBoundary,

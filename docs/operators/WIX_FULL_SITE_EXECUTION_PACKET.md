@@ -15,7 +15,7 @@ forms, legacy/duplicate pages, cached content, and Shop/Cart remnants.
 | Home description | `SCRIMED develops trustworthy, human-supervised healthcare intelligence and AI-enabled workflows for clinicians, care teams, health systems, payers, researchers, and patients. Current public experiences are demonstration and synthetic-data environments unless separately validated and approved.` |
 | Home Open Graph | Title `SCRIMED | Trustworthy Healthcare Intelligence`; human-supervised enterprise description |
 | Organization JSON-LD | Name, canonical URL, approved description, verified public email, slogan only; no address, telephone, review, rating, clinical or certification claim |
-| FaithCore title | `FaithCore by SCRIMED: Optional Faith-Aligned Experience` |
+| FaithCore title | `FaithCore by SCRIMED | Optional Faith-Aligned Experience` |
 | FaithCore body | `FaithCore is an optional, user-selected experience for individuals and organizations seeking faith-aligned engagement. It does not influence diagnosis, treatment, clinical recommendations, eligibility, prioritization, risk scoring, or access to care.` Add: `FaithCore is not a medical service and does not modify clinical logic or healthcare decisions.` |
 | FaithCore CTA | Replace clinic-activation language with `Explore Optional FaithCore Experience`. |
 | Vitals | Synthetic/test signals and reviewable demonstration trends; explicit no-diagnosis, no-treatment, no-emergency, no-live-device/no-PHI boundary |
@@ -44,10 +44,14 @@ decision, and the published-site gate remains open until fresh live and mobile e
 
 ## Fresh Read-Only Finding
 
-The 2026-08-01 live-browser check found current Atlas-first homepage metadata and conservative
-Organization JSON-LD, but published FaithCore and Vitals content did not consistently match the
-safe editor drafts. Published FaithCore still used efficacy-like spiritual-care language and a
-clinic-activation CTA. The exact FaithCore replacement is now saved in draft; the owner must
-authorize publication, inspect the mobile variant, publish, and rerun the remote verifier before
-the full-site gate can close. Search-engine snapshots may remain stale after publication and are
-supporting evidence only; the verifier must inspect the current live DOM and metadata directly.
+The direct-live strict check captured at `2026-08-03T01:26:35.867Z` reached all 17 configured
+pages, two retired routes, two noindexed Booking routes, three redirects, and six crawler files.
+Fourteen pages passed. Vitals metadata and boundaries now pass. The remaining 16 failures are
+limited to stale FaithCore title/description/Open Graph values on the FaithCore page, service
+page, and introduction post, plus four missing approved visible-copy markers on `/faithcore`.
+The strengthened visible Shop/Cart label and known unverified/placeholder telephone checks found
+no additional current failures.
+The exact FaithCore replacement is saved in draft; the owner must authorize publication, inspect
+the mobile variant, publish, and rerun the remote verifier before the full-site gate can close.
+Search-engine snapshots may remain stale after publication and are supporting evidence only; the
+verifier must inspect the current live DOM and metadata directly.
