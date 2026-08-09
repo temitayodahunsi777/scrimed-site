@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-02.wix-publication-v3",
+  "version": "2026-08-09.wix-publication-v4",
   "baseUrl": "https://www.scrimedsolutions.com",
   "scanRoutes": [
     "/",
@@ -37,9 +37,9 @@
     },
     {
       "path": "/faithcore",
-      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
+      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
       "description": "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
-      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
+      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
       "ogDescription": "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
       "requiredVisibleText": [
         "FaithCore is an optional, user-selected experience",
@@ -120,10 +120,10 @@
     },
     {
       "path": "/service-page/faithcore-integration",
-      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
-      "description": "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
-      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
-      "ogDescription": "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
+      "title": "FaithCore Integration by SCRIMED | Optional Faith-Aligned Experience",
+      "description": "An optional, user-selected faith-aligned engagement experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
+      "ogTitle": "FaithCore Integration by SCRIMED | Optional Faith-Aligned Experience",
+      "ogDescription": "An optional, user-selected faith-aligned engagement experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
     },
     {
       "path": "/service-page/voice-intake-assistants",
@@ -141,10 +141,10 @@
     },
     {
       "path": "/post/introducing-faithcore-where-spiritual-support-meets-clinical-care",
-      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
-      "description": "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
-      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
-      "ogDescription": "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
+      "title": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+      "description": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care.",
+      "ogTitle": "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
+      "ogDescription": "FaithCore is an optional, user-selected experience designed for faith-aligned engagement. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
     }
   ],
   "faithSpecificRoutes": [

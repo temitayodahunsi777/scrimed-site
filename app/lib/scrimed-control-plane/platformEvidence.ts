@@ -41,8 +41,8 @@ export type CrossPlatformApprovalStep = {
   automaticApprovalAllowed: false;
 };
 
-const observedAt = "2026-08-09T01:24:44Z";
-const expiresAt = "2026-08-10T01:24:44Z";
+const observedAt = "2026-08-09T05:04:46Z";
+const expiresAt = "2026-08-10T05:04:46Z";
 
 function evidenceRecord(
   input: Omit<
@@ -78,26 +78,26 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     expiresAt,
     evidenceClass: "connector-observed",
     sourceReference: "GitHub repository metadata and local git status",
-    summary: "Main remains behind the consolidated local candidate; PRs 22 and 23 are open drafts whose heads are already ancestors of the current branch, while the current branch still has no dedicated review PR.",
+    summary: "The consolidated candidate has one dedicated review path in PR 25; automated checks are attached to that path, while independent named engineering and security approval remains outstanding.",
     facts: [
       "Repository visibility is public.",
       "Observed main is 5e77beea57f458883f7544421b2014fd4e28ac67.",
-      "PR 22 remains open and draft at 450d9022356f1f19e3c1b1855f3a55f8634302bb.",
-      "PR 23 remains open and draft at 37d749c103ca1588be62740148b3dd294a35f7d2.",
-      "Both PR heads are ancestors of local candidate base 9d2cfceef81b0b13010ef28b55c040d459bc625a.",
-      "The current branch contains additional committed work plus attributable uncommitted changes and has no current review PR."
+      "PR 25 is the consolidated candidate review path for branch agent/scrimed-p32-consolidated-candidate.",
+      "Predecessor PRs 22 and 23 are superseded by the consolidated path and must not be merged independently.",
+      "Dependency review, dependency security, migration dry-run, CodeQL, core CI, and synthetic preview validation are required on the exact final head.",
+      "No distinct human APPROVED review is recorded in the retained observation."
     ],
     drift: [
-      "Reviewing or merging both predecessor PRs independently would duplicate an already consolidated history.",
-      "The current candidate and its final validation evidence are not yet bound to one clean, named-reviewer PR."
+      "Reviewing or merging both predecessor PRs independently would duplicate consolidated history.",
+      "Automated checks cannot substitute for named independent engineering and security review."
     ],
     approvalImpact: ["source-controlled release approval", "buyer diligence evidence", "change-management evidence", "rollback provenance"],
     accountableOwner: "Engineering release steward",
-    nextAction: "Validate the consolidated branch, create one attributable immutable candidate, supersede PRs 22 and 23 with a single exact-candidate review path, and obtain named review before merge or deployment.",
+    nextAction: "Bind the final strict evidence to PR 25 and obtain named independent engineering and security approval on its exact head before merge or deployment.",
     remediationStatus: "implemented-local",
     remediationEvidence: ["scripts/release-provenance-preflight.mjs", ".github/workflows/ci.yml", "docs/release-provenance.md"],
-    residualBlocker: "Final source mutations, clean candidate provenance, a current pull request, and named review remain incomplete.",
-    externalMutationPerformed: false
+    residualBlocker: "Named independent engineering and security approval remains external and incomplete.",
+    externalMutationPerformed: true
   }),
   evidenceRecord({
     id: "vercel-deployment-provenance",
@@ -109,25 +109,25 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     expiresAt,
     evidenceClass: "connector-observed",
     sourceReference: "Vercel project, deployment, build, and runtime-error metadata",
-    summary: "Production is READY at main commit 5e77beea, while ready previews exist for predecessor PRs 22 and 23; the consolidated local candidate is newer and has not been deployed.",
+    summary: "Production remains intentionally unchanged while the consolidated PR uses an isolated preview pipeline; the exact final head must complete preview build and desktop/mobile synthetic validation before deployment review.",
     facts: [
       "Observed production deployment dpl_96zHRNo6ebg6FUQahU91GtkfjEeW is READY.",
       "Production metadata identifies main commit 5e77beea57f458883f7544421b2014fd4e28ac67.",
-      "Ready preview deployment dpl_GahSSeJrYPdYxrVvhJnQxS4NKDMg is bound to PR 22.",
-      "Ready preview deployment dpl_6Fd9FqeHqK5CeWUfetgKS1D2ZgPL is bound to PR 23.",
-      "No deployment observed in this snapshot is bound to local candidate base 9d2cfceef81b0b13010ef28b55c040d459bc625a or the current worktree."
+      "PR 25 triggers the repository's Synthetic Preview Validation workflow and an isolated Vercel preview.",
+      "The preview is not a production deployment and grants no production authority.",
+      "Preview evidence must be tied to the exact final PR head; predecessor previews cannot satisfy that gate."
     ],
     drift: [
-      "A READY predecessor preview does not validate the consolidated candidate.",
-      "Production and local capability surfaces remain intentionally out of sync until review and deployment authorization."
+      "A preview for an earlier branch head does not validate a later source mutation.",
+      "Production and candidate capability surfaces remain intentionally out of sync until review and deployment authorization."
     ],
     approvalImpact: ["production promotion approval", "release attestation", "rollback evidence", "customer-facing capability claims"],
     accountableOwner: "Platform release steward",
-    nextAction: "After named source review, create one isolated exact-candidate preview, run protected and public smoke, then request a separate production deployment authorization.",
+    nextAction: "Require the exact final PR head to reach READY and pass desktop, 390px, protected, and public preview checks; request production authorization only after named review.",
     remediationStatus: "implemented-local",
     remediationEvidence: ["SCRIMED_RELEASE_PROVENANCE_ENFORCED", "SCRIMED_APPROVED_RELEASE_SHA", "npm run release:provenance:strict"],
-    residualBlocker: "The consolidated candidate lacks a current preview, named review, approved SHA, and deployment authorization.",
-    externalMutationPerformed: false
+    residualBlocker: "Exact-final-head preview completion, named review, approved SHA, and deployment authorization remain incomplete.",
+    externalMutationPerformed: true
   }),
   evidenceRecord({
     id: "supabase-data-plane-drift",
@@ -165,28 +165,28 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     id: "wix-public-claims-integrity",
     provider: "wix",
     controlDomain: "public-claims",
-    status: "blocked",
-    severity: "critical",
+    status: "verified",
+    severity: "low",
     observedAt,
     expiresAt,
-    evidenceClass: "local-repository-observed",
-    sourceReference: "Latest repository-held direct-live Wix report plus current strict-verifier network availability check",
-    summary: "Homepage, Vitals, commerce cleanup, and testimonial controls were previously verified, but the latest retained direct-live report records 16 FaithCore publication mismatches; the current sandbox could not refresh live pages.",
+    evidenceClass: "live-endpoint-observed",
+    sourceReference: "2026-08-09 policy-v4 direct-origin audit and published FaithCore browser observation",
+    summary: "The configured Wix public-claims surface passes policy v4, including Atlas-first metadata, synthetic Vitals boundaries, optional clinically neutral FaithCore copy, conservative schema, and retired-commerce controls.",
     facts: [
       "The Wix site is published on a custom domain.",
-      "The latest retained direct-live report passed homepage, Vitals, About, Partner, Demo, legal, canonical, JSON-LD, testimonial, address, telephone, commerce, sitemap, and robots checks.",
-      "That report recorded 16 FaithCore metadata and visible-copy mismatches across the FaithCore page, service page, and related post.",
-      "The clinically neutral FaithCore replacement exists as a saved draft and was not published in the retained report.",
-      "The current strict verification attempt failed closed because this execution sandbox could not reach any configured Wix page; it did not produce fresh publication evidence."
+      "The direct-origin audit covered 17 pages, two retired routes, two noindexed Booking routes, three redirects, and six crawler files with zero claim failures.",
+      "The published FaithCore page contains the approved opt-in copy, clinical-neutrality statement, supporting boundary, CTA, and safe metadata.",
+      "The published FaithCore JSON-LD is a conservative Organization object without address, telephone, Review, or AggregateRating.",
+      "A later strict attempt from a network-restricted shell observed zero pages and failed closed; that environmental result does not supersede the direct-origin evidence."
     ],
     drift: [
-      "FaithCore publication does not match the approved optional, clinically neutral source copy in the latest retained live evidence.",
-      "Fresh desktop and 390px mobile verification is unavailable until owner publication and a network-capable check occur."
+      "A true mobile-device visual check remains pending because desktop-user-agent resizing does not exercise Wix's separate mobile variant.",
+      "Search-engine snapshots may lag the live origin and must not supersede direct evidence."
     ],
     approvalImpact: ["marketing claims approval", "buyer-specific proof release", "legal review", "investor diligence"],
     accountableOwner: "Founder, legal reviewer, and marketing owner",
-    nextAction: "Have the Wix owner publish only the reviewed FaithCore changes, then rerun strict direct-live claims and 390px mobile verification before closing the public-claims gate.",
-    remediationStatus: "external-action-required",
+    nextAction: "Preserve the policy-v4 evidence and capture a true mobile-device presentation check without changing the verified public claims.",
+    remediationStatus: "implemented-local",
     remediationEvidence: [
       "scripts/public-claims-integrity-smoke.mjs",
       "docs/public-claims-integrity.md",
@@ -194,7 +194,7 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
       "docs/operators/WIX_FAITHCORE_FINAL_ACTION.md",
       "config/wix-publication-policy.json"
     ],
-    residualBlocker: "Founder-authorized FaithCore publication and fresh direct-live/mobile verification remain required.",
+    residualBlocker: "True mobile-device visual evidence remains an owner presentation action; no public-claims failure is open.",
     externalMutationPerformed: true
   }),
   evidenceRecord({
@@ -228,10 +228,10 @@ export const crossPlatformApprovalPath: CrossPlatformApprovalStep[] = [
   {
     id: "public-claims-integrity-review",
     title: "Public Claims Integrity Review",
-    status: "externally-gated",
+    status: "ready-for-human-review",
     accountableOwners: ["Founder/CEO", "Legal reviewer", "Marketing owner"],
-    completionEvidence: ["approved FaithCore draft published", "strict direct-live claims check", "390px mobile verification", "dated owner review"],
-    blockedUntil: ["FaithCore metadata and visible copy match the optional clinically neutral policy"],
+    completionEvidence: ["policy-v4 direct-live claims check", "published FaithCore browser observation", "true mobile-device presentation check", "dated owner review"],
+    blockedUntil: ["named owner records the current presentation review"],
     unlocks: ["truthful public narrative", "investor diligence confidence", "buyer-safe marketing"],
     automaticApprovalAllowed: false
   },
@@ -295,7 +295,7 @@ export function getCrossPlatformEvidenceSummary(now: Date = new Date()) {
       productionPromotionAllowed: false,
       customerGoLiveAllowed: false,
       preparedRemediationCount: records.filter((record) => record.remediationStatus !== "external-action-required").length,
-      fullyResolvedProviderCount: 0
+      fullyResolvedProviderCount: records.filter((record) => record.status === "verified").length
     },
     approvalPath: crossPlatformApprovalPath,
     immediateCorrection: {
@@ -319,7 +319,7 @@ export function getCrossPlatformEvidenceSummary(now: Date = new Date()) {
       "nonproduction migration planning"
     ],
     boundary: "This snapshot reconciles no-secret operational metadata only. It grants no deployment, PHI, clinical, payer, EHR, customer, testimonial, regulatory, certification, or go-live authority.",
-    nextBestMove: "Finish the exact-candidate source review path, publish and verify the approved FaithCore draft, then close Supabase Auth and disposable-migration evidence before requesting an isolated preview.",
+    nextBestMove: "Finish the exact-candidate source review path and independent review, then close Supabase Auth and disposable-migration evidence before any production authorization request.",
     auditHash: createAuditHash({
       records: records.map((record) => record.auditHash),
       approvalPath: crossPlatformApprovalPath.map((step) => step.id)

@@ -1,5 +1,9 @@
 # Current Candidate Baseline
 
+> Historical baseline only. PR 25 now provides the consolidated review path and the 2026-08-09
+> policy-v4 Wix audit confirms the remediated FaithCore publication. Current fingerprints and
+> exact-head checks must be read from the regenerated candidate evidence, not this starting record.
+
 Captured at `2026-08-03T00:19:44Z` before the bounded FaithCore remediation in this phase.
 This record is historical starting evidence and must not be reused as final evidence after a source
 change.

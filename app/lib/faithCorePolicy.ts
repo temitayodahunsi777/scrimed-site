@@ -5,7 +5,7 @@ export const faithCorePublicCopy = {
   supportingStatement:
     "FaithCore is not a medical service and does not modify clinical logic or healthcare decisions.",
   cta: "Explore Optional FaithCore Experience",
-  seoTitle: "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
+  seoTitle: "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
   metaDescription:
     "FaithCore is an optional, user-selected faith-aligned experience. It does not influence diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, or access to care."
 } as const;

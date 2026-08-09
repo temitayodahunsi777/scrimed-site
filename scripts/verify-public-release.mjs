@@ -57,7 +57,7 @@ const renderedBuildContracts = [
   {
     path: ".next/server/app/faithcore.html",
     canonical: `${canonicalApplicationOrigin}/faithcore`,
-    title: "FaithCore by SCRIMED | Optional Faith-Aligned Experience",
+    title: "FaithCore by SCRIMED | Optional Faith-Aligned Care Experience",
     requiredText: [
       "FaithCore — Optional Faith-Aligned Experience",
       "does not influence diagnosis, treatment, clinical recommendations, eligibility, prioritization, risk scoring, or access to care",

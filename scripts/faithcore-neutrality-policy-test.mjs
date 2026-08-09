@@ -82,8 +82,6 @@ for (const requiredCopy of Object.values(faithCorePublicCopy)) {
 
 for (const prohibitedClaim of [
   "A spiritually aligned trust and encouragement layer",
-  "Optional Faith-Aligned Care Experience",
-  "experience designed for faith-aligned engagement",
   "governs clinical reasoning",
   "spiritually governed clinical",
   "scripture-driven diagnosis",

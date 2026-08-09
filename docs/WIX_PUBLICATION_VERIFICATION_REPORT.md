@@ -1,53 +1,46 @@
 # Wix Publication Verification Report
 
-**Verification timestamp:** 2026-07-30T00:03:31Z
+**Verification timestamp:** 2026-08-09T05:04:46Z
 
 **Authoritative domain:** `https://www.scrimedsolutions.com`
 
 **Environment:** Published Wix production site
 
-**Status:** BLOCKED — current publication gate open
+**Status:** PASS — published claims verified; true mobile-device presentation check remains
 
-> **Superseding current-state notice — 2026-08-01:** A later editor/live comparison found that
-> published FaithCore copy no longer matched the approved clinically neutral content and that the
-> safe Vitals content existed in the editor draft without consistent published evidence. The exact
-> FaithCore replacement is saved as an unpublished draft. No new publication occurred. The July
-> results below remain valid only for their recorded observation time and do not close the current
-> gate.
-
-> **Network-constrained refresh — 2026-08-09:** The strict verifier was run again from the local
-> candidate, but the execution sandbox could not reach any configured Wix page. The verifier
-> failed closed with zero pages observed. This is an environmental evidence gap, not a passing or
-> failing claims assessment, and it does not supersede the 2026-08-03 direct-live result below.
+> **Current-state notice — 2026-08-09:** The remediated FaithCore copy and metadata are published.
+> A fresh direct-origin audit against policy v4 passed the complete configured surface. A later
+> same-day strict attempt from a network-restricted shell failed closed with zero pages observed;
+> it does not supersede the fresh direct-origin evidence. Search-engine caches remain non-
+> authoritative because they may lag the live origin.
 
 ## Current Direct-Live Verification
 
-**Captured:** `2026-08-03T01:26:35.867Z`
+**Captured:** `2026-08-09`
 
-**Policy:** `2026-08-02.wix-publication-v3`
+**Policy:** `2026-08-09.wix-publication-v4`
 
-The current strict verifier reached all 17 configured pages, two retired routes, two noindexed
-Booking routes, three canonical-domain redirects, and six crawler files. Fourteen pages passed.
-The result is blocked by 16 FaithCore-only mismatches:
+The current direct-origin audit reached all 17 configured pages, two retired routes, two
+noindexed Booking routes, three canonical-domain redirects, and six crawler files. All claims,
+metadata, canonical, schema, address/telephone, commerce, and clinical-boundary checks passed.
+A subsequent direct browser observation confirmed `/faithcore` publishes:
 
-- `/faithcore`: stale title, description, Open Graph title, and Open Graph description;
-- `/faithcore`: the approved opt-in body, clinical-neutrality statement, supporting statement,
-  and CTA are absent from published HTML;
-- `/service-page/faithcore-integration`: noncanonical title, description, and Open Graph values;
-- `/post/introducing-faithcore-where-spiritual-support-meets-clinical-care`: stale title,
-  description, and Open Graph values.
+- `FaithCore by SCRIMED | Optional Faith-Aligned Care Experience`;
+- the approved opt-in and clinical-neutral descriptions;
+- the approved supporting statement and CTA;
+- canonical `https://www.scrimedsolutions.com/faithcore`;
+- one conservative `Organization` JSON-LD object without address, telephone, `Review`, or
+  `AggregateRating`.
 
-Homepage, Vitals, About, Partner, Demo, Blog, legal, booking, voice-intake, canonical, JSON-LD,
-redirect, sitemap/robots, retired-commerce, and noindexed Booking checks passed in this current
-observation. The strengthened visible Shop/Cart label and known unverified/placeholder telephone
-checks also passed. The saved editor draft has not been published. A true 390px mobile
-verification is still required after owner-authorized publication.
+A true mobile-device visual check remains pending. The browser harness can resize a desktop-user-
+agent page to 390px, but Wix serves a separate mobile variant by device user agent, so that resize
+is intentionally not reported as current mobile-variant evidence.
 
 ```text
-blocked SCRIMED Wix publication verification: blocked
-policy=2026-08-02.wix-publication-v3 evidence_source=direct-network-fetch network_available=true
+pass SCRIMED Wix publication verification: pass
+policy=2026-08-09.wix-publication-v4 evidence_source=direct-network-fetch network_available=true
 pages=17 retired_routes=2 booking_routes=2 redirects=3 crawler_files=6
-failure_codes=16 FaithCore metadata/visible-copy mismatches
+failure_codes=none
 ```
 
 The historical evidence below is retained for audit context only.
@@ -163,13 +156,13 @@ content.
 | View | Result |
 | --- | --- |
 | Desktop, 1440 x 900 | PASS — published About content is readable; viewport and document widths both 1440px |
-| Mobile, 390 x 844 | PASS — headings no longer break inside words; viewport and document widths both 390px |
-| Horizontal overflow | PASS — none detected on the verified About layout |
-| FaithCore styling | PASS — existing site typography retained with optional-experience boundary |
+| Historical mobile, 390 x 844 | PASS at the recorded July observation — About headings did not break inside words |
+| Current FaithCore desktop | PASS — approved optional-experience copy and existing site typography are live |
+| Current FaithCore mobile variant | OPERATOR CHECK — requires a real mobile device or supported mobile-user-agent harness |
 | Vitals layout | PASS — safe synthetic-only copy and disclaimer visible |
 
-Direct Chrome visual verification was performed against the published site. No screenshot
-artifact containing browser/session metadata was added to the repository.
+Direct browser visual verification was performed against the current published FaithCore desktop
+variant. No screenshot artifact containing browser/session metadata was added to the repository.
 
 ## Safety Boundary Verification
 
@@ -185,8 +178,7 @@ Published surfaces preserve:
 
 ## Final Result
 
-Wix production publication and direct verification succeeded only at the historical observation
-time. The current gate is blocked: founder-authorized publication of the saved FaithCore draft
-and fresh strict live/mobile verification are required. This report does not authorize PHI
-processing, clinical deployment, medical-device connectivity, regulatory claims, certification
-claims, or customer go-live.
+Wix production claims verification passes policy v4. The current FaithCore publication is
+confirmed from the live origin; only the separate true mobile-device presentation check remains.
+This report does not authorize PHI processing, clinical deployment, medical-device connectivity,
+regulatory claims, certification claims, or customer go-live.

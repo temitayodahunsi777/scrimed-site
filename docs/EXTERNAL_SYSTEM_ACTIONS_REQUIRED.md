@@ -1,14 +1,14 @@
 # External System Actions Required
 
-## P0 - Wix Marketing Site — Historical Remediation, Publication Exception Open
+## P0 - Wix Marketing Site — Published Claims Remediation Verified
 
 **Owner:** Founder/site owner.
 
 The Wix-controlled public-claims remediation was published and directly verified on 2026-07-27.
-That evidence is historical. A 2026-08-03 check found later drift in published FaithCore
-copy and inconsistent publication of the safe Vitals draft. The exact FaithCore replacement is
-saved in Wix as an unpublished draft; publication remains founder-controlled. Until publication
-and fresh live verification complete, the current Wix gate remains open.
+A later FaithCore drift finding was remediated. On 2026-08-09, a fresh direct-origin audit against
+policy `2026-08-09.wix-publication-v4` passed all configured public surfaces with zero claim
+failures. A direct browser check then confirmed the published FaithCore title, safe metadata,
+opt-in copy, clinical-neutrality boundary, CTA, canonical URL, and conservative schema.
 
 The July publication evidence recorded:
 
@@ -63,7 +63,8 @@ These checks do not authorize deployment or production mutation.
 
 - The homepage metadata and conservative Organization schema were safe in the fresh inspection.
 - The 2026-07-27 strict marketing smoke passed and remains historical publication evidence only.
-- A 2026-08-03 direct-live comparison found publication drift. The exact FaithCore draft
-  is saved but unpublished; fresh strict and 390px mobile verification remain required.
-- A 2026-08-09 strict refresh attempt failed closed because the current execution sandbox could
-  not reach the configured Wix pages. It did not supersede the retained direct-live evidence.
+- A 2026-08-09 direct-origin policy-v4 audit passed the complete configured surface.
+- A later same-day strict refresh attempt from a network-restricted shell failed closed with zero
+  pages observed. That environmental result does not supersede the fresh direct-origin evidence.
+- A true mobile-device visual check remains an owner presentation action. It is not a public-
+  claims failure and cannot be substituted with desktop-user-agent resizing.

@@ -1,11 +1,11 @@
 # Wix Operator Execution Packet
 
-> **Current-state notice — 2026-08-01:** This file retains the July execution history below, but
-> later published-site inspection found FaithCore drift and inconsistent publication of the safe
-> Vitals draft. The exact FaithCore replacement copy and CTA are now saved in the authenticated
-> Wix Editor as an unpublished draft. No new publication occurred. Current completion is governed
-> by `docs/operators/WIX_FAITHCORE_FINAL_ACTION.md`, and the Wix gate remains open until founder-
-> authorized publication plus fresh strict live and 390px mobile verification.
+> **Current-state notice — 2026-08-09:** The approved FaithCore replacement is published. A fresh
+> direct-origin policy-v4 audit passed all 17 governed pages, two retired routes, two noindexed
+> Booking routes, three redirects, and six crawler files with zero claim failures. A subsequent
+> direct browser check confirmed the FaithCore title, clinical-neutral description, opt-in copy,
+> supporting boundary, CTA, canonical URL, and conservative `Organization` schema. A true mobile-
+> device visual check remains a presentation action; desktop-user-agent resizing is not counted.
 
 **Execution date:** 2026-07-24 and 2026-07-27 UTC
 
@@ -83,11 +83,11 @@ Until then, retain the noindexed system pages.
   files.
 - No DNS, registrar, billing, users, permissions, automations, contacts, CRM records, or application code were changed.
 
-## Remaining Blockers
+## Remaining Actions
 
-- Founder interim acceptance for publication of the exact saved FaithCore draft.
-- Wix owner publication through the normal owner flow.
-- Fresh strict published-site and true 390px mobile evidence.
+- Capture a fresh true mobile-device FaithCore screenshot and confirm no clipping or horizontal
+  overflow. This presentation check does not reopen the passed public-claims gate.
+- Keep the policy-v4 direct-live audit in the exact-candidate review packet.
 
 Legal adoption, live clinical activation, PHI processing, medical-device connectivity,
 certifications, and customer go-live remain separate NO-GO gates.

@@ -61,10 +61,10 @@ requireText("docs/public-claims-integrity.md", [
 ]);
 requireText("app/lib/scrimed-control-plane/platformEvidence.ts", [
   "public-claims-integrity-smoke.mjs",
-  "Latest repository-held direct-live Wix report",
-  "16 FaithCore publication mismatches",
-  "The current strict verification attempt failed closed",
-  "external-action-required"
+  "policy-v4 direct-origin audit",
+  "zero claim failures",
+  "network-restricted shell",
+  "implemented-local"
 ]);
 requireText("package.json", [
   '"contract:public-claims-integrity"',

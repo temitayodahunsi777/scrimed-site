@@ -25,18 +25,17 @@
 
 ## Public Site Delta
 
-The latest repository-held direct-live Wix report passed homepage, Vitals, testimonial, commerce,
-canonical, JSON-LD, address, telephone, sitemap, and robots checks, but recorded sixteen FaithCore
-metadata and visible-copy mismatches. The approved FaithCore copy remains an unpublished draft.
-The current sandbox could not perform a fresh network verification, so the public-claims gate
-remains blocked rather than inheriting historical evidence.
+The 2026-08-09 direct-origin Wix audit passed policy v4 across all configured pages, retired and
+noindexed routes, redirects, and crawler files with zero claim failures. A same-day browser check
+confirmed the published FaithCore copy and conservative schema. A later network-restricted shell
+refresh observed zero pages and failed closed; it does not supersede the direct-origin evidence.
 
 ## Promotion Preconditions
 
 1. Clean exact candidate and source manifest.
 2. Full validation, secret scan, SBOM, and deterministic artifact integrity.
 3. One consolidated PR and named reviewer dispositions bound to its exact head.
-4. Founder-authorized FaithCore publication plus fresh strict and 390px mobile verification.
+4. Preserve the passed Wix claims evidence and capture a true mobile-device presentation check.
 5. Supabase leaked-password protection evidence.
 6. Authorized disposable dry-run and review for the three pending migrations.
 7. Exact-candidate preview with public, protected, fail-closed, and rollback smoke evidence.
