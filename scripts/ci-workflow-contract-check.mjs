@@ -89,7 +89,11 @@ for (const expected of [
   "pull_request:",
   "uses: actions/dependency-review-action@v4",
   "fail-on-severity: moderate",
-  "license-check: true"
+  "license-check: true",
+  "vars.SCRIMED_GITHUB_DEPENDENCY_GRAPH_ENABLED == 'true'",
+  "npm audit --audit-level=moderate",
+  "npm run security:dependency-floor",
+  "npm run security:sbom"
 ]) {
   requireIncludes(".github/workflows/dependency-review.yml", expected);
 }
@@ -105,7 +109,7 @@ for (const expected of [
 }
 
 for (const expected of [
-  "image: postgres:17",
+  "image: pgvector/pgvector:pg17",
   "SCRIMED_DISPOSABLE_DATABASE: \"true\"",
   "node scripts/verify-migration-dry-run.mjs --execute --strict",
   "SCRIMED_DISPOSABLE_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/scrimed_migration_ci"

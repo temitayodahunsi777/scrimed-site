@@ -56,9 +56,7 @@ jobs:
           sha256sum package-lock.json artifacts/security/npm-audit.json > artifacts/security/dependency-evidence.sha256
 
       - name: Review pull-request dependency delta
-        if: github.event_name == 'pull_request'
-        id: dependency-review
-        continue-on-error: true
+        if: github.event_name == 'pull_request' && vars.SCRIMED_GITHUB_DEPENDENCY_GRAPH_ENABLED == 'true'
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
@@ -66,12 +64,12 @@ jobs:
           comment-summary-in-pr: always
 
       - name: Enforce connector-independent pull-request floor
-        if: github.event_name == 'pull_request' && steps.dependency-review.outcome == 'failure'
+        if: github.event_name == 'pull_request' && vars.SCRIMED_GITHUB_DEPENDENCY_GRAPH_ENABLED != 'true'
         run: |
           npm audit --audit-level=moderate
           npm run security:dependency-floor
           npm run security:sbom
-          echo "::warning::GitHub dependency review was unavailable or failed; deterministic lockfile, advisory, license, and SBOM gates passed."
+          echo "::notice::GitHub dependency graph is not declared enabled; deterministic lockfile, advisory, license, and SBOM gates passed."
 
       - name: Upload dependency evidence
         if: always()
