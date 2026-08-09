@@ -46,8 +46,7 @@ const approvalBase = {
     "ci"
   ],
   issuedAt: "2026-08-09T22:00:00.000Z",
-  expiresAt: "2026-08-10T22:00:00.000Z",
-  trustedIdentityEvidenceVerified: true
+  expiresAt: "2026-08-10T22:00:00.000Z"
 };
 const approval = {
   ...approvalBase,
@@ -61,8 +60,31 @@ function refreshDigest(value) {
   value.approvalDigest = createExactHeadApprovalDigest(payload);
 }
 
+function verifiedIdentityFor(value) {
+  return {
+    gateId: "exact-head-review",
+    decision: "approved",
+    reviewerIdentityHash: value.reviewerIdentityHash,
+    approvalDigest: value.approvalDigest,
+    issuer: "scrimed-qualified-review-test-issuer",
+    keyId: "scrimed-qualified-review-test-key",
+    verificationMethod: "ed25519-trusted-issuer",
+    signatureFingerprint: hash("6"),
+    payloadHash: hash("7"),
+    approvedAt: value.issuedAt,
+    approvalExpiresAt: value.expiresAt,
+    attestationExpiresAt: "2026-08-09T23:55:00.000Z",
+    verifiedAt: evaluatedAt
+  };
+}
+
 assert.equal(
-  evaluateExactHeadReviewBinding({ candidate, approval, evaluatedAt }).status,
+  evaluateExactHeadReviewBinding({
+    candidate,
+    approval,
+    verifiedIdentityEvidence: verifiedIdentityFor(approval),
+    evaluatedAt
+  }).status,
   "APPROVED_EXACT_HEAD"
 );
 assert.equal(
@@ -76,13 +98,15 @@ const approvalWithNotesBase = {
   replayNonce: "nonce-exact-head-notes-001",
   disposition: "APPROVE_WITH_NONBLOCKING_NOTES"
 };
+const approvalWithNotes = {
+  ...approvalWithNotesBase,
+  approvalDigest: createExactHeadApprovalDigest(approvalWithNotesBase)
+};
 assert.equal(
   evaluateExactHeadReviewBinding({
     candidate,
-    approval: {
-      ...approvalWithNotesBase,
-      approvalDigest: createExactHeadApprovalDigest(approvalWithNotesBase)
-    },
+    approval: approvalWithNotes,
+    verifiedIdentityEvidence: verifiedIdentityFor(approvalWithNotes),
     evaluatedAt
   }).status,
   "APPROVED_EXACT_HEAD"
@@ -91,7 +115,12 @@ assert.equal(
 function assertRejected(mutator, reasonCode) {
   const mutated = structuredClone(approval);
   mutator(mutated);
-  const result = evaluateExactHeadReviewBinding({ candidate, approval: mutated, evaluatedAt });
+  const result = evaluateExactHeadReviewBinding({
+    candidate,
+    approval: mutated,
+    verifiedIdentityEvidence: verifiedIdentityFor(approval),
+    evaluatedAt
+  });
   assert.equal(result.approved, false);
   assert.ok(result.reasonCodes.includes(reasonCode), `${reasonCode} was not emitted`);
 }
@@ -140,26 +169,35 @@ assertRejected((value) => {
 const replay = evaluateExactHeadReviewBinding({
   candidate,
   approval,
+  verifiedIdentityEvidence: verifiedIdentityFor(approval),
   consumedApprovalIds: new Set([approval.replayNonce]),
   evaluatedAt
 });
 assert.ok(replay.reasonCodes.includes("exact-head-review-replay-rejected"));
 
-const untrusted = {
-  ...approvalBase,
-  trustedIdentityEvidenceVerified: false
-};
+const untrusted = { ...approval, trustedIdentityEvidenceVerified: true };
+refreshDigest(untrusted);
 const untrustedResult = evaluateExactHeadReviewBinding({
   candidate,
-  approval: {
-    ...untrusted,
-    approvalDigest: createExactHeadApprovalDigest(untrusted)
-  },
+  approval: untrusted,
   evaluatedAt
 });
 assert.ok(untrustedResult.reasonCodes.includes("exact-head-review-untrusted-identity"));
 assert.equal(untrustedResult.releaseAuthorityGranted, false);
 
+const mismatchedIdentity = evaluateExactHeadReviewBinding({
+  candidate,
+  approval,
+  verifiedIdentityEvidence: {
+    ...verifiedIdentityFor(approval),
+    approvalDigest: hash("8")
+  },
+  evaluatedAt
+});
+assert.ok(
+  mismatchedIdentity.reasonCodes.includes("exact-head-review-untrusted-identity")
+);
+
 console.log(
-  "pass exact-head review binding tests (SHA, candidate, source, critical surfaces, disposition allowlist, effective time, replay, evidence, trust, and separation of duties)"
+  "pass exact-head review binding tests (SHA, candidate, source, critical surfaces, disposition allowlist, effective time, replay, signed-identity binding, and separation of duties)"
 );

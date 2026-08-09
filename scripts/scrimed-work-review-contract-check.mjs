@@ -57,6 +57,18 @@ assert.match(
   files["scripts/verify-merge-readiness.mjs"],
   /SCRIMED_EXACT_HEAD_APPROVAL_FILE/
 );
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /verifyP32SupplementalEvidenceAttestation/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON/
+);
+assert.doesNotMatch(
+  files["app/lib/exactHeadReviewBinding.ts"],
+  /trustedIdentityEvidenceVerified:\s*boolean/
+);
 assert.doesNotMatch(
   files["scripts/verify-merge-readiness.mjs"],
   /exactHeadApprovalMatches:\s*baseline\.review\.exactHeadApprovalRecorded/

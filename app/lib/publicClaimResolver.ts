@@ -2,7 +2,7 @@ import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
 import type { EvidenceMaturity, PlatformEvidenceGraph } from "./platformEvidenceGraph";
 
 export const publicClaimResolverVersion =
-  "scrimed-public-claim-resolver-v1-2026-08-09";
+  "scrimed-public-claim-resolver-v2-2026-08-09";
 
 export type PublicClaimInput = {
   claimId: string;
@@ -60,7 +60,7 @@ export function resolvePublicClaim(input: {
   ) {
     reasons.push("public-claim-evidence-immature");
   }
-  if (quantitativeOrSuperior && !input.claim.publicationAuthorized) {
+  if (!input.claim.publicationAuthorized) {
     reasons.push("public-claim-publication-approval-missing");
   }
   if (quantitativeOrSuperior && input.claim.syntheticOrEstimated) {

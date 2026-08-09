@@ -1,7 +1,7 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
 
 export const exactHeadReviewBindingVersion =
-  "scrimed-exact-head-review-binding-v2-2026-08-09";
+  "scrimed-exact-head-review-binding-v3-2026-08-09";
 
 export type ExactHeadCriticalSurfaceFingerprints = {
   securityCriticalFiles: string;
@@ -43,8 +43,23 @@ export type ExactHeadReviewApproval = {
   evidenceIds: string[];
   issuedAt: string;
   expiresAt: string;
-  trustedIdentityEvidenceVerified: boolean;
   approvalDigest: string;
+};
+
+export type ExactHeadVerifiedIdentityEvidence = {
+  gateId: "exact-head-review";
+  decision: "approved";
+  reviewerIdentityHash: string;
+  approvalDigest: string;
+  issuer: string;
+  keyId: string;
+  verificationMethod: "ed25519-trusted-issuer";
+  signatureFingerprint: string;
+  payloadHash: string;
+  approvedAt: string;
+  approvalExpiresAt: string;
+  attestationExpiresAt: string;
+  verifiedAt: string;
 };
 
 export type ExactHeadReviewReasonCode =
@@ -139,6 +154,45 @@ function isExactHeadReviewDisposition(
   );
 }
 
+function hasValidVerifiedIdentityEvidence(
+  evidence: ExactHeadVerifiedIdentityEvidence | null | undefined,
+  approval: ExactHeadReviewApproval
+) {
+  if (!evidence || typeof evidence !== "object" || Array.isArray(evidence)) {
+    return false;
+  }
+
+  const approvedAt = Date.parse(evidence.approvedAt);
+  const approvalExpiresAt = Date.parse(evidence.approvalExpiresAt);
+  const attestationExpiresAt = Date.parse(evidence.attestationExpiresAt);
+  const verifiedAt = Date.parse(evidence.verifiedAt);
+
+  return (
+    evidence.gateId === "exact-head-review" &&
+    evidence.decision === "approved" &&
+    evidence.verificationMethod === "ed25519-trusted-issuer" &&
+    typeof evidence.issuer === "string" &&
+    Boolean(evidence.issuer.trim()) &&
+    typeof evidence.keyId === "string" &&
+    Boolean(evidence.keyId.trim()) &&
+    sha256Pattern.test(evidence.reviewerIdentityHash) &&
+    sha256Pattern.test(evidence.approvalDigest) &&
+    sha256Pattern.test(evidence.signatureFingerprint) &&
+    sha256Pattern.test(evidence.payloadHash) &&
+    evidence.reviewerIdentityHash === approval.reviewerIdentityHash &&
+    evidence.approvalDigest === approval.approvalDigest &&
+    evidence.approvedAt === approval.issuedAt &&
+    evidence.approvalExpiresAt === approval.expiresAt &&
+    Number.isFinite(approvedAt) &&
+    Number.isFinite(approvalExpiresAt) &&
+    Number.isFinite(attestationExpiresAt) &&
+    Number.isFinite(verifiedAt) &&
+    approvedAt <= verifiedAt &&
+    verifiedAt < approvalExpiresAt &&
+    verifiedAt < attestationExpiresAt
+  );
+}
+
 function hasValidCandidate(candidate: ExactHeadReviewCandidate) {
   return (
     commitPattern.test(candidate.commitSha) &&
@@ -174,6 +228,7 @@ function buildResult(
 export function evaluateExactHeadReviewBinding(input: {
   candidate: ExactHeadReviewCandidate;
   approval?: ExactHeadReviewApproval | null;
+  verifiedIdentityEvidence?: ExactHeadVerifiedIdentityEvidence | null;
   consumedApprovalIds?: ReadonlySet<string>;
   evaluatedAt?: string;
 }): ExactHeadReviewResult {
@@ -220,7 +275,6 @@ export function evaluateExactHeadReviewBinding(input: {
     typeof approval.reviewerIdentityHash === "string" &&
     Array.isArray(approval.evidenceIds) &&
     approval.evidenceIds.every((value) => typeof value === "string") &&
-    typeof approval.trustedIdentityEvidenceVerified === "boolean" &&
     typeof approval.approvalDigest === "string";
   const approvalFieldsValid =
     approvalStructurallyValid &&
@@ -242,7 +296,7 @@ export function evaluateExactHeadReviewBinding(input: {
   if (consumedApprovalIds.has(approval.approvalId) || consumedApprovalIds.has(approval.replayNonce)) {
     reasons.push("exact-head-review-replay-rejected");
   }
-  if (!approval.trustedIdentityEvidenceVerified) {
+  if (!hasValidVerifiedIdentityEvidence(input.verifiedIdentityEvidence, approval)) {
     reasons.push("exact-head-review-untrusted-identity");
   }
   if (Number.isFinite(expiresAt) && Number.isFinite(evaluatedAtMs) && expiresAt <= evaluatedAtMs) {

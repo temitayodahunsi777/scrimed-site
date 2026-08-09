@@ -30,9 +30,9 @@ flowchart LR
 
 ### Merge-readiness approval evidence
 
-`release:merge-readiness` never infers exact-head approval from a boolean in the frozen baseline. It evaluates a complete approval artifact against the frozen candidate with `evaluateExactHeadReviewBinding`.
+`release:merge-readiness` never infers exact-head approval from a boolean in the frozen baseline. It evaluates a complete approval artifact against the frozen candidate with `evaluateExactHeadReviewBinding`, and it accepts reviewer identity only after Ed25519 verification against a configured trusted issuer.
 
-Provide the local, nonsecret approval artifact through `SCRIMED_EXACT_HEAD_APPROVAL_FILE` or `--approval-file <path>`. Missing, unreadable, malformed, stale, expired, future-dated, replayed, self-issued, digest-mismatched, or unsupported-disposition evidence fails closed. A GitHub review is human evidence, but it is not silently converted into the local cryptographic approval contract.
+Provide the local, nonsecret signed envelope through `SCRIMED_EXACT_HEAD_APPROVAL_FILE` or `--approval-file <path>`. The envelope contains `approval` plus one `identityEvidence` payload and its short-lived issuer attestation. Configure approved public keys and issuer scope through `SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON`; private keys never belong in this verifier or repository. Missing, unreadable, malformed, unsigned, untrusted, stale, expired, future-dated, replayed, self-issued, digest-mismatched, or unsupported-disposition evidence fails closed. A GitHub review is human evidence, but it is not silently converted into the local cryptographic approval contract.
 
 ## Validation
 

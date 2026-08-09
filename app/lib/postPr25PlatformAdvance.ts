@@ -3,6 +3,7 @@ import {
   calculateEconomicUnitModel,
   evaluateCapitalEfficiencyBudget
 } from "./economicUnitModel";
+import { exactHeadReviewBindingVersion } from "./exactHeadReviewBinding";
 import { getInvestorReadinessScorecard } from "./investorReadinessScorecard";
 import { evaluateMergeReadiness } from "./mergeReadiness";
 import { getScrimedOperatingModeSummary } from "./operatingMode";
@@ -151,7 +152,7 @@ export function getPostPr25PlatformAdvanceSummary() {
   });
   const mergeReadiness = evaluateMergeReadiness({
     exactHeadApproval: baseline.review.exactHeadApprovalRecorded,
-    exactHeadApprovalMatches: baseline.review.exactHeadApprovalRecorded,
+    exactHeadApprovalMatches: false,
     ciPassed:
       baseline.validation.githubActionsPassed === baseline.validation.githubActionsTotal,
     secretScanPassed: baseline.validation.secretScanFindings === 0,
@@ -176,7 +177,7 @@ export function getPostPr25PlatformAdvanceSummary() {
       status: baseline.review.state,
       approvalRecorded: baseline.review.exactHeadApprovalRecorded,
       acceptedHistoricalApproval: false as const,
-      bindingVersion: "scrimed-exact-head-review-binding-v1-2026-08-09",
+      bindingVersion: exactHeadReviewBindingVersion,
       allowedDispositions: [
         "APPROVE_EXACT_HEAD",
         "APPROVE_WITH_NONBLOCKING_NOTES",

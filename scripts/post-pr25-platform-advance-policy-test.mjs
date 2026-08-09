@@ -25,6 +25,10 @@ const summary = getPostPr25PlatformAdvanceSummary();
 assert.equal(summary.frozenReviewBaseline.headSha, "c15a79c76d59a2f94bb7f999469da8bbc1618d8c");
 assert.equal(summary.release.currentState, "REVIEW_REQUESTED");
 assert.equal(summary.mergeReadiness.status, "NOT_READY_FOR_MERGE");
+assert.equal(
+  summary.exactHeadReview.bindingVersion,
+  "scrimed-exact-head-review-binding-v3-2026-08-09"
+);
 assert.ok(
   summary.mergeReadiness.reasonCodes.includes("merge-exact-head-approval-missing")
 );
@@ -73,6 +77,27 @@ const unsupportedClaim = resolvePublicClaim({
 });
 assert.equal(unsupportedClaim.decision, "BLOCK");
 assert.equal(unsupportedClaim.publishable, false);
+
+const unpublishedQualitativeClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:unpublished-internal-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["claim:investor-platform-narrative", "source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-09T21:01:09.000Z",
+    publicationAuthorized: false,
+    syntheticOrEstimated: false
+  },
+  graph
+});
+assert.equal(unpublishedQualitativeClaim.decision, "BLOCK");
+assert.equal(unpublishedQualitativeClaim.publishable, false);
+assert.ok(
+  unpublishedQualitativeClaim.reasonCodes.includes(
+    "public-claim-publication-approval-missing"
+  )
+);
 
 const economics = calculateEconomicUnitModel({
   scenarioId: "policy-test",
