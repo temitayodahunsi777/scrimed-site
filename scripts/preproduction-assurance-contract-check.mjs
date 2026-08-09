@@ -90,8 +90,15 @@ requireText("scripts/verify-live-mobile.mjs", [
   "SCRIMED_PLAYWRIGHT_EXECUTABLE_PATH",
   "absolute Chrome/Chromium path",
   "...(executablePath ? { executablePath } : {})",
+  'waitUntil: "domcontentloaded"',
   "BLOCKED_ENVIRONMENT",
   "browser-launch-failed"
+]);
+requireText("scripts/verify-migration-dry-run.mjs", [
+  "drop schema if exists public cascade",
+  "drop schema if exists private cascade",
+  "drop schema if exists auth cascade",
+  "drop schema if exists extensions cascade"
 ]);
 requireText("package.json", [
   "test:preproduction-assurance",

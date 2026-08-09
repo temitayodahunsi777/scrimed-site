@@ -121,7 +121,7 @@ function inspectSchema(databaseUrl) {
 function resetDisposableSchema(databaseUrl) {
   runPsql(databaseUrl, [
     "--command",
-    "drop schema if exists public cascade; drop schema if exists auth cascade; drop schema if exists extensions cascade; create schema public; grant all on schema public to public;"
+    "drop schema if exists public cascade; drop schema if exists private cascade; drop schema if exists auth cascade; drop schema if exists extensions cascade; create schema public; grant all on schema public to public;"
   ]);
 }
 

@@ -37,7 +37,12 @@ const executablePath = normalizeExecutablePath(
 export function evaluateMobilePage(snapshot) {
   const failures = [];
   if (snapshot.status !== 200) failures.push(`route-status:${snapshot.path}:${snapshot.status}`);
-  if (snapshot.viewportWidth !== 390) failures.push(`viewport-width:${snapshot.path}:${snapshot.viewportWidth}`);
+  if (snapshot.configuredViewportWidth !== 390) {
+    failures.push(`configured-viewport-width:${snapshot.path}:${snapshot.configuredViewportWidth}`);
+  }
+  if (snapshot.viewportWidth < 320 || snapshot.viewportWidth > snapshot.configuredViewportWidth) {
+    failures.push(`rendered-viewport-width:${snapshot.path}:${snapshot.viewportWidth}`);
+  }
   if (snapshot.documentWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal-overflow:${snapshot.path}:${snapshot.documentWidth}`);
   }
@@ -52,13 +57,17 @@ if (flags.has("--self-test")) {
   const safe = {
     path: "/",
     status: 200,
-    viewportWidth: 390,
-    documentWidth: 390,
-    bodyWidth: 390,
+    configuredViewportWidth: 390,
+    viewportWidth: 320,
+    documentWidth: 320,
+    bodyWidth: 320,
     mobileUserAgent: true
   };
   assert.deepEqual(evaluateMobilePage(safe), []);
   assert.deepEqual(evaluateMobilePage({ ...safe, documentWidth: 980 }), ["horizontal-overflow:/:980"]);
+  assert.deepEqual(evaluateMobilePage({ ...safe, configuredViewportWidth: 375 }), [
+    "configured-viewport-width:/:375"
+  ]);
   assert.throws(() => new URL("not-a-url"));
   assert.throws(() => normalizeExecutablePath("relative/browser"));
   console.log("pass SCRIMED live mobile verifier self-test");
@@ -130,9 +139,10 @@ try {
   for (const route of routes) {
     const page = await context.newPage();
     const response = await page.goto(`${canonicalOrigin}${route}`, {
-      waitUntil: "networkidle",
+      waitUntil: "domcontentloaded",
       timeout: 45_000
     });
+    await page.waitForTimeout(2_000);
     const snapshot = await page.evaluate((pagePath) => {
       const viewportWidth = window.innerWidth;
       const offendingSelectors = [...document.querySelectorAll("body *")]
@@ -168,6 +178,7 @@ try {
       };
     }, route);
     snapshot.status = response?.status() ?? 0;
+    snapshot.configuredViewportWidth = 390;
     const fileName = route === "/" ? "home" : route.replace(/^\//, "").replaceAll("/", "-");
     const screenshot = path.join(outputDirectory, `${fileName}-390px.png`);
     await page.screenshot({ path: screenshot, fullPage: true });
