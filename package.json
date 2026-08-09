@@ -13,6 +13,7 @@
     "smoke:public:local": "node scripts/scrimed-local-public-smoke-runner.mjs",
     "contract:script-registry": "node scripts/script-registry-contract-check.mjs",
     "contract:ci-workflows": "node scripts/ci-workflow-contract-check.mjs",
+    "test:vercel-production-deployment-policy": "node scripts/vercel-production-deployment-policy-test.mjs",
     "contract:release-provenance": "node scripts/release-provenance-contract-check.mjs",
     "contract:design-governance": "node scripts/design-governance-contract-check.mjs",
     "contract:public-claims-integrity": "node scripts/public-claims-integrity-contract-check.mjs",

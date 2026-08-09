@@ -35,6 +35,8 @@ The production environment values are non-secret release controls, but only a na
 
 Missing required Git evidence, a dirty source tree, missing Vercel source attestation, SHA mismatch, a non-main production source, or a missing production attestation fails closed. The candidate manifest and provenance preflight do not print secrets, changed filenames, file contents, or raw diffs.
 
+Automatic Vercel production deployment from `main` is disabled in `vercel.json`. Preview branches remain enabled. A reviewed merge therefore remains separate from production deployment; an authorized release owner must explicitly deploy or promote the exact approved commit and retain the resulting Vercel receipt.
+
 ## Boundary
 
 This control verifies source identity. It does not deploy, commit, push, apply migrations, authorize PHI, approve clinical use, certify compliance, or approve customer go-live.

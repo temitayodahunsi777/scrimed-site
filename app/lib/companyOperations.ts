@@ -71,19 +71,19 @@ export const operationsBlockers: OperationsBlocker[] = [
     id: "vercel-cli",
     area: "deployment",
     status: "ready",
-    blocker: "Vercel Git deployment path is working from GitHub `main`.",
+    blocker: "Automatic Vercel production deployment from GitHub `main` is intentionally disabled.",
     impact:
-      "Production deploys can proceed through GitHub push even without a local Vercel CLI install.",
+      "Merging reviewed code cannot silently cross the separate production-deployment authorization gate.",
     currentEvidence:
-      "Vercel production deploys from pushed GitHub `main` commits and has returned READY for the latest pushed SCRIMED product builds.",
+      "`vercel.json` keeps branch previews available while setting `git.deploymentEnabled.main` to false.",
     owner: "Engineering",
     resolutionPath: [
-      "Use GitHub push as the primary deploy trigger.",
-      "Monitor Vercel production deployments after each pushed commit.",
-      "Install Vercel CLI only if manual deployment, env management, or domain operations require it."
+      "Merge only an exact reviewed candidate after repository approval.",
+      "Require a distinct deployment authorization naming the exact commit, environment, window, and rollback owner.",
+      "Use an authorized Vercel production deployment or promotion and retain its deployment receipt."
     ],
     fallback:
-      "Use the Vercel dashboard or connector inspection if the CLI is unavailable."
+      "Keep the current verified production deployment active until an authorized release can be promoted."
   },
   {
     id: "app-subdomain",

@@ -36,6 +36,10 @@ const checks = [
     args: ["scripts/ci-workflow-contract-check.mjs"]
   },
   {
+    label: "Vercel production deployment policy",
+    args: ["scripts/vercel-production-deployment-policy-test.mjs"]
+  },
+  {
     label: "release provenance contract",
     args: ["scripts/release-provenance-contract-check.mjs"]
   },

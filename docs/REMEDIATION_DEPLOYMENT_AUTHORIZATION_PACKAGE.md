@@ -67,9 +67,11 @@ Production application remains blocked. See `docs/PENDING_MIGRATION_AUTHORIZATIO
 
 ## Deployment Workflow
 
-Use the repository's normal reviewed Git/Vercel workflow for the exact approved commit. Do not
-use an ad hoc local production deployment. A deployment owner must record the workflow/run URL,
-environment, actor, authorization reference, and deployed commit.
+Automatic production deployment from `main` is disabled by the repository's Vercel policy.
+After merge, a named deployment owner must explicitly deploy or promote the exact approved commit
+through the governed Vercel workflow. Record the workflow/run URL, environment, actor,
+authorization reference, deployed commit, and rollback target. Do not use an unreviewed ad hoc
+deployment.
 
 ## Post-Deployment Verification
 
