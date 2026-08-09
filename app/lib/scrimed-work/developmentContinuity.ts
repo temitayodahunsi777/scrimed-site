@@ -30,6 +30,19 @@ export type DevelopmentContinuityStatus =
 
 export type DevelopmentContinuityEffort = "small" | "medium" | "large";
 
+export type DevelopmentStrategicValueFactors = {
+  marketValue: 1 | 2 | 3 | 4 | 5;
+  moatContribution: 1 | 2 | 3 | 4 | 5;
+  evidenceGain: 1 | 2 | 3 | 4 | 5;
+  crossSellPotential: 1 | 2 | 3 | 4 | 5;
+  investorRelevance: 1 | 2 | 3 | 4 | 5;
+  implementationEffort: 1 | 2 | 3 | 4 | 5;
+  regulatoryRisk: 1 | 2 | 3 | 4 | 5;
+  securityRisk: 1 | 2 | 3 | 4 | 5;
+  capitalCost: 1 | 2 | 3 | 4 | 5;
+  dependencyRisk: 1 | 2 | 3 | 4 | 5;
+};
+
 export type DevelopmentContinuityAction = {
   action: ReviewAction;
   title: string;
@@ -37,6 +50,8 @@ export type DevelopmentContinuityAction = {
   owner: string;
   priority: number;
   expectedStrategicImpact: 1 | 2 | 3 | 4 | 5;
+  strategicValueScore: number;
+  strategicValueFactors: DevelopmentStrategicValueFactors;
   effort: DevelopmentContinuityEffort;
   dependencies: string[];
   valueHypothesis: string;
@@ -80,6 +95,10 @@ export type DevelopmentContinuityPlan = {
   counts: Record<DevelopmentContinuityStatus, number>;
   recommendedAction: DevelopmentContinuityAction | null;
   bestNextAction: DevelopmentContinuityAction | null;
+  bestLowRiskAction: DevelopmentContinuityAction | null;
+  bestMoatAction: DevelopmentContinuityAction | null;
+  bestRevenueAction: DevelopmentContinuityAction | null;
+  bestInvestorReadinessAction: DevelopmentContinuityAction | null;
   priorityActions: DevelopmentContinuityAction[];
   actions: DevelopmentContinuityAction[];
   retainedBoundaries: string[];
@@ -328,6 +347,90 @@ const actionImpact: Partial<Record<ReviewAction, 1 | 2 | 3 | 4 | 5>> = {
   "clinical-execution": 5
 };
 
+function buildStrategicValueFactors(
+  action: ReviewAction,
+  catalog: ContinuityCatalogItem
+): DevelopmentStrategicValueFactors {
+  const impact = actionImpact[action] ?? 3;
+  const effort = effortForAction(action);
+  const implementationEffort = effort === "small" ? 1 : effort === "medium" ? 2 : 4;
+
+  if (action === "synthetic-demonstration") {
+    return {
+      marketValue: 4,
+      moatContribution: 3,
+      evidenceGain: 5,
+      crossSellPotential: 4,
+      investorRelevance: 5,
+      implementationEffort,
+      regulatoryRisk: 1,
+      securityRisk: 1,
+      capitalCost: 1,
+      dependencyRisk: 1
+    };
+  }
+  if (action === "source-commit") {
+    return {
+      marketValue: 3,
+      moatContribution: 5,
+      evidenceGain: 5,
+      crossSellPotential: 3,
+      investorRelevance: 5,
+      implementationEffort,
+      regulatoryRisk: 1,
+      securityRisk: 2,
+      capitalCost: 1,
+      dependencyRisk: 2
+    };
+  }
+  if (action === "disposable-migration-dry-run") {
+    return {
+      marketValue: 3,
+      moatContribution: 4,
+      evidenceGain: 5,
+      crossSellPotential: 3,
+      investorRelevance: 4,
+      implementationEffort,
+      regulatoryRisk: 2,
+      securityRisk: 2,
+      capitalCost: 2,
+      dependencyRisk: 2
+    };
+  }
+
+  return {
+    marketValue: impact,
+    moatContribution: catalog.productionTarget ? 4 : 3,
+    evidenceGain: catalog.externalAction ? 4 : 3,
+    crossSellPotential: catalog.productionTarget ? 5 : 3,
+    investorRelevance: catalog.irreversible ? 4 : 3,
+    implementationEffort,
+    regulatoryRisk: catalog.clinicalFacing ? 5 : catalog.irreversible ? 4 : 2,
+    securityRisk: catalog.touchesPhi ? 5 : catalog.externalAction ? 3 : 2,
+    capitalCost: catalog.productionTarget ? 4 : 2,
+    dependencyRisk: catalog.productionTarget ? 5 : 3
+  };
+}
+
+export function calculateDevelopmentStrategicValue(
+  factors: DevelopmentStrategicValueFactors
+) {
+  const value =
+    factors.marketValue *
+    factors.moatContribution *
+    factors.evidenceGain *
+    factors.crossSellPotential *
+    factors.investorRelevance;
+  const risk =
+    factors.implementationEffort *
+    factors.regulatoryRisk *
+    factors.securityRisk *
+    factors.capitalCost *
+    factors.dependencyRisk;
+
+  return Math.round((value / Math.max(risk, 1)) * 100) / 100;
+}
+
 function effortForAction(action: ReviewAction): DevelopmentContinuityEffort {
   if (["synthetic-demonstration", "preview-deployment", "wix-publication"].includes(action)) {
     return "small";
@@ -426,6 +529,10 @@ function buildAction(
     clinicalFacing: catalog.clinicalFacing,
     productionTarget: catalog.productionTarget
   });
+  const strategicValueFactors = buildStrategicValueFactors(action, catalog);
+  const strategicValueScore = calculateDevelopmentStrategicValue(
+    strategicValueFactors
+  );
   const payload = {
     action,
     policyVersion: scrimedReviewPolicyVersion,
@@ -436,7 +543,9 @@ function buildAction(
     missingEvidence,
     requiredReviewerRoles,
     operatingModeBlockReason: modeBlockReason,
-    automationDecision: automationDecision.decision
+    automationDecision: automationDecision.decision,
+    strategicValueFactors,
+    strategicValueScore
   };
 
   return {
@@ -446,6 +555,8 @@ function buildAction(
     owner: catalog.owner,
     priority: catalog.priority,
     expectedStrategicImpact: actionImpact[action] ?? 3,
+    strategicValueScore,
+    strategicValueFactors,
     effort: effortForAction(action),
     dependencies: [...(actionDependencies[action] ?? requirement.requiredEvidence)],
     valueHypothesis: valueHypothesisForAction(action, catalog.title),
@@ -504,6 +615,42 @@ export function buildDevelopmentContinuityPlan(input: {
     }
   );
   const recommendedAction = actions.find((action) => action.automaticExecutionEligible) ?? null;
+  const rankedAdvisoryActions = actions
+    .filter((action) => action.preparationAllowed)
+    .sort(
+      (left, right) =>
+        right.strategicValueScore - left.strategicValueScore ||
+        left.priority - right.priority
+    );
+  const bestNextAction = rankedAdvisoryActions[0] ?? null;
+  const bestLowRiskAction =
+    rankedAdvisoryActions.find(
+      (action) => action.riskTier === 0 || action.riskTier === 1
+    ) ?? null;
+  const bestMoatAction =
+    [...rankedAdvisoryActions].sort(
+      (left, right) =>
+        right.strategicValueFactors.moatContribution -
+          left.strategicValueFactors.moatContribution ||
+        right.strategicValueScore - left.strategicValueScore
+    )[0] ?? null;
+  const bestRevenueAction =
+    [...rankedAdvisoryActions].sort((left, right) => {
+      const rightRevenue =
+        right.strategicValueFactors.marketValue *
+        right.strategicValueFactors.crossSellPotential;
+      const leftRevenue =
+        left.strategicValueFactors.marketValue *
+        left.strategicValueFactors.crossSellPotential;
+      return rightRevenue - leftRevenue || right.strategicValueScore - left.strategicValueScore;
+    })[0] ?? null;
+  const bestInvestorReadinessAction =
+    [...rankedAdvisoryActions].sort(
+      (left, right) =>
+        right.strategicValueFactors.investorRelevance -
+          left.strategicValueFactors.investorRelevance ||
+        right.strategicValueScore - left.strategicValueScore
+    )[0] ?? null;
   const priorityActions = actions.filter(
     (action) => action.priority <= 60 || action.status === "PROHIBITED"
   );
@@ -538,7 +685,11 @@ export function buildDevelopmentContinuityPlan(input: {
     actionCount: actions.length,
     counts,
     recommendedAction,
-    bestNextAction: recommendedAction,
+    bestNextAction,
+    bestLowRiskAction,
+    bestMoatAction,
+    bestRevenueAction,
+    bestInvestorReadinessAction,
     priorityActions,
     actions,
     retainedBoundaries,

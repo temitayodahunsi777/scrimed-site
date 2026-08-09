@@ -162,6 +162,10 @@ main {
   z-index: 70;
 }
 
+.site-navigation-group:not([open]) > .site-navigation-menu {
+  display: none;
+}
+
 .site-navigation-menu p {
   color: var(--muted);
   font-size: 14px;
@@ -548,6 +552,15 @@ h3 {
   display: grid;
   gap: 48px;
   grid-template-columns: 0.95fr 1.05fr;
+}
+
+.exact-head-identity > * {
+  min-width: 0;
+}
+
+.exact-head-identity p,
+.exact-head-identity code {
+  overflow-wrap: anywhere;
 }
 
 .layer-list {

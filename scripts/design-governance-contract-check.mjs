@@ -35,6 +35,11 @@ for (const token of ["--ink", "--muted", "--line", "--surface", "--green", "--go
   requireIncludes("app/globals.css", token);
 }
 
+requireIncludes(
+  "app/globals.css",
+  ".site-navigation-group:not([open]) > .site-navigation-menu"
+);
+
 requireIncludes("app/lib/scrimed-control-plane/platformEvidence.ts", "figma-design-governance");
 requireIncludes("package.json", '"contract:design-governance": "node scripts/design-governance-contract-check.mjs"');
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/design-governance-contract-check.mjs");

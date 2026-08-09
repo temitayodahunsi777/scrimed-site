@@ -1,0 +1,49 @@
+# Post-PR25 Platform Advance
+
+## Architecture
+
+```mermaid
+flowchart LR
+  A["Frozen PR #25 candidate"] --> B["Exact-head review binding"]
+  B --> C["Release state machine"]
+  C --> D["Merge readiness verifier"]
+  A --> E["Follow-on development branch"]
+  E --> F["Evidence graph and claim resolver"]
+  E --> G["Investor and partner readiness"]
+  E --> H["Moat and unit-economics registries"]
+  E --> I["Synthetic pilot factory"]
+  F --> J["SCRIMED Work reviewer and executive views"]
+  G --> J
+  H --> J
+  I --> J
+```
+
+## Controls
+
+- Exact review requires a trusted identity result, exact commit and evidence fingerprints, critical-surface fingerprints, required evidence, expiry, digest integrity, separation of duties, and replay protection.
+- Release transitions are explicit and require evidence at each stage.
+- Merge preflight reports readiness but cannot merge.
+- The evidence graph verifies node/edge integrity and blocks unsupported public claims.
+- Investor and partner scores are internal planning tools, not predictions, guarantees, or relationship claims.
+- Economic outputs retain `UNAVAILABLE` rather than inventing revenue, margin, payback, or value.
+- The pilot factory is synthetic/no-PHI and cannot submit, write back, or activate a customer.
+
+## Validation
+
+Run:
+
+```text
+npm run test:exact-head-review-binding
+npm run test:release-state-machine
+npm run test:merge-readiness
+npm run test:post-pr25-platform-advance
+npm run evidence:post-pr25-platform
+npm run evidence:post-pr25-platform:check
+npm run typecheck
+npm run lint
+npm run test:nonsecret
+npm run build
+git diff --check
+```
+
+The follow-on branch grants no review, merge, production, migration, PHI, clinical, payer, EHR, device, certification, customer, partnership, investor-distribution, or commercial authority.

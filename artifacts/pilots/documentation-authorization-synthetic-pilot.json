@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "scrimed.synthetic-pilot.v1",
+  "definition": {
+    "pilotId": "pilot-documentation-authorization-synthetic-v1",
+    "title": "Documentation Before Authorization Synthetic Pilot",
+    "workflow": "prior-authorization-documentation-preparation",
+    "objective": "Evaluate whether SCRIMED can identify documentation gaps and prepare a cited review packet without submission or coverage determination.",
+    "stage": "success-criteria",
+    "baseline": [
+      "Synthetic cases only",
+      "Manual gap-identification time not yet measured",
+      "No production payer or EHR connection"
+    ],
+    "successCriteria": [
+      "All criteria findings cite the supplied synthetic policy fixture",
+      "Missing evidence produces abstention or human review",
+      "No payer submission or record mutation is possible",
+      "Reviewer correction and elapsed time are captured"
+    ],
+    "workflowTwin": {
+      "actors": [
+        "synthetic coordinator",
+        "documentation reviewer",
+        "payer-policy reviewer"
+      ],
+      "systems": [
+        "SCRIMED Work",
+        "synthetic policy corpus",
+        "evidence ledger"
+      ],
+      "inputs": [
+        "synthetic case",
+        "synthetic payer criteria"
+      ],
+      "outputs": [
+        "documentation gap list",
+        "review packet draft",
+        "verification result"
+      ],
+      "handoffs": [
+        "agent preparation to independent human review"
+      ],
+      "latencyAssumptions": [
+        "interactive preparation target recorded as a scenario input"
+      ],
+      "failureModes": [
+        "missing policy evidence",
+        "contradictory criteria",
+        "unsupported claim",
+        "review rejection"
+      ],
+      "costInputs": [
+        "inference",
+        "retrieval",
+        "review",
+        "retry",
+        "correction"
+      ],
+      "evidenceRequirements": [
+        "source citations",
+        "policy version",
+        "review disposition",
+        "cost inputs",
+        "boundary receipt"
+      ]
+    },
+    "limitations": [
+      "SYNTHETIC pilot; no customer, clinical, payer, revenue, or production outcome is represented.",
+      "No causal, savings, denial-reduction, or ROI claim is permitted.",
+      "Expansion requires independent review and separately authorized operating scope."
+    ],
+    "safetyStatus": "SYNTHETIC_NO_PHI_DECISION_SUPPORT_ONLY",
+    "expansionDecision": "NOT_EVALUATED",
+    "externalActionsEnabled": false,
+    "pilotFingerprint": "7df444d667acb6a4b124032f7f016093574d3b6049490f972dc7abd08780121b"
+  },
+  "evidencePack": {
+    "pilotId": "pilot-documentation-authorization-synthetic-v1",
+    "label": "SYNTHETIC",
+    "objective": "Evaluate whether SCRIMED can identify documentation gaps and prepare a cited review packet without submission or coverage determination.",
+    "baseline": [
+      "Synthetic cases only",
+      "Manual gap-identification time not yet measured",
+      "No production payer or EHR connection"
+    ],
+    "workflow": {
+      "actors": [
+        "synthetic coordinator",
+        "documentation reviewer",
+        "payer-policy reviewer"
+      ],
+      "systems": [
+        "SCRIMED Work",
+        "synthetic policy corpus",
+        "evidence ledger"
+      ],
+      "inputs": [
+        "synthetic case",
+        "synthetic payer criteria"
+      ],
+      "outputs": [
+        "documentation gap list",
+        "review packet draft",
+        "verification result"
+      ],
+      "handoffs": [
+        "agent preparation to independent human review"
+      ],
+      "latencyAssumptions": [
+        "interactive preparation target recorded as a scenario input"
+      ],
+      "failureModes": [
+        "missing policy evidence",
+        "contradictory criteria",
+        "unsupported claim",
+        "review rejection"
+      ],
+      "costInputs": [
+        "inference",
+        "retrieval",
+        "review",
+        "retry",
+        "correction"
+      ],
+      "evidenceRequirements": [
+        "source citations",
+        "policy version",
+        "review disposition",
+        "cost inputs",
+        "boundary receipt"
+      ]
+    },
+    "intervention": "Governed, cited, human-reviewed workflow preparation",
+    "evidence": [
+      "source citations",
+      "policy version",
+      "review disposition",
+      "cost inputs",
+      "boundary receipt"
+    ],
+    "outcomes": [],
+    "limitations": [
+      "SYNTHETIC pilot; no customer, clinical, payer, revenue, or production outcome is represented.",
+      "No causal, savings, denial-reduction, or ROI claim is permitted.",
+      "Expansion requires independent review and separately authorized operating scope."
+    ],
+    "cost": "UNAVAILABLE",
+    "value": "UNAVAILABLE",
+    "safetyStatus": "SYNTHETIC_NO_PHI_DECISION_SUPPORT_ONLY",
+    "expansionDecision": "REVIEW_REQUIRED",
+    "productionAuthorityGranted": false,
+    "evidencePackHash": "62b6723e5c9822ec2fcaa3aad575e4e8cb426c676a47b011a4864e06ccaa55fa"
+  }
+}

@@ -53,6 +53,7 @@ import { buildDevelopmentContinuityPlan } from "./developmentContinuity";
 import { priorAuthorizationFoundryBlueprint } from "./foundry";
 import { getClinicalAgentSreSummary } from "../clinicalAgentSre";
 import { getClinicalAssuranceControlPlaneSummary } from "../clinicalAssuranceControlPlane";
+import { getPostPr25PlatformAdvanceSummary } from "../postPr25PlatformAdvance";
 import { isScrimedWorkMigrationSetVerified } from "./migrationSet";
 import {
   buildPayerIqProtectedWorkSession,
@@ -280,6 +281,7 @@ export function getScrimedWorkSummary() {
     reviewPolicy,
     reviewPolicyPreflight,
     developmentContinuity,
+    postPr25PlatformAdvance: getPostPr25PlatformAdvanceSummary(),
     lifecycle: sessions.map(getWorkSessionLifecycleSnapshot),
     governanceStatus: {
       definitionOfDoneRequired: true,
