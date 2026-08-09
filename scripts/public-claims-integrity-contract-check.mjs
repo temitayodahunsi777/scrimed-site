@@ -20,15 +20,39 @@ function requireText(relativePath, values) {
 }
 
 requireText("scripts/public-claims-integrity-smoke.mjs", [
-  "unsubstantiated-named-testimonial",
-  "unverified-market-recognition",
-  "unverified-novelty-superlative",
-  "no-patient-information-disclosure",
+  "./lib/public-claims-policy.mjs",
+  "evaluatePublicClaimsIntegrity",
   "publicClaimsReleaseAllowed",
   "--self-test"
 ]);
+requireText("scripts/lib/public-claims-policy.mjs", [
+  "config/public-claims-policy.json",
+  "hasUnnegatedMarker",
+  "evaluatePublicClaimsIntegrity",
+  "missingDisclosures"
+]);
+requireText("config/public-claims-policy.json", [
+  "unsubstantiated-named-testimonial",
+  "unverified-physical-location",
+  "spiritually governed healthtech platform",
+  "unsupported-vitals-alert-claim",
+  "actionable clinical trends",
+  "patient-condition insights",
+  "real-time, accurate patient data analysis",
+  "unsupported-autonomous-care-claim",
+  "no-phi-disclosure",
+  "synthetic-status-disclosure",
+  "human-review-disclosure"
+]);
+requireText("app/lib/publicClaimsPolicy.ts", [
+  "evaluatePublicClaims",
+  "getPublicClaimsPolicySummary",
+  "publication permission",
+  "qualified human approval"
+]);
 requireText("docs/public-claims-integrity.md", [
-  "Proof Before Promises",
+  "Validation and Evidence",
+  "Building with clinicians, health systems, and innovators.",
   "Do not submit patient information",
   "Voice Intake Assistant` form accepted",
   "verified as disabled at revision 2",
@@ -37,8 +61,9 @@ requireText("docs/public-claims-integrity.md", [
 ]);
 requireText("app/lib/scrimed-control-plane/platformEvidence.ts", [
   "public-claims-integrity-smoke.mjs",
-  "static Wix Editor content",
-  "Voice Intake Assistant form was disabled",
+  "Latest repository-held direct-live Wix report",
+  "16 FaithCore publication mismatches",
+  "The current strict verification attempt failed closed",
   "external-action-required"
 ]);
 requireText("package.json", [
@@ -47,4 +72,4 @@ requireText("package.json", [
   '"test:wix-public-claims-policy"'
 ]);
 
-console.log("pass SCRIMED public-claims integrity contract check (4 files verified)");
+console.log("pass SCRIMED public-claims integrity contract check (7 files verified)");

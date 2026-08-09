@@ -42,6 +42,13 @@ const localSupabaseConfigured = Boolean(
 const localServerTokenConfigured = Boolean(process.env.SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN);
 const protectedWritesFlag = envFlag("SCRIMED_EXECUTION_ATTEMPT_DURABLE_STORE_ENABLED");
 const operatorReady = tokenAnalysis.ok;
+const browserSessionWorkaround = {
+  url: "https://app.scrimedsolutions.com/pilot-workspace/access",
+  requires: "Fresh AAL2 tenant-admin or pilot-lead browser session",
+  actions: ["Run SCRIMED Work Verification", "Run Tenant Verification"],
+  retainedBoundary:
+    "Uses the active browser session without exporting a bearer token; synthetic metadata only."
+};
 
 const gates = [
   gate(
@@ -63,7 +70,7 @@ const gates = [
     operatorReady ? "target-required" : "blocked",
     operatorReady
       ? "Protected SCRIMED APIs remain the source of truth for tenant-admin, pilot-lead, or reviewer authorization."
-      : "Role cannot be verified until a valid short-lived AAL2 bearer token is supplied.",
+      : "CLI role verification requires a valid short-lived token. The protected browser verifier can use an active AAL2 session without exporting bearer material.",
     "Use a tenant-admin, pilot-lead, or reviewer session for durable-store; stored-vector registration requires tenant-admin or pilot-lead."
   ),
   gate(
@@ -107,6 +114,7 @@ const report = {
   tokenLifetimeSeconds: tokenAnalysis.tokenLifetimeSeconds,
   localTarget,
   gates,
+  browserSessionWorkaround,
   nextCommands: operatorReady
     ? [
         "npm run smoke:aal2:durable-store:strict",
@@ -121,6 +129,7 @@ const report = {
     "no live patient data",
     "no autonomous diagnosis, treatment, prescribing, outreach, payer submission, billing submission, or EHR writeback",
     "no token logging",
+    "browser-session verification is preferred when interactive AAL2 access is available",
     "protected APIs remain the source of truth for signature, role, AAL2 session, tenant membership, server token, and feature flags"
   ]
 };
@@ -135,6 +144,15 @@ if (jsonMode) {
 
   for (const item of report.gates) {
     console.log(`${item.status} ${item.id}: ${item.detail}`);
+  }
+
+  if (!operatorReady) {
+    console.log("browser-safe alternative:");
+    console.log(`  Open ${browserSessionWorkaround.url}`);
+    for (const action of browserSessionWorkaround.actions) {
+      console.log(`  ${action}`);
+    }
+    console.log(`  ${browserSessionWorkaround.retainedBoundary}`);
   }
 
   console.log("next:");

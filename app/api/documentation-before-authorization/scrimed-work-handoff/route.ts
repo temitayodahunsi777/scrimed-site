@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     "X-SCRIMED-Artifact-Review": "independent-aal2-reviewer-required",
     "X-SCRIMED-External-Distribution": "not-authorized",
     "X-SCRIMED-Payer-Submission": "not-authorized"
-  });
+  }, request);
 
   if (!result.allowed) {
     return NextResponse.json(result.error, { status: result.status, headers });

@@ -1,0 +1,24 @@
+# SCRIMED repository ownership establishes review routing only. It is not approval evidence.
+* @temitayodahunsi777
+
+# Clinical safety, evidence, and healthcare interoperability
+/app/lib/clinical* @temitayodahunsi777
+/app/lib/scrimedClinical* @temitayodahunsi777
+/docs/clinical* @temitayodahunsi777
+/supabase/migrations/ @temitayodahunsi777
+
+# Identity, policy, security, privacy, and release controls
+/app/lib/scrimed-work/ @temitayodahunsi777
+/app/lib/*Security* @temitayodahunsi777
+/app/lib/*Governance* @temitayodahunsi777
+/app/lib/*Release* @temitayodahunsi777
+/scripts/*security* @temitayodahunsi777
+/scripts/*release* @temitayodahunsi777
+/SECURITY.md @temitayodahunsi777
+
+# Supply chain, CI, generated integrity, and public claims
+/.github/ @temitayodahunsi777
+/package.json @temitayodahunsi777
+/package-lock.json @temitayodahunsi777
+/scripts/check-generated-integrity.mjs @temitayodahunsi777
+/scripts/public-claims-integrity-* @temitayodahunsi777

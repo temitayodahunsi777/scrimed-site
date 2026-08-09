@@ -97,11 +97,13 @@ function parseItem(value: unknown): ScrimedWorkCompletionEvidenceItem | null {
     item.completionEvidenceBound === true &&
     isString(item.reviewEventId, /^[a-f0-9-]{36}$/i) &&
     isString(item.completionEventId, /^[a-f0-9-]{36}$/i) &&
+    item.reviewEventId !== item.completionEventId &&
     isString(item.reviewDecisionHash, /^scrimed-work-artifact-review-[a-f0-9]{64}$/) &&
     isString(item.lifecycleDecisionHash, /^scrimed-work-lifecycle-[a-f0-9]{8}$/) &&
     isString(item.evidencePacketHash, /^scrimed-work-completion-evidence-[a-f0-9]{64}$/) &&
     isIsoTimestamp(item.reviewedAt) &&
     isIsoTimestamp(item.completedAt) &&
+    Date.parse(item.reviewedAt) <= Date.parse(item.completedAt) &&
     item.syntheticOnly === true &&
     item.noPhi === true &&
     item.humanReviewRequired === true &&

@@ -20,12 +20,12 @@ export async function POST(request: Request) {
   if (!result.allowed) {
     return NextResponse.json(result.error, {
       status: result.status,
-      headers: scrimedWorkHeaders({ "X-SCRIMED-Write-Authority": "fail-closed" })
+      headers: scrimedWorkHeaders({ "X-SCRIMED-Write-Authority": "fail-closed" }, request)
     });
   }
 
   return NextResponse.json(wrapWorkData(result.data, result.data.session.id), {
     status: result.status,
-    headers: scrimedWorkHeaders({ "X-SCRIMED-Write-Authority": "authorized-aal2-durable-write" })
+    headers: scrimedWorkHeaders({ "X-SCRIMED-Write-Authority": "authorized-aal2-durable-write" }, request)
   });
 }

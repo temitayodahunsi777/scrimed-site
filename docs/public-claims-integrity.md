@@ -4,7 +4,9 @@
 
 The public-claims integrity gate prevents unsupported customer, outcome, market-leadership, novelty, physical-location, clinical, privacy, certification, and compliance language from being treated as approved marketing evidence.
 
-The July 11, 2026 review found a named testimonial and other claims on the published Wix site without matching authorization or substantiation in the SCRIMED evidence graph. The Wix CMS inventory contains no testimonial collection, which means the affected content is static Wix Editor content and cannot be corrected safely through the CMS API.
+The July 23, 2026 review found a named testimonial, outcome language, an unverified street
+address, Shop navigation, and unsafe vitals positioning on the published Wix site without
+matching authorization or substantiation in the SCRIMED evidence graph.
 
 ## Immediate Containment Completed
 
@@ -12,24 +14,27 @@ The review also found three enabled Wix forms. The `Voice Intake Assistant` form
 
 Two general contact forms remain enabled and contain unrestricted free-text fields without a schema-level no-PHI disclosure. They must be corrected in Wix Editor or through a separately reviewed full-schema update before SCRIMED represents the marketing site as privacy-ready.
 
-## Required Wix Correction
+## Published Remediation
 
-1. Open the published site's Home page in Wix Editor.
-2. Remove the entire `Hear from Our Clients` section, including the named testimonial.
-3. Replace it with:
-   - Eyebrow: `Proof Before Promises`
-   - Heading: `Inspect the evidence behind SCRIMED.`
-   - Body: `Review no-PHI demonstrations, governance controls, interoperability evidence, and clearly bounded pilot-readiness artifacts before making a buying decision.`
-   - Primary action: `Review the Trust Center`
-   - Secondary action: `Request a Governed Demo`
-   - Disclosure: `Synthetic demonstration and decision-support scope only. Do not submit patient information through this website.`
-4. Remove or substantiate unsupported recognition, market-leadership, novelty, outcome, and physical-location claims identified by the smoke.
-5. Add `Do not submit patient information` next to both remaining contact forms and every chat, booking, upload, and free-text collection surface.
-6. Keep the `Voice Intake Assistant` form disabled until the privacy owner approves its exact purpose, fields, retention, consent language, and no-PHI boundary.
-7. Preview desktop and mobile layouts, obtain Founder, legal, privacy, and marketing review, then publish only the approved page changes.
-8. Run `npm run smoke:wix-public-claims` and retain the dated pass result.
+The Wix owner-authenticated remediation was published on July 24 and automatically revalidated
+on July 27, 2026. The current site:
 
-Publishing through Wix Editor can include unrelated draft changes. The site owner must review the Wix change history and preview before publishing; SCRIMED automation must not issue a blind whole-site publish.
+- uses `Validation and Evidence` and `Building with clinicians, health systems, and innovators.`
+  instead of unverified testimonial content;
+- removes the named testimonial, unsupported outcomes, unverified address/telephone data,
+  ratings/reviews, template products, and the Wix Stores checkout app;
+- uses Atlas-first enterprise metadata and keeps FaithCore optional and clinically neutral;
+- frames Vitals as a synthetic-data workflow demonstration;
+- retains the public boundary `Do not submit patient information` through the stricter
+  no-PHI notices on public collection surfaces;
+- keeps the `Voice Intake Assistant` form accepted as a historical finding but verified as
+  disabled at revision 2;
+- preserves noindexed Wix Bookings system pages without exposing store catalog routes.
+
+The exact operator and verification records are:
+
+- `docs/WIX_OPERATOR_EXECUTION_PACKET.md`
+- `docs/WIX_PUBLICATION_VERIFICATION_REPORT.md`
 
 ## Commands
 
@@ -38,9 +43,20 @@ npm run test:wix-public-claims-policy
 npm run contract:public-claims-integrity
 npm run check:wix-public-claims
 npm run smoke:wix-public-claims
+npm run contract:wix-publication-verification
+npm run test:wix-publication-verification
+npm run smoke:wix-publication-verification
 ```
 
 `check:wix-public-claims` reports drift without failing local work. `smoke:wix-public-claims` is strict and fails closed when the published page is unavailable, blocked language remains, or required disclosures are absent. It stores no page content or visitor data.
+
+`smoke:wix-publication-verification` is the release-strength multi-page check. It verifies all
+17 intended Wix routes, including three booking-service pages, critical metadata, JSON-LD,
+canonical URLs, redirects, six crawler files, retired store routes, and noindexed Booking
+routes. It also fails when an indexed same-origin sitemap route is omitted from the scan. In a
+restricted environment, provide an ephemeral evidence packet through
+`SCRIMED_WIX_PUBLICATION_EVIDENCE_PATH`. Raw page content is never printed or retained by the
+verifier.
 
 ## Approval Boundary
 

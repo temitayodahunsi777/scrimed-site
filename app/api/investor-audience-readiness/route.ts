@@ -10,6 +10,8 @@ export async function GET() {
       "X-SCRIMED-Faith-Based-Authority": "not-endorsement-or-donor-advice",
       "X-SCRIMED-Financial-Authority": "not-audited-financial-report",
       "X-SCRIMED-Investment-Advice": "not-investment-advice",
+      "X-SCRIMED-Investor-Diligence": "candidate-review-required",
+      "X-SCRIMED-Investor-Discovery": "human-controlled-public-materials-only",
       "X-SCRIMED-Investor-Audience-Readiness": "investor-audience-readiness-control-plane-active",
       "X-SCRIMED-Legal-Authority": "qualified-review-required",
       "X-SCRIMED-Nonprofit-Authority": "qualified-review-required",

@@ -8,6 +8,7 @@ import {
 } from "../../../lib/pilotIntake";
 import { persistPilotIntake, type PilotIntakePersistenceResult } from "../../../lib/pilotIntakeStore";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../lib/requestRateLimit";
+import { evaluateOperatingModeAction } from "../../../lib/operatingMode";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,20 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const operatingModeDecision = evaluateOperatingModeAction("public-business-intake");
+
+  if (!operatingModeDecision.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: operatingModeDecision.reasonCode,
+          message: "Pilot intake is unavailable because the safe operating boundary is not active."
+        }
+      },
+      { status: 503 }
+    );
+  }
+
   const rateLimit = await enforceRequestRateLimit(request, {
     namespace: "public-pilot-intake",
     limit: 5,
@@ -119,6 +134,7 @@ export async function POST(request: Request) {
       intakeId,
       receivedAt,
       boundary: handoffPayload.boundary,
+      operatingModeDecision,
       assessment,
       attribution: handoffPayload.attribution,
       handoff,

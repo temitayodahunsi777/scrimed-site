@@ -1,0 +1,97 @@
+name: Synthetic Preview Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  local-preview:
+    name: Build and inspect synthetic-only preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SCRIMED_SYNTHETIC_ONLY: "true"
+      SCRIMED_ALLOW_PHI: "false"
+      SCRIMED_LIVE_CLINICAL_EXECUTION: "false"
+      SCRIMED_PRODUCTION_EHR_CONNECTIONS: "false"
+      SCRIMED_MEDICAL_DEVICE_CONNECTIONS: "false"
+      SCRIMED_EMERGENCY_MONITORING: "false"
+      SCRIMED_AUTONOMOUS_TREATMENT_ACTIONS: "false"
+      SCRIMED_AUTONOMOUS_ELIGIBILITY_DECISIONS: "false"
+      SCRIMED_AUTONOMOUS_PAYER_DECISIONS: "false"
+      SCRIMED_FAITH_AFFECTS_CLINICAL_LOGIC: "false"
+      SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: "false"
+      SCRIMED_EXTERNAL_PROVIDER_CALLS_ENABLED: "false"
+      SCRIMED_SCHEDULES_ENABLED: "false"
+      SCRIMED_VOICE_SIMULATION_ENABLED: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify preproduction policy and public claims
+        run: |
+          npm run test:preproduction-assurance
+          npm run contract:preproduction-assurance
+          npm run contract:public-remediation
+          npm run security:secret-scan
+
+      - name: Build local preview artifact
+        run: npm run build
+
+      - name: Install isolated browser verifier
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local preview
+        run: |
+          PORT=3000 npm run start > /tmp/scrimed-preview.log 2>&1 &
+          echo $! > /tmp/scrimed-preview.pid
+          for attempt in $(seq 1 60); do
+            curl --fail --silent http://127.0.0.1:3000/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/scrimed-preview.log
+          exit 1
+
+      - name: Verify desktop and exact 390px preview surfaces
+        run: >-
+          node scripts/verify-preview-ui.mjs --strict
+          --base-url=http://127.0.0.1:3000
+          --canonical-origin=https://app.scrimedsolutions.com
+          --output-dir=artifacts/ui-verification
+
+      - name: Verify rendered public output and prohibited claims
+        run: npm run verify:public-release
+
+      - name: Stop local preview
+        if: always()
+        run: |
+          if [ -f /tmp/scrimed-preview.pid ] && kill -0 "$(cat /tmp/scrimed-preview.pid)" 2>/dev/null; then
+            kill "$(cat /tmp/scrimed-preview.pid)"
+          fi
+
+      - name: Upload preview evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: synthetic-preview-evidence-${{ github.run_id }}
+          path: |
+            artifacts/ui-verification/**
+          if-no-files-found: warn
+          retention-days: 7

@@ -195,8 +195,8 @@ export const pilotWorkflowTargets: PilotIntakeOption[] = [
   },
   {
     value: "patient-onboarding",
-    label: "Patient onboarding triage",
-    description: "Synthetic onboarding profiles, navigation queues, urgency rationale, and review triggers."
+    label: "Patient onboarding navigation",
+    description: "Synthetic onboarding profiles, navigation queues, missing-context review, and human escalation triggers."
   },
   {
     value: "ambient-documentation",
@@ -276,7 +276,7 @@ export const pilotGovernanceRequirements: PilotIntakeOption[] = [
   },
   {
     value: "hipaa-ready",
-    label: "HIPAA-ready posture",
+    label: "Privacy and security readiness review",
     description: "Privacy, security, access, vendor, and audit controls before protected health information."
   },
   {
@@ -668,6 +668,14 @@ function readText(
     errors.push({ field, message: `Keep this field under ${maxLength} characters.` });
   }
 
+  if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(trimmed)) {
+    errors.push({ field, message: "Remove unsupported control characters." });
+  }
+
+  if (/<\/?[a-z][^>]*>|javascript:|data:text\/html|on[a-z]+\s*=/i.test(trimmed)) {
+    errors.push({ field, message: "Markup and executable content are not accepted." });
+  }
+
   return trimmed;
 }
 
@@ -731,7 +739,9 @@ function detectSensitiveHealthData(value: string) {
     { label: "MRN", pattern: /\b(mrn|medical record number)\b/i },
     { label: "date of birth", pattern: /\b(date of birth|dob)\b/i },
     { label: "patient identifier", pattern: /\b(patient|member)\s+(identifier|id|name|dob)\b/i },
-    { label: "insurance identifier", pattern: /\b(insurance id|member id|policy number)\b/i }
+    { label: "insurance identifier", pattern: /\b(insurance id|member id|policy number)\b/i },
+    { label: "clinical record excerpt", pattern: /\b(patient has|patient was diagnosed|prescribed to patient)\b/i },
+    { label: "health identifier", pattern: /\b(medicare|medicaid)\s+(number|id)\b/i }
   ];
 
   return markers.find((marker) => marker.pattern.test(value))?.label;

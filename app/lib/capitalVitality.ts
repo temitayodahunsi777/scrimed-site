@@ -1,4 +1,14 @@
 import { getCommercialStrategySummary } from "./commercialStrategy";
+import {
+  capitalPlanningBoundary,
+  capitalPlanningInputFields,
+  capitalPlanningInputTemplate,
+  capitalPlanningModelVersion,
+  evaluateCapitalPlan,
+  getInvestorDiligenceManifestSummary
+} from "./capitalPlanning";
+import { getCapitalAcquisitionReadinessSummary } from "./capitalAcquisitionReadiness";
+import { getCapitalAcquisitionCapturePacketSummary } from "./capitalAcquisitionCapturePacket";
 import { getMarketActivationSummary } from "./marketActivation";
 import { getNavigationAuditSummary } from "./navigationAudit";
 import { getPublicMarketReadinessSummary } from "./publicMarketReadiness";
@@ -58,10 +68,10 @@ export const capitalVitalityProofStackStatus =
   "capital-vitality-revenue-funding-readiness-active";
 export const capitalVitalityBriefProofStackStatus =
   "capital-vitality-brief-ready-no-securities-offer";
-export const capitalVitalityUpdatedAt = "2026-06-24";
+export const capitalVitalityUpdatedAt = "2026-07-20";
 
 export const capitalVitalityBoundary =
-  "SCRIMED Capital Vitality organizes revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, and retained external-review gates. It strengthens commercial execution and diligence readiness, but it is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, customer revenue guarantee, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.";
+  "SCRIMED Capital Vitality organizes revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, public-sector acquisition readiness, and retained external-review gates. It strengthens commercial execution and diligence readiness, but it is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, reimbursement assurance, customer revenue guarantee, government registration or certification verification, proposal-submission authority, contract or grant award, government endorsement, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.";
 
 export const revenueCapabilities: RevenueCapability[] = [
   {
@@ -278,11 +288,11 @@ export const investorReadinessMilestones: InvestorReadinessMilestone[] = [
   },
   {
     name: "Unit economics framework",
-    status: "in-progress",
+    status: "operator-required",
     investorQuestion: "Can SCRIMED measure cost, margin, and value by offer?",
-    evidence: "Public Market Readiness defines cost-per-workflow, gross margin by offer, protected operator metrics, and finance methodology gates.",
+    evidence: "Capital Vitality now provides a local-only runway, burn, margin, scenario, and cost-per-accepted-outcome workbench; Public Market Readiness retains protected operating metrics and finance methodology gates.",
     proofRoutes: ["/public-market-readiness", "/pilot-workspace/access"],
-    fundingImpact: "Creates the operating skeleton for future board and investor reporting.",
+    fundingImpact: "Makes the financial model reproducible while keeping founder inputs, reconciliation, and external review explicit.",
     retainedBoundary: "Framework is not audited financial reporting, accounting advice, tax advice, or valuation assurance."
   },
   {
@@ -395,6 +405,18 @@ export const fundingVitalityWorkstreams: FundingVitalityWorkstream[] = [
     proof: "/capital-vitality and /public-market-readiness",
     limitation: "SCRIMED cannot self-authorize investment materials or securities offering language.",
     nextAction: "Run any investor solicitation, SAFE/equity note, valuation, or offering deck through counsel."
+  },
+  {
+    name: "Public-sector and non-dilutive capture",
+    owner: "Founder + capture owner + qualified procurement or grant reviewers",
+    status: "external-review-required",
+    capability:
+      "Qualify federal prime, subcontracting, grant, SBIR/STTR, and state or local opportunities through official-source, registration, eligibility, safety, economics, evidence, and human-review gates.",
+    proof: "/capital-vitality#public-sector-opportunity-workbench and /pilot-workspace/access",
+    limitation:
+      "Readiness does not verify SAM.gov, UEI, CAGE, certification, eligibility, past performance, proposal compliance, award, or government endorsement and never authorizes submission.",
+    nextAction:
+      "Verify applicable registrations externally, select one authoritative opportunity, and run a weakest-link bid/no-bid review before proposal spend."
   }
 ];
 
@@ -413,6 +435,10 @@ export function getCapitalVitalitySummary() {
   const salesDealRoom = getSalesDealRoomSummary();
   const serviceReliability = getServiceReliabilitySummary();
   const navigationAudit = getNavigationAuditSummary();
+  const investorDiligenceManifest = getInvestorDiligenceManifestSummary();
+  const capitalAcquisitionReadiness = getCapitalAcquisitionReadinessSummary();
+  const capitalAcquisitionCapturePacket = getCapitalAcquisitionCapturePacketSummary();
+  const capitalPlanningTemplateEvaluation = evaluateCapitalPlan(capitalPlanningInputTemplate);
   const highMoatSignalCount = competitiveMoatSignals.filter(
     (signal) => signal.strength === "high"
   ).length;
@@ -459,7 +485,11 @@ export function getCapitalVitalitySummary() {
       approvalAuthority: "external-review-required",
       clinicalCareAuthority: "not-authorized-live-care",
       phiAuthority: "not-authorized-production-phi",
-      securityCertification: "not-security-certified"
+      securityCertification: "not-security-certified",
+      governmentRegistrationAuthority: "not-registration-verification",
+      governmentCertificationAuthority: "not-certification-verification",
+      publicSectorSubmissionAuthority: "not-authorized",
+      governmentAwardAuthority: "not-contract-or-grant-award"
     },
     sourceAlignment: {
       pageRouteCount: navigationAudit.sourceTotals.pageRouteCount,
@@ -487,13 +517,28 @@ export function getCapitalVitalitySummary() {
     externalReviewWorkstreamCount,
     retainedExternalReviewCount: externalReviewMilestoneCount + externalReviewWorkstreamCount,
     proofRouteCount: proofRoutes.length,
+    capitalPlanning: {
+      status: "capital-planning-workbench-ready-local-only",
+      modelVersion: capitalPlanningModelVersion,
+      boundary: capitalPlanningBoundary,
+      localOnly: true,
+      inputPersistence: false,
+      externalUseAuthorized: false,
+      requiredInputFields: capitalPlanningInputFields,
+      templateEvaluationStatus: capitalPlanningTemplateEvaluation.status
+    },
+    investorDiligenceManifest,
+    capitalAcquisitionReadiness,
+    capitalAcquisitionCapturePacket,
+    externalFundraisingReleaseAuthorized: false,
+    externalPublicSectorSubmissionAuthorized: false,
     revenueCapabilities,
     competitiveMoatSignals,
     investorReadinessMilestones,
     fundingVitalityWorkstreams,
     proofRoutes,
     nextCapitalMove:
-      "Use Capital Vitality as the executive growth lane: sell packaged synthetic and governance offers now, keep protected buyer/funding proof gated through AAL2 and release controls, refresh moat evidence before claims expand, and route any fundraising, valuation, securities, legal, reimbursement, security, PHI, or live-care claim through qualified external review.",
+      "Use Capital Vitality as the executive growth lane: complete exact-fingerprint fundraising diligence, qualify one official public-sector opportunity before proposal spend, keep protected buyer and funding proof gated through AAL2 and release controls, and route any fundraising, valuation, securities, legal, procurement, eligibility, registration, award, reimbursement, security, PHI, or live-care claim through named qualified review.",
     updated: capitalVitalityUpdatedAt
   };
 }
@@ -520,7 +565,7 @@ export function buildCapitalVitalityBrief() {
     "## Boundary",
     summary.boundary,
     "",
-    "This brief is not investment advice, securities offering material, audited financial reporting, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, customer revenue guarantee, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.",
+    "This brief is not investment advice, securities offering material, audited financial reporting, accounting advice, tax advice, legal advice, valuation assurance, reimbursement assurance, customer revenue guarantee, government registration or certification verification, proposal-submission authority, contract or grant award, government endorsement, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.",
     "",
     "## Revenue Capabilities",
     ...summary.revenueCapabilities.map(
@@ -545,6 +590,88 @@ export function buildCapitalVitalityBrief() {
       (workstream) =>
         `- ${workstream.name} (${workstream.status}): ${workstream.capability} Owner: ${workstream.owner} Proof: ${workstream.proof} Limitation: ${workstream.limitation} Next: ${workstream.nextAction}`
     ),
+    "",
+    "## Capital Planning Workbench",
+    `Status: ${summary.capitalPlanning.status}`,
+    `Model version: ${summary.capitalPlanning.modelVersion}`,
+    `Local only: ${summary.capitalPlanning.localOnly}`,
+    `Input persistence: ${summary.capitalPlanning.inputPersistence}`,
+    `External use authorized: ${summary.capitalPlanning.externalUseAuthorized}`,
+    `Boundary: ${summary.capitalPlanning.boundary}`,
+    "",
+    "## Investor Diligence Manifest",
+    `Status: ${summary.investorDiligenceManifest.status}`,
+    `Artifacts: ${summary.investorDiligenceManifest.artifactCount}`,
+    `Blocking artifacts: ${summary.investorDiligenceManifest.blockingArtifactCount}`,
+    `Accepts raw evidence: ${summary.investorDiligenceManifest.acceptsRawEvidence}`,
+    `External release authorized: ${summary.investorDiligenceManifest.externalReleaseAuthorized}`,
+    ...summary.investorDiligenceManifest.artifacts.map(
+      (artifact) =>
+        `- ${artifact.title} (${artifact.status}, ${artifact.shareability}): Owner: ${artifact.owner}. Blocks external fundraising release: ${artifact.blocksExternalFundraisingRelease}. Next: ${artifact.nextAction}`
+    ),
+    "",
+    "## Fundraising Release Assessment",
+    `Decision: ${summary.investorDiligenceManifest.releaseAssessment.decision}`,
+    `External release authorized: ${summary.investorDiligenceManifest.releaseAssessment.externalReleaseAuthorized}`,
+    `Missing artifacts: ${summary.investorDiligenceManifest.releaseAssessment.missingArtifactIds.join(", ") || "none"}`,
+    `Next: ${summary.investorDiligenceManifest.releaseAssessment.nextAction}`,
+    "",
+    "## Capital And Public-Sector Acquisition Readiness",
+    `Status: ${summary.capitalAcquisitionReadiness.status}`,
+    `Version: ${summary.capitalAcquisitionReadiness.version}`,
+    `Capital access lanes: ${summary.capitalAcquisitionReadiness.capitalAccessLaneCount}`,
+    `Public-sector lanes: ${summary.capitalAcquisitionReadiness.publicSectorLaneCount}`,
+    `Readiness gates: ${summary.capitalAcquisitionReadiness.readinessGateCount}`,
+    `Submission-blocking gates: ${summary.capitalAcquisitionReadiness.submissionBlockingGateCount}`,
+    `Registrations verified: ${summary.capitalAcquisitionReadiness.authority.registrationsVerified}`,
+    `Certifications verified: ${summary.capitalAcquisitionReadiness.authority.certificationsVerified}`,
+    `Eligibility verified: ${summary.capitalAcquisitionReadiness.authority.eligibilityVerified}`,
+    `Government award verified: ${summary.capitalAcquisitionReadiness.authority.governmentAwardVerified}`,
+    `External submission authorized: ${summary.capitalAcquisitionReadiness.authority.externalSubmissionAuthorized}`,
+    `Boundary: ${summary.capitalAcquisitionReadiness.boundary}`,
+    ...summary.capitalAcquisitionReadiness.capitalAccessLanes.map(
+      (lane) =>
+        `- ${lane.name} (${lane.status}): ${lane.fit} Required evidence: ${lane.requiredEvidence.join(", ")}. Reviewers: ${lane.requiredReviewers.join(", ")}. Blocked claims: ${lane.blockedClaims.join(", ")}. Next: ${lane.nextAction}`
+    ),
+    "",
+    "## Federal Contract Readiness",
+    `Status: ${summary.capitalAcquisitionReadiness.federalContractReadiness.status}`,
+    `Version: ${summary.capitalAcquisitionReadiness.federalContractReadiness.version}`,
+    `Default decision: ${summary.capitalAcquisitionReadiness.federalContractReadiness.defaultDecision}`,
+    `Checkpoints: ${summary.capitalAcquisitionReadiness.federalContractReadiness.checkpointCount}`,
+    `Active-registration checkpoints: ${summary.capitalAcquisitionReadiness.federalContractReadiness.activeRegistrationCheckpointCount}`,
+    `Market-entry checkpoints: ${summary.capitalAcquisitionReadiness.federalContractReadiness.marketEntryCheckpointCount}`,
+    `SAM registration verified: ${summary.capitalAcquisitionReadiness.federalContractReadiness.authority.samRegistrationVerified}`,
+    `Prime offer authorized: ${summary.capitalAcquisitionReadiness.federalContractReadiness.authority.primeOfferAuthorized}`,
+    `External submission authorized: ${summary.capitalAcquisitionReadiness.federalContractReadiness.authority.externalSubmissionAuthorized}`,
+    `Next: ${summary.capitalAcquisitionReadiness.federalContractReadiness.nextAction}`,
+    `Boundary: ${summary.capitalAcquisitionReadiness.federalContractReadiness.boundary}`,
+    ...summary.capitalAcquisitionReadiness.federalContractReadiness.checkpoints.map(
+      (checkpoint) =>
+        `- ${checkpoint.name} (${checkpoint.stage}): Owner: ${checkpoint.owner}. Required for active registration: ${checkpoint.requiredForActiveRegistration}. Required for market entry: ${checkpoint.requiredForMarketEntry}. Evidence: ${checkpoint.evidenceRequirement}. Next: ${checkpoint.nextAction}`
+    ),
+    "",
+    "## Public-Sector Readiness Gates",
+    ...summary.capitalAcquisitionReadiness.publicSectorReadinessGates.map(
+      (gate) =>
+        `- ${gate.name} (${gate.defaultStatus}): Owner: ${gate.owner}. Blocks submission: ${gate.blocksSubmission}. Required evidence: ${gate.requiredEvidence.join(", ")}. Blocked claims: ${gate.blockedClaims.join(", ")}. Next: ${gate.nextAction}`
+    ),
+    "",
+    "## Official Readiness Sources",
+    ...summary.capitalAcquisitionReadiness.officialReadinessSources.map(
+      (source) =>
+        `- ${source.title} - ${source.authority}: ${source.url}. Reviewed: ${source.reviewedAt}. Use: ${source.readinessUse} Freshness: ${source.freshnessPolicy}`
+    ),
+    "",
+    "## Capital Acquisition Capture Packet",
+    `Status: ${summary.capitalAcquisitionCapturePacket.status}`,
+    `Version: ${summary.capitalAcquisitionCapturePacket.version}`,
+    `Supported public-sector lanes: ${summary.capitalAcquisitionCapturePacket.supportedLaneCount}`,
+    `Compliance gates: ${summary.capitalAcquisitionCapturePacket.complianceGateCount}`,
+    `Proof artifacts: ${summary.capitalAcquisitionCapturePacket.proofArtifactCount}`,
+    `External release authorized: ${summary.capitalAcquisitionCapturePacket.defaultExternalReleaseAuthorized}`,
+    `External submission authorized: ${summary.capitalAcquisitionCapturePacket.defaultExternalSubmissionAuthorized}`,
+    `Boundary: ${summary.capitalAcquisitionCapturePacket.boundary}`,
     "",
     "## Next Capital Move",
     summary.nextCapitalMove,

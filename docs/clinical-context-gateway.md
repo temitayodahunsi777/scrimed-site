@@ -1,5 +1,7 @@
 # SCRIMED Clinical Context Gateway
 
+The gateway now includes SCRIMED Context Lens metadata with isolated `public-evidence` and `clinical-context` modes. Every proposed next action requires a supporting source and action reason. Stale, expired, unverified, missing, or low-confidence evidence triggers abstention or human review; live PHI remains disabled.
+
 SCRIMED Clinical Context Gateway is the governed doorway between SCRIMED agents and healthcare context. It converts strict metadata-only requests into semantic context envelopes after the request passes Clinical Data Governance and Clinical Data Fabric source-contract checks.
 
 Current status: `clinical-context-gateway-ready-no-phi`

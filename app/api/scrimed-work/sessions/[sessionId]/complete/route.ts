@@ -25,7 +25,7 @@ export async function POST(
         "X-SCRIMED-Work-Completion": "fail-closed",
         "X-SCRIMED-External-Distribution": "not-authorized",
         "X-SCRIMED-Payer-Submission": "not-authorized"
-      })
+      }, request)
     });
   }
 
@@ -35,6 +35,6 @@ export async function POST(
       "X-SCRIMED-Work-Completion": "verified-internal-work-complete",
       "X-SCRIMED-External-Distribution": "not-authorized",
       "X-SCRIMED-Payer-Submission": "not-authorized"
-    })
+    }, request)
   });
 }

@@ -2,10 +2,13 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { inspectCacheOnlyNextRoot } from "./lib/generated-cache-policy.mjs";
+import { collectDuplicateSiblingFiles } from "./lib/workspace-hygiene-policy.mjs";
 
 const generatedRootNames = [".next", ".next-quarantine-", "node_modules 2"];
 const ignoredDirectoryNames = new Set([
   ".git",
+  ".next",
   ".vercel",
   ".tools",
   "node_modules",
@@ -124,15 +127,29 @@ const generatedRoots = rootEntries
   .map((entry) => entry.name)
   .filter((name) => generatedRootNames.some((generatedRoot) => name === generatedRoot || name.startsWith(generatedRoot)));
 
-if (generatedRoots.length > 0) {
+const cacheOnlyNextInspection = generatedRoots.includes(".next")
+  ? await inspectCacheOnlyNextRoot()
+  : { safe: false };
+const disallowedGeneratedRoots = generatedRoots.filter(
+  (name) => name !== ".next" || !cacheOnlyNextInspection.safe
+);
+
+if (disallowedGeneratedRoots.length > 0) {
   throw new Error(
-    `Generated workspace output remains after cleanup: ${generatedRoots.join(", ")}. Run npm run clean:generated.`
+    `Generated workspace output remains after cleanup: ${disallowedGeneratedRoots.join(", ")}. Run npm run clean:generated.`
   );
 }
 
 const junkFiles = await collectJunkFiles(".");
 if (junkFiles.length > 0) {
   throw new Error(`Disposable junk files remain in workspace: ${junkFiles.join(", ")}`);
+}
+
+const duplicateSiblingFiles = await collectDuplicateSiblingFiles(".", ignoredDirectoryNames);
+if (duplicateSiblingFiles.length > 0) {
+  throw new Error(
+    `Duplicate-suffixed workspace files remain beside canonical siblings: ${duplicateSiblingFiles.join(", ")}`
+  );
 }
 
 for (const [filePath, expectedEntries] of Object.entries(requiredIgnoreText)) {

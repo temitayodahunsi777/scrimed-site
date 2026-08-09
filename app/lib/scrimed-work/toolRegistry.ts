@@ -1,4 +1,11 @@
 import { getScrimedWorkFeatureFlags } from "./featureFlags";
+import {
+  evaluateGovernedExecution,
+  type CapabilityManifest,
+  type ExecutionGrant,
+  type GovernedExecutionRequest,
+  type ReplayProtectionStore
+} from "./governedRuntime";
 import type { ToolCategory, WorkAgentRole } from "./types";
 
 export type ScrimedWorkTool = {
@@ -106,6 +113,13 @@ export function authorizeToolAccess(input: {
   toolId: string;
   agentRole: WorkAgentRole;
   consequentialActionsEnabled?: boolean;
+  governance: {
+    manifest: CapabilityManifest;
+    request: GovernedExecutionRequest;
+    evaluatedAt: string;
+    grant?: ExecutionGrant;
+    replayStore?: ReplayProtectionStore;
+  };
 }) {
   const tool = getScrimedWorkTools().find((candidate) => candidate.toolId === input.toolId);
 
@@ -117,19 +131,47 @@ export function authorizeToolAccess(input: {
     return { decision: "deny" as const, reason: "Agent role is not permitted to access this tool." };
   }
 
+  if (input.governance.request.toolCategory !== tool.category) {
+    return { decision: "deny" as const, reason: "Tool category does not match the governed request." };
+  }
+
+  const governedDecision = evaluateGovernedExecution(input.governance);
+  if (governedDecision.decision === "deny") {
+    return {
+      decision: "deny" as const,
+      reason: `Governed runtime denied tool access: ${governedDecision.reasonCodes.join(", ")}.`,
+      governedDecision
+    };
+  }
+
   if (!tool.enabled) {
-    return { decision: "deny" as const, reason: tool.blockedReason ?? "Tool is disabled by policy." };
+    return {
+      decision: "deny" as const,
+      reason: tool.blockedReason ?? "Tool is disabled by policy.",
+      governedDecision
+    };
   }
 
   if (
     ["consequential-write", "external-communication", "clinical", "financial", "identity", "scheduling"].includes(tool.category) &&
     !input.consequentialActionsEnabled
   ) {
-    return { decision: "require_human_approval" as const, reason: "Consequential tool requires approval and remains disabled by default." };
+    return {
+      decision: "require_human_approval" as const,
+      reason: "Consequential tool requires approval and remains disabled by default.",
+      governedDecision
+    };
   }
 
   return {
-    decision: tool.approvalRequired ? ("require_human_approval" as const) : ("allow" as const),
-    reason: tool.approvalRequired ? "Tool access is gated by human approval." : "Tool access is read-only and policy-permitted."
+    decision:
+      tool.approvalRequired || governedDecision.decision === "require_human_approval"
+        ? ("require_human_approval" as const)
+        : ("allow" as const),
+    reason:
+      tool.approvalRequired || governedDecision.decision === "require_human_approval"
+        ? "Tool access is gated by human approval."
+        : "Tool access is read-only and policy-permitted.",
+    governedDecision
   };
 }

@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "scrimed.moat-registry.v1",
+  "version": "scrimed-platform-strategy-v1-2026-08-08",
+  "status": "internal-diligence-evidence-only",
+  "boundary": "This registry describes SCRIMED's locally implemented, synthetic/no-PHI platform foundations and evidence paths. It does not authorize PHI, autonomous clinical care, diagnosis, treatment, prescribing, payer submission, EHR writeback, medical-device connectivity, production deployment, certification claims, customer activation, investor outreach, valuation claims, or revenue guarantees.",
+  "investorUse": "Internal diligence preparation only; founder, finance, legal, and recipient-specific approval remain required for external distribution.",
+  "moatRegistry": [
+    {
+      "id": "governance-evidence-runtime",
+      "name": "Governance and evidence runtime",
+      "basis": "Policy-before-action, exact evidence binding, independent review, audit receipts, rollback, and release gates.",
+      "status": "implemented-foundation",
+      "evidenceRoutes": [
+        "/scrimed-work",
+        "/scrimed-control-plane",
+        "/validation-evidence"
+      ],
+      "compoundingMechanism": "Each reviewed workflow contributes reusable policy, benchmark, failure, and approval evidence.",
+      "replicationFriction": "Requires integrated product, security, clinical, data, reviewer, and release controls rather than a prompt layer.",
+      "blockedClaim": "Does not prove certification, regulatory approval, customer adoption, or production safety."
+    },
+    {
+      "id": "healthcare-semantics-provenance",
+      "name": "Healthcare semantics and provenance",
+      "basis": "FHIR, HL7, DICOM metadata, payer-policy, ontology, citation, and source-lineage contracts.",
+      "status": "evidence-in-progress",
+      "evidenceRoutes": [
+        "/clinical-data-fabric",
+        "/interoperability",
+        "/scrimed-hybrid-retrieval"
+      ],
+      "compoundingMechanism": "Validated mappings and source contracts improve retrieval, verification, and implementation reuse.",
+      "replicationFriction": "Depends on clinical semantics, tenant isolation, transformation lineage, and workflow-specific acceptance tests.",
+      "blockedClaim": "Does not prove live EHR integration, medical-device interoperability, or standards certification."
+    },
+    {
+      "id": "workflow-outcome-learning",
+      "name": "Workflow outcome learning",
+      "basis": "Case evidence, accepted outcomes, corrections, worst-cell evaluation, reviewer burden, and value telemetry.",
+      "status": "evidence-in-progress",
+      "evidenceRoutes": [
+        "/healthcare-value-realization",
+        "/scrimed-clinical-benchmark-suite",
+        "/documentation-before-authorization"
+      ],
+      "compoundingMechanism": "Reviewed failures become regression cases and workflow improvements without online clinical self-modification.",
+      "replicationFriction": "Requires longitudinal evidence and operator adoption, not merely access to the same model.",
+      "blockedClaim": "Does not establish causality, clinical outcomes, ROI, revenue, or customer traction before formal evidence."
+    },
+    {
+      "id": "model-compute-portability",
+      "name": "Model and compute portability",
+      "basis": "Provider-neutral routing, task qualification, no privacy downgrade, bounded fallback, and effective-cost accounting.",
+      "status": "implemented-foundation",
+      "evidenceRoutes": [
+        "/scrimed-compute-fabric",
+        "/scrimed-model-router",
+        "/scrimed-control-plane"
+      ],
+      "compoundingMechanism": "Per-task evidence improves model eligibility and cost choices while preserving replaceability.",
+      "replicationFriction": "Requires workflow-specific evaluation and policy-compatible failover across model and deployment classes.",
+      "blockedClaim": "Does not prove provider availability, BAA eligibility, PHI approval, or production-scale performance."
+    },
+    {
+      "id": "regulated-buyer-operating-evidence",
+      "name": "Regulated buyer operating evidence",
+      "basis": "Claims-safe offers, intended-use records, review packets, security gates, migration evidence, and controlled pilot operations.",
+      "status": "external-validation-required",
+      "evidenceRoutes": [
+        "/offerings",
+        "/approvals-readiness",
+        "/investor-audience-readiness"
+      ],
+      "compoundingMechanism": "Approved buyer and pilot evidence can shorten later diligence only when permission and scope remain current.",
+      "replicationFriction": "Requires trustworthy execution history with named owners and independent review.",
+      "blockedClaim": "Does not imply customers, partners, revenue, procurement approval, investment, or commercial deployment."
+    }
+  ],
+  "nextBestAction": "Complete one buyer-specific Workflow Intelligence Assessment rehearsal with a baseline, acceptance rubric, reviewer burden, verified-intelligence-yield inputs, healthcare-value-returned inputs, and retained no-go boundary.",
+  "productionAuthorityGranted": false,
+  "auditHash": "1802ee0b64c34efbc531629872e762cebd3e0cd8faa3b9347b3c9fe2d98b66de"
+}

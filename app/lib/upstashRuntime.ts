@@ -1,22 +1,24 @@
-type UpstashRedisCredentials = {
+export type UpstashRedisCredentials = {
   url: string;
   token: string;
   source: "direct-upstash" | "vercel-marketplace";
 };
 
-export function getUpstashRedisCredentials(): UpstashRedisCredentials | null {
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+export function getUpstashRedisCredentials(
+  env: NodeJS.ProcessEnv = process.env
+): UpstashRedisCredentials | null {
+  if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) {
     return {
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      url: env.UPSTASH_REDIS_REST_URL,
+      token: env.UPSTASH_REDIS_REST_TOKEN,
       source: "direct-upstash"
     };
   }
 
   const marketplaceUrl =
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ?? process.env.KV_REST_API_URL;
+    env.UPSTASH_REDIS_REST_KV_REST_API_URL ?? env.KV_REST_API_URL;
   const marketplaceToken =
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ?? process.env.KV_REST_API_TOKEN;
+    env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ?? env.KV_REST_API_TOKEN;
 
   if (marketplaceUrl && marketplaceToken) {
     return {
@@ -29,6 +31,6 @@ export function getUpstashRedisCredentials(): UpstashRedisCredentials | null {
   return null;
 }
 
-export function isUpstashRedisConfigured() {
-  return getUpstashRedisCredentials() !== null;
+export function isUpstashRedisConfigured(env: NodeJS.ProcessEnv = process.env) {
+  return getUpstashRedisCredentials(env) !== null;
 }

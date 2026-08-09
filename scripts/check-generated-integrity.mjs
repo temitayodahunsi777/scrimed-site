@@ -71,7 +71,9 @@ if (duplicates.size > 0) {
   for (const duplicate of duplicates) {
     console.error(`- ${duplicate}`);
   }
-  console.error("Repair by closing running Next/Node processes, removing `.next`, then rerunning the quality gates.");
+  console.error(
+    "Run `node scripts/generated-output-postflight.mjs` to remove only proven-redundant output. If it fails closed, stop Next/Node processes, remove `.next`, and rebuild."
+  );
   process.exit(1);
 }
 

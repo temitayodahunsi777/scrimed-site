@@ -2,10 +2,25 @@
 
 import { readFile } from "node:fs/promises";
 
-const [accessSurface, administrationPanel, tenantAccessRoute, styles] = await Promise.all([
+const [
+  accessSurface,
+  administrationPanel,
+  tenantAccessRoute,
+  trustSafetyRoute,
+  trustSafetyIncidentRoute,
+  trustSafetyReviewPacketRoute,
+  protectedStoreError,
+  verificationPanel,
+  styles
+] = await Promise.all([
   readFile("app/pilot-workspace/ProtectedPilotAccess.tsx", "utf8"),
   readFile("app/pilot-workspace/TenantAccessAdministrationPanel.tsx", "utf8"),
   readFile("app/api/pilot-workspaces/[workspaceSlug]/tenant-access/route.ts", "utf8"),
+  readFile("app/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/route.ts", "utf8"),
+  readFile("app/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/[incidentId]/route.ts", "utf8"),
+  readFile("app/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/[incidentId]/review-packet/route.ts", "utf8"),
+  readFile("app/lib/protectedPilotStoreError.ts", "utf8"),
+  readFile("app/pilot-workspace/PilotWorkspaceVerificationPanel.tsx", "utf8"),
   readFile("app/globals.css", "utf8")
 ]);
 
@@ -24,8 +39,15 @@ requireIncludes("protected pilot workspace", accessSurface, [
   "aria-pressed={selectedWorkspace?.id === workspace.id}",
   'role="status" aria-live="polite"',
   "Active workspace",
-  "tenant-access-${selectedWorkspace.id}"
+  "tenant-access-${selectedWorkspace.id}",
+  "AAL2 required",
+  "No protected workspace is visible.",
+  "sign out, sign in again, and verify the authenticator"
 ]);
+
+if (accessSurface.includes("No approved tenant workspace membership is assigned to this identity.")) {
+  throw new Error("protected pilot workspace conflates expired governance assurance with missing membership");
+}
 
 requireIncludes("tenant access administration", administrationPanel, [
   "const created = await commitAction(",
@@ -44,6 +66,42 @@ requireIncludes("tenant access API", tenantAccessRoute, [
   "confirmedWorkspaceSlug !== workspaceSlug",
   'code: "workspace-confirmation-required"',
   "Confirm the active workspace before creating a governed invitation record."
+]);
+
+requireIncludes("protected store AAL2 classification", protectedStoreError, [
+  'code: "governance-aal2-session-required"',
+  'status: 403',
+  'reauthenticationRequired: true',
+  "Sign out, sign in again, verify the enrolled authenticator, and retry."
+]);
+
+requireIncludes("tenant access AAL2 response", tenantAccessRoute, [
+  "classifyProtectedPilotStoreFailure",
+  "reauthenticationRequired: failure.reauthenticationRequired",
+  "status: failure.status"
+]);
+
+requireIncludes("TrustOps AAL2 response", trustSafetyRoute, [
+  "classifyProtectedPilotStoreFailure",
+  "reauthenticationRequired: failure.reauthenticationRequired",
+  "status: failure.status"
+]);
+
+for (const [label, source] of [
+  ["TrustOps incident detail AAL2 response", trustSafetyIncidentRoute],
+  ["TrustOps review packet AAL2 response", trustSafetyReviewPacketRoute]
+]) {
+  requireIncludes(label, source, [
+    "classifyProtectedPilotStoreFailure",
+    "status: failure.status",
+    "code: failure.code"
+  ]);
+}
+
+requireIncludes("tenant verification AAL2 handling", verificationPanel, [
+  'error.code === "governance-aal2-session-required"',
+  "Verification stopped at the fresh AAL2 gate.",
+  "Sign out, sign in again, verify the enrolled authenticator, and rerun verification."
 ]);
 
 if (administrationPanel.includes('placeholder="Metadata only. No PHI or clinical details."')) {

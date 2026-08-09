@@ -167,6 +167,16 @@ import type {
   ProtectedAuthorityArtifactReferenceRecord,
   ProtectedAuthorityArtifactReferenceStatus
 } from "./protectedAuthorityArtifactReferences";
+import type {
+  P32EvidenceIssuerReceipt,
+  P32EvidenceIssuerReceiptInput
+} from "./scrimedP32EvidenceIssuer";
+import type {
+  P32CandidateReviewAssignmentReceipt,
+  P32CandidateReviewAssignmentReceiptInput,
+  P32CandidateReviewDecisionReceipt,
+  P32CandidateReviewDecisionReceiptInput
+} from "./scrimedP32CandidateReview";
 
 type AuthenticatedPilotContext =
   | {
@@ -190,6 +200,11 @@ type WorkspaceRow = {
   boundary: string;
   created_at: string;
   pilot_tenants: { name: string } | Array<{ name: string }> | null;
+};
+
+type PilotMembershipAccessRow = {
+  role: PilotWorkspaceRole;
+  status: "active" | "inactive";
 };
 
 type SessionRow = {
@@ -2464,6 +2479,33 @@ export async function getAccessiblePilotWorkspace(client: SupabaseClient, worksp
   };
 }
 
+export async function getPilotWorkspaceMembershipAccess(
+  client: SupabaseClient,
+  tenantId: string,
+  userId: string
+) {
+  const { data, error } = await client
+    .from("pilot_memberships")
+    .select("role, status")
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const row = data as PilotMembershipAccessRow | null;
+  const validRole =
+    row?.role === "tenant-admin" ||
+    row?.role === "pilot-lead" ||
+    row?.role === "reviewer" ||
+    row?.role === "observer";
+
+  return {
+    membership:
+      row && row.status === "active" && validRole
+        ? { role: row.role, status: row.status }
+        : null,
+    error
+  };
+}
+
 export async function listPilotSessions(client: SupabaseClient, workspaceId: string) {
   const { data, error } = await client
     .from("pilot_demo_sessions")
@@ -4035,6 +4077,60 @@ export async function recordQaManualRunEvidencePacket(
     boundary: typeof payload.boundary === "string" ? payload.boundary : null,
     error
   };
+}
+
+export async function recordP32EvidenceAttestationIssuance(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32EvidenceIssuerReceiptInput
+) {
+  const { data, error } = await client.rpc("record_p32_evidence_attestation_issuance", {
+    p_workspace_slug: workspaceSlug,
+    p_issuance: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32EvidenceIssuerReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function createP32CandidateReviewAssignmentReceipt(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32CandidateReviewAssignmentReceiptInput
+) {
+  const { data, error } = await client.rpc("create_p32_candidate_review_assignment", {
+    p_workspace_slug: workspaceSlug,
+    p_assignment: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32CandidateReviewAssignmentReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function recordP32CandidateReviewDecisionReceipt(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32CandidateReviewDecisionReceiptInput
+) {
+  const { data, error } = await client.rpc("record_p32_candidate_review_decision", {
+    p_workspace_slug: workspaceSlug,
+    p_decision: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32CandidateReviewDecisionReceipt)
+      : null;
+
+  return { receipt, error };
 }
 
 export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {

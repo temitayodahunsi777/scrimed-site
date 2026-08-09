@@ -137,6 +137,383 @@ export default function HealthcareIntelligenceOSPage() {
         </div>
       </section>
 
+      <section className="section-band" aria-label="P31 applied intelligence controls">
+        <div className="section-heading">
+          <p className="eyebrow">P31 applied intelligence</p>
+          <h2>Context, evidence, imaging QA, learning, reliability, and agent creation share one governed release path.</h2>
+          <p className="section-copy">{summary.p31AppliedIntelligence.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>{summary.p31AppliedIntelligence.imagingWorkflowIntelligence.status}</span>
+            <h3>Imaging workflow intelligence</h3>
+            <p>
+              Synthetic DICOM metadata is checked for exam and measurement completeness, then normalized into
+              preliminary FHIR previews with provenance and mandatory review.
+            </p>
+            <ul className="compact-list">
+              <li>FHIR previews: {summary.p31AppliedIntelligence.imagingWorkflowIntelligence.fhirOutputs.join(", ")}</li>
+              <li>External adapters: disabled</li>
+              <li>Diagnostic finalization: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p31AppliedIntelligence.domainBenchmarkCard.releaseDecision}</span>
+            <h3>Worst-cell release gate</h3>
+            <p>{summary.p31AppliedIntelligence.domainBenchmarkCard.humanReadableSummary}</p>
+            <ul className="compact-list">
+              <li>Worst cell: {summary.p31AppliedIntelligence.domainBenchmarkCard.worstMaterialCellId ?? "none"}</li>
+              <li>Global average override: disabled</li>
+              <li>Clinical authority: disabled</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p31AppliedIntelligence.outcomeLearning.operatingMode}</span>
+            <h3>Outcome learning controller</h3>
+            <p>
+              No-feedback, randomized-feedback, and measured-feedback experiments remain sandboxed behind fixed
+              evaluations, review, canary, monitoring, and tested rollback.
+            </p>
+            <ul className="compact-list">
+              <li>Controllers: {summary.p31AppliedIntelligence.outcomeLearning.controllerCount}</li>
+              <li>Online clinical self-modification: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p31AppliedIntelligence.clinicianAgentFoundry.deploymentStatus}</span>
+            <h3>Clinician-to-Agent Foundry</h3>
+            <p>{summary.p31AppliedIntelligence.clinicianAgentFoundry.templateName}</p>
+            <ul className="compact-list">
+              <li>Permission decisions: {summary.p31AppliedIntelligence.clinicianAgentFoundry.permissionCount}</li>
+              <li>Synthetic adversarial cases: {summary.p31AppliedIntelligence.clinicianAgentFoundry.evaluationCaseCount}</li>
+              <li>Production activation: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p31AppliedIntelligence.clinicalAgentSre.evaluation.status}</span>
+            <h3>Clinical Agent SRE</h3>
+            <p>
+              Workload isolation, signed artifacts, backpressure, bounded retries, circuit state, failover evidence,
+              worst-cell status, and PHI-safe telemetry are evaluated together.
+            </p>
+            <ul className="compact-list">
+              <li>p95 latency: {summary.p31AppliedIntelligence.clinicalAgentSre.evaluation.serviceLevels.p95LatencyMs} ms</li>
+              <li>Evidence completeness: {summary.p31AppliedIntelligence.clinicalAgentSre.evaluation.serviceLevels.evidenceCompletenessPercent}%</li>
+              <li>Release authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p31AppliedIntelligence.valueContractEvidence.status}</span>
+            <h3>Value Contract</h3>
+            <p>
+              Baseline, target, owners, safety constraints, adoption, 30/60/90 reviews, evidence, renewal, and rollback
+              criteria are machine-readable before commercial claims are considered.
+            </p>
+            <ul className="compact-list">
+              <li>Workflow: {summary.p31AppliedIntelligence.valueContractEvidence.contract.workflowId}</li>
+              <li>Causal and unverified claims: blocked</li>
+              <li>Human review: required</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-band" aria-label="P32 work and intelligence controls">
+        <div className="section-heading">
+          <p className="eyebrow">P32 work and intelligence platform</p>
+          <h2>Search, routing, incident evidence, workflow intent, connectors, trials, and release gates share one verifiable control plane.</h2>
+          <p className="section-copy">{summary.p32ControlPlane.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span>{summary.p32ControlPlane.status}</span>
+            <h3>Clinical Search Fabric</h3>
+            <p>
+              Approved public references move through bounded retrieval, source ranking, claim-citation validation,
+              freshness review, and explicit conflict presentation.
+            </p>
+            <ul className="compact-list">
+              <li>External retrieval: disabled</li>
+              <li>Optimization: {summary.p32ControlPlane.optimizationTarget}</li>
+              <li>Patient-specific cache: disabled</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.trustReleaseGuardian.incidentForensicsVersion}</span>
+            <h3>Trust release and incident forensics</h3>
+            <p>
+              Restricted evidence bundles reconstruct model, evidence, tool, service, user, approval, and display events
+              without storing raw outputs or assigning liability.
+            </p>
+            <ul className="compact-list">
+              <li>Ordered reconstruction: enabled</li>
+              <li>Counterfactual review: enabled</li>
+              <li>Automatic liability determination: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.evidenceOps.originPlatform}</span>
+            <h3>EvidenceOps benchmark provenance</h3>
+            <p>
+              Benchmark origin, population, sampling, raters, missingness, confidence, conflicts, holdouts, and external
+              validity limitations remain visible before any model comparison.
+            </p>
+            <ul className="compact-list">
+              <li>Task lanes: {summary.p32ControlPlane.evidenceOps.taskLanes.length}</li>
+              <li>Temporal holdout: {summary.p32ControlPlane.evidenceOps.temporalHoldout ? "present" : "missing"}</li>
+              <li>Universal winner claims: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>provider-neutral</span>
+            <h3>ModelFit routing</h3>
+            <p>
+              Model selection considers risk, policy, residency, workflow evidence, provider health, human review, and
+              total accepted-answer cost. Unmeasured clinical promotion and silent fallback remain blocked.
+            </p>
+            <ul className="compact-list">
+              <li>Configured aliases: {summary.p32ControlPlane.modelFit.aliases.filter((alias) => alias.configured).length}</li>
+              <li>Silent fallback: disabled</li>
+              <li>Shadow evaluation: required</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.healthConversationFabric.enabled ? "policy active" : "disabled"}</span>
+            <h3>Role-specific health conversation fabric</h3>
+            <p>
+              MyVitals AI and CareExplain remain patient-facing, while Sanar AI and Perfect Chart remain clinician-facing.
+              Identity, memory, tools, grants, and actions stay isolated across roles and contexts.
+            </p>
+            <ul className="compact-list">
+              <li>Cross-domain default: {summary.p32ControlPlane.healthConversationFabric.crossDomainDefault}</li>
+              <li>Named clinician review: required</li>
+              <li>EHR writeback: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.containedAgentExecution.enabled ? "synthetic lab enabled" : "disabled by default"}</span>
+            <h3>Contained AgentOps</h3>
+            <p>
+              Ephemeral tenant isolation, default-deny egress, short-lived capability leases, fresh fork identities,
+              digest-only snapshots, and one causal trace constrain synthetic agent runs.
+            </p>
+            <ul className="compact-list">
+              <li>Isolation: {summary.p32ControlPlane.containedAgentExecution.isolation}</li>
+              <li>Emergency stop: enabled and tested</li>
+              <li>Production execution authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.patientRecords.ambientMode}</span>
+            <h3>Ambient and patient-controlled records</h3>
+            <p>
+              Consent, retention, source coverage, clinician edits, revocation, and deletion receipts support synthetic
+              documentation and longitudinal-record evaluation without autonomous record inclusion.
+            </p>
+            <ul className="compact-list">
+              <li>Raw audio default: {summary.p32ControlPlane.patientRecords.rawAudioDefault}</li>
+              <li>Patient grants: purpose-bound and revocable</li>
+              <li>Training and secondary use: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.researchIntelligence.trialFailureIntelligenceEnabled ? "synthetic lab enabled" : "disabled by default"}</span>
+            <h3>TrialCore failure and biological research</h3>
+            <p>
+              Registry evidence, contradictions, hypotheses, adversarial review, study-level holdouts, and deterministic
+              biological similarity remain clearly classified and separated from clinical action.
+            </p>
+            <ul className="compact-list">
+              <li>Evidence classes: {summary.p32ControlPlane.researchIntelligence.evidenceClassifications.length}</li>
+              <li>Independent human review: required</li>
+              <li>Enrollment and clinical action: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.imagingControlPlane.queueRecommendationsEnabled ? "synthetic recommendation enabled" : "disabled by default"}</span>
+            <h3>Imaging and MRD control planes</h3>
+            <p>
+              Imaging models require offline, shadow, contract, and site validation before recommendation-only queue use.
+              MRD observations retain assay-specific provenance and cannot be trended without validated comparability.
+            </p>
+            <ul className="compact-list">
+              <li>Radiologist override: retained</li>
+              <li>MRD comparability: required</li>
+              <li>Diagnosis, treatment, and ordering: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.networkIntelligence.enabled ? "synthetic analysis enabled" : "disabled by default"}</span>
+            <h3>Network and provider conformance</h3>
+            <p>
+              Site and subgroup variance remains visible while provider promotion depends on exact artifacts, task evidence,
+              conformance, canarying, and rollback rather than public leaderboard position.
+            </p>
+            <ul className="compact-list">
+              <li>Provider profiles: {summary.p32ControlPlane.modelFit.disabledEvaluationProfiles.length} disabled evaluation candidates</li>
+              <li>Coverage and payer mutation: prohibited</li>
+              <li>Silent model substitution: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.workflowControls.version}</span>
+            <h3>Intent, trial, attention, and connector controls</h3>
+            <p>
+              Facts stay distinct from inference; ambiguous clinical intent requires review; trial matching stays
+              preliminary; attention events need evidence; connector terms changes freeze writes.
+            </p>
+            <ul className="compact-list">
+              <li>Trial auto-enrollment: prohibited</li>
+              <li>Connector terms freeze: enabled</li>
+              <li>Automatic mass outreach: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.productionHarness.fitnessPolicy}</span>
+            <h3>Production Harness</h3>
+            <p>
+              Safety, privacy, security, provenance, and evidence are noncompensable gates. Cost and latency can improve a
+              route only after mandatory floors and deterministic verification pass.
+            </p>
+            <ul className="compact-list">
+              <li>Objective: {summary.p32ControlPlane.productionHarness.optimizationTarget}</li>
+              <li>LLM judge: secondary signal only</li>
+              <li>Correction corpus: quarantined and reviewed</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.governedRuntime.authorizationStages.join(" -> ")}</span>
+            <h3>Governed Agent Runtime</h3>
+            <p>
+              Candidate-bound grants, exact tool and resource scopes, budgets, idempotency, nonce replay protection, and
+              separate approval stages constrain every registered SCRIMED Work tool.
+            </p>
+            <ul className="compact-list">
+              <li>Consequential default: deny or human review</li>
+              <li>Candidate-bound grants: required</li>
+              <li>Production execution authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.careContextAutonomy.policyCells} policy cells</span>
+            <h3>Care-context autonomy</h3>
+            <p>
+              Task risk, evidence, freshness, identity, and failure consequence determine the ceiling. Acute-critical work
+              fails closed and clinical authority remains with authenticated humans.
+            </p>
+            <ul className="compact-list">
+              <li>Contexts: {summary.p32ControlPlane.careContextAutonomy.contexts.length}</li>
+              <li>Acute-critical fail closed: enabled</li>
+              <li>Autonomous clinical authority: prohibited</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.resourceAdmission.runtimeStates.join(" / ")}</span>
+            <h3>Memory-aware admission</h3>
+            <p>
+              Device, memory, KV cache, thermal, accelerator, latency, cost, retry, tool, and privacy constraints are checked
+              before model selection. Pressure degrades predictably or returns a safe refusal.
+            </p>
+            <ul className="compact-list">
+              <li>Device profiles: simulated</li>
+              <li>Silent clinical downgrade: prohibited</li>
+              <li>Live model authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.clinicalDataViews.version}</span>
+            <h3>Longitudinal data views</h3>
+            <p>
+              Raw structured, compact structured, and narrative views retain source, time, transformation, confidence,
+              measurement, uncertainty, and provenance links while the original source stays authoritative.
+            </p>
+            <ul className="compact-list">
+              <li>Derived strategies: {summary.p32ControlPlane.clinicalDataViews.derivedStrategies.length}</li>
+              <li>Source of record: preserved</li>
+              <li>Live ingestion: not authorized</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.multimodalNormalization.version}</span>
+            <h3>Multimodal Provenance</h3>
+            <p>
+              Document, OCR, structured-feed, claims, imaging-metadata, and genomics-metadata facts retain source location,
+              extraction version, confidence, transformations, corrections, and conflict state.
+            </p>
+            <ul className="compact-list">
+              <li>Low confidence: human review required</li>
+              <li>Complex context: no silent truncation</li>
+              <li>Clinical truth authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.artifactLedger.identity}</span>
+            <h3>Artifact Ledger</h3>
+            <p>
+              Stable document identity and immutable revision hashes preserve transformation lineage. Trash and restore are
+              explicit revisions, and backup trust requires matching restore evidence.
+            </p>
+            <ul className="compact-list">
+              <li>Deletion: recoverable</li>
+              <li>Audit: tamper evident</li>
+              <li>Distribution authority: not granted</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.guardedRcmVoice.enabled ? "synthetic lab enabled" : "disabled by default"}</span>
+            <h3>Guarded payer voice</h3>
+            <p>
+              Low-risk status retrieval follows a deterministic synthetic state machine. Ambiguity enters a human queue;
+              raw audio, live calls, payer submissions, and automatic writeback remain disabled.
+            </p>
+            <ul className="compact-list">
+              <li>External calls: disabled</li>
+              <li>Writeback: disabled</li>
+              <li>Ambiguity: human exception queue</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.applicationRationalization.materialVendorChangeDefault}</span>
+            <h3>Application and vendor sentinel</h3>
+            <p>
+              Portfolio decisions require usage, dependencies, value, security, portability, retention, recovery, and owner
+              evidence. Material vendor changes freeze new deployment and writes until qualified review.
+            </p>
+            <ul className="compact-list">
+              <li>Dispositions: {summary.p32ControlPlane.applicationRationalization.dispositions.length}</li>
+              <li>Automatic retirement: prohibited</li>
+              <li>Portability evidence: required</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.repoOps.version}</span>
+            <h3>Secure RepoOps</h3>
+            <p>
+              Local secret scanning, deterministic SBOM evidence, dependency review, CodeQL, CODEOWNERS, and attributable
+              development receipts support review without claiming remote controls are enabled.
+            </p>
+            <ul className="compact-list">
+              <li>Remote settings: unverified</li>
+              <li>Remote mutation: not authorized</li>
+              <li>Named review: still required</li>
+            </ul>
+          </article>
+          <article>
+            <span>{summary.p32ControlPlane.releaseGateCatalog.count} gates</span>
+            <h3>Fingerprint-bound release evidence</h3>
+            <p>
+              Automated evidence and named approvals must match the exact source commit, source tree, artifact, and
+              validation fingerprints and must remain unexpired.
+            </p>
+            <ul className="compact-list">
+              <li>Automated gates: {summary.p32ControlPlane.releaseGateCatalog.automated}</li>
+              <li>External gates: {summary.p32ControlPlane.releaseGateCatalog.external}</li>
+              <li>Aggregate release authority: not granted</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
       <section className="table-section" aria-label="Healthcare Intelligence OS phase plan">
         <div className="section-heading">
           <p className="eyebrow">Strategic phase plan</p>
@@ -358,6 +735,19 @@ export default function HealthcareIntelligenceOSPage() {
               <li>Raw connector payload: {summary.clinicalContextGateway.rawConnectorPayloadAccess}</li>
               <li>Record mutation: {summary.clinicalContextGateway.recordMutationAuthority}</li>
               <li>Patient outreach: {summary.clinicalContextGateway.patientOutreachAuthority}</li>
+            </ul>
+          </article>
+          <article>
+            <span>Context Lens</span>
+            <h3>Evidence inside the governed workflow surface</h3>
+            <p>
+              Public Evidence and Clinical Context remain isolated. Every proposed next action carries
+              source provenance, freshness, confidence, missing-data state, constraints, and a reason.
+            </p>
+            <ul className="compact-list">
+              <li>Modes: {summary.clinicalContextGateway.contextLensModes.join(", ")}</li>
+              <li>Stale or unsupported context: {summary.clinicalContextGateway.unsupportedOrStaleContextAction}</li>
+              <li>Live PHI: {summary.clinicalContextGateway.contextLensLivePhiEnabled ? "enabled" : "disabled"}</li>
             </ul>
           </article>
         </div>

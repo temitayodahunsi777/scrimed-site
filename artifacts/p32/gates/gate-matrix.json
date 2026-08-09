@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "scrimed-p32-gate-matrix-v1",
+  "evidenceClass": "NON_CANDIDATE",
+  "evaluatedAt": "2026-07-30T13:48:12Z",
+  "profile": "development",
+  "automatedGateEvidence": {
+    "status": "PASS",
+    "passed": 66,
+    "failed": 0,
+    "blocked": 0,
+    "evidenceType": "local deterministic synthetic/deidentified read-only policy tests",
+    "catalogPointer": "app/lib/scrimed-work/p32TechnicalGates.ts",
+    "testPointer": "scripts/scrimed-p32-consolidated-governance-policy-test.mjs",
+    "selfTestPointer": "scripts/scrimed-p32-preproduction-governance-gates.mjs",
+    "candidateAuthorityGranted": false
+  },
+  "externalGates": [
+    {
+      "gateId": "clean-reviewed-commit-provenance",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "release-steward"
+    },
+    {
+      "gateId": "named-independent-reviewer",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "principal-reviewer"
+    },
+    {
+      "gateId": "aal2-operator-evidence",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "authorized-operator"
+    },
+    {
+      "gateId": "migration-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "database-owner"
+    },
+    {
+      "gateId": "intended-use-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "founder-clinical-governance-counsel"
+    },
+    {
+      "gateId": "clinical-safety-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "clinical-safety-officer"
+    },
+    {
+      "gateId": "privacy-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "privacy-officer"
+    },
+    {
+      "gateId": "legal-regulatory-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "qualified-healthcare-counsel"
+    },
+    {
+      "gateId": "security-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "security-officer"
+    },
+    {
+      "gateId": "baa-subprocessor-residency-approval",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "privacy-security-counsel"
+    },
+    {
+      "gateId": "deployment-authorization",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "deployment-authority"
+    },
+    {
+      "gateId": "post-deployment-smoke-validation",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "release-operator"
+    },
+    {
+      "gateId": "customer-go-live-authorization",
+      "status": "PENDING_HUMAN",
+      "ownerRole": "customer-authority-and-scrimed-founder"
+    }
+  ],
+  "counts": {
+    "PASS": 66,
+    "FAIL": 0,
+    "BLOCKED": 0,
+    "BLOCKED_EXTERNAL": 0,
+    "PENDING_HUMAN": 13
+  },
+  "developmentSafeModeAllowed": true,
+  "productionReleaseAllowed": false,
+  "safetyPosture": {
+    "syntheticOnly": true,
+    "deidentifiedFixturesOnly": true,
+    "readOnly": true,
+    "liveProviderCallsEnabled": false,
+    "productionMutationsEnabled": false
+  },
+  "boundary": "Automated local evidence supports synthetic, de-identified-fixture, read-only development only. It is not candidate-bound external approval or production authority."
+}

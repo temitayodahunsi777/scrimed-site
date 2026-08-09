@@ -2,11 +2,67 @@
 
 SCRIMED Work is a synthetic/no-PHI, verification-first control plane for long-running healthcare work sessions. It consolidates workspaces, Definition-of-Done contracts, model and tool routing, multi-agent orchestration, healthcare context retrieval, approval gates, artifact generation, disabled schedule definitions, voice-session simulation, learning-loop proposals, rollback metadata, audit records, and value telemetry.
 
+## Development continuity planner
+
+`developmentContinuity.ts` joins the existing Automation Autopilot to the authoritative
+`review-requirements.json` policy matrix. It gives operators one deterministic answer for each
+registered action: its owner, risk tier, required evidence, missing evidence, review posture,
+operating-mode block, and next controlled step.
+
+The planner deliberately does not authorize work. `authorizationStatus` remains `NOT_EVALUATED`,
+`productionAuthorityGranted` remains false, and every executable action must still pass
+`evaluateReviewPolicy` with the exact current candidate and assurance fingerprints, evidence,
+identity, and approval references. This prevents a dashboard recommendation or automation-agent
+narrative from becoming authority.
+
+The default safe operating mode makes a synthetic demonstration eligible for an execution
+preflight when the built-in no-PHI disclosure and synthetic-mode attestation are present. Source
+commits and preview or Wix publication remain founder-acceptance lanes. Legal adoption remains a
+qualified-counsel lane. Production, PHI, connector, clinical, payer, and customer actions remain
+external-authority or prohibited lanes according to the review matrix and operating-mode gates.
+
+Each action has a deterministic evidence hash, and the complete plan has a stable fingerprint that
+changes when evidence, policy posture, or operating mode changes. These hashes are planning and
+review evidence only; they are not signatures, approvals, release provenance, or production grants.
+
+### Exact-evidence review preflight
+
+`POST /api/scrimed-work/continuity/preflight` turns a selected continuity action into an
+authenticated, tenant-scoped advisory receipt. The caller supplies only the action context, exact
+candidate and assurance-manifest SHA-256 fingerprints, declared metadata conditions, and evidence
+identifiers. Evaluation time is assigned by the server. Unknown fields, caller-controlled
+timestamps, approval objects, tokens, direct identifiers, and PHI are rejected.
+
+The preflight intentionally does not accept `signatureVerified` assertions or other approval
+claims from a request. Founder acceptance and qualified approvals remain in their existing trusted,
+candidate-bound workflows. Every response reports `authorizationStatus=NOT_EVALUATED`,
+`executionAuthorized=false`, `externalMutationAllowed=false`, and
+`productionAuthorityGranted=false`. A `PREFLIGHT_PASSED` receipt means only that the registered
+Tier-0 context and required evidence are internally consistent; action-specific authorization is a
+separate gate.
+
+## Independent Review And Gap Closure
+
+The control plane exposes twelve independently scoped AI-assisted review lanes. Review packets
+bind candidate/source fingerprints, reviewer and model identity, prompt version, line-bounded
+evidence, rubric results, findings, disposition, expiration, and a deterministic audit hash.
+Self-review, tampering, stale evidence, candidate/model mismatch, duplicate/conflicting lanes,
+unresolved critical findings, and human-approval impersonation fail closed.
+
+Agent teams also carry explicit cost, runtime, action, tool, egress, stop, retry, audit,
+idempotency, and circuit-breaker limits. The default network allowlist is empty and retrieved
+content remains data, never executable instructions. Unverified model candidates remain disabled
+until official model identity and offline qualification evidence are reviewed.
+
+Portable commands support direct-live Wix verification, preview desktop/exact-390px checks, and
+exact-set disposable migration preflight. Live external evidence and qualified human approvals
+remain separate gates; these utilities grant no production authority.
+
 ## Safety Boundary
 
 SCRIMED Work does not authorize live PHI, autonomous clinical care, diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, final imaging interpretation, production connector approval, certification claims, customer go-live, or external model calls.
 
-Consequential clinical, financial, privacy, identity, scheduling, write, and external-communication actions are disabled by default and must fail closed unless future approved authentication, authorization, CSRF, rate limiting, durable storage, and human approval controls are configured.
+Consequential clinical, financial, privacy, identity, scheduling, write, and external-communication actions are disabled by default. Protected SCRIMED Work mutations enforce authentication, authorization, exact same-origin browser request provenance, actor and tenant rate limits, idempotency, durable storage, and human approval. Production rate limiting requires the distributed provider and fails closed when that provider is missing or unavailable.
 
 ## Architecture
 
@@ -15,7 +71,10 @@ flowchart TD
   UI["/scrimed-work"] --> API["/api/scrimed-work"]
   API --> Session["Work Session Store"]
   API --> Durable["AAL2 Durable Store RPC"]
+  API --> CSRF["Same-Origin Mutation Guard"]
+  API --> RateLimit["Actor + Tenant Mutation Limits"]
   API --> Hardening["Production Hardening Gate"]
+  API --> Preflight["Exact-Evidence Advisory Preflight"]
   Durable --> RLS["Private Supabase Tables + RLS Deny Policies"]
   Session --> Contract["Definition of Done"]
   Contract --> Policy["Autonomy Policy"]
@@ -44,11 +103,14 @@ flowchart TD
 - `durableStore.ts`: protected Supabase RPC adapter for AAL2-gated session, artifact, status, idempotency, and audit persistence.
 - `sessionLifecycle.ts`: explicit session state machine, transition preconditions, independent-review controls, cancellation propagation, and deterministic decision hashes.
 - `productionHardening.ts`: machine-readable production-hardening gate separating evidence-ready controls from operator-required release steps.
+- `reviewPolicyPreflight.ts`: strict exact-fingerprint request validation, server-owned evaluation time, operating-mode blocks, and non-authorizing advisory receipts.
 - `modelRouter.ts`: provider-neutral model selection with privacy, residency, cost, and safety constraints.
 - `providerRegistry.ts`: configurable OpenAI-compatible, Anthropic-compatible, local/private, and synthetic no-call adapters.
 - `toolRegistry.ts`: least-privilege tools with consequential actions disabled and approval-gated.
 - `agentRegistry.ts`: coordinator, clinical-context, interoperability, patient-access, research, RCM, verification, safety, artifact, executive, and reviewer agents.
 - `contextEngine.ts`: citation-required hybrid retrieval scaffold with ontology concepts mapped to FHIR previews.
+- `csrfProtection.ts`: exact same-origin browser mutation enforcement and explicit non-browser operator-smoke provenance.
+- `rateLimitPolicy.ts`: hashed actor/tenant mutation quotas, production downgrade prevention, distributed-provider enforcement, and no-secret quota headers.
 - `verificationEngine.ts`: schema, citation, policy, PHI, loop, budget, rollback, and approval checks.
 - `artifactEngine.ts`: JSON/Markdown draft artifacts with citations, verification, review status, and export metadata.
 - `artifactReview.ts`: reviewer-only internal disposition policy with separation of duties, database-verifiable reviewer/decision hashes, mandatory verification, and fixed external-use blocks.
@@ -81,6 +143,10 @@ Metadata POST routes:
 - `POST /api/scrimed-work/context/search`
 - `POST /api/scrimed-work/voice/simulate`
 - `POST /api/scrimed-work/sessions/:sessionId/verify`
+
+Protected read-shaped POST routes:
+
+- `POST /api/scrimed-work/continuity/preflight` (AAL2, tenant-scoped, metadata-only, no caller approval assertions, no execution authority)
 
 Protected write-shaped routes:
 
@@ -115,6 +181,19 @@ Protected writes require all of the following:
 - the operator has `tenant-admin`, `pilot-lead`, or `reviewer` membership for the supplied workspace
 - an `idempotency-key` header is present for mutations; authenticated durable reads do not accept mutation authority from that header
 - `x-scrimed-workspace-slug`, `workspaceSlug`, or `SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG` identifies the tenant workspace
+- actor and tenant mutation quotas permit the request; production requires configured Upstash REST credentials and does not fall back to process memory
+
+### Browser Mutation and CSRF Protection
+
+Protected browser mutations must carry an `Origin` that exactly matches the request origin. When Fetch Metadata headers are present, `sec-fetch-site` must be `same-origin`, the mode must be `cors` or `same-origin`, and the destination must be `empty`. Cross-origin, sibling-subdomain, null-origin, navigational, malformed, and browser-shaped requests without an origin fail closed with `403 scrimed_work_csrf_denied` before tenant or authentication lookup.
+
+Approved Node/CLI smoke clients do not have browser origin headers. They must send the fixed, nonsecret header `x-scrimed-request-context: operator-smoke-v1`. This header is request provenance only: it never replaces the bearer token, AAL2, RBAC, RLS, workspace scope, idempotency, safety policy, migration evidence, runtime authorization, or durable audit controls. Browser requests cannot use it to override an origin mismatch.
+
+### Actor and Tenant Mutation Rate Limits
+
+Every protected mutation passes through two shared quotas after AAL2 identity and tenant membership resolve: 30 mutations per actor/workspace per 10 minutes and 120 mutations per tenant per 10 minutes. Action names are intentionally excluded from the counter key so switching endpoints or retrying with a different action cannot evade the shared budget. Tenant, workspace, and actor identifiers are hashed before counter storage and are never emitted in headers, logs, tests, or UI.
+
+Local and test runtimes may use the bounded-memory adapter for deterministic validation, but that mode is explicitly nonproduction. A Vercel production runtime, or any runtime marked `SCRIMED_DEPLOYMENT_STAGE=production`, forces `distributed-required` even if `bounded-memory` was requested. Missing or unreachable distributed storage returns `503 scrimed_work_rate_limit_provider_unavailable`; quota exhaustion returns `429 scrimed_work_rate_limit_exceeded` with a bounded `Retry-After`. Neither response weakens AAL2, RBAC, RLS, CSRF, idempotency, migration, durable-audit, or clinical safety controls.
 
 The ordered local migrations are:
 
@@ -205,7 +284,19 @@ npm run smoke:scrimed-work:durable-store-preflight:strict
 npm run smoke:scrimed-work:two-identity:strict
 ```
 
-The strict canary checks distinct JWT `sub` and `session_id` claims locally, then relies on protected APIs for signature, AAL2, tenant membership, role, and lifecycle verification. Output is limited to synthetic record IDs, audit IDs, and one-way fingerprints. After a reviewed successful run, bind the retained evidence with `SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED=true` and a nonsecret `SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID`; never retain the bearer values as release evidence.
+The strict canary checks distinct JWT `sub` and `session_id` claims locally, then relies on protected APIs for signature, AAL2, tenant membership, role, and lifecycle verification. Output is limited to synthetic record IDs, audit IDs, release fingerprints, completion time, and one-way evidence hashes. The protected completion-evidence read derives `SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID` from immutable review/completion evidence, the exact tenant workspace, and the exact deployed Git SHA; operators do not invent this identifier.
+
+After a reviewed successful run, bind all five nonsecret settings reported by the protected response:
+
+```bash
+SCRIMED_WORKSPACE_SLUG=<exact-canary-workspace>
+SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED=true
+SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID=scrimed-work-canary-<evidence-sha256>.<authentication-tag>
+SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA=<exact-deployed-git-sha>
+SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT=<immutable-completion-timestamp>
+```
+
+The evidence ID is authenticated with a domain-separated HMAC backed by the existing server-held runtime authorization token; that secret is never returned or retained as evidence. The production-hardening gate accepts the canary only when this authentication tag is valid, the configured release SHA and workspace exactly match the running deployment, and completion occurred within the preceding 72 hours. Five minutes of clock skew is tolerated; older or future-dated evidence fails closed. A subsequent Git release, workspace change, runtime-token rotation, or freshness expiry requires a new controlled two-identity run. Never retain either bearer token as release evidence.
 
 `GET /api/scrimed-work/production-hardening` returns a no-secret readiness gate for SCRIMED Work. It reports:
 
@@ -216,6 +307,28 @@ The strict canary checks distinct JWT `sub` and `session_id` claims locally, the
 - retained no-PHI, no-autonomous-care, no-EHR-writeback, no-payer-submission, no-certification, and no-customer-go-live boundaries.
 
 The gate intentionally does not apply migrations, verify production readiness, expose credential values, or authorize buyer-facing protected mutations.
+Both the API and `/scrimed-work` control-plane page are dynamically rendered so freshness cannot remain frozen at build time.
+
+## Agent Team, Qualification, And Impact Governance
+
+`app/lib/scrimed-work/agentTeams.ts` defines ten bounded planner, specialist, reviewer, and
+release-verifier teams. Every team requires independent evidence review and a human gateway;
+agents cannot self-approve, expand permissions, communicate externally, deploy, or gain clinical
+authority.
+
+`app/lib/scrimed-work/modelQualification.ts` maintains hashed provider and agent approval
+passports plus bounded offline effort routing. Unverified providers and model names remain
+disabled. The deterministic synthetic fallback is the only model profile approved for local
+synthetic evaluation, and no profile grants PHI, clinical, provider-call, or release authority.
+
+`app/lib/scrimed-work/impactGovernance.ts` provides evidence-tagged Verified Intelligence Yield,
+Healthcare Value Returned, workforce transition, procurement, and sovereign architecture
+readiness contracts. Current dashboard values are simulated planning evidence, not customer
+outcomes, audited ROI, procurement approval, employment authority, clinical validation, or
+deployment authorization.
+
+Run `npm run test:scrimed-qualification-impact` and
+`npm run contract:scrimed-qualification-impact` for focused validation.
 
 ## Feature Flags
 
@@ -237,8 +350,13 @@ The gate intentionally does not apply migrations, verify production readiness, e
 - `SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID`: required nonsecret identifier linking the two-step queue migration to reviewed grant, function, and advisor evidence.
 - `SCRIMED_REVIEWER_BEARER_TOKEN`: short-lived local-only reviewer AAL2 token used by the strict two-identity canary; never deploy or log it.
 - `SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED`: true only after the protected two-person lifecycle succeeds and its evidence is reviewed.
-- `SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID`: nonsecret identifier linking release provenance to that reviewed canary evidence.
+- `SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID`: server-derived nonsecret evidence digest plus authentication tag linking immutable reviewed completion evidence to one exact release.
+- `SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA`: exact 40- or 64-character deployed Git SHA bound into the canary evidence identifier; a mismatch fails closed.
+- `SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT`: immutable completion timestamp bound into the authentication tag; release promotion fails closed after 72 hours.
+- `SCRIMED_WORKSPACE_SLUG`: exact tenant workspace bound into the authentication tag; canary release evidence does not accept the fallback workspace variable.
 - `SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG`: optional fallback workspace slug for protected SCRIMED Work smoke tests.
+- `SCRIMED_WORK_RATE_LIMIT_MODE`: `bounded-memory` for explicit local/test validation or `distributed-required` for protected deployment; production runtime detection always prevents downgrade.
+- `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or the existing Vercel Marketplace `KV_REST_API_*`/Upstash equivalents: server-only distributed counter configuration. Values are never returned or logged.
 
 ## Local Validation
 
@@ -251,6 +369,9 @@ npm run test:scrimed-work:artifact-review-policy
 npm run test:scrimed-work:review-queue-policy
 npm run test:scrimed-work:review-preparation-policy
 npm run test:scrimed-work:two-identity-policy
+npm run test:scrimed-work:canary-attestation-policy
+npm run test:scrimed-work:csrf-policy
+npm run test:scrimed-work:rate-limit-policy
 npm run test:scrimed-work:production-hardening-policy
 npm run smoke:scrimed-work:durable-store-preflight
 npm run smoke:scrimed-work:authenticated
@@ -280,6 +401,10 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 - Read-only public views remain synthetic. Protected durable reads and verification require an AAL2 bearer session, authorized workspace membership, workspace scope, and the durable-store flag. Protected writes additionally require the server runtime token, mutation idempotency key, protected-write flag, and reviewed migration evidence.
 - The existing membership model has tenant-admin, pilot-lead, reviewer, and observer roles but no verified clinician credential binding. High-risk clinical approval therefore remains blocked rather than treating a generic reviewer as a clinician.
 - Completion and its evidence history remain internal synthetic lifecycle evidence. They are not release, distribution, clinical, regulatory, connector, or customer go-live authority.
+- Release-bound canary evidence expires after 72 hours or whenever the deployed Git SHA or explicit workspace changes; each condition requires a new two-identity lifecycle canary and reviewed binding.
+- Browser mutations require exact same-origin provenance. Approved non-browser smoke clients require the fixed `operator-smoke-v1` context header and remain fully subject to AAL2 and tenant authorization.
+- Bounded-memory mutation counters are process-local and acceptable only for local/test validation. Production protected writes require the distributed provider and fail closed on missing credentials, provider errors, or invalid rate-limit mode configuration.
+- Rotating `SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN` invalidates the canary authentication tag by design and requires fresh controlled evidence.
 - A complete PayerIQ lifecycle needs two distinct AAL2 identities: an authorized initiator and a separate `reviewer` member. One account cannot satisfy separation of duties.
 - Provider adapters do not call external models and require future secret-managed configuration, legal/privacy review, and budget controls.
 - Schedules are definitions only; no uncontrolled background scheduler is introduced.
@@ -288,4 +413,4 @@ Local token inspection is explicitly reported as `signature=not-verified-local-p
 
 ## Next Production-Hardening Step
 
-Apply and review the completion-evidence migration in the approved no-PHI target, then run an authenticated tenant-admin read against `mode=evidence` and retain only its safe audit-event ID and evidence packet hash. Keep buyer-facing export disabled until a separate recipient, purpose, legal, and release-authority workflow approves sharing. Externally reviewed clinician-identity binding remains mandatory before any high-risk clinical approval path is considered.
+Configure and verify the distributed mutation provider in the exact-release two-identity canary, retaining only no-secret quota and provider-state evidence. The next code-side hardening item is a retained abuse-event ledger plus provider-health circuit-breaker telemetry that never records identifiers, prompts, tokens, or PHI. Keep buyer-facing export disabled until a separate recipient, purpose, legal, and release-authority workflow approves sharing. Externally reviewed clinician-identity binding remains mandatory before any high-risk clinical approval path is considered.

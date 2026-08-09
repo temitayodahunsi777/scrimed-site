@@ -22,7 +22,10 @@ for (const expected of [
   "discoverSensitiveLocalEnvironmentNames",
   ".env.local",
   "scripts/clean-generated-cache.mjs",
+  "--preserve-next-cache",
   "scripts/check-generated-integrity.mjs",
+  "scripts/generated-output-postflight.mjs",
+  "scripts/verify-public-release.mjs",
   "scripts/workspace-hygiene-contract-check.mjs",
   "scripts/scrimed-nonsecret-test-suite.mjs",
   "node_modules/typescript/bin/tsc",
@@ -31,6 +34,9 @@ for (const expected of [
   "--noEmit",
   "build",
   "--webpack",
+  "generated-output postflight",
+  "built public release verification",
+  "--require-build",
   "post-run generated integrity"
 ]) {
   requireIncludes(runnerPath, runner, expected);
@@ -44,6 +50,10 @@ for (const forbidden of ["npm install", "npm ci", "pnpm install", "yarn install"
 
 if (packageJson.scripts?.["quality:direct-node"] !== `node ${runnerPath}`) {
   throw new Error("package.json must expose quality:direct-node through the direct runner.");
+}
+
+if (packageJson.scripts?.prebuild !== "node scripts/clean-generated-cache.mjs --preserve-next-cache && node scripts/release-provenance-preflight.mjs --deployment-aware") {
+  throw new Error("package.json prebuild must preserve only the validated non-authoritative Next cache.");
 }
 
 for (const expected of [

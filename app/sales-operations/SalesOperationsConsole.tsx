@@ -3,7 +3,14 @@
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore
+} from "react";
 import PasskeyManagementPanel from "../components/PasskeyManagementPanel";
 import type { AttributionAnalyticsReport } from "../lib/attributionAnalytics";
 import {
@@ -41,6 +48,13 @@ import type {
   SalesBuyerDemoSession,
   SalesBuyerDemoSessionResult
 } from "../lib/buyerDemoSessions";
+import { buildPilotDemoSessionCatalog } from "../lib/pilotDemoCommercialReadiness";
+import {
+  parsePilotDemoProtectedHandoffQuery,
+  pilotDemoProtectedHandoffQueryKeys,
+  toPilotDemoProtectedHandoffCandidate,
+  type PilotDemoProtectedHandoffValidation
+} from "../lib/pilotDemoProtectedHandoff";
 import type { SalesDemoSessionQaRun } from "../lib/salesDemoSessionQa";
 import type { SalesCommandCenterSummary } from "../lib/salesCommandCenter";
 
@@ -186,6 +200,30 @@ function governancePackFor(opportunity: SalesOpportunity) {
   return opportunity.payload.assessment.governanceWorkflowPack ?? opportunity.payload.governance?.workflowPack ?? null;
 }
 
+const locationSearchChangeEvent = "scrimed:location-search-change";
+
+function subscribeToLocationSearch(onStoreChange: () => void) {
+  window.addEventListener("popstate", onStoreChange);
+  window.addEventListener(locationSearchChangeEvent, onStoreChange);
+
+  return () => {
+    window.removeEventListener("popstate", onStoreChange);
+    window.removeEventListener(locationSearchChangeEvent, onStoreChange);
+  };
+}
+
+function readLocationSearch() {
+  return window.location.search;
+}
+
+function readServerLocationSearch() {
+  return "";
+}
+
+function notifyLocationSearchChanged() {
+  window.dispatchEvent(new Event(locationSearchChangeEvent));
+}
+
 export default function SalesOperationsConsole({
   supabaseUrl,
   supabasePublishableKey
@@ -207,6 +245,7 @@ export default function SalesOperationsConsole({
         : null,
     [configured, supabasePublishableKey, supabaseUrl]
   );
+  const pilotDemoCatalog = useMemo(() => buildPilotDemoSessionCatalog(), []);
   const [email, setEmail] = useState("");
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -233,6 +272,17 @@ export default function SalesOperationsConsole({
   const [demoOperatorNotes, setDemoOperatorNotes] = useState("");
   const [demoBuyerQuestions, setDemoBuyerQuestions] = useState("");
   const [demoNextActions, setDemoNextActions] = useState("");
+  const locationSearch = useSyncExternalStore(
+    subscribeToLocationSearch,
+    readLocationSearch,
+    readServerLocationSearch
+  );
+  const demoHandoffValidation = useMemo<PilotDemoProtectedHandoffValidation | null>(() => {
+    const params = new URLSearchParams(locationSearch);
+    if (!params.has(pilotDemoProtectedHandoffQueryKeys.version)) return null;
+
+    return parsePilotDemoProtectedHandoffQuery(locationSearch, pilotDemoCatalog);
+  }, [locationSearch, pilotDemoCatalog]);
   const [mfaFactorId, setMfaFactorId] = useState("");
   const [mfaFactorStatus, setMfaFactorStatus] = useState<"verified" | "unverified" | "">("");
   const [mfaQrCode, setMfaQrCode] = useState("");
@@ -827,6 +877,10 @@ export default function SalesOperationsConsole({
           operatorNotes: demoOperatorNotes,
           buyerQuestions: linesFromText(demoBuyerQuestions),
           nextActions,
+          rehearsalHandoff:
+            demoHandoffValidation?.status === "accepted-metadata-draft"
+              ? toPilotDemoProtectedHandoffCandidate(demoHandoffValidation.handoff)
+              : undefined,
           followUpPlan: {
             owner: user?.email ?? "SCRIMED sales operator",
             nextStep: nextActions[0] ?? selected.nextAction ?? "Confirm buyer decision path",
@@ -847,6 +901,14 @@ export default function SalesOperationsConsole({
     setDemoOperatorNotes("");
     setDemoBuyerQuestions("");
     setDemoNextActions("");
+    if (demoHandoffValidation) {
+      const nextUrl = new URL(window.location.href);
+      for (const key of Object.values(pilotDemoProtectedHandoffQueryKeys)) {
+        nextUrl.searchParams.delete(key);
+      }
+      window.history.replaceState(null, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+      notifyLocationSearchChanged();
+    }
     await refreshDashboard("Buyer demo session recorded with no-PHI history and append-only audit.");
     await loadBuyerDemoSessions(selected);
   }
@@ -1433,6 +1495,10 @@ export default function SalesOperationsConsole({
     ? buyerDemoSessionsByIntake[selected.intakeId] ?? []
     : [];
   const latestBuyerDemoSession = selectedBuyerDemoSessions[0] ?? null;
+  const acceptedDemoHandoff =
+    demoHandoffValidation?.status === "accepted-metadata-draft" ? demoHandoffValidation : null;
+  const rejectedDemoHandoff =
+    demoHandoffValidation?.status === "rejected" ? demoHandoffValidation : null;
   const latestBuyerDemoQaRun = selected ? buyerDemoQaRunsByIntake[selected.intakeId] ?? null : null;
   const selectedSalesCommandCenter = selected
     ? salesCommandCentersByIntake[selected.intakeId] ?? null
@@ -2014,7 +2080,7 @@ export default function SalesOperationsConsole({
               ) : null}
 
               <div className="sales-activation-grid">
-                <section>
+                <section id="authenticated-buyer-demo-execution">
                   <p className="eyebrow">Authenticated buyer demo execution</p>
                   <h3>Run the no-PHI buyer demo path from one protected checklist.</h3>
                   <p className="section-copy">
@@ -2059,6 +2125,46 @@ export default function SalesOperationsConsole({
                       </div>
                     ))}
                   </div>
+                  {acceptedDemoHandoff ? (
+                    <div className="sales-demo-handoff" aria-label="Validated rehearsal metadata draft">
+                      <div>
+                        <span className="status-pill status-pill-warn">Public metadata draft</span>
+                        <strong>{acceptedDemoHandoff.plan.demoName}</strong>
+                        <p>
+                          {acceptedDemoHandoff.plan.audienceLabel} · {acceptedDemoHandoff.plan.focusLabel} ·{" "}
+                          {acceptedDemoHandoff.plan.durationMinutes} minutes ·{" "}
+                          {acceptedDemoHandoff.handoff.proofTargetCount} proof routes
+                        </p>
+                      </div>
+                      <dl>
+                        <div>
+                          <dt>Plan</dt>
+                          <dd>{acceptedDemoHandoff.handoff.planId}</dd>
+                        </div>
+                        <div>
+                          <dt>Handoff</dt>
+                          <dd>{acceptedDemoHandoff.handoff.handoffFingerprint}</dd>
+                        </div>
+                      </dl>
+                      <p>
+                        Canonical plan identity passed. The rehearsal and preflight fingerprints remain
+                        client-origin references, not independent verification. Select the correct opportunity,
+                        review the evidence, then use Record Demo Session for explicit AAL2 persistence.
+                      </p>
+                    </div>
+                  ) : null}
+                  {rejectedDemoHandoff ? (
+                    <div className="sales-demo-handoff is-rejected" role="alert">
+                      <div>
+                        <span className="status-pill status-pill-block">Handoff rejected</span>
+                        <strong>Rebuild the governed rehearsal metadata.</strong>
+                      </div>
+                      <p>{rejectedDemoHandoff.message}</p>
+                      <Link className="secondary-action" href="/pilot-demo-commercial-readiness#demo-session-planner">
+                        Rebuild rehearsal
+                      </Link>
+                    </div>
+                  ) : null}
                   <div className="form-grid">
                     <label className="form-field form-field-wide">
                       <span>Operator notes</span>
@@ -2128,7 +2234,11 @@ export default function SalesOperationsConsole({
                   <div className="form-actions">
                     <button
                       className="primary-action"
-                      disabled={status === "recording-demo-session" || status === "running-demo-session-qa"}
+                      disabled={
+                        status === "recording-demo-session" ||
+                        status === "running-demo-session-qa" ||
+                        Boolean(rejectedDemoHandoff)
+                      }
                       onClick={recordBuyerDemoSession}
                       type="button"
                     >
