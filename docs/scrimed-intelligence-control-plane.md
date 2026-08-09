@@ -29,6 +29,10 @@ The Intelligence Control Plane consolidates healthcare work orchestration into o
 - Outcome Intelligence: separate baseline and post-implementation fields without fabricated improvements.
 - Approval Achievement: dependency graph, dated evidence, owners, expiry, safe workarounds, and human/external authority boundaries.
 - Cross-Platform Evidence: dated GitHub, Vercel, Supabase, Wix, and Figma observations, drift, owners, approval impact, and fail-closed release decisions without credentials or raw logs.
+- Platform Strategy Registry: eleven-plane ownership map, capability evidence, portfolio
+  dispositions, strategic metric definitions, commercialization boundaries, and moat hypotheses.
+  Deterministic JSON artifacts are generated under `artifacts/platform`, `artifacts/product`, and
+  `artifacts/investor` and checked for source drift.
 
 ## Feature Flags
 
@@ -43,10 +47,18 @@ Read-only synthetic functionality may default on locally. `SCRIMED_APPROVAL_ACHI
 - Capital profiles are investor archetypes, not permission to contact any party.
 - Outcome fields remain null until an approved pilot measurement plan produces evidence.
 - Connector observations are dated snapshots, not live runtime synchronization, and expire unless refreshed.
-- The published Wix testimonial remains a public-claims blocker until removed or supported by signed authorization and substantiation.
+- The retained direct-live Wix report shows the testimonial, commerce, homepage, and Vitals
+  controls passing, but the FaithCore page, service page, and related post remain inconsistent
+  with the approved optional and clinically neutral copy. A fresh network-capable strict check is
+  required after owner publication.
 
 ## Production Hardening
 
-Remove or substantiate the public testimonial, bind the current build to a clean reviewed revision, then apply the existing SCRIMED Work migration in an approved nonproduction project. Run strict AAL2 mutation smoke, test tenant isolation and cancellation under failure, validate no-PHI canary evidence, and complete clinical, privacy, security, legal, finance, and buyer-specific approvals before scope expands.
+Publish only the reviewed FaithCore copy through the Wix owner workflow, bind the current build to
+a clean reviewed revision, and dry-run the three pending migrations only in an approved disposable
+environment. Enable leaked-password protection through the scoped Supabase Auth control, run
+strict AAL2 smoke, test tenant isolation and cancellation under failure, validate no-PHI canary
+evidence, and complete clinical, privacy, security, legal, finance, and buyer-specific approvals
+before scope expands.
 
 When a local sandbox permits sockets, run `npm run smoke:scrimed-control-plane` against a started build. In socket-restricted environments, run `node scripts/scrimed-control-plane-smoke.mjs --compiled` after `npm run build` to exercise the compiled API handler and verify the compiled page module.

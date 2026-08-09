@@ -22,6 +22,7 @@ import {
 } from "./registries";
 import { getApprovalAchievementSummary } from "./approvalAchievement";
 import { getCrossPlatformEvidenceSummary } from "./platformEvidence";
+import { getPlatformStrategySummary } from "./platformStrategy";
 
 export * from "./types";
 export * from "./featureFlags";
@@ -36,6 +37,7 @@ export * from "./outcomeIntelligence";
 export * from "./governance";
 export * from "./approvalAchievement";
 export * from "./platformEvidence";
+export * from "./platformStrategy";
 
 export const controlPlaneRoute = "/scrimed-control-plane";
 export const controlPlaneApiRoute = "/api/scrimed-control-plane";
@@ -143,6 +145,7 @@ export function getControlPlaneSummary() {
     approvals: primarySession.approvalCheckpoints,
     approvalAchievement: getApprovalAchievementSummary(),
     platformEvidence: getCrossPlatformEvidenceSummary(),
+    platformStrategy: getPlatformStrategySummary(),
     voiceSimulation: work.voiceSimulation,
     capitalIntelligence: getCapitalIntelligenceSummary(),
     computeResilience: getComputeResilienceSummary(),
@@ -206,6 +209,9 @@ export function buildControlPlaneBrief() {
     `- Objective drift detected: ${summary.reasoningObservatory.objectiveDriftFlags.length > 0}`,
     `- ConsequenceBench status: ${summary.consequenceBench.evaluationStatus}`,
     `- Cross-platform release blockers: ${summary.platformEvidence.summary.blockedProviderCount}`,
+    `- Platform capabilities: ${summary.platformStrategy.capabilityCount} across ${summary.platformStrategy.platformPlanes.length} planes`,
+    `- Capability registry valid: ${summary.platformStrategy.validation.valid}`,
+    `- Core commercial wedge: ${summary.platformStrategy.coreWedge.offer} + ${summary.platformStrategy.coreWedge.productWorkflow}`,
     "",
     "## Safety Boundary",
     summary.boundary,

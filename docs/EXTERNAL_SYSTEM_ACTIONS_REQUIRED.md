@@ -5,7 +5,7 @@
 **Owner:** Founder/site owner.
 
 The Wix-controlled public-claims remediation was published and directly verified on 2026-07-27.
-That evidence is historical. A fresh 2026-08-01 check found later drift in published FaithCore
+That evidence is historical. A 2026-08-03 check found later drift in published FaithCore
 copy and inconsistent publication of the safe Vitals draft. The exact FaithCore replacement is
 saved in Wix as an unpublished draft; publication remains founder-controlled. Until publication
 and fresh live verification complete, the current Wix gate remains open.
@@ -52,9 +52,9 @@ reviewed rollback plan.
 
 **Owner:** authorized platform operators.
 
-- Vercel: the connected project was `READY` on 2026-08-01. Production remains at commit `5e77beea57f458883f7544421b2014fd4e28ac67`; the latest ready preview belongs to a different branch. The current local candidate is committed and intentionally not deployed. Bind deployment authorization to the final reviewed `HEAD` and assurance fingerprints before using the normal workflow, then collect exact-release post-deployment smoke evidence.
-- GitHub: no pull request exists for the current `agent/scrimed-p31-workstreams` branch. Existing open draft pull requests belong to other branches. Generate the exact candidate and least-disclosure review batches, obtain named dispositions, then create a PR only through the authorized repository workflow. Do not reuse another branch's review evidence.
-- Supabase: project `scrimed-protected-pilot` was `ACTIVE_HEALTHY` on Postgres 17.6.1 on 2026-08-01. Security Advisor reported one warning: leaked-password protection is disabled. The connector has no scoped Auth-setting mutation, so follow `docs/SUPABASE_SECURITY_OPERATOR_PACKET.md`, then rerun Security Advisor. No production migration was applied. The three pending local migrations remain static-READY for a separately authorized disposable dry-run; see `docs/MIGRATION_DRY_RUN_REPORT.md` and `docs/PENDING_MIGRATION_AUTHORIZATION_PACKET.md`.
+- Vercel: the connected project was `READY` on 2026-08-09. Production remains at commit `5e77beea57f458883f7544421b2014fd4e28ac67`. Ready previews exist for predecessor PRs 22 and 23, but neither preview contains the current consolidated candidate. Bind deployment authorization to the final reviewed `HEAD` and assurance fingerprints before using the normal workflow, then collect exact-release post-deployment smoke evidence.
+- GitHub: draft PR 22 at `450d9022356f1f19e3c1b1855f3a55f8634302bb` and draft PR 23 at `37d749c103ca1588be62740148b3dd294a35f7d2` are both ancestors of the current local base `9d2cfceef81b0b13010ef28b55c040d459bc625a`. Do not merge both predecessors independently. Validate one attributable candidate, create one replacement review path through the authorized repository workflow, and obtain named dispositions against that exact head.
+- Supabase: project `scrimed-protected-pilot` was `ACTIVE_HEALTHY` on Postgres 17.6.1 on 2026-08-09. Security Advisor still reported one warning: leaked-password protection is disabled. The connector has no scoped Auth-setting mutation, so follow `docs/SUPABASE_SECURITY_OPERATOR_PACKET.md`, then rerun Security Advisor. No production migration was applied. The three pending local migrations remain static-READY for a separately authorized disposable dry-run; see `docs/MIGRATION_DRY_RUN_REPORT.md` and `docs/PENDING_MIGRATION_AUTHORIZATION_PACKET.md`.
 - Supabase Performance Advisor reported informational unused-index findings. Do not remove those indexes from an early-stage workload solely because usage counters are currently zero; collect representative query/load evidence and review write/read tradeoffs first.
 
 These checks do not authorize deployment or production mutation.
@@ -63,5 +63,7 @@ These checks do not authorize deployment or production mutation.
 
 - The homepage metadata and conservative Organization schema were safe in the fresh inspection.
 - The 2026-07-27 strict marketing smoke passed and remains historical publication evidence only.
-- A fresh 2026-08-01 editor/live comparison found publication drift. The exact FaithCore draft
+- A 2026-08-03 direct-live comparison found publication drift. The exact FaithCore draft
   is saved but unpublished; fresh strict and 390px mobile verification remain required.
+- A 2026-08-09 strict refresh attempt failed closed because the current execution sandbox could
+  not reach the configured Wix pages. It did not supersede the retained direct-live evidence.

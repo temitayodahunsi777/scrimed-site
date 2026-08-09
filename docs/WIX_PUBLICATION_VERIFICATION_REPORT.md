@@ -15,6 +15,11 @@
 > results below remain valid only for their recorded observation time and do not close the current
 > gate.
 
+> **Network-constrained refresh — 2026-08-09:** The strict verifier was run again from the local
+> candidate, but the execution sandbox could not reach any configured Wix page. The verifier
+> failed closed with zero pages observed. This is an environmental evidence gap, not a passing or
+> failing claims assessment, and it does not supersede the 2026-08-03 direct-live result below.
+
 ## Current Direct-Live Verification
 
 **Captured:** `2026-08-03T01:26:35.867Z`

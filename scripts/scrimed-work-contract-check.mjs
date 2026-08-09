@@ -12,6 +12,8 @@ const requiredFiles = [
   "app/lib/scrimed-work/modelRouter.ts",
   "app/lib/scrimed-work/providerRegistry.ts",
   "app/lib/scrimed-work/productionHardening.ts",
+  "app/lib/scrimed-work/developmentContinuity.ts",
+  "app/lib/scrimed-work/reviewPolicyPreflight.ts",
   "app/lib/scrimed-work/migrationSet.ts",
   "app/lib/scrimed-work/browserVerification.ts",
   "app/lib/scrimed-work/sessionLifecycle.ts",
@@ -61,11 +63,13 @@ const requiredFiles = [
   "app/api/scrimed-work/tools/route.ts",
   "app/api/scrimed-work/schedules/route.ts",
   "app/api/scrimed-work/production-hardening/route.ts",
+  "app/api/scrimed-work/continuity/preflight/route.ts",
   "app/api/scrimed-work/route-model/route.ts",
   "app/api/scrimed-work/context/search/route.ts",
   "app/api/scrimed-work/artifacts/route.ts",
   "app/api/scrimed-work/voice/simulate/route.ts",
   "app/api/documentation-before-authorization/scrimed-work-handoff/route.ts",
+  "app/globals.css",
   "app/scrimed-work/page.tsx",
   "app/pilot-workspace/ProtectedPilotAccess.tsx",
   "app/pilot-workspace/ScrimedWorkBrowserVerificationPanel.tsx",
@@ -94,6 +98,8 @@ const requiredFiles = [
   "scripts/scrimed-work-review-preparation-policy-test.mjs",
   "scripts/scrimed-work-preflight-policy-test.mjs",
   "scripts/scrimed-work-browser-verification-policy-test.mjs",
+  "scripts/scrimed-work-development-continuity-policy-test.mjs",
+  "scripts/scrimed-work-review-policy-preflight-test.mjs",
   "supabase/migrations/20260709193000_scrimed_work_durable_store.sql",
   "supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql",
   "supabase/migrations/20260713163000_scrimed_work_advisor_index_hardening.sql",
@@ -151,6 +157,8 @@ const combinedLib = [
   files["app/lib/scrimed-work/featureFlags.ts"],
   files["app/lib/scrimed-work/durableStore.ts"],
   files["app/lib/scrimed-work/productionHardening.ts"],
+  files["app/lib/scrimed-work/developmentContinuity.ts"],
+  files["app/lib/scrimed-work/reviewPolicyPreflight.ts"],
   files["app/lib/scrimed-work/sessionLifecycle.ts"],
   files["app/lib/scrimed-work/index.ts"]
 ].join("\n");
@@ -178,6 +186,13 @@ for (const expected of [
   "fallbackModels",
   "scrimedWorkProviderRegistry",
   "scrimed-work-production-hardening-gate",
+  "scrimed-development-continuity-planner",
+  "AUTOMATIC_PREFLIGHT_ELIGIBLE",
+  "mustInvokeReviewPolicyBeforeExecution",
+  "executionAuthorized: false",
+  "scrimed-review-policy-preflight",
+  "callerSuppliedApprovalsAccepted: false",
+  "authorizationStatus: \"NOT_EVALUATED\"",
   "getScrimedWorkProductionHardeningGate",
   "getScrimedWorkFeatureFlags(env)",
   "isScrimedWorkDurableStoreEnabled(env)",
@@ -265,6 +280,21 @@ for (const expected of [
   "not-authorized"
 ]) {
   requireIncludes("app/lib/scrimed-work/index.ts", files["app/lib/scrimed-work/index.ts"], expected);
+}
+
+for (const expected of [
+  "guardedEvaluateReviewPolicyPreflight",
+  "authenticated-aal2-tenant-scoped-advisory",
+  "caller-supplied-approvals-rejected",
+  "X-SCRIMED-Execution-Authority",
+  "not-granted",
+  "fail-closed"
+]) {
+  requireIncludes(
+    "app/api/scrimed-work/continuity/preflight/route.ts",
+    files["app/api/scrimed-work/continuity/preflight/route.ts"],
+    expected
+  );
 }
 
 for (const expected of [
@@ -392,12 +422,20 @@ for (const expected of [
   "Approval Queue + Verification Results",
   "Model Routing + Value Telemetry",
   "Production Hardening Gate",
+  "Development Continuity",
+  "exact-fingerprint",
+  "Exact-evidence preflight",
+  "module-row-four",
   "Schedules + Voice Simulation",
   "SCRIMED Studio",
   "Lifecycle Control",
   "Authoritative state"
 ]) {
   requireIncludes("app/scrimed-work/page.tsx", files["app/scrimed-work/page.tsx"], expected);
+}
+
+for (const expected of [".module-row-four", "overflow-wrap: anywhere"]) {
+  requireIncludes("app/globals.css", files["app/globals.css"], expected);
 }
 
 const lifecycleMigration = files["supabase/migrations/20260713160000_scrimed_work_lifecycle_hardening.sql"];

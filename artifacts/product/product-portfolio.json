@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "scrimed.product-portfolio.v1",
+  "version": "scrimed-platform-strategy-v1-2026-08-08",
+  "status": "portfolio-rationalized-synthetic-no-authority",
+  "boundary": "This registry describes SCRIMED's locally implemented, synthetic/no-PHI platform foundations and evidence paths. It does not authorize PHI, autonomous clinical care, diagnosis, treatment, prescribing, payer submission, EHR writeback, medical-device connectivity, production deployment, certification claims, customer activation, investor outreach, valuation claims, or revenue guarantees.",
+  "coreWedge": {
+    "offer": "Workflow Intelligence Assessment",
+    "offerSlug": "workflow-intelligence-assessment",
+    "productWorkflow": "Documentation Before Authorization",
+    "progression": [
+      "paid no-PHI assessment",
+      "governed synthetic evaluation",
+      "protected workflow pilot",
+      "annual governed workflow subscription"
+    ],
+    "proofRoutes": [
+      "/offerings",
+      "/documentation-before-authorization",
+      "/healthcare-value-realization"
+    ],
+    "boundary": "No live PHI, payer submission, EHR writeback, clinical authority, outcome guarantee, or customer activation."
+  },
+  "portfolioRationalization": [
+    {
+      "id": "workflow-intelligence-entry-wedge",
+      "name": "Workflow Intelligence Assessment",
+      "sourceOfferSlug": "workflow-intelligence-assessment",
+      "disposition": "sell-now",
+      "rationale": "Lowest-risk path to paid discovery, buyer evidence, and a measurable follow-on pilot without requiring PHI or production connectors.",
+      "buyer": "Health-system operations, access, RCM, documentation, and transformation leaders.",
+      "proofRoutes": [
+        "/offerings",
+        "/documentation-before-authorization",
+        "/pilot-demo-commercial-readiness"
+      ],
+      "nextMilestone": "Complete three buyer-specific synthetic rehearsals with baseline, acceptance rubric, reviewer burden, and expansion gate.",
+      "retainedBoundary": "No live data, payer submission, production connector, clinical outcome, or ROI claim."
+    },
+    {
+      "id": "governed-synthetic-evaluation",
+      "name": "Governed Synthetic Evaluation",
+      "sourceOfferSlug": "synthetic-pilot-evaluation",
+      "disposition": "sell-now",
+      "rationale": "Turns platform safety and verification into a reviewable service while collecting product-fit and workflow evidence.",
+      "buyer": "Innovation, clinical informatics, security, governance, and procurement teams.",
+      "proofRoutes": [
+        "/offerings",
+        "/validation-evidence",
+        "/scrimed-control-plane"
+      ],
+      "nextMilestone": "Package exact scope, price floor, acceptance criteria, delivery capacity, and evidence-room index.",
+      "retainedBoundary": "No certification, clinical validation, production readiness, or customer-go-live claim."
+    },
+    {
+      "id": "protected-workflow-pilots",
+      "name": "Protected Workflow Pilots",
+      "sourceOfferSlug": null,
+      "disposition": "advance-after-gates",
+      "rationale": "Best route to outcome and renewal evidence after identity, migration, tenant, security, and reviewer gates are independently satisfied.",
+      "buyer": "Qualified health-system, clinic, payer, and research pilot sponsors.",
+      "proofRoutes": [
+        "/pilot-workspace/access",
+        "/approvals-readiness",
+        "/clinical-production-readiness"
+      ],
+      "nextMilestone": "Close named review, leaked-password protection, disposable migration evidence, and exact-candidate preview validation.",
+      "retainedBoundary": "No customer activation, PHI, live clinical execution, payer action, or production writeback."
+    },
+    {
+      "id": "clinical-experience-catalog",
+      "name": "Clinical and Patient Experience Catalog",
+      "sourceOfferSlug": null,
+      "disposition": "demo-only",
+      "rationale": "Preserve compelling role-specific demonstrations while concentrating commercialization on one measurable workflow wedge.",
+      "buyer": "Clinicians, care teams, patient-access leaders, and executive sponsors.",
+      "proofRoutes": [
+        "/demos",
+        "/healthcare-intelligence-os",
+        "/scrimed-patient-context-gateway"
+      ],
+      "nextMilestone": "Select only the modules required for each buyer story and retire unsupported claims, not reusable infrastructure.",
+      "retainedBoundary": "Synthetic demonstration only; no diagnosis, treatment, monitoring, clinical authority, or patient-specific action."
+    },
+    {
+      "id": "partner-agent-marketplace",
+      "name": "Agent and Partner Marketplace",
+      "sourceOfferSlug": null,
+      "disposition": "incubate",
+      "rationale": "Potential distribution leverage is real, but admission, liability, security, quality, and commercial controls are not externally approved.",
+      "buyer": "Future technology, implementation, data, and model partners.",
+      "proofRoutes": [
+        "/scrimed-studio",
+        "/approvals-readiness"
+      ],
+      "nextMilestone": "Validate one read-only partner adapter through conformance, security, legal, rollback, and operator review.",
+      "retainedBoundary": "No public marketplace, partner certification, revenue share, or inherited clinical authority."
+    }
+  ],
+  "strategicMetrics": [
+    {
+      "id": "verified-intelligence-yield",
+      "name": "Verified intelligence yield",
+      "formula": "verified outputs accepted by a qualified reviewer / all attempted outputs",
+      "numerator": "Count of outputs passing mandatory verification and receiving the required human disposition.",
+      "denominator": "Count of all bounded output attempts, including failures, abstentions, retries, and rejections.",
+      "currentValue": null,
+      "evidenceStatus": "baseline-not-collected",
+      "owner": "Evaluation + Trust Engineering",
+      "humanReviewRequired": true,
+      "syntheticOnly": true,
+      "blockedInterpretation": "Not clinical accuracy, customer impact, production reliability, or a universal model score."
+    },
+    {
+      "id": "healthcare-value-returned",
+      "name": "Healthcare value returned",
+      "formula": "reviewed operational, financial, patient, and clinical value evidenced / total verified workflow cost",
+      "numerator": "Approved baseline-to-observed value supported by outcome evidence and attributable workflow records.",
+      "denominator": "Inference, retrieval, infrastructure, retry, reviewer-time, failure, and maintenance cost for verified work.",
+      "currentValue": null,
+      "evidenceStatus": "baseline-not-collected",
+      "owner": "Outcome Intelligence + Finance Review",
+      "humanReviewRequired": true,
+      "syntheticOnly": true,
+      "blockedInterpretation": "Not an ROI, savings, revenue, reimbursement, clinical-outcome, or valuation guarantee."
+    },
+    {
+      "id": "cost-per-verified-successful-task",
+      "name": "Cost per verified successful task",
+      "formula": "total effective workflow cost / verified successful tasks",
+      "numerator": "Provider, hosting, retrieval, validation, review, retry, latency, and failure cost.",
+      "denominator": "Tasks meeting mandatory policy, evidence, quality, and human-acceptance criteria.",
+      "currentValue": null,
+      "evidenceStatus": "baseline-not-collected",
+      "owner": "AI Platform + Product Finance",
+      "humanReviewRequired": true,
+      "syntheticOnly": true,
+      "blockedInterpretation": "Not token price, provider leaderboard rank, margin guarantee, or audited cost evidence."
+    }
+  ],
+  "sourceAlignment": {
+    "productOfferCount": 10,
+    "productPackageCount": 5,
+    "valueMetricCount": 14,
+    "valuePackageCount": 6,
+    "sourceOfferExists": true
+  },
+  "externalActionsExecuted": false,
+  "auditHash": "1802ee0b64c34efbc531629872e762cebd3e0cd8faa3b9347b3c9fe2d98b66de"
+}

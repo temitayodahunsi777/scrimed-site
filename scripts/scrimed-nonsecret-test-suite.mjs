@@ -305,6 +305,24 @@ const checks = [
     ]
   },
   {
+    label: "SCRIMED Work development continuity policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-development-continuity-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Work exact-evidence review-policy preflight behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-review-policy-preflight-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED preproduction assurance generator self-test",
     args: [
       "--disable-warning=ExperimentalWarning",
@@ -784,6 +802,25 @@ const checks = [
   {
     label: "SCRIMED Intelligence Control Plane contract",
     args: ["scripts/scrimed-control-plane-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED platform strategy policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-platform-strategy-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED platform strategy artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-platform-strategy-artifacts.mjs",
+      "--check"
+    ]
   },
   {
     label: "SCRIMED Work durable-store preflight",

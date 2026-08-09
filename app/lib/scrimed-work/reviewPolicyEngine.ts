@@ -155,6 +155,9 @@ export function evaluateReviewPolicy(context: ReviewPolicyContext) {
       requiredReviewerRoles: [],
       missingReviewerRoles: [],
       founderAcceptanceValid: false,
+      authorizationEvidenceSatisfied: false as const,
+      executionAuthorized: false as const,
+      productionAuthorityGranted: false as const,
       environmentVariableBypassAllowed: false as const,
       auditHash: createClinicalEvidenceHash({ context, reasonCodes })
     };
@@ -222,6 +225,8 @@ export function evaluateReviewPolicy(context: ReviewPolicyContext) {
     missingReviewerRoles,
     founderAcceptanceValid,
     founderAcceptanceEligible: requirement.founderAcceptanceEligible,
+    authorizationEvidenceSatisfied: !hardFailure,
+    executionAuthorized: false as const,
     environmentVariableBypassAllowed: false as const,
     productionAuthorityGranted: false as const
   };

@@ -2,6 +2,45 @@
 
 SCRIMED Work is a synthetic/no-PHI, verification-first control plane for long-running healthcare work sessions. It consolidates workspaces, Definition-of-Done contracts, model and tool routing, multi-agent orchestration, healthcare context retrieval, approval gates, artifact generation, disabled schedule definitions, voice-session simulation, learning-loop proposals, rollback metadata, audit records, and value telemetry.
 
+## Development continuity planner
+
+`developmentContinuity.ts` joins the existing Automation Autopilot to the authoritative
+`review-requirements.json` policy matrix. It gives operators one deterministic answer for each
+registered action: its owner, risk tier, required evidence, missing evidence, review posture,
+operating-mode block, and next controlled step.
+
+The planner deliberately does not authorize work. `authorizationStatus` remains `NOT_EVALUATED`,
+`productionAuthorityGranted` remains false, and every executable action must still pass
+`evaluateReviewPolicy` with the exact current candidate and assurance fingerprints, evidence,
+identity, and approval references. This prevents a dashboard recommendation or automation-agent
+narrative from becoming authority.
+
+The default safe operating mode makes a synthetic demonstration eligible for an execution
+preflight when the built-in no-PHI disclosure and synthetic-mode attestation are present. Source
+commits and preview or Wix publication remain founder-acceptance lanes. Legal adoption remains a
+qualified-counsel lane. Production, PHI, connector, clinical, payer, and customer actions remain
+external-authority or prohibited lanes according to the review matrix and operating-mode gates.
+
+Each action has a deterministic evidence hash, and the complete plan has a stable fingerprint that
+changes when evidence, policy posture, or operating mode changes. These hashes are planning and
+review evidence only; they are not signatures, approvals, release provenance, or production grants.
+
+### Exact-evidence review preflight
+
+`POST /api/scrimed-work/continuity/preflight` turns a selected continuity action into an
+authenticated, tenant-scoped advisory receipt. The caller supplies only the action context, exact
+candidate and assurance-manifest SHA-256 fingerprints, declared metadata conditions, and evidence
+identifiers. Evaluation time is assigned by the server. Unknown fields, caller-controlled
+timestamps, approval objects, tokens, direct identifiers, and PHI are rejected.
+
+The preflight intentionally does not accept `signatureVerified` assertions or other approval
+claims from a request. Founder acceptance and qualified approvals remain in their existing trusted,
+candidate-bound workflows. Every response reports `authorizationStatus=NOT_EVALUATED`,
+`executionAuthorized=false`, `externalMutationAllowed=false`, and
+`productionAuthorityGranted=false`. A `PREFLIGHT_PASSED` receipt means only that the registered
+Tier-0 context and required evidence are internally consistent; action-specific authorization is a
+separate gate.
+
 ## Independent Review And Gap Closure
 
 The control plane exposes twelve independently scoped AI-assisted review lanes. Review packets
@@ -35,6 +74,7 @@ flowchart TD
   API --> CSRF["Same-Origin Mutation Guard"]
   API --> RateLimit["Actor + Tenant Mutation Limits"]
   API --> Hardening["Production Hardening Gate"]
+  API --> Preflight["Exact-Evidence Advisory Preflight"]
   Durable --> RLS["Private Supabase Tables + RLS Deny Policies"]
   Session --> Contract["Definition of Done"]
   Contract --> Policy["Autonomy Policy"]
@@ -63,6 +103,7 @@ flowchart TD
 - `durableStore.ts`: protected Supabase RPC adapter for AAL2-gated session, artifact, status, idempotency, and audit persistence.
 - `sessionLifecycle.ts`: explicit session state machine, transition preconditions, independent-review controls, cancellation propagation, and deterministic decision hashes.
 - `productionHardening.ts`: machine-readable production-hardening gate separating evidence-ready controls from operator-required release steps.
+- `reviewPolicyPreflight.ts`: strict exact-fingerprint request validation, server-owned evaluation time, operating-mode blocks, and non-authorizing advisory receipts.
 - `modelRouter.ts`: provider-neutral model selection with privacy, residency, cost, and safety constraints.
 - `providerRegistry.ts`: configurable OpenAI-compatible, Anthropic-compatible, local/private, and synthetic no-call adapters.
 - `toolRegistry.ts`: least-privilege tools with consequential actions disabled and approval-gated.
@@ -102,6 +143,10 @@ Metadata POST routes:
 - `POST /api/scrimed-work/context/search`
 - `POST /api/scrimed-work/voice/simulate`
 - `POST /api/scrimed-work/sessions/:sessionId/verify`
+
+Protected read-shaped POST routes:
+
+- `POST /api/scrimed-work/continuity/preflight` (AAL2, tenant-scoped, metadata-only, no caller approval assertions, no execution authority)
 
 Protected write-shaped routes:
 

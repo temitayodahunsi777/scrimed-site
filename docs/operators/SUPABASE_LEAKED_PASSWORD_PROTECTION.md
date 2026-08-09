@@ -1,7 +1,7 @@
 # Supabase Leaked-Password Protection
 
 **Project:** `scrimed-protected-pilot` (`yxacqdfeyojrjghpwike`)
-**Observed:** `2026-08-03T00:27:00Z`
+**Observed:** `2026-08-09T01:24:44Z`
 **Current state:** disabled; Security Advisor `auth_leaked_password_protection` warning present
 **Desired state:** enabled
 **Owner:** Supabase organization owner or authorized Auth administrator
@@ -10,6 +10,9 @@
 The connected Supabase tools provided read-only project and advisor evidence but no narrowly
 scoped Auth configuration mutation. No user, provider, session, redirect, key, RLS policy, role,
 storage setting, database row, or migration was changed.
+
+The 2026-08-09 advisor refresh confirmed the warning remains open. This document is an operator
+procedure, not evidence that the setting was changed.
 
 ## Exact Dashboard Action
 

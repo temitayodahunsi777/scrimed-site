@@ -49,6 +49,7 @@ import {
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
 import { sampleLearningLoopArtifacts, sampleOutcomeLearningControllers } from "./learningLoop";
 import { getScrimedImpactGovernanceSummary } from "./impactGovernance";
+import { buildDevelopmentContinuityPlan } from "./developmentContinuity";
 import { priorAuthorizationFoundryBlueprint } from "./foundry";
 import { getClinicalAgentSreSummary } from "../clinicalAgentSre";
 import { getClinicalAssuranceControlPlaneSummary } from "../clinicalAssuranceControlPlane";
@@ -75,6 +76,11 @@ import {
 } from "./reviewQueue";
 import { getScrimedReviewOrchestratorSummary } from "./reviewOrchestrator";
 import { getReviewRequirementsSummary } from "./reviewPolicyEngine";
+import {
+  buildReviewPolicyPreflight,
+  getReviewPolicyPreflightSummary,
+  parseReviewPolicyPreflightRequest
+} from "./reviewPolicyPreflight";
 import { containsPhiRisk, containsTokenLikeField, parseArtifactRequest, parseWorkSessionCreateInput } from "./schemas";
 import { scrimedWorkScheduleDefinitions } from "./scheduleDefinitions";
 import {
@@ -118,6 +124,7 @@ export * from "./completionQueue";
 export * from "./reviewQueue";
 export * from "./reviewOrchestrator";
 export * from "./reviewPolicyEngine";
+export * from "./reviewPolicyPreflight";
 export * from "./assuranceManifest";
 export * from "./controlAttestations";
 export * from "./reviewConfidence";
@@ -127,6 +134,7 @@ export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
 export * from "./impactGovernance";
+export * from "./developmentContinuity";
 export * from "./foundry";
 export * from "./governedRuntime";
 export * from "./agentExecution";
@@ -201,6 +209,8 @@ export function getScrimedWorkSummary() {
   const impactGovernance = getScrimedImpactGovernanceSummary();
   const reviewOrchestrator = getScrimedReviewOrchestratorSummary();
   const reviewPolicy = getReviewRequirementsSummary();
+  const reviewPolicyPreflight = getReviewPolicyPreflightSummary();
+  const developmentContinuity = buildDevelopmentContinuityPlan();
 
   return {
     service: "scrimed-work-intelligence-platform",
@@ -268,6 +278,8 @@ export function getScrimedWorkSummary() {
     impactGovernance,
     reviewOrchestrator,
     reviewPolicy,
+    reviewPolicyPreflight,
+    developmentContinuity,
     lifecycle: sessions.map(getWorkSessionLifecycleSnapshot),
     governanceStatus: {
       definitionOfDoneRequired: true,
@@ -329,6 +341,19 @@ export function buildScrimedWorkBrief() {
     `- Evidence-ready gates: ${summary.productionHardening.summary.evidenceReady}/${summary.productionHardening.summary.totalGates}`,
     `- Operator-required gates: ${summary.productionHardening.summary.operatorRequired}`,
     "",
+    "## Development Continuity",
+    `- Policy posture: ${summary.developmentContinuity.authorizationStatus}`,
+    `- Protected exact-evidence preflight: ${summary.reviewPolicyPreflight.method} ${summary.reviewPolicyPreflight.route}`,
+    `- Caller-supplied approvals accepted: ${summary.reviewPolicyPreflight.callerSuppliedApprovalsAccepted}`,
+    `- Plan fingerprint: ${summary.developmentContinuity.planFingerprint}`,
+    `- Automatic preflight eligible: ${summary.developmentContinuity.counts.AUTOMATIC_PREFLIGHT_ELIGIBLE}`,
+    `- Founder acceptance required: ${summary.developmentContinuity.counts.FOUNDER_ACCEPTANCE_REQUIRED}`,
+    `- Qualified review required: ${summary.developmentContinuity.counts.QUALIFIED_REVIEW_REQUIRED}`,
+    `- Production authorization required: ${summary.developmentContinuity.counts.PRODUCTION_AUTHORIZATION_REQUIRED}`,
+    `- Prohibited: ${summary.developmentContinuity.counts.PROHIBITED}`,
+    `- Recommended next action: ${summary.developmentContinuity.recommendedAction?.nextAction ?? "No action is eligible; escalate to a human owner."}`,
+    "- Planner output never grants execution authority; every executable action must pass exact-fingerprint review-policy evaluation.",
+    "",
     "## Next Production-Hardening Step",
     summary.nextProductionHardeningStep
   ].join("\n");
@@ -345,7 +370,7 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
     return {
       ok: false as const,
       status: 415,
-      error: errorEnvelope("scrimed_work_unsupported_content_type", "SCRIMED Work protected writes require application/json.", action, false)
+      error: errorEnvelope("scrimed_work_unsupported_content_type", "SCRIMED Work protected requests require application/json.", action, false)
     };
   }
 
@@ -355,7 +380,7 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
     return {
       ok: false as const,
       status: 413,
-      error: errorEnvelope("scrimed_work_payload_too_large", "SCRIMED Work protected write payload is too large for metadata-only persistence.", action, false)
+      error: errorEnvelope("scrimed_work_payload_too_large", "SCRIMED Work protected request payload is too large for metadata-only processing.", action, false)
     };
   }
 
@@ -365,7 +390,7 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
     return {
       ok: false as const,
       status: 400,
-      error: errorEnvelope("scrimed_work_invalid_json", "SCRIMED Work protected write payload must be valid JSON.", action, false)
+      error: errorEnvelope("scrimed_work_invalid_json", "SCRIMED Work protected request payload must be valid JSON.", action, false)
     };
   }
 }
@@ -564,6 +589,58 @@ export function buildWriteAuthorizationDecision(request: Request, action: string
 
 export function buildReadAuthorizationDecision(request: Request, action: string, payload?: unknown) {
   return buildProtectedAuthorizationDecision(request, action, payload, "read");
+}
+
+export async function guardedEvaluateReviewPolicyPreflight(request: Request) {
+  const body = await readBoundedJson(request, "continuity-review-policy-preflight");
+  if (!body.ok) return { allowed: false as const, status: body.status, error: body.error };
+
+  const auth = await buildReadAuthorizationDecision(
+    request,
+    "continuity-review-policy-preflight",
+    body.payload
+  );
+  if (!auth.allowed) return auth;
+
+  const parsed = parseReviewPolicyPreflightRequest(body.payload);
+  if (!parsed.ok) {
+    return {
+      allowed: false as const,
+      status: 400,
+      error: errorEnvelope(
+        "scrimed_work_review_policy_preflight_invalid",
+        parsed.reason,
+        parsed.rejectedField ?? "continuity-review-policy-preflight",
+        false
+      )
+    };
+  }
+
+  const preflight = buildReviewPolicyPreflight({
+    request: parsed.value,
+    evaluatedAt: new Date().toISOString()
+  });
+  const scopeBindingHash = createAuditHash({
+    action: "continuity-review-policy-preflight",
+    tenantId: auth.context.tenantId,
+    workspaceId: auth.context.workspaceId,
+    actorId: auth.context.user.id,
+    candidateFingerprint: parsed.value.candidateFingerprint,
+    assuranceManifestFingerprint: parsed.value.assuranceManifestFingerprint,
+    preflightAuditHash: preflight.auditHash
+  });
+
+  return {
+    allowed: true as const,
+    status: 200,
+    data: {
+      ...preflight,
+      tenantScopeVerified: true as const,
+      authenticatedActorVerified: true as const,
+      scopeBindingHash,
+      receiptPersistence: "caller-retained-advisory-receipt" as const
+    }
+  };
 }
 
 export async function guardedCreateSession(request: Request) {

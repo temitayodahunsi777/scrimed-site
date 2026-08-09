@@ -1776,6 +1776,15 @@ h3 {
   padding: 28px 0;
 }
 
+.module-row > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.module-row-four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .module-row-stack {
   display: block;
 }

@@ -61,8 +61,9 @@ requireText("docs/public-claims-integrity.md", [
 ]);
 requireText("app/lib/scrimed-control-plane/platformEvidence.ts", [
   "public-claims-integrity-smoke.mjs",
-  "static Wix Editor content",
-  "Voice Intake Assistant form was disabled",
+  "Latest repository-held direct-live Wix report",
+  "16 FaithCore publication mismatches",
+  "The current strict verification attempt failed closed",
   "external-action-required"
 ]);
 requireText("package.json", [
