@@ -13,6 +13,7 @@ import {
 } from "../../../../../lib/scrimedP32CandidateReview";
 import {
   createP32CandidateReviewAssignmentReceipt,
+  getP32CandidateReviewEvidence,
   getAccessiblePilotWorkspace,
   getAuthenticatedGovernanceContext,
   getPilotWorkspaceMembershipAccess,
@@ -168,14 +169,34 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   try {
+    const summary = getP32CandidateReviewSummary({
+      tenantId: resolved.workspace.tenantId,
+      userId: resolved.context.user.id
+    });
+    const recovered = await getP32CandidateReviewEvidence(
+      resolved.context.client,
+      resolved.workspace.slug,
+      summary.fingerprints
+    );
+    if (recovered.error || !recovered.persistedReview) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "p32-candidate-review-evidence-unavailable",
+            message: "Candidate-review evidence could not be recovered. The workflow failed closed."
+          },
+          boundary: scrimedP32CandidateReviewBoundary
+        },
+        { status: 503, headers }
+      );
+    }
+
     return NextResponse.json(
       {
         service: "scrimed-protected-p32-candidate-review",
         workspace: resolved.workspace,
-        ...getP32CandidateReviewSummary({
-          tenantId: resolved.workspace.tenantId,
-          userId: resolved.context.user.id
-        }),
+        ...summary,
+        persistedReview: recovered.persistedReview,
         actorCapabilities: getP32CandidateReviewActorCapabilities(
           resolved.membership.role
         )

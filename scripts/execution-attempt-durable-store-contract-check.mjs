@@ -17,6 +17,7 @@ const requiredFiles = [
   "supabase/migrations/20260705164000_execution_attempt_compute_fabric_evidence_binding.sql",
   "scripts/aal2-smoke-readiness-preflight.mjs",
   "scripts/execution-attempt-durable-store-authenticated-smoke.mjs",
+  ".github/workflows/execution-attempt-durable-store-qa-smoke.yml",
   "scripts/aal2-bearer-token-helper.mjs",
   "scripts/lib/aal2-token-policy.mjs",
   "scripts/aal2-token-policy-selftest.mjs",
@@ -54,6 +55,7 @@ const identifierGuardWordBoundaryMigration =
 const computeFabricMigration =
   files["supabase/migrations/20260705164000_execution_attempt_compute_fabric_evidence_binding.sql"];
 const authenticatedSmoke = files["scripts/execution-attempt-durable-store-authenticated-smoke.mjs"];
+const durableStoreQaWorkflow = files[".github/workflows/execution-attempt-durable-store-qa-smoke.yml"];
 const aal2ReadinessPreflight = files["scripts/aal2-smoke-readiness-preflight.mjs"];
 const aal2TokenHelper = files["scripts/aal2-bearer-token-helper.mjs"];
 const aal2TokenPolicy = files["scripts/lib/aal2-token-policy.mjs"];
@@ -208,9 +210,27 @@ for (const expected of [
   "execution-attempt-idempotent-replay",
   "execution-attempt-metadata-replayed",
   "no-phi-human-review-no-clinical-authority",
-  "synthetic-and-metadata-only"
+  "synthetic-and-metadata-only",
+  "safe evidence workflowKind=execution-attempt-durable-store-qa",
+  "safe evidence durableRecordId=",
+  "safe evidence reviewAuditEventId="
 ]) {
   requireIncludes("scripts/execution-attempt-durable-store-authenticated-smoke.mjs", authenticatedSmoke, expected);
+}
+
+for (const expected of [
+  "workflow_dispatch:",
+  "SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_BEARER_TOKEN }}",
+  "node scripts/aal2-smoke-readiness-preflight.mjs --strict",
+  "node scripts/execution-attempt-durable-store-authenticated-smoke.mjs --strict",
+  "workflowKind: execution-attempt-durable-store-qa",
+  "Do not copy bearer tokens"
+]) {
+  requireIncludes(
+    ".github/workflows/execution-attempt-durable-store-qa-smoke.yml",
+    durableStoreQaWorkflow,
+    expected
+  );
 }
 
 for (const expected of [

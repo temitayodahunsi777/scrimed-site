@@ -36,6 +36,8 @@ The assigning identity and reviewing identity must differ. Approval does not gra
 
 The protected summary reads only the authenticated actor's tenant membership row through existing row-level security and returns a typed capability view. The browser renders only the actor's permitted stage, while the API repeats the role check before signing work and the database remains the final authorization boundary. Missing, inactive, malformed, or unverifiable membership fails closed.
 
+Assignment and signed-decision recovery is also tenant-, actor-, and exact-candidate-scoped. An assigning administrator may recover only assignments they created; a reviewer may recover only assignments bound to their hashed authenticated identity. A refresh therefore cannot strand a successfully persisted signed evidence file, while stale-candidate and cross-actor evidence remains inaccessible.
+
 ## Configuration
 
 The feature defaults off with `SCRIMED_P32_CANDIDATE_REVIEW_ENABLED=false`. A protected environment must supply:
@@ -67,7 +69,7 @@ Never store the private key in Git, `.env.example`, browser variables, review pa
 7. A tenant admin or pilot lead enters that hash and records the assignment.
 8. The administrator uses **Copy Assignment ID** and transfers only that UUID through the approved reviewer channel.
 9. The reviewer enters the assignment ID, reviews the exact packet, and records approval or rejection.
-10. The reviewer downloads the short-lived signed evidence JSON through the workspace panel.
+10. The reviewer downloads the short-lived signed evidence JSON through the workspace panel. If the response or download is interrupted after persistence, reload the panel; the exact-candidate evidence is recovered from the append-only ledger for the authorized actor.
 11. A release steward supplies that file to `npm run release:scrimed-p32-evidence:strict -- --evidence-file=/absolute/path/file.json` while its outer attestation is current.
 12. Remove the transfer file according to the evidence retention policy after the verified gate packet is archived.
 

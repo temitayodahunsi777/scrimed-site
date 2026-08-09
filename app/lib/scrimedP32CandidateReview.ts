@@ -124,6 +124,27 @@ export type P32CandidateReviewDecisionReceipt = {
   recordedAt: string;
 };
 
+export type P32CandidateReviewPersistedEvidence = {
+  assignment: (P32CandidateReviewFingerprints & {
+    assignmentId: string;
+    reviewerIdentityHash: string;
+    reviewerRole: "principal-engineer";
+    assignedAt: string;
+    expiresAt: string;
+  }) | null;
+  decision: {
+    approvalId: string;
+    decision: "approved" | "rejected";
+    reasonCode: P32CandidateReviewDecisionRequest["reasonCode"];
+    decidedAt: string;
+  } | null;
+  evidenceFile: P32SupplementalEvidenceFile | null;
+  receipt: P32CandidateReviewDecisionReceipt | null;
+  humanDecisionRecorded: boolean;
+  releaseAuthorityGranted: false;
+  boundary: string;
+};
+
 export type P32CandidateReviewAssignmentPersistenceResult = {
   receipt: P32CandidateReviewAssignmentReceipt | null;
   error: { message: string } | null;

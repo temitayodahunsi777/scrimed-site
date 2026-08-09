@@ -11,59 +11,125 @@ const maximumHtmlTagBytes = 32_768;
 const maximumScriptBodyBytes = 4_000_000;
 const maximumEvidenceAgeMs = 30 * 60 * 1000;
 
+function isTagBoundary(value) {
+  return !value || /[\s/>]/.test(value);
+}
+
+function findTagEnd(html, start) {
+  let quote = "";
+  const limit = Math.min(html.length, start + maximumHtmlTagBytes + 1);
+  for (let index = start; index < limit; index += 1) {
+    const character = html[index];
+    if (quote) {
+      if (character === quote) quote = "";
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      quote = character;
+    } else if (character === ">") {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function findClosingTag(html, normalized, tagName, from) {
+  const marker = `</${tagName}`;
+  let cursor = from;
+  while (cursor < normalized.length) {
+    const start = normalized.indexOf(marker, cursor);
+    if (start < 0) return null;
+    if (!isTagBoundary(normalized[start + marker.length])) {
+      cursor = start + marker.length;
+      continue;
+    }
+    const end = findTagEnd(html, start + marker.length);
+    return end < 0 ? null : { start, end };
+  }
+  return null;
+}
+
+function scanHtmlElements(html, tagName, includeBody = false) {
+  const normalized = html.toLowerCase();
+  const marker = `<${tagName}`;
+  const elements = [];
+  const failures = [];
+  let cursor = 0;
+
+  while (cursor < normalized.length) {
+    const start = normalized.indexOf(marker, cursor);
+    if (start < 0) break;
+    if (!isTagBoundary(normalized[start + marker.length])) {
+      cursor = start + marker.length;
+      continue;
+    }
+    if (elements.length >= maximumHtmlStartTags) {
+      failures.push(`html-tag-budget-exceeded:${tagName}`);
+      break;
+    }
+    const tagEnd = findTagEnd(html, start + marker.length);
+    if (tagEnd < 0) {
+      failures.push(`html-tag-malformed-or-oversized:${tagName}`);
+      break;
+    }
+
+    const element = {
+      start,
+      openEnd: tagEnd,
+      end: tagEnd,
+      attributesSource: html.slice(start + marker.length, tagEnd),
+      body: ""
+    };
+    if (includeBody) {
+      const close = findClosingTag(html, normalized, tagName, tagEnd + 1);
+      if (!close || close.start - tagEnd > maximumScriptBodyBytes) {
+        failures.push(`html-${tagName}-malformed-or-oversized`);
+        break;
+      }
+      element.body = html.slice(tagEnd + 1, close.start);
+      element.end = close.end;
+    }
+    elements.push(element);
+    cursor = element.end + 1;
+  }
+
+  return { elements, failures };
+}
+
 function inspectBoundedHtmlStructure(html) {
   const failures = [];
-  const normalized = html.toLowerCase();
-
   for (const tagName of ["meta", "link", "title", "script"]) {
-    const marker = `<${tagName}`;
-    let cursor = 0;
-    let count = 0;
-    while (cursor < normalized.length) {
-      const start = normalized.indexOf(marker, cursor);
-      if (start < 0) break;
-      const boundary = normalized[start + marker.length] ?? "";
-      if (boundary && !/[\s/>]/.test(boundary)) {
-        cursor = start + marker.length;
-        continue;
-      }
-      count += 1;
-      if (count > maximumHtmlStartTags) {
-        failures.push(`html-tag-budget-exceeded:${tagName}`);
-        break;
-      }
-      const tagEnd = normalized.indexOf(">", start + marker.length);
-      if (tagEnd < 0 || tagEnd - start > maximumHtmlTagBytes) {
-        failures.push(`html-tag-malformed-or-oversized:${tagName}`);
-        break;
-      }
-      if (tagName === "script") {
-        const close = normalized.indexOf("</script>", tagEnd + 1);
-        if (close < 0 || close - tagEnd > maximumScriptBodyBytes) {
-          failures.push("html-script-malformed-or-oversized");
-          break;
-        }
-        cursor = close + "</script>".length;
-      } else {
-        cursor = tagEnd + 1;
-      }
-    }
+    failures.push(...scanHtmlElements(html, tagName, tagName === "title" || tagName === "script").failures);
   }
 
   return failures;
 }
 
 function decodeHtml(value = "") {
-  return value
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)))
-    .replaceAll("&amp;", "&")
-    .replaceAll("&quot;", "\"")
-    .replaceAll("&#39;", "'")
-    .replaceAll("&apos;", "'")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .trim();
+  return value.replace(
+    /&(?:#([0-9]{1,7})|#x([0-9a-f]{1,6})|amp|quot|apos|lt|gt);/gi,
+    (entity, decimal, hexadecimal) => {
+      if (decimal || hexadecimal) {
+        const codePoint = Number.parseInt(decimal ?? hexadecimal, hexadecimal ? 16 : 10);
+        if (
+          !Number.isInteger(codePoint) ||
+          codePoint < 0 ||
+          codePoint > 0x10ffff ||
+          (codePoint >= 0xd800 && codePoint <= 0xdfff)
+        ) {
+          return entity;
+        }
+        return String.fromCodePoint(codePoint);
+      }
+      const named = entity.toLowerCase();
+      if (named === "&amp;") return "&";
+      if (named === "&quot;") return '"';
+      if (named === "&apos;") return "'";
+      if (named === "&lt;") return "<";
+      if (named === "&gt;") return ">";
+      return entity;
+    }
+  ).trim();
 }
 
 function parseAttributes(source = "") {
@@ -79,28 +145,77 @@ function parseAttributes(source = "") {
 }
 
 function extractTags(html, tagName) {
-  const expression = new RegExp(`<${tagName}\\b([^>]*)>`, "gi");
-  return [...html.matchAll(expression)].map((match) => parseAttributes(match[1]));
+  return scanHtmlElements(html, tagName).elements.map((element) =>
+    parseAttributes(element.attributesSource)
+  );
 }
 
 function extractTitle(html) {
-  const match = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
-  return decodeHtml(match?.[1]?.replace(/<[^>]+>/g, "") ?? "");
+  const title = scanHtmlElements(html, "title", true).elements[0];
+  return decodeHtml(title ? stripMarkup(title.body) : "");
+}
+
+function stripMarkup(html) {
+  let output = "";
+  let cursor = 0;
+  while (cursor < html.length) {
+    const start = html.indexOf("<", cursor);
+    if (start < 0) {
+      output += html.slice(cursor);
+      break;
+    }
+    output += `${html.slice(cursor, start)} `;
+    const end = findTagEnd(html, start + 1);
+    if (end < 0) {
+      output += html.slice(start);
+      break;
+    }
+    cursor = end + 1;
+  }
+  return output;
+}
+
+function removeElementBodies(html, tagNames) {
+  const ranges = tagNames.flatMap((tagName) =>
+    scanHtmlElements(html, tagName, true).elements.map((element) => ({
+      start: element.start,
+      end: element.end
+    }))
+  ).sort((left, right) => left.start - right.start);
+  let output = "";
+  let cursor = 0;
+  for (const range of ranges) {
+    if (range.start < cursor) continue;
+    output += `${html.slice(cursor, range.start)} `;
+    cursor = range.end + 1;
+  }
+  return output + html.slice(cursor);
+}
+
+function normalizeWhitespace(value) {
+  return value.split(/\s+/).filter(Boolean).join(" ");
 }
 
 function extractVisibleText(html) {
-  return decodeHtml(
-    html
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
+  return normalizeWhitespace(
+    decodeHtml(stripMarkup(removeElementBodies(html, ["script", "style"])))
   );
 }
 
 function containsVisibleLabel(visibleText, label) {
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
-  return new RegExp(`\\b${escaped}\\b`, "i").test(visibleText);
+  const haystack = normalizeWhitespace(visibleText).toLowerCase();
+  const needle = normalizeWhitespace(label).toLowerCase();
+  let cursor = 0;
+  while (needle && cursor < haystack.length) {
+    const index = haystack.indexOf(needle, cursor);
+    if (index < 0) return false;
+    const before = haystack[index - 1] ?? "";
+    const after = haystack[index + needle.length] ?? "";
+    const isWord = (character) => /[a-z0-9]/.test(character);
+    if (!isWord(before) && !isWord(after)) return true;
+    cursor = index + needle.length;
+  }
+  return false;
 }
 
 function extractMeta(html, attributeName, attributeValue) {
@@ -124,15 +239,12 @@ function extractCanonical(html) {
 function extractJsonLd(html) {
   const objects = [];
   const errors = [];
-  const expression = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-  let match;
-
-  while ((match = expression.exec(html)) !== null) {
-    const attributes = parseAttributes(match[1]);
+  for (const script of scanHtmlElements(html, "script", true).elements) {
+    const attributes = parseAttributes(script.attributesSource);
     if (attributes.type?.toLowerCase() !== "application/ld+json") continue;
 
     try {
-      objects.push(JSON.parse(match[2].trim()));
+      objects.push(JSON.parse(script.body.trim()));
     } catch {
       errors.push("invalid-json-ld");
     }
@@ -339,7 +451,7 @@ export function inspectWixPublicationPage(page) {
   if (page.path === "/" && claims.missingDisclosures.length > 0) {
     failures.push(`missing-home-disclosures:${claims.missingDisclosures.join(",")}`);
   }
-  if (/<a\b[^>]*href\s*=\s*["']tel:/i.test(html)) {
+  if (extractTags(html, "a").some((attributes) => attributes.href?.toLowerCase().startsWith("tel:"))) {
     failures.push(`telephone-link:${page.path}`);
   }
   if (!wixPublicationPolicy.faithSpecificRoutes.includes(page.path)) {

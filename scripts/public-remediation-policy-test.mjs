@@ -130,6 +130,18 @@ try {
     );
   }
 
+  for (const organization of [
+    "javascript:alert(1)",
+    "data:text/html,unsafe",
+    "onerror = alert(1)"
+  ]) {
+    const executableAttempt = validatePilotIntakePayload({
+      ...validSubmission,
+      organization
+    });
+    assert.equal(executableAttempt.ok, false, organization);
+  }
+
   const missingConsent = validatePilotIntakePayload({
     ...validSubmission,
     contactConsent: false

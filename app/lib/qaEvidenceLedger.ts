@@ -32,7 +32,12 @@ export type QaKnownLimitation = {
 
 export type QaManualRunWorkflowKind =
   | "sales-demo-session-qa"
-  | "authority-reference-qa";
+  | "authority-reference-qa"
+  | "execution-attempt-durable-store-qa";
+
+export type QaPersistedRunWorkflowKind =
+  | QaManualRunWorkflowKind
+  | "legacy-unclassified";
 
 export type QaEvidenceActivationWorkflow = {
   workflowKind: QaManualRunWorkflowKind;
@@ -75,7 +80,8 @@ export type QaManualRunEvidenceInput = {
   dataBoundary: "synthetic-business-workflow-only";
 };
 
-export type QaManualRunEvidencePacketRecord = QaManualRunEvidenceInput & {
+export type QaManualRunEvidencePacketRecord = Omit<QaManualRunEvidenceInput, "workflowKind"> & {
+  workflowKind: QaPersistedRunWorkflowKind;
   id: string;
   tenantId: string;
   workspaceId: string;
@@ -251,6 +257,59 @@ export const qaEvidenceActivationWorkflows: QaEvidenceActivationWorkflow[] = [
       "The renewal queue, fail-closed protected routes, stateless packet generation, and no-secret persistence bridge are already verified without storing credentials.",
     nextAction:
       "Run the manual workflow once a fresh AAL2 tenant governance token and synthetic workspace target are available."
+  },
+  {
+    workflowKind: "execution-attempt-durable-store-qa",
+    name: "Execution Attempt Durable Store QA activation",
+    status: "ready-for-human-aal2-run",
+    workflowPath: ".github/workflows/execution-attempt-durable-store-qa-smoke.yml",
+    preflightScript: "scripts/aal2-smoke-readiness-preflight.mjs",
+    smokeScript: "scripts/execution-attempt-durable-store-authenticated-smoke.mjs",
+    targetInput: "workspace_slug",
+    requiredSecretName: "SCRIMED_BEARER_TOKEN",
+    protectedRoutes: [
+      "/api/workflows/execution-attempts/durable-store/record",
+      "/api/workflows/execution-attempts/durable-store/replay",
+      "/api/workflows/execution-attempts/durable-store/review-disposition"
+    ],
+    safeEvidenceFields: [
+      "workflowKind=execution-attempt-durable-store-qa",
+      "workflowRunId",
+      "workflowRunUrl",
+      "executedAt",
+      "baseUrl",
+      "workspace slug as intakeId",
+      "created durable record UUID as createdSessionId",
+      "review disposition audit event UUID as packetAuditEventId",
+      "packetSha256 after protected persistence"
+    ],
+    prohibitedInputs: [
+      "bearer tokens",
+      "refresh tokens",
+      "raw execution payloads",
+      "patient or payer identifiers",
+      "PHI",
+      "production credentials"
+    ],
+    operatorSteps: [
+      "Open /pilot-workspace/access with an approved AAL2 tenant governance session.",
+      "Use the protected synthetic workspace slug as the explicit target.",
+      "Create a temporary masked GitHub secret only for the short-lived AAL2 token.",
+      "Dispatch the Execution Attempt Durable Store QA workflow.",
+      "Confirm record, idempotent replay, replay lookup, and review-disposition checks pass.",
+      "Copy only the printed workflow kind, workspace target, durable record UUID, and review audit event UUID.",
+      "Delete or rotate the temporary secret immediately after the workflow finishes.",
+      "Persist the safe metadata through /pilot-workspace/access -> Manual QA Evidence in durable-store mode."
+    ],
+    persistenceTarget: qaManualRunEvidencePersistenceApiRoute,
+    buyerDiligenceImpact:
+      "Provides the exact protected AAL2 durable-store evidence required by the p.32 technical evidence issuer.",
+    currentBoundary:
+      "No AAL2 CLI evidence may be issued from sales-demo, authority-reference, legacy, or unclassified QA packets.",
+    workaround:
+      "The issuer remains fail closed until a current packet from this exact workflow is retained.",
+    nextAction:
+      "Run the designated durable-store workflow with a fresh short-lived AAL2 token and persist only its safe identifiers."
   }
 ];
 
@@ -763,7 +822,8 @@ export const qaManualRunEvidenceContract = {
   authorityReferenceBridgeStatus: qaAuthorityReferenceEvidenceBridgeStatus,
   supportedWorkflowKinds: [
     "sales-demo-session-qa",
-    "authority-reference-qa"
+    "authority-reference-qa",
+    "execution-attempt-durable-store-qa"
   ] satisfies QaManualRunWorkflowKind[],
   persistenceStatus: qaManualRunEvidencePersistenceStatus,
   requiredFields: [
@@ -797,7 +857,7 @@ export const qaManualRunEvidenceContract = {
   persistenceBoundary:
     "The public route validates and returns a Markdown evidence packet without storing data. The protected workspace route persists the same sanitized metadata only after AAL2 tenant governance authorization and server-side storage controls.",
   authorityReferencePersistence:
-    "For authority-reference QA, createdSessionId carries the created authority reference UUID and packetAuditEventId carries the authority reference packet audit event UUID. The packet labels these fields explicitly; the database column names remain generic legacy storage."
+    "For authority-reference QA, createdSessionId carries the authority reference UUID and packetAuditEventId carries its packet audit event UUID. For durable-store QA, those fields carry the durable record UUID and review-disposition audit event UUID. The packet labels these fields explicitly; the database column names remain generic legacy storage."
 };
 
 export function getQaEvidenceActivationPlan() {
@@ -836,8 +896,8 @@ export function getQaEvidenceActivationPlan() {
     unresolvedBoundary:
       "Authenticated QA evidence remains pending until a human operator performs the AAL2 run; code must not bypass this with committed credentials or long-lived secrets.",
     nextAction:
-      "Use this activation plan to run Sales Demo Session QA and Authority Reference QA with fresh AAL2 tokens, persist only safe metadata, then export Buyer Diligence.",
-    updated: "2026-06-22"
+      "Use this activation plan to run the required synthetic QA workflow with a fresh AAL2 token, persist only safe metadata, then export Buyer Diligence. Only the designated durable-store workflow can satisfy p.32 AAL2 CLI evidence.",
+    updated: "2026-08-08"
   };
 }
 
@@ -1093,7 +1153,9 @@ export function validateQaManualRunEvidenceInput(value: unknown) {
   }
 
   if (!qaManualRunEvidenceContract.supportedWorkflowKinds.includes(input.workflowKind ?? "sales-demo-session-qa")) {
-    errors.push("workflowKind must be sales-demo-session-qa or authority-reference-qa.");
+    errors.push(
+      "workflowKind must be sales-demo-session-qa, authority-reference-qa, or execution-attempt-durable-store-qa."
+    );
   }
 
   if (!isSafeOptionalEvidenceText(input.evidenceTargetLabel ?? "")) {
@@ -1130,18 +1192,29 @@ export function validateQaManualRunEvidenceInput(value: unknown) {
 export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) {
   const workflowKind = input.workflowKind ?? "sales-demo-session-qa";
   const isAuthorityReference = workflowKind === "authority-reference-qa";
+  const isDurableStore = workflowKind === "execution-attempt-durable-store-qa";
   const title = isAuthorityReference
     ? "SCRIMED Manual Authority Reference QA Evidence Packet"
-    : "SCRIMED Manual Sales Demo Session QA Evidence Packet";
+    : isDurableStore
+      ? "SCRIMED Manual Execution Attempt Durable Store QA Evidence Packet"
+      : "SCRIMED Manual Sales Demo Session QA Evidence Packet";
   const evidenceTargetLabel =
     input.evidenceTargetLabel ||
-    (isAuthorityReference ? "Authority workspace target" : "Intake target");
+    (isAuthorityReference || isDurableStore ? "Workspace target" : "Intake target");
   const evidenceObjectLabel =
     input.evidenceObjectLabel ||
-    (isAuthorityReference ? "Created authority reference ID" : "Created session ID");
+    (isAuthorityReference
+      ? "Created authority reference ID"
+      : isDurableStore
+        ? "Created durable record ID"
+        : "Created session ID");
   const packetAuditEventLabel =
     input.packetAuditEventLabel ||
-    (isAuthorityReference ? "Authority reference packet audit event ID" : "Packet audit event ID");
+    (isAuthorityReference
+      ? "Authority reference packet audit event ID"
+      : isDurableStore
+        ? "Review disposition audit event ID"
+        : "Packet audit event ID");
   const controls = isAuthorityReference
     ? [
         "AAL2 tenant governance session required.",
@@ -1151,7 +1224,15 @@ export function buildQaManualRunEvidencePacket(input: QaManualRunEvidenceInput) 
         "No PHI, artifact, URL, credential, signature, legal opinion, security report, or live-care authority stored.",
         "Temporary session access material must be deleted or rotated after the run."
       ]
-    : salesDemoSessionQaControls;
+    : isDurableStore
+      ? [
+          "AAL2 tenant governance session and short-lived token required.",
+          "Protected record, idempotent retry, replay lookup, and human review disposition must all pass.",
+          "Only synthetic metadata identifiers may be retained.",
+          "No PHI, credentials, raw execution payloads, payer data, or release authority may be stored.",
+          "Temporary session access material must be deleted or rotated after the run."
+        ]
+      : salesDemoSessionQaControls;
 
   return [
     `# ${title}`,

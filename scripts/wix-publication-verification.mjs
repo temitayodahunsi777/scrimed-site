@@ -6,6 +6,7 @@ import path from "node:path";
 import { lstat, open, realpath } from "node:fs/promises";
 
 import {
+  inspectWixPublicationPage,
   verifyWixPublicationEvidence,
   wixPublicationPolicy
 } from "./lib/wix-publication-policy.mjs";
@@ -638,6 +639,30 @@ async function runSelfTest() {
       failure.startsWith("html-tag-")
     ),
     true
+  );
+
+  const doubleEncodedTitleHtml = safeHtml("/").replace(
+    /<title>[^<]*<\/title>/,
+    "<title>&amp;lt;script&amp;gt;SCRIMED&amp;lt;/script&amp;gt;</title>"
+  );
+  const doubleEncodedTitle = inspectWixPublicationPage({
+    path: "/",
+    status: 200,
+    finalUrl: `${wixPublicationPolicy.baseUrl}/`,
+    html: doubleEncodedTitleHtml
+  });
+  assert.equal(doubleEncodedTitle.metadata.title, "&lt;script&gt;SCRIMED&lt;/script&gt;");
+
+  const spacedScriptClose = structuredClone(safe);
+  spacedScriptClose.pages[0].html = spacedScriptClose.pages[0].html.replace(
+    "</script>",
+    "</script >"
+  );
+  assert.equal(
+    verifyWixPublicationEvidence(spacedScriptClose).failures.some((failure) =>
+      failure.startsWith("html-script-malformed") || failure.startsWith("invalid-json-ld")
+    ),
+    false
   );
 
   console.log(

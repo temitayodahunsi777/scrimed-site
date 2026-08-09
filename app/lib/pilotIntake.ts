@@ -641,6 +641,34 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function containsExecutableContent(value: string) {
+  const normalized = value.toLowerCase();
+  if (
+    normalized.includes("<") ||
+    normalized.includes(">") ||
+    normalized.includes("javascript:") ||
+    normalized.includes("data:text/html")
+  ) {
+    return true;
+  }
+
+  for (let index = 0; index < normalized.length - 2; index += 1) {
+    if (normalized[index] !== "o" || normalized[index + 1] !== "n") continue;
+    let cursor = index + 2;
+    const eventNameStart = cursor;
+    while (cursor < normalized.length) {
+      const code = normalized.charCodeAt(cursor);
+      if (code < 97 || code > 122) break;
+      cursor += 1;
+    }
+    if (cursor === eventNameStart) continue;
+    while (cursor < normalized.length && /\s/.test(normalized[cursor])) cursor += 1;
+    if (normalized[cursor] === "=") return true;
+  }
+
+  return false;
+}
+
 function readText(
   payload: Record<string, unknown>,
   field: string,
@@ -672,7 +700,7 @@ function readText(
     errors.push({ field, message: "Remove unsupported control characters." });
   }
 
-  if (/<\/?[a-z][^>]*>|javascript:|data:text\/html|on[a-z]+\s*=/i.test(trimmed)) {
+  if (containsExecutableContent(trimmed)) {
     errors.push({ field, message: "Markup and executable content are not accepted." });
   }
 

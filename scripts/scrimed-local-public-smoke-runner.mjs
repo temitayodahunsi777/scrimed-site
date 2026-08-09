@@ -11,7 +11,6 @@ const root = process.cwd();
 const loopbackHost = "127.0.0.1";
 const defaultPort = 3048;
 const defaultStartupTimeoutMs = 30_000;
-const maximumLogTailBytes = 24_000;
 const localEnvironmentFiles = [
   ".env",
   ".env.local",
@@ -154,11 +153,6 @@ function createNonsecretEnvironment(port, localEnvironmentNames) {
   return environment;
 }
 
-function appendLogTail(current, chunk) {
-  const combined = `${current}${chunk.toString("utf8")}`;
-  return combined.slice(-maximumLogTailBytes);
-}
-
 function trackChildProcess(child) {
   const state = {
     code: null,
@@ -282,7 +276,7 @@ async function waitForReadiness(serverState, baseUrl, timeoutMs) {
       });
 
       if (response.status === 200) {
-        console.log(`pass local Next server readiness: ${baseUrl}`);
+        console.log("pass local Next server readiness: loopback health endpoint responded");
         return;
       }
     } catch {
@@ -418,7 +412,6 @@ try {
   process.exit(1);
 }
 
-let outputTail = "";
 let runError = null;
 let server = null;
 let serverState = null;
@@ -427,18 +420,11 @@ try {
   server = spawn(process.execPath, [entrypoints.next, "start", "-H", loopbackHost, "-p", String(options.port)], {
     cwd: root,
     env: environment,
-    stdio: ["ignore", "pipe", "pipe"],
+    stdio: ["ignore", "ignore", "ignore"],
     shell: false
   });
 
   serverState = trackChildProcess(server);
-  server.stdout.on("data", (chunk) => {
-    outputTail = appendLogTail(outputTail, chunk);
-  });
-  server.stderr.on("data", (chunk) => {
-    outputTail = appendLogTail(outputTail, chunk);
-  });
-
   await waitForReadiness(serverState, baseUrl, options.startupTimeoutMs);
   runNodeStage("local public production smoke", [entrypoints.smoke], environment, 300_000);
 } catch (error) {
@@ -486,13 +472,10 @@ if (!integrity.ok) {
 }
 
 if (runError) {
-  if (outputTail.trim()) {
-    console.error(`Local Next server output tail:\n${outputTail.trim()}`);
-  }
   console.error(
     `fail SCRIMED local public smoke runner: ${runError instanceof Error ? runError.message : String(runError)}`
   );
   process.exit(1);
 }
 
-console.log(`pass SCRIMED local public smoke runner: base_url=${baseUrl} server_stopped=true integrity=passed`);
+console.log("pass SCRIMED local public smoke runner: loopback_verified=true server_stopped=true integrity=passed");

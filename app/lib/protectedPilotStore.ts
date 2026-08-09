@@ -36,7 +36,8 @@ import type {
 } from "./pilotDemoReadiness";
 import type {
   QaManualRunEvidenceInput,
-  QaManualRunEvidencePacketRecord
+  QaManualRunEvidencePacketRecord,
+  QaPersistedRunWorkflowKind
 } from "./qaEvidenceLedger";
 import type {
   CommandIntelligenceHubSummary,
@@ -175,7 +176,9 @@ import type {
   P32CandidateReviewAssignmentReceipt,
   P32CandidateReviewAssignmentReceiptInput,
   P32CandidateReviewDecisionReceipt,
-  P32CandidateReviewDecisionReceiptInput
+  P32CandidateReviewDecisionReceiptInput,
+  P32CandidateReviewFingerprints,
+  P32CandidateReviewPersistedEvidence
 } from "./scrimedP32CandidateReview";
 
 type AuthenticatedPilotContext =
@@ -232,6 +235,7 @@ type QaManualRunEvidencePacketRow = {
   id: string;
   tenant_id: string;
   workspace_id: string;
+  workflow_kind?: string;
   workflow_run_id: string;
   workflow_run_url: string;
   executed_at: string;
@@ -1384,6 +1388,13 @@ function mapQaManualRunEvidencePacket(
     id: row.id,
     tenantId: row.tenant_id,
     workspaceId: row.workspace_id,
+    workflowKind: [
+      "sales-demo-session-qa",
+      "authority-reference-qa",
+      "execution-attempt-durable-store-qa"
+    ].includes(row.workflow_kind ?? "")
+      ? row.workflow_kind as QaPersistedRunWorkflowKind
+      : "legacy-unclassified",
     workflowRunId: row.workflow_run_id,
     workflowRunUrl: row.workflow_run_url,
     executedAt: row.executed_at,
@@ -2407,6 +2418,8 @@ const sessionSelect =
 const auditEventSelect =
   "id, workspace_id, session_id, actor_user_id, event_type, event_metadata, created_at";
 const qaManualRunEvidencePacketSelect =
+  "id, tenant_id, workspace_id, workflow_kind, workflow_run_id, workflow_run_url, executed_at, base_url, intake_id, created_session_id, packet_audit_event_id, qa_outcome, operator_attestation, token_disposal_attestation, data_boundary, packet_markdown, packet_sha256, created_by, created_at, boundary";
+const qaManualRunEvidencePacketLegacySelect =
   "id, tenant_id, workspace_id, workflow_run_id, workflow_run_url, executed_at, base_url, intake_id, created_session_id, packet_audit_event_id, qa_outcome, operator_attestation, token_disposal_attestation, data_boundary, packet_markdown, packet_sha256, created_by, created_at, boundary";
 const pilotDemoReadinessSnapshotSelect =
   "id, tenant_id, workspace_id, readiness_state, readiness_score, passed_count, review_count, blocked_count, required_actions, buyer_brief, check_results, runbook, verification, evidence_counts, snapshot, last_evidence_at, boundary, created_by, created_at";
@@ -2548,18 +2561,32 @@ export async function listPilotAuditEvents(client: SupabaseClient, workspaceId: 
 }
 
 export async function listQaManualRunEvidencePackets(client: SupabaseClient, workspaceId: string) {
-  const { data, error } = await client
+  const currentSchemaResult = await client
     .from("qa_manual_run_evidence_packets")
     .select(qaManualRunEvidencePacketSelect)
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false })
     .limit(50);
+  const workflowColumnUnavailable = Boolean(
+    currentSchemaResult.error &&
+      (currentSchemaResult.error.code === "42703" ||
+        currentSchemaResult.error.code === "PGRST204") &&
+      currentSchemaResult.error.message.includes("workflow_kind")
+  );
+  const result = workflowColumnUnavailable
+    ? await client
+        .from("qa_manual_run_evidence_packets")
+        .select(qaManualRunEvidencePacketLegacySelect)
+        .eq("workspace_id", workspaceId)
+        .order("created_at", { ascending: false })
+        .limit(50)
+    : currentSchemaResult;
 
   return {
-    packets: ((data ?? []) as unknown as QaManualRunEvidencePacketRow[]).map(
+    packets: ((result.data ?? []) as unknown as QaManualRunEvidencePacketRow[]).map(
       mapQaManualRunEvidencePacket
     ),
-    error
+    error: result.error
   };
 }
 
@@ -4131,6 +4158,23 @@ export async function recordP32CandidateReviewDecisionReceipt(
       : null;
 
   return { receipt, error };
+}
+
+export async function getP32CandidateReviewEvidence(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  fingerprints: P32CandidateReviewFingerprints
+) {
+  const { data, error } = await client.rpc("get_p32_candidate_review_evidence", {
+    p_workspace_slug: workspaceSlug,
+    p_candidate: fingerprints
+  });
+  const persistedReview =
+    data && typeof data === "object"
+      ? (data as unknown as P32CandidateReviewPersistedEvidence)
+      : null;
+
+  return { persistedReview, error };
 }
 
 export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {

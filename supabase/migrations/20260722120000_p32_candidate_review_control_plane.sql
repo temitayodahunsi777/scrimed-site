@@ -174,7 +174,7 @@ begin
     raise exception 'p32-candidate-review-assignment-invalid-typed-field';
   end;
 
-  assigner_identity_hash_value := encode(digest(
+  assigner_identity_hash_value := encode(extensions.digest(
     'scrimed-p32-reviewer-v1|' || (select auth.uid())::text,
     'sha256'
   ), 'hex');
@@ -203,7 +203,7 @@ begin
     where membership.tenant_id = selected_workspace.tenant_id
       and membership.role = 'reviewer'
       and membership.status = 'active'
-      and encode(digest(
+      and encode(extensions.digest(
         'scrimed-p32-reviewer-v1|' || membership.user_id::text,
         'sha256'
       ), 'hex') = normalized ->> 'reviewerIdentityHash'
@@ -230,7 +230,7 @@ begin
   order by assignment.created_at desc, assignment.id desc
   limit 1;
 
-  audit_hash_value := encode(digest(concat_ws(
+  audit_hash_value := encode(extensions.digest(concat_ws(
     '|',
     coalesce(previous_hash_value, ''),
     assignment_id_value::text,
@@ -410,11 +410,11 @@ begin
     raise exception 'p32-candidate-review-decision-invalid-typed-field';
   end;
 
-  reviewer_identity_hash_value := encode(digest(
+  reviewer_identity_hash_value := encode(extensions.digest(
     'scrimed-p32-reviewer-v1|' || (select auth.uid())::text,
     'sha256'
   ), 'hex');
-  tenant_scope_hash_value := encode(digest(
+  tenant_scope_hash_value := encode(extensions.digest(
     'scrimed-p32-tenant-v1|' || selected_workspace.tenant_id::text,
     'sha256'
   ), 'hex');
@@ -507,7 +507,7 @@ begin
   order by decision.created_at desc, decision.id desc
   limit 1;
 
-  audit_hash_value := encode(digest(concat_ws(
+  audit_hash_value := encode(extensions.digest(concat_ws(
     '|',
     coalesce(previous_hash_value, ''),
     approval_id_value::text,
@@ -614,6 +614,168 @@ as $$
   );
 $$;
 
+create or replace function private.get_p32_candidate_review_evidence(
+  p_workspace_slug text,
+  p_candidate jsonb
+)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  selected_workspace public.pilot_workspaces%rowtype;
+  selected_assignment private.p32_candidate_review_assignments%rowtype;
+  selected_decision private.p32_candidate_review_decisions%rowtype;
+  normalized jsonb := coalesce(p_candidate, '{}'::jsonb);
+  actor_role text;
+  reviewer_identity_hash_value text;
+begin
+  select *
+  into selected_workspace
+  from public.pilot_workspaces
+  where id = private.require_governance_workspace(
+    p_workspace_slug,
+    array['tenant-admin', 'pilot-lead', 'reviewer']
+  );
+
+  if jsonb_typeof(normalized) <> 'object'
+    or pg_column_size(normalized) > 4096
+    or normalized - array[
+      'sourceCommit',
+      'sourceTreeFingerprint',
+      'artifactFingerprint',
+      'validationEvidenceFingerprint',
+      'reviewPacketFingerprint'
+    ] <> '{}'::jsonb
+    or normalized ->> 'sourceCommit' !~ '^[0-9a-f]{40}$'
+    or normalized ->> 'sourceTreeFingerprint' !~ '^[0-9a-f]{64}$'
+    or normalized ->> 'artifactFingerprint' !~ '^[0-9a-f]{64}$'
+    or normalized ->> 'validationEvidenceFingerprint' !~ '^[0-9a-f]{64}$'
+    or normalized ->> 'reviewPacketFingerprint' !~ '^[0-9a-f]{64}$' then
+    raise exception 'p32-candidate-review-recovery-invalid-candidate';
+  end if;
+
+  select membership.role
+  into actor_role
+  from public.pilot_memberships membership
+  where membership.tenant_id = selected_workspace.tenant_id
+    and membership.user_id = (select auth.uid())
+    and membership.status = 'active'
+    and membership.role in ('tenant-admin', 'pilot-lead', 'reviewer')
+  limit 1;
+
+  if actor_role is null then
+    raise exception 'p32-candidate-review-recovery-role-denied';
+  end if;
+
+  reviewer_identity_hash_value := encode(extensions.digest(
+    'scrimed-p32-reviewer-v1|' || (select auth.uid())::text,
+    'sha256'
+  ), 'hex');
+
+  select assignment.*
+  into selected_assignment
+  from private.p32_candidate_review_assignments assignment
+  where assignment.workspace_id = selected_workspace.id
+    and assignment.tenant_id = selected_workspace.tenant_id
+    and assignment.source_commit = normalized ->> 'sourceCommit'
+    and assignment.source_tree_fingerprint = normalized ->> 'sourceTreeFingerprint'
+    and assignment.artifact_fingerprint = normalized ->> 'artifactFingerprint'
+    and assignment.validation_evidence_fingerprint = normalized ->> 'validationEvidenceFingerprint'
+    and assignment.review_packet_fingerprint = normalized ->> 'reviewPacketFingerprint'
+    and (
+      (actor_role in ('tenant-admin', 'pilot-lead')
+        and assignment.assigned_by = (select auth.uid()))
+      or (actor_role = 'reviewer'
+        and assignment.reviewer_identity_hash = reviewer_identity_hash_value)
+    )
+  order by assignment.created_at desc, assignment.id desc
+  limit 1;
+
+  if selected_assignment.id is null then
+    return jsonb_build_object(
+      'assignment', null,
+      'decision', null,
+      'evidenceFile', null,
+      'receipt', null,
+      'humanDecisionRecorded', false,
+      'releaseAuthorityGranted', false,
+      'boundary', 'synthetic-metadata-only-no-release-authority'
+    );
+  end if;
+
+  select decision.*
+  into selected_decision
+  from private.p32_candidate_review_decisions decision
+  where decision.assignment_id = selected_assignment.id
+    and decision.workspace_id = selected_workspace.id
+    and decision.tenant_id = selected_workspace.tenant_id;
+
+  return jsonb_build_object(
+    'assignment', jsonb_build_object(
+      'assignmentId', selected_assignment.id,
+      'reviewerIdentityHash', selected_assignment.reviewer_identity_hash,
+      'reviewerRole', selected_assignment.reviewer_role,
+      'sourceCommit', selected_assignment.source_commit,
+      'sourceTreeFingerprint', selected_assignment.source_tree_fingerprint,
+      'artifactFingerprint', selected_assignment.artifact_fingerprint,
+      'validationEvidenceFingerprint', selected_assignment.validation_evidence_fingerprint,
+      'reviewPacketFingerprint', selected_assignment.review_packet_fingerprint,
+      'assignedAt', selected_assignment.assigned_at,
+      'expiresAt', selected_assignment.expires_at
+    ),
+    'decision', case
+      when selected_decision.id is null then null
+      else jsonb_build_object(
+        'approvalId', selected_decision.id,
+        'decision', selected_decision.decision,
+        'reasonCode', selected_decision.reason_code,
+        'decidedAt', selected_decision.created_at
+      )
+    end,
+    'evidenceFile', case
+      when selected_decision.id is null then null
+      else jsonb_build_object(
+        'automatedEvidence', jsonb_build_array(),
+        'approvals', jsonb_build_array(selected_decision.approval_evidence),
+        'attestation', selected_decision.attestation
+      )
+    end,
+    'receipt', case
+      when selected_decision.id is null then null
+      else jsonb_build_object(
+        'approvalId', selected_decision.id,
+        'assignmentId', selected_decision.assignment_id,
+        'auditHash', selected_decision.audit_hash,
+        'previousAuditHash', selected_decision.previous_audit_hash,
+        'recordedAt', selected_decision.created_at
+      )
+    end,
+    'humanDecisionRecorded', selected_decision.id is not null,
+    'releaseAuthorityGranted', false,
+    'boundary', 'synthetic-metadata-only-no-release-authority'
+  );
+end;
+$$;
+
+create or replace function public.get_p32_candidate_review_evidence(
+  p_workspace_slug text,
+  p_candidate jsonb
+)
+returns jsonb
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select private.get_p32_candidate_review_evidence(
+    p_workspace_slug,
+    p_candidate
+  );
+$$;
+
 revoke all on function private.prevent_p32_candidate_review_mutation()
   from public, anon, authenticated, service_role;
 revoke all on function private.create_p32_candidate_review_assignment(text, jsonb)
@@ -624,6 +786,10 @@ revoke all on function public.create_p32_candidate_review_assignment(text, jsonb
   from public, anon, authenticated, service_role;
 revoke all on function public.record_p32_candidate_review_decision(text, jsonb)
   from public, anon, authenticated, service_role;
+revoke all on function private.get_p32_candidate_review_evidence(text, jsonb)
+  from public, anon, authenticated, service_role;
+revoke all on function public.get_p32_candidate_review_evidence(text, jsonb)
+  from public, anon, authenticated, service_role;
 grant execute on function private.create_p32_candidate_review_assignment(text, jsonb)
   to authenticated;
 grant execute on function private.record_p32_candidate_review_decision(text, jsonb)
@@ -631,6 +797,10 @@ grant execute on function private.record_p32_candidate_review_decision(text, jso
 grant execute on function public.create_p32_candidate_review_assignment(text, jsonb)
   to authenticated;
 grant execute on function public.record_p32_candidate_review_decision(text, jsonb)
+  to authenticated;
+grant execute on function private.get_p32_candidate_review_evidence(text, jsonb)
+  to authenticated;
+grant execute on function public.get_p32_candidate_review_evidence(text, jsonb)
   to authenticated;
 
 comment on table private.p32_candidate_review_assignments is
@@ -641,3 +811,5 @@ comment on function public.create_p32_candidate_review_assignment(text, jsonb) i
   'Requires an AAL2 governance session, server runtime token, tenant-admin or pilot-lead role, an active distinct reviewer membership, exact candidate hashes, and one-use idempotency.';
 comment on function public.record_p32_candidate_review_decision(text, jsonb) is
   'Requires an AAL2 governance session, server runtime token, active reviewer role, exact assignment and candidate binding, separation of duties, bounded evidence, and one-use idempotency.';
+comment on function public.get_p32_candidate_review_evidence(text, jsonb) is
+  'Recovers only exact-candidate signed evidence visible to the assigning tenant administrator or assigned reviewer. It exposes no raw identity, idempotency, private-key, PHI, or release-authority data.';

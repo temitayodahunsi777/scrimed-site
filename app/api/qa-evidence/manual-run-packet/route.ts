@@ -52,9 +52,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const filename =
-    validation.input.workflowKind === "authority-reference-qa"
-      ? "scrimed-manual-authority-reference-qa-evidence-packet.md"
+  const filename = validation.input.workflowKind === "authority-reference-qa"
+    ? "scrimed-manual-authority-reference-qa-evidence-packet.md"
+    : validation.input.workflowKind === "execution-attempt-durable-store-qa"
+      ? "scrimed-manual-execution-attempt-durable-store-qa-evidence-packet.md"
       : "scrimed-manual-sales-demo-session-qa-evidence-packet.md";
 
   return new NextResponse(buildQaManualRunEvidencePacket(validation.input), {

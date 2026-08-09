@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { PilotWorkspaceRecord } from "../lib/protectedPilotWorkspace";
 import type { P32SupplementalEvidenceFile } from "../lib/scrimedP32EvidenceAttestation";
+import type { P32CandidateReviewPersistedEvidence } from "../lib/scrimedP32CandidateReview";
 
 type CandidateReviewSummary = {
   reviewerIdentityHash: string;
@@ -38,6 +39,7 @@ type CandidateReviewResponse = Partial<CandidateReviewSummary> & {
     assignmentId?: string;
     approvalId?: string;
   };
+  persistedReview?: P32CandidateReviewPersistedEvidence;
   error?: { code?: string; message?: string };
 };
 
@@ -92,7 +94,23 @@ export default function P32CandidateReviewPanel({ accessToken, workspace }: Prop
         return;
       }
       setSummary(body as CandidateReviewSummary);
-      if (body.actorCapabilities.canAssignReview) {
+      if (body.persistedReview?.assignment?.assignmentId) {
+        setAssignmentId(body.persistedReview.assignment.assignmentId);
+      }
+      if (body.persistedReview?.evidenceFile) {
+        setEvidenceFile(body.persistedReview.evidenceFile);
+      }
+      if (body.persistedReview?.decision && body.persistedReview.evidenceFile) {
+        setMessage(
+          `Signed ${body.persistedReview.decision.decision} evidence recovered from the append-only review ledger.`
+        );
+      } else if (body.persistedReview?.assignment) {
+        setMessage(
+          body.actorCapabilities.canRecordDecision
+            ? "Your candidate-bound assignment was recovered and is ready for a reviewer disposition."
+            : "The candidate-bound assignment was recovered and remains available to the assigned reviewer."
+        );
+      } else if (body.actorCapabilities.canAssignReview) {
         setMessage("Candidate-bound assignment controls are ready for a distinct reviewer.");
       } else if (body.actorCapabilities.canRecordDecision) {
         setMessage("Copy your protected identity hash, then use the assignment ID supplied by the administrator.");

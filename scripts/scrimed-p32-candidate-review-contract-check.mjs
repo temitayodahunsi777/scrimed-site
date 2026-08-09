@@ -33,6 +33,7 @@ for (const expected of [
   "canRecordDecision",
   "p32-candidate-review-stage-forbidden",
   "createP32CandidateReviewAssignmentReceipt",
+  "getP32CandidateReviewEvidence",
   "recordP32CandidateReviewDecisionReceipt",
   "evaluateScrimedWorkWriteRequestProvenance(request)",
   "p32-candidate-review-csrf-denied",
@@ -69,6 +70,7 @@ for (const expected of [
 for (const expected of [
   "private.p32_candidate_review_assignments",
   "private.p32_candidate_review_decisions",
+  "private.get_p32_candidate_review_evidence",
   "p32_candidate_review_assignments_workspace_tenant_fk",
   "p32_candidate_review_decisions_workspace_tenant_fk",
   "p32_candidate_review_decisions_assignment_scope_fk",
@@ -84,7 +86,12 @@ for (const expected of [
   "release_authority_granted = false",
   "revoke all on table",
   "grant execute on function public.create_p32_candidate_review_assignment",
-  "grant execute on function public.record_p32_candidate_review_decision"
+  "grant execute on function public.record_p32_candidate_review_decision",
+  "grant execute on function public.get_p32_candidate_review_evidence",
+  "assignment.assigned_by = (select auth.uid())",
+  "assignment.reviewer_identity_hash = reviewer_identity_hash_value",
+  "'evidenceFile'",
+  "'releaseAuthorityGranted', false"
 ]) {
   requireIncludes("candidate-review migration", files.migration, expected);
 }
@@ -95,6 +102,7 @@ for (const expected of [
   '.select("role, status")',
   "create_p32_candidate_review_assignment",
   "record_p32_candidate_review_decision",
+  "get_p32_candidate_review_evidence",
   "P32CandidateReviewAssignmentReceiptInput",
   "P32CandidateReviewDecisionReceiptInput"
 ]) {
@@ -112,6 +120,7 @@ for (const expected of [
   "Read-only candidate evidence",
   "assignmentIdPattern",
   "Download Review Evidence",
+  "Signed ${body.persistedReview.decision.decision} evidence recovered",
   "crypto.randomUUID()"
 ]) {
   requireIncludes("candidate-review browser workflow", files.panel + files.access, expected);

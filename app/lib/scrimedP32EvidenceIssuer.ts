@@ -276,7 +276,8 @@ function selectCurrentQaEvidencePacket(
   const packet = packets.find((candidate) => {
     const executedAtMs = Date.parse(candidate.executedAt);
     const createdAtMs = Date.parse(candidate.createdAt);
-    return candidate.qaOutcome === "pass" &&
+    return candidate.workflowKind === "execution-attempt-durable-store-qa" &&
+      candidate.qaOutcome === "pass" &&
       candidate.operatorAttestation === "no-secrets-no-phi-aal2-human-run" &&
       candidate.tokenDisposalAttestation === "temporary-token-deleted-or-rotated" &&
       candidate.dataBoundary === "synthetic-business-workflow-only" &&
@@ -293,7 +294,7 @@ function selectCurrentQaEvidencePacket(
     issuerError(
       "p32-evidence-issuer-qa-evidence-required",
       422,
-      "No current retained no-PHI AAL2 QA packet is eligible for issuance."
+      "No current retained no-PHI durable-store AAL2 QA packet is eligible for issuance."
     );
   }
   return packet;

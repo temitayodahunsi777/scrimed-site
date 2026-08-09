@@ -53,7 +53,7 @@ const packet = {
   id: "10000000-0000-4000-8000-000000000001",
   tenantId: "20000000-0000-4000-8000-000000000001",
   workspaceId: "30000000-0000-4000-8000-000000000001",
-  workflowKind: "authority-reference-qa",
+  workflowKind: "execution-attempt-durable-store-qa",
   workflowRunId: "123456789",
   workflowRunUrl:
     "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/123456789",
@@ -154,6 +154,16 @@ await expectIssuerError("missing QA evidence", "p32-evidence-issuer-qa-evidence-
     env,
     idempotencyKey: "70000000-0000-4000-8000-000000000004",
     packets: [],
+    persistReceipt: successfulPersistence,
+    request,
+    now
+  })
+);
+await expectIssuerError("wrong QA workflow", "p32-evidence-issuer-qa-evidence-required", () =>
+  issueP32Aal2Evidence({
+    env,
+    idempotencyKey: "70000000-0000-4000-8000-000000000008",
+    packets: [{ ...packet, workflowKind: "authority-reference-qa" }],
     persistReceipt: successfulPersistence,
     request,
     now

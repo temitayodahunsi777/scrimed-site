@@ -16,8 +16,8 @@ and composite workspace/tenant binding.
 | Order | Migration | SHA-256 | Static status |
 | --- | --- | --- | --- |
 | 1 | `20260718153148_clinical_assurance_control_plane.sql` | `5cdc5be2794b233476687e5930546746802ee5b57de3011afc1a781fa7d3902b` | READY |
-| 2 | `20260721173000_p32_evidence_attestation_issuances.sql` | `18ca2d9df239d8eb1925b46ca7a85647ba9e6bfb513918e0720578bffafeb4fb` | READY |
-| 3 | `20260722120000_p32_candidate_review_control_plane.sql` | `cdf380a8ae13d1134d9a33bdf872107e59effa295436e4dc3acba023b0283815` | READY |
+| 2 | `20260721173000_p32_evidence_attestation_issuances.sql` | `fbbbfa0fbdfaf51ac7c52cc6cfba88fb743c84f9748167d3e97eb440148c97db` | READY |
+| 3 | `20260722120000_p32_candidate_review_control_plane.sql` | `d0d2c98ee652c452f8dc52ef05bac4b5bb90f7e9ebdf408101f5e6ed72a46f54` | READY |
 
 `READY` means ready for a separately authorized disposable-database dry-run. It does not
 mean ready to apply to production.

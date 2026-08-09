@@ -6967,6 +6967,10 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA evidence activation plan missing sales-demo workflow.");
   }
 
+  if (!activationPlanBody.workflows?.some((workflow) => workflow.workflowKind === "execution-attempt-durable-store-qa")) {
+    throw new Error("QA evidence activation plan missing execution-attempt durable-store workflow.");
+  }
+
   const activationPlanBrief = await request("/api/qa-evidence/activation-plan/brief");
   requireStatus("QA evidence activation plan brief", activationPlanBrief.response.status, 200);
   requireContentType("QA evidence activation plan brief", activationPlanBrief.response, "text/markdown");
@@ -6995,6 +6999,10 @@ async function checkQaEvidenceLedger() {
 
   if (!contractBody.supportedWorkflowKinds?.includes("authority-reference-qa")) {
     throw new Error("QA manual run evidence packet contract missing authority-reference workflow kind.");
+  }
+
+  if (!contractBody.supportedWorkflowKinds?.includes("execution-attempt-durable-store-qa")) {
+    throw new Error("QA manual run evidence packet contract missing durable-store workflow kind.");
   }
 
   const rejectedSecret = await postJson("/api/qa-evidence/manual-run-packet", {
@@ -7062,6 +7070,34 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA authority reference evidence packet missing workflow kind.");
   }
 
+  const acceptedDurableStorePacket = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowKind: "execution-attempt-durable-store-qa",
+    workflowRunId: "202606221322",
+    workflowRunUrl: "https://app.scrimedsolutions.com/qa-run-control?runId=202606221322",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "atlas-synthetic-evaluation",
+    createdSessionId: "55555555-5555-4555-8555-555555555555",
+    packetAuditEventId: "66666666-6666-4666-8666-666666666666",
+    evidenceTargetLabel: "Workspace target",
+    evidenceObjectLabel: "Created durable record ID",
+    packetAuditEventLabel: "Review disposition audit event ID",
+    evidenceRoute: "/api/workflows/execution-attempts/durable-store/record",
+    packetRoute: "/api/workflows/execution-attempts/durable-store/review-disposition",
+    operatorRunbook: "/docs/aal2-durable-store-smoke.md",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA durable-store evidence packet", acceptedDurableStorePacket.response.status, 200);
+  requireContentType("QA durable-store evidence packet", acceptedDurableStorePacket.response, "text/markdown");
+  requireSyntheticBoundary("QA durable-store evidence packet", acceptedDurableStorePacket.response);
+
+  if (!acceptedDurableStorePacket.body.text.includes("Workflow kind: execution-attempt-durable-store-qa")) {
+    throw new Error("QA durable-store evidence packet missing workflow kind.");
+  }
+
   console.log("pass QA evidence ledger");
 }
 
@@ -7088,8 +7124,8 @@ async function checkQaExecutionReadiness() {
     throw new Error("QA execution readiness must preserve not-retained-proof claim boundary.");
   }
 
-  if (!Array.isArray(body.dispatchWorkflows) || body.dispatchWorkflows.length < 2) {
-    throw new Error("QA execution readiness expected both manual workflows.");
+  if (!Array.isArray(body.dispatchWorkflows) || body.dispatchWorkflows.length < 3) {
+    throw new Error("QA execution readiness expected all three governed manual workflows.");
   }
 
   if (!body.dispatchWorkflows.every((workflow) => workflow.state === "ready-for-human-aal2-run-not-executed")) {
@@ -7140,8 +7176,8 @@ async function checkQaRunControl() {
     throw new Error("QA run control must preserve not-retained authenticated proof boundary.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
-    throw new Error("QA run control expected both manual workflows.");
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
+    throw new Error("QA run control expected all three governed manual workflows.");
   }
 
   if (!body.workflows.every((workflow) => workflow.state === "ready-for-operator-control-human-aal2-required")) {
@@ -7228,8 +7264,8 @@ async function checkQaLaunchKit() {
     throw new Error("QA launch kit expected hard-stop phase.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
-    throw new Error("QA launch kit expected both manual workflows.");
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
+    throw new Error("QA launch kit expected all three governed manual workflows.");
   }
 
   if (!body.workflows.every((workflow) => workflow.dispatchInputs?.require_authenticated_path === true)) {
@@ -7300,8 +7336,8 @@ async function checkQaHumanRunPacket() {
     throw new Error("QA human run packet must block proof claims and buyer use before protected packet visibility.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
-    throw new Error("QA human run packet expected both manual workflows.");
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
+    throw new Error("QA human run packet expected all three governed manual workflows.");
   }
 
   if (!Array.isArray(body.controls) || body.controls.length < 7) {
@@ -7385,6 +7421,22 @@ async function checkQaHumanRunPacket() {
 
   if (acceptedBody.workflow?.workflowKind !== "authority-reference-qa") {
     throw new Error("QA human run packet accepted candidate expected authority-reference workflow.");
+  }
+
+  const acceptedDurableCandidate = await postJson("/api/qa-evidence/human-run-packet", {
+    workflowKind: "execution-attempt-durable-store-qa",
+    operatorRole: "tenant-admin",
+    protectedWorkspaceSlug: "atlas-synthetic-evaluation",
+    syntheticTargetId: "atlas-synthetic-evaluation",
+    plannedExecutionWindow: "operator-window-2026-08-08T12:00:00Z",
+    dispatchAttestation: "human-aal2-required-no-code-bypass",
+    proofBlockedAttestation: "no-retained-proof-until-protected-packet-visible",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA human run packet durable-store candidate", acceptedDurableCandidate.response.status, 200);
+  const acceptedDurableBody = requireJson("QA human run packet durable-store candidate", acceptedDurableCandidate.body);
+  if (acceptedDurableBody.workflow?.workflowKind !== "execution-attempt-durable-store-qa") {
+    throw new Error("QA human run packet expected the durable-store workflow.");
   }
 
   const brief = await request("/api/qa-evidence/human-run-packet/brief");
@@ -7518,6 +7570,32 @@ async function checkQaCompletionBridge() {
 
   if (!acceptedBody.packetPreviewMarkdown?.includes("SCRIMED Manual Authority Reference QA Evidence Packet")) {
     throw new Error("QA completion bridge accepted candidate expected authority reference packet preview.");
+  }
+
+  const acceptedDurableCandidate = await postJson("/api/qa-evidence/completion-bridge", {
+    workflowKind: "execution-attempt-durable-store-qa",
+    workflowRunId: "1234567891",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567891",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "atlas-synthetic-evaluation",
+    createdSessionId: "33333333-3333-4333-8333-333333333333",
+    packetAuditEventId: "44444444-4444-4444-8444-444444444444",
+    evidenceTargetLabel: "Workspace target",
+    evidenceObjectLabel: "Created durable record ID",
+    packetAuditEventLabel: "Review disposition audit event ID",
+    evidenceRoute: "/api/workflows/execution-attempts/durable-store/record",
+    packetRoute: "/api/workflows/execution-attempts/durable-store/review-disposition",
+    operatorRunbook: "/docs/aal2-durable-store-smoke.md",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA completion bridge durable-store candidate", acceptedDurableCandidate.response.status, 200);
+  const acceptedDurableBody = requireJson("QA completion bridge durable-store candidate", acceptedDurableCandidate.body);
+  if (!acceptedDurableBody.packetPreviewMarkdown?.includes("SCRIMED Manual Execution Attempt Durable Store QA Evidence Packet")) {
+    throw new Error("QA completion bridge expected the durable-store packet preview.");
   }
 
   const brief = await request("/api/qa-evidence/completion-bridge/brief");
@@ -8037,7 +8115,7 @@ async function checkQaManualExecutionConsole() {
     throw new Error("QA manual execution console public API must not mark buyer proof release ready.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
     throw new Error("QA manual execution console expected workflow coverage.");
   }
 

@@ -100,6 +100,8 @@ Strict smoke requires `SCRIMED_BEARER_TOKEN`, `SCRIMED_WORKSPACE_SLUG`, and a ta
 npm run smoke:aal2:durable-store:strict
 ```
 
+For p.32 `aal2-cli-evidence`, dispatch `.github/workflows/execution-attempt-durable-store-qa-smoke.yml` and retain the resulting manual QA packet with `workflowKind=execution-attempt-durable-store-qa`. Sales-demo, authority-reference, legacy, and unclassified packets cannot satisfy that gate. The workflow prints only the workspace target, durable-record UUID, and review audit-event UUID; it never prints the bearer token or raw execution payload.
+
 Equivalent explicit environment:
 
 ```bash

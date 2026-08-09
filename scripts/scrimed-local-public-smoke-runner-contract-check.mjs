@@ -42,12 +42,22 @@ for (const expected of [
   "SIGTERM",
   "SIGKILL",
   "server_stopped=true",
+  "loopback_verified=true",
   "shell: false"
 ]) {
   requireIncludes(runnerPath, runner, expected);
 }
 
-for (const forbidden of ["shell: true", "env: process.env", "...process.env", "npm install", "npm ci"]) {
+for (const forbidden of [
+  "shell: true",
+  "env: process.env",
+  "...process.env",
+  "npm install",
+  "npm ci",
+  "outputTail",
+  "Local Next server output tail",
+  "base_url=${baseUrl}"
+]) {
   if (runner.includes(forbidden)) {
     throw new Error(`${runnerPath} contains forbidden environment, shell, or package behavior: ${forbidden}`);
   }
