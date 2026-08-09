@@ -83,6 +83,22 @@ function workflowLabels(workflowKind: QaManualRunWorkflowKind, workspaceSlug: st
     };
   }
 
+  if (workflowKind === "execution-attempt-durable-store-qa") {
+    return {
+      heading: "Persist the exact AAL2 Durable Store QA run required by the p.32 evidence gate.",
+      copy:
+        "Use this mode only after the designated durable-store workflow records synthetic metadata, verifies idempotent replay, records a human review disposition, and deletes or rotates the temporary AAL2 token.",
+      targetLabel: "Workspace target",
+      targetHelp: "Use the protected synthetic workspace slug that was tested.",
+      objectLabel: "Created durable record ID",
+      objectHelp: "Use the record UUID printed by the durable-store smoke.",
+      auditLabel: "Review disposition audit event ID",
+      route: "/api/workflows/execution-attempts/durable-store/record",
+      packetRoute: "/api/workflows/execution-attempts/durable-store/review-disposition",
+      runbook: "/docs/aal2-durable-store-smoke.md"
+    };
+  }
+
   return {
     heading: "Persist the AAL2 Sales Demo Session QA run without copying bearer tokens into scripts.",
     copy:
@@ -264,7 +280,8 @@ export default function ManualQaEvidencePanel({
                   ...current,
                   workflowKind: event.target.value as QaManualRunWorkflowKind,
                   intakeId:
-                    event.target.value === "authority-reference-qa"
+                    event.target.value === "authority-reference-qa" ||
+                    event.target.value === "execution-attempt-durable-store-qa"
                       ? workspace.slug
                       : current.intakeId
                 }))
@@ -273,9 +290,12 @@ export default function ManualQaEvidencePanel({
             >
               <option value="sales-demo-session-qa">Sales Demo Session QA</option>
               <option value="authority-reference-qa">Authority Reference QA</option>
+              <option value="execution-attempt-durable-store-qa">
+                Execution Attempt Durable Store QA
+              </option>
             </select>
             <small>
-              Authority Reference QA uses the created reference UUID in the created-object field.
+              Durable Store QA is the only workflow eligible to satisfy the p.32 AAL2 CLI evidence gate.
             </small>
           </label>
           <label className="form-field">

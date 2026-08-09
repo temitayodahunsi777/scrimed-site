@@ -24,19 +24,23 @@ Snapshots expire quickly. Expired observations are marked `refresh-required`; th
 
 ## Current Reconciliation
 
-- **GitHub:** the current working build is not bound to one immutable reviewed revision.
-- **Vercel:** the observed deployment is ready and has no recent runtime-error cluster, but dirty-build metadata and missing live control-plane routes block promotion claims.
+- **GitHub:** PR 25 is the consolidated candidate path. Exact-head automation is required and
+  named independent engineering/security approval remains outstanding.
+- **Vercel:** production remains unchanged; PR 25 uses an isolated preview path whose exact final
+  head must pass desktop, 390px, protected, and public checks.
 - **Supabase:** the project is healthy, while pending durable-store migrations and advisor findings block the protected data-plane gate.
-- **Wix:** the live named testimonial requires removal or signed authorization and claim substantiation.
-- **Wix editor boundary:** the CMS inventory contains no testimonial collection, so the affected section is static editor content. A narrow CMS API mutation is unavailable, and a blind whole-site publish is prohibited.
+- **Wix:** the policy-v4 direct-origin audit passes the configured public-claims surface. The
+  FaithCore page is published with optional, clinically neutral copy and conservative schema.
+- **Wix presentation boundary:** a fresh true mobile-device visual check remains an owner action;
+  desktop-user-agent resizing is not accepted as mobile-variant evidence.
 - **Wix privacy containment:** the Voice Intake Assistant form was disabled through a narrow Forms API update and verified at revision 2. Two general free-text contact forms still require explicit no-PHI copy and privacy review.
 - **Wix data boundary:** the dashboard identifies the current configuration as not HIPAA compliant; public forms, chat, booking, and collection surfaces must remain explicitly no-PHI.
 - **Figma:** the account is connected, but a canonical editable design source is not yet bound to release review.
 
 ## Approval Path
 
-1. Remove or substantiate the public testimonial and record Founder, legal, and marketing review.
-2. Partition the working tree into a reviewable release candidate and bind quality evidence to its immutable revision.
+1. Preserve the verified public claims and record the remaining true mobile-device presentation check.
+2. Bind final quality evidence to PR 25's exact head and obtain named engineering/security review.
 3. Authorize a nonproduction Supabase target, apply pending migrations there, disposition advisor findings, and run strict AAL2 smoke.
 4. Complete the existing intended-use review with named Founder/CEO, qualified healthcare counsel, and clinical-governance signoff.
 

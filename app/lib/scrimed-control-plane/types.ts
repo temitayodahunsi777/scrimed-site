@@ -215,3 +215,97 @@ export type OutcomeMetric = {
   evidenceStatus: "not-collected" | "baseline-collected" | "review-required";
   syntheticOnly: true;
 };
+
+export type PlatformPlane =
+  | "clinical-experience"
+  | "workflows-agents"
+  | "data-interoperability"
+  | "model-compute"
+  | "trust-governance"
+  | "evidence-learning"
+  | "developer-ecosystem"
+  | "partner-marketplace"
+  | "research-trials"
+  | "business-capital"
+  | "operations-continuity";
+
+export type CapabilityActivationStatus =
+  | "active-synthetic"
+  | "review-ready"
+  | "protected-pilot-gated"
+  | "disabled-external-gate"
+  | "prohibited";
+
+export type CapabilityPublicClaimStatus =
+  | "approved-safe-description"
+  | "evidence-pending"
+  | "internal-only"
+  | "prohibited";
+
+export type PlatformCapabilityDefinition = {
+  id: string;
+  name: string;
+  plane: PlatformPlane;
+  purpose: string;
+  owner: string;
+  riskTier: RiskLevel;
+  environmentSupport: Array<"local" | "test" | "preview" | "protected-pilot">;
+  requiredApprovals: string[];
+  allowedDataClassifications: DataClassification[];
+  allowedProviderClasses: ProviderClass[];
+  allowedToolClasses: ToolRiskClass[];
+  requiredEvidence: string[];
+  jurisdictionConstraints: string[];
+  activationStatus: CapabilityActivationStatus;
+  publicClaimStatus: CapabilityPublicClaimStatus;
+  maturity: "foundation" | "integrated" | "review-ready" | "protected-pilot";
+  dependencies: string[];
+  agentIds: string[];
+  workflowIds: string[];
+  customerTypes: string[];
+  monetizationPath: string;
+  moatContribution: string;
+  evidenceStatus: "synthetic-verified" | "local-verified" | "external-validation-required";
+  proofRoutes: string[];
+  featureFlag: string;
+  highRiskDefaultOff: boolean;
+  externalActionsEnabled: false;
+  auditHash: string;
+};
+
+export type PlatformPortfolioDisposition = {
+  id: string;
+  name: string;
+  sourceOfferSlug: string | null;
+  disposition: "sell-now" | "advance-after-gates" | "demo-only" | "incubate" | "retire";
+  rationale: string;
+  buyer: string;
+  proofRoutes: string[];
+  nextMilestone: string;
+  retainedBoundary: string;
+};
+
+export type StrategicMetricDefinition = {
+  id: "verified-intelligence-yield" | "healthcare-value-returned" | "cost-per-verified-successful-task";
+  name: string;
+  formula: string;
+  numerator: string;
+  denominator: string;
+  currentValue: null;
+  evidenceStatus: "baseline-not-collected";
+  owner: string;
+  humanReviewRequired: true;
+  syntheticOnly: true;
+  blockedInterpretation: string;
+};
+
+export type PlatformMoatDefinition = {
+  id: string;
+  name: string;
+  basis: string;
+  status: "implemented-foundation" | "evidence-in-progress" | "external-validation-required";
+  evidenceRoutes: string[];
+  compoundingMechanism: string;
+  replicationFriction: string;
+  blockedClaim: string;
+};

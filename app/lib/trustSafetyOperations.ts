@@ -1,3 +1,8 @@
+import {
+  scrimedTrustIncidentForensicsBoundary,
+  scrimedTrustIncidentForensicsVersion
+} from "./scrimedTrustIncidentForensics";
+
 export type TrustSafetyStatus =
   | "active-control"
   | "watch-required"
@@ -1329,6 +1334,15 @@ export function getTrustSafetyOperationsSummary() {
       "/api/pilot-workspaces/{workspaceSlug}/trust-safety-incidents/{incidentId}/review-packet",
     boundary: trustSafetyOperationsBoundary,
     tenantIncidentBoundary: tenantTrustSafetyIncidentBoundary,
+    incidentForensics: {
+      version: scrimedTrustIncidentForensicsVersion,
+      accessScope: "restricted-incident-review",
+      timelineReconstruction: true,
+      counterfactualComparators: ["corrected-input", "prior-model", "alternate-model", "no-ai-workflow"],
+      legalLiabilityDeterminationAllowed: false,
+      rawPhiInBundleAllowed: false,
+      boundary: scrimedTrustIncidentForensicsBoundary
+    },
     operatingPosture:
       "24/7 trust, safety, monitoring, auditing, fixing, improving, and escalation model is defined. Production managed monitoring still requires approved staffing, on-call, SOC/MDR, and customer-specific runbooks before being claimed as live coverage.",
     durableTenantStorage:
@@ -1453,6 +1467,13 @@ export function buildTrustSafetyOperationsBrief() {
     `Mutation API: ${summary.tenantIncidentMutationApiRoute}`,
     `Review packet API: ${summary.tenantIncidentReviewPacketApiRoute}`,
     `Boundary: ${summary.tenantIncidentBoundary}`,
+    "",
+    "## Incident Forensics",
+    `Version: ${summary.incidentForensics.version}`,
+    `Access scope: ${summary.incidentForensics.accessScope}`,
+    `Timeline reconstruction: ${summary.incidentForensics.timelineReconstruction}`,
+    `Legal liability determination allowed: ${summary.incidentForensics.legalLiabilityDeterminationAllowed}`,
+    `Raw PHI in bundle allowed: ${summary.incidentForensics.rawPhiInBundleAllowed}`,
     "",
     "## Target Audience Fit",
     ...summary.targetAudienceSignals.map((signal) => `- ${signal.audience}: ${signal.appeal}`),

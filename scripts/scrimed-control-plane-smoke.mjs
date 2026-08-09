@@ -94,6 +94,11 @@ await requireGet("/api/scrimed-control-plane/capital-intelligence", '"outboundAl
 await requireGet("/api/scrimed-control-plane/outcomes", '"baseline":null', "application/json");
 await requireGet("/api/scrimed-control-plane/approvals", '"technicalGateAchieved":true', "application/json");
 await requireGet("/api/scrimed-control-plane/platform-evidence", '"productionPromotionAllowed":false', "application/json");
+await requireGet(
+  "/api/scrimed-control-plane/platform-strategy",
+  '"service":"scrimed-platform-capability-registry"',
+  "application/json"
+);
 
 await requireProtectedPost("/api/scrimed-control-plane/sessions", {
   tenantId: "synthetic-tenant",

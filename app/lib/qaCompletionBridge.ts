@@ -264,6 +264,7 @@ export function buildQaCompletionBridgeBrief() {
 
 export function sampleQaCompletionBridgePayload(workflowKind: QaManualRunEvidenceInput["workflowKind"]) {
   const isAuthorityReference = workflowKind === "authority-reference-qa";
+  const isDurableStore = workflowKind === "execution-attempt-durable-store-qa";
 
   return {
     workflowKind: workflowKind ?? "sales-demo-session-qa",
@@ -271,23 +272,35 @@ export function sampleQaCompletionBridgePayload(workflowKind: QaManualRunEvidenc
     workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567890",
     executedAt: new Date().toISOString(),
     baseUrl: "https://app.scrimedsolutions.com",
-    intakeId: isAuthorityReference ? "atlas-synthetic-evaluation" : "synthetic-intake-001",
+    intakeId: isAuthorityReference || isDurableStore ? "atlas-synthetic-evaluation" : "synthetic-intake-001",
     createdSessionId: "11111111-1111-4111-8111-111111111111",
     packetAuditEventId: "22222222-2222-4222-8222-222222222222",
-    evidenceTargetLabel: isAuthorityReference ? "Workspace target" : "Target intake ID",
-    evidenceObjectLabel: isAuthorityReference ? "Created authority reference ID" : "Created session ID",
+    evidenceTargetLabel: isAuthorityReference || isDurableStore ? "Workspace target" : "Target intake ID",
+    evidenceObjectLabel: isAuthorityReference
+      ? "Created authority reference ID"
+      : isDurableStore
+        ? "Created durable record ID"
+        : "Created session ID",
     packetAuditEventLabel: isAuthorityReference
       ? "Authority packet audit event ID"
-      : "Packet audit event ID",
+      : isDurableStore
+        ? "Review disposition audit event ID"
+        : "Packet audit event ID",
     evidenceRoute: isAuthorityReference
       ? "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references"
-      : "/api/sales-operations/qa/buyer-demo-sessions",
+      : isDurableStore
+        ? "/api/workflows/execution-attempts/durable-store/record"
+        : "/api/sales-operations/qa/buyer-demo-sessions",
     packetRoute: isAuthorityReference
       ? "/api/pilot-workspaces/{workspaceSlug}/authority-artifact-references/packet"
-      : "/api/sales-operations/opportunities/{intakeId}/demo-sessions/{sessionId}/packet",
+      : isDurableStore
+        ? "/api/workflows/execution-attempts/durable-store/review-disposition"
+        : "/api/sales-operations/opportunities/{intakeId}/demo-sessions/{sessionId}/packet",
     operatorRunbook: isAuthorityReference
       ? "/docs/protected-authority-artifact-references.md"
-      : "/docs/operator-token-rotation.md",
+      : isDurableStore
+        ? "/docs/aal2-durable-store-smoke.md"
+        : "/docs/operator-token-rotation.md",
     qaOutcome: "pass",
     operatorAttestation: "no-secrets-no-phi-aal2-human-run",
     tokenDisposalAttestation: "temporary-token-deleted-or-rotated",

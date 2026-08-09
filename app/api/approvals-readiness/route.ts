@@ -4,10 +4,12 @@ import { getApprovalsReadinessSummary } from "../../lib/approvalsReadiness";
 export async function GET() {
   return NextResponse.json(getApprovalsReadinessSummary(), {
     headers: {
+      "Cache-Control": "no-store",
       "X-SCRIMED-Approvals-Readiness": "operating-ladder-active",
       "X-SCRIMED-Clinical-Care-Authority": "not-authorized-live-care",
       "X-SCRIMED-Data-Boundary": "synthetic-only",
       "X-SCRIMED-Legal-Authority": "external-approval-required",
+      "X-SCRIMED-Intended-Use-Authority": "qualified-review-required",
       "X-SCRIMED-PHI-Authority": "not-authorized-production-phi",
       "X-SCRIMED-Regulatory-Authority": "external-review-required",
       "X-SCRIMED-Reimbursement-Authority": "no-reimbursement-guarantee",

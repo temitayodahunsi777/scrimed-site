@@ -6,7 +6,14 @@ import { getClinicalDataGovernanceSummary } from "./clinicalDataGovernance";
 import { getClinicalDataFabricSummary } from "./clinicalDataFabric";
 import { getHealthRecordsSafetyExchangeSummary } from "./healthRecordsSafetyExchange";
 import { getInteroperabilitySummary } from "./interoperabilityStandards";
+import { getImagingWorkflowIntelligenceSummary } from "./imagingWorkflowIntelligence";
 import { getProtectedPilotWorkspaceSummary } from "./protectedPilotWorkspace";
+import { getScrimedClinicalBenchmarkSuiteSummary } from "./scrimedClinicalBenchmarkSuite";
+import { getClinicalAgentSreSummary } from "./clinicalAgentSre";
+import { getValueContractEvidenceSummary } from "./valueContractEvidence";
+import { getScrimedP32ControlPlaneSummary } from "./scrimedP32ControlPlane";
+import { priorAuthorizationFoundryBlueprint } from "./scrimed-work/foundry";
+import { sampleOutcomeLearningControllers } from "./scrimed-work/learningLoop";
 import { getTrustOSSummary } from "./trustOS";
 
 export type IntelligencePhaseId = "phase-1" | "phase-2" | "phase-3" | "phase-4";
@@ -922,6 +929,11 @@ export function getHealthcareIntelligenceOSSummary() {
   const trustOS = getTrustOSSummary();
   const interoperability = getInteroperabilitySummary();
   const protectedWorkspace = getProtectedPilotWorkspaceSummary();
+  const imagingWorkflowIntelligence = getImagingWorkflowIntelligenceSummary();
+  const clinicalBenchmarkSuite = getScrimedClinicalBenchmarkSuiteSummary();
+  const clinicalAgentSre = getClinicalAgentSreSummary();
+  const valueContractEvidence = getValueContractEvidenceSummary();
+  const p32ControlPlane = getScrimedP32ControlPlaneSummary();
   const clinicalWorkflowPatientSafetyControls = Array.from(
     new Set(clinicalWorkflowAutomationTracks.flatMap((track) => track.patientSafetyControls))
   );
@@ -1037,11 +1049,48 @@ export function getHealthcareIntelligenceOSSummary() {
       productionConnectorAuthority: clinicalContextGateway.productionConnectorAuthority,
       supportedScopeCount: clinicalContextGateway.supportedScopes.length,
       gatewayControlCount: clinicalContextGateway.gatewayControls.length,
+      contextLensModes: clinicalContextGateway.contextLens.modes,
+      contextLensLivePhiEnabled: clinicalContextGateway.contextLens.livePhiEnabled,
+      unsupportedOrStaleContextAction:
+        clinicalContextGateway.contextLens.unsupportedOrStaleContextAction,
+      contextLensSourceAndReasonRequired:
+        clinicalContextGateway.contextLens.sourceAndReasonRequired,
+      clinicalSearchFabric: clinicalContextGateway.clinicalSearchFabric,
       sourceContractCount: clinicalContextGateway.sourceContractCount,
       baselineEvaluationCount: clinicalContextGateway.baselineEvaluationCount,
       validationStatus: clinicalContextGateway.validation.status,
       boundary: clinicalContextGateway.boundary
     },
+    p31AppliedIntelligence: {
+      contextLens: {
+        modes: clinicalContextGateway.contextLens.modes,
+        livePhiEnabled: clinicalContextGateway.contextLens.livePhiEnabled,
+        unsupportedOrStaleAction: clinicalContextGateway.contextLens.unsupportedOrStaleContextAction,
+        sourceAndReasonRequired: clinicalContextGateway.contextLens.sourceAndReasonRequired
+      },
+      imagingWorkflowIntelligence,
+      domainBenchmarkCard: clinicalBenchmarkSuite.benchmarkCard,
+      outcomeLearning: {
+        controllerCount: sampleOutcomeLearningControllers.length,
+        operatingMode: "synthetic-research-sandbox",
+        onlineClinicalSelfModificationAllowed: false,
+        controllers: sampleOutcomeLearningControllers
+      },
+      clinicianAgentFoundry: {
+        blueprintId: priorAuthorizationFoundryBlueprint.blueprintId,
+        templateName: priorAuthorizationFoundryBlueprint.definition.name,
+        deploymentStatus: priorAuthorizationFoundryBlueprint.deploymentManifest.status,
+        productionActivationAllowed: priorAuthorizationFoundryBlueprint.deploymentManifest.productionActivationAllowed,
+        permissionCount: priorAuthorizationFoundryBlueprint.permissionsManifest.length,
+        evaluationCaseCount: priorAuthorizationFoundryBlueprint.syntheticEvaluationSet.length,
+        boundary: priorAuthorizationFoundryBlueprint.boundary
+      },
+      clinicalAgentSre,
+      valueContractEvidence,
+      boundary:
+        "P31 applied intelligence is synthetic, metadata-only, review-gated, and non-authoritative. External imaging adapters, durable evidence storage, production adaptation, live PHI, EHR writeback, payer submission, clinical finalization, and customer activation remain disabled."
+    },
+    p32ControlPlane,
     validationTrustLab: {
       status: trustOS.status,
       route: trustOS.route,
@@ -1230,6 +1279,9 @@ export function buildHealthcareIntelligenceOSBrief() {
     `- Raw schema access: ${summary.clinicalContextGateway.rawSchemaAccess}`,
     `- Raw connector payload access: ${summary.clinicalContextGateway.rawConnectorPayloadAccess}`,
     `- Gateway controls: ${summary.clinicalContextGateway.gatewayControlCount}`,
+    `- Context Lens modes: ${summary.clinicalContextGateway.contextLensModes.join(", ")}`,
+    `- Unsupported or stale context: ${summary.clinicalContextGateway.unsupportedOrStaleContextAction}`,
+    `- Source and action reason required: ${summary.clinicalContextGateway.contextLensSourceAndReasonRequired}`,
     `- Baseline evaluations: ${summary.clinicalContextGateway.baselineEvaluationCount}`,
     `- Validation: ${summary.clinicalContextGateway.validationStatus}`,
     `- Boundary: ${summary.clinicalContextGateway.boundary}`,

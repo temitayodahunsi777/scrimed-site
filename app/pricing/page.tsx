@@ -1,34 +1,60 @@
 import Link from "next/link";
-import { getCommercialStrategySummary } from "../lib/commercialStrategy";
+import {
+  getCommercialStrategySummary,
+  type CommercialEngagementGoal
+} from "../lib/commercialStrategy";
 import { getPilotDemoCommercialReadinessSummary } from "../lib/pilotDemoCommercialReadiness";
+import PricingScopeGuard from "./PricingScopeGuard";
+import PricingValuePlanner from "./PricingValuePlanner";
 
 export const metadata = {
-  title: "SCRIMED Pricing | Healthcare AI Pilots",
+  title: "SCRIMED Pricing | Governed Healthcare AI Evaluations",
   description:
-    "Review SCRIMED pricing for healthcare AI assessments, synthetic pilots, protected enterprise pilots, annual operating licenses, and strategic partnerships."
+    "Explore non-binding SCRIMED planning ranges for no-PHI assessments, synthetic pilots, protected enterprise planning, and governed healthcare intelligence programs.",
+  alternates: {
+    canonical: "https://app.scrimedsolutions.com/pricing"
+  }
 };
 
 export default function PricingPage() {
   const summary = getCommercialStrategySummary();
   const pilotDemoReadiness = getPilotDemoCommercialReadinessSummary();
+  const plannerGoals: ReadonlyArray<{ goal: CommercialEngagementGoal; tierName: string }> = [
+    { goal: "assessment", tierName: "Workflow Intelligence Assessment" },
+    { goal: "synthetic-pilot", tierName: "Synthetic Pilot Evaluation" },
+    { goal: "protected-pilot", tierName: "Protected Enterprise Pilot" }
+  ];
+  const plannerTiers = plannerGoals.flatMap(({ goal, tierName }) => {
+    const tier = summary.pricingTiers.find((candidate) => candidate.name === tierName);
+
+    return tier
+      ? [
+          {
+            goal,
+            label: tier.name,
+            priceRange: tier.priceRange
+          }
+        ]
+      : [];
+  });
 
   return (
     <main>
       <section className="page-hero">
         <Link className="back-link" href="/product">Product Console</Link>
-        <p className="eyebrow">Pricing built for enterprise healthcare decisions</p>
-        <h1>Start free, pilot with proof, then expand only when the value is clear.</h1>
+        <p className="eyebrow">Pre-commercial pricing built around verified workflow value</p>
+        <h1>Start with inspectable proof. Expand only when the value and governance case hold.</h1>
         <p className="hero-text">
-          SCRIMED is priced to be easy to evaluate and serious to buy: free public demos, paid workflow
-          assessments, synthetic pilots, protected enterprise pilots, annual operating licenses, and strategic
-          partnerships for organizations ready to scale.
+          SCRIMED uses free public proof, paid no-PHI assessments, synthetic pilots, and externally reviewed
+          enterprise planning. Every range is non-binding until a named human owner approves scope, evidence,
+          terms, and retained safety gates.
         </p>
         <div className="hero-actions" aria-label="Pricing actions">
-          <Link className="primary-action" href="/pilot-demo-commercial-readiness">
-            Find My Price Band
+          <Link className="primary-action" href="#scope-guard">
+            Qualify Scope
           </Link>
-          <Link className="secondary-action" href="/demos">
-            Watch Demos
+          <Link className="secondary-action" href="#value-planner">
+            Model a Value Case
           </Link>
           <Link className="secondary-action" href="/pilots">
             Compare Pilots
@@ -39,24 +65,57 @@ export default function PricingPage() {
       <section className="section-band hub-summary" aria-label="SCRIMED pricing summary">
         <article>
           <span>Status</span>
-          <strong>{summary.status}</strong>
+          <strong>Pre-commercial</strong>
         </article>
         <article>
-          <span>App domain</span>
-          <strong>{summary.recommendedAppDomain}</strong>
+          <span>Pricing authority</span>
+          <strong>Non-binding</strong>
         </article>
         <article>
           <span>Tiers</span>
           <strong>{summary.pricingTiers.length}</strong>
         </article>
         <article>
-          <span>API</span>
-          <strong>{summary.apiRoute}</strong>
+          <span>Market evidence</span>
+          <strong>
+            {summary.marketEvidenceReview.currentCount}/{summary.sourceCounts.marketBenchmarkCount} current
+          </strong>
         </article>
         <article>
-          <span>Benchmarks</span>
-          <strong>{pilotDemoReadiness.marketBenchmarkCount}</strong>
+          <span>Safety posture</span>
+          <strong>Fail closed</strong>
         </article>
+      </section>
+
+      <section className="section-band" id="scope-guard">
+        <PricingScopeGuard tiers={plannerTiers} />
+      </section>
+
+      <section className="section-band" id="value-planner">
+        <PricingValuePlanner tiers={plannerTiers} />
+      </section>
+
+      <section className="section-band" aria-label="Commercial readiness controls">
+        <div className="section-heading">
+          <p className="eyebrow">Commercial control plane</p>
+          <h2>Value, trust, and global fit are separate decisions with explicit evidence.</h2>
+          <p className="section-copy">{summary.boundary}</p>
+        </div>
+        <div className="principle-grid">
+          {summary.commercialReadinessControls.map((control) => (
+            <article key={control.dimension}>
+              <span>{control.status}</span>
+              <h3>{control.dimension.replaceAll("-", " ")}</h3>
+              <p>{control.currentEvidence}</p>
+              <ul className="compact-list">
+                <li>{control.decisionRule}</li>
+              </ul>
+              <Link className="module-link" href={control.proofRoute}>
+                Inspect evidence route
+              </Link>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="section-band split-band">
@@ -110,6 +169,8 @@ export default function PricingPage() {
             <div>
               <strong>{tier.recommendedDisplayPrice}</strong>
               <ul className="compact-list">
+                <li>Authority: {tier.pricingAuthority}</li>
+                <li>Proposal gate: {tier.proposalGate}</li>
                 <li>{tier.successMetric}</li>
                 <li>Expansion: {tier.expansionPath}</li>
                 <li>{tier.boundary}</li>
@@ -147,19 +208,79 @@ export default function PricingPage() {
         <div className="section-heading">
           <p className="eyebrow">Current market context</p>
           <h2>SCRIMED is not priced as a commodity monthly scribe seat.</h2>
+          <p className="section-copy">
+            Evidence status: {summary.marketEvidenceReview.status.replaceAll("-", " ")}. Next review due {summary.marketEvidenceReview.nextReviewDue}. {summary.marketEvidenceReview.decisionRule}
+          </p>
         </div>
         <div className="principle-grid">
           {summary.marketPricingBenchmarks.map((benchmark) => (
             <article key={benchmark.segment}>
-              <span>{benchmark.segment}</span>
+              <span>
+                {benchmark.freshness} · verified {benchmark.lastVerified} · review by {benchmark.reviewDue}
+              </span>
               <h3>{benchmark.publicSignal}</h3>
               <p>{benchmark.scrimedImplication}</p>
               <ul className="compact-list">
-                <li>{benchmark.source}</li>
+                <li>{benchmark.comparisonBoundary}</li>
               </ul>
+              <a className="module-link" href={benchmark.sourceUrl} rel="noreferrer" target="_blank">
+                {benchmark.sourceName}
+              </a>
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Competitive positioning pillars">
+        <div className="section-heading">
+          <p className="eyebrow">Competitive position</p>
+          <h2>Differentiate through inspectable controls, not unverified superlatives.</h2>
+        </div>
+        {summary.competitivePositioningPillars.map((pillar) => (
+          <article className="module-row" key={pillar.pillar}>
+            <div>
+              <span>owned position</span>
+              <h2>{pillar.pillar}</h2>
+            </div>
+            <p>{pillar.buyerValue}</p>
+            <div>
+              <Link className="module-link" href={pillar.proofRoute}>
+                Inspect proof
+              </Link>
+              <ul className="compact-list">
+                <li>{pillar.inspectableProof}</li>
+                <li>{pillar.blockedClaim}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Global commercial profiles">
+        <div className="section-heading">
+          <p className="eyebrow">Global positioning</p>
+          <h2>One platform thesis, localized authority and procurement paths.</h2>
+        </div>
+        {summary.globalCommercialProfiles.map((profile) => (
+          <article className="module-row" key={profile.regionProfile}>
+            <div>
+              <span>regional profile</span>
+              <h2>{profile.regionProfile}</h2>
+            </div>
+            <p>{profile.entryMotion}</p>
+            <div>
+              <strong>{profile.pricingPolicy}</strong>
+              <ul className="compact-list">
+                <li>Buyer fit: {profile.buyerFit}</li>
+                <li>Localization: {profile.requiredLocalization.join("; ")}</li>
+                <li>Retained gates: {profile.retainedGates.join("; ")}</li>
+              </ul>
+              <Link className="module-link" href={profile.proofRoute}>
+                Inspect regional proof
+              </Link>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="section-band" aria-label="SCRIMED sales motion">

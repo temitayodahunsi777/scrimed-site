@@ -89,6 +89,11 @@ export function redactForTelemetry(value: unknown): unknown {
       .replace(/\bBearer\s+[A-Za-z0-9._-]+\b/g, "Bearer [REDACTED]")
       .replace(/\bsk-[A-Za-z0-9_-]+\b/g, "[REDACTED_API_KEY]")
       .replace(/\b\d{3}-\d{2}-\d{4}\b/g, "[REDACTED_IDENTIFIER]")
+      .replace(/\bMRN\s*[:#=-]?\s*[A-Za-z0-9-]{4,32}\b/gi, "MRN [REDACTED_IDENTIFIER]")
+      .replace(
+        /(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]\d{3}[\s.-]\d{4}\b/g,
+        "[REDACTED_PHONE]"
+      )
       .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED_EMAIL]");
   }
 
@@ -97,7 +102,12 @@ export function redactForTelemetry(value: unknown): unknown {
   if (value && typeof value === "object") {
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>).map(([key, entry]) => {
-        if (/token|secret|password|credential|authorization|cookie/i.test(key)) {
+        if (
+          /token|secret|password|credential|authorization|cookie/i.test(key) ||
+          /(?:^|_)(?:patient_?name|subject_?name|mrn|medical_?record_?number|phone|address|date_?of_?birth|dob|raw_?text|clinical_?note|transcript|raw_?prompt|raw_?payload)(?:$|_)/i.test(
+            key
+          )
+        ) {
           return [key, "[REDACTED]"];
         }
 

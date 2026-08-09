@@ -1,4 +1,4 @@
-import { SyntheticScenario, syntheticScenarios } from "./syntheticClinical";
+import { syntheticScenarios, type SyntheticScenario } from "./syntheticClinical";
 import { getSyntheticFixtureBySlug } from "./syntheticFixtures";
 
 export type SyntheticValidationStatus = "pass" | "fail";

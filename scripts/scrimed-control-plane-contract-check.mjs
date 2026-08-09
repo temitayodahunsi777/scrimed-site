@@ -13,6 +13,11 @@ const requiredFiles = [
   "docs/scrimed-compute-resilience.md",
   "docs/scrimed-approval-achievement.md",
   "docs/scrimed-cross-platform-evidence.md",
+  "docs/investor/SCRIMED_PLATFORM_MAP.md",
+  "docs/investor/MOAT_AND_DILIGENCE_INDEX.md",
+  "docs/product/PORTFOLIO_RATIONALIZATION.md",
+  "docs/release/PR_22_23_CONSOLIDATION_REPORT.md",
+  "docs/release/PRODUCTION_DELTA_REPORT.md",
   "docs/SCRIMED_INTENDED_USE_MEMO.md",
   "app/lib/scrimed-control-plane/types.ts",
   "app/lib/scrimed-control-plane/featureFlags.ts",
@@ -27,6 +32,7 @@ const requiredFiles = [
   "app/lib/scrimed-control-plane/governance.ts",
   "app/lib/scrimed-control-plane/approvalAchievement.ts",
   "app/lib/scrimed-control-plane/platformEvidence.ts",
+  "app/lib/scrimed-control-plane/platformStrategy.ts",
   "app/lib/scrimed-control-plane/index.ts",
   "app/api/scrimed-control-plane/[[...path]]/route.ts",
   "app/scrimed-control-plane/page.tsx",
@@ -34,7 +40,12 @@ const requiredFiles = [
   "app/lib/navigationAudit.ts",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs",
-  "scripts/scrimed-control-plane-smoke.mjs"
+  "scripts/scrimed-control-plane-smoke.mjs",
+  "scripts/scrimed-platform-strategy-artifacts.mjs",
+  "scripts/scrimed-platform-strategy-policy-test.mjs",
+  "artifacts/platform/platform-map.json",
+  "artifacts/product/product-portfolio.json",
+  "artifacts/investor/moat-registry.json"
 ];
 
 const files = Object.fromEntries(
@@ -121,7 +132,7 @@ for (const expected of [
   "productionPromotionAllowed: false",
   "externalMutationsExecuted: records.some",
   "externalMutationPerformed: true",
-  "Voice Intake Assistant form was disabled",
+  "policy-v4 direct-origin audit",
   "secretsStored: false",
   "rawProviderLogsStored: false",
   "productionAuthorityGranted: false",
@@ -133,7 +144,19 @@ for (const expected of [
   "figma-design-governance",
   "remediationStatus",
   "preparedRemediationCount",
-  "fullyResolvedProviderCount: 0"
+  "fullyResolvedProviderCount: records.filter",
+  "PlatformCapabilityDefinition",
+  "platformCapabilityRegistry",
+  "scrimedPlatformStrategyBoundary",
+  "verified-intelligence-yield",
+  "healthcare-value-returned",
+  "cost-per-verified-successful-task",
+  "currentValue: null",
+  "documentation-authorization-wedge",
+  "externalActionsEnabled: false",
+  "governed-partner-marketplace",
+  "No public marketplace",
+  "Does not imply customers, partners, revenue"
 ]) {
   requireCombined(domainFiles, expected);
 }
@@ -156,6 +179,7 @@ for (const endpoint of [
   "outcomes",
   "approvals",
   "platform-evidence",
+  "platform-strategy",
   "plan",
   "run",
   "pause",
@@ -196,6 +220,7 @@ for (const expected of [
   "Voice + Learning + Outcomes + Audit",
   "Approval Achievement",
   "Cross-Platform Evidence",
+  "Platform Map + Portfolio Discipline",
   "Synthetic"
 ]) {
   requireIncludes(pagePath, expected);
@@ -204,7 +229,7 @@ for (const expected of [
 for (const path of ["app/lib/siteNavigation.ts", "app/lib/navigationAudit.ts"]) {
   requireIncludes(path, "/scrimed-control-plane");
 }
-requireIncludes("app/lib/navigationAudit.ts", "expectedApiRoutePatternCount = 440");
+requireIncludes("app/lib/navigationAudit.ts", "expectedApiRoutePatternCount = 448");
 
 const packageJson = JSON.parse(files["package.json"]);
 if (packageJson.scripts?.["contract:scrimed-control-plane"] !== "node scripts/scrimed-control-plane-contract-check.mjs") {
@@ -214,6 +239,21 @@ if (packageJson.scripts?.["smoke:scrimed-control-plane"] !== "node scripts/scrim
   throw new Error("package.json missing smoke:scrimed-control-plane.");
 }
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-control-plane-contract-check.mjs");
+requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-platform-strategy-policy-test.mjs");
+requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-platform-strategy-artifacts.mjs");
+
+if (
+  packageJson.scripts?.["test:scrimed-platform-strategy"] !==
+  "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-platform-strategy-policy-test.mjs"
+) {
+  throw new Error("package.json missing test:scrimed-platform-strategy.");
+}
+if (
+  packageJson.scripts?.["check:scrimed-platform-strategy"] !==
+  "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-platform-strategy-artifacts.mjs --check"
+) {
+  throw new Error("package.json missing check:scrimed-platform-strategy.");
+}
 
 for (const expected of [
   "/scrimed-control-plane",
@@ -225,6 +265,7 @@ for (const expected of [
   "/api/scrimed-control-plane/voice/simulate",
   "/api/scrimed-control-plane/approvals",
   "/api/scrimed-control-plane/platform-evidence",
+  "/api/scrimed-control-plane/platform-strategy",
   "expected fail-closed 401, 403, or 503",
   "--compiled",
   "routeModule.userland",

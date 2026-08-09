@@ -22,6 +22,10 @@ import {
   type TenantInvitationDeliveryReadinessStatus
 } from "../../../../lib/protectedPilotWorkspace";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../../lib/requestRateLimit";
+import {
+  classifyProtectedPilotStoreFailure,
+  isGovernanceAal2SessionError
+} from "../../../../lib/protectedPilotStoreError";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +62,7 @@ const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 const domainPattern = /^[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 function statusForTenantAccessError(message: string) {
+  if (isGovernanceAal2SessionError({ message })) return 403;
   if (message.includes("tenant-access-final-admin-protected")) return 409;
   if (message.includes("tenant-access-pending-invitation-exists")) return 409;
   if (message.includes("tenant-access-membership-already-active")) return 409;
@@ -73,6 +78,7 @@ function statusForTenantAccessError(message: string) {
 }
 
 function tenantAccessErrorCode(message: string) {
+  if (isGovernanceAal2SessionError({ message })) return "governance-aal2-session-required";
   if (message.includes("tenant-access-final-admin-protected")) return "tenant-access-final-admin-protected";
   if (message.includes("tenant-access-pending-invitation-exists")) return "tenant-access-pending-invitation-exists";
   if (message.includes("tenant-access-membership-already-active")) return "tenant-access-membership-already-active";
@@ -86,6 +92,10 @@ function tenantAccessErrorCode(message: string) {
 }
 
 function tenantAccessErrorMessage(message: string) {
+  if (isGovernanceAal2SessionError({ message })) {
+    return "A fresh AAL2 governance session is required. Sign out, sign in again, verify the enrolled authenticator, and retry.";
+  }
+
   if (message.includes("tenant-access-final-admin-protected")) {
     return "The final active tenant-admin cannot be demoted or deactivated. Promote another active admin first.";
   }
@@ -190,16 +200,20 @@ export async function GET(request: Request, { params }: RouteContext) {
   const result = await getTenantAccessDashboard(context.client, workspaceSlug);
 
   if (result.error || !result.dashboard) {
+    const failure = classifyProtectedPilotStoreFailure(result.error, {
+      code: "tenant-access-query-failed",
+      message: "Tenant access administration is unavailable for this workspace and identity.",
+      status: statusForTenantAccessError(result.error?.message ?? "")
+    });
+
     return NextResponse.json(
       {
-        error: {
-          code: "tenant-access-query-failed",
-          message: "Tenant access administration is unavailable for this workspace and identity."
-        },
+        error: { code: failure.code, message: failure.message },
+        reauthenticationRequired: failure.reauthenticationRequired,
         boundary: protectedPilotBoundary
       },
       {
-        status: statusForTenantAccessError(result.error?.message ?? ""),
+        status: failure.status,
         headers: protectedPilotNoStoreHeaders
       }
     );

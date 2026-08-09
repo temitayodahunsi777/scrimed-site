@@ -9,6 +9,8 @@ import {
   containsProhibitedDemoSessionText,
   type SalesBuyerDemoSessionInput
 } from "../../../../../lib/buyerDemoSessions";
+import { buildPilotDemoSessionCatalog } from "../../../../../lib/pilotDemoCommercialReadiness";
+import { validatePilotDemoProtectedHandoff } from "../../../../../lib/pilotDemoProtectedHandoff";
 import { getAuthenticatedSalesContext } from "../../../../../lib/protectedPilotStore";
 import {
   salesOperationsBoundary,
@@ -211,6 +213,25 @@ export async function POST(request: Request, { params }: RouteContext) {
     );
   }
 
+  const handoffValidation = body.rehearsalHandoff
+    ? validatePilotDemoProtectedHandoff(body.rehearsalHandoff, buildPilotDemoSessionCatalog())
+    : null;
+
+  if (handoffValidation?.status === "rejected") {
+    return NextResponse.json(
+      {
+        error: {
+          code: "sales-demo-session-invalid-rehearsal-handoff",
+          message:
+            "The public rehearsal metadata draft was rejected. Rebuild the governed demo plan and rerun its proof preflight before recording."
+        },
+        handoffError: handoffValidation.code,
+        boundary: buyerDemoSessionBoundary
+      },
+      { status: 400, headers: salesOperationsNoStoreHeaders }
+    );
+  }
+
   const pathResult = await loadPath(request, context, intakeId);
 
   if ("response" in pathResult) {
@@ -219,7 +240,9 @@ export async function POST(request: Request, { params }: RouteContext) {
 
   const payload = buildBuyerDemoSessionPayload({
     path: pathResult.path,
-    input: body
+    input: body,
+    validatedRehearsalHandoff:
+      handoffValidation?.status === "accepted-metadata-draft" ? handoffValidation.handoff : null
   });
   const result = await recordSalesBuyerDemoSession(context.client, intakeId, payload);
 
@@ -245,7 +268,11 @@ export async function POST(request: Request, { params }: RouteContext) {
   return NextResponse.json(result.result, {
     headers: {
       ...salesOperationsNoStoreHeaders,
-      "X-SCRIMED-Demo-Session-History": "recorded-aal2-private-rpc"
+      "X-SCRIMED-Demo-Session-History": "recorded-aal2-private-rpc",
+      "X-SCRIMED-Demo-Rehearsal-Handoff":
+        handoffValidation?.status === "accepted-metadata-draft"
+          ? "canonical-metadata-draft-recorded"
+          : "not-supplied"
     }
   });
 }

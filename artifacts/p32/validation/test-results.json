@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "scrimed-p32-validation-results-v1",
+  "evidenceClass": "NON_CANDIDATE",
+  "completedAt": "2026-07-30T13:57:25Z",
+  "runtime": {
+    "node": "v24.14.0",
+    "packageManagerObservation": "package-lock.json is present; npm executable was unavailable in the Codex desktop shell, so package scripts were executed through their exact direct-Node equivalents"
+  },
+  "results": [
+    {
+      "check": "generated-integrity",
+      "status": "PASS",
+      "command": "node scripts/check-generated-integrity.mjs"
+    },
+    {
+      "check": "typecheck",
+      "status": "PASS",
+      "command": "node node_modules/typescript/bin/tsc --noEmit"
+    },
+    {
+      "check": "lint",
+      "status": "PASS",
+      "command": "node node_modules/eslint/bin/eslint.js ."
+    },
+    {
+      "check": "nonsecret-suite",
+      "status": "PASS",
+      "command": "node scripts/scrimed-nonsecret-test-suite.mjs",
+      "checkCount": 136
+    },
+    {
+      "check": "p32-automated-development-gates",
+      "status": "PASS",
+      "command": "node --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p32-preproduction-governance-gates.mjs --self-test --strict --profile=development",
+      "passed": 66,
+      "failed": 0,
+      "pendingHuman": 13,
+      "productionReleaseAllowed": false
+    },
+    {
+      "check": "secret-scan",
+      "status": "PASS",
+      "command": "node scripts/scrimed-secret-scan.mjs",
+      "filesScanned": 1463,
+      "findings": 0
+    },
+    {
+      "check": "sbom",
+      "status": "PASS_REVIEW_REQUIRED",
+      "command": "node scripts/scrimed-sbom.mjs --verify",
+      "componentCount": 419,
+      "dependencyDeltaCount": 0,
+      "sbomHash": "56b434ab36e6c9fab555421f6ced915eff0f03f293760afdb304561985cb6d18",
+      "externalSigningComplete": false,
+      "licenseReviewComplete": false
+    },
+    {
+      "check": "migration-packet",
+      "status": "STATIC_PASS_EXECUTION_BLOCKED",
+      "command": "node scripts/scrimed-migration-evidence-packet.mjs",
+      "migrationCount": 87,
+      "migrationSetFingerprint": "44615c067dc20913ba62c9fd6ebe5634b59b49601ed9b479234c4a0a1d047a25",
+      "packetHash": "1b35b8ec9299530800a98e1c211543dd3db0de7fa8d598b2b603894fc4e202b0",
+      "disposableDatabaseDryRunPassed": false,
+      "productionMigrationAuthorized": false
+    },
+    {
+      "check": "pending-migration-static-authorization",
+      "status": "PASS_FOR_DISPOSABLE_DRY_RUN_AUTHORIZATION_ONLY",
+      "command": "node scripts/pending-migration-authorization-check.mjs --strict",
+      "packetFingerprint": "4b6c8ca0704105dba5ee7addb2ffbbfef0808c435cc5bd77b0678ed4149d7052",
+      "migrationCount": 3,
+      "orderingValid": true,
+      "productionApplicationAuthorized": false
+    },
+    {
+      "check": "production-build",
+      "status": "PASS",
+      "command": "node node_modules/next/dist/bin/next build --webpack",
+      "nextVersion": "16.2.7",
+      "staticPagesGenerated": 459,
+      "swcNativeWarningObserved": false
+    },
+    {
+      "check": "built-public-runtime-smoke",
+      "status": "PASS",
+      "command": "SCRIMED_BASE_URL=http://127.0.0.1:3050 node scripts/public-production-smoke.mjs",
+      "protectedApisFailClosedWithoutOperatorConfiguration": true
+    },
+    {
+      "check": "built-p32-api-summary",
+      "status": "PASS",
+      "command": "GET http://127.0.0.1:3050/api/healthcare-intelligence-os",
+      "httpStatus": 200,
+      "consolidatedGovernancePresent": true,
+      "technicalGateCount": 79
+    },
+    {
+      "check": "git-diff-check",
+      "status": "PASS",
+      "command": "git diff --check"
+    }
+  ],
+  "expectedExternalBlocks": [
+    "AAL2 CLI smoke has no exported bearer token",
+    "durable-store target configuration is absent",
+    "disposable PostgreSQL/Supabase runtime is unavailable",
+    "SBOM signing and license review require external reviewers",
+    "13 production release gates require named human or operator evidence"
+  ],
+  "candidateAuthorityGranted": false,
+  "productionReleaseAllowed": false
+}

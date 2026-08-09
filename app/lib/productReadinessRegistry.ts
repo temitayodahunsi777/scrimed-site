@@ -50,13 +50,13 @@ export const scrimedProductReadinessRegistry: ScrimedProductReadinessItem[] = [
   {
     name: "MyVitals AI",
     slug: "myvitals-ai",
-    description: "Patient-facing vitals education and engagement concept for future RPM and virtual-care support.",
+    description: "Synthetic-data workflow concept for vitals education, test-signal visualization, and future reviewer-governed RPM research.",
     currentStage: "blocked-before-clinical-production",
-    allowedDemoMode: "Synthetic educational examples and no-PHI workflow mapping.",
+    allowedDemoMode: "Synthetic educational examples, demonstration alerts generated from test data, reviewable trend displays, and no-PHI workflow mapping.",
     blockedProductionMode: "No live vitals ingestion, patient advice, remote monitoring decisions, outreach, escalation, or device integration.",
     nextEngineeringMilestone: "Design consent, RPM device, alerting, data-retention, and clinician-review architecture.",
     investorNarrative: "Expands SCRIMED's patient engagement surface while keeping clinical escalation gated.",
-    complianceNote: "Requires privacy, security, clinical, consent, and device/data governance before pilot use."
+    complianceNote: "Not intended for diagnosis, treatment, emergency monitoring, or time-critical clinical decision-making. Production devices and live patient data require separate technical, security, clinical, legal, and regulatory approval."
   },
   {
     name: "DocuTwin",

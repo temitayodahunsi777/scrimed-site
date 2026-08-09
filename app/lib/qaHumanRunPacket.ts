@@ -231,7 +231,8 @@ function hashPacket(value: unknown) {
 }
 
 function workflowDefaultTarget(workflowKind: QaManualRunWorkflowKind) {
-  return workflowKind === "authority-reference-qa"
+  return workflowKind === "authority-reference-qa" ||
+    workflowKind === "execution-attempt-durable-store-qa"
     ? "atlas-synthetic-evaluation"
     : "synthetic-sales-opportunity-intake-id";
 }
@@ -410,7 +411,9 @@ export function evaluateQaHumanRunPacketCandidate(value: unknown) {
   const matchedBlockedClaims = matchBlockedClaims(value);
 
   if (!summary.workflows.some((workflow) => workflow.workflowKind === workflowKind)) {
-    errors.push("workflowKind must be sales-demo-session-qa or authority-reference-qa.");
+    errors.push(
+      "workflowKind must be sales-demo-session-qa, authority-reference-qa, or execution-attempt-durable-store-qa."
+    );
   }
 
   if (!qaHumanRunPacketAcceptedAttestations.operatorRole.includes(operatorRole)) {

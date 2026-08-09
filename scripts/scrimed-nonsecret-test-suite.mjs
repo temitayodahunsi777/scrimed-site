@@ -4,8 +4,20 @@ import { spawnSync } from "node:child_process";
 
 const checks = [
   {
+    label: "generated-cache preservation policy",
+    args: ["scripts/generated-cache-preservation-policy-test.mjs"]
+  },
+  {
+    label: "workspace hygiene policy",
+    args: ["scripts/workspace-hygiene-policy-test.mjs"]
+  },
+  {
     label: "generated integrity",
     args: ["scripts/check-generated-integrity.mjs"]
+  },
+  {
+    label: "generated-output postflight self-test",
+    args: ["scripts/generated-output-postflight.mjs", "--self-test"]
   },
   {
     label: "script registry contract",
@@ -16,8 +28,16 @@ const checks = [
     args: ["scripts/scrimed-local-quality-runner-contract-check.mjs"]
   },
   {
+    label: "managed local public smoke runner contract",
+    args: ["scripts/scrimed-local-public-smoke-runner-contract-check.mjs"]
+  },
+  {
     label: "CI workflow contract",
     args: ["scripts/ci-workflow-contract-check.mjs"]
+  },
+  {
+    label: "Vercel production deployment policy",
+    args: ["scripts/vercel-production-deployment-policy-test.mjs"]
   },
   {
     label: "release provenance contract",
@@ -28,6 +48,42 @@ const checks = [
     args: ["scripts/release-provenance-preflight.mjs", "--self-test"]
   },
   {
+    label: "p.32 worktree evidence policy",
+    args: ["scripts/scrimed-p32-worktree-evidence-policy-test.mjs"]
+  },
+  {
+    label: "release candidate manifest policy self-test",
+    args: ["scripts/release-candidate-manifest.mjs", "--self-test"]
+  },
+  {
+    label: "release candidate manifest contract",
+    args: ["scripts/release-candidate-manifest-contract-check.mjs"]
+  },
+  {
+    label: "release candidate validation policy self-test",
+    args: ["scripts/release-candidate-validation.mjs", "--self-test"]
+  },
+  {
+    label: "release candidate validation contract",
+    args: ["scripts/release-candidate-validation-contract-check.mjs"]
+  },
+  {
+    label: "release candidate review packet policy self-test",
+    args: ["scripts/release-candidate-review-packet.mjs", "--self-test"]
+  },
+  {
+    label: "release candidate review packet contract",
+    args: ["scripts/release-candidate-review-packet-contract-check.mjs"]
+  },
+  {
+    label: "investor deck review policy self-test",
+    args: ["scripts/investor-deck-review.mjs", "--self-test"]
+  },
+  {
+    label: "investor deck review contract",
+    args: ["scripts/investor-deck-review-contract-check.mjs"]
+  },
+  {
     label: "design governance contract",
     args: ["scripts/design-governance-contract-check.mjs"]
   },
@@ -36,12 +92,78 @@ const checks = [
     args: ["scripts/public-claims-integrity-contract-check.mjs"]
   },
   {
+    label: "public remediation contract",
+    args: ["scripts/public-remediation-contract-check.mjs"]
+  },
+  {
     label: "public-claims integrity policy self-test",
     args: ["scripts/public-claims-integrity-smoke.mjs", "--self-test"]
   },
   {
+    label: "Wix publication verification contract",
+    args: ["scripts/wix-publication-verification-contract-check.mjs"]
+  },
+  {
+    label: "Wix publication verification policy self-test",
+    args: ["scripts/wix-publication-verification.mjs", "--self-test"]
+  },
+  {
+    label: "portable Wix production verifier self-test",
+    args: ["scripts/verify-wix-production.mjs", "--self-test"]
+  },
+  {
+    label: "portable preview UI verifier self-test",
+    args: ["scripts/verify-preview-ui.mjs", "--self-test"]
+  },
+  {
+    label: "public remediation policy tests",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/public-remediation-policy-test.mjs"
+    ]
+  },
+  {
+    label: "FaithCore API, service, and public-copy neutrality",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/faithcore-neutrality-policy-test.mjs"
+    ]
+  },
+  {
+    label: "public release source verification",
+    args: ["scripts/verify-public-release.mjs"]
+  },
+  {
     label: "dependency security floor contract",
     args: ["scripts/dependency-security-floor-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED deterministic SBOM self-test",
+    args: ["scripts/scrimed-sbom.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED no-secret candidate scanner self-test",
+    args: ["scripts/scrimed-secret-scan.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED migration evidence analyzer self-test",
+    args: ["scripts/scrimed-migration-evidence-packet.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED pending-migration authorization self-test",
+    args: ["scripts/pending-migration-authorization-check.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED pending-migration static authorization check",
+    args: ["scripts/pending-migration-authorization-check.mjs", "--strict"]
+  },
+  {
+    label: "SCRIMED disposable migration preflight policy",
+    args: ["scripts/disposable-migration-preflight.mjs", "--self-test"]
   },
   {
     label: "AAL2 bearer-token policy",
@@ -76,12 +198,310 @@ const checks = [
     args: ["scripts/clinical-context-gateway-contract-check.mjs"]
   },
   {
+    label: "P31 clinical evidence controls policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/clinical-evidence-controls-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P31 applied intelligence contract",
+    args: ["scripts/scrimed-p31-applied-intelligence-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P31 extended workstreams policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p31-workstreams-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P31 extended workstreams contract",
+    args: ["scripts/scrimed-p31-workstreams-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 policy and negative-path behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 production harness and guarded workflow behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-execution-harness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 governed runtime and release hardening behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-release-hardening-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 clinical operations and contained-agent behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-clinical-operations-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 clinical operations repository contract",
+    args: ["scripts/scrimed-p32-clinical-operations-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 consolidated governance policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-consolidated-governance-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 control-plane closure policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-control-plane-closure-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED model, agent, and impact qualification policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-qualification-impact-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED independent review orchestrator policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-review-orchestrator-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED risk-tiered preproduction assurance policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/preproduction-assurance-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Work development continuity policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-development-continuity-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Work exact-evidence review-policy preflight behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-review-policy-preflight-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED preproduction assurance generator self-test",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/generate-preproduction-assurance.mjs",
+      "--self-test"
+    ]
+  },
+  {
+    label: "SCRIMED disposable migration dry-run verifier self-test",
+    args: ["scripts/verify-migration-dry-run.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED live mobile verifier self-test",
+    args: ["scripts/verify-live-mobile.mjs", "--self-test"]
+  },
+  {
+    label: "SCRIMED preproduction assurance repository contract",
+    args: ["scripts/preproduction-assurance-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED model, agent, and impact qualification repository contract",
+    args: ["scripts/scrimed-qualification-impact-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED release gap-closure repository contract",
+    args: ["scripts/scrimed-release-gap-closure-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 consolidated governance repository contract",
+    args: ["scripts/scrimed-p32-consolidated-governance-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 consolidated governance gate self-test",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-preproduction-governance-gates.mjs",
+      "--self-test",
+      "--strict",
+      "--profile=development"
+    ]
+  },
+  {
+    label: "SCRIMED P32 repository-native contract",
+    args: ["scripts/scrimed-p32-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 trusted evidence issuer attestation",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-evidence-attestation-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 protected evidence issuer behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-evidence-issuer-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 protected evidence issuer contract",
+    args: ["scripts/scrimed-p32-evidence-issuer-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 protected candidate-review behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-candidate-review-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED P32 protected candidate-review contract",
+    args: ["scripts/scrimed-p32-candidate-review-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED P32 candidate-bound release gate evidence",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p32-release-gate-evidence.mjs",
+      "--self-test"
+    ]
+  },
+  {
+    label: "SCRIMED Clinical Assurance Control Plane policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/clinical-assurance-control-plane-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Clinical Assurance Control Plane contract",
+    args: ["scripts/clinical-assurance-control-plane-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED Clinical Assurance migration contract",
+    args: ["scripts/clinical-assurance-migration-contract-check.mjs"]
+  },
+  {
     label: "Documentation-Before-Authorization contract",
     args: ["scripts/documentation-before-authorization-contract-check.mjs"]
   },
   {
     label: "Strategic investor outreach contract",
     args: ["scripts/strategic-investor-outreach-contract-check.mjs"]
+  },
+  {
+    label: "Strategic investor meeting policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/strategic-investor-meeting-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Capital planning policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/capital-planning-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Capital acquisition readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/capital-acquisition-readiness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Federal contract readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/federal-contract-readiness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Federal contract readiness contract",
+    args: ["scripts/federal-contract-readiness-contract-check.mjs"]
+  },
+  {
+    label: "Capital Vitality contract",
+    args: ["scripts/capital-vitality-contract-check.mjs"]
+  },
+  {
+    label: "Intended Use review policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/intended-use-review-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Approvals Readiness contract",
+    args: ["scripts/approvals-readiness-contract-check.mjs"]
   },
   {
     label: "On-Device De-Identification contract",
@@ -100,8 +520,57 @@ const checks = [
     args: ["scripts/competitive-market-intelligence-contract-check.mjs"]
   },
   {
+    label: "commercial pricing policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/commercial-pricing-policy-test.mjs"
+    ]
+  },
+  {
+    label: "commercial pricing contract",
+    args: ["scripts/commercial-pricing-contract-check.mjs"]
+  },
+  {
     label: "Pilot Demo Commercial Readiness contract",
     args: ["scripts/pilot-demo-commercial-readiness-contract-check.mjs"]
+  },
+  {
+    label: "Pilot Demo Session Plan policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/pilot-demo-session-plan-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Pilot Demo Proof Preflight policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/pilot-demo-proof-preflight-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Pilot Demo Rehearsal policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/pilot-demo-rehearsal-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Pilot Demo Protected Handoff policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/pilot-demo-protected-handoff-policy-test.mjs"
+    ]
   },
   {
     label: "SCRIMED Market Execution contract",
@@ -269,6 +738,28 @@ const checks = [
     args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-completion-evidence-policy-test.mjs"]
   },
   {
+    label: "SCRIMED Work release-bound canary attestation policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-canary-attestation-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Work browser mutation CSRF policy behavior",
+    args: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/scrimed-work-csrf-policy-test.mjs"]
+  },
+  {
+    label: "SCRIMED Work actor and tenant mutation rate-limit policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-work-rate-limit-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED Work migration-set policy behavior",
     args: [
       "--disable-warning=ExperimentalWarning",
@@ -315,6 +806,25 @@ const checks = [
   {
     label: "SCRIMED Intelligence Control Plane contract",
     args: ["scripts/scrimed-control-plane-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED platform strategy policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-platform-strategy-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED platform strategy artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-platform-strategy-artifacts.mjs",
+      "--check"
+    ]
   },
   {
     label: "SCRIMED Work durable-store preflight",

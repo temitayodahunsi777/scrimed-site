@@ -6,11 +6,18 @@ const workflowPaths = [
   ".github/workflows/ci.yml",
   ".github/workflows/agent-workspace-governance-smoke.yml",
   ".github/workflows/authority-reference-qa-smoke.yml",
-  ".github/workflows/sales-demo-session-qa-smoke.yml"
+  ".github/workflows/sales-demo-session-qa-smoke.yml",
+  ".github/workflows/migration-dry-run.yml",
+  ".github/workflows/preview-validation.yml"
+];
+const securityWorkflowPaths = [
+  ".github/workflows/dependency-review.yml",
+  ".github/workflows/codeql.yml",
+  ".github/workflows/dependency-security.yml"
 ];
 
 const files = Object.fromEntries(
-  await Promise.all(workflowPaths.map(async (pathname) => [pathname, await readFile(pathname, "utf8")]))
+  await Promise.all([...workflowPaths, ...securityWorkflowPaths].map(async (pathname) => [pathname, await readFile(pathname, "utf8")]))
 );
 
 function requireIncludes(pathname, expected) {
@@ -49,18 +56,86 @@ for (const pathname of workflowPaths) {
 
 for (const expected of [
   "npm ci",
+  "uses: actions/cache@v5",
+  "path: .next/cache",
+  "runner.os }}-next-${{ hashFiles('package-lock.json')",
   "npm run release:provenance:strict",
   "npm audit --audit-level=moderate",
   "npm run security:dependency-floor",
+  "npm run security:secret-scan",
+  "npm run security:sbom",
+  "npm run release:migration-packet",
   "node scripts/check-generated-integrity.mjs",
   "npm run smoke:execution-attempt-durable-store",
   "npm run smoke:scrimed-intelligence-safety-stack",
   "npm run test:nonsecret",
   "npm run lint",
   "npm run typecheck",
-  "npm run build"
+  "npm run build",
+  "npm run verify:public-release"
 ]) {
   requireIncludes(".github/workflows/ci.yml", expected);
+}
+
+for (const pathname of securityWorkflowPaths) {
+  requireIncludes(pathname, "permissions:\n  contents: read");
+  requireIncludes(pathname, "uses: actions/checkout@v6");
+  for (const forbidden of ["continue-on-error: true", "|| true", "set -x", "printenv", "cat .env", "echo ${{ secrets."]) {
+    forbidIncludes(pathname, forbidden);
+  }
+}
+
+for (const expected of [
+  "pull_request:",
+  "uses: actions/dependency-review-action@v4",
+  "fail-on-severity: moderate",
+  "license-check: true",
+  "vars.SCRIMED_GITHUB_DEPENDENCY_GRAPH_ENABLED == 'true'",
+  "npm audit --audit-level=moderate",
+  "npm run security:dependency-floor",
+  "npm run security:sbom"
+]) {
+  requireIncludes(".github/workflows/dependency-review.yml", expected);
+}
+
+for (const expected of [
+  "uses: github/codeql-action/init@v4",
+  "languages: javascript-typescript",
+  "build-mode: none",
+  "uses: github/codeql-action/analyze@v4",
+  "security-events: write"
+]) {
+  requireIncludes(".github/workflows/codeql.yml", expected);
+}
+
+for (const expected of [
+  "image: pgvector/pgvector:pg17",
+  "SCRIMED_DISPOSABLE_DATABASE: \"true\"",
+  "node scripts/verify-migration-dry-run.mjs --execute --strict",
+  "SCRIMED_DISPOSABLE_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/scrimed_migration_ci"
+]) {
+  requireIncludes(".github/workflows/migration-dry-run.yml", expected);
+}
+
+for (const expected of [
+  "SCRIMED_SYNTHETIC_ONLY: \"true\"",
+  "SCRIMED_ALLOW_PHI: \"false\"",
+  "SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: \"false\"",
+  "npm run test:preproduction-assurance",
+  "node scripts/verify-preview-ui.mjs --strict",
+  "retention-days: 7"
+]) {
+  requireIncludes(".github/workflows/preview-validation.yml", expected);
+}
+
+for (const expected of [
+  "npm audit --audit-level=high --json",
+  "npm audit --audit-level=critical",
+  "npm run security:dependency-floor",
+  "npm run security:sbom",
+  "actions/dependency-review-action@v4"
+]) {
+  requireIncludes(".github/workflows/dependency-security.yml", expected);
 }
 
 for (const pathname of [
@@ -105,4 +180,4 @@ for (const expected of [
   requireIncludes(".github/workflows/sales-demo-session-qa-smoke.yml", expected);
 }
 
-console.log(`pass SCRIMED CI workflow contract check (${workflowPaths.length} workflows verified)`);
+console.log(`pass SCRIMED CI workflow contract check (${workflowPaths.length + securityWorkflowPaths.length} workflows verified)`);

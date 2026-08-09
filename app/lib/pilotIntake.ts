@@ -195,8 +195,8 @@ export const pilotWorkflowTargets: PilotIntakeOption[] = [
   },
   {
     value: "patient-onboarding",
-    label: "Patient onboarding triage",
-    description: "Synthetic onboarding profiles, navigation queues, urgency rationale, and review triggers."
+    label: "Patient onboarding navigation",
+    description: "Synthetic onboarding profiles, navigation queues, missing-context review, and human escalation triggers."
   },
   {
     value: "ambient-documentation",
@@ -276,7 +276,7 @@ export const pilotGovernanceRequirements: PilotIntakeOption[] = [
   },
   {
     value: "hipaa-ready",
-    label: "HIPAA-ready posture",
+    label: "Privacy and security readiness review",
     description: "Privacy, security, access, vendor, and audit controls before protected health information."
   },
   {
@@ -641,6 +641,34 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function containsExecutableContent(value: string) {
+  const normalized = value.toLowerCase();
+  if (
+    normalized.includes("<") ||
+    normalized.includes(">") ||
+    normalized.includes("javascript:") ||
+    normalized.includes("data:text/html")
+  ) {
+    return true;
+  }
+
+  for (let index = 0; index < normalized.length - 2; index += 1) {
+    if (normalized[index] !== "o" || normalized[index + 1] !== "n") continue;
+    let cursor = index + 2;
+    const eventNameStart = cursor;
+    while (cursor < normalized.length) {
+      const code = normalized.charCodeAt(cursor);
+      if (code < 97 || code > 122) break;
+      cursor += 1;
+    }
+    if (cursor === eventNameStart) continue;
+    while (cursor < normalized.length && /\s/.test(normalized[cursor])) cursor += 1;
+    if (normalized[cursor] === "=") return true;
+  }
+
+  return false;
+}
+
 function readText(
   payload: Record<string, unknown>,
   field: string,
@@ -666,6 +694,14 @@ function readText(
 
   if (trimmed.length > maxLength) {
     errors.push({ field, message: `Keep this field under ${maxLength} characters.` });
+  }
+
+  if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(trimmed)) {
+    errors.push({ field, message: "Remove unsupported control characters." });
+  }
+
+  if (containsExecutableContent(trimmed)) {
+    errors.push({ field, message: "Markup and executable content are not accepted." });
   }
 
   return trimmed;
@@ -731,7 +767,9 @@ function detectSensitiveHealthData(value: string) {
     { label: "MRN", pattern: /\b(mrn|medical record number)\b/i },
     { label: "date of birth", pattern: /\b(date of birth|dob)\b/i },
     { label: "patient identifier", pattern: /\b(patient|member)\s+(identifier|id|name|dob)\b/i },
-    { label: "insurance identifier", pattern: /\b(insurance id|member id|policy number)\b/i }
+    { label: "insurance identifier", pattern: /\b(insurance id|member id|policy number)\b/i },
+    { label: "clinical record excerpt", pattern: /\b(patient has|patient was diagnosed|prescribed to patient)\b/i },
+    { label: "health identifier", pattern: /\b(medicare|medicaid)\s+(number|id)\b/i }
   ];
 
   return markers.find((marker) => marker.pattern.test(value))?.label;

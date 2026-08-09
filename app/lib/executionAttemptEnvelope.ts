@@ -484,6 +484,7 @@ const clinicalRobustnessScenarioRefsByWorkflow: Record<string, string[]> = {
     "clinical-copilot-unit-abbreviation-citation"
   ],
   "clinical-documentation-draft-review": [
+    "docutwin-structured-document-stress",
     "docutwin-noisy-incomplete-draft",
     "ambient-scribe-noise-multilingual-injection"
   ],

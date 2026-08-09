@@ -125,20 +125,29 @@ function stage(
 }
 
 function safeEvidenceFields(workflow: ReturnType<typeof getQaHumanRunPacketSummary>["workflows"][number]) {
+  const workspaceTarget =
+    workflow.workflowKind === "authority-reference-qa" ||
+    workflow.workflowKind === "execution-attempt-durable-store-qa";
+  const durableStore = workflow.workflowKind === "execution-attempt-durable-store-qa";
+
   return [
     "workflowKind",
     "workflowRunId",
     "workflowRunUrl",
     "executedAt",
     "baseUrl",
-    workflow.workflowKind === "authority-reference-qa"
+    workspaceTarget
       ? "workspace slug as synthetic target"
       : "synthetic sales opportunity intake ID",
     workflow.workflowKind === "authority-reference-qa"
       ? "created authority reference UUID"
+      : durableStore
+        ? "created durable record UUID"
       : "created demo session UUID",
     workflow.workflowKind === "authority-reference-qa"
       ? "authority reference packet audit event UUID"
+      : durableStore
+        ? "review disposition audit event UUID"
       : "demo session packet audit event UUID",
     "qaOutcome=pass",
     "operatorAttestation=no-secrets-no-phi-aal2-human-run",

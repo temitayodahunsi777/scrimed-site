@@ -9,6 +9,7 @@ import {
   protectedPilotBoundary,
   protectedPilotNoStoreHeaders
 } from "../../../../../../lib/protectedPilotWorkspace";
+import { classifyProtectedPilotStoreFailure } from "../../../../../../lib/protectedPilotStoreError";
 import {
   buildTenantTrustSafetyIncidentReviewPacket,
   tenantTrustSafetyIncidentBoundary
@@ -89,16 +90,21 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   if (dashboardResult.error || !dashboardResult.dashboard) {
+    const failure = classifyProtectedPilotStoreFailure(dashboardResult.error, {
+      code: "trust-safety-incident-dashboard-unavailable",
+      message:
+        "The tenant TrustOps review packet was not released because the incident dashboard could not be retrieved.",
+      status: 503
+    });
     return NextResponse.json(
       {
         error: {
-          code: "trust-safety-incident-dashboard-unavailable",
-          message:
-            "The tenant TrustOps review packet was not released because the incident dashboard could not be retrieved."
+          code: failure.code,
+          message: failure.message
         },
         boundary: tenantTrustSafetyIncidentBoundary
       },
-      { status: 503, headers }
+      { status: failure.status, headers }
     );
   }
 
@@ -118,16 +124,21 @@ export async function GET(request: Request, { params }: RouteContext) {
   );
 
   if (audit.error || !audit.eventId) {
+    const failure = classifyProtectedPilotStoreFailure(audit.error, {
+      code: "trust-safety-incident-review-packet-audit-failed",
+      message:
+        "The review packet was not released because its append-only packet-download audit event could not be committed.",
+      status: 502
+    });
     return NextResponse.json(
       {
         error: {
-          code: "trust-safety-incident-review-packet-audit-failed",
-          message:
-            "The review packet was not released because its append-only packet-download audit event could not be committed."
+          code: failure.code,
+          message: failure.message
         },
         boundary: tenantTrustSafetyIncidentBoundary
       },
-      { status: 502, headers }
+      { status: failure.status, headers }
     );
   }
 

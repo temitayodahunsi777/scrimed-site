@@ -60,7 +60,7 @@ export const investorAudienceReadinessStatus =
   "investor-audience-readiness-control-plane-active";
 export const investorAudienceReadinessBriefStatus =
   "investor-audience-readiness-brief-ready-no-securities-offer";
-export const investorAudienceReadinessUpdatedAt = "2026-07-13";
+export const investorAudienceReadinessUpdatedAt = "2026-07-30";
 
 export const investorAudienceReadinessBoundary =
   "SCRIMED Investor and Audience Readiness organizes weakness relief, competitive differentiation, sellable value, and investor or buyer audience packets for readiness review. It is operating-readiness material only. It is not investment advice, securities offering material, audited financial reporting, valuation assurance, legal advice, tax advice, accounting advice, solicitation, private placement approval, Form D filing, crowdfunding approval, nonprofit tax advice, donor advice, faith-based endorsement, customer revenue guarantee, profit guarantee, reimbursement assurance, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.";
@@ -663,10 +663,13 @@ export function getInvestorAudienceReadinessSummary() {
     externalReviewAudienceCount,
     readinessGateCount: investorReadinessGates.length,
     strategicTargetCount: strategicInvestorOutreach.targetCount,
+    strategicMeetingPacketCount: strategicInvestorOutreach.meetingPacketCount,
     diligenceEvidenceReadyCount: strategicInvestorOutreach.evidenceReadyCount,
     diligenceReviewRequiredCount:
       strategicInvestorOutreach.qualifiedReviewRequiredCount +
       strategicInvestorOutreach.externalEvidenceRequiredCount,
+    fundingEvidenceReadyCount: strategicInvestorOutreach.fundingEvidenceReadyCount,
+    fundingReleaseBlockerCount: strategicInvestorOutreach.fundingReleaseBlockerCount,
     proofRouteCount: proofRoutes.length,
     blockedClaimCount: blockedClaims.length,
     weaknessReliefTracks,
@@ -698,8 +701,11 @@ export function buildInvestorAudienceReadinessBrief() {
     `External-review audience packets: ${summary.externalReviewAudienceCount}`,
     `Readiness gates: ${summary.readinessGateCount}`,
     `Strategic ecosystem targets: ${summary.strategicTargetCount}`,
+    `Strategic meeting packets: ${summary.strategicMeetingPacketCount}`,
     `Diligence evidence-ready items: ${summary.diligenceEvidenceReadyCount}`,
     `Diligence review-required items: ${summary.diligenceReviewRequiredCount}`,
+    `Funding evidence-ready controls: ${summary.fundingEvidenceReadyCount}`,
+    `Funding release blockers: ${summary.fundingReleaseBlockerCount}`,
     `Proof routes: ${summary.proofRouteCount}`,
     `Blocked claims: ${summary.blockedClaimCount}`,
     "",
@@ -707,6 +713,16 @@ export function buildInvestorAudienceReadinessBrief() {
     summary.boundary,
     "",
     "This brief is not investment advice, not securities offering material, not solicitation, not audited financial reporting, not valuation assurance, and not legal advice, tax advice, accounting advice, nonprofit tax advice, donor advice, faith-based endorsement, customer revenue guarantee, profit guarantee, reimbursement assurance, security certification, regulatory approval, PHI processing approval, production connector approval, or live clinical care authorization.",
+    "",
+    "## Parallel Funding And Candidate Review Track",
+    `Status: ${summary.strategicInvestorOutreach.parallelFundingTrack.status}`,
+    `Evidence class: ${summary.strategicInvestorOutreach.parallelFundingTrack.evidenceClass}`,
+    `Commercial proof: ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.executableDemoCount} executable synthetic demos, ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.pilotCount} pilot offers, ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.sellableSyntheticPilotCount} sellable synthetic pilots, and ${summary.strategicInvestorOutreach.parallelFundingTrack.commercialProof.protectedPilotCount} protected pilot.`,
+    summary.strategicInvestorOutreach.parallelFundingTrack.boundary,
+    ...summary.strategicInvestorOutreach.parallelFundingTrack.decisions.map(
+      (decision) =>
+        `- ${decision.action}: ${decision.decision} (${decision.readiness}). Reasons: ${decision.reasonCodes.join(", ")}. Candidate binding required: ${decision.candidateBinding.required ? "yes" : "no"}. External action executed: no.`
+    ),
     "",
     "## Weakness Relief Tracks",
     ...summary.weaknessReliefTracks.map(
@@ -748,6 +764,18 @@ export function buildInvestorAudienceReadinessBrief() {
     ...summary.strategicInvestorOutreach.pitchOutline.map(
       (slide) =>
         `${slide.order}. ${slide.title}: ${slide.decisionQuestion} Claim guard: ${slide.claimGuard}`
+    ),
+    "",
+    "## Strategic Meeting Packets",
+    ...summary.strategicInvestorOutreach.meetingProfiles.map(
+      (profile) =>
+        `- ${profile.organization} (${profile.packetStatus}): Objective: ${profile.firstMeetingObjective} Ask: ${profile.specificAsk} Funding path: ${profile.fundingPathStatus} External release authorized: ${profile.externalReleaseAuthorized ? "yes" : "no"}`
+    ),
+    "",
+    "## Funding Release Controls",
+    ...summary.strategicInvestorOutreach.fundingReadinessControls.map(
+      (control) =>
+        `- ${control.title} (${control.status}): Owner: ${control.owner} Evidence: ${control.requiredEvidence} Blocks fundraising release: ${control.blocksFundraisingRelease ? "yes" : "no"} Completion: ${control.completionRule}`
     ),
     "",
     "## Next Investor Move",

@@ -1,3 +1,5 @@
+import { getIntendedUseReviewProgram } from "./intendedUseReview";
+
 export type ApprovalTrackStatus =
   | "public-operations-ready"
   | "evidence-build-required"
@@ -66,7 +68,7 @@ export const approvalTracks: ApprovalTrack[] = [
       "Qualified reviewer sign-off for customer-specific or public claims"
     ],
     nextAction:
-      "Create the first founder-approved Intended Use Memo and use it as the source of truth for website, deck, demo, and buyer-room language.",
+      "Complete qualified founder, legal, and clinical governance review of the proposed Intended Use Memo, retain the decision externally, and then use the approved version as the source of truth for website, deck, demo, and buyer-room language.",
     accountableOwners: ["Founder", "Product", "Legal reviewer", "Clinical governance reviewer"],
     proofRoutes: ["/claims", "/boundary-resolution", "/qa-claim-guard", "/public-market-readiness"]
   },
@@ -353,6 +355,7 @@ export function getApprovalsReadinessSummary() {
   const evidenceBuildCount = approvalTracks.filter((track) => track.status === "evidence-build-required").length;
   const externalReviewCount = approvalTracks.filter((track) => track.status === "external-review-required").length;
   const blockedBeforeApprovalCount = approvalTracks.filter((track) => track.status === "blocked-before-approval").length;
+  const intendedUseReview = getIntendedUseReviewProgram();
 
   return {
     service: "scrimed-approvals-readiness",
@@ -376,13 +379,14 @@ export function getApprovalsReadinessSummary() {
     agentControlCount: approvalAgentControls.length,
     processCount: approvalProcesses.length,
     sourceReferenceCount: approvalSourceReferences.length,
+    intendedUseReview,
     tracks: approvalTracks,
     agentControls: approvalAgentControls,
     processes: approvalProcesses,
     sourceReferences: approvalSourceReferences,
     nextOperatorActions: [
       "Use operations-first language as the default public launch posture.",
-      "Create a founder-approved Intended Use Memo before expanding claims.",
+      "Run the controlled Intended Use review packet, obtain named founder, legal, and clinical governance decisions, and retain them outside source code before expanding claims.",
       "Build HIPAA/BAA and SOC 2 readiness evidence before accepting PHI or certification requests.",
       "Route FDA/CDS/SaMD questions to qualified regulatory review before clinical claims.",
       "Keep buyer-specific release evidence gated behind protected AAL2 workflows and named human review."
@@ -409,6 +413,16 @@ export function buildApprovalsReadinessBrief() {
     summary.boundary,
     "",
     "This brief is not legal advice, regulatory approval, HIPAA certification, SOC 2 certification, HITRUST certification, FDA clearance, ONC certification, reimbursement advice, PHI processing approval, or live clinical authorization.",
+    "",
+    "## Intended Use Review Packet",
+    `Status: ${summary.intendedUseReview.status}`,
+    `Memo: ${summary.intendedUseReview.memoReference} (version ${summary.intendedUseReview.memoVersion})`,
+    `Default safe-scope decision: ${summary.intendedUseReview.defaultEvaluation.decision}`,
+    `Approval authority: ${summary.intendedUseReview.approvalAuthority}`,
+    `Required reviewers: ${summary.intendedUseReview.defaultEvaluation.requiredReviewers.join("; ")}`,
+    `External use authorized: ${summary.intendedUseReview.defaultEvaluation.externalUseAuthorized}`,
+    `PHI authority: ${summary.intendedUseReview.defaultEvaluation.phiAuthority}`,
+    summary.intendedUseReview.boundary,
     "",
     "## Approval Tracks",
     ...summary.tracks.map(

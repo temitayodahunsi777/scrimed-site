@@ -148,6 +148,35 @@ export default function ScrimedControlPlanePage() {
         ))}
       </section>
 
+      <section className="table-section" aria-label="Platform capability and portfolio strategy">
+        <div className="section-heading">
+          <p className="eyebrow">Platform Map + Portfolio Discipline</p>
+          <h2>Every capability declares its owner, evidence, commercial path, risk, activation state, and retained authority.</h2>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.platformStrategy.validation.valid ? "registry-valid" : "review-required"}</span><h2>{summary.platformStrategy.coreWedge.offer}</h2></div>
+          <p>{summary.platformStrategy.nextBestAction}</p>
+          <div><strong>Core workflow</strong><p>{summary.platformStrategy.coreWedge.productWorkflow}</p></div>
+          <div><strong>Progression</strong><p>{summary.platformStrategy.coreWedge.progression.join(" → ")}</p></div>
+        </article>
+        {summary.platformStrategy.capabilities.map((capability) => (
+          <article className="module-row" key={capability.id}>
+            <div><span>{capability.activationStatus}</span><h2>{capability.name}</h2></div>
+            <p>{capability.purpose}</p>
+            <div><strong>Ownership + evidence</strong><ul className="compact-list"><li>{capability.owner}</li><li>{capability.evidenceStatus}</li><li>Risk: {capability.riskTier}</li></ul></div>
+            <div><strong>Commercial discipline</strong><ul className="compact-list"><li>{capability.monetizationPath}</li><li>Public claim: {capability.publicClaimStatus}</li><li>External actions: disabled</li></ul></div>
+          </article>
+        ))}
+        {summary.platformStrategy.strategicMetrics.map((metric) => (
+          <article className="module-row" key={metric.id}>
+            <div><span>{metric.evidenceStatus}</span><h2>{metric.name}</h2></div>
+            <p>{metric.formula}</p>
+            <div><strong>Current value</strong><p>{metric.currentValue ?? "baseline not collected"}</p></div>
+            <div><strong>Boundary</strong><p>{metric.blockedInterpretation}</p></div>
+          </article>
+        ))}
+      </section>
+
       <section className="table-section" aria-label="Approval achievement">
         <div className="section-heading"><p className="eyebrow">Approval Achievement</p><h2>Evidence, dependencies, owners, expiry, and authority stay explicit before scope expands.</h2></div>
         <article className="module-row">

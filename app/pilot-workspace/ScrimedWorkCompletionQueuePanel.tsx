@@ -4,6 +4,11 @@ import type { Session } from "@supabase/supabase-js";
 import { useState } from "react";
 
 import {
+  parseScrimedWorkCanaryAttestationPayload,
+  scrimedWorkCanaryAttestationBoundary,
+  type ScrimedWorkCanaryAttestation
+} from "../lib/scrimed-work/canaryAttestation";
+import {
   parseScrimedWorkCompletionQueuePayload,
   scrimedWorkCompletionQueueBoundary,
   type ScrimedWorkCompletionQueue
@@ -72,6 +77,8 @@ export default function ScrimedWorkCompletionQueuePanel({
   const [queue, setQueue] = useState<ScrimedWorkCompletionQueue | null>(null);
   const [completionEvidence, setCompletionEvidence] =
     useState<ScrimedWorkCompletionEvidence | null>(null);
+  const [canaryAttestation, setCanaryAttestation] =
+    useState<ScrimedWorkCanaryAttestation | null>(null);
   const [message, setMessage] = useState(
     "Tenant-admin or pilot-lead membership and fresh AAL2 are checked when readiness is loaded."
   );
@@ -101,6 +108,7 @@ export default function ScrimedWorkCompletionQueuePanel({
       if (response.status === 403) {
         setQueue(null);
         setCompletionEvidence(null);
+        setCanaryAttestation(null);
         setState("denied");
         setMessage("Tenant-admin or pilot-lead membership with fresh AAL2 is required. Completion records remained closed.");
         return;
@@ -109,6 +117,7 @@ export default function ScrimedWorkCompletionQueuePanel({
       if (!response.ok || !parsedQueue) {
         setQueue(null);
         setCompletionEvidence(null);
+        setCanaryAttestation(null);
         setState("failed");
         setMessage(`The completion queue failed closed: ${safeError(response, body)}.`);
         return;
@@ -128,6 +137,7 @@ export default function ScrimedWorkCompletionQueuePanel({
         );
       } catch {
         setCompletionEvidence(null);
+        setCanaryAttestation(null);
         setMessage(
           `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification. Completed evidence could not be reached and remained closed.`
         );
@@ -138,9 +148,13 @@ export default function ScrimedWorkCompletionQueuePanel({
       const evidenceBody = await readJson(evidenceResponse);
       const evidenceData = asRecord(evidenceBody?.data);
       const parsedEvidence = parseScrimedWorkCompletionEvidencePayload(evidenceData?.evidence);
+      const parsedCanaryAttestation = parseScrimedWorkCanaryAttestationPayload(
+        evidenceData?.canaryAttestation
+      );
 
-      if (!evidenceResponse.ok || !parsedEvidence) {
+      if (!evidenceResponse.ok || !parsedEvidence || !parsedCanaryAttestation) {
         setCompletionEvidence(null);
+        setCanaryAttestation(null);
         setMessage(
           `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification. Completed evidence remained closed: ${safeError(evidenceResponse, evidenceBody)}.`
         );
@@ -149,13 +163,15 @@ export default function ScrimedWorkCompletionQueuePanel({
       }
 
       setCompletionEvidence(parsedEvidence);
+      setCanaryAttestation(parsedCanaryAttestation);
       setMessage(
-        `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification; ${parsedEvidence.count} completed internal evidence record${parsedEvidence.count === 1 ? " is" : "s are"} retained.`
+        `${parsedQueue.count} session${parsedQueue.count === 1 ? " is" : "s are"} ready for mandatory verification; ${parsedEvidence.count} completed internal evidence record${parsedEvidence.count === 1 ? " is" : "s are"} retained; release binding is ${parsedCanaryAttestation.status.replaceAll("_", " ")}.`
       );
       await onAuditChanged().catch(() => undefined);
     } catch {
       setQueue(null);
       setCompletionEvidence(null);
+      setCanaryAttestation(null);
       setState("failed");
       setMessage("Completion records could not be reached and remained closed.");
     }
@@ -337,8 +353,43 @@ export default function ScrimedWorkCompletionQueuePanel({
         </article>
       ) : null}
 
+      {canaryAttestation ? (
+        <article className="module-row">
+          <div>
+            <span>release-bound canary</span>
+            <h2>
+              {canaryAttestation.eligibleForReleaseBinding
+                ? "Derived Evidence Ready"
+                : "Release Binding Still Required"}
+            </h2>
+          </div>
+          <p>
+            Status: {canaryAttestation.status.replaceAll("_", " ")} · release {canaryAttestation.releaseShaFingerprint}
+          </p>
+          <p>
+            Workspace: {canaryAttestation.workspaceSlug} · completed {canaryAttestation.freshness.completedAt ?? "unavailable"}
+          </p>
+          <p>
+            Freshness: {canaryAttestation.freshness.fresh ? "within promotion window" : "stale or unavailable"} · age {canaryAttestation.freshness.ageHours?.toFixed(2) ?? "unavailable"} hours · maximum {canaryAttestation.freshness.maxAgeHours} hours
+          </p>
+          <strong>
+            {canaryAttestation.eligibleForReleaseBinding
+              ? "Immutable completion evidence is bound to this exact workspace and deployed commit within the required freshness window."
+              : "No release-ready canary identifier is issued until immutable completion evidence, workspace, deployment identity, and freshness are all valid."}
+          </strong>
+          {canaryAttestation.evidenceId ? (
+            <p style={{ overflowWrap: "anywhere" }}>Evidence ID: {canaryAttestation.evidenceId}</p>
+          ) : null}
+          <p>
+            This attestation is metadata-only and internal-use-only. It does not authorize PHI, live care,
+            external distribution, payer submission, EHR writeback, certification, or customer go-live.
+          </p>
+        </article>
+      ) : null}
+
       <p className="section-copy">{scrimedWorkCompletionQueueBoundary}</p>
       <p className="section-copy">{scrimedWorkCompletionEvidenceBoundary}</p>
+      <p className="section-copy">{scrimedWorkCanaryAttestationBoundary}</p>
     </section>
   );
 }

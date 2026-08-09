@@ -104,6 +104,20 @@ for (const unsafeEvidence of [
   {
     ...validEvidence,
     items: [{ ...validEvidence.items[0], evidencePacketHash: "unsafe" }]
+  },
+  {
+    ...validEvidence,
+    items: [{ ...validEvidence.items[0], completionEventId: validEvidence.items[0].reviewEventId }]
+  },
+  {
+    ...validEvidence,
+    items: [
+      {
+        ...validEvidence.items[0],
+        reviewedAt: "2026-07-16T14:20:00.000Z",
+        completedAt: "2026-07-16T14:15:00.000Z"
+      }
+    ]
   }
 ]) {
   assert.equal(parseScrimedWorkCompletionEvidencePayload(unsafeEvidence), null);

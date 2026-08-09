@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   guardedListProtectedCompletionQueue,
+  scrimedWorkCanaryAttestationPolicyVersion,
   scrimedWorkCompletionEvidencePolicyVersion,
   scrimedWorkCompletionQueuePolicyVersion,
   scrimedWorkHeaders,
@@ -16,6 +17,16 @@ export async function GET(request: Request) {
   const completionPolicy = result.allowed
     ? result.data.policyVersion
     : scrimedWorkCompletionQueuePolicyVersion;
+  const canaryAttestationStatus =
+    result.allowed && result.data.mode === "evidence"
+      ? result.data.canaryAttestation.status
+      : "denied";
+  const canaryFreshness =
+    result.allowed && result.data.mode === "evidence"
+      ? result.data.canaryAttestation.freshness.fresh
+        ? "fresh"
+        : "stale-or-unavailable"
+      : "denied";
   const headers = scrimedWorkHeaders({
     "X-SCRIMED-Completion-Queue": result.allowed
       ? "operator-only-aal2-tenant-scoped-metadata"
@@ -23,6 +34,9 @@ export async function GET(request: Request) {
     "X-SCRIMED-Completion-Read-Mode": completionReadMode,
     "X-SCRIMED-Completion-Queue-Policy": completionPolicy,
     "X-SCRIMED-Completion-Evidence-Policy": scrimedWorkCompletionEvidencePolicyVersion,
+    "X-SCRIMED-Canary-Attestation": canaryAttestationStatus,
+    "X-SCRIMED-Canary-Attestation-Policy": scrimedWorkCanaryAttestationPolicyVersion,
+    "X-SCRIMED-Canary-Freshness": canaryFreshness,
     "X-SCRIMED-External-Distribution": "not-authorized",
     "X-SCRIMED-Payer-Submission": "not-authorized",
     "X-SCRIMED-EHR-Writeback": "not-authorized"

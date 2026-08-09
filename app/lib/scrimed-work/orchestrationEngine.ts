@@ -1,6 +1,7 @@
 import { createAuditHash } from "./audit";
 import { scrimedWorkAgents } from "./agentRegistry";
 import { getScrimedWorkFeatureFlags } from "./featureFlags";
+import { createSyntheticCapabilityManifest } from "./governedRuntime";
 import { routeScrimedWorkModel } from "./modelRouter";
 import { authorizeToolAccess } from "./toolRegistry";
 import type { PlannedStep, ToolCallRecord, WorkAgentRole, WorkSession } from "./types";
@@ -41,10 +42,52 @@ export function buildToolCallPlan(session: WorkSession): ToolCallRecord[] {
   ];
 
   return relevantTools.map((tool, index) => {
+    const governedActorId = `agent-${tool.agentRole}`;
+    const resource = `scrimed-work:${session.id}`;
+    const candidateFingerprint = createAuditHash({ sessionId: session.id, candidate: "synthetic-preview" });
+    const sourceFingerprint = createAuditHash({ sessionId: session.id, source: "synthetic-preview" });
+    const evaluatedAt = session.updatedAt;
+    const manifest = createSyntheticCapabilityManifest({
+      agentRole: tool.agentRole,
+      tenantId: session.tenantId,
+      actorId: governedActorId,
+      permittedTools: [tool.toolId],
+      permittedResources: [resource],
+      issuedAt: session.createdAt,
+      expiresAt: new Date(Date.parse(session.createdAt) + 365 * 24 * 60 * 60 * 1000).toISOString()
+    });
     const authorization = authorizeToolAccess({
       toolId: tool.toolId,
       agentRole: tool.agentRole,
-      consequentialActionsEnabled: flags.consequentialActionsEnabled
+      consequentialActionsEnabled: flags.consequentialActionsEnabled,
+      governance: {
+        manifest,
+        evaluatedAt,
+        request: {
+          stage: "propose",
+          action: tool.toolId,
+          toolId: tool.toolId,
+          toolCategory: tool.category,
+          resource,
+          dataClassification: session.inputClassification,
+          riskLevel: session.riskLevel,
+          tenantId: session.tenantId,
+          actorId: governedActorId,
+          environment: "local",
+          candidateFingerprint,
+          sourceFingerprint,
+          idempotencyKey: null,
+          budgetUsage: {
+            requestsThisMinute: 1,
+            tokens: 0,
+            durationMs: 0,
+            spendUsd: 0,
+            toolCalls: index + 1
+          },
+          evidencePointers: session.sourceContextReferences,
+          humanApprovalReferences: []
+        }
+      }
     });
 
     return {
