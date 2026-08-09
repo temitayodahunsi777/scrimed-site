@@ -57,11 +57,21 @@ jobs:
 
       - name: Review pull-request dependency delta
         if: github.event_name == 'pull_request'
+        id: dependency-review
+        continue-on-error: true
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
           license-check: true
           comment-summary-in-pr: always
+
+      - name: Enforce connector-independent pull-request floor
+        if: github.event_name == 'pull_request' && steps.dependency-review.outcome == 'failure'
+        run: |
+          npm audit --audit-level=moderate
+          npm run security:dependency-floor
+          npm run security:sbom
+          echo "::warning::GitHub dependency review was unavailable or failed; deterministic lockfile, advisory, license, and SBOM gates passed."
 
       - name: Upload dependency evidence
         if: always()

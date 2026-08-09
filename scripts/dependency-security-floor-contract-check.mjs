@@ -148,8 +148,27 @@ for (const version of lockedPackageVersions("js-yaml")) {
   }
 }
 
+for (const version of lockedPackageVersions("nanoid")) {
+  if (compareVersions(version, "3.3.17", "nanoid") < 0) {
+    throw new Error(`nanoid@${version} is below the reviewed 3.3.17 security floor.`);
+  }
+}
+
+const prohibitedLicensePattern = /\b(?:AGPL|SSPL|BUSL)\b|Commons Clause/i;
+for (const [packagePath, metadata] of Object.entries(packageLock.packages ?? {})) {
+  if (!packagePath) continue;
+
+  if (typeof metadata?.license !== "string" || metadata.license.trim().length === 0) {
+    throw new Error(`${packagePath} must declare a license in the reviewed lockfile.`);
+  }
+
+  if (prohibitedLicensePattern.test(metadata.license)) {
+    throw new Error(`${packagePath} uses prohibited or review-required license ${metadata.license}.`);
+  }
+}
+
 console.log(
   `pass SCRIMED dependency security floor contract check (next ${dependencySpecifier("next")}, react ${dependencySpecifier(
     "react"
-  )}, postcss ${postcssOverride}, sharp ${sharpOverride})`
+  )}, postcss ${postcssOverride}, sharp ${sharpOverride}, nanoid ${lockedVersion("nanoid")})`
 );

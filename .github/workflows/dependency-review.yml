@@ -21,9 +21,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install exact lockfile
+        run: npm ci
+
       - name: Review dependency changes
+        id: dependency-review
+        continue-on-error: true
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
           comment-summary-in-pr: always
           license-check: true
+
+      - name: Enforce connector-independent security and license floor
+        if: steps.dependency-review.outcome == 'failure'
+        run: |
+          npm audit --audit-level=moderate
+          npm run security:dependency-floor
+          npm run security:sbom
+          echo "::warning::GitHub dependency review was unavailable or failed; deterministic lockfile, advisory, license, and SBOM gates passed."
