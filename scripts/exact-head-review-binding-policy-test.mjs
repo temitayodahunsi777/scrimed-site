@@ -55,6 +55,12 @@ const approval = {
 };
 const evaluatedAt = "2026-08-09T23:00:00.000Z";
 
+function refreshDigest(value) {
+  const payload = { ...value };
+  delete payload.approvalDigest;
+  value.approvalDigest = createExactHeadApprovalDigest(payload);
+}
+
 assert.equal(
   evaluateExactHeadReviewBinding({ candidate, approval, evaluatedAt }).status,
   "APPROVED_EXACT_HEAD"
@@ -62,6 +68,24 @@ assert.equal(
 assert.equal(
   evaluateExactHeadReviewBinding({ candidate, approval: null, evaluatedAt }).status,
   "REVIEW_REQUIRED"
+);
+
+const approvalWithNotesBase = {
+  ...approvalBase,
+  approvalId: "approval-exact-head-notes-001",
+  replayNonce: "nonce-exact-head-notes-001",
+  disposition: "APPROVE_WITH_NONBLOCKING_NOTES"
+};
+assert.equal(
+  evaluateExactHeadReviewBinding({
+    candidate,
+    approval: {
+      ...approvalWithNotesBase,
+      approvalDigest: createExactHeadApprovalDigest(approvalWithNotesBase)
+    },
+    evaluatedAt
+  }).status,
+  "APPROVED_EXACT_HEAD"
 );
 
 function assertRejected(mutator, reasonCode) {
@@ -89,14 +113,29 @@ assertRejected((value) => {
 }, "exact-head-review-critical-surface-stale");
 assertRejected((value) => {
   value.reviewerIdentityHash = candidate.authorIdentityHash;
-  value.approvalDigest = createExactHeadApprovalDigest({
-    ...value,
-    approvalDigest: undefined
-  });
+  refreshDigest(value);
 }, "exact-head-review-self-review-rejected");
 assertRejected((value) => {
   value.evidenceIds = value.evidenceIds.filter((id) => id !== "sbom");
 }, "exact-head-review-evidence-incomplete");
+assertRejected((value) => {
+  value.disposition = "NOT_A_REAL_DISPOSITION";
+  refreshDigest(value);
+}, "exact-head-review-approval-invalid");
+assertRejected((value) => {
+  value.issuedAt = "2026-08-10T00:00:00.000Z";
+  value.expiresAt = "2026-08-11T00:00:00.000Z";
+  refreshDigest(value);
+}, "exact-head-review-not-yet-effective");
+assertRejected((value) => {
+  value.disposition = "REQUEST_CHANGES";
+  refreshDigest(value);
+}, "exact-head-review-disposition-blocks");
+assertRejected((value) => {
+  value.approvalId = 42;
+  value.evidenceIds = null;
+  value.criticalSurfaces = null;
+}, "exact-head-review-approval-invalid");
 
 const replay = evaluateExactHeadReviewBinding({
   candidate,
@@ -122,5 +161,5 @@ assert.ok(untrustedResult.reasonCodes.includes("exact-head-review-untrusted-iden
 assert.equal(untrustedResult.releaseAuthorityGranted, false);
 
 console.log(
-  "pass exact-head review binding tests (SHA, candidate, source, critical surfaces, packet, replay, evidence, trust, and separation of duties)"
+  "pass exact-head review binding tests (SHA, candidate, source, critical surfaces, disposition allowlist, effective time, replay, evidence, trust, and separation of duties)"
 );

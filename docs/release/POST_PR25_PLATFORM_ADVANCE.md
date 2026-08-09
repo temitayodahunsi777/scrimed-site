@@ -28,6 +28,12 @@ flowchart LR
 - Economic outputs retain `UNAVAILABLE` rather than inventing revenue, margin, payback, or value.
 - The pilot factory is synthetic/no-PHI and cannot submit, write back, or activate a customer.
 
+### Merge-readiness approval evidence
+
+`release:merge-readiness` never infers exact-head approval from a boolean in the frozen baseline. It evaluates a complete approval artifact against the frozen candidate with `evaluateExactHeadReviewBinding`.
+
+Provide the local, nonsecret approval artifact through `SCRIMED_EXACT_HEAD_APPROVAL_FILE` or `--approval-file <path>`. Missing, unreadable, malformed, stale, expired, future-dated, replayed, self-issued, digest-mismatched, or unsupported-disposition evidence fails closed. A GitHub review is human evidence, but it is not silently converted into the local cryptographic approval contract.
+
 ## Validation
 
 Run:

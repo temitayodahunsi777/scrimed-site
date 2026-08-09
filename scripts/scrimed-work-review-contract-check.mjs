@@ -49,6 +49,18 @@ assert.match(files["app/globals.css"], /\.exact-head-identity code/);
 assert.match(files["app/api/scrimed-work/review/route.ts"], /none-read-only-summary/);
 assert.match(files["package.json"], /test:exact-head-review-binding/);
 assert.match(files["package.json"], /evidence:post-pr25-platform:check/);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /evaluateExactHeadReviewBinding/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /SCRIMED_EXACT_HEAD_APPROVAL_FILE/
+);
+assert.doesNotMatch(
+  files["scripts/verify-merge-readiness.mjs"],
+  /exactHeadApprovalMatches:\s*baseline\.review\.exactHeadApprovalRecorded/
+);
 
 console.log(
   "pass SCRIMED Work exact-head reviewer contract (frozen identity, read-only UI/API, release separation, merge preflight, and operator boundaries)"

@@ -1,4 +1,5 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
+import type { ExactHeadReviewCandidate } from "./exactHeadReviewBinding";
 
 export const pr25FrozenReviewBaselineVersion =
   "scrimed-pr25-frozen-review-baseline-v1-2026-08-09";
@@ -79,4 +80,60 @@ export const pr25FrozenReviewBaseline = {
 
 export function getPr25FrozenReviewBaseline() {
   return pr25FrozenReviewBaseline;
+}
+
+export function getPr25ExactHeadReviewCandidate(): ExactHeadReviewCandidate {
+  const binding = {
+    schemaVersion: pr25FrozenReviewBaselineVersion,
+    repository: baseline.repository,
+    pullRequest: baseline.pullRequest,
+    headSha: baseline.headSha
+  };
+
+  return {
+    commitSha: baseline.headSha,
+    candidateFingerprint: baseline.fingerprints.candidate,
+    sourceFingerprint: baseline.fingerprints.source,
+    validationFingerprint: baseline.fingerprints.validation,
+    reviewPacketFingerprint: baseline.fingerprints.reviewPacket,
+    sbomFingerprint: baseline.fingerprints.sbom,
+    criticalSurfaces: {
+      securityCriticalFiles: createClinicalEvidenceHash({
+        ...binding,
+        surface: "security-critical-files",
+        sourceFingerprint: baseline.fingerprints.source,
+        sbomFingerprint: baseline.fingerprints.sbom
+      }),
+      policyFiles: createClinicalEvidenceHash({
+        ...binding,
+        surface: "policy-files",
+        sourceFingerprint: baseline.fingerprints.source,
+        validationFingerprint: baseline.fingerprints.validation
+      }),
+      migrationSet: createClinicalEvidenceHash({
+        ...binding,
+        surface: "migration-set",
+        validationFingerprint: baseline.fingerprints.validation,
+        staticReviewPassed: baseline.validation.migrationStaticReviewPassed
+      }),
+      publicClaims: createClinicalEvidenceHash({
+        ...binding,
+        surface: "public-claims",
+        validationFingerprint: baseline.fingerprints.validation,
+        publicClaimsPassed: baseline.validation.publicClaimsPassed
+      }),
+      deploymentConfiguration: createClinicalEvidenceHash({
+        ...binding,
+        surface: "deployment-configuration",
+        previewDeploymentId: baseline.preview.deploymentId,
+        automaticProductionDeploymentFromMain:
+          baseline.releaseControls.automaticProductionDeploymentFromMain
+      })
+    },
+    authorIdentityHash: createClinicalEvidenceHash({
+      ...binding,
+      identityProvider: "github",
+      authorSubject: "temitayodahunsi777"
+    })
+  };
 }

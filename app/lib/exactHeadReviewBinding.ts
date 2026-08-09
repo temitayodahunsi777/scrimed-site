@@ -1,7 +1,7 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
 
 export const exactHeadReviewBindingVersion =
-  "scrimed-exact-head-review-binding-v1-2026-08-09";
+  "scrimed-exact-head-review-binding-v2-2026-08-09";
 
 export type ExactHeadCriticalSurfaceFingerprints = {
   securityCriticalFiles: string;
@@ -59,6 +59,7 @@ export type ExactHeadReviewReasonCode =
   | "exact-head-review-evidence-incomplete"
   | "exact-head-review-untrusted-identity"
   | "exact-head-review-expired"
+  | "exact-head-review-not-yet-effective"
   | "exact-head-review-digest-mismatch"
   | "exact-head-review-disposition-blocks";
 
@@ -83,6 +84,16 @@ const requiredEvidenceIds = [
   "migration-review",
   "operating-mode"
 ] as const;
+const exactHeadReviewDispositions = new Set<ExactHeadReviewDisposition>([
+  "APPROVE_EXACT_HEAD",
+  "APPROVE_WITH_NONBLOCKING_NOTES",
+  "REQUEST_CHANGES",
+  "BLOCK"
+]);
+const approvingExactHeadReviewDispositions = new Set<ExactHeadReviewDisposition>([
+  "APPROVE_EXACT_HEAD",
+  "APPROVE_WITH_NONBLOCKING_NOTES"
+]);
 
 function approvalDigestPayload(
   approval: Omit<ExactHeadReviewApproval, "approvalDigest">
@@ -101,9 +112,31 @@ export function createExactHeadApprovalDigest(
 }
 
 function hasValidCriticalSurfaces(
-  surfaces: ExactHeadCriticalSurfaceFingerprints
+  surfaces: ExactHeadCriticalSurfaceFingerprints | unknown
 ) {
-  return Object.values(surfaces).every((value) => sha256Pattern.test(value));
+  if (!surfaces || typeof surfaces !== "object" || Array.isArray(surfaces)) {
+    return false;
+  }
+
+  return [
+    "securityCriticalFiles",
+    "policyFiles",
+    "migrationSet",
+    "publicClaims",
+    "deploymentConfiguration"
+  ].every((key) => {
+    const value = (surfaces as Record<string, unknown>)[key];
+    return typeof value === "string" && sha256Pattern.test(value);
+  });
+}
+
+function isExactHeadReviewDisposition(
+  value: unknown
+): value is ExactHeadReviewDisposition {
+  return (
+    typeof value === "string" &&
+    exactHeadReviewDispositions.has(value as ExactHeadReviewDisposition)
+  );
 }
 
 function hasValidCandidate(candidate: ExactHeadReviewCandidate) {
@@ -177,17 +210,30 @@ export function evaluateExactHeadReviewBinding(input: {
   const approvalWithoutDigest = { ...approval };
   delete (approvalWithoutDigest as Partial<ExactHeadReviewApproval>).approvalDigest;
 
-  if (
-    !approval.approvalId.trim() ||
-    !approval.replayNonce.trim() ||
-    !commitPattern.test(approval.commitSha) ||
-    !sha256Pattern.test(approval.reviewerIdentityHash) ||
-    !hasValidCriticalSurfaces(approval.criticalSurfaces) ||
-    !Number.isFinite(issuedAt) ||
-    !Number.isFinite(expiresAt) ||
-    !Number.isFinite(evaluatedAtMs) ||
-    expiresAt <= issuedAt
-  ) {
+  const dispositionValid = isExactHeadReviewDisposition(approval.disposition);
+  const approvalStructurallyValid =
+    typeof approval.approvalId === "string" &&
+    Boolean(approval.approvalId.trim()) &&
+    typeof approval.replayNonce === "string" &&
+    Boolean(approval.replayNonce.trim()) &&
+    typeof approval.commitSha === "string" &&
+    typeof approval.reviewerIdentityHash === "string" &&
+    Array.isArray(approval.evidenceIds) &&
+    approval.evidenceIds.every((value) => typeof value === "string") &&
+    typeof approval.trustedIdentityEvidenceVerified === "boolean" &&
+    typeof approval.approvalDigest === "string";
+  const approvalFieldsValid =
+    approvalStructurallyValid &&
+    commitPattern.test(approval.commitSha) &&
+    sha256Pattern.test(approval.reviewerIdentityHash) &&
+    hasValidCriticalSurfaces(approval.criticalSurfaces) &&
+    dispositionValid &&
+    Number.isFinite(issuedAt) &&
+    Number.isFinite(expiresAt) &&
+    Number.isFinite(evaluatedAtMs) &&
+    expiresAt > issuedAt;
+
+  if (!approvalFieldsValid) {
     reasons.push("exact-head-review-approval-invalid");
   }
   if (approval.reviewerIdentityHash === input.candidate.authorIdentityHash) {
@@ -202,7 +248,13 @@ export function evaluateExactHeadReviewBinding(input: {
   if (Number.isFinite(expiresAt) && Number.isFinite(evaluatedAtMs) && expiresAt <= evaluatedAtMs) {
     reasons.push("exact-head-review-expired");
   }
-  if (approval.disposition === "REQUEST_CHANGES" || approval.disposition === "BLOCK") {
+  if (Number.isFinite(issuedAt) && Number.isFinite(evaluatedAtMs) && issuedAt > evaluatedAtMs) {
+    reasons.push("exact-head-review-not-yet-effective");
+  }
+  if (
+    dispositionValid &&
+    !approvingExactHeadReviewDispositions.has(approval.disposition)
+  ) {
     reasons.push("exact-head-review-disposition-blocks");
   }
 
@@ -215,24 +267,32 @@ export function evaluateExactHeadReviewBinding(input: {
     approval.sbomFingerprint === input.candidate.sbomFingerprint;
   if (!exactFieldsMatch) reasons.push("exact-head-review-stale");
 
-  const criticalSurfacesMatch = Object.entries(input.candidate.criticalSurfaces).every(
-    ([key, value]) =>
-      approval.criticalSurfaces[key as keyof ExactHeadCriticalSurfaceFingerprints] === value
-  );
+  const criticalSurfacesMatch =
+    hasValidCriticalSurfaces(approval.criticalSurfaces) &&
+    Object.entries(input.candidate.criticalSurfaces).every(
+      ([key, value]) =>
+        approval.criticalSurfaces[
+          key as keyof ExactHeadCriticalSurfaceFingerprints
+        ] === value
+    );
   if (!criticalSurfacesMatch) {
     reasons.push("exact-head-review-critical-surface-stale");
   }
 
-  const evidenceIds = new Set(approval.evidenceIds);
+  const evidenceIds = new Set(
+    Array.isArray(approval.evidenceIds) ? approval.evidenceIds : []
+  );
   if (requiredEvidenceIds.some((evidenceId) => !evidenceIds.has(evidenceId))) {
     reasons.push("exact-head-review-evidence-incomplete");
   }
 
-  const expectedDigest = createExactHeadApprovalDigest(
-    approvalWithoutDigest as Omit<ExactHeadReviewApproval, "approvalDigest">
-  );
-  if (approval.approvalDigest !== expectedDigest) {
-    reasons.push("exact-head-review-digest-mismatch");
+  if (approvalFieldsValid) {
+    const expectedDigest = createExactHeadApprovalDigest(
+      approvalWithoutDigest as Omit<ExactHeadReviewApproval, "approvalDigest">
+    );
+    if (approval.approvalDigest !== expectedDigest) {
+      reasons.push("exact-head-review-digest-mismatch");
+    }
   }
 
   const uniqueReasons = [...new Set(reasons)];

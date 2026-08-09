@@ -3,18 +3,61 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
+import {
+  createExactHeadApprovalDigest,
+  evaluateExactHeadReviewBinding
+} from "../app/lib/exactHeadReviewBinding.ts";
 import { evaluateMergeReadiness } from "../app/lib/mergeReadiness.ts";
 import { getScrimedOperatingModeSummary } from "../app/lib/operatingMode.ts";
-import { getPr25FrozenReviewBaseline } from "../app/lib/pr25FrozenReviewBaseline.ts";
+import {
+  getPr25ExactHeadReviewCandidate,
+  getPr25FrozenReviewBaseline
+} from "../app/lib/pr25FrozenReviewBaseline.ts";
 
-export async function buildCurrentMergeReadinessInput() {
+function cliValue(name) {
+  const exactIndex = process.argv.indexOf(name);
+  if (exactIndex >= 0) return process.argv[exactIndex + 1] ?? null;
+  const prefix = `${name}=`;
+  return process.argv.find((value) => value.startsWith(prefix))?.slice(prefix.length) ?? null;
+}
+
+async function loadApprovalFile(path) {
+  if (!path) return { approval: null, loadError: null };
+
+  try {
+    const parsed = JSON.parse(await readFile(path, "utf8"));
+    const approval = parsed?.approval ?? parsed;
+    if (!approval || typeof approval !== "object" || Array.isArray(approval)) {
+      return { approval: null, loadError: "exact-head-approval-file-invalid" };
+    }
+    return { approval, loadError: null };
+  } catch {
+    return { approval: null, loadError: "exact-head-approval-file-unreadable" };
+  }
+}
+
+export async function buildCurrentMergeReadinessInput(options = {}) {
   const baseline = getPr25FrozenReviewBaseline();
+  const candidate = getPr25ExactHeadReviewCandidate();
   const operatingMode = getScrimedOperatingModeSummary().mode;
   const vercel = JSON.parse(await readFile("vercel.json", "utf8"));
+  const approvalPath =
+    options.approvalPath ??
+    process.env.SCRIMED_EXACT_HEAD_APPROVAL_FILE ??
+    cliValue("--approval-file");
+  const loaded = Object.hasOwn(options, "approval")
+    ? { approval: options.approval, loadError: null }
+    : await loadApprovalFile(approvalPath);
+  const reviewBinding = evaluateExactHeadReviewBinding({
+    candidate,
+    approval: loaded.approval,
+    evaluatedAt: options.evaluatedAt
+  });
 
   return {
-    exactHeadApproval: baseline.review.exactHeadApprovalRecorded,
-    exactHeadApprovalMatches: baseline.review.exactHeadApprovalRecorded,
+    exactHeadApproval: Boolean(loaded.approval),
+    exactHeadApprovalMatches:
+      reviewBinding.approved && reviewBinding.status === "APPROVED_EXACT_HEAD",
     ciPassed:
       baseline.validation.githubActionsPassed === baseline.validation.githubActionsTotal,
     secretScanPassed: baseline.validation.secretScanFindings === 0,
@@ -28,7 +71,13 @@ export async function buildCurrentMergeReadinessInput() {
     deviceWritebackEnabled: operatingMode.medicalDeviceConnections,
     customerActivationEnabled: false,
     productionAutoDeployFromMainEnabled:
-      vercel?.git?.deploymentEnabled?.main !== false
+      vercel?.git?.deploymentEnabled?.main !== false,
+    reviewBindingStatus: reviewBinding.status,
+    reviewBindingReasonCodes: [
+      ...(loaded.loadError ? [loaded.loadError] : []),
+      ...reviewBinding.reasonCodes
+    ],
+    reviewedCommitSha: reviewBinding.approvedCommitSha
   };
 }
 
@@ -69,8 +118,64 @@ export async function runMergeReadinessSelfTest() {
   assert.ok(unsafe.reasonCodes.includes("merge-phi-enabled"));
   assert.ok(unsafe.reasonCodes.includes("merge-production-auto-deploy-enabled"));
 
+  const candidate = getPr25ExactHeadReviewCandidate();
+  const approvalBase = {
+    approvalId: "merge-readiness-self-test-approval",
+    replayNonce: "merge-readiness-self-test-nonce",
+    commitSha: candidate.commitSha,
+    candidateFingerprint: candidate.candidateFingerprint,
+    sourceFingerprint: candidate.sourceFingerprint,
+    validationFingerprint: candidate.validationFingerprint,
+    reviewPacketFingerprint: candidate.reviewPacketFingerprint,
+    sbomFingerprint: candidate.sbomFingerprint,
+    criticalSurfaces: candidate.criticalSurfaces,
+    reviewerIdentityHash: "0".repeat(64),
+    disposition: "APPROVE_EXACT_HEAD",
+    evidenceIds: [
+      "ci",
+      "secret-scan",
+      "sbom",
+      "public-claims",
+      "migration-review",
+      "operating-mode"
+    ],
+    issuedAt: "2026-08-09T22:00:00.000Z",
+    expiresAt: "2026-08-10T22:00:00.000Z",
+    trustedIdentityEvidenceVerified: true
+  };
+  const approval = {
+    ...approvalBase,
+    approvalDigest: createExactHeadApprovalDigest(approvalBase)
+  };
+  const verifiedInput = await buildCurrentMergeReadinessInput({
+    approval,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(verifiedInput.exactHeadApproval, true);
+  assert.equal(verifiedInput.exactHeadApprovalMatches, true);
+  assert.equal(verifiedInput.reviewBindingStatus, "APPROVED_EXACT_HEAD");
+
+  const unknownDispositionBase = {
+    ...approvalBase,
+    disposition: "UNKNOWN_DISPOSITION"
+  };
+  const invalidInput = await buildCurrentMergeReadinessInput({
+    approval: {
+      ...unknownDispositionBase,
+      approvalDigest: createExactHeadApprovalDigest(unknownDispositionBase)
+    },
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(invalidInput.exactHeadApproval, true);
+  assert.equal(invalidInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    invalidInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-approval-invalid"
+    )
+  );
+
   console.log(
-    "pass merge-readiness verifier self-test (exact review, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
+    "pass merge-readiness verifier self-test (evaluated exact-head artifact, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
   );
 }
 
