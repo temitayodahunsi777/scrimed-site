@@ -36,6 +36,8 @@ begin
 end;
 $$;
 
+grant usage on schema extensions to anon, authenticated, service_role;
+
 do $$
 declare
   extension_schema text;

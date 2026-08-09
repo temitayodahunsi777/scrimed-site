@@ -58,7 +58,7 @@ const routePolicy = [
   },
   {
     path: "/faithcore",
-    requiredText: ["optional", "do not affect"]
+    requiredText: ["optional", "does not influence"]
   },
   {
     path: "/pilot-demo-commercial-readiness",
@@ -140,7 +140,7 @@ function safeSnapshot(policy, width = 390) {
     "/": "SCRIMED healthcare intelligence. Human-supervised synthetic demonstration.",
     "/validation-evidence": "Validation and evidence for synthetic workflows.",
     "/legal": "Do not submit protected health information. AI outputs require human review.",
-    "/faithcore": "FaithCore is optional and faith experiences do not affect clinical outputs.",
+    "/faithcore": "FaithCore is optional and does not influence clinical outputs.",
     "/pilot-demo-commercial-readiness": "Synthetic demonstration. No PHI."
   };
   return {
