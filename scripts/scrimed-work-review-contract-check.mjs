@@ -82,6 +82,18 @@ assert.match(
   files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
   /exact-head-review-replay-rejected/
 );
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /assertProtectedAncestorChain/
+);
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /assertPinnedLedgerDirectory/
+);
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /directoryHandle\.sync\(\)/
+);
 assert.doesNotMatch(
   files["app/lib/exactHeadReviewBinding.ts"],
   /trustedIdentityEvidenceVerified:\s*boolean/

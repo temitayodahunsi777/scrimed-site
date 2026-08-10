@@ -1,13 +1,26 @@
+import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { constants as fileConstants } from "node:fs";
-import { lstat, open, realpath } from "node:fs/promises";
-import { isAbsolute, join } from "node:path";
+import {
+  access,
+  lstat,
+  mkdtemp,
+  mkdir,
+  open,
+  readFile,
+  realpath,
+  rename,
+  rm
+} from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 export const exactHeadApprovalConsumptionLedgerVersion =
-  "scrimed-exact-head-approval-consumption-ledger-v1-2026-08-10";
+  "scrimed-exact-head-approval-consumption-ledger-v2-2026-08-10";
 
 const sha256Pattern = /^[0-9a-f]{64}$/;
 const commitPattern = /^[0-9a-f]{40}$/;
+const maximumMarkerBytes = 4096;
 const trustedConsumptionStates = new WeakMap();
 
 function sha256(value) {
@@ -81,11 +94,107 @@ function buildMarkerDescriptors(identity, resolvedDirectory) {
   });
 }
 
-async function resolveProtectedLedgerDirectory(ledgerDirectory) {
+async function assertProtectedAncestorChain(resolvedDirectory) {
+  if (
+    typeof process.geteuid !== "function" ||
+    process.platform === "win32" ||
+    process.geteuid() === 0
+  ) {
+    throw new Error(
+      "exact-head-review-consumption-ledger-runtime-identity-unsafe"
+    );
+  }
+
+  let current = dirname(resolvedDirectory);
+  while (true) {
+    const currentStat = await lstat(current);
+    if (
+      !currentStat.isDirectory() ||
+      currentStat.isSymbolicLink() ||
+      currentStat.uid !== 0
+    ) {
+      throw new Error(
+        "exact-head-review-consumption-ledger-ancestry-unsafe"
+      );
+    }
+
+    try {
+      await access(current, fileConstants.W_OK);
+      throw new Error(
+        "exact-head-review-consumption-ledger-ancestry-unsafe"
+      );
+    } catch (error) {
+      if (
+        error?.message ===
+        "exact-head-review-consumption-ledger-ancestry-unsafe"
+      ) {
+        throw error;
+      }
+      if (error?.code !== "EACCES" && error?.code !== "EPERM") throw error;
+    }
+
+    const parent = dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+}
+
+async function assertNoSymlinkPathComponents(ledgerDirectory) {
+  if (ledgerDirectory !== resolve(ledgerDirectory)) {
+    throw new Error("exact-head-review-consumption-ledger-path-invalid");
+  }
+
+  let current = ledgerDirectory;
+  while (true) {
+    const currentStat = await lstat(current);
+    if (currentStat.isSymbolicLink()) {
+      throw new Error("exact-head-review-consumption-ledger-path-invalid");
+    }
+    const parent = dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+}
+
+function directoryIdentity(directoryStat) {
+  return {
+    device: String(directoryStat.dev),
+    inode: String(directoryStat.ino)
+  };
+}
+
+async function assertPinnedLedgerDirectory(trustedState) {
+  const [pathStat, handleStat] = await Promise.all([
+    lstat(trustedState.resolvedDirectory),
+    trustedState.directoryHandle.stat()
+  ]);
+  const pathIdentity = directoryIdentity(pathStat);
+  const handleIdentity = directoryIdentity(handleStat);
+
+  if (
+    !pathStat.isDirectory() ||
+    pathStat.isSymbolicLink() ||
+    !handleStat.isDirectory() ||
+    (pathStat.mode & 0o022) !== 0 ||
+    (handleStat.mode & 0o022) !== 0 ||
+    pathIdentity.device !== trustedState.directoryIdentity.device ||
+    pathIdentity.inode !== trustedState.directoryIdentity.inode ||
+    handleIdentity.device !== trustedState.directoryIdentity.device ||
+    handleIdentity.inode !== trustedState.directoryIdentity.inode
+  ) {
+    throw new Error("exact-head-review-consumption-ledger-path-changed");
+  }
+}
+
+async function resolveProtectedLedgerDirectory(
+  ledgerDirectory,
+  { allowRenameableAncestorsForSelfTest = false } = {}
+) {
   if (typeof ledgerDirectory !== "string" || !isAbsolute(ledgerDirectory)) {
     throw new Error("exact-head-review-consumption-ledger-path-invalid");
   }
 
+  await assertNoSymlinkPathComponents(ledgerDirectory);
   const initial = await lstat(ledgerDirectory);
   if (!initial.isDirectory() || initial.isSymbolicLink()) {
     throw new Error("exact-head-review-consumption-ledger-path-invalid");
@@ -103,7 +212,33 @@ async function resolveProtectedLedgerDirectory(ledgerDirectory) {
     throw new Error("exact-head-review-consumption-ledger-permissions-unsafe");
   }
 
-  return resolved;
+  if (!allowRenameableAncestorsForSelfTest) {
+    await assertProtectedAncestorChain(resolved);
+  }
+
+  const noFollow = fileConstants.O_NOFOLLOW ?? 0;
+  const directoryOnly = fileConstants.O_DIRECTORY ?? 0;
+  const directoryHandle = await open(
+    resolved,
+    fileConstants.O_RDONLY | directoryOnly | noFollow
+  );
+  const handleStat = await directoryHandle.stat();
+  const resolvedIdentity = directoryIdentity(resolvedStat);
+  const handleIdentity = directoryIdentity(handleStat);
+  if (
+    !handleStat.isDirectory() ||
+    resolvedIdentity.device !== handleIdentity.device ||
+    resolvedIdentity.inode !== handleIdentity.inode
+  ) {
+    await directoryHandle.close();
+    throw new Error("exact-head-review-consumption-ledger-path-changed");
+  }
+
+  return {
+    resolvedDirectory: resolved,
+    directoryHandle,
+    directoryIdentity: resolvedIdentity
+  };
 }
 
 function validateStoredMarker(marker, descriptor) {
@@ -143,11 +278,10 @@ function unavailableState({ approval, configured, errorCode }) {
   };
 }
 
-export async function inspectExactHeadApprovalConsumption({
-  approval,
-  ledgerDirectory,
-  required = false
-}) {
+async function inspectExactHeadApprovalConsumptionInternal(
+  { approval, ledgerDirectory, required = false },
+  { allowRenameableAncestorsForSelfTest = false } = {}
+) {
   if (!approval) {
     return {
       configured: Boolean(ledgerDirectory),
@@ -179,11 +313,14 @@ export async function inspectExactHeadApprovalConsumption({
     };
   }
 
+  let protectedDirectory;
   try {
     const identity = approvalMarkerIdentity(approval);
-    const resolvedDirectory = await resolveProtectedLedgerDirectory(
-      ledgerDirectory
+    protectedDirectory = await resolveProtectedLedgerDirectory(
+      ledgerDirectory,
+      { allowRenameableAncestorsForSelfTest }
     );
+    const { resolvedDirectory } = protectedDirectory;
     const markers = buildMarkerDescriptors(identity, resolvedDirectory);
     let consumed = false;
 
@@ -200,7 +337,12 @@ export async function inspectExactHeadApprovalConsumption({
           fileConstants.O_RDONLY | noFollow
         );
         const markerStat = await markerHandle.stat();
-        if (!markerStat.isFile() || (markerStat.mode & 0o022) !== 0) {
+        if (
+          !markerStat.isFile() ||
+          markerStat.size <= 0 ||
+          markerStat.size > maximumMarkerBytes ||
+          (markerStat.mode & 0o022) !== 0
+        ) {
           throw new Error("exact-head-review-consumption-ledger-tampered");
         }
         const marker = JSON.parse(await markerHandle.readFile("utf8"));
@@ -214,6 +356,8 @@ export async function inspectExactHeadApprovalConsumption({
         await markerHandle?.close();
       }
     }
+
+    await assertPinnedLedgerDirectory(protectedDirectory);
 
     const state = {
       configured: true,
@@ -234,11 +378,19 @@ export async function inspectExactHeadApprovalConsumption({
       trustedConsumptionStates.set(state, {
         approvalIdentityHash: stableHash(identity),
         markers: markers.map((marker) => Object.freeze({ ...marker })),
+        resolvedDirectory,
+        directoryHandle: protectedDirectory.directoryHandle,
+        directoryIdentity: protectedDirectory.directoryIdentity,
         consumed: false
       });
+      protectedDirectory = undefined;
+    } else {
+      await protectedDirectory.directoryHandle.close();
+      protectedDirectory = undefined;
     }
     return state;
   } catch (error) {
+    await protectedDirectory?.directoryHandle.close();
     return unavailableState({
       approval,
       configured: true,
@@ -249,6 +401,17 @@ export async function inspectExactHeadApprovalConsumption({
           : "exact-head-review-consumption-ledger-unavailable"
     });
   }
+}
+
+export async function inspectExactHeadApprovalConsumption(input) {
+  return inspectExactHeadApprovalConsumptionInternal(input);
+}
+
+export async function releaseExactHeadApprovalConsumption(consumptionState) {
+  const trustedState = trustedConsumptionStates.get(consumptionState);
+  if (!trustedState) return;
+  trustedConsumptionStates.delete(consumptionState);
+  await trustedState.directoryHandle.close();
 }
 
 export async function consumeExactHeadApproval({
@@ -310,54 +473,71 @@ export async function consumeExactHeadApproval({
 
   const recordHashes = [];
   const noFollow = fileConstants.O_NOFOLLOW ?? 0;
-  for (const descriptor of trustedState.markers) {
-    const payload = {
-      version: exactHeadApprovalConsumptionLedgerVersion,
-      markerKind: descriptor.markerKind,
-      markerKey: descriptor.markerKey,
-      identifierHash: descriptor.identifierHash,
-      approvalIdHash: identity.approvalIdHash,
-      replayNonceHash: identity.replayNonceHash,
-      approvalDigest: identity.approvalDigest,
-      commitSha: identity.commitSha,
-      candidateFingerprint: identity.candidateFingerprint,
-      sourceFingerprint: identity.sourceFingerprint,
-      consumedAt
-    };
-    const marker = {
-      ...payload,
-      recordHash: stableHash(payload)
-    };
-    let handle;
-
-    try {
-      handle = await open(
-        descriptor.markerPath,
-        fileConstants.O_CREAT |
-          fileConstants.O_EXCL |
-          fileConstants.O_WRONLY |
-          noFollow,
-        0o600
-      );
-      await handle.writeFile(`${JSON.stringify(marker)}\n`, "utf8");
-      await handle.sync();
-      recordHashes.push(marker.recordHash);
-    } catch (error) {
-      if (error?.code === "EEXIST" || recordHashes.length > 0) {
-        trustedState.consumed = true;
-      }
-      return {
-        consumed: false,
-        replayRejected: error?.code === "EEXIST",
-        receiptHash: null,
-        errorCode:
-          error?.code === "EEXIST"
-            ? "exact-head-review-replay-rejected"
-            : "exact-head-review-consumption-ledger-write-failed"
+  try {
+    await assertPinnedLedgerDirectory(trustedState);
+    for (const descriptor of trustedState.markers) {
+      await assertPinnedLedgerDirectory(trustedState);
+      const payload = {
+        version: exactHeadApprovalConsumptionLedgerVersion,
+        markerKind: descriptor.markerKind,
+        markerKey: descriptor.markerKey,
+        identifierHash: descriptor.identifierHash,
+        approvalIdHash: identity.approvalIdHash,
+        replayNonceHash: identity.replayNonceHash,
+        approvalDigest: identity.approvalDigest,
+        commitSha: identity.commitSha,
+        candidateFingerprint: identity.candidateFingerprint,
+        sourceFingerprint: identity.sourceFingerprint,
+        consumedAt
       };
-    } finally {
-      await handle?.close();
+      const marker = {
+        ...payload,
+        recordHash: stableHash(payload)
+      };
+      let handle;
+
+      try {
+        handle = await open(
+          descriptor.markerPath,
+          fileConstants.O_CREAT |
+            fileConstants.O_EXCL |
+            fileConstants.O_WRONLY |
+            noFollow,
+          0o600
+        );
+        await handle.writeFile(`${JSON.stringify(marker)}\n`, "utf8");
+        await handle.sync();
+        recordHashes.push(marker.recordHash);
+      } finally {
+        await handle?.close();
+      }
     }
+
+    await assertPinnedLedgerDirectory(trustedState);
+    try {
+      await trustedState.directoryHandle.sync();
+    } catch {
+      throw new Error("exact-head-review-consumption-ledger-sync-failed");
+    }
+    await assertPinnedLedgerDirectory(trustedState);
+  } catch (error) {
+    if (error?.code === "EEXIST" || recordHashes.length > 0) {
+      trustedState.consumed = true;
+    }
+    const knownError =
+      typeof error?.message === "string" &&
+      error.message.startsWith("exact-head-review-consumption-")
+        ? error.message
+        : null;
+    return {
+      consumed: false,
+      replayRejected: error?.code === "EEXIST",
+      receiptHash: null,
+      errorCode:
+        error?.code === "EEXIST"
+          ? "exact-head-review-replay-rejected"
+          : knownError ?? "exact-head-review-consumption-ledger-write-failed"
+    };
   }
 
   trustedState.consumed = true;
@@ -371,4 +551,161 @@ export async function consumeExactHeadApproval({
     }),
     errorCode: null
   };
+}
+
+function buildSyntheticApproval(overrides = {}) {
+  const approval = {
+    approvalId: "synthetic-ledger-approval",
+    replayNonce: "synthetic-ledger-replay-nonce",
+    approvalDigest: "1".repeat(64),
+    commitSha: "2".repeat(40),
+    candidateFingerprint: "3".repeat(64),
+    sourceFingerprint: "4".repeat(64),
+    ...overrides
+  };
+  return {
+    ...approval,
+    approvalDigest: sha256(JSON.stringify(approval))
+  };
+}
+
+async function inspectSyntheticLedger(input) {
+  return inspectExactHeadApprovalConsumptionInternal(input, {
+    allowRenameableAncestorsForSelfTest: true
+  });
+}
+
+export async function runExactHeadApprovalConsumptionLedgerSelfTest() {
+  const temporaryRoot = await mkdtemp(
+    join(tmpdir(), "scrimed-exact-head-ledger-self-test-")
+  );
+  const root = await realpath(temporaryRoot);
+  const ledgerDirectory = join(root, "ledger");
+  const movedDirectory = join(root, "ledger-moved");
+  const approval = buildSyntheticApproval();
+  const statesToRelease = [];
+
+  await mkdir(ledgerDirectory, { mode: 0o700 });
+  try {
+    const unsafeAncestry = await inspectExactHeadApprovalConsumption({
+      approval,
+      ledgerDirectory,
+      required: true
+    });
+    assert.equal(unsafeAncestry.ready, false);
+    assert.ok(
+      [
+        "exact-head-review-consumption-ledger-ancestry-unsafe",
+        "exact-head-review-consumption-ledger-runtime-identity-unsafe"
+      ].includes(unsafeAncestry.errorCode)
+    );
+
+    const identityProbe = buildSyntheticApproval({
+      approvalId: "synthetic-ledger-identity-probe",
+      replayNonce: "synthetic-ledger-identity-probe-nonce"
+    });
+    const identityState = await inspectSyntheticLedger({
+      approval: identityProbe,
+      ledgerDirectory,
+      required: true
+    });
+    statesToRelease.push(identityState);
+    identityState.markers = [];
+    const substitutedIdentity = await consumeExactHeadApproval({
+      approval: buildSyntheticApproval({
+        ...identityProbe,
+        sourceFingerprint: "5".repeat(64)
+      }),
+      consumptionState: identityState,
+      consumedAt: "2026-08-10T00:00:00.000Z"
+    });
+    assert.equal(substitutedIdentity.consumed, false);
+    assert.equal(
+      substitutedIdentity.errorCode,
+      "exact-head-review-consumption-ledger-unavailable"
+    );
+    const identityConsumption = await consumeExactHeadApproval({
+      approval: identityProbe,
+      consumptionState: identityState,
+      consumedAt: "2026-08-10T00:00:01.000Z"
+    });
+    assert.equal(identityConsumption.consumed, true);
+    assert.match(identityConsumption.receiptHash, sha256Pattern);
+
+    const replay = await inspectSyntheticLedger({
+      approval: identityProbe,
+      ledgerDirectory,
+      required: true
+    });
+    assert.equal(replay.consumed, true);
+    assert.ok(replay.consumedApprovalIds.has(identityProbe.approvalId));
+    assert.ok(replay.consumedApprovalIds.has(identityProbe.replayNonce));
+
+    for (const reusedIdentifier of [
+      buildSyntheticApproval({
+        approvalId: identityProbe.approvalId,
+        replayNonce: "synthetic-ledger-new-nonce"
+      }),
+      buildSyntheticApproval({
+        approvalId: "synthetic-ledger-new-approval",
+        replayNonce: identityProbe.replayNonce
+      })
+    ]) {
+      const reused = await inspectSyntheticLedger({
+        approval: reusedIdentifier,
+        ledgerDirectory,
+        required: true
+      });
+      assert.equal(reused.consumed, true);
+    }
+
+    const pathSwapApproval = buildSyntheticApproval({
+      approvalId: "synthetic-ledger-path-swap",
+      replayNonce: "synthetic-ledger-path-swap-nonce"
+    });
+    const pathSwapState = await inspectSyntheticLedger({
+      approval: pathSwapApproval,
+      ledgerDirectory,
+      required: true
+    });
+    statesToRelease.push(pathSwapState);
+    await rename(ledgerDirectory, movedDirectory);
+    await mkdir(ledgerDirectory, { mode: 0o700 });
+    const swapped = await consumeExactHeadApproval({
+      approval: pathSwapApproval,
+      consumptionState: pathSwapState,
+      consumedAt: "2026-08-10T00:00:02.000Z"
+    });
+    assert.equal(swapped.consumed, false);
+    assert.equal(
+      swapped.errorCode,
+      "exact-head-review-consumption-ledger-path-changed"
+    );
+    await rm(ledgerDirectory, { recursive: true, force: true });
+    await rename(movedDirectory, ledgerDirectory);
+    const restored = await consumeExactHeadApproval({
+      approval: pathSwapApproval,
+      consumptionState: pathSwapState,
+      consumedAt: "2026-08-10T00:00:03.000Z"
+    });
+    assert.equal(restored.consumed, true);
+    for (const marker of pathSwapState.markers) {
+      const stored = JSON.parse(
+        await readFile(
+          join(ledgerDirectory, `${marker.markerKind}-${marker.markerKey}.json`),
+          "utf8"
+        )
+      );
+      assert.equal(stored.markerKey, marker.markerKey);
+    }
+  } finally {
+    for (const state of statesToRelease) {
+      await releaseExactHeadApprovalConsumption(state);
+    }
+    await rm(root, { recursive: true, force: true });
+  }
+
+  console.log(
+    "pass exact-head approval consumption ledger self-test (unsafe ancestry rejection, pinned-directory continuity, directory sync, identity binding, and durable replay rejection)"
+  );
 }
