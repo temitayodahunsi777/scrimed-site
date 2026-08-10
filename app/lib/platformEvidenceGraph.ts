@@ -101,6 +101,17 @@ const evidenceRelations = new Set<EvidenceRelation>([
   "measured_by"
 ]);
 const sha256Pattern = /^[0-9a-f]{64}$/;
+const canonicalTimestampPattern =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
+export function parseCanonicalEvidenceTimestamp(value: string) {
+  if (!canonicalTimestampPattern.test(value)) return null;
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed) || new Date(parsed).toISOString() !== value) {
+    return null;
+  }
+  return parsed;
+}
 
 export function createEvidenceNode(
   input: Omit<PlatformEvidenceNode, "contentHash">
@@ -291,14 +302,15 @@ export function verifyPlatformEvidenceGraph(graph: PlatformEvidenceGraph) {
     ) {
       failures.push(`invalid-evidence-confidence:${node.id}`);
     }
-    if (!Number.isFinite(Date.parse(node.createdAt))) {
+    const createdAtMs = parseCanonicalEvidenceTimestamp(node.createdAt);
+    if (createdAtMs === null) {
       failures.push(`invalid-evidence-created-at:${node.id}`);
     }
     if (node.expiresAt !== null) {
-      const expiresAtMs = Date.parse(node.expiresAt);
+      const expiresAtMs = parseCanonicalEvidenceTimestamp(node.expiresAt);
       if (
-        !Number.isFinite(expiresAtMs) ||
-        expiresAtMs <= Date.parse(node.createdAt)
+        expiresAtMs === null ||
+        (createdAtMs !== null && expiresAtMs <= createdAtMs)
       ) {
         failures.push(`invalid-evidence-expiry:${node.id}`);
       }
@@ -324,7 +336,7 @@ export function verifyPlatformEvidenceGraph(graph: PlatformEvidenceGraph) {
     if (!nodeIds.has(edge.from) || !nodeIds.has(edge.to)) {
       failures.push(`dangling-evidence-edge:${edge.id}`);
     }
-    if (!Number.isFinite(Date.parse(edge.createdAt))) {
+    if (parseCanonicalEvidenceTimestamp(edge.createdAt) === null) {
       failures.push(`invalid-evidence-edge-created-at:${edge.id}`);
     }
     if (!sha256Pattern.test(edge.contentHash)) {

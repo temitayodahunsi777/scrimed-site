@@ -1,5 +1,8 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
-import { verifyPlatformEvidenceGraph } from "./platformEvidenceGraph";
+import {
+  parseCanonicalEvidenceTimestamp,
+  verifyPlatformEvidenceGraph
+} from "./platformEvidenceGraph";
 import type {
   EvidenceMaturity,
   EvidenceRelation,
@@ -9,7 +12,7 @@ import type {
 } from "./platformEvidenceGraph";
 
 export const publicClaimResolverVersion =
-  "scrimed-public-claim-resolver-v4-2026-08-10";
+  "scrimed-public-claim-resolver-v5-2026-08-10";
 
 export type PublicClaimInput = {
   claimId: string;
@@ -45,19 +48,22 @@ const disqualifyingRelations = new Set<EvidenceRelation>([
 ]);
 
 function isNodeEffective(node: PlatformEvidenceNode, evaluatedAtMs: number) {
-  const createdAtMs = Date.parse(node.createdAt);
-  const expiresAtMs = node.expiresAt === null ? null : Date.parse(node.expiresAt);
+  const createdAtMs = parseCanonicalEvidenceTimestamp(node.createdAt);
+  const expiresAtMs =
+    node.expiresAt === null
+      ? null
+      : parseCanonicalEvidenceTimestamp(node.expiresAt);
   return (
-    Number.isFinite(createdAtMs) &&
+    createdAtMs !== null &&
     createdAtMs <= evaluatedAtMs &&
     (expiresAtMs === null ||
-      (Number.isFinite(expiresAtMs) && expiresAtMs > evaluatedAtMs))
+      expiresAtMs > evaluatedAtMs)
   );
 }
 
 function isEdgeEffective(edge: PlatformEvidenceEdge, evaluatedAtMs: number) {
-  const createdAtMs = Date.parse(edge.createdAt);
-  return Number.isFinite(createdAtMs) && createdAtMs <= evaluatedAtMs;
+  const createdAtMs = parseCanonicalEvidenceTimestamp(edge.createdAt);
+  return createdAtMs !== null && createdAtMs <= evaluatedAtMs;
 }
 
 function getSupportingReachable(input: {
@@ -184,8 +190,8 @@ export function resolvePublicClaim(input: {
   const reasons: string[] = [];
   const graphIntegrity = verifyPlatformEvidenceGraph(input.graph);
   const quantitativeOrSuperior = isQuantitativeOrSuperiorityClaim(input.claim.text);
-  const evaluatedAtMs = Date.parse(input.evaluatedAt);
-  const evaluationTimeValid = Number.isFinite(evaluatedAtMs);
+  const evaluatedAtMs = parseCanonicalEvidenceTimestamp(input.evaluatedAt);
+  const evaluationTimeValid = evaluatedAtMs !== null;
   const pathAnalyses = evidenceNodes.map((node) => ({
     node,
     structuralPathExists: hasStructuralSupportingPath({
@@ -265,14 +271,21 @@ export function resolvePublicClaim(input: {
   if (
     evaluationTimeValid &&
     evidenceNodes.some(
-      (node) => node.expiresAt !== null && Date.parse(node.expiresAt) <= evaluatedAtMs
+      (node) => {
+        if (node.expiresAt === null) return false;
+        const expiresAtMs = parseCanonicalEvidenceTimestamp(node.expiresAt);
+        return expiresAtMs === null || expiresAtMs <= evaluatedAtMs;
+      }
     )
   ) {
     reasons.push("public-claim-evidence-expired");
   }
   if (
     evaluationTimeValid &&
-    evidenceNodes.some((node) => Date.parse(node.createdAt) > evaluatedAtMs)
+    evidenceNodes.some((node) => {
+      const createdAtMs = parseCanonicalEvidenceTimestamp(node.createdAt);
+      return createdAtMs === null || createdAtMs > evaluatedAtMs;
+    })
   ) {
     reasons.push("public-claim-evidence-not-yet-effective");
   }
@@ -282,7 +295,7 @@ export function resolvePublicClaim(input: {
   if (quantitativeOrSuperior && input.claim.syntheticOrEstimated) {
     reasons.push("public-claim-synthetic-or-estimated-label-required");
   }
-  if (!Number.isFinite(Date.parse(input.claim.reviewDate))) {
+  if (parseCanonicalEvidenceTimestamp(input.claim.reviewDate) === null) {
     reasons.push("public-claim-review-date-invalid");
   }
   if (!evaluationTimeValid) {

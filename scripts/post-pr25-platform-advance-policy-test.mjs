@@ -374,6 +374,108 @@ assert.ok(
   malformedExpiryClaim.reasonCodes.includes("public-claim-evidence-graph-invalid")
 );
 
+const nonCanonicalTimestampGraph = structuredClone(graph);
+nonCanonicalTimestampGraph.nodes = nonCanonicalTimestampGraph.nodes.map((node) => {
+  if (node.id === "source:pr25-exact-head") {
+    return createEvidenceNode({
+      id: node.id,
+      type: node.type,
+      label: node.label,
+      sourceType: node.sourceType,
+      sourceReference: node.sourceReference,
+      confidence: node.confidence,
+      maturity: node.maturity,
+      createdAt: "2026-02-30T12:00:00.000Z",
+      expiresAt: node.expiresAt
+    });
+  }
+  if (node.id === "benchmark:pr25-ci") {
+    return createEvidenceNode({
+      id: node.id,
+      type: node.type,
+      label: node.label,
+      sourceType: node.sourceType,
+      sourceReference: node.sourceReference,
+      confidence: node.confidence,
+      maturity: node.maturity,
+      createdAt: node.createdAt,
+      expiresAt: "2026-11-31T12:00:00.000Z"
+    });
+  }
+  return node;
+});
+nonCanonicalTimestampGraph.edges = nonCanonicalTimestampGraph.edges.map((edge) =>
+  edge.id === "edge:source-supports-platform-narrative"
+    ? createEvidenceEdge({
+        id: edge.id,
+        from: edge.from,
+        to: edge.to,
+        relation: edge.relation,
+        createdAt: "2026-02-30T12:00:00.000Z"
+      })
+    : edge
+);
+const nonCanonicalTimestampIntegrity = verifyPlatformEvidenceGraph(
+  nonCanonicalTimestampGraph
+);
+assert.equal(nonCanonicalTimestampIntegrity.valid, false);
+assert.ok(
+  nonCanonicalTimestampIntegrity.failures.includes(
+    "invalid-evidence-created-at:source:pr25-exact-head"
+  )
+);
+assert.ok(
+  nonCanonicalTimestampIntegrity.failures.includes(
+    "invalid-evidence-expiry:benchmark:pr25-ci"
+  )
+);
+assert.ok(
+  nonCanonicalTimestampIntegrity.failures.includes(
+    "invalid-evidence-edge-created-at:edge:source-supports-platform-narrative"
+  )
+);
+const nonCanonicalTimestampClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: nonCanonicalTimestampGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(nonCanonicalTimestampClaim.publishable, false);
+assert.ok(
+  nonCanonicalTimestampClaim.reasonCodes.includes(
+    "public-claim-evidence-graph-invalid"
+  )
+);
+
+const nonCanonicalEvaluationTimeClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph,
+  evaluatedAt: "2026-02-30T12:00:00.000Z"
+});
+assert.equal(nonCanonicalEvaluationTimeClaim.publishable, false);
+assert.ok(
+  nonCanonicalEvaluationTimeClaim.reasonCodes.includes(
+    "public-claim-evaluation-time-invalid"
+  )
+);
+
 const economics = calculateEconomicUnitModel({
   scenarioId: "policy-test",
   evidenceTag: "SIMULATED",
