@@ -130,10 +130,13 @@ export function getPr25ExactHeadReviewCandidate(): ExactHeadReviewCandidate {
           baseline.releaseControls.automaticProductionDeploymentFromMain
       })
     },
-    authorIdentityHash: createClinicalEvidenceHash({
-      ...binding,
-      identityProvider: "github",
-      authorSubject: "temitayodahunsi777"
-    })
+    authorIdentityHashes: [
+      createClinicalEvidenceHash({
+        ...binding,
+        identityProvider: "github",
+        authorSubject: "temitayodahunsi777"
+      })
+    ],
+    requiredReviewerRoles: ["Principal engineer", "Release steward"]
   };
 }

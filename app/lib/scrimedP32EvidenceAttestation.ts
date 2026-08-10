@@ -10,7 +10,39 @@ export const p32SupplementalEvidenceAttestationVersion =
 export type P32SupplementalEvidencePayload = {
   automatedEvidence: AutomatedGateEvidence[];
   approvals: ApprovalEvidence[];
+  reviewerIdentityMappings?: P32ReviewerIdentityMapping[];
 };
+
+export type P32ReviewerIdentityMapping = {
+  reviewerIdentityHash: string;
+  comparableIdentityHashes: string[];
+  evidencePointer: string;
+  mappedAt: string;
+  expiresAt: string;
+  mappingHash: string;
+};
+
+export function computeP32ReviewerIdentityMappingHash(
+  mapping: Omit<P32ReviewerIdentityMapping, "mappingHash">
+) {
+  return createClinicalEvidenceHash({
+    ...mapping,
+    comparableIdentityHashes: [...new Set(mapping.comparableIdentityHashes)].sort()
+  });
+}
+
+export function createP32ReviewerIdentityMapping(
+  mapping: Omit<P32ReviewerIdentityMapping, "mappingHash">
+): P32ReviewerIdentityMapping {
+  const normalized = {
+    ...mapping,
+    comparableIdentityHashes: [...new Set(mapping.comparableIdentityHashes)].sort()
+  };
+  return {
+    ...normalized,
+    mappingHash: computeP32ReviewerIdentityMappingHash(normalized)
+  };
+}
 
 export type P32SupplementalEvidenceAttestation = {
   version: typeof p32SupplementalEvidenceAttestationVersion;
@@ -30,8 +62,15 @@ export type P32SupplementalEvidenceFile = P32SupplementalEvidencePayload & {
 export function computeP32SupplementalEvidencePayloadHash(
   supplementalEvidence: P32SupplementalEvidencePayload
 ) {
-  return createClinicalEvidenceHash({
+  const payload = {
     automatedEvidence: supplementalEvidence.automatedEvidence,
-    approvals: supplementalEvidence.approvals
-  });
+    approvals: supplementalEvidence.approvals,
+    ...(supplementalEvidence.reviewerIdentityMappings === undefined
+      ? {}
+      : {
+          reviewerIdentityMappings:
+            supplementalEvidence.reviewerIdentityMappings
+        })
+  };
+  return createClinicalEvidenceHash(payload);
 }

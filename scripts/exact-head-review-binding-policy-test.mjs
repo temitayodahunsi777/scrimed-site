@@ -23,7 +23,8 @@ const candidate = {
   reviewPacketFingerprint: hash("d"),
   sbomFingerprint: hash("e"),
   criticalSurfaces: surfaces,
-  authorIdentityHash: hash("f")
+  authorIdentityHashes: [hash("f"), hash("8")],
+  requiredReviewerRoles: ["Principal engineer", "Security reviewer"]
 };
 const approvalBase = {
   approvalId: "approval-exact-head-001",
@@ -74,7 +75,10 @@ function verifiedIdentityFor(value) {
     approvedAt: value.issuedAt,
     approvalExpiresAt: value.expiresAt,
     attestationExpiresAt: "2026-08-09T23:55:00.000Z",
-    verifiedAt: evaluatedAt
+    verifiedAt: evaluatedAt,
+    remoteCiEvidenceHash: hash("9"),
+    specialistReviewerRoles: [...candidate.requiredReviewerRoles],
+    specialistReviewerIdentityHashes: [hash("0"), hash("7")]
   };
 }
 
@@ -141,9 +145,22 @@ assertRejected((value) => {
   value.criticalSurfaces.policyFiles = hash("6");
 }, "exact-head-review-critical-surface-stale");
 assertRejected((value) => {
-  value.reviewerIdentityHash = candidate.authorIdentityHash;
+  value.reviewerIdentityHash = candidate.authorIdentityHashes[1];
   refreshDigest(value);
 }, "exact-head-review-self-review-rejected");
+
+const specialistSelfReview = evaluateExactHeadReviewBinding({
+  candidate,
+  approval,
+  verifiedIdentityEvidence: {
+    ...verifiedIdentityFor(approval),
+    specialistReviewerIdentityHashes: [hash("0"), candidate.authorIdentityHashes[0]]
+  },
+  evaluatedAt
+});
+assert.ok(
+  specialistSelfReview.reasonCodes.includes("exact-head-review-self-review-rejected")
+);
 assertRejected((value) => {
   value.evidenceIds = value.evidenceIds.filter((id) => id !== "sbom");
 }, "exact-head-review-evidence-incomplete");
@@ -199,5 +216,5 @@ assert.ok(
 );
 
 console.log(
-  "pass exact-head review binding tests (SHA, candidate, source, critical surfaces, disposition allowlist, effective time, replay, signed-identity binding, and separation of duties)"
+  "pass exact-head review binding tests (SHA, candidate, source, critical surfaces, multi-author separation, disposition allowlist, effective time, replay, and signed-identity binding)"
 );

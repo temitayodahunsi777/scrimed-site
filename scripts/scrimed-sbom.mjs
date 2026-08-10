@@ -27,15 +27,50 @@ function stableHash(value) {
   return sha256(JSON.stringify(canonicalize(value)));
 }
 
-function gitHeadPackageJson() {
-  const result = spawnSync("git", ["show", "HEAD:package.json"], { encoding: "utf8", shell: false });
+function gitText(args) {
+  const result = spawnSync("git", args, { encoding: "utf8", shell: false });
+  return result.status === 0 ? result.stdout.trim() : null;
+}
+
+function resolveCandidateBase() {
+  const requested = process.env.SCRIMED_RELEASE_CANDIDATE_BASE_REF?.trim() || "HEAD^";
+  if (!/^[A-Za-z0-9][A-Za-z0-9._/-]{0,159}$/.test(requested) || requested.includes("..")) {
+    throw new Error("SCRIMED SBOM candidate base ref is invalid");
+  }
+  const candidateBaseSha = gitText(["rev-parse", "--verify", `${requested}^{commit}`]);
+  const headSha = gitText(["rev-parse", "--verify", "HEAD^{commit}"]);
+  if (
+    !candidateBaseSha ||
+    !headSha ||
+    !/^[0-9a-f]{40}$/.test(candidateBaseSha) ||
+    !/^[0-9a-f]{40}$/.test(headSha) ||
+    candidateBaseSha === headSha ||
+    gitText(["merge-base", "--is-ancestor", candidateBaseSha, headSha]) === null
+  ) {
+    throw new Error("SCRIMED SBOM candidate base must be an ancestor of HEAD");
+  }
+  return { candidateBaseRef: requested, candidateBaseSha, headSha };
+}
+
+function gitPackageJsonAt(commitSha) {
+  const result = spawnSync("git", ["show", `${commitSha}:package.json`], { encoding: "utf8", shell: false });
   if (result.status !== 0) return null;
   try { return JSON.parse(result.stdout); } catch { return null; }
+}
+
+function buildDependencyDelta(current, prior) {
+  const currentDependencies = { ...(current.dependencies ?? {}), ...(current.devDependencies ?? {}) };
+  const priorDependencies = { ...(prior?.dependencies ?? {}), ...(prior?.devDependencies ?? {}) };
+  return [...new Set([...Object.keys(currentDependencies), ...Object.keys(priorDependencies)])]
+    .sort()
+    .filter((name) => currentDependencies[name] !== priorDependencies[name])
+    .map((name) => ({ name, before: priorDependencies[name] ?? null, after: currentDependencies[name] ?? null }));
 }
 
 async function buildReport() {
   const packageJson = JSON.parse(await readFile("package.json", "utf8"));
   const lock = JSON.parse(await readFile("package-lock.json", "utf8"));
+  const candidateBase = resolveCandidateBase();
   const components = Object.entries(lock.packages ?? {})
     .filter(([path, record]) => path.startsWith("node_modules/") && record?.version)
     .map(([path, record]) => ({
@@ -47,13 +82,9 @@ async function buildReport() {
       purl: `pkg:npm/${encodeURIComponent(path.slice("node_modules/".length))}@${encodeURIComponent(record.version)}`
     }))
     .sort((left, right) => `${left.name}@${left.version}`.localeCompare(`${right.name}@${right.version}`));
-  const prior = gitHeadPackageJson();
-  const currentDependencies = { ...(packageJson.dependencies ?? {}), ...(packageJson.devDependencies ?? {}) };
-  const priorDependencies = { ...(prior?.dependencies ?? {}), ...(prior?.devDependencies ?? {}) };
-  const dependencyDelta = [...new Set([...Object.keys(currentDependencies), ...Object.keys(priorDependencies)])]
-    .sort()
-    .filter((name) => currentDependencies[name] !== priorDependencies[name])
-    .map((name) => ({ name, before: priorDependencies[name] ?? null, after: currentDependencies[name] ?? null }));
+  const prior = gitPackageJsonAt(candidateBase.candidateBaseSha);
+  if (!prior) throw new Error("SCRIMED SBOM candidate-base package manifest is unavailable");
+  const dependencyDelta = buildDependencyDelta(packageJson, prior);
   const bom = {
     bomFormat: "CycloneDX",
     specVersion: "1.6",
@@ -62,7 +93,9 @@ async function buildReport() {
       component: { type: "application", name: packageJson.name, version: packageJson.version },
       properties: [
         { name: "scrimed:evidence-boundary", value: "local-no-secret-no-release-authority" },
-        { name: "scrimed:synthetic-only", value: "true" }
+        { name: "scrimed:synthetic-only", value: "true" },
+        { name: "scrimed:candidate-base-sha", value: candidateBase.candidateBaseSha },
+        { name: "scrimed:candidate-head-sha", value: candidateBase.headSha }
       ]
     },
     components,
@@ -73,6 +106,9 @@ async function buildReport() {
     status: "LOCAL_SBOM_GENERATED_REVIEW_REQUIRED",
     componentCount: components.length,
     dependencyDeltaCount: dependencyDelta.length,
+    candidateBaseRef: candidateBase.candidateBaseRef,
+    candidateBaseSha: candidateBase.candidateBaseSha,
+    candidateHeadSha: candidateBase.headSha,
     packageLockHash: sha256(JSON.stringify(lock)),
     sbomHash: stableHash(bom),
     bom,
@@ -86,7 +122,14 @@ if (args.has("--self-test")) {
   const first = stableHash({ b: 2, a: 1 });
   const second = stableHash({ a: 1, b: 2 });
   if (first !== second) throw new Error("SBOM canonical hashing self-test failed");
-  console.log("pass SCRIMED deterministic SBOM hashing self-test");
+  const delta = buildDependencyDelta(
+    { dependencies: { alpha: "2", beta: "1" } },
+    { dependencies: { alpha: "1", gamma: "1" } }
+  );
+  if (delta.length !== 3 || delta[0]?.name !== "alpha") {
+    throw new Error("SBOM candidate-base dependency delta self-test failed");
+  }
+  console.log("pass SCRIMED deterministic SBOM hashing and candidate-base dependency delta self-test");
   process.exit(0);
 }
 

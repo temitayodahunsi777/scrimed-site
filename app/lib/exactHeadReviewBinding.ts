@@ -1,7 +1,7 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
 
 export const exactHeadReviewBindingVersion =
-  "scrimed-exact-head-review-binding-v3-2026-08-09";
+  "scrimed-exact-head-review-binding-v4-2026-08-10";
 
 export type ExactHeadCriticalSurfaceFingerprints = {
   securityCriticalFiles: string;
@@ -19,7 +19,8 @@ export type ExactHeadReviewCandidate = {
   reviewPacketFingerprint: string;
   sbomFingerprint: string;
   criticalSurfaces: ExactHeadCriticalSurfaceFingerprints;
-  authorIdentityHash: string;
+  authorIdentityHashes: string[];
+  requiredReviewerRoles: string[];
 };
 
 export type ExactHeadReviewDisposition =
@@ -60,6 +61,9 @@ export type ExactHeadVerifiedIdentityEvidence = {
   approvalExpiresAt: string;
   attestationExpiresAt: string;
   verifiedAt: string;
+  remoteCiEvidenceHash: string;
+  specialistReviewerRoles: string[];
+  specialistReviewerIdentityHashes: string[];
 };
 
 export type ExactHeadReviewReasonCode =
@@ -156,7 +160,8 @@ function isExactHeadReviewDisposition(
 
 function hasValidVerifiedIdentityEvidence(
   evidence: ExactHeadVerifiedIdentityEvidence | null | undefined,
-  approval: ExactHeadReviewApproval
+  approval: ExactHeadReviewApproval,
+  candidate: ExactHeadReviewCandidate
 ) {
   if (!evidence || typeof evidence !== "object" || Array.isArray(evidence)) {
     return false;
@@ -166,6 +171,10 @@ function hasValidVerifiedIdentityEvidence(
   const approvalExpiresAt = Date.parse(evidence.approvalExpiresAt);
   const attestationExpiresAt = Date.parse(evidence.attestationExpiresAt);
   const verifiedAt = Date.parse(evidence.verifiedAt);
+  const expectedRoles = [...candidate.requiredReviewerRoles].sort();
+  const verifiedRoles = Array.isArray(evidence.specialistReviewerRoles)
+    ? [...evidence.specialistReviewerRoles].sort()
+    : [];
 
   return (
     evidence.gateId === "exact-head-review" &&
@@ -179,6 +188,14 @@ function hasValidVerifiedIdentityEvidence(
     sha256Pattern.test(evidence.approvalDigest) &&
     sha256Pattern.test(evidence.signatureFingerprint) &&
     sha256Pattern.test(evidence.payloadHash) &&
+    sha256Pattern.test(evidence.remoteCiEvidenceHash) &&
+    verifiedRoles.length === expectedRoles.length &&
+    verifiedRoles.every((role, index) => role === expectedRoles[index]) &&
+    Array.isArray(evidence.specialistReviewerIdentityHashes) &&
+    evidence.specialistReviewerIdentityHashes.length === expectedRoles.length &&
+    evidence.specialistReviewerIdentityHashes.every((identityHash) =>
+      sha256Pattern.test(identityHash)
+    ) &&
     evidence.reviewerIdentityHash === approval.reviewerIdentityHash &&
     evidence.approvalDigest === approval.approvalDigest &&
     evidence.approvedAt === approval.issuedAt &&
@@ -194,6 +211,8 @@ function hasValidVerifiedIdentityEvidence(
 }
 
 function hasValidCandidate(candidate: ExactHeadReviewCandidate) {
+  const authorIdentityHashes = candidate.authorIdentityHashes;
+  const requiredReviewerRoles = candidate.requiredReviewerRoles;
   return (
     commitPattern.test(candidate.commitSha) &&
     [
@@ -201,9 +220,18 @@ function hasValidCandidate(candidate: ExactHeadReviewCandidate) {
       candidate.sourceFingerprint,
       candidate.validationFingerprint,
       candidate.reviewPacketFingerprint,
-      candidate.sbomFingerprint,
-      candidate.authorIdentityHash
+      candidate.sbomFingerprint
     ].every((value) => sha256Pattern.test(value)) &&
+    Array.isArray(authorIdentityHashes) &&
+    authorIdentityHashes.length > 0 &&
+    new Set(authorIdentityHashes).size === authorIdentityHashes.length &&
+    authorIdentityHashes.every((value) => sha256Pattern.test(value)) &&
+    Array.isArray(requiredReviewerRoles) &&
+    requiredReviewerRoles.length > 0 &&
+    new Set(requiredReviewerRoles).size === requiredReviewerRoles.length &&
+    requiredReviewerRoles.every(
+      (value) => typeof value === "string" && Boolean(value.trim())
+    ) &&
     hasValidCriticalSurfaces(candidate.criticalSurfaces)
   );
 }
@@ -290,13 +318,25 @@ export function evaluateExactHeadReviewBinding(input: {
   if (!approvalFieldsValid) {
     reasons.push("exact-head-review-approval-invalid");
   }
-  if (approval.reviewerIdentityHash === input.candidate.authorIdentityHash) {
+  const authorIdentityHashes = new Set(input.candidate.authorIdentityHashes);
+  if (
+    authorIdentityHashes.has(approval.reviewerIdentityHash) ||
+    input.verifiedIdentityEvidence?.specialistReviewerIdentityHashes?.some(
+      (identityHash) => authorIdentityHashes.has(identityHash)
+    )
+  ) {
     reasons.push("exact-head-review-self-review-rejected");
   }
   if (consumedApprovalIds.has(approval.approvalId) || consumedApprovalIds.has(approval.replayNonce)) {
     reasons.push("exact-head-review-replay-rejected");
   }
-  if (!hasValidVerifiedIdentityEvidence(input.verifiedIdentityEvidence, approval)) {
+  if (
+    !hasValidVerifiedIdentityEvidence(
+      input.verifiedIdentityEvidence,
+      approval,
+      input.candidate
+    )
+  ) {
     reasons.push("exact-head-review-untrusted-identity");
   }
   if (Number.isFinite(expiresAt) && Number.isFinite(evaluatedAtMs) && expiresAt <= evaluatedAtMs) {

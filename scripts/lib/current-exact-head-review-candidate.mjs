@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { createClinicalEvidenceHash } from "../../app/lib/clinicalEvidenceControls.ts";
 
 export const currentExactHeadReviewCandidateVersion =
-  "scrimed-current-exact-head-review-candidate-v1-2026-08-10";
+  "scrimed-current-exact-head-review-candidate-v2-2026-08-10";
 
 const repository = "temitayodahunsi777/scrimed-site";
 const commitPattern = /^[0-9a-f]{40}$/;
@@ -28,11 +28,11 @@ function runGitText(args) {
   return result.stdout.trim();
 }
 
-function runJsonScript(path, args = []) {
+function runJsonScript(path, args = [], envOverrides = {}) {
   const result = spawnSync(process.execPath, [path, ...args], {
     encoding: "utf8",
     shell: false,
-    env: process.env,
+    env: { ...process.env, ...envOverrides },
     maxBuffer: 64 * 1024 * 1024
   });
   requireCondition(result.status === 0, "exact-head-current-evidence-command-failed");
@@ -61,23 +61,65 @@ export function inspectCheckedOutSource() {
   const status = runGitText(["status", "--porcelain=v1", "--untracked-files=all"]);
   const commitSha = runGitText(["rev-parse", "HEAD"]);
   const treeSha = runGitText(["rev-parse", "HEAD^{tree}"]);
-  const authorName = runGitText(["show", "-s", "--format=%an", "HEAD"]);
-  const authorEmail = runGitText(["show", "-s", "--format=%ae", "HEAD"]);
-  const githubSubject = githubAuthorSubject(authorEmail);
-
   return {
     clean: status.length === 0,
     commitSha,
-    treeSha,
-    authorIdentityHash: createClinicalEvidenceHash(
-      githubSubject
-        ? { identityProvider: "github", authorSubject: githubSubject }
-        : {
-            identityProvider: "git-commit-author",
-            authorName,
-            authorEmail
-          }
-    )
+    treeSha
+  };
+}
+
+export function inspectCandidateAuthorIdentities(candidateBaseSha, headSha) {
+  requireCondition(
+    commitPattern.test(candidateBaseSha) && commitPattern.test(headSha),
+    "exact-head-current-author-range-invalid"
+  );
+  const log = runGitText([
+    "log",
+    "--format=%an%x1f%ae%x1e",
+    `${candidateBaseSha}..${headSha}`
+  ]);
+  const authors = log
+    .split("\x1e")
+    .map((record) => record.trim())
+    .filter(Boolean)
+    .map((record) => {
+      const [authorName, authorEmail] = record.split("\x1f");
+      requireCondition(
+        Boolean(authorName?.trim()) && Boolean(authorEmail?.trim()),
+        "exact-head-current-author-identity-invalid"
+      );
+      return { authorName: authorName.trim(), authorEmail: authorEmail.trim() };
+    });
+  requireCondition(authors.length > 0, "exact-head-current-author-range-empty");
+
+  const identityHashes = new Set();
+  for (const author of authors) {
+    identityHashes.add(
+      createClinicalEvidenceHash({
+        identityProvider: "git-commit-author",
+        authorName: author.authorName,
+        authorEmail: author.authorEmail.toLowerCase()
+      })
+    );
+    const githubSubject = githubAuthorSubject(author.authorEmail);
+    if (githubSubject) {
+      identityHashes.add(
+        createClinicalEvidenceHash({
+          identityProvider: "github",
+          authorSubject: githubSubject
+        })
+      );
+    }
+  }
+
+  return {
+    commitAuthorCount: new Set(
+      authors.map(
+        ({ authorName, authorEmail }) =>
+          `${authorName}\x1f${authorEmail.toLowerCase()}`
+      )
+    ).size,
+    authorIdentityHashes: [...identityHashes].sort()
   };
 }
 
@@ -96,7 +138,11 @@ export function buildCurrentExactHeadReviewCandidate({
     "exact-head-current-source-unavailable"
   );
   requireCondition(
-    sha256Pattern.test(sourceState.authorIdentityHash),
+    Array.isArray(sourceState.authorIdentityHashes) &&
+      sourceState.authorIdentityHashes.length > 0 &&
+      new Set(sourceState.authorIdentityHashes).size ===
+        sourceState.authorIdentityHashes.length &&
+      sourceState.authorIdentityHashes.every((value) => sha256Pattern.test(value)),
     "exact-head-current-author-identity-invalid"
   );
   requireCondition(isObject(manifest), "exact-head-current-manifest-invalid");
@@ -135,6 +181,12 @@ export function buildCurrentExactHeadReviewCandidate({
       reviewPacket.candidateDigestSha256 === manifest.candidateDigestSha256 &&
       reviewPacket.sourceCandidateDigestSha256 ===
         manifest.sourceCandidateDigestSha256 &&
+      Array.isArray(reviewPacket.reviewerRoles) &&
+      reviewPacket.reviewerRoles.length > 0 &&
+      new Set(reviewPacket.reviewerRoles).size === reviewPacket.reviewerRoles.length &&
+      reviewPacket.reviewerRoles.every(
+        (role) => typeof role === "string" && Boolean(role.trim())
+      ) &&
       sha256Pattern.test(reviewPacket.candidateReviewPacketSha256),
     "exact-head-current-review-packet-mismatch"
   );
@@ -143,6 +195,7 @@ export function buildCurrentExactHeadReviewCandidate({
       sha256Pattern.test(sbom.sbomHash) &&
       Number.isInteger(sbom.componentCount) &&
       sbom.componentCount > 0 &&
+      sbom.candidateBaseSha === manifest.candidateBaseSha &&
       sbom.dependencyDeltaCount === 0,
     "exact-head-current-sbom-invalid"
   );
@@ -207,12 +260,15 @@ export function buildCurrentExactHeadReviewCandidate({
           productionAutoDeployFromMainEnabled
         })
       },
-      authorIdentityHash: sourceState.authorIdentityHash
+      authorIdentityHashes: [...sourceState.authorIdentityHashes],
+      requiredReviewerRoles: [...reviewPacket.reviewerRoles].sort()
     },
     validation: {
-      ciPassed:
+      localValidationPassed:
         validation.automatedValidationPassed === true &&
         validation.failedChecks.length === 0,
+      ciPassed: false,
+      remoteCiEvidenceRequired: true,
       secretScanPassed: checkPassed(validation, "secret-scan"),
       sbomPassed:
         checkPassed(validation, "sbom") && sbom.dependencyDeltaCount === 0,
@@ -227,6 +283,8 @@ export function buildCurrentExactHeadReviewCandidate({
       changedFileCount: manifest.changedFileCount,
       reviewableFileCount: reviewPacket.reviewableFileCount,
       rejectedFileCount: reviewPacket.rejectedFileCount,
+      requiredReviewerRoleCount: reviewPacket.reviewerRoles.length,
+      commitAuthorCount: sourceState.commitAuthorCount,
       validationCheckCount: validation.checkCount,
       sbomComponentCount: sbom.componentCount
     }
@@ -238,23 +296,37 @@ export async function loadCurrentExactHeadReviewCandidate(options = {}) {
     return buildCurrentExactHeadReviewCandidate(options.currentCandidateEvidence);
   }
 
-  const validation = runJsonScript("scripts/release-candidate-validation.mjs", [
-    "--json",
-    "--strict"
-  ]);
   const manifest = runJsonScript("scripts/release-candidate-manifest.mjs", [
     "--json",
     "--strict"
   ]);
+  const candidateEnvironment = {
+    SCRIMED_RELEASE_CANDIDATE_BASE_REF: manifest.candidateBaseSha
+  };
+  const validation = runJsonScript(
+    "scripts/release-candidate-validation.mjs",
+    ["--json", "--strict"],
+    candidateEnvironment
+  );
   const reviewPacket = runJsonScript(
     "scripts/release-candidate-review-packet.mjs",
-    ["--json", "--strict"]
+    ["--json", "--strict"],
+    candidateEnvironment
   );
-  const sbom = runJsonScript("scripts/scrimed-sbom.mjs", ["--json", "--verify"]);
+  const sbom = runJsonScript(
+    "scripts/scrimed-sbom.mjs",
+    ["--json", "--verify"],
+    candidateEnvironment
+  );
   const vercelConfiguration = JSON.parse(await readFile("vercel.json", "utf8"));
+  const sourceState = inspectCheckedOutSource();
+  const authorState = inspectCandidateAuthorIdentities(
+    manifest.candidateBaseSha,
+    sourceState.commitSha
+  );
 
   return buildCurrentExactHeadReviewCandidate({
-    sourceState: inspectCheckedOutSource(),
+    sourceState: { ...sourceState, ...authorState },
     manifest,
     validation,
     reviewPacket,

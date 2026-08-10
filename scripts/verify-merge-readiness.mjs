@@ -11,7 +11,15 @@ import {
 import { evaluateMergeReadiness } from "../app/lib/mergeReadiness.ts";
 import { getScrimedOperatingModeSummary } from "../app/lib/operatingMode.ts";
 import {
+  createP32ApprovalEvidence,
+  createP32AutomatedGateEvidence,
+  evaluateP32ApprovalEvidence,
+  evaluateP32AutomatedGateEvidence
+} from "../app/lib/scrimedP32ReleaseGates.ts";
+import {
+  computeP32ReviewerIdentityMappingHash,
   computeP32SupplementalEvidencePayloadHash,
+  createP32ReviewerIdentityMapping,
   p32EvidenceTrustRegistryVersion,
   p32SupplementalEvidenceAttestationVersion,
   verifyP32SupplementalEvidenceAttestation
@@ -28,6 +36,7 @@ import {
 } from "./lib/current-exact-head-review-candidate.mjs";
 
 const sha256Pattern = /^[0-9a-f]{64}$/;
+const exactHeadRemoteCiEvidenceId = "exact-head-remote-ci";
 
 function isObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -90,8 +99,132 @@ function approvalEvidenceMatches(approval, evidence) {
   );
 }
 
+function expectedFingerprintsForCandidate(candidate) {
+  return {
+    sourceCommit: candidate.commitSha,
+    sourceTree: candidate.sourceFingerprint,
+    artifact: candidate.candidateFingerprint,
+    validationEvidence: candidate.validationFingerprint,
+    reviewPacket: candidate.reviewPacketFingerprint
+  };
+}
+
+function verifyRemoteCiEvidence(evidence, candidate, evaluatedAt) {
+  if (
+    !isObject(evidence) ||
+    evidence.evidenceId !== exactHeadRemoteCiEvidenceId ||
+    evidence.identityAssurance !== "protected-remote-ci"
+  ) {
+    return false;
+  }
+  return evaluateP32AutomatedGateEvidence(evidence, {
+    expectedFingerprints: expectedFingerprintsForCandidate(candidate),
+    evaluatedAt
+  }).valid;
+}
+
+function verifySpecialistDispositions(evidence, candidate, evaluatedAt) {
+  if (!Array.isArray(evidence)) return null;
+  const requiredRoles = [...candidate.requiredReviewerRoles].sort();
+  const dispositions = evidence.filter(
+    (entry) => entry?.gateId === "named-reviewer-approval"
+  );
+  if (
+    dispositions.length !== requiredRoles.length ||
+    dispositions.some(
+      (entry) =>
+        !requiredRoles.includes(entry.reviewerRole) ||
+        entry.identityAssurance !== "aal2-protected-workspace"
+    ) ||
+    new Set(dispositions.map((entry) => entry.reviewerRole)).size !==
+      requiredRoles.length ||
+    new Set(dispositions.map((entry) => entry.approvalId)).size !==
+      requiredRoles.length
+  ) {
+    return null;
+  }
+
+  const expectedFingerprints = expectedFingerprintsForCandidate(candidate);
+  if (
+    dispositions.some(
+      (entry) =>
+        !evaluateP32ApprovalEvidence(entry, {
+          expectedFingerprints,
+          evaluatedAt
+        }).valid
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    roles: dispositions.map((entry) => entry.reviewerRole).sort(),
+    reviewerIdentityHashes: dispositions.map((entry) => entry.reviewerId)
+  };
+}
+
+function verifyReviewerIdentityMappings(
+  mappings,
+  reviewerIdentityHashes,
+  candidate,
+  evaluatedAt
+) {
+  if (!Array.isArray(mappings)) return { valid: false, selfReview: false };
+  const requiredReviewerHashes = [...new Set(reviewerIdentityHashes)].sort();
+  if (
+    mappings.length !== requiredReviewerHashes.length ||
+    new Set(mappings.map((mapping) => mapping?.reviewerIdentityHash)).size !==
+      requiredReviewerHashes.length
+  ) {
+    return { valid: false, selfReview: false };
+  }
+
+  const candidateAuthorHashes = new Set(candidate.authorIdentityHashes);
+  let selfReview = false;
+  for (const mapping of mappings) {
+    if (
+      !isObject(mapping) ||
+      !requiredReviewerHashes.includes(mapping.reviewerIdentityHash) ||
+      !sha256Pattern.test(mapping.reviewerIdentityHash) ||
+      !Array.isArray(mapping.comparableIdentityHashes) ||
+      mapping.comparableIdentityHashes.length === 0 ||
+      new Set(mapping.comparableIdentityHashes).size !==
+        mapping.comparableIdentityHashes.length ||
+      !mapping.comparableIdentityHashes.every((value) =>
+        sha256Pattern.test(value)
+      ) ||
+      !mapping.comparableIdentityHashes.includes(mapping.reviewerIdentityHash) ||
+      typeof mapping.evidencePointer !== "string" ||
+      !mapping.evidencePointer.trim() ||
+      !Number.isFinite(Date.parse(mapping.mappedAt)) ||
+      !Number.isFinite(Date.parse(mapping.expiresAt)) ||
+      Date.parse(mapping.mappedAt) > Date.parse(evaluatedAt) ||
+      Date.parse(mapping.expiresAt) <= Date.parse(evaluatedAt) ||
+      !sha256Pattern.test(mapping.mappingHash)
+    ) {
+      return { valid: false, selfReview: false };
+    }
+    const { mappingHash, ...mappingPayload } = mapping;
+    if (
+      computeP32ReviewerIdentityMappingHash(mappingPayload) !== mappingHash
+    ) {
+      return { valid: false, selfReview: false };
+    }
+    if (
+      mapping.comparableIdentityHashes.some((identityHash) =>
+        candidateAuthorHashes.has(identityHash)
+      )
+    ) {
+      selfReview = true;
+    }
+  }
+
+  return { valid: true, selfReview };
+}
+
 function verifyApprovalDocument({
   document,
+  candidate,
   trustedPublicKeysJson,
   evaluatedAt
 }) {
@@ -99,6 +232,7 @@ function verifyApprovalDocument({
     return {
       approval: null,
       verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
       verificationError: "exact-head-approval-file-invalid"
     };
   }
@@ -108,6 +242,7 @@ function verifyApprovalDocument({
     return {
       approval,
       verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
       verificationError: "exact-head-review-identity-attestation-missing"
     };
   }
@@ -115,23 +250,84 @@ function verifyApprovalDocument({
   const { attestation, ...supplementalEvidence } = document.identityEvidence;
   if (
     !Array.isArray(supplementalEvidence.automatedEvidence) ||
-    supplementalEvidence.automatedEvidence.length !== 0 ||
-    !Array.isArray(supplementalEvidence.approvals) ||
-    supplementalEvidence.approvals.length !== 1
+    !Array.isArray(supplementalEvidence.approvals)
   ) {
     return {
       approval,
       verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
       verificationError: "exact-head-review-identity-evidence-invalid"
     };
   }
 
-  const approvalEvidence = supplementalEvidence.approvals[0];
+  const exactHeadApprovals = supplementalEvidence.approvals.filter(
+    (entry) => entry?.gateId === "exact-head-review"
+  );
+  const approvalEvidence = exactHeadApprovals[0];
+  if (
+    exactHeadApprovals.length !== 1 ||
+    supplementalEvidence.approvals.length !==
+      candidate.requiredReviewerRoles.length + 1
+  ) {
+    return {
+      approval,
+      verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
+      verificationError: "exact-head-review-specialist-dispositions-incomplete"
+    };
+  }
   if (!approvalEvidenceMatches(approval, approvalEvidence)) {
     return {
       approval,
       verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
       verificationError: "exact-head-review-identity-evidence-mismatch"
+    };
+  }
+
+  const specialistDispositions = verifySpecialistDispositions(
+    supplementalEvidence.approvals,
+    candidate,
+    evaluatedAt
+  );
+  if (!specialistDispositions) {
+    return {
+      approval,
+      verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
+      verificationError: "exact-head-review-specialist-dispositions-incomplete"
+    };
+  }
+
+  const identityMappingResult = verifyReviewerIdentityMappings(
+    supplementalEvidence.reviewerIdentityMappings,
+    [approvalEvidence.reviewerId, ...specialistDispositions.reviewerIdentityHashes],
+    candidate,
+    evaluatedAt
+  );
+  if (!identityMappingResult.valid || identityMappingResult.selfReview) {
+    return {
+      approval,
+      verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
+      verificationError: identityMappingResult.selfReview
+        ? "exact-head-review-self-review-rejected"
+        : "exact-head-review-identity-mapping-required"
+    };
+  }
+
+  const remoteCiEvidence = supplementalEvidence.automatedEvidence.find(
+    (entry) => entry?.evidenceId === exactHeadRemoteCiEvidenceId
+  );
+  if (
+    supplementalEvidence.automatedEvidence.length !== 1 ||
+    !verifyRemoteCiEvidence(remoteCiEvidence, candidate, evaluatedAt)
+  ) {
+    return {
+      approval,
+      verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
+      verificationError: "exact-head-review-remote-ci-evidence-required"
     };
   }
 
@@ -161,14 +357,20 @@ function verifyApprovalDocument({
         approvedAt: approvalEvidence.approvedAt,
         approvalExpiresAt: approvalEvidence.expiresAt,
         attestationExpiresAt: verified.expiresAt,
-        verifiedAt: verified.verifiedAt
+        verifiedAt: verified.verifiedAt,
+        remoteCiEvidenceHash: remoteCiEvidence.evidenceHash,
+        specialistReviewerRoles: specialistDispositions.roles,
+        specialistReviewerIdentityHashes:
+          specialistDispositions.reviewerIdentityHashes
       },
+      remoteCiVerified: true,
       verificationError: null
     };
   } catch {
     return {
       approval,
       verifiedIdentityEvidence: null,
+      remoteCiVerified: false,
       verificationError: "exact-head-review-identity-attestation-invalid"
     };
   }
@@ -190,9 +392,10 @@ async function buildCurrentMergeReadinessContext(options = {}) {
     ? { document: options.approvalDocument, loadError: null }
     : await loadApprovalFile(approvalPath);
   const verifiedDocument = loaded.document
-    ? verifyApprovalDocument({
-        document: loaded.document,
-        trustedPublicKeysJson:
+      ? verifyApprovalDocument({
+          document: loaded.document,
+          candidate,
+          trustedPublicKeysJson:
           options.trustedPublicKeysJson ??
           process.env.SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON,
         evaluatedAt: options.evaluatedAt ?? new Date().toISOString()
@@ -200,6 +403,7 @@ async function buildCurrentMergeReadinessContext(options = {}) {
     : {
         approval: null,
         verifiedIdentityEvidence: null,
+        remoteCiVerified: false,
         verificationError: null
       };
   const consumptionState = await inspectExactHeadApprovalConsumption({
@@ -230,7 +434,9 @@ async function buildCurrentMergeReadinessContext(options = {}) {
       consumptionState.ready &&
       reviewBinding.approved &&
       reviewBinding.status === "APPROVED_EXACT_HEAD",
-    ciPassed: currentCandidate.validation.ciPassed,
+    ciPassed:
+      currentCandidate.validation.localValidationPassed === true &&
+      verifiedDocument.remoteCiVerified === true,
     secretScanPassed: currentCandidate.validation.secretScanPassed,
     sbomPassed: currentCandidate.validation.sbomPassed,
     publicClaimsPassed: currentCandidate.validation.publicClaimsPassed,
@@ -333,7 +539,7 @@ export async function evaluateCurrentMergeReadiness(options = {}) {
   }
 }
 
-function buildSelfTestTrustContext(approval) {
+function buildSelfTestTrustContext(approval, candidate, options = {}) {
   const issuer = "scrimed-exact-head-self-test-issuer";
   const keyId = "scrimed-exact-head-self-test-key";
   const { privateKey, publicKey } = generateKeyPairSync("ed25519");
@@ -356,9 +562,66 @@ function buildSelfTestTrustContext(approval) {
     releaseAuthorityGranted: false,
     decisionHash: approval.approvalDigest
   };
+  const specialistApprovals = candidate.requiredReviewerRoles.map(
+    (reviewerRole, index) =>
+      createP32ApprovalEvidence({
+        approvalId: `merge-readiness-specialist-${index}`,
+        gateId: "named-reviewer-approval",
+        reviewerId: `${index + 1}`.repeat(64).slice(0, 64),
+        reviewerRole,
+        identityAssurance: "aal2-protected-workspace",
+        tenantScopeHash: approval.sourceFingerprint,
+        decision: "approved",
+        sourceCommit: approval.commitSha,
+        sourceTreeFingerprint: approval.sourceFingerprint,
+        artifactFingerprint: approval.candidateFingerprint,
+        validationEvidenceFingerprint: approval.validationFingerprint,
+        reviewPacketFingerprint: approval.reviewPacketFingerprint,
+        evidencePointer: `self-test:specialist:${index}`,
+        approvedAt: approval.issuedAt,
+        expiresAt: approval.expiresAt,
+        releaseAuthorityGranted: false
+      })
+  );
+  const remoteCiEvidence = createP32AutomatedGateEvidence({
+    evidenceId: exactHeadRemoteCiEvidenceId,
+    status: "passed",
+    sourceCommit: candidate.commitSha,
+    sourceTreeFingerprint: candidate.sourceFingerprint,
+    artifactFingerprint: candidate.candidateFingerprint,
+    validationEvidenceFingerprint: candidate.validationFingerprint,
+    identityAssurance: "protected-remote-ci",
+    generatedAt: "2026-08-09T22:30:00.000Z",
+    checkedAt: "2026-08-09T22:50:00.000Z",
+    expiresAt: "2026-08-10T22:00:00.000Z",
+    evidencePointer: "self-test:remote-ci"
+  });
+  const reviewerIdentityMappings = [
+    approvalEvidence.reviewerId,
+    ...specialistApprovals.map((entry) => entry.reviewerId)
+  ].map((reviewerIdentityHash, index) =>
+    createP32ReviewerIdentityMapping({
+      reviewerIdentityHash,
+      comparableIdentityHashes:
+        index === 0 && options.reviewerAliasIdentityHash
+          ? [reviewerIdentityHash, options.reviewerAliasIdentityHash]
+          : [reviewerIdentityHash],
+      evidencePointer: `self-test:identity-map:${index}`,
+      mappedAt: "2026-08-09T22:45:00.000Z",
+      expiresAt: "2026-08-10T22:00:00.000Z"
+    })
+  );
   const supplementalEvidence = {
-    automatedEvidence: [],
-    approvals: [approvalEvidence]
+    automatedEvidence:
+      options.includeRemoteCi === false ? [] : [remoteCiEvidence],
+    approvals:
+      options.includeSpecialists === false
+        ? [approvalEvidence]
+        : [approvalEvidence, ...specialistApprovals],
+    reviewerIdentityMappings:
+      options.includeIdentityMappings === false
+        ? undefined
+        : reviewerIdentityMappings
   };
   const payloadHash = computeP32SupplementalEvidencePayloadHash(
     supplementalEvidence
@@ -395,9 +658,16 @@ function buildSelfTestTrustContext(approval) {
         notBefore: "2026-08-09T00:00:00.000Z",
         expiresAt: "2026-08-11T00:00:00.000Z",
         publicKeyPem: publicKey.export({ type: "spki", format: "pem" }),
-        allowedAutomatedEvidenceIds: [],
-        allowedApprovalGateIds: ["exact-head-review"],
-        allowedIdentityAssurance: ["qualified-external-reference"]
+        allowedAutomatedEvidenceIds: [exactHeadRemoteCiEvidenceId],
+        allowedApprovalGateIds: [
+          "exact-head-review",
+          "named-reviewer-approval"
+        ],
+        allowedIdentityAssurance: [
+          "qualified-external-reference",
+          "aal2-protected-workspace",
+          "protected-remote-ci"
+        ]
       }
     }
   });
@@ -410,7 +680,8 @@ function buildSelfTestCurrentCandidateResult() {
     clean: true,
     commitSha: "f".repeat(40),
     treeSha: "e".repeat(40),
-    authorIdentityHash: "b".repeat(64)
+    authorIdentityHashes: ["b".repeat(64), "c".repeat(64)],
+    commitAuthorCount: 2
   };
   const manifest = {
     strictProvenanceEligible: true,
@@ -452,7 +723,8 @@ function buildSelfTestCurrentCandidateResult() {
     candidateDigestSha256: manifest.candidateDigestSha256,
     sourceCandidateDigestSha256: manifest.sourceCandidateDigestSha256,
     candidateReviewPacketSha256: "4".repeat(64),
-    reviewableFileCount: 1
+    reviewableFileCount: 1,
+    reviewerRoles: ["Principal engineer", "Security reviewer"]
   };
 
   return buildCurrentExactHeadReviewCandidate({
@@ -463,7 +735,8 @@ function buildSelfTestCurrentCandidateResult() {
     sbom: {
       sbomHash: "5".repeat(64),
       componentCount: 1,
-      dependencyDeltaCount: 0
+      dependencyDeltaCount: 0,
+      candidateBaseSha: manifest.candidateBaseSha
     },
     vercelConfiguration: {
       git: { deploymentEnabled: { main: false } }
@@ -537,7 +810,7 @@ export async function runMergeReadinessSelfTest() {
     ...approvalBase,
     approvalDigest: createExactHeadApprovalDigest(approvalBase)
   };
-  const trusted = buildSelfTestTrustContext(approval);
+  const trusted = buildSelfTestTrustContext(approval, candidate);
   const verifiedInput = await buildCurrentMergeReadinessInput({
     ...trusted,
     currentCandidateResult,
@@ -547,6 +820,68 @@ export async function runMergeReadinessSelfTest() {
   assert.equal(verifiedInput.exactHeadApproval, true);
   assert.equal(verifiedInput.exactHeadApprovalMatches, true);
   assert.equal(verifiedInput.reviewBindingStatus, "APPROVED_EXACT_HEAD");
+  assert.equal(verifiedInput.ciPassed, true);
+
+  const localOnlyInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(approval, candidate, {
+      includeRemoteCi: false
+    }),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(localOnlyInput.ciPassed, false);
+  assert.equal(localOnlyInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    localOnlyInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-remote-ci-evidence-required"
+    )
+  );
+
+  const incompleteSpecialistInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(approval, candidate, {
+      includeSpecialists: false
+    }),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(incompleteSpecialistInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    incompleteSpecialistInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-specialist-dispositions-incomplete"
+    )
+  );
+
+  const unmappedReviewerInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(approval, candidate, {
+      includeIdentityMappings: false
+    }),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(unmappedReviewerInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    unmappedReviewerInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-identity-mapping-required"
+    )
+  );
+
+  const aliasedAuthorInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(approval, candidate, {
+      reviewerAliasIdentityHash: candidate.authorIdentityHashes[0]
+    }),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(aliasedAuthorInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    aliasedAuthorInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-self-review-rejected"
+    )
+  );
 
   const missingLedgerInput = await buildCurrentMergeReadinessInput({
     ...trusted,
@@ -569,7 +904,7 @@ export async function runMergeReadinessSelfTest() {
     approvalDigest: createExactHeadApprovalDigest(unknownDispositionBase)
   };
   const invalidInput = await buildCurrentMergeReadinessInput({
-    ...buildSelfTestTrustContext(unknownDispositionApproval),
+    ...buildSelfTestTrustContext(unknownDispositionApproval, candidate),
     currentCandidateResult,
     requireConsumptionLedger: false,
     evaluatedAt: "2026-08-09T23:00:00.000Z"
@@ -625,7 +960,7 @@ export async function runMergeReadinessSelfTest() {
     approvalDigest: createExactHeadApprovalDigest(staleApprovalBase)
   };
   const staleBaselineInput = await buildCurrentMergeReadinessInput({
-    ...buildSelfTestTrustContext(staleApproval),
+    ...buildSelfTestTrustContext(staleApproval, staleCandidate),
     currentCandidateResult,
     requireConsumptionLedger: false,
     evaluatedAt: "2026-08-09T23:00:00.000Z"
@@ -641,7 +976,7 @@ export async function runMergeReadinessSelfTest() {
   await runExactHeadApprovalConsumptionLedgerSelfTest();
 
   console.log(
-    "pass merge-readiness verifier self-test (checked-out-head candidate binding, stale frozen-baseline rejection, trusted Ed25519 artifact, durable one-use consumption, replay rejection, forged unsigned rejection, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
+    "pass merge-readiness verifier self-test (current-head binding, all-role dispositions, trusted remote CI, reviewer identity mapping, multi-author separation, durable one-use consumption, supply chain, claims, migrations, operating mode, and production auto-deploy)"
   );
 }
 

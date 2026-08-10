@@ -97,6 +97,34 @@ assert.match(
   /validation\.validationEvidenceHashSha256/
 );
 assert.match(
+  files["scripts/lib/current-exact-head-review-candidate.mjs"],
+  /inspectCandidateAuthorIdentities/
+);
+assert.match(
+  files["scripts/lib/current-exact-head-review-candidate.mjs"],
+  /sbom\.candidateBaseSha === manifest\.candidateBaseSha/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /exact-head-review-specialist-dispositions-incomplete/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /exact-head-review-remote-ci-evidence-required/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /verifyReviewerIdentityMappings/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /currentCandidate\.validation\.localValidationPassed/
+);
+assert.doesNotMatch(
+  files["scripts/verify-merge-readiness.mjs"],
+  /ciPassed:\s*currentCandidate\.validation\.ciPassed/
+);
+assert.match(
   files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
   /O_EXCL/
 );

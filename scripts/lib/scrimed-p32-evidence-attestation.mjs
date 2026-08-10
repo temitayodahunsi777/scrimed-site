@@ -6,13 +6,17 @@ import {
 } from "node:crypto";
 
 import {
+  computeP32ReviewerIdentityMappingHash,
   computeP32SupplementalEvidencePayloadHash,
+  createP32ReviewerIdentityMapping,
   p32EvidenceTrustRegistryVersion,
   p32SupplementalEvidenceAttestationVersion
 } from "../../app/lib/scrimedP32EvidenceAttestation.ts";
 
 export {
+  computeP32ReviewerIdentityMappingHash,
   computeP32SupplementalEvidencePayloadHash,
+  createP32ReviewerIdentityMapping,
   p32EvidenceTrustRegistryVersion,
   p32SupplementalEvidenceAttestationVersion
 };
@@ -170,7 +174,9 @@ export function verifyP32SupplementalEvidenceAttestation({
   const payloadHash = computeP32SupplementalEvidencePayloadHash(supplementalEvidence);
   const hasEvidence =
     supplementalEvidence.automatedEvidence.length > 0 ||
-    supplementalEvidence.approvals.length > 0;
+    supplementalEvidence.approvals.length > 0 ||
+    (Array.isArray(supplementalEvidence.reviewerIdentityMappings) &&
+      supplementalEvidence.reviewerIdentityMappings.length > 0);
   if (!hasEvidence && attestation === undefined) return null;
   if (!isObject(attestation)) {
     reject("non-empty evidence requires an issuer attestation");
