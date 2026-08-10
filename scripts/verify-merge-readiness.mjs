@@ -2,7 +2,9 @@
 
 import assert from "node:assert/strict";
 import { generateKeyPairSync, sign } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import {
   createExactHeadApprovalDigest,
@@ -20,6 +22,10 @@ import {
   p32SupplementalEvidenceAttestationVersion,
   verifyP32SupplementalEvidenceAttestation
 } from "./lib/scrimed-p32-evidence-attestation.mjs";
+import {
+  consumeExactHeadApproval,
+  inspectExactHeadApprovalConsumption
+} from "./lib/exact-head-approval-consumption-ledger.mjs";
 
 const sha256Pattern = /^[0-9a-f]{64}$/;
 
@@ -168,7 +174,7 @@ function verifyApprovalDocument({
   }
 }
 
-export async function buildCurrentMergeReadinessInput(options = {}) {
+async function buildCurrentMergeReadinessContext(options = {}) {
   const baseline = getPr25FrozenReviewBaseline();
   const candidate = getPr25ExactHeadReviewCandidate();
   const operatingMode = getScrimedOperatingModeSummary().mode;
@@ -193,17 +199,34 @@ export async function buildCurrentMergeReadinessInput(options = {}) {
         verifiedIdentityEvidence: null,
         verificationError: null
       };
+  const consumptionState = await inspectExactHeadApprovalConsumption({
+    approval: verifiedDocument.approval,
+    ledgerDirectory:
+      options.consumptionLedgerDirectory ??
+      process.env.SCRIMED_EXACT_HEAD_CONSUMPTION_LEDGER_DIR,
+    required:
+      options.requireConsumptionLedger ?? Boolean(verifiedDocument.approval)
+  });
   const reviewBinding = evaluateExactHeadReviewBinding({
     candidate,
     approval: verifiedDocument.approval,
     verifiedIdentityEvidence: verifiedDocument.verifiedIdentityEvidence,
+    consumedApprovalIds: consumptionState.consumedApprovalIds,
     evaluatedAt: options.evaluatedAt
   });
-
-  return {
+  const approvalConsumptionState = !verifiedDocument.approval
+    ? "not-applicable"
+    : !consumptionState.ready
+      ? "unavailable"
+      : consumptionState.consumed
+        ? "consumed"
+        : "available";
+  const input = {
     exactHeadApproval: Boolean(verifiedDocument.approval),
     exactHeadApprovalMatches:
-      reviewBinding.approved && reviewBinding.status === "APPROVED_EXACT_HEAD",
+      consumptionState.ready &&
+      reviewBinding.approved &&
+      reviewBinding.status === "APPROVED_EXACT_HEAD",
     ciPassed:
       baseline.validation.githubActionsPassed === baseline.validation.githubActionsTotal,
     secretScanPassed: baseline.validation.secretScanFindings === 0,
@@ -218,15 +241,82 @@ export async function buildCurrentMergeReadinessInput(options = {}) {
     customerActivationEnabled: false,
     productionAutoDeployFromMainEnabled:
       vercel?.git?.deploymentEnabled?.main !== false,
-    reviewBindingStatus: reviewBinding.status,
+    reviewBindingStatus:
+      verifiedDocument.approval && !consumptionState.ready
+        ? "BLOCKED"
+        : reviewBinding.status,
     reviewBindingReasonCodes: [
       ...(loaded.loadError ? [loaded.loadError] : []),
       ...(verifiedDocument.verificationError
         ? [verifiedDocument.verificationError]
         : []),
+      ...(consumptionState.errorCode ? [consumptionState.errorCode] : []),
       ...reviewBinding.reasonCodes
     ],
-    reviewedCommitSha: reviewBinding.approvedCommitSha
+    reviewedCommitSha:
+      consumptionState.ready && !consumptionState.consumed
+        ? reviewBinding.approvedCommitSha
+        : null,
+    approvalConsumptionLedgerConfigured: consumptionState.configured,
+    approvalConsumptionLedgerReady: consumptionState.ready,
+    approvalConsumptionState,
+    approvalConsumptionLedgerFingerprint:
+      consumptionState.ledgerDirectoryFingerprint
+  };
+
+  return {
+    input,
+    approval: verifiedDocument.approval,
+    identityVerified: Boolean(verifiedDocument.verifiedIdentityEvidence),
+    consumptionState
+  };
+}
+
+export async function buildCurrentMergeReadinessInput(options = {}) {
+  return (await buildCurrentMergeReadinessContext(options)).input;
+}
+
+export async function evaluateCurrentMergeReadiness(options = {}) {
+  const context = await buildCurrentMergeReadinessContext(options);
+  let input = context.input;
+  let result = evaluateMergeReadiness(input);
+  let consumptionReceipt = {
+    consumed: false,
+    replayRejected: false,
+    receiptHash: null,
+    errorCode: null
+  };
+
+  if (options.consumeApproval === true && result.ready) {
+    consumptionReceipt = await consumeExactHeadApproval({
+      approval: context.approval,
+      consumptionState: context.consumptionState,
+      consumedAt: options.consumedAt
+    });
+    if (!consumptionReceipt.consumed) {
+      input = {
+        ...input,
+        exactHeadApprovalMatches: false,
+        reviewBindingStatus: "BLOCKED",
+        reviewedCommitSha: null,
+        approvalConsumptionState: consumptionReceipt.replayRejected
+          ? "consumed"
+          : "unavailable",
+        reviewBindingReasonCodes: [
+          ...new Set([
+            ...input.reviewBindingReasonCodes,
+            consumptionReceipt.errorCode
+          ].filter(Boolean))
+        ]
+      };
+      result = evaluateMergeReadiness(input);
+    }
+  }
+
+  return {
+    input,
+    result,
+    approvalConsumptionReceipt: consumptionReceipt
   };
 }
 
@@ -368,57 +458,179 @@ export async function runMergeReadinessSelfTest() {
     approvalDigest: createExactHeadApprovalDigest(approvalBase)
   };
   const trusted = buildSelfTestTrustContext(approval);
-  const verifiedInput = await buildCurrentMergeReadinessInput({
-    ...trusted,
-    evaluatedAt: "2026-08-09T23:00:00.000Z"
-  });
-  assert.equal(verifiedInput.exactHeadApproval, true);
-  assert.equal(verifiedInput.exactHeadApprovalMatches, true);
-  assert.equal(verifiedInput.reviewBindingStatus, "APPROVED_EXACT_HEAD");
-
-  const unknownDispositionBase = {
-    ...approvalBase,
-    disposition: "UNKNOWN_DISPOSITION"
-  };
-  const unknownDispositionApproval = {
-    ...unknownDispositionBase,
-    approvalDigest: createExactHeadApprovalDigest(unknownDispositionBase)
-  };
-  const unknownDispositionTrust = buildSelfTestTrustContext(
-    unknownDispositionApproval
-  );
-  const invalidInput = await buildCurrentMergeReadinessInput({
-    ...unknownDispositionTrust,
-    evaluatedAt: "2026-08-09T23:00:00.000Z"
-  });
-  assert.equal(invalidInput.exactHeadApproval, true);
-  assert.equal(invalidInput.exactHeadApprovalMatches, false);
-  assert.ok(
-    invalidInput.reviewBindingReasonCodes.includes(
-      "exact-head-review-approval-invalid"
-    )
+  const consumptionLedgerDirectory = await mkdtemp(
+    join(tmpdir(), "scrimed-exact-head-ledger-")
   );
 
-  const unsignedInput = await buildCurrentMergeReadinessInput({
-    approvalDocument: { approval },
-    trustedPublicKeysJson: trusted.trustedPublicKeysJson,
-    evaluatedAt: "2026-08-09T23:00:00.000Z"
-  });
-  assert.equal(unsignedInput.exactHeadApproval, true);
-  assert.equal(unsignedInput.exactHeadApprovalMatches, false);
-  assert.ok(
-    unsignedInput.reviewBindingReasonCodes.includes(
-      "exact-head-review-identity-attestation-missing"
-    )
-  );
-  assert.ok(
-    unsignedInput.reviewBindingReasonCodes.includes(
-      "exact-head-review-untrusted-identity"
-    )
-  );
+  try {
+    const verifiedInput = await buildCurrentMergeReadinessInput({
+      ...trusted,
+      consumptionLedgerDirectory,
+      evaluatedAt: "2026-08-09T23:00:00.000Z"
+    });
+    assert.equal(verifiedInput.exactHeadApproval, true);
+    assert.equal(verifiedInput.exactHeadApprovalMatches, true);
+    assert.equal(verifiedInput.reviewBindingStatus, "APPROVED_EXACT_HEAD");
+    assert.equal(verifiedInput.approvalConsumptionState, "available");
+
+    const missingLedgerInput = await buildCurrentMergeReadinessInput({
+      ...trusted,
+      evaluatedAt: "2026-08-09T23:00:00.000Z"
+    });
+    assert.equal(missingLedgerInput.exactHeadApprovalMatches, false);
+    assert.ok(
+      missingLedgerInput.reviewBindingReasonCodes.includes(
+        "exact-head-review-consumption-ledger-required"
+      )
+    );
+
+    const unknownDispositionBase = {
+      ...approvalBase,
+      disposition: "UNKNOWN_DISPOSITION"
+    };
+    const unknownDispositionApproval = {
+      ...unknownDispositionBase,
+      approvalDigest: createExactHeadApprovalDigest(unknownDispositionBase)
+    };
+    const unknownDispositionTrust = buildSelfTestTrustContext(
+      unknownDispositionApproval
+    );
+    const invalidInput = await buildCurrentMergeReadinessInput({
+      ...unknownDispositionTrust,
+      consumptionLedgerDirectory,
+      evaluatedAt: "2026-08-09T23:00:00.000Z"
+    });
+    assert.equal(invalidInput.exactHeadApproval, true);
+    assert.equal(invalidInput.exactHeadApprovalMatches, false);
+    assert.ok(
+      invalidInput.reviewBindingReasonCodes.includes(
+        "exact-head-review-approval-invalid"
+      )
+    );
+
+    const unsignedInput = await buildCurrentMergeReadinessInput({
+      approvalDocument: { approval },
+      trustedPublicKeysJson: trusted.trustedPublicKeysJson,
+      consumptionLedgerDirectory,
+      evaluatedAt: "2026-08-09T23:00:00.000Z"
+    });
+    assert.equal(unsignedInput.exactHeadApproval, true);
+    assert.equal(unsignedInput.exactHeadApprovalMatches, false);
+    assert.ok(
+      unsignedInput.reviewBindingReasonCodes.includes(
+        "exact-head-review-identity-attestation-missing"
+      )
+    );
+    assert.ok(
+      unsignedInput.reviewBindingReasonCodes.includes(
+        "exact-head-review-untrusted-identity"
+      )
+    );
+
+    const identityProbeBase = {
+      ...approvalBase,
+      approvalId: "merge-readiness-identity-probe",
+      replayNonce: "merge-readiness-identity-probe-nonce"
+    };
+    const identityProbeApproval = {
+      ...identityProbeBase,
+      approvalDigest: createExactHeadApprovalDigest(identityProbeBase)
+    };
+    const identityProbeState = await inspectExactHeadApprovalConsumption({
+      approval: identityProbeApproval,
+      ledgerDirectory: consumptionLedgerDirectory,
+      required: true
+    });
+    identityProbeState.markers = [];
+    const substitutedIdentityBase = {
+      ...identityProbeBase,
+      sourceFingerprint: "f".repeat(64)
+    };
+    const substitutedIdentityApproval = {
+      ...substitutedIdentityBase,
+      approvalDigest: createExactHeadApprovalDigest(substitutedIdentityBase)
+    };
+    const substitutedIdentity = await consumeExactHeadApproval({
+      approval: substitutedIdentityApproval,
+      consumptionState: identityProbeState,
+      consumedAt: "2026-08-09T23:00:30.000Z"
+    });
+    assert.equal(substitutedIdentity.consumed, false);
+    assert.equal(
+      substitutedIdentity.errorCode,
+      "exact-head-review-consumption-ledger-unavailable"
+    );
+    const identityProbe = await consumeExactHeadApproval({
+      approval: identityProbeApproval,
+      consumptionState: identityProbeState,
+      consumedAt: "2026-08-09T23:00:31.000Z"
+    });
+    assert.equal(identityProbe.consumed, true);
+
+    const firstUse = await evaluateCurrentMergeReadiness({
+      ...trusted,
+      consumptionLedgerDirectory,
+      consumeApproval: true,
+      evaluatedAt: "2026-08-09T23:00:00.000Z",
+      consumedAt: "2026-08-09T23:01:00.000Z"
+    });
+    assert.equal(firstUse.result.ready, true);
+    assert.equal(firstUse.approvalConsumptionReceipt.consumed, true);
+    assert.match(
+      firstUse.approvalConsumptionReceipt.receiptHash,
+      sha256Pattern
+    );
+
+    const replay = await evaluateCurrentMergeReadiness({
+      ...trusted,
+      consumptionLedgerDirectory,
+      consumeApproval: true,
+      evaluatedAt: "2026-08-09T23:02:00.000Z",
+      consumedAt: "2026-08-09T23:03:00.000Z"
+    });
+    assert.equal(replay.result.ready, false);
+    assert.equal(replay.input.exactHeadApprovalMatches, false);
+    assert.equal(replay.input.approvalConsumptionState, "consumed");
+    assert.ok(
+      replay.input.reviewBindingReasonCodes.includes(
+        "exact-head-review-replay-rejected"
+      )
+    );
+
+    for (const reusedIdentifierBase of [
+      {
+        ...approvalBase,
+        replayNonce: "merge-readiness-self-test-new-nonce"
+      },
+      {
+        ...approvalBase,
+        approvalId: "merge-readiness-self-test-new-approval"
+      }
+    ]) {
+      const reusedIdentifierApproval = {
+        ...reusedIdentifierBase,
+        approvalDigest: createExactHeadApprovalDigest(reusedIdentifierBase)
+      };
+      const reusedIdentifier = await evaluateCurrentMergeReadiness({
+        ...buildSelfTestTrustContext(reusedIdentifierApproval),
+        consumptionLedgerDirectory,
+        consumeApproval: true,
+        evaluatedAt: "2026-08-09T23:04:00.000Z",
+        consumedAt: "2026-08-09T23:05:00.000Z"
+      });
+      assert.equal(reusedIdentifier.result.ready, false);
+      assert.ok(
+        reusedIdentifier.input.reviewBindingReasonCodes.includes(
+          "exact-head-review-replay-rejected"
+        )
+      );
+    }
+  } finally {
+    await rm(consumptionLedgerDirectory, { recursive: true, force: true });
+  }
 
   console.log(
-    "pass merge-readiness verifier self-test (trusted Ed25519 exact-head artifact, forged unsigned rejection, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
+    "pass merge-readiness verifier self-test (trusted Ed25519 exact-head artifact, durable one-use consumption, replay rejection, forged unsigned rejection, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
   );
 }
 
@@ -427,10 +639,13 @@ if (process.argv.includes("--self-test")) {
   process.exit(0);
 }
 
-const input = await buildCurrentMergeReadinessInput();
-const result = evaluateMergeReadiness(input);
-console.log(JSON.stringify({ input, result }, null, 2));
+const strict = process.argv.includes("--strict");
+const evaluation = await evaluateCurrentMergeReadiness({
+  requireConsumptionLedger: strict,
+  consumeApproval: strict
+});
+console.log(JSON.stringify(evaluation, null, 2));
 
-if (process.argv.includes("--strict") && !result.ready) {
+if (strict && !evaluation.result.ready) {
   process.exit(1);
 }

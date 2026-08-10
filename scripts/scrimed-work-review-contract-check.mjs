@@ -15,6 +15,7 @@ const paths = [
   "docs/release/PR25_FROZEN_REVIEW_BASELINE.md",
   "docs/review/PR25_REVIEWER_BRIEF.md",
   "docs/release/PRODUCTION_AUTHORIZATION_PACKET.md",
+  "scripts/lib/exact-head-approval-consumption-ledger.mjs",
   "scripts/verify-merge-readiness.mjs",
   "package.json"
 ];
@@ -64,6 +65,22 @@ assert.match(
 assert.match(
   files["scripts/verify-merge-readiness.mjs"],
   /SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /SCRIMED_EXACT_HEAD_CONSUMPTION_LEDGER_DIR/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /consumedApprovalIds:\s*consumptionState\.consumedApprovalIds/
+);
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /O_EXCL/
+);
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /exact-head-review-replay-rejected/
 );
 assert.doesNotMatch(
   files["app/lib/exactHeadReviewBinding.ts"],
