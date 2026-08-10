@@ -94,6 +94,14 @@ assert.match(
   files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
   /directoryHandle\.sync\(\)/
 );
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /legacyLedgerVersionV1/
+);
+assert.match(
+  files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
+  /stableIdentifierKeyVersion/
+);
 assert.doesNotMatch(
   files["app/lib/exactHeadReviewBinding.ts"],
   /trustedIdentityEvidenceVerified:\s*boolean/

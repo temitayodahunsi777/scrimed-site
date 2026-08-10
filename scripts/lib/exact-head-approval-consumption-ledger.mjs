@@ -18,6 +18,19 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 export const exactHeadApprovalConsumptionLedgerVersion =
   "scrimed-exact-head-approval-consumption-ledger-v2-2026-08-10";
 
+const legacyLedgerVersionV1 =
+  "scrimed-exact-head-approval-consumption-ledger-v1-2026-08-10";
+const stableIdentifierKeyVersion =
+  "scrimed-exact-head-approval-consumption-identifier-key-v1";
+const supportedLedgerRecordVersions = new Set([
+  legacyLedgerVersionV1,
+  exactHeadApprovalConsumptionLedgerVersion
+]);
+const markerKeyVersions = [
+  legacyLedgerVersionV1,
+  exactHeadApprovalConsumptionLedgerVersion,
+  stableIdentifierKeyVersion
+];
 const sha256Pattern = /^[0-9a-f]{64}$/;
 const commitPattern = /^[0-9a-f]{40}$/;
 const maximumMarkerBytes = 4096;
@@ -69,7 +82,7 @@ function approvalMarkerIdentity(approval) {
 }
 
 function buildMarkerDescriptors(identity, resolvedDirectory) {
-  return [
+  const identifiers = [
     {
       markerKind: "approval-id",
       identifierHash: identity.approvalIdHash
@@ -78,20 +91,25 @@ function buildMarkerDescriptors(identity, resolvedDirectory) {
       markerKind: "replay-nonce",
       identifierHash: identity.replayNonceHash
     }
-  ].map((descriptor) => {
-    const markerKey = stableHash({
-      version: exactHeadApprovalConsumptionLedgerVersion,
-      ...descriptor
-    });
-    return {
-      ...descriptor,
-      markerKey,
-      markerPath: join(
-        resolvedDirectory,
-        `${descriptor.markerKind}-${markerKey}.json`
-      )
-    };
-  });
+  ];
+
+  return identifiers.flatMap((descriptor) =>
+    markerKeyVersions.map((keyVersion) => {
+      const markerKey = stableHash({
+        version: keyVersion,
+        ...descriptor
+      });
+      return {
+        ...descriptor,
+        keyVersion,
+        markerKey,
+        markerPath: join(
+          resolvedDirectory,
+          `${descriptor.markerKind}-${markerKey}.json`
+        )
+      };
+    })
+  );
 }
 
 async function assertProtectedAncestorChain(resolvedDirectory) {
@@ -247,7 +265,7 @@ function validateStoredMarker(marker, descriptor) {
   }
   const { recordHash, ...payload } = marker;
   return (
-    marker.version === exactHeadApprovalConsumptionLedgerVersion &&
+    supportedLedgerRecordVersions.has(marker.version) &&
     marker.markerKind === descriptor.markerKind &&
     marker.markerKey === descriptor.markerKey &&
     marker.identifierHash === descriptor.identifierHash &&
@@ -366,11 +384,14 @@ async function inspectExactHeadApprovalConsumptionInternal(
       consumedApprovalIds: consumed
         ? new Set([approval.approvalId, approval.replayNonce])
         : new Set(),
-      markers: markers.map(({ markerKind, markerKey, identifierHash }) => ({
-        markerKind,
-        markerKey,
-        identifierHash
-      })),
+      markers: markers.map(
+        ({ markerKind, markerKey, identifierHash, keyVersion }) => ({
+          markerKind,
+          markerKey,
+          identifierHash,
+          keyVersion
+        })
+      ),
       ledgerDirectoryFingerprint: sha256(resolvedDirectory),
       errorCode: null
     };
@@ -424,7 +445,7 @@ export async function consumeExactHeadApproval({
     !consumptionState?.ready ||
     !trustedState ||
     !Array.isArray(trustedState.markers) ||
-    trustedState.markers.length !== 2 ||
+    trustedState.markers.length !== markerKeyVersions.length * 2 ||
     trustedState.consumed ||
     consumptionState.consumed ||
     typeof consumedAt !== "string" ||
@@ -451,16 +472,17 @@ export async function consumeExactHeadApproval({
       errorCode: "exact-head-review-consumption-ledger-unavailable"
     };
   }
-  const expectedKinds = new Map(
-    buildMarkerDescriptors(identity, "/").map((descriptor) => [
-      descriptor.markerKind,
-      descriptor.markerKey
-    ])
+  const expectedMarkers = buildMarkerDescriptors(
+    identity,
+    trustedState.resolvedDirectory
   );
   if (
     trustedState.markers.some(
-      (descriptor) =>
-        expectedKinds.get(descriptor.markerKind) !== descriptor.markerKey
+      (descriptor, index) =>
+        expectedMarkers[index]?.markerKind !== descriptor.markerKind ||
+        expectedMarkers[index]?.keyVersion !== descriptor.keyVersion ||
+        expectedMarkers[index]?.markerKey !== descriptor.markerKey ||
+        expectedMarkers[index]?.markerPath !== descriptor.markerPath
     )
   ) {
     return {
@@ -575,6 +597,48 @@ async function inspectSyntheticLedger(input) {
   });
 }
 
+async function writeLegacyMarkerForSelfTest({
+  approval,
+  ledgerDirectory,
+  markerKind
+}) {
+  const identity = approvalMarkerIdentity(approval);
+  const descriptor = buildMarkerDescriptors(identity, ledgerDirectory).find(
+    (candidate) =>
+      candidate.keyVersion === legacyLedgerVersionV1 &&
+      candidate.markerKind === markerKind
+  );
+  assert.ok(descriptor);
+  const payload = {
+    version: legacyLedgerVersionV1,
+    markerKind: descriptor.markerKind,
+    markerKey: descriptor.markerKey,
+    identifierHash: descriptor.identifierHash,
+    approvalIdHash: identity.approvalIdHash,
+    replayNonceHash: identity.replayNonceHash,
+    approvalDigest: identity.approvalDigest,
+    commitSha: identity.commitSha,
+    candidateFingerprint: identity.candidateFingerprint,
+    sourceFingerprint: identity.sourceFingerprint,
+    consumedAt: "2026-08-09T23:59:59.000Z"
+  };
+  const marker = {
+    ...payload,
+    recordHash: stableHash(payload)
+  };
+  const handle = await open(
+    descriptor.markerPath,
+    fileConstants.O_CREAT | fileConstants.O_EXCL | fileConstants.O_WRONLY,
+    0o600
+  );
+  try {
+    await handle.writeFile(`${JSON.stringify(marker)}\n`, "utf8");
+    await handle.sync();
+  } finally {
+    await handle.close();
+  }
+}
+
 export async function runExactHeadApprovalConsumptionLedgerSelfTest() {
   const temporaryRoot = await mkdtemp(
     join(tmpdir(), "scrimed-exact-head-ledger-self-test-")
@@ -599,6 +663,31 @@ export async function runExactHeadApprovalConsumptionLedgerSelfTest() {
         "exact-head-review-consumption-ledger-runtime-identity-unsafe"
       ].includes(unsafeAncestry.errorCode)
     );
+
+    const legacyApproval = buildSyntheticApproval({
+      approvalId: "synthetic-ledger-v1-approval",
+      replayNonce: "synthetic-ledger-v1-nonce"
+    });
+    await writeLegacyMarkerForSelfTest({
+      approval: legacyApproval,
+      ledgerDirectory,
+      markerKind: "approval-id"
+    });
+    const legacyConsumption = await inspectSyntheticLedger({
+      approval: legacyApproval,
+      ledgerDirectory,
+      required: true
+    });
+    assert.equal(legacyConsumption.consumed, true);
+    const reusedLegacyApprovalId = await inspectSyntheticLedger({
+      approval: buildSyntheticApproval({
+        approvalId: legacyApproval.approvalId,
+        replayNonce: "synthetic-ledger-v2-new-nonce"
+      }),
+      ledgerDirectory,
+      required: true
+    });
+    assert.equal(reusedLegacyApprovalId.consumed, true);
 
     const identityProbe = buildSyntheticApproval({
       approvalId: "synthetic-ledger-identity-probe",
@@ -706,6 +795,6 @@ export async function runExactHeadApprovalConsumptionLedgerSelfTest() {
   }
 
   console.log(
-    "pass exact-head approval consumption ledger self-test (unsafe ancestry rejection, pinned-directory continuity, directory sync, identity binding, and durable replay rejection)"
+    "pass exact-head approval consumption ledger self-test (legacy marker continuity, unsafe ancestry rejection, pinned-directory continuity, directory sync, identity binding, and durable replay rejection)"
   );
 }
