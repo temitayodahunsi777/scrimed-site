@@ -10,6 +10,7 @@ import { getInvestorReadinessScorecard } from "../app/lib/investorReadinessScore
 import {
   buildPostPr25EvidenceGraph,
   createEvidenceEdge,
+  createEvidenceNode,
   verifyPlatformEvidenceGraph
 } from "../app/lib/platformEvidenceGraph.ts";
 import { getPostPr25PlatformAdvanceSummary } from "../app/lib/postPr25PlatformAdvance.ts";
@@ -190,6 +191,50 @@ assert.ok(
   )
 );
 
+const externalContradictionGraph = structuredClone(graph);
+externalContradictionGraph.nodes.push(
+  createEvidenceNode({
+    id: "source:independent-counter-evidence",
+    type: "source",
+    label: "Independent counter-evidence",
+    sourceType: "synthetic-policy-test",
+    sourceReference: "synthetic:counter-evidence",
+    confidence: 0.9,
+    maturity: "local-verified",
+    createdAt: "2026-08-10T10:00:00.000Z",
+    expiresAt: null
+  })
+);
+externalContradictionGraph.edges.push(
+  createEvidenceEdge({
+    id: "edge:external-counter-evidence-contradicts-platform-narrative",
+    from: "source:independent-counter-evidence",
+    to: "claim:investor-platform-narrative",
+    relation: "contradicts",
+    createdAt: "2026-08-10T10:00:00.000Z"
+  })
+);
+const externallyContradictedClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: externalContradictionGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(externallyContradictedClaim.publishable, false);
+assert.ok(
+  externallyContradictedClaim.reasonCodes.includes(
+    "public-claim-evidence-contradicted"
+  )
+);
+
 const expiredEvidenceGraph = structuredClone(graph);
 expiredEvidenceGraph.edges.push(
   createEvidenceEdge({
@@ -217,6 +262,116 @@ const expiredEvidenceClaim = resolvePublicClaim({
 assert.equal(expiredEvidenceClaim.publishable, false);
 assert.ok(
   expiredEvidenceClaim.reasonCodes.includes("public-claim-evidence-expired")
+);
+
+const expiredIntermediateGraph = structuredClone(graph);
+expiredIntermediateGraph.nodes = expiredIntermediateGraph.nodes.map((node) =>
+  node.id === "source:pr25-exact-head"
+    ? createEvidenceNode({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        sourceType: node.sourceType,
+        sourceReference: node.sourceReference,
+        confidence: node.confidence,
+        maturity: node.maturity,
+        createdAt: node.createdAt,
+        expiresAt: "2026-08-10T11:00:00.000Z"
+      })
+    : node
+);
+const expiredIntermediateClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["benchmark:pr25-ci"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: expiredIntermediateGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(expiredIntermediateClaim.publishable, false);
+assert.ok(
+  expiredIntermediateClaim.reasonCodes.includes(
+    "public-claim-evidence-path-inactive"
+  )
+);
+
+const futureEdgeGraph = structuredClone(graph);
+futureEdgeGraph.edges = futureEdgeGraph.edges.map((edge) =>
+  edge.id === "edge:source-supports-platform-narrative"
+    ? createEvidenceEdge({
+        id: edge.id,
+        from: edge.from,
+        to: edge.to,
+        relation: edge.relation,
+        createdAt: "2026-08-10T13:00:00.000Z"
+      })
+    : edge
+);
+const futureEdgeClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: futureEdgeGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(futureEdgeClaim.publishable, false);
+assert.ok(
+  futureEdgeClaim.reasonCodes.includes("public-claim-evidence-path-inactive")
+);
+
+const malformedExpiryGraph = structuredClone(graph);
+malformedExpiryGraph.nodes = malformedExpiryGraph.nodes.map((node) =>
+  node.id === "source:pr25-exact-head"
+    ? createEvidenceNode({
+        id: node.id,
+        type: node.type,
+        label: node.label,
+        sourceType: node.sourceType,
+        sourceReference: node.sourceReference,
+        confidence: node.confidence,
+        maturity: node.maturity,
+        createdAt: node.createdAt,
+        expiresAt: "not-a-date"
+      })
+    : node
+);
+const malformedExpiryIntegrity = verifyPlatformEvidenceGraph(malformedExpiryGraph);
+assert.equal(malformedExpiryIntegrity.valid, false);
+assert.ok(
+  malformedExpiryIntegrity.failures.includes(
+    "invalid-evidence-expiry:source:pr25-exact-head"
+  )
+);
+const malformedExpiryClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: malformedExpiryGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(malformedExpiryClaim.publishable, false);
+assert.ok(
+  malformedExpiryClaim.reasonCodes.includes("public-claim-evidence-graph-invalid")
 );
 
 const economics = calculateEconomicUnitModel({

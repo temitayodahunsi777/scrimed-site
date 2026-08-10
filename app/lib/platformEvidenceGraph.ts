@@ -66,6 +66,42 @@ export type PlatformEvidenceGraph = {
   edges: PlatformEvidenceEdge[];
 };
 
+const evidenceNodeTypes = new Set<EvidenceNodeType>([
+  "source",
+  "claim",
+  "model",
+  "agent",
+  "workflow",
+  "benchmark",
+  "evaluation",
+  "policy",
+  "product",
+  "release",
+  "economic-metric",
+  "incident",
+  "reviewer",
+  "approval"
+]);
+const evidenceMaturities = new Set<EvidenceMaturity>([
+  "synthetic",
+  "local-verified",
+  "independently-reviewed",
+  "external-validated"
+]);
+const evidenceRelations = new Set<EvidenceRelation>([
+  "supports",
+  "contradicts",
+  "derived_from",
+  "supersedes",
+  "reviewed_by",
+  "invalidated_by",
+  "approved_for",
+  "prohibited_for",
+  "generated_by",
+  "measured_by"
+]);
+const sha256Pattern = /^[0-9a-f]{64}$/;
+
 export function createEvidenceNode(
   input: Omit<PlatformEvidenceNode, "contentHash">
 ): PlatformEvidenceNode {
@@ -233,20 +269,42 @@ export function buildPostPr25EvidenceGraph(): PlatformEvidenceGraph {
 
 export function verifyPlatformEvidenceGraph(graph: PlatformEvidenceGraph) {
   const failures: string[] = [];
+  if (graph.version !== platformEvidenceGraphVersion) {
+    failures.push("unsupported-evidence-graph-version");
+  }
   const nodeIds = new Set(graph.nodes.map((node) => node.id));
   const edgeIds = new Set(graph.edges.map((edge) => edge.id));
   if (nodeIds.size !== graph.nodes.length) failures.push("duplicate-evidence-node-id");
   if (edgeIds.size !== graph.edges.length) failures.push("duplicate-evidence-edge-id");
 
   for (const node of graph.nodes) {
-    if (node.confidence < 0 || node.confidence > 1) {
+    if (!node.id.trim() || !evidenceNodeTypes.has(node.type)) {
+      failures.push(`invalid-evidence-node-contract:${node.id}`);
+    }
+    if (!evidenceMaturities.has(node.maturity)) {
+      failures.push(`invalid-evidence-maturity:${node.id}`);
+    }
+    if (
+      !Number.isFinite(node.confidence) ||
+      node.confidence < 0 ||
+      node.confidence > 1
+    ) {
       failures.push(`invalid-evidence-confidence:${node.id}`);
     }
     if (!Number.isFinite(Date.parse(node.createdAt))) {
       failures.push(`invalid-evidence-created-at:${node.id}`);
     }
-    if (node.expiresAt && Date.parse(node.expiresAt) <= Date.parse(node.createdAt)) {
-      failures.push(`invalid-evidence-expiry:${node.id}`);
+    if (node.expiresAt !== null) {
+      const expiresAtMs = Date.parse(node.expiresAt);
+      if (
+        !Number.isFinite(expiresAtMs) ||
+        expiresAtMs <= Date.parse(node.createdAt)
+      ) {
+        failures.push(`invalid-evidence-expiry:${node.id}`);
+      }
+    }
+    if (!sha256Pattern.test(node.contentHash)) {
+      failures.push(`invalid-evidence-node-hash:${node.id}`);
     }
     const { contentHash, ...input } = node;
     if (createEvidenceNode(input).contentHash !== contentHash) {
@@ -255,8 +313,22 @@ export function verifyPlatformEvidenceGraph(graph: PlatformEvidenceGraph) {
   }
 
   for (const edge of graph.edges) {
+    if (
+      !edge.id.trim() ||
+      !edge.from.trim() ||
+      !edge.to.trim() ||
+      !evidenceRelations.has(edge.relation)
+    ) {
+      failures.push(`invalid-evidence-edge-contract:${edge.id}`);
+    }
     if (!nodeIds.has(edge.from) || !nodeIds.has(edge.to)) {
       failures.push(`dangling-evidence-edge:${edge.id}`);
+    }
+    if (!Number.isFinite(Date.parse(edge.createdAt))) {
+      failures.push(`invalid-evidence-edge-created-at:${edge.id}`);
+    }
+    if (!sha256Pattern.test(edge.contentHash)) {
+      failures.push(`invalid-evidence-edge-hash:${edge.id}`);
     }
     const { contentHash, ...input } = edge;
     if (createEvidenceEdge(input).contentHash !== contentHash) {

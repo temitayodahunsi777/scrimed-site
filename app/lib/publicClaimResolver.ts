@@ -3,11 +3,13 @@ import { verifyPlatformEvidenceGraph } from "./platformEvidenceGraph";
 import type {
   EvidenceMaturity,
   EvidenceRelation,
-  PlatformEvidenceGraph
+  PlatformEvidenceEdge,
+  PlatformEvidenceGraph,
+  PlatformEvidenceNode
 } from "./platformEvidenceGraph";
 
 export const publicClaimResolverVersion =
-  "scrimed-public-claim-resolver-v3-2026-08-10";
+  "scrimed-public-claim-resolver-v4-2026-08-10";
 
 export type PublicClaimInput = {
   claimId: string;
@@ -42,9 +44,64 @@ const disqualifyingRelations = new Set<EvidenceRelation>([
   "invalidated_by"
 ]);
 
-function getSupportingClosure(input: {
+function isNodeEffective(node: PlatformEvidenceNode, evaluatedAtMs: number) {
+  const createdAtMs = Date.parse(node.createdAt);
+  const expiresAtMs = node.expiresAt === null ? null : Date.parse(node.expiresAt);
+  return (
+    Number.isFinite(createdAtMs) &&
+    createdAtMs <= evaluatedAtMs &&
+    (expiresAtMs === null ||
+      (Number.isFinite(expiresAtMs) && expiresAtMs > evaluatedAtMs))
+  );
+}
+
+function isEdgeEffective(edge: PlatformEvidenceEdge, evaluatedAtMs: number) {
+  const createdAtMs = Date.parse(edge.createdAt);
+  return Number.isFinite(createdAtMs) && createdAtMs <= evaluatedAtMs;
+}
+
+function getSupportingReachable(input: {
+  graph: PlatformEvidenceGraph;
+  startId: string;
+  evaluatedAtMs: number;
+  reverse?: boolean;
+}) {
+  const nodes = new Map(input.graph.nodes.map((node) => [node.id, node]));
+  const startNode = nodes.get(input.startId);
+  if (!startNode || !isNodeEffective(startNode, input.evaluatedAtMs)) {
+    return new Set<string>();
+  }
+
+  const visited = new Set<string>();
+  const pending = [input.startId];
+  while (pending.length > 0) {
+    const current = pending.shift();
+    if (!current || visited.has(current)) continue;
+    visited.add(current);
+
+    for (const edge of input.graph.edges) {
+      if (!supportingRelations.has(edge.relation)) continue;
+      const matches = input.reverse ? edge.to === current : edge.from === current;
+      if (!matches || !isEdgeEffective(edge, input.evaluatedAtMs)) continue;
+      const nextId = input.reverse ? edge.from : edge.to;
+      const nextNode = nodes.get(nextId);
+      if (
+        nextNode &&
+        isNodeEffective(nextNode, input.evaluatedAtMs) &&
+        !visited.has(nextId)
+      ) {
+        pending.push(nextId);
+      }
+    }
+  }
+
+  return visited;
+}
+
+function hasStructuralSupportingPath(input: {
   graph: PlatformEvidenceGraph;
   evidenceId: string;
+  claimId: string;
 }) {
   const visited = new Set<string>();
   const pending = [input.evidenceId];
@@ -52,32 +109,60 @@ function getSupportingClosure(input: {
     const current = pending.shift();
     if (!current || visited.has(current)) continue;
     visited.add(current);
-
     for (const edge of input.graph.edges) {
       if (edge.from !== current || !supportingRelations.has(edge.relation)) continue;
+      if (edge.to === input.claimId) return true;
       if (!visited.has(edge.to)) pending.push(edge.to);
     }
   }
+  return false;
+}
 
-  return visited;
+function getEffectiveSupportingPathNodes(input: {
+  graph: PlatformEvidenceGraph;
+  evidenceId: string;
+  claimId: string;
+  evaluatedAtMs: number;
+}) {
+  const forward = getSupportingReachable({
+    graph: input.graph,
+    startId: input.evidenceId,
+    evaluatedAtMs: input.evaluatedAtMs
+  });
+  if (!forward.has(input.claimId)) return new Set<string>();
+  const reverse = getSupportingReachable({
+    graph: input.graph,
+    startId: input.claimId,
+    evaluatedAtMs: input.evaluatedAtMs,
+    reverse: true
+  });
+  return new Set([...forward].filter((nodeId) => reverse.has(nodeId)));
 }
 
 function hasDisqualifyingRelationship(input: {
   graph: PlatformEvidenceGraph;
-  evidenceId: string;
-  claimId: string;
+  supportingPathNodeIds: Set<string>;
+  evaluatedAtMs: number;
 }) {
-  const supportingClosure = getSupportingClosure({
-    graph: input.graph,
-    evidenceId: input.evidenceId
-  });
+  const nodes = new Map(input.graph.nodes.map((node) => [node.id, node]));
 
   return input.graph.edges.some(
-    (edge) =>
-      disqualifyingRelations.has(edge.relation) &&
-      ((supportingClosure.has(edge.from) && edge.to === input.claimId) ||
-        (edge.from === input.claimId && supportingClosure.has(edge.to)) ||
-        (edge.relation === "invalidated_by" && supportingClosure.has(edge.from)))
+    (edge) => {
+      if (
+        !disqualifyingRelations.has(edge.relation) ||
+        !isEdgeEffective(edge, input.evaluatedAtMs)
+      ) {
+        return false;
+      }
+      const fromNode = nodes.get(edge.from);
+      const toNode = nodes.get(edge.to);
+      return (
+        Boolean(fromNode && isNodeEffective(fromNode, input.evaluatedAtMs)) &&
+        Boolean(toNode && isNodeEffective(toNode, input.evaluatedAtMs)) &&
+        (input.supportingPathNodeIds.has(edge.from) ||
+          input.supportingPathNodeIds.has(edge.to))
+      );
+    }
   );
 }
 
@@ -101,6 +186,25 @@ export function resolvePublicClaim(input: {
   const quantitativeOrSuperior = isQuantitativeOrSuperiorityClaim(input.claim.text);
   const evaluatedAtMs = Date.parse(input.evaluatedAt);
   const evaluationTimeValid = Number.isFinite(evaluatedAtMs);
+  const pathAnalyses = evidenceNodes.map((node) => ({
+    node,
+    structuralPathExists: hasStructuralSupportingPath({
+      graph: input.graph,
+      evidenceId: node.id,
+      claimId: input.claim.claimId
+    }),
+    effectivePathNodeIds: evaluationTimeValid
+      ? getEffectiveSupportingPathNodes({
+          graph: input.graph,
+          evidenceId: node.id,
+          claimId: input.claim.claimId,
+          evaluatedAtMs
+        })
+      : new Set<string>()
+  }));
+  const supportingPathNodeIds = new Set(
+    pathAnalyses.flatMap((analysis) => [...analysis.effectivePathNodeIds])
+  );
 
   if (evidenceNodes.length !== input.claim.evidenceIds.length || evidenceNodes.length === 0) {
     reasons.push("public-claim-evidence-missing");
@@ -118,27 +222,45 @@ export function resolvePublicClaim(input: {
     reasons.push("public-claim-evidence-immature");
   }
   if (
-    evidenceNodes.some(
-      (node) =>
-        node.id === input.claim.claimId ||
-        !getSupportingClosure({
-          graph: input.graph,
-          evidenceId: node.id
-        }).has(input.claim.claimId)
+    pathAnalyses.some(
+      (analysis) =>
+        analysis.node.id === input.claim.claimId ||
+        !analysis.structuralPathExists
     )
   ) {
     reasons.push("public-claim-evidence-relationship-missing");
   }
   if (
-    evidenceNodes.some((node) =>
-      hasDisqualifyingRelationship({
-        graph: input.graph,
-        evidenceId: node.id,
-        claimId: input.claim.claimId
-      })
+    evaluationTimeValid &&
+    pathAnalyses.some(
+      (analysis) =>
+        analysis.structuralPathExists && analysis.effectivePathNodeIds.size === 0
     )
   ) {
+    reasons.push("public-claim-evidence-path-inactive");
+  }
+  if (
+    evaluationTimeValid &&
+    hasDisqualifyingRelationship({
+      graph: input.graph,
+      supportingPathNodeIds,
+      evaluatedAtMs
+    })
+  ) {
     reasons.push("public-claim-evidence-contradicted");
+  }
+  if (
+    [...supportingPathNodeIds].some((nodeId) => {
+      if (nodeId === input.claim.claimId) return false;
+      const node = input.graph.nodes.find((entry) => entry.id === nodeId);
+      return (
+        node !== undefined &&
+        maturityRank[node.maturity] <
+          maturityRank[input.claim.evidenceMaturityRequired]
+      );
+    })
+  ) {
+    reasons.push("public-claim-evidence-path-immature");
   }
   if (
     evaluationTimeValid &&
@@ -173,6 +295,8 @@ export function resolvePublicClaim(input: {
       "public-claim-evidence-graph-invalid",
       "public-claim-evidence-immature",
       "public-claim-evidence-relationship-missing",
+      "public-claim-evidence-path-inactive",
+      "public-claim-evidence-path-immature",
       "public-claim-evidence-contradicted",
       "public-claim-evidence-expired",
       "public-claim-evidence-not-yet-effective",
