@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { createClinicalEvidenceHash } from "../../app/lib/clinicalEvidenceControls.ts";
 
 export const currentExactHeadReviewCandidateVersion =
-  "scrimed-current-exact-head-review-candidate-v2-2026-08-10";
+  "scrimed-current-exact-head-review-candidate-v3-2026-08-10";
 
 const repository = "temitayodahunsi777/scrimed-site";
 const commitPattern = /^[0-9a-f]{40}$/;
@@ -92,25 +92,41 @@ export function inspectCandidateAuthorIdentities(candidateBaseSha, headSha) {
     });
   requireCondition(authors.length > 0, "exact-head-current-author-range-empty");
 
-  const identityHashes = new Set();
+  const identities = new Map();
   for (const author of authors) {
-    identityHashes.add(
-      createClinicalEvidenceHash({
+    const gitIdentity = {
+      identityProvider: "git-commit-author",
+      identityHash: createClinicalEvidenceHash({
         identityProvider: "git-commit-author",
         authorName: author.authorName,
         authorEmail: author.authorEmail.toLowerCase()
       })
+    };
+    identities.set(
+      `${gitIdentity.identityProvider}:${gitIdentity.identityHash}`,
+      gitIdentity
     );
     const githubSubject = githubAuthorSubject(author.authorEmail);
     if (githubSubject) {
-      identityHashes.add(
-        createClinicalEvidenceHash({
+      const githubIdentity = {
+        identityProvider: "github",
+        identityHash: createClinicalEvidenceHash({
           identityProvider: "github",
           authorSubject: githubSubject
         })
+      };
+      identities.set(
+        `${githubIdentity.identityProvider}:${githubIdentity.identityHash}`,
+        githubIdentity
       );
     }
   }
+
+  const authorIdentities = [...identities.values()].sort((left, right) =>
+    `${left.identityProvider}:${left.identityHash}`.localeCompare(
+      `${right.identityProvider}:${right.identityHash}`
+    )
+  );
 
   return {
     commitAuthorCount: new Set(
@@ -119,7 +135,10 @@ export function inspectCandidateAuthorIdentities(candidateBaseSha, headSha) {
           `${authorName}\x1f${authorEmail.toLowerCase()}`
       )
     ).size,
-    authorIdentityHashes: [...identityHashes].sort()
+    authorIdentities,
+    authorIdentityHashes: [
+      ...new Set(authorIdentities.map((identity) => identity.identityHash))
+    ].sort()
   };
 }
 
@@ -138,11 +157,35 @@ export function buildCurrentExactHeadReviewCandidate({
     "exact-head-current-source-unavailable"
   );
   requireCondition(
-    Array.isArray(sourceState.authorIdentityHashes) &&
+    Array.isArray(sourceState.authorIdentities) &&
+      sourceState.authorIdentities.length > 0 &&
+      new Set(
+        sourceState.authorIdentities.map(
+          (identity) =>
+            `${identity?.identityProvider}:${identity?.identityHash}`
+        )
+      ).size === sourceState.authorIdentities.length &&
+      sourceState.authorIdentities.every(
+        (identity) =>
+          (identity?.identityProvider === "git-commit-author" ||
+            identity?.identityProvider === "github") &&
+          sha256Pattern.test(identity.identityHash)
+      ) &&
+      Array.isArray(sourceState.authorIdentityHashes) &&
       sourceState.authorIdentityHashes.length > 0 &&
       new Set(sourceState.authorIdentityHashes).size ===
         sourceState.authorIdentityHashes.length &&
       sourceState.authorIdentityHashes.every((value) => sha256Pattern.test(value)),
+    "exact-head-current-author-identity-invalid"
+  );
+  requireCondition(
+    JSON.stringify(
+      [
+        ...new Set(
+          sourceState.authorIdentities.map((identity) => identity.identityHash)
+        )
+      ].sort()
+    ) === JSON.stringify([...sourceState.authorIdentityHashes].sort()),
     "exact-head-current-author-identity-invalid"
   );
   requireCondition(isObject(manifest), "exact-head-current-manifest-invalid");
@@ -196,6 +239,8 @@ export function buildCurrentExactHeadReviewCandidate({
       Number.isInteger(sbom.componentCount) &&
       sbom.componentCount > 0 &&
       sbom.candidateBaseSha === manifest.candidateBaseSha &&
+      sbom.manifestDependencyDeltaCount === 0 &&
+      sbom.lockfileComponentDeltaCount === 0 &&
       sbom.dependencyDeltaCount === 0,
     "exact-head-current-sbom-invalid"
   );
@@ -237,7 +282,8 @@ export function buildCurrentExactHeadReviewCandidate({
       criticalSurfaces: {
         securityCriticalFiles: createClinicalEvidenceHash({
           ...binding,
-          surface: "security-critical-files"
+          surface: "security-critical-files",
+          authorIdentities: sourceState.authorIdentities
         }),
         policyFiles: createClinicalEvidenceHash({
           ...binding,
@@ -260,6 +306,9 @@ export function buildCurrentExactHeadReviewCandidate({
           productionAutoDeployFromMainEnabled
         })
       },
+      authorIdentities: sourceState.authorIdentities.map((identity) => ({
+        ...identity
+      })),
       authorIdentityHashes: [...sourceState.authorIdentityHashes],
       requiredReviewerRoles: [...reviewPacket.reviewerRoles].sort()
     },

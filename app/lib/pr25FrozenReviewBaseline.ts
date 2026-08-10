@@ -89,6 +89,14 @@ export function getPr25ExactHeadReviewCandidate(): ExactHeadReviewCandidate {
     pullRequest: baseline.pullRequest,
     headSha: baseline.headSha
   };
+  const authorIdentity = {
+    identityProvider: "github" as const,
+    identityHash: createClinicalEvidenceHash({
+      ...binding,
+      identityProvider: "github",
+      authorSubject: "temitayodahunsi777"
+    })
+  };
 
   return {
     commitSha: baseline.headSha,
@@ -130,13 +138,8 @@ export function getPr25ExactHeadReviewCandidate(): ExactHeadReviewCandidate {
           baseline.releaseControls.automaticProductionDeploymentFromMain
       })
     },
-    authorIdentityHashes: [
-      createClinicalEvidenceHash({
-        ...binding,
-        identityProvider: "github",
-        authorSubject: "temitayodahunsi777"
-      })
-    ],
+    authorIdentities: [authorIdentity],
+    authorIdentityHashes: [authorIdentity.identityHash],
     requiredReviewerRoles: ["Principal engineer", "Release steward"]
   };
 }

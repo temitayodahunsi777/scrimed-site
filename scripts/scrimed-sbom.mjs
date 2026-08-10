@@ -60,8 +60,8 @@ function resolveCandidateBase() {
   return { candidateBaseRef: requested, candidateBaseSha, headSha };
 }
 
-function gitPackageJsonAt(commitSha) {
-  const result = spawnSync("git", ["show", `${commitSha}:package.json`], { encoding: "utf8", shell: false });
+function gitJsonAt(commitSha, pathname) {
+  const result = spawnSync("git", ["show", `${commitSha}:${pathname}`], { encoding: "utf8", shell: false });
   if (result.status !== 0) return null;
   try { return JSON.parse(result.stdout); } catch { return null; }
 }
@@ -75,24 +75,91 @@ function buildDependencyDelta(current, prior) {
     .map((name) => ({ name, before: priorDependencies[name] ?? null, after: currentDependencies[name] ?? null }));
 }
 
+function lockfileComponentRecords(lock) {
+  return Object.entries(lock?.packages ?? {})
+    .filter(([path, record]) => path.includes("node_modules/") && record?.version)
+    .map(([packagePath, record]) => {
+      const name = packagePath.slice(
+        packagePath.lastIndexOf("node_modules/") + "node_modules/".length
+      );
+      return {
+        packagePath,
+        name,
+        version: record.version,
+        integrityHash: record.integrity ? sha256(record.integrity) : null,
+        resolvedHash: record.resolved ? sha256(record.resolved) : null,
+        dev: record.dev === true,
+        optional: record.optional === true,
+        peer: record.peer === true,
+        license: record.license ?? null
+      };
+    })
+    .sort((left, right) => left.packagePath.localeCompare(right.packagePath));
+}
+
+function buildLockfileComponentDelta(currentLock, priorLock) {
+  const current = new Map(
+    lockfileComponentRecords(currentLock).map((record) => [record.packagePath, record])
+  );
+  const prior = new Map(
+    lockfileComponentRecords(priorLock).map((record) => [record.packagePath, record])
+  );
+  return [...new Set([...current.keys(), ...prior.keys()])]
+    .sort()
+    .filter((packagePath) =>
+      stableHash(current.get(packagePath) ?? null) !==
+      stableHash(prior.get(packagePath) ?? null)
+    )
+    .map((packagePath) => {
+      const before = prior.get(packagePath) ?? null;
+      const after = current.get(packagePath) ?? null;
+      return {
+        packagePath,
+        name: after?.name ?? before?.name ?? "unknown",
+        before: before
+          ? {
+              version: before.version,
+              integrityHash: before.integrityHash,
+              resolvedHash: before.resolvedHash
+            }
+          : null,
+        after: after
+          ? {
+              version: after.version,
+              integrityHash: after.integrityHash,
+              resolvedHash: after.resolvedHash
+            }
+          : null
+      };
+    });
+}
+
 async function buildReport() {
   const packageJson = JSON.parse(await readFile("package.json", "utf8"));
   const lock = JSON.parse(await readFile("package-lock.json", "utf8"));
   const candidateBase = resolveCandidateBase();
-  const components = Object.entries(lock.packages ?? {})
-    .filter(([path, record]) => path.startsWith("node_modules/") && record?.version)
-    .map(([path, record]) => ({
+  const components = lockfileComponentRecords(lock)
+    .map((record) => ({
       type: "library",
-      name: path.slice("node_modules/".length),
+      name: record.name,
       version: record.version,
       scope: record.dev ? "optional" : "required",
       licenses: record.license ? [{ license: { id: record.license } }] : [],
-      purl: `pkg:npm/${encodeURIComponent(path.slice("node_modules/".length))}@${encodeURIComponent(record.version)}`
+      purl: `pkg:npm/${encodeURIComponent(record.name)}@${encodeURIComponent(record.version)}`
     }))
     .sort((left, right) => `${left.name}@${left.version}`.localeCompare(`${right.name}@${right.version}`));
-  const prior = gitPackageJsonAt(candidateBase.candidateBaseSha);
-  if (!prior) throw new Error("SCRIMED SBOM candidate-base package manifest is unavailable");
-  const dependencyDelta = buildDependencyDelta(packageJson, prior);
+  const priorPackageJson = gitJsonAt(candidateBase.candidateBaseSha, "package.json");
+  const priorLock = gitJsonAt(candidateBase.candidateBaseSha, "package-lock.json");
+  if (!priorPackageJson || !priorLock) {
+    throw new Error("SCRIMED SBOM candidate-base dependency manifests are unavailable");
+  }
+  const manifestDependencyDelta = buildDependencyDelta(
+    packageJson,
+    priorPackageJson
+  );
+  const lockfileComponentDelta = buildLockfileComponentDelta(lock, priorLock);
+  const dependencyDeltaCount =
+    manifestDependencyDelta.length + lockfileComponentDelta.length;
   const bom = {
     bomFormat: "CycloneDX",
     specVersion: "1.6",
@@ -107,13 +174,16 @@ async function buildReport() {
       ]
     },
     components,
-    dependencyDelta
+    dependencyDelta: manifestDependencyDelta,
+    lockfileComponentDelta
   };
   return {
     service: "scrimed-supply-chain-evidence",
     status: "LOCAL_SBOM_GENERATED_REVIEW_REQUIRED",
     componentCount: components.length,
-    dependencyDeltaCount: dependencyDelta.length,
+    dependencyDeltaCount,
+    manifestDependencyDeltaCount: manifestDependencyDelta.length,
+    lockfileComponentDeltaCount: lockfileComponentDelta.length,
     candidateBaseRef: candidateBase.candidateBaseRef,
     candidateBaseSha: candidateBase.candidateBaseSha,
     candidateHeadSha: candidateBase.headSha,
@@ -137,6 +207,52 @@ if (args.has("--self-test")) {
   if (delta.length !== 3 || delta[0]?.name !== "alpha") {
     throw new Error("SBOM candidate-base dependency delta self-test failed");
   }
+  const lockfileDelta = buildLockfileComponentDelta(
+    {
+      packages: {
+        "node_modules/alpha": {
+          version: "2.0.0",
+          integrity: "sha512-current"
+        }
+      }
+    },
+    {
+      packages: {
+        "node_modules/alpha": {
+          version: "1.0.0",
+          integrity: "sha512-prior"
+        }
+      }
+    }
+  );
+  if (
+    lockfileDelta.length !== 1 ||
+    lockfileDelta[0]?.before?.version !== "1.0.0" ||
+    lockfileDelta[0]?.after?.version !== "2.0.0"
+  ) {
+    throw new Error("SBOM candidate-base lockfile component delta self-test failed");
+  }
+  const integrityOnlyDelta = buildLockfileComponentDelta(
+    {
+      packages: {
+        "node_modules/alpha": {
+          version: "1.0.0",
+          integrity: "sha512-repacked"
+        }
+      }
+    },
+    {
+      packages: {
+        "node_modules/alpha": {
+          version: "1.0.0",
+          integrity: "sha512-original"
+        }
+      }
+    }
+  );
+  if (integrityOnlyDelta.length !== 1) {
+    throw new Error("SBOM lockfile integrity-only delta self-test failed");
+  }
   if (!isSafeCandidateBaseRef(DEFAULT_CANDIDATE_BASE_REF) || isSafeCandidateBaseRef("HEAD;rm -rf /")) {
     throw new Error("SBOM candidate-base reference validation self-test failed");
   }
@@ -149,4 +265,4 @@ if (!/^[0-9a-f]{64}$/.test(report.sbomHash) || report.componentCount < 1) {
   throw new Error("SCRIMED SBOM verification failed");
 }
 if (args.has("--json")) console.log(JSON.stringify(report, null, 2));
-else console.log(`pass SCRIMED local SBOM component_count=${report.componentCount} dependency_delta=${report.dependencyDeltaCount} sbom_hash=${report.sbomHash.slice(0, 16)} signing=external-review-required`);
+else console.log(`pass SCRIMED local SBOM component_count=${report.componentCount} manifest_delta=${report.manifestDependencyDeltaCount} lockfile_delta=${report.lockfileComponentDeltaCount} dependency_delta=${report.dependencyDeltaCount} sbom_hash=${report.sbomHash.slice(0, 16)} signing=external-review-required`);

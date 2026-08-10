@@ -17,6 +17,7 @@ const paths = [
   "docs/release/PRODUCTION_AUTHORIZATION_PACKET.md",
   "scripts/lib/current-exact-head-review-candidate.mjs",
   "scripts/lib/exact-head-approval-consumption-ledger.mjs",
+  "scripts/scrimed-sbom.mjs",
   "scripts/verify-merge-readiness.mjs",
   "package.json"
 ];
@@ -115,6 +116,22 @@ assert.match(
 assert.match(
   files["scripts/verify-merge-readiness.mjs"],
   /verifyReviewerIdentityMappings/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /candidate\.authorIdentities/
+);
+assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /comparableIdentities/
+);
+assert.match(
+  files["scripts/scrimed-sbom.mjs"],
+  /buildLockfileComponentDelta/
+);
+assert.match(
+  files["scripts/lib/current-exact-head-review-candidate.mjs"],
+  /sbom\.lockfileComponentDeltaCount === 0/
 );
 assert.match(
   files["scripts/verify-merge-readiness.mjs"],

@@ -159,18 +159,44 @@ function verifySpecialistDispositions(evidence, candidate, evaluatedAt) {
 
   return {
     roles: dispositions.map((entry) => entry.reviewerRole).sort(),
-    reviewerIdentityHashes: dispositions.map((entry) => entry.reviewerId)
+    reviewerIdentities: dispositions.map((entry) => ({
+      identityHash: entry.reviewerId,
+      identityProvider: entry.identityAssurance
+    }))
   };
 }
 
 function verifyReviewerIdentityMappings(
   mappings,
-  reviewerIdentityHashes,
+  reviewerIdentities,
   candidate,
   evaluatedAt
 ) {
-  if (!Array.isArray(mappings)) return { valid: false, selfReview: false };
-  const requiredReviewerHashes = [...new Set(reviewerIdentityHashes)].sort();
+  if (
+    !Array.isArray(mappings) ||
+    !Array.isArray(reviewerIdentities) ||
+    !Array.isArray(candidate?.authorIdentities) ||
+    !Array.isArray(candidate?.authorIdentityHashes)
+  ) {
+    return { valid: false, selfReview: false };
+  }
+  const requiredReviewerProviders = new Map();
+  for (const identity of reviewerIdentities) {
+    if (
+      !isObject(identity) ||
+      !sha256Pattern.test(identity.identityHash) ||
+      !new Set([
+        "aal2-protected-workspace",
+        "qualified-external-reference"
+      ]).has(identity.identityProvider)
+    ) {
+      return { valid: false, selfReview: false };
+    }
+    const providers = requiredReviewerProviders.get(identity.identityHash) ?? new Set();
+    providers.add(identity.identityProvider);
+    requiredReviewerProviders.set(identity.identityHash, providers);
+  }
+  const requiredReviewerHashes = [...requiredReviewerProviders.keys()].sort();
   if (
     mappings.length !== requiredReviewerHashes.length ||
     new Set(mappings.map((mapping) => mapping?.reviewerIdentityHash)).size !==
@@ -180,20 +206,61 @@ function verifyReviewerIdentityMappings(
   }
 
   const candidateAuthorHashes = new Set(candidate.authorIdentityHashes);
+  const candidateAuthorProviders = new Set(
+    candidate.authorIdentities.map((identity) => identity.identityProvider)
+  );
+  const supportedIdentityProviders = new Set([
+    "aal2-protected-workspace",
+    "qualified-external-reference",
+    "git-commit-author",
+    "github"
+  ]);
   let selfReview = false;
   for (const mapping of mappings) {
+    const comparableIdentities = mapping?.comparableIdentities;
+    const comparableIdentityKeys = Array.isArray(comparableIdentities)
+      ? comparableIdentities.map(
+          (identity) =>
+            `${identity?.identityProvider}:${identity?.identityHash}`
+        )
+      : [];
+    const comparableProviders = new Set(
+      Array.isArray(comparableIdentities)
+        ? comparableIdentities.map((identity) => identity?.identityProvider)
+        : []
+    );
+    const requiredProviders = requiredReviewerProviders.get(
+      mapping?.reviewerIdentityHash
+    );
     if (
       !isObject(mapping) ||
       !requiredReviewerHashes.includes(mapping.reviewerIdentityHash) ||
       !sha256Pattern.test(mapping.reviewerIdentityHash) ||
-      !Array.isArray(mapping.comparableIdentityHashes) ||
-      mapping.comparableIdentityHashes.length === 0 ||
-      new Set(mapping.comparableIdentityHashes).size !==
-        mapping.comparableIdentityHashes.length ||
-      !mapping.comparableIdentityHashes.every((value) =>
-        sha256Pattern.test(value)
+      !Array.isArray(comparableIdentities) ||
+      comparableIdentities.length === 0 ||
+      new Set(comparableIdentityKeys).size !== comparableIdentities.length ||
+      new Set(
+        comparableIdentities.map((identity) => identity?.identityHash)
+      ).size !== comparableIdentities.length ||
+      !comparableIdentities.every(
+        (identity) =>
+          isObject(identity) &&
+          supportedIdentityProviders.has(identity.identityProvider) &&
+          identity.verificationMethod ===
+            "trusted-issuer-directory-binding" &&
+          sha256Pattern.test(identity.identityHash)
       ) ||
-      !mapping.comparableIdentityHashes.includes(mapping.reviewerIdentityHash) ||
+      !requiredProviders ||
+      ![...requiredProviders].every((identityProvider) =>
+        comparableIdentities.some(
+          (identity) =>
+            identity.identityProvider === identityProvider &&
+            identity.identityHash === mapping.reviewerIdentityHash
+        )
+      ) ||
+      ![...candidateAuthorProviders].every((identityProvider) =>
+        comparableProviders.has(identityProvider)
+      ) ||
       typeof mapping.evidencePointer !== "string" ||
       !mapping.evidencePointer.trim() ||
       !Number.isFinite(Date.parse(mapping.mappedAt)) ||
@@ -211,8 +278,8 @@ function verifyReviewerIdentityMappings(
       return { valid: false, selfReview: false };
     }
     if (
-      mapping.comparableIdentityHashes.some((identityHash) =>
-        candidateAuthorHashes.has(identityHash)
+      comparableIdentities.some((identity) =>
+        candidateAuthorHashes.has(identity.identityHash)
       )
     ) {
       selfReview = true;
@@ -301,7 +368,13 @@ function verifyApprovalDocument({
 
   const identityMappingResult = verifyReviewerIdentityMappings(
     supplementalEvidence.reviewerIdentityMappings,
-    [approvalEvidence.reviewerId, ...specialistDispositions.reviewerIdentityHashes],
+    [
+      {
+        identityHash: approvalEvidence.reviewerId,
+        identityProvider: approvalEvidence.identityAssurance
+      },
+      ...specialistDispositions.reviewerIdentities
+    ],
     candidate,
     evaluatedAt
   );
@@ -361,7 +434,9 @@ function verifyApprovalDocument({
         remoteCiEvidenceHash: remoteCiEvidence.evidenceHash,
         specialistReviewerRoles: specialistDispositions.roles,
         specialistReviewerIdentityHashes:
-          specialistDispositions.reviewerIdentityHashes
+          specialistDispositions.reviewerIdentities.map(
+            (identity) => identity.identityHash
+          )
       },
       remoteCiVerified: true,
       verificationError: null
@@ -596,20 +671,40 @@ function buildSelfTestTrustContext(approval, candidate, options = {}) {
     expiresAt: "2026-08-10T22:00:00.000Z",
     evidencePointer: "self-test:remote-ci"
   });
-  const reviewerIdentityMappings = [
-    approvalEvidence.reviewerId,
-    ...specialistApprovals.map((entry) => entry.reviewerId)
-  ].map((reviewerIdentityHash, index) =>
-    createP32ReviewerIdentityMapping({
-      reviewerIdentityHash,
-      comparableIdentityHashes:
-        index === 0 && options.reviewerAliasIdentityHash
-          ? [reviewerIdentityHash, options.reviewerAliasIdentityHash]
-          : [reviewerIdentityHash],
-      evidencePointer: `self-test:identity-map:${index}`,
-      mappedAt: "2026-08-09T22:45:00.000Z",
-      expiresAt: "2026-08-10T22:00:00.000Z"
-    })
+  const reviewerIdentityMappings = [approvalEvidence, ...specialistApprovals].map(
+    (reviewerEvidence, index) => {
+      const directIdentity = {
+        identityProvider: reviewerEvidence.identityAssurance,
+        identityHash: reviewerEvidence.reviewerId,
+        verificationMethod: "trusted-issuer-directory-binding"
+      };
+      const gitIdentity = {
+        identityProvider: "git-commit-author",
+        identityHash:
+          index === 0 && options.reviewerAliasIdentityHash
+            ? options.reviewerAliasIdentityHash
+            : `${index + 3}`.repeat(64),
+        verificationMethod: "trusted-issuer-directory-binding"
+      };
+      const githubIdentity = {
+        identityProvider: "github",
+        identityHash: `${index + 6}`.repeat(64),
+        verificationMethod: "trusted-issuer-directory-binding"
+      };
+      const comparableIdentities = options.singletonIdentityMappings
+        ? [directIdentity]
+        : options.omitGithubIdentityMapping
+          ? [directIdentity, gitIdentity]
+          : [directIdentity, gitIdentity, githubIdentity];
+
+      return createP32ReviewerIdentityMapping({
+        reviewerIdentityHash: reviewerEvidence.reviewerId,
+        comparableIdentities,
+        evidencePointer: `self-test:identity-map:${index}`,
+        mappedAt: "2026-08-09T22:45:00.000Z",
+        expiresAt: "2026-08-10T22:00:00.000Z"
+      });
+    }
   );
   const supplementalEvidence = {
     automatedEvidence:
@@ -680,6 +775,10 @@ function buildSelfTestCurrentCandidateResult() {
     clean: true,
     commitSha: "f".repeat(40),
     treeSha: "e".repeat(40),
+    authorIdentities: [
+      { identityProvider: "git-commit-author", identityHash: "b".repeat(64) },
+      { identityProvider: "github", identityHash: "c".repeat(64) }
+    ],
     authorIdentityHashes: ["b".repeat(64), "c".repeat(64)],
     commitAuthorCount: 2
   };
@@ -736,6 +835,8 @@ function buildSelfTestCurrentCandidateResult() {
       sbomHash: "5".repeat(64),
       componentCount: 1,
       dependencyDeltaCount: 0,
+      manifestDependencyDeltaCount: 0,
+      lockfileComponentDeltaCount: 0,
       candidateBaseSha: manifest.candidateBaseSha
     },
     vercelConfiguration: {
@@ -864,6 +965,36 @@ export async function runMergeReadinessSelfTest() {
   assert.equal(unmappedReviewerInput.exactHeadApprovalMatches, false);
   assert.ok(
     unmappedReviewerInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-identity-mapping-required"
+    )
+  );
+
+  const singletonIdentityInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(approval, candidate, {
+      singletonIdentityMappings: true
+    }),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(singletonIdentityInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    singletonIdentityInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-identity-mapping-required"
+    )
+  );
+
+  const incompleteProviderMappingInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(approval, candidate, {
+      omitGithubIdentityMapping: true
+    }),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(incompleteProviderMappingInput.exactHeadApprovalMatches, false);
+  assert.ok(
+    incompleteProviderMappingInput.reviewBindingReasonCodes.includes(
       "exact-head-review-identity-mapping-required"
     )
   );

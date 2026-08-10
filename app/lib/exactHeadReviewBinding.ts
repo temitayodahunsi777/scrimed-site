@@ -1,7 +1,12 @@
 import { createClinicalEvidenceHash } from "./clinicalEvidenceControls";
 
 export const exactHeadReviewBindingVersion =
-  "scrimed-exact-head-review-binding-v4-2026-08-10";
+  "scrimed-exact-head-review-binding-v5-2026-08-10";
+
+export type ExactHeadAuthorIdentity = {
+  identityProvider: "git-commit-author" | "github";
+  identityHash: string;
+};
 
 export type ExactHeadCriticalSurfaceFingerprints = {
   securityCriticalFiles: string;
@@ -19,6 +24,7 @@ export type ExactHeadReviewCandidate = {
   reviewPacketFingerprint: string;
   sbomFingerprint: string;
   criticalSurfaces: ExactHeadCriticalSurfaceFingerprints;
+  authorIdentities: ExactHeadAuthorIdentity[];
   authorIdentityHashes: string[];
   requiredReviewerRoles: string[];
 };
@@ -211,6 +217,7 @@ function hasValidVerifiedIdentityEvidence(
 }
 
 function hasValidCandidate(candidate: ExactHeadReviewCandidate) {
+  const authorIdentities = candidate.authorIdentities;
   const authorIdentityHashes = candidate.authorIdentityHashes;
   const requiredReviewerRoles = candidate.requiredReviewerRoles;
   return (
@@ -222,10 +229,28 @@ function hasValidCandidate(candidate: ExactHeadReviewCandidate) {
       candidate.reviewPacketFingerprint,
       candidate.sbomFingerprint
     ].every((value) => sha256Pattern.test(value)) &&
+    Array.isArray(authorIdentities) &&
+    authorIdentities.length > 0 &&
+    new Set(
+      authorIdentities.map(
+        (identity) => `${identity?.identityProvider}:${identity?.identityHash}`
+      )
+    ).size === authorIdentities.length &&
+    authorIdentities.every(
+      (identity) =>
+        (identity?.identityProvider === "git-commit-author" ||
+          identity?.identityProvider === "github") &&
+        sha256Pattern.test(identity.identityHash)
+    ) &&
     Array.isArray(authorIdentityHashes) &&
     authorIdentityHashes.length > 0 &&
     new Set(authorIdentityHashes).size === authorIdentityHashes.length &&
     authorIdentityHashes.every((value) => sha256Pattern.test(value)) &&
+    [...new Set(authorIdentities.map((identity) => identity.identityHash))]
+      .sort()
+      .every((value, index) => value === [...authorIdentityHashes].sort()[index]) &&
+    new Set(authorIdentities.map((identity) => identity.identityHash)).size ===
+      authorIdentityHashes.length &&
     Array.isArray(requiredReviewerRoles) &&
     requiredReviewerRoles.length > 0 &&
     new Set(requiredReviewerRoles).size === requiredReviewerRoles.length &&

@@ -15,19 +15,52 @@ export type P32SupplementalEvidencePayload = {
 
 export type P32ReviewerIdentityMapping = {
   reviewerIdentityHash: string;
-  comparableIdentityHashes: string[];
+  comparableIdentities: P32ComparableReviewerIdentity[];
   evidencePointer: string;
   mappedAt: string;
   expiresAt: string;
   mappingHash: string;
 };
 
+export type P32ReviewerIdentityProvider =
+  | "aal2-protected-workspace"
+  | "qualified-external-reference"
+  | "git-commit-author"
+  | "github";
+
+export type P32ComparableReviewerIdentity = {
+  identityProvider: P32ReviewerIdentityProvider;
+  identityHash: string;
+  verificationMethod: "trusted-issuer-directory-binding";
+};
+
+function normalizeComparableIdentities(
+  identities: P32ComparableReviewerIdentity[]
+) {
+  return [...identities]
+    .filter(
+      (identity, index, values) =>
+        values.findIndex(
+          (candidate) =>
+            candidate.identityProvider === identity.identityProvider &&
+            candidate.identityHash === identity.identityHash
+        ) === index
+    )
+    .sort((left, right) =>
+      `${left.identityProvider}:${left.identityHash}`.localeCompare(
+        `${right.identityProvider}:${right.identityHash}`
+      )
+    );
+}
+
 export function computeP32ReviewerIdentityMappingHash(
   mapping: Omit<P32ReviewerIdentityMapping, "mappingHash">
 ) {
   return createClinicalEvidenceHash({
     ...mapping,
-    comparableIdentityHashes: [...new Set(mapping.comparableIdentityHashes)].sort()
+    comparableIdentities: normalizeComparableIdentities(
+      mapping.comparableIdentities
+    )
   });
 }
 
@@ -36,7 +69,9 @@ export function createP32ReviewerIdentityMapping(
 ): P32ReviewerIdentityMapping {
   const normalized = {
     ...mapping,
-    comparableIdentityHashes: [...new Set(mapping.comparableIdentityHashes)].sort()
+    comparableIdentities: normalizeComparableIdentities(
+      mapping.comparableIdentities
+    )
   };
   return {
     ...normalized,

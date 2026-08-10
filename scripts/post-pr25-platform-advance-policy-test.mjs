@@ -27,7 +27,7 @@ assert.equal(summary.release.currentState, "REVIEW_REQUESTED");
 assert.equal(summary.mergeReadiness.status, "NOT_READY_FOR_MERGE");
 assert.equal(
   summary.exactHeadReview.bindingVersion,
-  "scrimed-exact-head-review-binding-v4-2026-08-10"
+  "scrimed-exact-head-review-binding-v5-2026-08-10"
 );
 assert.ok(
   summary.mergeReadiness.reasonCodes.includes("merge-exact-head-approval-missing")

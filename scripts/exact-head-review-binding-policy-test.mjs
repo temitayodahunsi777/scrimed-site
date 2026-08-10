@@ -23,6 +23,10 @@ const candidate = {
   reviewPacketFingerprint: hash("d"),
   sbomFingerprint: hash("e"),
   criticalSurfaces: surfaces,
+  authorIdentities: [
+    { identityProvider: "git-commit-author", identityHash: hash("f") },
+    { identityProvider: "github", identityHash: hash("8") }
+  ],
   authorIdentityHashes: [hash("f"), hash("8")],
   requiredReviewerRoles: ["Principal engineer", "Security reviewer"]
 };
