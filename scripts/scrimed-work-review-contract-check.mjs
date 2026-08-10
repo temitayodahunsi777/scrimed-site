@@ -15,6 +15,7 @@ const paths = [
   "docs/release/PR25_FROZEN_REVIEW_BASELINE.md",
   "docs/review/PR25_REVIEWER_BRIEF.md",
   "docs/release/PRODUCTION_AUTHORIZATION_PACKET.md",
+  "scripts/lib/current-exact-head-review-candidate.mjs",
   "scripts/lib/exact-head-approval-consumption-ledger.mjs",
   "scripts/verify-merge-readiness.mjs",
   "package.json"
@@ -75,6 +76,27 @@ assert.match(
   /consumedApprovalIds:\s*consumptionState\.consumedApprovalIds/
 );
 assert.match(
+  files["scripts/verify-merge-readiness.mjs"],
+  /loadCurrentExactHeadReviewCandidate/
+);
+assert.match(files["scripts/verify-merge-readiness.mjs"], /--candidate-only/);
+assert.doesNotMatch(
+  files["scripts/verify-merge-readiness.mjs"],
+  /getPr25ExactHeadReviewCandidate/
+);
+assert.match(
+  files["scripts/lib/current-exact-head-review-candidate.mjs"],
+  /manifest\.baseHeadSha === sourceState\.commitSha/
+);
+assert.match(
+  files["scripts/lib/current-exact-head-review-candidate.mjs"],
+  /reviewPacket\.candidateReviewPacketSha256/
+);
+assert.match(
+  files["scripts/lib/current-exact-head-review-candidate.mjs"],
+  /validation\.validationEvidenceHashSha256/
+);
+assert.match(
   files["scripts/lib/exact-head-approval-consumption-ledger.mjs"],
   /O_EXCL/
 );
@@ -112,5 +134,5 @@ assert.doesNotMatch(
 );
 
 console.log(
-  "pass SCRIMED Work exact-head reviewer contract (frozen identity, read-only UI/API, release separation, merge preflight, and operator boundaries)"
+  "pass SCRIMED Work exact-head reviewer contract (historical frozen identity, checked-out-head merge binding, read-only UI/API, release separation, and operator boundaries)"
 );

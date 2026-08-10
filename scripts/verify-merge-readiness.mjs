@@ -11,10 +11,6 @@ import {
 import { evaluateMergeReadiness } from "../app/lib/mergeReadiness.ts";
 import { getScrimedOperatingModeSummary } from "../app/lib/operatingMode.ts";
 import {
-  getPr25ExactHeadReviewCandidate,
-  getPr25FrozenReviewBaseline
-} from "../app/lib/pr25FrozenReviewBaseline.ts";
-import {
   computeP32SupplementalEvidencePayloadHash,
   p32EvidenceTrustRegistryVersion,
   p32SupplementalEvidenceAttestationVersion,
@@ -26,6 +22,10 @@ import {
   releaseExactHeadApprovalConsumption,
   runExactHeadApprovalConsumptionLedgerSelfTest
 } from "./lib/exact-head-approval-consumption-ledger.mjs";
+import {
+  buildCurrentExactHeadReviewCandidate,
+  loadCurrentExactHeadReviewCandidate
+} from "./lib/current-exact-head-review-candidate.mjs";
 
 const sha256Pattern = /^[0-9a-f]{64}$/;
 
@@ -175,10 +175,13 @@ function verifyApprovalDocument({
 }
 
 async function buildCurrentMergeReadinessContext(options = {}) {
-  const baseline = getPr25FrozenReviewBaseline();
-  const candidate = getPr25ExactHeadReviewCandidate();
+  const currentCandidate =
+    options.currentCandidateResult ??
+    (await loadCurrentExactHeadReviewCandidate({
+      currentCandidateEvidence: options.currentCandidateEvidence
+    }));
+  const candidate = currentCandidate.candidate;
   const operatingMode = getScrimedOperatingModeSummary().mode;
-  const vercel = JSON.parse(await readFile("vercel.json", "utf8"));
   const approvalPath =
     options.approvalPath ??
     process.env.SCRIMED_EXACT_HEAD_APPROVAL_FILE ??
@@ -227,12 +230,12 @@ async function buildCurrentMergeReadinessContext(options = {}) {
       consumptionState.ready &&
       reviewBinding.approved &&
       reviewBinding.status === "APPROVED_EXACT_HEAD",
-    ciPassed:
-      baseline.validation.githubActionsPassed === baseline.validation.githubActionsTotal,
-    secretScanPassed: baseline.validation.secretScanFindings === 0,
-    sbomPassed: baseline.validation.dependencyDelta === 0,
-    publicClaimsPassed: baseline.validation.publicClaimsPassed,
-    unreviewedMigrationsAdded: !baseline.validation.migrationStaticReviewPassed,
+    ciPassed: currentCandidate.validation.ciPassed,
+    secretScanPassed: currentCandidate.validation.secretScanPassed,
+    sbomPassed: currentCandidate.validation.sbomPassed,
+    publicClaimsPassed: currentCandidate.validation.publicClaimsPassed,
+    unreviewedMigrationsAdded:
+      currentCandidate.validation.unreviewedMigrationsAdded,
     syntheticOnly: operatingMode.syntheticOnly,
     phiEnabled: operatingMode.allowPHI,
     clinicalExecutionEnabled: operatingMode.liveClinicalExecution,
@@ -240,7 +243,7 @@ async function buildCurrentMergeReadinessContext(options = {}) {
     deviceWritebackEnabled: operatingMode.medicalDeviceConnections,
     customerActivationEnabled: false,
     productionAutoDeployFromMainEnabled:
-      vercel?.git?.deploymentEnabled?.main !== false,
+      currentCandidate.validation.productionAutoDeployFromMainEnabled,
     reviewBindingStatus:
       verifiedDocument.approval && !consumptionState.ready
         ? "BLOCKED"
@@ -268,7 +271,8 @@ async function buildCurrentMergeReadinessContext(options = {}) {
     input,
     approval: verifiedDocument.approval,
     identityVerified: Boolean(verifiedDocument.verifiedIdentityEvidence),
-    consumptionState
+    consumptionState,
+    currentCandidate
   };
 }
 
@@ -401,6 +405,72 @@ function buildSelfTestTrustContext(approval) {
   return { approvalDocument, trustedPublicKeysJson };
 }
 
+function buildSelfTestCurrentCandidateResult() {
+  const sourceState = {
+    clean: true,
+    commitSha: "f".repeat(40),
+    treeSha: "e".repeat(40),
+    authorIdentityHash: "b".repeat(64)
+  };
+  const manifest = {
+    strictProvenanceEligible: true,
+    candidateMode: "clean-commit",
+    dirtyEntryCount: 0,
+    baseHeadSha: sourceState.commitSha,
+    headTreeSha: sourceState.treeSha,
+    candidateBaseSha: "d".repeat(40),
+    candidateDigestSha256: "1".repeat(64),
+    sourceCandidateDigestSha256: "2".repeat(64),
+    changedFileCount: 1
+  };
+  const checks = [
+    "secret-scan",
+    "sbom",
+    "migration-packet",
+    "nonsecret-suite",
+    "build"
+  ].map((id) => ({ id, passed: true }));
+  const validation = {
+    automatedValidationPassed: true,
+    candidateStable: true,
+    sourceCommitStable: true,
+    sourceReviewReady: true,
+    sourceCommitSha: sourceState.commitSha,
+    candidateFingerprintSha256: manifest.candidateDigestSha256,
+    sourceFingerprintSha256: manifest.sourceCandidateDigestSha256,
+    validationEvidenceHashSha256: "3".repeat(64),
+    failedChecks: [],
+    checkCount: checks.length,
+    checks
+  };
+  const reviewPacket = {
+    completeCoverage: true,
+    reviewBatchCoverageComplete: true,
+    rejectedFileCount: 0,
+    baseHeadSha: sourceState.commitSha,
+    headTreeSha: sourceState.treeSha,
+    candidateDigestSha256: manifest.candidateDigestSha256,
+    sourceCandidateDigestSha256: manifest.sourceCandidateDigestSha256,
+    candidateReviewPacketSha256: "4".repeat(64),
+    reviewableFileCount: 1
+  };
+
+  return buildCurrentExactHeadReviewCandidate({
+    sourceState,
+    manifest,
+    validation,
+    reviewPacket,
+    sbom: {
+      sbomHash: "5".repeat(64),
+      componentCount: 1,
+      dependencyDeltaCount: 0
+    },
+    vercelConfiguration: {
+      git: { deploymentEnabled: { main: false } }
+    }
+  });
+}
+
 export async function runMergeReadinessSelfTest() {
   const readyInput = {
     exactHeadApproval: true,
@@ -438,7 +508,8 @@ export async function runMergeReadinessSelfTest() {
   assert.ok(unsafe.reasonCodes.includes("merge-phi-enabled"));
   assert.ok(unsafe.reasonCodes.includes("merge-production-auto-deploy-enabled"));
 
-  const candidate = getPr25ExactHeadReviewCandidate();
+  const currentCandidateResult = buildSelfTestCurrentCandidateResult();
+  const candidate = currentCandidateResult.candidate;
   const approvalBase = {
     approvalId: "merge-readiness-self-test-approval",
     replayNonce: "merge-readiness-self-test-nonce",
@@ -469,6 +540,7 @@ export async function runMergeReadinessSelfTest() {
   const trusted = buildSelfTestTrustContext(approval);
   const verifiedInput = await buildCurrentMergeReadinessInput({
     ...trusted,
+    currentCandidateResult,
     requireConsumptionLedger: false,
     evaluatedAt: "2026-08-09T23:00:00.000Z"
   });
@@ -478,6 +550,7 @@ export async function runMergeReadinessSelfTest() {
 
   const missingLedgerInput = await buildCurrentMergeReadinessInput({
     ...trusted,
+    currentCandidateResult,
     evaluatedAt: "2026-08-09T23:00:00.000Z"
   });
   assert.equal(missingLedgerInput.exactHeadApprovalMatches, false);
@@ -497,6 +570,7 @@ export async function runMergeReadinessSelfTest() {
   };
   const invalidInput = await buildCurrentMergeReadinessInput({
     ...buildSelfTestTrustContext(unknownDispositionApproval),
+    currentCandidateResult,
     requireConsumptionLedger: false,
     evaluatedAt: "2026-08-09T23:00:00.000Z"
   });
@@ -511,6 +585,7 @@ export async function runMergeReadinessSelfTest() {
   const unsignedInput = await buildCurrentMergeReadinessInput({
     approvalDocument: { approval },
     trustedPublicKeysJson: trusted.trustedPublicKeysJson,
+    currentCandidateResult,
     requireConsumptionLedger: false,
     evaluatedAt: "2026-08-09T23:00:00.000Z"
   });
@@ -527,15 +602,70 @@ export async function runMergeReadinessSelfTest() {
     )
   );
 
+  const staleCandidate = {
+    ...candidate,
+    commitSha: "c15a79c76d59a2f94bb7f999469da8bbc1618d8c",
+    candidateFingerprint: "c".repeat(64),
+    sourceFingerprint: "d".repeat(64),
+    validationFingerprint: "e".repeat(64),
+    reviewPacketFingerprint: "0".repeat(64)
+  };
+  const staleApprovalBase = {
+    ...approvalBase,
+    commitSha: staleCandidate.commitSha,
+    candidateFingerprint: staleCandidate.candidateFingerprint,
+    sourceFingerprint: staleCandidate.sourceFingerprint,
+    validationFingerprint: staleCandidate.validationFingerprint,
+    reviewPacketFingerprint: staleCandidate.reviewPacketFingerprint,
+    sbomFingerprint: staleCandidate.sbomFingerprint,
+    criticalSurfaces: staleCandidate.criticalSurfaces
+  };
+  const staleApproval = {
+    ...staleApprovalBase,
+    approvalDigest: createExactHeadApprovalDigest(staleApprovalBase)
+  };
+  const staleBaselineInput = await buildCurrentMergeReadinessInput({
+    ...buildSelfTestTrustContext(staleApproval),
+    currentCandidateResult,
+    requireConsumptionLedger: false,
+    evaluatedAt: "2026-08-09T23:00:00.000Z"
+  });
+  assert.equal(staleBaselineInput.exactHeadApprovalMatches, false);
+  assert.equal(staleBaselineInput.reviewBindingStatus, "BLOCKED");
+  assert.ok(
+    staleBaselineInput.reviewBindingReasonCodes.includes(
+      "exact-head-review-stale"
+    )
+  );
+
   await runExactHeadApprovalConsumptionLedgerSelfTest();
 
   console.log(
-    "pass merge-readiness verifier self-test (trusted Ed25519 exact-head artifact, durable one-use consumption, replay rejection, forged unsigned rejection, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
+    "pass merge-readiness verifier self-test (checked-out-head candidate binding, stale frozen-baseline rejection, trusted Ed25519 artifact, durable one-use consumption, replay rejection, forged unsigned rejection, CI, supply chain, claims, migrations, operating mode, and production auto-deploy)"
   );
 }
 
 if (process.argv.includes("--self-test")) {
   await runMergeReadinessSelfTest();
+  process.exit(0);
+}
+
+if (process.argv.includes("--candidate-only")) {
+  const currentCandidate = await loadCurrentExactHeadReviewCandidate();
+  console.log(
+    JSON.stringify(
+      {
+        service: "scrimed-exact-head-current-candidate",
+        status: "CURRENT_HEAD_EVIDENCE_READY_HUMAN_REVIEW_REQUIRED",
+        ...currentCandidate,
+        releaseAuthorityGranted: false,
+        boundary:
+          "This deterministic packet describes the clean checked-out candidate for review. It grants no merge, deployment, migration, PHI, clinical, payer, EHR, certification, customer-activation, or external-distribution authority."
+      },
+      null,
+      2
+    )
+  );
   process.exit(0);
 }
 

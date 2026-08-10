@@ -4,10 +4,11 @@
 
 ```mermaid
 flowchart LR
-  A["Frozen PR #25 candidate"] --> B["Exact-head review binding"]
-  B --> C["Release state machine"]
-  C --> D["Merge readiness verifier"]
-  A --> E["Follow-on development branch"]
+  A["Historical PR #25 baseline"] --> E["Follow-on development branch"]
+  E --> B["Checked-out HEAD evidence loader"]
+  B --> C["Exact-head review binding"]
+  C --> D["Release state machine"]
+  D --> K["Merge readiness verifier"]
   E --> F["Evidence graph and claim resolver"]
   E --> G["Investor and partner readiness"]
   E --> H["Moat and unit-economics registries"]
@@ -30,7 +31,17 @@ flowchart LR
 
 ### Merge-readiness approval evidence
 
-`release:merge-readiness` never infers exact-head approval from a boolean in the frozen baseline. It evaluates a complete approval artifact against the frozen candidate with `evaluateExactHeadReviewBinding`, and it accepts reviewer identity only after Ed25519 verification against a configured trusted issuer.
+`release:merge-readiness` never infers exact-head approval from a boolean or reuses the historical PR #25 candidate. Before evaluating an approval, it reconstructs the candidate from the clean checked-out Git commit and tree, strict candidate manifest, strict validation evidence, complete review packet, deterministic SBOM, and current deployment configuration. Every source commit, tree, candidate, source, validation, review-packet, and SBOM value must align. It then evaluates the complete approval artifact against that current candidate with `evaluateExactHeadReviewBinding`, and accepts reviewer identity only after Ed25519 verification against a configured trusted issuer. An approval for PR #25 or any earlier head therefore fails with `exact-head-review-stale`.
+
+Set `SCRIMED_RELEASE_CANDIDATE_BASE_REF` to the exact reviewed ancestor used to generate the candidate packet before running merge readiness. The loader passes the same base through all deterministic evidence commands. A missing or different base produces different fingerprints and fails closed rather than reinterpreting an approval. The evidence loader runs the strict local candidate suite; remote CI and named human review remain separately observed release controls and are never inferred from the historical baseline.
+
+Generate the non-authorizing reviewer input for the checked-out head with:
+
+```text
+SCRIMED_RELEASE_CANDIDATE_BASE_REF=<exact-reviewed-base> npm run release:merge-readiness -- --candidate-only
+```
+
+The output contains hash-only candidate, validation, review-coverage, SBOM, and critical-surface evidence. Any source change invalidates it and requires a new packet and a fresh independent review.
 
 Provide the local, nonsecret signed envelope through `SCRIMED_EXACT_HEAD_APPROVAL_FILE` or `--approval-file <path>`. The envelope contains `approval` plus one `identityEvidence` payload and its short-lived issuer attestation. Configure approved public keys and issuer scope through `SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON`; private keys never belong in this verifier or repository.
 
