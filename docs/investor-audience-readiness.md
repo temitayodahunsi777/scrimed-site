@@ -65,6 +65,22 @@ No external outreach, program application, investment request, or partnership co
 
 The investor narrative is organized around twelve decision questions: category, workflow problem, entry wedge, product, architecture, trust, proof, market, business model, defensibility, milestones/capital, and company-specific strategic fit. Every slide has proof routes and a claim guard.
 
+## Guided Investor Demonstration
+
+The Investor and Audience Readiness page includes a timed run-of-show that reduces the first meeting to three inspectable proof chapters:
+
+1. Documentation Before Authorization establishes a narrow administrative workflow wedge using synthetic records and no payer submission.
+2. Atlas and TrustOS show policy, provenance, human review, auditability, and fail-closed execution as the platform moat.
+3. The Demo-to-Pilot Accelerator converts interest into a bounded synthetic evaluation and a controlled diligence decision.
+
+The `3-minute preview` is intended for an executive first meeting. The `12-minute walkthrough` supports technical, product, clinical-operations, or diligence follow-up. Timing is deterministic and tested. Both modes retain the same evidence standard and blocked claims.
+
+An automated rehearsal assessment verifies timebox integrity, chapter order, internal proof-route scope, evidence and decision coverage, and explicit authority boundaries. Passing these checks means the run-of-show is ready for an internal founder rehearsal. Before any external meeting, a human presenter must still confirm the audience and ask, rehearse the live proof routes on the meeting device, validate meeting-specific claims against current evidence and permissions, and keep downloadable artifacts internal unless recipient-specific distribution is separately authorized.
+
+Run `SCRIMED_BASE_URL=https://app.scrimedsolutions.com npm run smoke:investor-demo-proof-routes` before an external presentation. The read-only smoke verifies all nine guided-demo routes, route-specific content, same-origin navigation, no-live-care/no-PHI/no-production-connector response headers, and prohibited-claim absence. Requests, response bodies, and read-only retries are bounded to prevent stalled, oversized, or looping proof checks; operators may tighten the safe defaults with `SCRIMED_SMOKE_REQUEST_TIMEOUT_MS`, `SCRIMED_SMOKE_MAX_RESPONSE_BYTES`, and `SCRIMED_SMOKE_MAX_ATTEMPTS`. Mutation checks remain single-attempt. The smoke stores no page bodies, uses no credentials, performs no mutation, and creates no external distribution or solicitation authority. Its offline and adversarial transport behavior is covered by the nonsecret suite.
+
+The guided demonstration does not authorize external distribution, investment solicitation, customer claims, live PHI, clinical execution, payer submission, EHR writeback, production deployment, or customer activation. A founder or approved human presenter remains responsible for the meeting and every external statement.
+
 ## Competitive Edge
 
 The strongest sellable signals are:
