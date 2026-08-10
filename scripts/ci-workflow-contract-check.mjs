@@ -85,6 +85,16 @@ for (const pathname of securityWorkflowPaths) {
   }
 }
 
+for (const pathname of [
+  ".github/workflows/ci.yml",
+  ".github/workflows/dependency-review.yml",
+  ".github/workflows/dependency-security.yml"
+]) {
+  requireIncludes(pathname, "fetch-depth: 0");
+  requireIncludes(pathname, "SCRIMED_RELEASE_CANDIDATE_BASE_REF:");
+  requireIncludes(pathname, "github.event.pull_request.base.sha");
+}
+
 for (const expected of [
   "pull_request:",
   "uses: actions/dependency-review-action@v4",

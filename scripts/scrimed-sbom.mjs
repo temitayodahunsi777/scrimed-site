@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 
 const args = new Set(process.argv.slice(2));
 const allowed = new Set(["--json", "--verify", "--self-test"]);
+const DEFAULT_CANDIDATE_BASE_REF = "HEAD^";
 const unknown = [...args].filter((arg) => !allowed.has(arg));
 if (unknown.length) throw new Error(`Unsupported SBOM option: ${unknown.join(", ")}`);
 
@@ -32,9 +33,16 @@ function gitText(args) {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
+function isSafeCandidateBaseRef(value) {
+  return value === DEFAULT_CANDIDATE_BASE_REF || (
+    /^[A-Za-z0-9][A-Za-z0-9._/-]{0,159}$/.test(value) &&
+    !value.includes("..")
+  );
+}
+
 function resolveCandidateBase() {
-  const requested = process.env.SCRIMED_RELEASE_CANDIDATE_BASE_REF?.trim() || "HEAD^";
-  if (!/^[A-Za-z0-9][A-Za-z0-9._/-]{0,159}$/.test(requested) || requested.includes("..")) {
+  const requested = process.env.SCRIMED_RELEASE_CANDIDATE_BASE_REF?.trim() || DEFAULT_CANDIDATE_BASE_REF;
+  if (!isSafeCandidateBaseRef(requested)) {
     throw new Error("SCRIMED SBOM candidate base ref is invalid");
   }
   const candidateBaseSha = gitText(["rev-parse", "--verify", `${requested}^{commit}`]);
@@ -128,6 +136,9 @@ if (args.has("--self-test")) {
   );
   if (delta.length !== 3 || delta[0]?.name !== "alpha") {
     throw new Error("SBOM candidate-base dependency delta self-test failed");
+  }
+  if (!isSafeCandidateBaseRef(DEFAULT_CANDIDATE_BASE_REF) || isSafeCandidateBaseRef("HEAD;rm -rf /")) {
+    throw new Error("SBOM candidate-base reference validation self-test failed");
   }
   console.log("pass SCRIMED deterministic SBOM hashing and candidate-base dependency delta self-test");
   process.exit(0);
