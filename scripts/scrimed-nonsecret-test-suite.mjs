@@ -447,6 +447,27 @@ const checks = [
     args: ["scripts/strategic-investor-outreach-contract-check.mjs"]
   },
   {
+    label: "Investor demo run-of-show contract",
+    args: ["scripts/investor-demo-run-of-show-contract-check.mjs"]
+  },
+  {
+    label: "Investor demo run-of-show policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/investor-demo-run-of-show-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Investor demo proof-route smoke policy",
+    args: ["scripts/investor-demo-proof-route-smoke.mjs", "--self-test"]
+  },
+  {
+    label: "Bounded public fetch policy",
+    args: ["scripts/bounded-public-fetch-policy-test.mjs"]
+  },
+  {
     label: "Strategic investor meeting policy",
     args: [
       "--disable-warning=ExperimentalWarning",

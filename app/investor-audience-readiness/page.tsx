@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getInvestorAudienceReadinessSummary } from "../lib/investorAudienceReadiness";
+import InvestorDemoRunOfShow from "./InvestorDemoRunOfShow";
 
 export const metadata = {
   title: "SCRIMED Investor and Audience Readiness",
@@ -20,7 +21,8 @@ export default function InvestorAudienceReadinessPage() {
           This control plane packages angel, corporate strategic, private investor, faith-based clinic, health system, payer, public-sector, clinician, global partner, and transformation-sponsor paths while preserving no-securities, no-solicitation, no-tax-advice, no-PHI, and no-live-care boundaries.
         </p>
         <div className="hero-actions">
-          <a className="primary-action" href={summary.briefRoute}>Download Audience Brief</a>
+          <a className="primary-action" href="#investor-demo-run-of-show">Start Guided Demo</a>
+          <a className="secondary-action" href={summary.briefRoute}>Download Audience Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/capital-vitality">Capital Vitality</Link>
           <Link className="secondary-action" href="/growth-engine">Growth Engine</Link>
@@ -90,6 +92,8 @@ export default function InvestorAudienceReadinessPage() {
           <strong>{summary.fundingReleaseBlockerCount}</strong>
         </article>
       </section>
+
+      <InvestorDemoRunOfShow />
 
       <section className="section-band split-band" aria-label="Investor audience boundary">
         <div>
