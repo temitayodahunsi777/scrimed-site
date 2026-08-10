@@ -3,6 +3,8 @@ node_modules/
 node_modules 2/
 .next/
 .next-quarantine-*/
+artifacts/p32/worktree/final-worktree-attribution.json
+artifacts/p32/worktree/noncandidate-worktree-fingerprint.json
 out/
 .vercel/
 .tools/
@@ -11,3 +13,20 @@ out/
 .env.*.local
 *.log
 *.tsbuildinfo
+outputs/SCRIMED_Strategic_Investor_Deck.pptx
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+artifacts/ui-verification/
+artifacts/assurance/
+artifacts/governance/
+artifacts/migrations/
+artifacts/security/
+artifacts/live-mobile/
+
+# Preserved pre-existing local script. The candidate-owned equivalent is
+# scripts/scrimed-p32-preproduction-governance-gates.mjs.
+/scripts/scrimed-p32-consolidated-governance-gates.mjs

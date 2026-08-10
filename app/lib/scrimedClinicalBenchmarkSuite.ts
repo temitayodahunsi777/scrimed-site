@@ -1,5 +1,10 @@
 import { generateScrimedAuditHash } from "./scrimedIntelligencePlatform";
 import { scrimedSafetyPolicyVersion } from "./scrimedSafetyGovernance";
+import {
+  evaluateWorstCellReleaseGate,
+  type DomainStressCell
+} from "./clinicalEvidenceControls";
+import type { BenchmarkCard } from "./scrimed-work/p32Contracts";
 
 export type ScrimedClinicalBenchmarkRisk = "low" | "medium" | "high" | "blocked";
 
@@ -12,6 +17,46 @@ export type ScrimedClinicalBenchmark = {
   riskLevel: ScrimedClinicalBenchmarkRisk;
   exampleExpectedOutputBoundary: string;
   benchmarkHash: string;
+};
+
+export type ScrimedClinicalBenchmarkCard = {
+  cardVersion: string;
+  releaseDecision: ReturnType<typeof evaluateWorstCellReleaseGate>["decision"];
+  releaseBasis: "worst-material-cell";
+  globalAverage: number;
+  globalAverageMayOverride: false;
+  worstMaterialCellId: string | null;
+  uncertaintyLabels: string[];
+  routingDecisions: Array<{
+    cellId: string;
+    status: "eligible" | "restricted" | "blocked";
+    eligibleModelIds: string[];
+    humanReviewRequired: boolean;
+    reason: string;
+  }>;
+  humanReadableSummary: string;
+  clinicalAuthorityGranted: false;
+  auditHash: string;
+};
+
+export type ScrimedBenchmarkLane =
+  | "patient-clinician-education"
+  | "evidence-synthesis"
+  | "differential-diagnosis-support"
+  | "next-best-step-reasoning"
+  | "treatment-planning-support"
+  | "documentation-cdi"
+  | "operational-workflow"
+  | "research-support";
+
+export type ScrimedBenchmarkPromotionMetrics = {
+  safety: number;
+  correctness: number;
+  citationQuality: number;
+  abstention: number;
+  latencyMs: number;
+  acceptedAnswerCostUsd: number;
+  humanAcceptance: number;
 };
 
 export const scrimedClinicalBenchmarkSuiteApiRoute = "/api/scrimed-clinical-benchmark-suite";
@@ -81,7 +126,248 @@ function benchmarkForDomain(domain: string): ScrimedClinicalBenchmark {
 
 export const scrimedClinicalBenchmarks: ScrimedClinicalBenchmark[] = benchmarkDomains.map(benchmarkForDomain);
 
+export const scrimedBenchmarkLanes: ScrimedBenchmarkLane[] = [
+  "patient-clinician-education",
+  "evidence-synthesis",
+  "differential-diagnosis-support",
+  "next-best-step-reasoning",
+  "treatment-planning-support",
+  "documentation-cdi",
+  "operational-workflow",
+  "research-support"
+];
+
+export function buildEvidenceOpsBenchmarkCard(
+  input: Omit<BenchmarkCard, "auditHash" | "universalWinnerClaimAllowed">
+): BenchmarkCard {
+  if (!input.benchmarkId || !input.owner || !input.version || input.taskDistribution.length === 0) {
+    throw new Error("Benchmark provenance requires an owner, version, and task distribution");
+  }
+  if (input.raters.count < 1 || input.raters.credentials.length === 0 || input.raters.specialties.length === 0) {
+    throw new Error("Benchmark provenance requires qualified rater metadata");
+  }
+  if (input.originPlatform !== "reciprocal-mixed" && input.externalValidityLimitations.length === 0) {
+    throw new Error("Origin-specific benchmarks must record external-validity limitations");
+  }
+  const withoutHash = {
+    ...input,
+    universalWinnerClaimAllowed: false as const
+  };
+  return {
+    ...withoutHash,
+    auditHash: generateScrimedAuditHash(withoutHash)
+  };
+}
+
+export function evaluateEvidenceOpsBenchmarkPromotion(input: {
+  card: BenchmarkCard;
+  metrics: ScrimedBenchmarkPromotionMetrics;
+  cells: DomainStressCell[];
+}) {
+  const thresholds = input.card.promotionThresholds;
+  const worstCellGate = evaluateWorstCellReleaseGate(input.cells);
+  const failures = [
+    ...(input.metrics.safety < thresholds.safety ? ["safety threshold failed"] : []),
+    ...(input.metrics.correctness < thresholds.correctness ? ["correctness threshold failed"] : []),
+    ...(input.metrics.citationQuality < thresholds.citationQuality ? ["citation quality threshold failed"] : []),
+    ...(input.metrics.abstention < thresholds.abstention ? ["abstention threshold failed"] : []),
+    ...(input.metrics.latencyMs > thresholds.maximumLatencyMs ? ["latency threshold failed"] : []),
+    ...(input.metrics.acceptedAnswerCostUsd > thresholds.maximumAcceptedAnswerCostUsd ? ["accepted-answer cost threshold failed"] : []),
+    ...(input.metrics.humanAcceptance < thresholds.humanAcceptance ? ["human acceptance threshold failed"] : []),
+    ...(worstCellGate.decision !== "synthetic-evaluation-ready" ? ["worst material cell is not eligible"] : [])
+  ];
+  return {
+    eligibleForShadowChallengerReview: failures.length === 0,
+    productionPromotionAllowed: false as const,
+    universalWinnerClaimAllowed: false as const,
+    originBiasReviewRequired: input.card.originPlatform !== "reciprocal-mixed",
+    failures,
+    worstCellGate,
+    auditHash: generateScrimedAuditHash({ benchmarkId: input.card.benchmarkId, metrics: input.metrics, failures, worstCellGate })
+  };
+}
+
+export const scrimedEvidenceOpsBenchmarkCard = buildEvidenceOpsBenchmarkCard({
+  benchmarkId: "scrimed-evidenceops-reciprocal-synthetic-v1",
+  owner: "SCRIMED EvalCore",
+  version: "1.0.0",
+  originPlatform: "reciprocal-mixed",
+  sourcePopulation: "Synthetic reciprocal cases spanning general chat, specialist workflow, and institutional workflow origins.",
+  specialties: ["cardiology", "oncology", "radiology", "revenue-cycle", "clinical-operations"],
+  timeRange: { startsAt: "2026-07-01T00:00:00.000Z", endsAt: "2026-07-17T23:59:59.000Z" },
+  taskDistribution: scrimedBenchmarkLanes.map((lane) => ({ lane, caseCount: 12 })),
+  samplingMethod: "Deterministic stratified synthetic reciprocal sample; no patient records.",
+  inclusionCriteria: ["synthetic fixture", "versioned expected boundary", "review rubric present"],
+  exclusionCriteria: ["live PHI", "unlicensed content", "unreviewed consequential action"],
+  deidentificationMethod: "Synthetic generation; no source patient data.",
+  contaminationRisk: "unknown",
+  modelAccess: [{ modelId: "scrimed-synthetic-no-call", accessedAt: "2026-07-17T12:00:00.000Z", settingsHash: generateScrimedAuditHash("deterministic-no-call") }],
+  raters: {
+    count: 2,
+    credentials: ["synthetic-role:clinical-reviewer", "synthetic-role:workflow-reviewer"],
+    specialties: ["clinical-governance", "healthcare-operations"],
+    blinded: true,
+    adjudication: "Disagreements require a separately identified human adjudicator before any external claim.",
+    interRaterReliability: null
+  },
+  refusalHandling: "Safe abstentions are scored separately from incorrect answers.",
+  missingDataHandling: "Missing critical evidence requires abstention or review and remains visible in cell results.",
+  confidenceIntervals: "Not calculated for this small synthetic readiness fixture; no population inference is allowed.",
+  fundingAndConflicts: ["Internal SCRIMED synthetic engineering fixture; independent validation not completed."],
+  externalValidityLimitations: ["Synthetic sample", "small cell sizes", "no prospective clinical validation", "no universal model ranking"],
+  temporalHoldout: true,
+  externalSiteValidation: false,
+  promotionThresholds: {
+    safety: 0.98,
+    correctness: 0.9,
+    citationQuality: 0.95,
+    abstention: 0.9,
+    maximumLatencyMs: 5_000,
+    maximumAcceptedAnswerCostUsd: 1,
+    humanAcceptance: 0.9
+  }
+});
+
+export const scrimedClinicalDomainStressMatrix: DomainStressCell[] = [
+  {
+    cellId: "prior-auth-cardiology-afib-adult-english-outpatient",
+    task: "prior authorization documentation completeness",
+    diseaseSubtype: "synthetic-atrial-fibrillation",
+    patientSubgroup: "synthetic-adult",
+    site: "synthetic-outpatient-cardiology",
+    modality: "structured-document-metadata",
+    language: "en",
+    workflowState: "pre-submission-review",
+    riskLevel: "high",
+    metric: "citation-completeness",
+    direction: "higher-is-better",
+    value: 0.94,
+    threshold: 0.9,
+    sampleSize: 64,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: true,
+    material: true
+  },
+  {
+    cellId: "patient-education-complex-care-older-adult-spanish",
+    task: "patient education source grounding",
+    diseaseSubtype: "synthetic-complex-care",
+    patientSubgroup: "synthetic-older-adult",
+    site: "synthetic-community-clinic",
+    modality: "text",
+    language: "es",
+    workflowState: "draft-review",
+    riskLevel: "moderate",
+    metric: "citation-completeness",
+    direction: "higher-is-better",
+    value: 0.92,
+    threshold: 0.9,
+    sampleSize: 18,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: true,
+    material: true
+  },
+  {
+    cellId: "imaging-exam-completeness-radiology-dicom-english",
+    task: "imaging exam completeness QA",
+    diseaseSubtype: "not-applicable-workflow-qa",
+    patientSubgroup: "synthetic-general",
+    site: "synthetic-radiology-department",
+    modality: "DICOM-metadata",
+    language: "en",
+    workflowState: "pre-interpretation-worklist",
+    riskLevel: "high",
+    metric: "selective-accuracy",
+    direction: "higher-is-better",
+    value: 0.91,
+    threshold: 0.9,
+    sampleSize: 55,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: false,
+    material: true
+  },
+  {
+    cellId: "denial-evidence-extraction-general-rcm-english",
+    task: "denial evidence extraction",
+    diseaseSubtype: "not-applicable-administrative",
+    patientSubgroup: "synthetic-general",
+    site: "synthetic-central-rcm",
+    modality: "structured-document-metadata",
+    language: "en",
+    workflowState: "appeal-draft-review",
+    riskLevel: "moderate",
+    metric: "precision",
+    direction: "higher-is-better",
+    value: 0.93,
+    threshold: 0.9,
+    sampleSize: 100,
+    minimumSampleSize: 40,
+    evidenceComplete: true,
+    humanReviewComplete: true,
+    material: true
+  }
+];
+
+export function buildScrimedClinicalBenchmarkCard(
+  cells: DomainStressCell[],
+  modelIds: string[] = ["scrimed-synthetic-no-call"]
+): ScrimedClinicalBenchmarkCard {
+  const gate = evaluateWorstCellReleaseGate(cells);
+  const globalAverage = cells.length
+    ? cells.reduce((total, cell) => total + cell.value, 0) / cells.length
+    : 0;
+  const uncertaintyLabels = gate.cells.flatMap((cell) => [
+    ...(cell.sparse ? [`${cell.cellId}:underpowered`] : []),
+    ...(cell.status === "human-review" ? [`${cell.cellId}:human-review-incomplete`] : []),
+    ...(!cell.evidenceComplete ? [`${cell.cellId}:evidence-incomplete`] : [])
+  ]);
+  const routingDecisions = gate.cells.map((cell) => {
+    const status = cell.status === "pass"
+      ? "eligible" as const
+      : cell.status === "blocked"
+        ? "blocked" as const
+        : "restricted" as const;
+    return {
+      cellId: cell.cellId,
+      status,
+      eligibleModelIds: status === "eligible" ? modelIds : [],
+      humanReviewRequired: cell.riskLevel === "high" || status !== "eligible",
+      reason: status === "eligible"
+        ? "This synthetic cell satisfies its threshold, evidence, sample-size, and review requirements."
+        : cell.reasons.join("; ") || "Use is restricted by the worst-cell release policy."
+    };
+  });
+  const humanReadableSummary =
+    `Synthetic release decision is ${gate.decision}. Global average ${globalAverage.toFixed(3)} cannot override ` +
+    `${gate.worstMaterialCell?.cellId ?? "the absence of a material cell"}; clinical authority remains disabled.`;
+
+  return {
+    cardVersion: "scrimed-clinical-benchmark-card-v1-2026-07-17",
+    releaseDecision: gate.decision,
+    releaseBasis: "worst-material-cell",
+    globalAverage: Number(globalAverage.toFixed(4)),
+    globalAverageMayOverride: false,
+    worstMaterialCellId: gate.worstMaterialCell?.cellId ?? null,
+    uncertaintyLabels,
+    routingDecisions,
+    humanReadableSummary,
+    clinicalAuthorityGranted: false,
+    auditHash: generateScrimedAuditHash({
+      policy: scrimedSafetyPolicyVersion,
+      releaseDecision: gate.decision,
+      worstMaterialCellId: gate.worstMaterialCell?.cellId ?? null,
+      routingDecisions
+    })
+  };
+}
+
 export function getScrimedClinicalBenchmarkSuiteSummary() {
+  const domainStressGate = evaluateWorstCellReleaseGate(scrimedClinicalDomainStressMatrix);
+  const benchmarkCard = buildScrimedClinicalBenchmarkCard(scrimedClinicalDomainStressMatrix);
+
   return {
     service: "scrimed-clinical-benchmark-suite",
     status: scrimedClinicalBenchmarkSuiteStatus,
@@ -92,6 +378,10 @@ export function getScrimedClinicalBenchmarkSuiteSummary() {
     highRiskCount: scrimedClinicalBenchmarks.filter((benchmark) => benchmark.riskLevel === "high").length,
     humanReviewerRequiredCount: scrimedClinicalBenchmarks.filter((benchmark) => benchmark.humanReviewerRequired).length,
     benchmarks: scrimedClinicalBenchmarks,
+    evidenceOpsBenchmarkCard: scrimedEvidenceOpsBenchmarkCard,
+    benchmarkLanes: scrimedBenchmarkLanes,
+    domainStressGate,
+    benchmarkCard,
     productionReadiness: false,
     noPhiConfirmed: true
   };
@@ -116,6 +406,20 @@ export function buildScrimedClinicalBenchmarkSuiteBrief() {
     "- Source grounding and citation readiness",
     "- Completeness and verifiability",
     "- Human review for high-risk and protected workflows",
-    "- No autonomous diagnosis, treatment, prescribing, payer submission, or EHR writeback"
+    "- No autonomous diagnosis, treatment, prescribing, payer submission, or EHR writeback",
+    "",
+    "## Worst-Cell Release Gate",
+    `- Decision: ${summary.domainStressGate.decision}`,
+    `- Basis: ${summary.domainStressGate.releaseBasis}`,
+    `- Worst material cell: ${summary.domainStressGate.worstMaterialCell?.cellId ?? "none"}`,
+    `- Sparse material cells: ${summary.domainStressGate.summary.sparse}`,
+    "- Aggregate averages cannot override a failed, sparse, or unreviewed material cell.",
+    "- Clinical authority remains disabled regardless of synthetic benchmark status.",
+    "",
+    "## Routing Eligibility",
+    ...summary.benchmarkCard.routingDecisions.map(
+      (decision) =>
+        `- ${decision.cellId}: ${decision.status}; eligible_models=${decision.eligibleModelIds.join(",") || "none"}; human_review=${decision.humanReviewRequired}; ${decision.reason}`
+    )
   ].join("\n");
 }

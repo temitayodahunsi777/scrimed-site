@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getScrimedWorkSummary } from "../lib/scrimed-work";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "SCRIMED Work & Intelligence Platform",
   description:
@@ -60,6 +62,30 @@ export default function ScrimedWorkPage() {
           <strong>{summary.providers.length}</strong>
         </article>
         <article>
+          <span>Agent teams</span>
+          <strong>{summary.agentTeams.templateCount}</strong>
+        </article>
+        <article>
+          <span>Approval passports</span>
+          <strong>{summary.modelQualification.passportCount}</strong>
+        </article>
+        <article>
+          <span>Independent review lanes</span>
+          <strong>{summary.reviewOrchestrator.laneCount}</strong>
+        </article>
+        <article>
+          <span>Risk-tiered actions</span>
+          <strong>{summary.reviewPolicy.requirementCount}</strong>
+        </article>
+        <article>
+          <span>Automatic preflight</span>
+          <strong>{summary.developmentContinuity.counts.AUTOMATIC_PREFLIGHT_ELIGIBLE}</strong>
+        </article>
+        <article>
+          <span>Hard boundaries</span>
+          <strong>{summary.developmentContinuity.counts.PROHIBITED}</strong>
+        </article>
+        <article>
           <span>Schedules</span>
           <strong>{summary.scheduleDefinitions.length}</strong>
         </article>
@@ -87,10 +113,118 @@ export default function ScrimedWorkPage() {
           <ul className="compact-list">
             <li>Definition of Done required: {summary.governanceStatus.definitionOfDoneRequired ? "yes" : "no"}</li>
             <li>Verification blocks completion: {summary.governanceStatus.verificationBlocksCompletion ? "yes" : "no"}</li>
+            <li>Browser mutation CSRF protection: {summary.governanceStatus.browserWriteCsrfEnforced ? "exact same-origin" : "not enforced"}</li>
+            <li>Mutation rate-limit mode: {summary.governanceStatus.mutationRateLimit.mode}</li>
+            <li>Distributed rate-limit provider configured: {summary.governanceStatus.mutationRateLimit.distributedProviderConfigured ? "yes" : "no"}</li>
+            <li>Provider-unavailable behavior: {summary.governanceStatus.mutationRateLimit.failClosedOnProviderUnavailable ? "fail closed" : "local/test bounded fallback"}</li>
             <li>Schedules disabled by default: {summary.governanceStatus.schedulesDisabledByDefault ? "yes" : "no"}</li>
             <li>Voice simulation only: {summary.governanceStatus.voiceSimulationOnly ? "yes" : "no"}</li>
           </ul>
         </div>
+      </section>
+
+      <section className="table-section" aria-label="Development continuity planner">
+        <div className="section-heading">
+          <p className="eyebrow">Development Continuity</p>
+          <h2>The next safe action is derived from operating mode, evidence, and the authoritative review matrix.</h2>
+          <p>
+            This planner coordinates Automation Autopilot with release policy. It is a policy posture,
+            not execution authority, and every executable action still requires an exact-fingerprint
+            preflight.
+          </p>
+        </div>
+        {summary.developmentContinuity.priorityActions.map((action) => (
+          <article className="module-row module-row-four" key={action.action}>
+            <div>
+              <span>
+                {summary.developmentContinuity.recommendedAction?.action === action.action
+                  ? "recommended"
+                  : action.status}
+              </span>
+              <h2>{action.title}</h2>
+            </div>
+            <p>{action.nextAction}</p>
+            <div>
+              <strong>Authority</strong>
+              <ul className="compact-list">
+                <li>Owner: {action.owner}</li>
+                <li>Policy: {action.policyDecision}</li>
+                <li>Execution authorized: {action.executionAuthorized ? "yes" : "no"}</li>
+                <li>Human review: {action.humanReviewRequired ? "required" : "not required by tier"}</li>
+              </ul>
+            </div>
+            <div>
+              <strong>Evidence</strong>
+              <ul className="compact-list">
+                <li>
+                  Available: {action.availableEvidence.length ? action.availableEvidence.join(", ") : "none"}
+                </li>
+                <li>
+                  Missing: {action.missingEvidence.length ? action.missingEvidence.join(", ") : "none"}
+                </li>
+                <li>Evidence hash: {action.evidenceHash.slice(0, 16)}</li>
+              </ul>
+            </div>
+          </article>
+        ))}
+        <article className="module-row module-row-four">
+          <div>
+            <span>{summary.developmentContinuity.authorizationStatus}</span>
+            <h2>Plan evidence</h2>
+          </div>
+          <p>
+            The plan fingerprint changes when policy posture, operating mode, or supplied evidence changes.
+          </p>
+          <div>
+            <strong>Coverage</strong>
+            <ul className="compact-list">
+              <li>Actions: {summary.developmentContinuity.actionCount}</li>
+              <li>Evidence required: {summary.developmentContinuity.counts.EVIDENCE_REQUIRED}</li>
+              <li>Founder acceptance: {summary.developmentContinuity.counts.FOUNDER_ACCEPTANCE_REQUIRED}</li>
+              <li>Qualified review: {summary.developmentContinuity.counts.QUALIFIED_REVIEW_REQUIRED}</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Fingerprint</strong>
+            <p>{summary.developmentContinuity.planFingerprint}</p>
+          </div>
+        </article>
+        <article className="module-row module-row-four">
+          <div>
+            <span>{summary.reviewPolicyPreflight.access}</span>
+            <h2>Exact-evidence preflight</h2>
+          </div>
+          <p>
+            Server-owned evaluation time and exact candidate bindings prevent stale evidence from
+            silently authorizing a different release.
+          </p>
+          <div>
+            <strong>Contract</strong>
+            <ul className="compact-list">
+              <li>Method: {summary.reviewPolicyPreflight.method}</li>
+              <li>Route: {summary.reviewPolicyPreflight.route}</li>
+              <li>
+                Caller approvals: {summary.reviewPolicyPreflight.callerSuppliedApprovalsAccepted
+                  ? "accepted"
+                  : "rejected"}
+              </li>
+            </ul>
+          </div>
+          <div>
+            <strong>Authority</strong>
+            <ul className="compact-list">
+              <li>Authorization: {summary.reviewPolicyPreflight.authorizationStatus}</li>
+              <li>
+                Execution authorized: {summary.reviewPolicyPreflight.executionAuthorized ? "yes" : "no"}
+              </li>
+              <li>
+                Production authority: {summary.reviewPolicyPreflight.productionAuthorityGranted
+                  ? "granted"
+                  : "not granted"}
+              </li>
+            </ul>
+          </div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="Production hardening gate">
@@ -98,7 +232,7 @@ export default function ScrimedWorkPage() {
           <p className="eyebrow">Production Hardening Gate</p>
           <h2>Evidence-ready controls are separated from operator-required release steps.</h2>
         </div>
-        <article className="module-row">
+        <article className="module-row module-row-four">
           <div>
             <span>{summary.productionHardening.status}</span>
             <h2>Strict durable-store readiness</h2>
@@ -114,6 +248,17 @@ export default function ScrimedWorkPage() {
               <li>Operator-required gates: {summary.productionHardening.summary.operatorRequired}</li>
               <li>Strict smoke eligible: {summary.productionHardening.canRunStrictNonProductionSmoke ? "yes" : "no"}</li>
               <li>Canary eligible: {summary.productionHardening.canaryEligible ? "yes" : "no"}</li>
+              <li>Mutation rate-limit mode: {summary.productionHardening.mutationRateLimit.mode}</li>
+              <li>Actor quota: {summary.productionHardening.mutationRateLimit.actorLimit} / {summary.productionHardening.mutationRateLimit.windowSeconds}s</li>
+              <li>Tenant quota: {summary.productionHardening.mutationRateLimit.tenantLimit} / {summary.productionHardening.mutationRateLimit.windowSeconds}s</li>
+              <li>Distributed provider configured: {summary.productionHardening.mutationRateLimit.distributedProviderConfigured ? "yes" : "no"}</li>
+              <li>Production downgrade prevented: {summary.productionHardening.mutationRateLimit.downgradePrevented ? "yes" : "not requested"}</li>
+              <li>Current release: {summary.productionHardening.releaseBinding.currentReleaseShaFingerprint}</li>
+              <li>Canary release: {summary.productionHardening.releaseBinding.canaryReleaseShaFingerprint}</li>
+              <li>Evidence authenticated: {summary.productionHardening.releaseBinding.evidenceIdAuthenticated ? "yes" : "no"}</li>
+              <li>Workspace binding: {summary.productionHardening.releaseBinding.workspaceBound ? summary.productionHardening.releaseBinding.workspaceSlug : "not verified"}</li>
+              <li>Canary freshness: {summary.productionHardening.releaseBinding.fresh ? `fresh (${summary.productionHardening.releaseBinding.ageHours?.toFixed(2) ?? "0.00"}h)` : "stale or unavailable"}</li>
+              <li>Release binding matched: {summary.productionHardening.releaseBinding.matched ? "yes" : "no"}</li>
             </ul>
           </div>
           <div>
@@ -126,7 +271,7 @@ export default function ScrimedWorkPage() {
           </div>
         </article>
         {summary.productionHardening.gates.map((gate) => (
-          <article className="module-row" key={gate.gateId}>
+          <article className="module-row module-row-four" key={gate.gateId}>
             <div>
               <span>{gate.status}</span>
               <h2>{gate.title}</h2>
@@ -154,7 +299,7 @@ export default function ScrimedWorkPage() {
           <h2>Domain views keep clinical, executive, research, operations, and Studio work separated by boundary.</h2>
         </div>
         {summary.workspaces.map((workspace) => (
-          <article className="module-row" key={workspace.workspaceId}>
+          <article className="module-row module-row-four" key={workspace.workspaceId}>
             <div>
               <span>{workspace.domain}</span>
               <h2>{workspace.title}</h2>
@@ -182,7 +327,7 @@ export default function ScrimedWorkPage() {
           <h2>Persistent sessions carry scope, risk, autonomy, context, plans, approvals, artifacts, telemetry, cancellation, and rollback metadata.</h2>
         </div>
         {summary.sessions.map((session) => (
-          <article className="module-row" key={session.id}>
+          <article className="module-row module-row-four" key={session.id}>
             <div>
               <span>{session.statusHistory.at(-1)?.status}</span>
               <h2>{session.title}</h2>
@@ -241,7 +386,7 @@ export default function ScrimedWorkPage() {
           <h2>Authoritative state, independent approval, and durable idempotency prevent impossible or duplicated work histories.</h2>
         </div>
         {summary.lifecycle.map((lifecycle) => (
-          <article className="module-row" key={lifecycle.sessionId}>
+          <article className="module-row module-row-four" key={lifecycle.sessionId}>
             <div>
               <span>{lifecycle.currentStatus}</span>
               <h2>{lifecycle.sessionId}</h2>
@@ -278,7 +423,7 @@ export default function ScrimedWorkPage() {
           <h2>Agents retrieve ranked context with citations, trust tiers, recency, and tenant metadata instead of guessing.</h2>
         </div>
         {summary.context.records.map((record) => (
-          <article className="module-row" key={record.sourceId}>
+          <article className="module-row module-row-four" key={record.sourceId}>
             <div>
               <span>{record.sourceType}</span>
               <h2>{record.title}</h2>
@@ -385,6 +530,111 @@ export default function ScrimedWorkPage() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="table-section" aria-label="Qualification and impact governance">
+        <div className="section-heading">
+          <p className="eyebrow">Qualification + Impact Governance</p>
+          <h2>Models, agent teams, value evidence, workforce effects, and procurement claims remain independently reviewable.</h2>
+        </div>
+        <article className="module-row module-row-four">
+          <div>
+            <span>Model and agent passports</span>
+            <h2>{summary.modelQualification.passportCount} governed subjects</h2>
+          </div>
+          <p>{summary.modelQualification.boundary}</p>
+          <div>
+            <strong>Qualification posture</strong>
+            <ul className="compact-list">
+              <li>Model passports: {summary.modelQualification.modelPassportCount}</li>
+              <li>Agent passports: {summary.modelQualification.agentPassportCount}</li>
+              <li>Provider calls: disabled</li>
+              <li>PHI authority: none</li>
+              <li>Clinical authority: none</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Unverified candidates</strong>
+            <ul className="compact-list">
+              {summary.modelQualification.unverifiedCandidates.map((candidate) => (
+                <li key={candidate.candidateId}>
+                  {candidate.requestedCandidateName}: {candidate.verificationStatus}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
+        <article className="module-row module-row-four">
+          <div>
+            <span>Governed agent teams</span>
+            <h2>{summary.agentTeams.templateCount} bounded templates</h2>
+          </div>
+          <p>{summary.agentTeams.boundary}</p>
+          <div>
+            <strong>Team controls</strong>
+            <ul className="compact-list">
+              <li>Independent review: required</li>
+              <li>Human conflict escalation: required</li>
+              <li>Cost, runtime, and actions: bounded</li>
+              <li>Network: default deny</li>
+              <li>Audit and idempotency: required</li>
+              <li>External execution: disabled</li>
+              <li>Release authority: none</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Templates</strong>
+            <p>{summary.agentTeams.templates.map((template) => template.title).join(", ")}</p>
+          </div>
+        </article>
+        <article className="module-row module-row-four">
+          <div>
+            <span>AI-assisted review</span>
+            <h2>{summary.reviewOrchestrator.laneCount} independent lanes</h2>
+          </div>
+          <p>{summary.reviewOrchestrator.boundary}</p>
+          <div>
+            <strong>Review controls</strong>
+            <ul className="compact-list">
+              <li>Self-review: prohibited</li>
+              <li>Evidence references: required</li>
+              <li>Stale review: rejected</li>
+              <li>Human approval impersonation: prohibited</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Accountable sign-off</strong>
+            <p>Legal, clinical, privacy, security, database, finance, and release authority remain human-controlled.</p>
+          </div>
+        </article>
+        <article className="module-row module-row-four">
+          <div>
+            <span>{summary.impactGovernance.intelligenceYield.evidenceStatus}</span>
+            <h2>Verified Intelligence Yield</h2>
+          </div>
+          <p>{summary.impactGovernance.boundary}</p>
+          <div>
+            <strong>Synthetic planning evidence</strong>
+            <ul className="compact-list">
+              <li>
+                Accepted outputs per burden dollar: {summary.impactGovernance.intelligenceYield.yieldPerUsd?.toFixed(2) ?? "unavailable"}
+              </li>
+              <li>
+                Healthcare value evidence: {summary.impactGovernance.healthcareValueReturned.evidenceStatus}
+              </li>
+              <li>Workforce transition: {summary.impactGovernance.workforceTransition.decision}</li>
+              <li>Procurement: {summary.impactGovernance.procurement.status}</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Sovereign profile</strong>
+            <ul className="compact-list">
+              <li>Status: {summary.impactGovernance.sovereignDeployment.status}</li>
+              <li>Production activation: disabled</li>
+              <li>PHI authority: none</li>
+            </ul>
+          </div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="Schedules and voice simulation">

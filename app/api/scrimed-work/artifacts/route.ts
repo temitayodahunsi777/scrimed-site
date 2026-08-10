@@ -13,12 +13,12 @@ export async function POST(request: Request) {
   if (!durable.allowed) {
     return NextResponse.json(durable.error, {
       status: durable.status,
-      headers: scrimedWorkHeaders({ "X-SCRIMED-Write-Authority": "fail-closed" })
+      headers: scrimedWorkHeaders({ "X-SCRIMED-Write-Authority": "fail-closed" }, request)
     });
   }
 
   return NextResponse.json(wrapWorkData(durable.data, durable.data.artifact.artifactId), {
     status: durable.status,
-    headers: scrimedWorkHeaders({ "X-SCRIMED-Artifact-Authority": "draft-human-review-required-aal2-durable-write" })
+    headers: scrimedWorkHeaders({ "X-SCRIMED-Artifact-Authority": "draft-human-review-required-aal2-durable-write" }, request)
   });
 }

@@ -4,6 +4,7 @@ import { buildReleaseCandidateReadinessBrief } from "../../../lib/releaseCandida
 export async function GET() {
   return new NextResponse(buildReleaseCandidateReadinessBrief(), {
     headers: {
+      "Cache-Control": "no-store",
       "Content-Disposition": "attachment; filename=\"scrimed-release-candidate-readiness.md\"",
       "Content-Type": "text/markdown; charset=utf-8",
       "X-SCRIMED-Clinical-Care-Authority": "not-authorized-live-care",
@@ -15,6 +16,12 @@ export async function GET() {
       "X-SCRIMED-PHI-Authority": "not-authorized-production-phi",
       "X-SCRIMED-Release-Candidate-Readiness":
         "validation-passed-source-provenance-blocked",
+      "X-SCRIMED-Release-Candidate-Manifest": "required-before-source-review",
+      "X-SCRIMED-Investor-Artifact-Review":
+        "automated-review-command-available-human-release-review-required",
+      "X-SCRIMED-Candidate-Validation":
+        "automated-validation-command-available-human-review-required",
+      "X-SCRIMED-Validation-Evidence": "recorded-catalog-revalidation-required",
       "X-SCRIMED-Security-Certification": "not-security-certified"
     }
   });

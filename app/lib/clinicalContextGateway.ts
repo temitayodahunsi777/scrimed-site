@@ -20,6 +20,15 @@ import {
   clinicalDataGovernancePolicyVersion,
   evaluateClinicalDataGovernanceRequest
 } from "./clinicalDataGovernance";
+import {
+  clinicalContextIsolationPolicy,
+  evaluateClinicalContextLens,
+  type ClinicalContextLensResult
+} from "./clinicalEvidenceControls";
+import {
+  clinicalSearchFabricBoundary,
+  clinicalSearchFabricVersion
+} from "./clinicalSearchFabric";
 
 export type ClinicalContextGatewayScope =
   | "patient-context-summary"
@@ -120,6 +129,7 @@ export type ClinicalContextGatewayEvaluation = {
     requiredReviewers: string[];
     retainedBoundaries: string[];
   } | null;
+  contextLens: ClinicalContextLensResult | null;
   auditEnvelope: ClinicalContextGatewayAuditEnvelope;
   rationale: string;
 };
@@ -149,6 +159,22 @@ export type ClinicalContextGatewaySummary = {
   productionConnectorAuthority: "not-production-connector-approved";
   supportedScopes: ClinicalContextGatewayScope[];
   gatewayControls: string[];
+  contextLens: {
+    modes: Array<"public-evidence" | "clinical-context">;
+    livePhiEnabled: false;
+    unsupportedOrStaleContextAction: "abstain-or-require-review";
+    sourceAndReasonRequired: true;
+  };
+  clinicalSearchFabric: {
+    version: typeof clinicalSearchFabricVersion;
+    pipeline: string[];
+    externalCrawlerEnabled: false;
+    patientSpecificCacheEnabled: false;
+    conflictAction: "present-conflict-and-require-review";
+    retrievalFailureIsNoEvidence: false;
+    optimizationTarget: "cost-per-clinically-accepted-answer";
+    boundary: typeof clinicalSearchFabricBoundary;
+  };
   sourceContractCount: number;
   baselineEvaluationCount: number;
   baselineEvaluations: Array<{ id: string; decision: ClinicalContextGatewayEvaluation }>;
@@ -416,6 +442,55 @@ function buildContextEnvelope(
   };
 }
 
+function buildContextLens(
+  request: ClinicalContextGatewayRequest,
+  sourceContract: ClinicalDataFabricSourceContract
+) {
+  const publicEvidence = request.dataClasses.every((dataClass) => dataClass === "public");
+  const sourceHash = hashJson({
+    id: sourceContract.id,
+    standards: sourceContract.standards,
+    provenanceRequirements: sourceContract.provenanceRequirements
+  });
+
+  return evaluateClinicalContextLens(
+    {
+      mode: publicEvidence ? "public-evidence" : "clinical-context",
+      tenantId: publicEvidence ? null : "synthetic-tenant-scope",
+      taskType: request.requestedContextScope,
+      dataClassification: publicEvidence ? "public" : "metadata",
+      authenticated: request.requesterRole !== "public-visitor",
+      tenantScoped: request.tenantScoped,
+      minimumNecessary: request.minimumNecessary,
+      consentVerified: ["verified", "not-required-for-metadata"].includes(request.consentStatus),
+      humanReviewRequired: !publicEvidence,
+      patientFit: publicEvidence ? "not-applicable" : "not-assessed",
+      relevantHistory: request.requestedConcepts.map((concept) => `semantic-concept:${concept}`),
+      sources: [
+        {
+          id: sourceContract.id,
+          title: sourceContract.name,
+          uri: `source-contract:${sourceContract.id}`,
+          tenantScope: publicEvidence ? "public" : "synthetic-tenant-scope",
+          trustTier: "reviewed",
+          effectiveAt: "2026-07-17T00:00:00.000Z",
+          expiresAt: null,
+          provenanceHash: sourceHash
+        }
+      ],
+      missingData: sourceContract.provenanceRequirements.map(
+        (requirement) => `verify-at-runtime:${requirement}`
+      ),
+      confidenceScore: 0.8,
+      calibrationStatus: "not-evaluated",
+      contraindications: [],
+      policyConstraints: sourceContract.blockedActions,
+      proposedNextAction: "Review the semantic context envelope and source provenance with the assigned human reviewer."
+    },
+    "2026-07-17T12:00:00.000Z"
+  );
+}
+
 function buildAuditEnvelope(input: {
   request: ClinicalContextGatewayRequest;
   status: ClinicalContextGatewayDecisionStatus;
@@ -536,6 +611,7 @@ export function evaluateClinicalContextGatewayRequest(
       reviewRequirements,
       contextEnvelope: null,
       reviewPacket: null,
+      contextLens: null,
       auditEnvelope,
       rationale:
         "Context request is blocked before any semantic envelope is delivered because it violates source, governance, destination, data class, or authority boundaries."
@@ -576,6 +652,7 @@ export function evaluateClinicalContextGatewayRequest(
         requiredReviewers: ["clinical data steward", "privacy/security reviewer", "workflow owner"],
         retainedBoundaries: governanceDecision.retainedNoGoBoundaries
       },
+      contextLens: null,
       auditEnvelope,
       rationale:
         "Context request is policy-contained but needs qualified human review before semantic context is released or used for customer-facing work."
@@ -583,6 +660,10 @@ export function evaluateClinicalContextGatewayRequest(
   }
 
   const contextEnvelope = buildContextEnvelope(request, sourceContract as ClinicalDataFabricSourceContract);
+  const contextLens = buildContextLens(
+    request,
+    sourceContract as ClinicalDataFabricSourceContract
+  );
   const auditEnvelope = buildAuditEnvelope({
     request,
     status: "semantic-context-ready",
@@ -609,6 +690,7 @@ export function evaluateClinicalContextGatewayRequest(
     reviewRequirements: [],
     contextEnvelope,
     reviewPacket: null,
+    contextLens,
     auditEnvelope,
     rationale:
       "Context request stays inside SCRIMED's metadata-only semantic gateway. The returned envelope contains governance, provenance, confidence, and blocked-use instructions only."
@@ -821,6 +903,31 @@ export function getClinicalContextGatewaySummary(): ClinicalContextGatewaySummar
     productionConnectorAuthority: "not-production-connector-approved",
     supportedScopes,
     gatewayControls,
+    contextLens: {
+      modes: ["public-evidence", "clinical-context"],
+      livePhiEnabled: clinicalContextIsolationPolicy.modes.clinicalContext.livePhiEnabled,
+      unsupportedOrStaleContextAction: clinicalContextIsolationPolicy.unsupportedOrStaleContextAction,
+      sourceAndReasonRequired: true
+    },
+    clinicalSearchFabric: {
+      version: clinicalSearchFabricVersion,
+      pipeline: [
+        "clinical-intent-classification",
+        "bounded-query-expansion",
+        "approved-source-selection",
+        "rights-aware-retrieval",
+        "evidence-ranking",
+        "claim-citation-validation",
+        "conflict-and-uncertainty-presentation",
+        "accepted-answer-cost-measurement"
+      ],
+      externalCrawlerEnabled: false,
+      patientSpecificCacheEnabled: false,
+      conflictAction: "present-conflict-and-require-review",
+      retrievalFailureIsNoEvidence: false,
+      optimizationTarget: "cost-per-clinically-accepted-answer",
+      boundary: clinicalSearchFabricBoundary
+    },
     sourceContractCount: getClinicalDataFabricSummary().sourceContractCount,
     baselineEvaluationCount: baselineEvaluations.length,
     baselineEvaluations,
@@ -853,6 +960,19 @@ export function buildClinicalContextGatewayBrief() {
     "",
     "## Gateway Controls",
     ...summary.gatewayControls.map((control) => `- ${control}`),
+    "",
+    "## Clinical Search Fabric",
+    `- Version: ${summary.clinicalSearchFabric.version}`,
+    `- Optimization target: ${summary.clinicalSearchFabric.optimizationTarget}`,
+    `- Conflict action: ${summary.clinicalSearchFabric.conflictAction}`,
+    `- External crawler enabled: ${summary.clinicalSearchFabric.externalCrawlerEnabled}`,
+    `- Patient-specific cache enabled: ${summary.clinicalSearchFabric.patientSpecificCacheEnabled}`,
+    "",
+    "## Context Lens",
+    `- Modes: ${summary.contextLens.modes.join(", ")}`,
+    `- Live PHI enabled: ${summary.contextLens.livePhiEnabled}`,
+    `- Unsupported or stale context: ${summary.contextLens.unsupportedOrStaleContextAction}`,
+    "- Every proposed next action requires a supporting source and action reason.",
     "",
     "## Supported Context Scopes",
     ...summary.supportedScopes.map((scope) => `- ${scope}`),

@@ -24,7 +24,10 @@ const maxResponseBytes = parsePublicSmokeMaxResponseBytes(
 const maxReadAttempts = parsePublicSmokeMaxAttempts(
   process.env.SCRIMED_SMOKE_MAX_ATTEMPTS
 );
-const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG ?? "atlas-synthetic-evaluation";
+const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG?.trim() || "atlas-synthetic-evaluation";
+if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(workspaceSlug)) {
+  throw new Error("SCRIMED_WORKSPACE_SLUG must be a bounded lowercase workspace slug.");
+}
 
 function endpoint(path) {
   return `${baseUrl}${path}`;
@@ -71,7 +74,7 @@ async function request(path) {
   return { body, response };
 }
 
-async function postJson(path, payload) {
+async function postJson(path, payload, extraHeaders = {}) {
   let response;
 
   try {
@@ -80,7 +83,8 @@ async function postJson(path, payload) {
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          ...extraHeaders
         },
         body: JSON.stringify(payload)
       },
@@ -220,11 +224,19 @@ function requirePublicMarketBoundary(label, response) {
 
 function requireCapitalVitalityBoundary(label, response) {
   const approvalAuthority = response.headers.get("x-scrimed-approval-authority");
+  const capitalInputPersistence = response.headers.get("x-scrimed-capital-input-persistence");
+  const capturePacket = response.headers.get("x-scrimed-capture-packet");
   const capitalVitality = response.headers.get("x-scrimed-capital-vitality");
   const financialAuthority = response.headers.get("x-scrimed-financial-authority");
+  const federalOfferAuthority = response.headers.get("x-scrimed-federal-offer-authority");
+  const fundraisingRelease = response.headers.get("x-scrimed-fundraising-release");
+  const governmentAwardAuthority = response.headers.get("x-scrimed-government-award-authority");
+  const governmentRegistration = response.headers.get("x-scrimed-government-registration");
   const investmentAdvice = response.headers.get("x-scrimed-investment-advice");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
+  const publicSectorSubmission = response.headers.get("x-scrimed-public-sector-submission");
   const reimbursementAuthority = response.headers.get("x-scrimed-reimbursement-authority");
+  const samControl = response.headers.get("x-scrimed-sam-control");
   const securitiesAuthority = response.headers.get("x-scrimed-securities-authority");
   const securityCertification = response.headers.get("x-scrimed-security-certification");
   const valuationAuthority = response.headers.get("x-scrimed-valuation-authority");
@@ -234,6 +246,14 @@ function requireCapitalVitalityBoundary(label, response) {
 
   if (approvalAuthority !== "external-review-required") {
     throw new Error(`${label} expected x-scrimed-approval-authority external-review-required but received ${approvalAuthority}.`);
+  }
+
+  if (capitalInputPersistence !== "none-local-browser-only") {
+    throw new Error(`${label} expected x-scrimed-capital-input-persistence none-local-browser-only but received ${capitalInputPersistence}.`);
+  }
+
+  if (capturePacket !== "internal-metadata-only-not-release-authority") {
+    throw new Error(`${label} expected x-scrimed-capture-packet internal-metadata-only-not-release-authority but received ${capturePacket}.`);
   }
 
   if (![
@@ -247,6 +267,22 @@ function requireCapitalVitalityBoundary(label, response) {
     throw new Error(`${label} expected x-scrimed-financial-authority not-audited-financial-report but received ${financialAuthority}.`);
   }
 
+  if (federalOfferAuthority !== "not-authorized") {
+    throw new Error(`${label} expected x-scrimed-federal-offer-authority not-authorized but received ${federalOfferAuthority}.`);
+  }
+
+  if (fundraisingRelease !== "not-authorized") {
+    throw new Error(`${label} expected x-scrimed-fundraising-release not-authorized but received ${fundraisingRelease}.`);
+  }
+
+  if (governmentAwardAuthority !== "not-contract-or-grant-award") {
+    throw new Error(`${label} expected x-scrimed-government-award-authority not-contract-or-grant-award but received ${governmentAwardAuthority}.`);
+  }
+
+  if (governmentRegistration !== "not-verified") {
+    throw new Error(`${label} expected x-scrimed-government-registration not-verified but received ${governmentRegistration}.`);
+  }
+
   if (investmentAdvice !== "not-investment-advice") {
     throw new Error(`${label} expected x-scrimed-investment-advice not-investment-advice but received ${investmentAdvice}.`);
   }
@@ -255,8 +291,16 @@ function requireCapitalVitalityBoundary(label, response) {
     throw new Error(`${label} expected x-scrimed-phi-authority not-authorized-production-phi but received ${phiAuthority}.`);
   }
 
+  if (publicSectorSubmission !== "not-authorized") {
+    throw new Error(`${label} expected x-scrimed-public-sector-submission not-authorized but received ${publicSectorSubmission}.`);
+  }
+
   if (reimbursementAuthority !== "no-reimbursement-guarantee") {
     throw new Error(`${label} expected x-scrimed-reimbursement-authority no-reimbursement-guarantee but received ${reimbursementAuthority}.`);
+  }
+
+  if (samControl !== "operator-evidence-required") {
+    throw new Error(`${label} expected x-scrimed-sam-control operator-evidence-required but received ${samControl}.`);
   }
 
   if (securitiesAuthority !== "not-securities-offering-material") {
@@ -974,6 +1018,7 @@ function requireBoundaryReleaseApprovalMatrixBoundary(label, response) {
 
 function requireApprovalsReadinessBoundary(label, response) {
   const approvalsReadiness = response.headers.get("x-scrimed-approvals-readiness");
+  const intendedUseAuthority = response.headers.get("x-scrimed-intended-use-authority");
   const legalAuthority = response.headers.get("x-scrimed-legal-authority");
   const phiAuthority = response.headers.get("x-scrimed-phi-authority");
   const regulatoryAuthority = response.headers.get("x-scrimed-regulatory-authority");
@@ -989,6 +1034,10 @@ function requireApprovalsReadinessBoundary(label, response) {
 
   if (legalAuthority !== "external-approval-required") {
     throw new Error(`${label} expected x-scrimed-legal-authority external-approval-required but received ${legalAuthority}.`);
+  }
+
+  if (intendedUseAuthority !== "qualified-review-required") {
+    throw new Error(`${label} expected x-scrimed-intended-use-authority qualified-review-required but received ${intendedUseAuthority}.`);
   }
 
   if (phiAuthority !== "not-authorized-production-phi") {
@@ -2047,6 +2096,7 @@ function requireScrimedWorkBoundary(label, response) {
   const consequentialActions = response.headers.get("x-scrimed-consequential-actions");
   const productionAuthorization = response.headers.get("x-scrimed-production-authorization");
   const customerGoLive = response.headers.get("x-scrimed-customer-go-live");
+  const csrfProtection = response.headers.get("x-scrimed-csrf-protection");
 
   if (work !== "scrimed-work-intelligence-platform-active-synthetic-no-phi") {
     throw new Error(`${label} expected SCRIMED Work active synthetic header but received ${work}.`);
@@ -2086,6 +2136,10 @@ function requireScrimedWorkBoundary(label, response) {
 
   if (customerGoLive !== "not-authorized") {
     throw new Error(`${label} expected x-scrimed-customer-go-live not-authorized but received ${customerGoLive}.`);
+  }
+
+  if (csrfProtection !== "exact-same-origin-or-explicit-non-browser") {
+    throw new Error(`${label} expected SCRIMED Work request-provenance protection but received ${csrfProtection}.`);
   }
 }
 
@@ -3439,12 +3493,12 @@ async function checkSiteNavigationShell() {
     throw new Error("site navigation root expected persistent site-navigation-shell markup.");
   }
 
-  if (!root.body.text.includes("Buy governed healthcare AI with proof before production risk")) {
-    throw new Error("site navigation root expected buyer-centric advertising hero copy.");
+  if (!root.body.text.includes("Atlas-first healthcare intelligence")) {
+    throw new Error("site navigation root expected Atlas-first public positioning.");
   }
 
-  if (!root.body.text.includes("What you can buy now")) {
-    throw new Error("site navigation root expected buyer purchase-options section.");
+  if (!root.body.text.includes("Illustrative engagement paths")) {
+    throw new Error("site navigation root expected pre-commercial engagement paths.");
   }
 
   if (!root.body.text.includes("Trust that helps close the deal")) {
@@ -5950,6 +6004,111 @@ async function checkReadiness() {
   console.log("pass protected pilot readiness");
 }
 
+async function checkCommercialPricing() {
+  const result = await request("/api/commercial/pricing");
+  requireStatus("commercial pricing", result.response.status, 200);
+  requireContentType("commercial pricing", result.response, "application/json");
+  requirePilotValueEvidenceBoundary("commercial pricing", result.response);
+  if (result.response.headers.get("x-scrimed-market-evidence") !== "current") {
+    throw new Error("commercial pricing market evidence header is not current.");
+  }
+  if (result.response.headers.get("x-scrimed-competitive-comparison") !== "current-first-party-evidence-only") {
+    throw new Error("commercial pricing competitive comparison header lost its freshness boundary.");
+  }
+  const body = requireJson("commercial pricing", result.body);
+
+  if (body.service !== "scrimed-commercial-strategy") {
+    throw new Error(`commercial pricing expected scrimed-commercial-strategy but received ${body.service}.`);
+  }
+
+  if (body.status !== "commercial-planning-model-active-pre-commercial") {
+    throw new Error(`commercial pricing expected pre-commercial planning status but received ${body.status}.`);
+  }
+
+  if (
+    body.authority?.pricingAuthority !== "non-binding-planning-ranges" ||
+    body.authority?.contractAuthority !== "not-granted" ||
+    body.authority?.productionAuthority !== "not-production-authorized" ||
+    body.authority?.customerActivationAuthority !== "not-customer-go-live-approval"
+  ) {
+    throw new Error("commercial pricing lost a quote, contract, production, or customer-activation boundary.");
+  }
+
+  if (!Array.isArray(body.pricingTiers) || body.pricingTiers.length < 6) {
+    throw new Error("commercial pricing expected a complete pricing ladder.");
+  }
+
+  if (
+    !body.pricingTiers.every(
+      (tier) =>
+        tier.priceRange?.minimumUsd >= 0 &&
+        tier.priceRange?.maximumUsd >= tier.priceRange?.minimumUsd &&
+        tier.proposalGate &&
+        tier.pricingAuthority
+    )
+  ) {
+    throw new Error("commercial pricing expected machine-readable ranges and proposal gates.");
+  }
+
+  if (
+    body.valuePlanner?.status !== "browser-only-no-data-persistence" ||
+    body.valuePlanner?.pricingAuthority !== "non-binding-planning-model" ||
+    body.valuePlanner?.humanReviewRequired !== true
+  ) {
+    throw new Error("commercial pricing value planner lost its no-storage or human-review boundary.");
+  }
+
+  if (!Array.isArray(body.marketPricingBenchmarks) || body.marketPricingBenchmarks.length < 4) {
+    throw new Error("commercial pricing expected dated market evidence.");
+  }
+
+  if (
+    !body.marketPricingBenchmarks.every(
+      (benchmark) =>
+        benchmark.evidenceStatus === "first-party-public" &&
+        benchmark.sourceUrl?.startsWith("https://") &&
+        benchmark.lastVerified === "2026-08-01" &&
+        benchmark.reviewDue === "2026-10-30" &&
+        ["current", "review-due"].includes(benchmark.freshness) &&
+        benchmark.comparisonBoundary
+    )
+  ) {
+    throw new Error("commercial pricing expected first-party market evidence with comparison boundaries.");
+  }
+
+  if (
+    body.marketEvidenceReview?.status !== "current" ||
+    body.marketEvidenceReview?.competitiveComparisonAllowed !== true ||
+    body.marketEvidenceReview?.staleCount !== 0 ||
+    body.marketEvidenceReview?.humanReviewRequired !== true ||
+    body.sourceCounts?.currentMarketBenchmarkCount !== body.marketPricingBenchmarks.length
+  ) {
+    throw new Error("commercial pricing market evidence is stale, incomplete, or missing its human review gate.");
+  }
+
+  if (!Array.isArray(body.competitivePositioningPillars) || body.competitivePositioningPillars.length < 6) {
+    throw new Error("commercial pricing expected competitive positioning pillars.");
+  }
+
+  if (!Array.isArray(body.globalCommercialProfiles) || body.globalCommercialProfiles.length < 4) {
+    throw new Error("commercial pricing expected global commercial profiles.");
+  }
+
+  if (
+    !Array.isArray(body.commercialReadinessControls) ||
+    !body.commercialReadinessControls.some(
+      (control) => control.dimension === "safety" && control.status === "enforced-in-code"
+    ) ||
+    !body.commercialReadinessControls.some(
+      (control) => control.dimension === "privacy" && control.status === "enforced-in-code"
+    )
+  ) {
+    throw new Error("commercial pricing expected enforced safety and privacy controls.");
+  }
+
+  console.log("pass commercial pricing");
+}
+
 async function checkCompetitiveEdgeApi() {
   const result = await request("/api/competitive-edge");
   requireStatus("competitive edge", result.response.status, 200);
@@ -6837,6 +6996,10 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA evidence activation plan missing sales-demo workflow.");
   }
 
+  if (!activationPlanBody.workflows?.some((workflow) => workflow.workflowKind === "execution-attempt-durable-store-qa")) {
+    throw new Error("QA evidence activation plan missing execution-attempt durable-store workflow.");
+  }
+
   const activationPlanBrief = await request("/api/qa-evidence/activation-plan/brief");
   requireStatus("QA evidence activation plan brief", activationPlanBrief.response.status, 200);
   requireContentType("QA evidence activation plan brief", activationPlanBrief.response, "text/markdown");
@@ -6867,6 +7030,10 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA manual run evidence packet contract missing authority-reference workflow kind.");
   }
 
+  if (!contractBody.supportedWorkflowKinds?.includes("execution-attempt-durable-store-qa")) {
+    throw new Error("QA manual run evidence packet contract missing durable-store workflow kind.");
+  }
+
   const rejectedSecret = await postJson("/api/qa-evidence/manual-run-packet", {
     workflowKind: "sales-demo-session-qa",
     workflowRunId: "123456789",
@@ -6880,7 +7047,7 @@ async function checkQaEvidenceLedger() {
     operatorAttestation: "no-secrets-no-phi-aal2-human-run",
     tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
     dataBoundary: "synthetic-business-workflow-only",
-    bearerToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkby1ub3Qtc3RvcmUifQ.signature"
+    bearerToken: "eyJexampleHeader.examplePayload.exampleSignature"
   });
   requireStatus("QA manual run evidence packet secret rejection", rejectedSecret.response.status, 400);
   requireContentType("QA manual run evidence packet secret rejection", rejectedSecret.response, "application/json");
@@ -6932,6 +7099,34 @@ async function checkQaEvidenceLedger() {
     throw new Error("QA authority reference evidence packet missing workflow kind.");
   }
 
+  const acceptedDurableStorePacket = await postJson("/api/qa-evidence/manual-run-packet", {
+    workflowKind: "execution-attempt-durable-store-qa",
+    workflowRunId: "202606221322",
+    workflowRunUrl: "https://app.scrimedsolutions.com/qa-run-control?runId=202606221322",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "atlas-synthetic-evaluation",
+    createdSessionId: "55555555-5555-4555-8555-555555555555",
+    packetAuditEventId: "66666666-6666-4666-8666-666666666666",
+    evidenceTargetLabel: "Workspace target",
+    evidenceObjectLabel: "Created durable record ID",
+    packetAuditEventLabel: "Review disposition audit event ID",
+    evidenceRoute: "/api/workflows/execution-attempts/durable-store/record",
+    packetRoute: "/api/workflows/execution-attempts/durable-store/review-disposition",
+    operatorRunbook: "/docs/aal2-durable-store-smoke.md",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA durable-store evidence packet", acceptedDurableStorePacket.response.status, 200);
+  requireContentType("QA durable-store evidence packet", acceptedDurableStorePacket.response, "text/markdown");
+  requireSyntheticBoundary("QA durable-store evidence packet", acceptedDurableStorePacket.response);
+
+  if (!acceptedDurableStorePacket.body.text.includes("Workflow kind: execution-attempt-durable-store-qa")) {
+    throw new Error("QA durable-store evidence packet missing workflow kind.");
+  }
+
   console.log("pass QA evidence ledger");
 }
 
@@ -6958,8 +7153,8 @@ async function checkQaExecutionReadiness() {
     throw new Error("QA execution readiness must preserve not-retained-proof claim boundary.");
   }
 
-  if (!Array.isArray(body.dispatchWorkflows) || body.dispatchWorkflows.length < 2) {
-    throw new Error("QA execution readiness expected both manual workflows.");
+  if (!Array.isArray(body.dispatchWorkflows) || body.dispatchWorkflows.length < 3) {
+    throw new Error("QA execution readiness expected all three governed manual workflows.");
   }
 
   if (!body.dispatchWorkflows.every((workflow) => workflow.state === "ready-for-human-aal2-run-not-executed")) {
@@ -7010,8 +7205,8 @@ async function checkQaRunControl() {
     throw new Error("QA run control must preserve not-retained authenticated proof boundary.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
-    throw new Error("QA run control expected both manual workflows.");
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
+    throw new Error("QA run control expected all three governed manual workflows.");
   }
 
   if (!body.workflows.every((workflow) => workflow.state === "ready-for-operator-control-human-aal2-required")) {
@@ -7098,8 +7293,8 @@ async function checkQaLaunchKit() {
     throw new Error("QA launch kit expected hard-stop phase.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
-    throw new Error("QA launch kit expected both manual workflows.");
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
+    throw new Error("QA launch kit expected all three governed manual workflows.");
   }
 
   if (!body.workflows.every((workflow) => workflow.dispatchInputs?.require_authenticated_path === true)) {
@@ -7170,8 +7365,8 @@ async function checkQaHumanRunPacket() {
     throw new Error("QA human run packet must block proof claims and buyer use before protected packet visibility.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
-    throw new Error("QA human run packet expected both manual workflows.");
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
+    throw new Error("QA human run packet expected all three governed manual workflows.");
   }
 
   if (!Array.isArray(body.controls) || body.controls.length < 7) {
@@ -7255,6 +7450,22 @@ async function checkQaHumanRunPacket() {
 
   if (acceptedBody.workflow?.workflowKind !== "authority-reference-qa") {
     throw new Error("QA human run packet accepted candidate expected authority-reference workflow.");
+  }
+
+  const acceptedDurableCandidate = await postJson("/api/qa-evidence/human-run-packet", {
+    workflowKind: "execution-attempt-durable-store-qa",
+    operatorRole: "tenant-admin",
+    protectedWorkspaceSlug: "atlas-synthetic-evaluation",
+    syntheticTargetId: "atlas-synthetic-evaluation",
+    plannedExecutionWindow: "operator-window-2026-08-08T12:00:00Z",
+    dispatchAttestation: "human-aal2-required-no-code-bypass",
+    proofBlockedAttestation: "no-retained-proof-until-protected-packet-visible",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA human run packet durable-store candidate", acceptedDurableCandidate.response.status, 200);
+  const acceptedDurableBody = requireJson("QA human run packet durable-store candidate", acceptedDurableCandidate.body);
+  if (acceptedDurableBody.workflow?.workflowKind !== "execution-attempt-durable-store-qa") {
+    throw new Error("QA human run packet expected the durable-store workflow.");
   }
 
   const brief = await request("/api/qa-evidence/human-run-packet/brief");
@@ -7388,6 +7599,32 @@ async function checkQaCompletionBridge() {
 
   if (!acceptedBody.packetPreviewMarkdown?.includes("SCRIMED Manual Authority Reference QA Evidence Packet")) {
     throw new Error("QA completion bridge accepted candidate expected authority reference packet preview.");
+  }
+
+  const acceptedDurableCandidate = await postJson("/api/qa-evidence/completion-bridge", {
+    workflowKind: "execution-attempt-durable-store-qa",
+    workflowRunId: "1234567891",
+    workflowRunUrl: "https://github.com/temitayodahunsi777/scrimed-site/actions/runs/1234567891",
+    executedAt: new Date().toISOString(),
+    baseUrl: "https://app.scrimedsolutions.com",
+    intakeId: "atlas-synthetic-evaluation",
+    createdSessionId: "33333333-3333-4333-8333-333333333333",
+    packetAuditEventId: "44444444-4444-4444-8444-444444444444",
+    evidenceTargetLabel: "Workspace target",
+    evidenceObjectLabel: "Created durable record ID",
+    packetAuditEventLabel: "Review disposition audit event ID",
+    evidenceRoute: "/api/workflows/execution-attempts/durable-store/record",
+    packetRoute: "/api/workflows/execution-attempts/durable-store/review-disposition",
+    operatorRunbook: "/docs/aal2-durable-store-smoke.md",
+    qaOutcome: "pass",
+    operatorAttestation: "no-secrets-no-phi-aal2-human-run",
+    tokenDisposalAttestation: "temporary-token-deleted-or-rotated",
+    dataBoundary: "synthetic-business-workflow-only"
+  });
+  requireStatus("QA completion bridge durable-store candidate", acceptedDurableCandidate.response.status, 200);
+  const acceptedDurableBody = requireJson("QA completion bridge durable-store candidate", acceptedDurableCandidate.body);
+  if (!acceptedDurableBody.packetPreviewMarkdown?.includes("SCRIMED Manual Execution Attempt Durable Store QA Evidence Packet")) {
+    throw new Error("QA completion bridge expected the durable-store packet preview.");
   }
 
   const brief = await request("/api/qa-evidence/completion-bridge/brief");
@@ -7907,7 +8144,7 @@ async function checkQaManualExecutionConsole() {
     throw new Error("QA manual execution console public API must not mark buyer proof release ready.");
   }
 
-  if (!Array.isArray(body.workflows) || body.workflows.length < 2) {
+  if (!Array.isArray(body.workflows) || body.workflows.length < 3) {
     throw new Error("QA manual execution console expected workflow coverage.");
   }
 
@@ -9085,6 +9322,30 @@ async function checkPilotDemoCommercialReadiness() {
   requireStatus("Pilot Demo Commercial Readiness", result.response.status, 200);
   requireContentType("Pilot Demo Commercial Readiness", result.response, "application/json");
   requirePilotDemoCommercialReadinessBoundary("Pilot Demo Commercial Readiness", result.response);
+  if (result.response.headers.get("x-scrimed-demo-session-planner") !== "interactive-synthetic-session-planner-active") {
+    throw new Error("Pilot Demo Commercial Readiness missing session-planner evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-rehearsal-gate") !== "proof-preflight-rehearsal-gate-active") {
+    throw new Error("Pilot Demo Commercial Readiness missing rehearsal-gate evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-proof-preflight") !== "same-origin-read-only-operator-triggered") {
+    throw new Error("Pilot Demo Commercial Readiness missing proof-preflight evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-protected-handoff") !== "aal2-sales-operations-only") {
+    throw new Error("Pilot Demo Commercial Readiness must retain the protected AAL2 handoff boundary.");
+  }
+  if (
+    result.response.headers.get("x-scrimed-demo-handoff-draft") !==
+    "canonical-metadata-no-automatic-persistence"
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness must expose its bounded metadata-only handoff contract.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-session-storage") !== "no-buyer-data-stored") {
+    throw new Error("Pilot Demo Commercial Readiness missing no-storage evidence header.");
+  }
+  if (result.response.headers.get("x-scrimed-demo-session-send-authority") !== "not-authorized-external-send") {
+    throw new Error("Pilot Demo Commercial Readiness must not authorize external sending.");
+  }
   const body = requireJson("Pilot Demo Commercial Readiness", result.body);
 
   if (body.service !== "scrimed-pilot-demo-commercial-readiness") {
@@ -9135,6 +9396,118 @@ async function checkPilotDemoCommercialReadiness() {
     )
   ) {
     throw new Error("Pilot Demo Commercial Readiness buyer conversion packets must include intake fields, disqualifiers, and audit hashes.");
+  }
+
+  const sessionPlanner = body.sessionPlanner;
+  if (sessionPlanner?.status !== "interactive-synthetic-session-planner-active") {
+    throw new Error("Pilot Demo Commercial Readiness expected the interactive session planner.");
+  }
+
+  if (!Array.isArray(sessionPlanner.catalog) || sessionPlanner.catalog.length !== body.demoOfferPaths.length) {
+    throw new Error("Pilot Demo Commercial Readiness session planner must cover every demo offer path.");
+  }
+
+  if (sessionPlanner.defaultPlan?.status !== "ready-for-synthetic-guided-demo") {
+    throw new Error("Pilot Demo Commercial Readiness expected a synthetic guided-demo default plan.");
+  }
+
+  if (
+    sessionPlanner.defaultPlan?.syntheticOnly !== true ||
+    sessionPlanner.defaultPlan?.humanReviewRequired !== true ||
+    sessionPlanner.defaultPlan?.bindingQuoteAuthorized !== false ||
+    sessionPlanner.defaultPlan?.externalSendAuthorized !== false ||
+    sessionPlanner.defaultPlan?.releaseAuthorityGranted !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness session planner lost a commercial or safety boundary.");
+  }
+
+  if (!Array.isArray(sessionPlanner.defaultPlan?.agenda) || sessionPlanner.defaultPlan.agenda.length !== 5) {
+    throw new Error("Pilot Demo Commercial Readiness expected a five-step default run of show.");
+  }
+
+  const plannedMinutes = sessionPlanner.defaultPlan.agenda.reduce((total, step) => total + step.minutes, 0);
+  if (plannedMinutes !== sessionPlanner.defaultPlan.durationMinutes) {
+    throw new Error("Pilot Demo Commercial Readiness default run of show does not fit its meeting length.");
+  }
+
+  if (
+    sessionPlanner.storesBuyerData !== false ||
+    sessionPlanner.acceptsFreeText !== false ||
+    sessionPlanner.externalSendAuthorized !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness planner must remain local, structured, and no-send.");
+  }
+
+  const rehearsalGate = sessionPlanner.rehearsalGate;
+  if (rehearsalGate?.status !== "proof-preflight-rehearsal-gate-active") {
+    throw new Error("Pilot Demo Commercial Readiness expected a governed local rehearsal gate.");
+  }
+
+  if (!Array.isArray(rehearsalGate.controls) || rehearsalGate.controls.length !== 3) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate expected three operator controls.");
+  }
+
+  if (
+    rehearsalGate.defaultEvaluation?.status !== "rehearsal-incomplete" ||
+    rehearsalGate.defaultEvaluation?.readinessScore !== 0 ||
+    !Array.isArray(rehearsalGate.defaultEvaluation?.blockers) ||
+    rehearsalGate.defaultEvaluation.blockers.length !== 4
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate must fail closed before self-attestation.");
+  }
+
+  if (
+    rehearsalGate.protectedHandoffRoute !== "/sales-operations#authenticated-buyer-demo-execution" ||
+    rehearsalGate.completionStatus !== "ready-for-protected-handoff" ||
+    rehearsalGate.evidenceBasis !== "automated-route-preflight-plus-operator-self-attestation" ||
+    rehearsalGate.persistent !== false ||
+    rehearsalGate.importsAutomatically !== false ||
+    rehearsalGate.humanReviewRequired !== true ||
+    rehearsalGate.pilotLaunchAuthorized !== false ||
+    rehearsalGate.defaultEvaluation?.externalSendAuthorized !== false ||
+    rehearsalGate.defaultEvaluation?.releaseAuthorityGranted !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate lost a handoff or authority boundary.");
+  }
+
+  const protectedHandoff = rehearsalGate.protectedHandoff;
+  if (
+    protectedHandoff?.status !== "canonical-metadata-draft-handoff-active" ||
+    protectedHandoff.transport !== "same-origin-query-metadata" ||
+    protectedHandoff.sourceTrust !== "untrusted-public-origin-draft" ||
+    protectedHandoff.canonicalPlanValidationRequired !== true ||
+    !Number.isInteger(protectedHandoff.maximumQueryLength) ||
+    protectedHandoff.maximumQueryLength < 1 ||
+    protectedHandoff.maximumQueryLength > 1_800 ||
+    protectedHandoff.acceptsFreeText !== false ||
+    protectedHandoff.storesBuyerData !== false ||
+    protectedHandoff.automaticPersistenceAuthorized !== false ||
+    protectedHandoff.aal2RecordRequired !== true ||
+    protectedHandoff.externalSendAuthorized !== false ||
+    protectedHandoff.releaseAuthorityGranted !== false
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness protected handoff lost a validation or authority boundary.");
+  }
+
+  if (
+    rehearsalGate.proofPreflight?.status !== "same-origin-read-only-proof-preflight-active" ||
+    rehearsalGate.proofPreflight?.method !== "HEAD" ||
+    rehearsalGate.proofPreflight?.credentials !== "omit" ||
+    rehearsalGate.proofPreflight?.sameOriginOnly !== true ||
+    rehearsalGate.proofPreflight?.operatorTriggered !== true ||
+    rehearsalGate.proofPreflight?.externalNetworkAllowed !== false ||
+    rehearsalGate.proofPreflight?.requestBodyAllowed !== false ||
+    rehearsalGate.proofPreflight?.storesBuyerData !== false ||
+    rehearsalGate.proofPreflight?.defaultResult?.status !== "not-run" ||
+    !Array.isArray(rehearsalGate.proofPreflight?.defaultResult?.routeChecks) ||
+    rehearsalGate.proofPreflight.defaultResult.routeChecks.length < 1 ||
+    rehearsalGate.proofPreflight.defaultResult.routeChecks.length > rehearsalGate.proofPreflight.maximumTargets
+  ) {
+    throw new Error("Pilot Demo Commercial Readiness proof preflight lost its bounded read-only boundary.");
+  }
+
+  if (!rehearsalGate.defaultEvaluation?.criteria?.some((criterion) => criterion.id === "agenda-coverage")) {
+    throw new Error("Pilot Demo Commercial Readiness rehearsal gate is missing agenda coverage.");
   }
 
   if (!Array.isArray(body.conversionSteps) || body.conversionSteps.length < 6) {
@@ -9192,6 +9565,22 @@ async function checkPilotDemoCommercialReadiness() {
 
   if (!brief.body.text.includes("Buyer Conversion Packets")) {
     throw new Error("Pilot Demo Commercial Readiness brief missing buyer conversion packet section.");
+  }
+
+  if (!brief.body.text.includes("Guided Demo Session Plan")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing guided session plan section.");
+  }
+
+  if (!brief.body.text.includes("stores no buyer data")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing no-storage boundary.");
+  }
+
+  if (!brief.body.text.includes("Governed Rehearsal Gate")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing rehearsal-gate section.");
+  }
+
+  if (!brief.body.text.includes("Route reachability is checked automatically")) {
+    throw new Error("Pilot Demo Commercial Readiness brief missing proof-preflight evidence limitation.");
   }
 
   console.log("pass pilot demo commercial readiness");
@@ -9585,6 +9974,30 @@ async function checkApprovalsReadiness() {
     throw new Error("Approvals Readiness expected approval processes.");
   }
 
+  if (body.intendedUseReview?.service !== "scrimed-intended-use-review") {
+    throw new Error("Approvals Readiness expected the Intended Use review program.");
+  }
+
+  if (body.intendedUseReview?.status !== "intended-use-review-packet-safe-draft-only") {
+    throw new Error("Approvals Readiness expected Intended Use draft-only status.");
+  }
+
+  const intendedUseDefault = body.intendedUseReview?.defaultEvaluation;
+
+  if (intendedUseDefault?.decision !== "qualified-review-packet-ready") {
+    throw new Error("Approvals Readiness expected the bounded default scope to be ready for qualified review.");
+  }
+
+  for (const field of ["approved", "approvalClaimAllowed", "externalUseAuthorized", "phiAuthority", "clinicalAuthority", "productionAuthority"]) {
+    if (intendedUseDefault?.[field] !== false) {
+      throw new Error(`Approvals Readiness Intended Use default must keep ${field} false.`);
+    }
+  }
+
+  if (!Array.isArray(body.intendedUseReview?.actionOptions) || !body.intendedUseReview.actionOptions.some((action) => action.id === "ehr-writeback" && action.classification === "prohibited")) {
+    throw new Error("Approvals Readiness Intended Use registry must prohibit EHR writeback.");
+  }
+
   const brief = await request("/api/approvals-readiness/brief");
   requireStatus("Approvals Readiness brief", brief.response.status, 200);
   requireContentType("Approvals Readiness brief", brief.response, "text/markdown");
@@ -9600,6 +10013,14 @@ async function checkApprovalsReadiness() {
 
   if (!brief.body.text.includes("FDA clearance")) {
     throw new Error("Approvals Readiness brief missing FDA boundary.");
+  }
+
+  if (!brief.body.text.includes("Intended Use Review Packet")) {
+    throw new Error("Approvals Readiness brief missing Intended Use review packet.");
+  }
+
+  if (!brief.body.text.includes("External use authorized: false")) {
+    throw new Error("Approvals Readiness brief must preserve blocked external use.");
   }
 
   console.log("pass approvals readiness");
@@ -11198,6 +11619,14 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /continuous-review-audit in smoke-covered HTML routes.");
   }
 
+  if (!body.smokeCoveredHtmlRoutes.includes("/validation-evidence")) {
+    throw new Error("Navigation Audit expected /validation-evidence in smoke-covered HTML routes.");
+  }
+
+  if (!body.smokeCoveredHtmlRoutes.includes("/legal")) {
+    throw new Error("Navigation Audit expected /legal in smoke-covered HTML routes.");
+  }
+
   if (!Array.isArray(body.bottlenecks) || !body.bottlenecks.some((bottleneck) => bottleneck.status === "operator-required")) {
     throw new Error("Navigation Audit expected an operator-required AAL2 bottleneck.");
   }
@@ -12433,6 +12862,27 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work expected durable writes to require Supabase AAL2/RBAC/RLS.");
   }
 
+  if (
+    body.governanceStatus?.mutationRateLimit?.policyVersion !==
+      "scrimed-work-mutation-rate-limit-v1-2026-07-17" ||
+    !["distributed-required", "bounded-memory"].includes(
+      body.governanceStatus?.mutationRateLimit?.mode
+    ) ||
+    body.governanceStatus?.mutationRateLimit?.actorLimit !== 30 ||
+    body.governanceStatus?.mutationRateLimit?.tenantLimit !== 120 ||
+    body.governanceStatus?.mutationRateLimit?.windowSeconds !== 600
+  ) {
+    throw new Error("SCRIMED Work expected actor and tenant mutation rate-limit posture metadata.");
+  }
+
+  if (
+    body.governanceStatus.mutationRateLimit.productionRuntime === true &&
+    (body.governanceStatus.mutationRateLimit.mode !== "distributed-required" ||
+      body.governanceStatus.mutationRateLimit.failClosedOnProviderUnavailable !== true)
+  ) {
+    throw new Error("SCRIMED Work production runtime must require distributed fail-closed mutation limiting.");
+  }
+
   if (body.productionHardening?.service !== "scrimed-work-production-hardening-gate") {
     throw new Error("SCRIMED Work expected production hardening gate metadata.");
   }
@@ -12441,8 +12891,36 @@ async function checkScrimedWork() {
     throw new Error("SCRIMED Work production hardening gate must retain no-production and no-PHI authority boundaries.");
   }
 
+  if (
+    body.productionHardening?.mutationRateLimit?.policyVersion !==
+      "scrimed-work-mutation-rate-limit-v1-2026-07-17" ||
+    typeof body.productionHardening?.mutationRateLimit?.distributedProviderConfigured !==
+      "boolean" ||
+    typeof body.productionHardening?.mutationRateLimit?.readyForProtectedMutations !== "boolean"
+  ) {
+    throw new Error("SCRIMED Work production hardening must expose no-secret mutation rate-limit posture.");
+  }
+
   if (!Array.isArray(body.productionHardening?.gates) || body.productionHardening.gates.length < 8) {
     throw new Error("SCRIMED Work production hardening gate expected release-control coverage.");
+  }
+
+  if (
+    typeof body.productionHardening?.releaseBinding?.currentReleaseShaFingerprint !== "string" ||
+    typeof body.productionHardening?.releaseBinding?.canaryReleaseShaFingerprint !== "string" ||
+    typeof body.productionHardening?.releaseBinding?.evidenceIdFormatValid !== "boolean" ||
+    typeof body.productionHardening?.releaseBinding?.evidenceIdAuthenticated !== "boolean" ||
+    typeof body.productionHardening?.releaseBinding?.workspaceSlug !== "string" ||
+    typeof body.productionHardening?.releaseBinding?.workspaceBound !== "boolean" ||
+    (body.productionHardening?.releaseBinding?.completedAt !== null &&
+      typeof body.productionHardening?.releaseBinding?.completedAt !== "string") ||
+    (body.productionHardening?.releaseBinding?.ageHours !== null &&
+      typeof body.productionHardening?.releaseBinding?.ageHours !== "number") ||
+    typeof body.productionHardening?.releaseBinding?.maxAgeHours !== "number" ||
+    typeof body.productionHardening?.releaseBinding?.fresh !== "boolean" ||
+    typeof body.productionHardening?.releaseBinding?.matched !== "boolean"
+  ) {
+    throw new Error("SCRIMED Work production hardening must expose no-secret release-binding posture.");
   }
 
   if (!Array.isArray(body.sessions) || body.sessions.length < 2) {
@@ -12571,7 +13049,9 @@ async function checkScrimedWork() {
   );
   if (
     protectedCompletionEvidence.response.headers.get("x-scrimed-completion-queue") !== "fail-closed" ||
-    protectedCompletionEvidence.response.headers.get("x-scrimed-completion-read-mode") !== "denied"
+    protectedCompletionEvidence.response.headers.get("x-scrimed-completion-read-mode") !== "denied" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-canary-attestation") !== "denied" ||
+    protectedCompletionEvidence.response.headers.get("x-scrimed-canary-freshness") !== "denied"
   ) {
     throw new Error("SCRIMED Work completion evidence must fail closed without AAL2 operator authorization.");
   }
@@ -12613,9 +13093,11 @@ async function checkScrimedWork() {
   requireStatus("SCRIMED Work voice simulate", voice.response.status, 200);
   requireScrimedWorkBoundary("SCRIMED Work voice simulate", voice.response);
 
-  const protectedCreate = await postJson("/api/scrimed-work/sessions", {
-    title: "blocked synthetic session create without protected write auth"
-  });
+  const protectedCreate = await postJson(
+    "/api/scrimed-work/sessions",
+    { title: "blocked synthetic session create without protected write auth" },
+    { "x-scrimed-request-context": "operator-smoke-v1" }
+  );
   requireStatus("SCRIMED Work protected session create", protectedCreate.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected session create", protectedCreate.response);
 
@@ -12638,7 +13120,8 @@ async function checkScrimedWork() {
       reviewerStatus: "queued",
       requestedAction: "draft_reviewer_packet",
       dataBoundaryAcknowledged: true
-    }
+    },
+    { "x-scrimed-request-context": "operator-smoke-v1" }
   );
   requireStatus("PayerIQ protected SCRIMED Work handoff", protectedPayerIqHandoff.response.status, [401, 503]);
   requireScrimedWorkBoundary("PayerIQ protected SCRIMED Work handoff", protectedPayerIqHandoff.response);
@@ -12648,14 +13131,16 @@ async function checkScrimedWork() {
     {
       disposition: "approved_for_internal_use",
       reasonCode: "evidence_and_boundaries_confirmed"
-    }
+    },
+    { "x-scrimed-request-context": "operator-smoke-v1" }
   );
   requireStatus("SCRIMED Work protected artifact review", protectedArtifactReview.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected artifact review", protectedArtifactReview.response);
 
   const protectedCompletion = await postJson(
     "/api/scrimed-work/sessions/work_session_unknown_protected/complete",
-    {}
+    {},
+    { "x-scrimed-request-context": "operator-smoke-v1" }
   );
   requireStatus("SCRIMED Work protected completion", protectedCompletion.response.status, [401, 503]);
   requireScrimedWorkBoundary("SCRIMED Work protected completion", protectedCompletion.response);
@@ -13894,6 +14379,89 @@ async function checkCapitalVitality() {
     throw new Error("Capital Vitality must not create audited financial reporting.");
   }
 
+  if (body.capitalPlanning?.status !== "capital-planning-workbench-ready-local-only") {
+    throw new Error("Capital Vitality expected a local-only capital planning workbench.");
+  }
+
+  if (
+    body.capitalPlanning?.modelVersion !== "scrimed-capital-plan-v1" ||
+    body.capitalPlanning?.localOnly !== true ||
+    body.capitalPlanning?.inputPersistence !== false ||
+    body.capitalPlanning?.externalUseAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality planning posture must remain local, nonpersistent, and externally unauthorized.");
+  }
+
+  if (body.investorDiligenceManifest?.status !== "investor-diligence-manifest-active-metadata-only") {
+    throw new Error("Capital Vitality expected a metadata-only investor diligence manifest.");
+  }
+
+  if (
+    body.investorDiligenceManifest?.artifactCount !== 6 ||
+    body.investorDiligenceManifest?.blockingArtifactCount !== 5 ||
+    body.investorDiligenceManifest?.acceptsRawEvidence !== false ||
+    body.investorDiligenceManifest?.externalReleaseAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality diligence manifest counts or fail-closed posture drifted.");
+  }
+
+  if (
+    body.investorDiligenceManifest?.releaseAssessment?.decision !== "blocked-remediation-required" ||
+    body.investorDiligenceManifest?.releaseAssessment?.externalReleaseAuthorized !== false ||
+    body.externalFundraisingReleaseAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality fundraising release must remain blocked pending qualified evidence and approval.");
+  }
+
+  if (
+    body.capitalAcquisitionReadiness?.status !== "capital-and-public-sector-readiness-active-evidence-gated" ||
+    body.capitalAcquisitionReadiness?.capitalAccessLaneCount !== 7 ||
+    body.capitalAcquisitionReadiness?.readinessGateCount < 10
+  ) {
+    throw new Error("Capital Vitality expected evidence-gated capital and public-sector acquisition readiness.");
+  }
+
+  if (
+    body.capitalAcquisitionReadiness?.authority?.registrationsVerified !== false ||
+    body.capitalAcquisitionReadiness?.authority?.certificationsVerified !== false ||
+    body.capitalAcquisitionReadiness?.authority?.governmentAwardVerified !== false ||
+    body.capitalAcquisitionReadiness?.authority?.externalSubmissionAuthorized !== false ||
+    body.externalPublicSectorSubmissionAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality must not infer registration, certification, government award, or submission authority.");
+  }
+
+  if (body.capitalAcquisitionReadiness?.defaultAssessment?.decision !== "input-required") {
+    throw new Error("Capital Vitality public-sector evaluator must require verified operator input by default.");
+  }
+
+  if (
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.status !==
+      "sam-far-readiness-active-operator-evidence-required" ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.checkpointCount !== 14 ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.defaultDecision !== "operator-input-required" ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.authority?.samRegistrationVerified !== false ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.authority?.primeOfferAuthorized !== false ||
+    body.capitalAcquisitionReadiness?.federalContractReadiness?.authority?.externalSubmissionAuthorized !== false
+  ) {
+    throw new Error("Capital Vitality federal contract readiness must require operator evidence and retain all registration, offer, and submission authority.");
+  }
+
+  if (
+    body.capitalAcquisitionCapturePacket?.status !==
+      "capital-acquisition-capture-packet-active-internal-metadata-only" ||
+    body.capitalAcquisitionCapturePacket?.supportedLaneCount !== 5 ||
+    body.capitalAcquisitionCapturePacket?.proofArtifactCount !== 5 ||
+    body.capitalAcquisitionCapturePacket?.defaultExternalReleaseAuthorized !== false ||
+    body.capitalAcquisitionCapturePacket?.defaultExternalSubmissionAuthorized !== false ||
+    body.capitalAcquisitionCapturePacket?.containsRawProposal !== false ||
+    body.capitalAcquisitionCapturePacket?.containsRegistrationIdentifiers !== false ||
+    body.capitalAcquisitionCapturePacket?.containsCredentials !== false ||
+    body.capitalAcquisitionCapturePacket?.containsPhi !== false
+  ) {
+    throw new Error("Capital Vitality capture packet must remain internal, metadata-only, and fail-closed for external release and submission.");
+  }
+
   if (!Array.isArray(body.revenueCapabilities) || body.revenueCapabilities.length < 8) {
     throw new Error("Capital Vitality expected revenue capability coverage.");
   }
@@ -13940,6 +14508,30 @@ async function checkCapitalVitality() {
 
   if (!brief.body.text.includes("not securities offering material")) {
     throw new Error("Capital Vitality brief missing securities boundary.");
+  }
+
+  if (!brief.body.text.includes("Capital Planning Workbench")) {
+    throw new Error("Capital Vitality brief missing capital planning workbench posture.");
+  }
+
+  if (!brief.body.text.includes("Investor Diligence Manifest")) {
+    throw new Error("Capital Vitality brief missing investor diligence manifest posture.");
+  }
+
+  if (!brief.body.text.includes("Capital And Public-Sector Acquisition Readiness")) {
+    throw new Error("Capital Vitality brief missing public-sector acquisition readiness posture.");
+  }
+
+  if (!brief.body.text.includes("Capital Acquisition Capture Packet")) {
+    throw new Error("Capital Vitality brief missing the internal capital acquisition capture packet posture.");
+  }
+
+  if (!brief.body.text.includes("External submission authorized: false")) {
+    throw new Error("Capital Vitality brief must preserve the public-sector submission lock.");
+  }
+
+  if (!brief.body.text.includes("External release authorized: false")) {
+    throw new Error("Capital Vitality brief must preserve the external fundraising release lock.");
   }
 
   console.log("pass capital vitality");
@@ -14123,6 +14715,54 @@ async function checkInvestorAudienceReadiness() {
   ) {
     throw new Error("Investor Audience Readiness expected pitch and diligence gap coverage.");
   }
+
+  if (
+    body.strategicMeetingPacketCount !== 4 ||
+    body.strategicInvestorOutreach?.meetingPreparationReady !== true ||
+    body.strategicInvestorOutreach?.externalFundraisingReleaseAuthorized !== false ||
+    body.fundingReleaseBlockerCount !== 5
+  ) {
+    throw new Error("Investor Audience Readiness expected four internal meeting packets and five weakest-link funding release blockers.");
+  }
+
+  const openaiPacket = await request(
+    "/api/investor-audience-readiness/meeting-packet?target=openai&format=json"
+  );
+  requireStatus("OpenAI meeting packet", openaiPacket.response.status, 200);
+  requireContentType("OpenAI meeting packet", openaiPacket.response, "application/json");
+  const openaiPacketBody = requireJson("OpenAI meeting packet", openaiPacket.body);
+
+  if (
+    openaiPacketBody.ok !== true ||
+    openaiPacketBody.data?.organization !== "OpenAI" ||
+    openaiPacketBody.data?.fundingPathStatus !== "no-public-direct-investment-application-verified" ||
+    openaiPacketBody.meta?.externalReleaseAuthorized !== false ||
+    openaiPacketBody.meta?.relationshipImplied !== false
+  ) {
+    throw new Error("OpenAI meeting packet must remain internal, source-aligned, and relationship-neutral.");
+  }
+
+  if (openaiPacket.response.headers.get("x-scrimed-fundraising-release") !== "not-authorized") {
+    throw new Error("OpenAI meeting packet must fail closed for external fundraising release.");
+  }
+
+  const openaiMarkdown = await request(
+    "/api/investor-audience-readiness/meeting-packet?target=openai&format=markdown"
+  );
+  requireStatus("OpenAI meeting packet markdown", openaiMarkdown.response.status, 200);
+  requireContentType("OpenAI meeting packet markdown", openaiMarkdown.response, "text/markdown");
+
+  if (
+    !openaiMarkdown.body.text.includes("SCRIMED OpenAI Meeting Preparation Brief") ||
+    !openaiMarkdown.body.text.includes("External release authorized: no")
+  ) {
+    throw new Error("OpenAI meeting packet markdown missing heading or external-release boundary.");
+  }
+
+  const invalidPacket = await request(
+    "/api/investor-audience-readiness/meeting-packet?target=unsupported&format=json"
+  );
+  requireStatus("Invalid strategic meeting target", invalidPacket.response.status, 400);
 
   const brief = await request("/api/investor-audience-readiness/brief");
   requireStatus("Investor Audience Readiness brief", brief.response.status, 200);
@@ -15135,6 +15775,24 @@ async function checkProtectedPostFailClosed(path, label, payload) {
   console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
 }
 
+async function checkP32ProtectedPostFailClosed(path, label, payload) {
+  const result = await postJson(path, payload);
+  requireStatus(label, result.response.status, [401, 403, 503]);
+  requireContentType(label, result.response, "application/json");
+  const dataBoundary = result.response.headers.get("x-scrimed-data-boundary");
+  if (dataBoundary !== "synthetic-metadata-only") {
+    throw new Error(`${label} expected synthetic-metadata-only boundary but received ${dataBoundary}.`);
+  }
+  requireNoClinicalCareAuthority(label, result.response);
+  if (!result.response.headers.get("x-scrimed-csrf-protection")) {
+    throw new Error(`${label} missing protected mutation provenance policy header.`);
+  }
+  if (result.response.headers.get("x-scrimed-release-authority") !== "not-granted") {
+    throw new Error(`${label} must not grant release authority.`);
+  }
+  console.log(`pass ${label} fail-closed: ${result.response.status} ${result.response.statusText}`);
+}
+
 async function checkSalesProtectedFailClosed(path, label) {
   const result = await request(path);
   requireStatus(label, result.response.status, [401, 503]);
@@ -15147,6 +15805,7 @@ await checkSiteNavigationShell();
 await checkBuyerTrustReliabilitySafetyMessaging();
 await checkHtml("/company-assessment");
 await checkHtml("/clinical-production-readiness");
+await checkHtml("/pricing");
 await checkHtml("/pilot-demo-commercial-readiness");
 await checkHtml("/pilot-workspace/access");
 await checkHtml("/sales-operations");
@@ -15225,6 +15884,8 @@ await checkHtml("/qa-buyer-proof-release");
 await checkHtml("/buyer-release-control-run");
 await checkHtml("/qa-manual-execution-console");
 await checkHtml("/qa-aal2-run-evidence");
+await checkHtml("/validation-evidence");
+await checkHtml("/legal");
 await checkReleaseContinuity();
 await checkNavigationAudit();
 await checkServiceReliability();
@@ -15274,6 +15935,7 @@ await checkBoundaryResolution();
 await checkBoundaryReleaseApprovalMatrix();
 await checkProductConsole();
 await checkReadiness();
+await checkCommercialPricing();
 await checkCompetitiveEdgeApi();
 await checkCompetitiveIntelligenceApi();
 await checkScrimedMarketExecutionApi();
@@ -15926,6 +16588,21 @@ await checkProtectedFailClosed(
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/aal2-run-evidence`,
   "QA AAL2 Run Evidence protected API"
+);
+await checkP32ProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/p32-attestation`,
+  "P.32 Evidence Attestation protected API",
+  {
+    sourceCommit: "0".repeat(40),
+    sourceTreeFingerprint: "1".repeat(64),
+    artifactFingerprint: "2".repeat(64),
+    validationEvidenceFingerprint: "3".repeat(64)
+  }
+);
+await checkP32ProtectedPostFailClosed(
+  `/api/pilot-workspaces/${workspaceSlug}/qa-evidence/p32-candidate-review?action=assign`,
+  "P.32 Candidate Review protected API",
+  { reviewerIdentityHash: "4".repeat(64) }
 );
 await checkProtectedFailClosed(
   `/api/pilot-workspaces/${workspaceSlug}/enterprise-proof-packet`,

@@ -4,6 +4,8 @@ SCRIMED production promotion must be bound to one clean, immutable, reviewed Git
 
 ## Controls
 
+- `npm run release:candidate-manifest` creates deterministic SHA-256 fingerprints for the complete candidate, application source lane, and non-source deliverable lane without printing filenames, file contents, or raw diffs. It reports category counts, correlated risk signals, non-source deliverables, and required reviewer roles.
+- `npm run release:candidate-manifest:strict` remains blocked until the reviewed source is represented by a clean immutable revision. A candidate digest is not a commit, approval, or deployment authorization.
 - `npm run release:provenance` reports local provenance without blocking development.
 - `npm run release:provenance:strict` fails when modified or untracked files exist, Git metadata is unavailable, or CI's SHA differs from `HEAD`.
 - CI runs strict provenance before quality and build gates.
@@ -17,19 +19,23 @@ The production environment values are non-secret release controls, but only a na
 
 ## Release Sequence
 
-1. Partition and review the intended change set.
-2. Run `npm run quality:direct-node`.
-3. Commit only the intended files through the approved review path.
-4. Run `npm run release:provenance:strict` on the clean reviewed revision.
-5. Record the full `git rev-parse HEAD` value as `SCRIMED_APPROVED_RELEASE_SHA` in the production environment.
-6. Set `SCRIMED_RELEASE_PROVENANCE_ENFORCED=true` in production.
-7. Allow the source-controlled Vercel deployment.
-8. Run public and deployment-drift smoke against the custom domain.
-9. Revoke or replace the approved SHA before the next release.
+1. Run `npm run release:candidate-manifest` and inspect category counts, risk signals, and required reviewers.
+2. Exclude non-source deliverables from the application source release and route them through the artifact review lane.
+3. Partition and review the intended source change set.
+4. Run `npm run quality:direct-node`.
+5. Commit only the intended files through the approved review path.
+6. Run `npm run release:candidate-manifest:strict` and `npm run release:provenance:strict` on the clean reviewed revision.
+7. Record the full `git rev-parse HEAD` value as `SCRIMED_APPROVED_RELEASE_SHA` in the production environment.
+8. Set `SCRIMED_RELEASE_PROVENANCE_ENFORCED=true` in production.
+9. Allow the source-controlled Vercel deployment.
+10. Run public and deployment-drift smoke against the custom domain.
+11. Revoke or replace the approved SHA before the next release.
 
 ## Failure Behavior
 
-Missing required Git evidence, a dirty source tree, missing Vercel source attestation, SHA mismatch, a non-main production source, or a missing production attestation fails closed. The preflight does not print secrets or changed filenames.
+Missing required Git evidence, a dirty source tree, missing Vercel source attestation, SHA mismatch, a non-main production source, or a missing production attestation fails closed. The candidate manifest and provenance preflight do not print secrets, changed filenames, file contents, or raw diffs.
+
+Automatic Vercel production deployment from `main` is disabled in `vercel.json`. Preview branches remain enabled. A reviewed merge therefore remains separate from production deployment; an authorized release owner must explicitly deploy or promote the exact approved commit and retain the resulting Vercel receipt.
 
 ## Boundary
 

@@ -168,6 +168,19 @@ function commandTemplates(workflowKind: QaManualRunWorkflowKind, preflightScript
     };
   }
 
+  if (workflowKind === "execution-attempt-durable-store-qa") {
+    return {
+      preflight:
+        "SCRIMED_WORKSPACE_SLUG=<synthetic-workspace-slug> SCRIMED_BEARER_TOKEN=<short-lived-aal2-token> node " +
+        preflightScript +
+        " --strict",
+      smoke:
+        "SCRIMED_BASE_URL=https://app.scrimedsolutions.com SCRIMED_WORKSPACE_SLUG=<synthetic-workspace-slug> SCRIMED_BEARER_TOKEN=<short-lived-aal2-token> node " +
+        smokeScript +
+        " --strict"
+    };
+  }
+
   return {
     preflight:
       "SCRIMED_REQUIRE_SALES_QA=1 SCRIMED_SALES_QA_INTAKE_ID=<synthetic-intake-id> SCRIMED_SALES_QA_BEARER_TOKEN=<short-lived-aal2-token> node " +
@@ -179,7 +192,10 @@ function commandTemplates(workflowKind: QaManualRunWorkflowKind, preflightScript
 }
 
 function dispatchInputs(workflowKind: QaManualRunWorkflowKind): Record<string, string | boolean> {
-  if (workflowKind === "authority-reference-qa") {
+  if (
+    workflowKind === "authority-reference-qa" ||
+    workflowKind === "execution-attempt-durable-store-qa"
+  ) {
     return {
       base_url: "https://app.scrimedsolutions.com",
       workspace_slug: "atlas-synthetic-evaluation",
@@ -196,6 +212,7 @@ function dispatchInputs(workflowKind: QaManualRunWorkflowKind): Record<string, s
 
 function evidenceTemplate(workflowKind: QaManualRunWorkflowKind): QaRunControlEvidenceTemplate {
   const isAuthorityReference = workflowKind === "authority-reference-qa";
+  const isDurableStore = workflowKind === "execution-attempt-durable-store-qa";
 
   return {
     workflowKind,
@@ -204,14 +221,18 @@ function evidenceTemplate(workflowKind: QaManualRunWorkflowKind): QaRunControlEv
       "https://app.scrimedsolutions.com/qa-run-control?runId=<numeric-scrimed-manual-run-id>",
     executedAt: "<iso-8601-run-timestamp>",
     baseUrl: "https://app.scrimedsolutions.com",
-    intakeId: isAuthorityReference
+    intakeId: isAuthorityReference || isDurableStore
       ? "atlas-synthetic-evaluation"
       : "<synthetic-sales-opportunity-intake-id>",
     createdSessionId: isAuthorityReference
       ? "<created-authority-reference-uuid>"
+      : isDurableStore
+        ? "<created-durable-record-uuid>"
       : "<created-demo-session-uuid>",
     packetAuditEventId: isAuthorityReference
       ? "<authority-reference-packet-audit-event-uuid>"
+      : isDurableStore
+        ? "<review-disposition-audit-event-uuid>"
       : "<demo-session-packet-audit-event-uuid>",
     qaOutcome: "pass",
     operatorAttestation: "no-secrets-no-phi-aal2-human-run",
@@ -222,7 +243,8 @@ function evidenceTemplate(workflowKind: QaManualRunWorkflowKind): QaRunControlEv
 
 function operatorSequence(workflowKind: QaManualRunWorkflowKind) {
   const targetStep =
-    workflowKind === "authority-reference-qa"
+    workflowKind === "authority-reference-qa" ||
+    workflowKind === "execution-attempt-durable-store-qa"
       ? "Use the protected synthetic workspace slug as the explicit target."
       : "Use one explicit synthetic Sales Operations intake ID as the target.";
 

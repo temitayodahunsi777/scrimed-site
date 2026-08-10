@@ -1,6 +1,6 @@
 # SCRIMED Investor And Audience Readiness
 
-Updated: 2026-07-13
+Updated: 2026-07-30
 
 SCRIMED Investor and Audience Readiness turns known weaknesses into owned relief tracks and packages the company for distinct capital, clinic, buyer, and partner audiences. It is designed to strengthen competitive edge, sellable value, and diligence readiness without creating securities, valuation, legal, tax, donor, clinical, PHI, reimbursement, customer-proof, partnership, or approval claims.
 
@@ -9,8 +9,21 @@ SCRIMED Investor and Audience Readiness turns known weaknesses into owned relief
 - Page: `/investor-audience-readiness`
 - API: `/api/investor-audience-readiness`
 - Brief: `/api/investor-audience-readiness/brief`
+- Target meeting packet: `/api/investor-audience-readiness/meeting-packet?target=openai&format=markdown`
 - Status: `investor-audience-readiness-control-plane-active`
 - Brief status: `investor-audience-readiness-brief-ready-no-securities-offer`
+
+## Parallel Pre-Fundraise Lane
+
+SCRIMED now distinguishes three separate readiness states:
+
+1. Internal preparation may continue while candidate review is open.
+2. Public-safe discovery conversations and published demo sharing are `REQUIRE_HUMAN`; they use only approved public routes and never send themselves.
+3. Investor-deck distribution, controlled diligence, and any securities process remain `BLOCK` until a clean candidate, named independent review, exact SHA-256 bindings, deck approvals, release-steward approval, and applicable customer or counsel permissions exist.
+
+The deterministic policy preview currently exposes six executable synthetic demos and four governed pilot offers from the canonical demo/pilot registry. It labels the preview as synthetic readiness evidence, not current external approval evidence.
+
+The evaluator never performs outreach, submits a startup-program application, opens a data room, or distributes a deck. Even fully satisfied external-release inputs return `REQUIRE_HUMAN`, preserving a named operator as the final actor.
 
 ## Weakness Relief Tracks
 
@@ -60,6 +73,38 @@ The control plane now includes distinct, evidence-backed preparation packets for
 The associated diligence manifest separates `evidence-ready`, `qualified-review-required`, and `external-evidence-required` items across company narrative, product, safety, security, commercial proof, finance, legal, and clinical/regulatory readiness.
 
 No external outreach, program application, investment request, or partnership communication is sent by this module.
+
+## Strategic Meeting Room
+
+The control plane now provides internal meeting-preparation packets for OpenAI, NVIDIA, Anthropic, and Microsoft. Every packet contains:
+
+- A first-meeting objective and explicit non-goal.
+- A concise opening narrative.
+- Official-source strategic signals with a SCRIMED implication.
+- A timed 30-minute agenda.
+- A four-step no-PHI demo sequence.
+- Evidence-backed answers to recurring diligence questions.
+- One specific ask and one mutual next step.
+- Release requirements and forbidden claims.
+
+The OpenAI path deliberately begins with OpenAI for Startups and healthcare technical discovery. SCRIMED has not verified a public general-purpose direct-investment application, so the meeting packet does not frame startup ecosystem access as an investment offer. Any financing conversation requires a permissioned introduction plus founder, counsel, finance, claims, and release-steward approval.
+
+The route supports `target=openai|nvidia|anthropic|microsoft` and `format=json|markdown`. Unsupported targets and formats fail closed with a `400` response. Every response states that external fundraising release is not authorized, no outreach has been sent, and no strategic relationship is implied.
+
+## Funding Release Ledger
+
+Eight controls separate internal meeting readiness from external fundraising release:
+
+- Category and wedge proof.
+- Product and technical proof.
+- Safety and boundary proof.
+- Reconciled financial model and capital plan.
+- Entity, IP, cap table, and securities path.
+- Permissioned customer and outcome evidence.
+- Independent security, clinical, privacy, and regulatory assurance.
+- Immutable packet provenance and release authorization.
+
+Product, architecture, and safety preparation can be evidence-ready while the overall fundraising packet remains blocked. Financial reconciliation, qualified legal review, permissioned customer evidence, independent assurance, and immutable release provenance are intentionally weakest-link controls.
 
 ## Pitch Architecture
 
@@ -133,3 +178,4 @@ SCRIMED uses these references to route work to qualified reviewers. The app does
 3. Identify blocked claims before the meeting.
 4. Route securities, valuation, legal, tax, nonprofit, donor, customer, PHI, clinical, reimbursement, certification, and partnership language through qualified review.
 5. Use Claim Guard before any external deck, email, investor memo, PR line, grant narrative, or partner note leaves SCRIMED.
+6. Regenerate candidate, source, review-packet, and deck fingerprints after any material change; stale approvals cannot authorize diligence.

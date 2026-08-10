@@ -41,8 +41,8 @@ export type CrossPlatformApprovalStep = {
   automaticApprovalAllowed: false;
 };
 
-const observedAt = "2026-07-11T22:35:00-04:00";
-const expiresAt = "2026-07-12T22:35:00-04:00";
+const observedAt = "2026-08-09T05:04:46Z";
+const expiresAt = "2026-08-10T05:04:46Z";
 
 function evidenceRecord(
   input: Omit<
@@ -78,24 +78,26 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     expiresAt,
     evidenceClass: "connector-observed",
     sourceReference: "GitHub repository metadata and local git status",
-    summary: "The public main branch is behind the current local SCRIMED build, and the working tree contains a large unreviewed change set.",
+    summary: "The consolidated candidate has one dedicated review path in PR 25; automated checks are attached to that path, while independent named engineering and security approval remains outstanding.",
     facts: [
       "Repository visibility is public.",
-      "The latest observed main commit is Add commercial growth engine lane.",
-      "No pull-request-triggered workflow runs were returned for the latest observed commit.",
-      "The local working tree contains modified and untracked product, API, documentation, migration, and CI files."
+      "Observed main is 5e77beea57f458883f7544421b2014fd4e28ac67.",
+      "PR 25 is the consolidated candidate review path for branch agent/scrimed-p32-consolidated-candidate.",
+      "Predecessor PRs 22 and 23 are superseded by the consolidated path and must not be merged independently.",
+      "Dependency review, dependency security, migration dry-run, CodeQL, core CI, and synthetic preview validation are required on the exact final head.",
+      "No distinct human APPROVED review is recorded in the retained observation."
     ],
     drift: [
-      "The active product implementation is not represented by a reviewable commit or pull request.",
-      "Release evidence cannot be bound to one immutable source revision."
+      "Reviewing or merging both predecessor PRs independently would duplicate consolidated history.",
+      "Automated checks cannot substitute for named independent engineering and security review."
     ],
     approvalImpact: ["source-controlled release approval", "buyer diligence evidence", "change-management evidence", "rollback provenance"],
     accountableOwner: "Engineering release steward",
-    nextAction: "Partition the related working-tree changes, run the complete quality gate, and prepare one reviewable release candidate without committing unrelated state.",
+    nextAction: "Bind the final strict evidence to PR 25 and obtain named independent engineering and security approval on its exact head before merge or deployment.",
     remediationStatus: "implemented-local",
     remediationEvidence: ["scripts/release-provenance-preflight.mjs", ".github/workflows/ci.yml", "docs/release-provenance.md"],
-    residualBlocker: "The current broad working tree still requires human review and an intentional clean commit.",
-    externalMutationPerformed: false
+    residualBlocker: "Named independent engineering and security approval remains external and incomplete.",
+    externalMutationPerformed: true
   }),
   evidenceRecord({
     id: "vercel-deployment-provenance",
@@ -107,26 +109,25 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     expiresAt,
     evidenceClass: "connector-observed",
     sourceReference: "Vercel project, deployment, build, and runtime-error metadata",
-    summary: "The latest production deployment is READY, but its metadata identifies a dirty source tree and the current control-plane endpoint is not present on the custom domain.",
+    summary: "Production remains intentionally unchanged while the consolidated PR uses an isolated preview pipeline; the exact final head must complete preview build and desktop/mobile synthetic validation before deployment review.",
     facts: [
-      "Latest observed production deployment state is READY.",
-      "No grouped runtime errors were observed in the selected seven-day window.",
-      "The latest build error filter returned no build failure.",
-      "The deployment metadata reports gitDirty=1.",
-      "The live custom domain returns 404 for /api/scrimed-control-plane/approvals."
+      "Observed production deployment dpl_96zHRNo6ebg6FUQahU91GtkfjEeW is READY.",
+      "Production metadata identifies main commit 5e77beea57f458883f7544421b2014fd4e28ac67.",
+      "PR 25 triggers the repository's Synthetic Preview Validation workflow and an isolated Vercel preview.",
+      "The preview is not a production deployment and grants no production authority.",
+      "Preview evidence must be tied to the exact final PR head; predecessor previews cannot satisfy that gate."
     ],
     drift: [
-      "A READY deployment does not prove that the current local platform is deployed.",
-      "Dirty-build provenance weakens reproducibility and rollback confidence.",
-      "The production domain and current repository capability surface are out of sync."
+      "A preview for an earlier branch head does not validate a later source mutation.",
+      "Production and candidate capability surfaces remain intentionally out of sync until review and deployment authorization."
     ],
     approvalImpact: ["production promotion approval", "release attestation", "rollback evidence", "customer-facing capability claims"],
     accountableOwner: "Platform release steward",
-    nextAction: "Block further promotion until a clean immutable revision passes CI, deploys through the approved pipeline, and the intended live route set passes public smoke.",
+    nextAction: "Require the exact final PR head to reach READY and pass desktop, 390px, protected, and public preview checks; request production authorization only after named review.",
     remediationStatus: "implemented-local",
     remediationEvidence: ["SCRIMED_RELEASE_PROVENANCE_ENFORCED", "SCRIMED_APPROVED_RELEASE_SHA", "npm run release:provenance:strict"],
-    residualBlocker: "Vercel production environment values and a source-controlled approved SHA require release-steward action.",
-    externalMutationPerformed: false
+    residualBlocker: "Exact-final-head preview completion, named review, approved SHA, and deployment authorization remain incomplete.",
+    externalMutationPerformed: true
   }),
   evidenceRecord({
     id: "supabase-data-plane-drift",
@@ -138,63 +139,62 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     expiresAt,
     evidenceClass: "connector-observed",
     sourceReference: "Supabase project health, migration history, and advisor metadata",
-    summary: "The protected-pilot project is healthy, but local durable-store and evidence-binding migrations are not present in the observed remote migration history.",
+    summary: "The protected-pilot project is healthy and durable SCRIMED Work migrations are present; three newer p.32 migrations remain local-only and leaked-password protection remains disabled.",
     facts: [
-      "Project status is ACTIVE_HEALTHY in a US region.",
-      "Observed remote migrations stop at the stored-vector lookup migration.",
-      "Local execution-attempt compute-fabric evidence binding and SCRIMED Work durable-store migrations remain unapplied.",
-      "Security advisors report the vector extension in the public schema and leaked-password protection disabled.",
-      "Performance advisors report two stored-vector foreign keys without covering indexes."
+      "Project scrimed-protected-pilot is ACTIVE_HEALTHY in us-east-1 on Postgres 17.6.1.",
+      "Observed remote migrations include compute-fabric evidence binding, SCRIMED Work durability, review queues, approval binding, and completion evidence.",
+      "Remote migration history stops at scrimed_work_completion_evidence.",
+      "Clinical assurance, p.32 evidence attestation issuance, and p.32 candidate review migrations remain unapplied.",
+      "Security Advisor reports one warning: leaked-password protection is disabled.",
+      "Performance Advisor reports informational unused indexes; no index was removed without representative workload evidence."
     ],
     drift: [
-      "Protected SCRIMED Work durability is not available in the observed data plane.",
-      "Strict authenticated AAL2 durable-store evidence cannot pass until an approved nonproduction migration path exists.",
-      "Security and query-performance findings require owner decisions before protected-pilot expansion."
+      "Three newer governance migrations require an authorized disposable dry-run and separate application decision.",
+      "Leaked-password protection requires an Auth administrator action that the connected toolset cannot narrowly perform.",
+      "Fresh exact-candidate AAL2 evidence remains required before protected-pilot expansion."
     ],
     approvalImpact: ["no-PHI protected-pilot release", "AAL2 durability evidence", "security review", "database change approval"],
     accountableOwner: "Data platform and security owners",
-    nextAction: "Create or authorize a nonproduction branch, apply pending migrations there, resolve advisor findings through reviewed migrations or documented risk acceptance, and run strict AAL2 smoke.",
+    nextAction: "Enable leaked-password protection through the scoped dashboard control, authorize a disposable dry-run for the three pending migrations, and rerun exact-candidate AAL2 and advisor checks.",
     remediationStatus: "prepared-not-applied",
-    remediationEvidence: ["supabase/migrations/20260711224500_stored_vector_advisor_index_hardening.sql", "docs/supabase-advisor-remediation.md"],
-    residualBlocker: "Nonproduction migration authority, Pro-plan leaked-password protection, extension dependency review, and strict AAL2 evidence remain external.",
+    remediationEvidence: ["docs/MIGRATION_DRY_RUN_REPORT.md", "config/pending-migration-authorization.json", "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md"],
+    residualBlocker: "Auth-owner setting change, disposable migration authority, migration execution evidence, and fresh AAL2 validation remain external.",
     externalMutationPerformed: false
   }),
   evidenceRecord({
     id: "wix-public-claims-integrity",
     provider: "wix",
     controlDomain: "public-claims",
-    status: "blocked",
-    severity: "critical",
+    status: "verified",
+    severity: "low",
     observedAt,
     expiresAt,
     evidenceClass: "live-endpoint-observed",
-    sourceReference: "Published SCRIMED Solutions marketing-site content",
-    summary: "The published marketing site contains a named client testimonial for which the repository approval graph has no authorization evidence.",
+    sourceReference: "2026-08-09 policy-v4 direct-origin audit and published FaithCore browser observation",
+    summary: "The configured Wix public-claims surface passes policy v4, including Atlas-first metadata, synthetic Vitals boundaries, optional clinically neutral FaithCore copy, conservative schema, and retired-commerce controls.",
     facts: [
       "The Wix site is published on a custom domain.",
-      "The public page includes a Hear from Our Clients section and a named testimonial.",
-      "The Wix CMS collection inventory contains no testimonial collection; the affected section is static Wix Editor content.",
-      "The Voice Intake Assistant form was disabled through a narrow Wix Forms API update after it was found accepting healthcare service details without a no-PHI warning.",
-      "Two general contact forms remain enabled with unrestricted free-text fields and no schema-level no-PHI disclosure.",
-      "The Wix dashboard identifies the current site configuration as not HIPAA compliant.",
-      "SCRIMED governance blocks customer testimonials and logos without recipient-specific authorization evidence."
+      "The direct-origin audit covered 17 pages, two retired routes, two noindexed Booking routes, three redirects, and six crawler files with zero claim failures.",
+      "The published FaithCore page contains the approved opt-in copy, clinical-neutrality statement, supporting boundary, CTA, and safe metadata.",
+      "The published FaithCore JSON-LD is a conservative Organization object without address, telephone, Review, or AggregateRating.",
+      "A later strict attempt from a network-restricted shell observed zero pages and failed closed; that environmental result does not supersede the direct-origin evidence."
     ],
     drift: [
-      "Public marketing content exceeds the evidence currently represented in the buyer-proof approval path.",
-      "Remaining Wix forms, chat, bookings, and other collection paths must not solicit PHI under the current configuration.",
-      "Unverified customer language can undermine investor and buyer trust."
+      "A true mobile-device visual check remains pending because desktop-user-agent resizing does not exercise Wix's separate mobile variant.",
+      "Search-engine snapshots may lag the live origin and must not supersede direct evidence."
     ],
     approvalImpact: ["marketing claims approval", "buyer-specific proof release", "legal review", "investor diligence"],
     accountableOwner: "Founder, legal reviewer, and marketing owner",
-    nextAction: "Remove the named testimonial, label every Wix collection path no-PHI, and replace social proof with evidence-based platform proof until signed customer authorization and claim substantiation exist.",
-    remediationStatus: "external-action-required",
+    nextAction: "Preserve the policy-v4 evidence and capture a true mobile-device presentation check without changing the verified public claims.",
+    remediationStatus: "implemented-local",
     remediationEvidence: [
       "scripts/public-claims-integrity-smoke.mjs",
       "docs/public-claims-integrity.md",
-      "Voice Intake Assistant form disabled and verified at revision 2",
-      "Proof Before Promises replacement copy"
+      "docs/WIX_PUBLICATION_VERIFICATION_REPORT.md",
+      "docs/operators/WIX_FAITHCORE_FINAL_ACTION.md",
+      "config/wix-publication-policy.json"
     ],
-    residualBlocker: "Static Wix Editor content and both remaining free-text contact forms must be corrected, previewed, reviewed, and published by the authorized site owner; a blind whole-site publish is prohibited.",
+    residualBlocker: "True mobile-device visual evidence remains an owner presentation action; no public-claims failure is open.",
     externalMutationPerformed: true
   }),
   evidenceRecord({
@@ -205,13 +205,13 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     severity: "moderate",
     observedAt,
     expiresAt,
-    evidenceClass: "connector-observed",
-    sourceReference: "Figma authenticated-account metadata",
-    summary: "A Figma account is connected with a view seat, but no canonical SCRIMED design file is linked to this release evidence snapshot.",
+    evidenceClass: "local-repository-observed",
+    sourceReference: "Latest repository-held Figma governance snapshot",
+    summary: "No canonical editable SCRIMED design source is bound to this release evidence snapshot.",
     facts: [
-      "The connected Figma account is authenticated.",
-      "The observed team seat is view-only.",
-      "No design-file key or component-library evidence was provided for reconciliation."
+      "The prior connected-account snapshot reported a view-only seat.",
+      "No design-file key or component-library fingerprint is bound to the current candidate.",
+      "No fresh Figma connector observation was performed in this evidence refresh."
     ],
     drift: ["Visual changes cannot yet be traced to a canonical design artifact or approved component library."],
     approvalImpact: ["design review", "accessibility review", "brand consistency", "investor-demo polish"],
@@ -230,8 +230,8 @@ export const crossPlatformApprovalPath: CrossPlatformApprovalStep[] = [
     title: "Public Claims Integrity Review",
     status: "ready-for-human-review",
     accountableOwners: ["Founder/CEO", "Legal reviewer", "Marketing owner"],
-    completionEvidence: ["testimonial removed or signed authorization attached", "public copy review", "dated approval record"],
-    blockedUntil: ["named customer and outcome claims are substantiated"],
+    completionEvidence: ["policy-v4 direct-live claims check", "published FaithCore browser observation", "true mobile-device presentation check", "dated owner review"],
+    blockedUntil: ["named owner records the current presentation review"],
     unlocks: ["truthful public narrative", "investor diligence confidence", "buyer-safe marketing"],
     automaticApprovalAllowed: false
   },
@@ -295,18 +295,18 @@ export function getCrossPlatformEvidenceSummary(now: Date = new Date()) {
       productionPromotionAllowed: false,
       customerGoLiveAllowed: false,
       preparedRemediationCount: records.filter((record) => record.remediationStatus !== "external-action-required").length,
-      fullyResolvedProviderCount: 0
+      fullyResolvedProviderCount: records.filter((record) => record.status === "verified").length
     },
     approvalPath: crossPlatformApprovalPath,
     immediateCorrection: {
-      id: "remove-unverified-testimonial",
-      reason: "Public trust and legal defensibility outrank promotional social proof that lacks authorization evidence.",
+      id: "publish-and-verify-faithcore-neutrality",
+      reason: "Optional FaithCore positioning must remain clinically neutral and consistent across visible copy and metadata.",
       safeReplacement: {
-        eyebrow: "Proof Before Promises",
-        heading: "Inspect the evidence behind SCRIMED.",
-        body: "Review no-PHI demonstrations, governance controls, interoperability evidence, and clearly bounded pilot-readiness artifacts before making a buying decision.",
-        primaryAction: "Review the Trust Center",
-        secondaryAction: "Request a Governed Demo",
+        eyebrow: "Optional By Design",
+        heading: "FaithCore supports faith-aligned engagement without changing clinical logic.",
+        body: "FaithCore is user-selected and separate from diagnosis, treatment, eligibility, prioritization, risk scoring, medical recommendations, and access to care.",
+        primaryAction: "Review FaithCore",
+        secondaryAction: "Review SCRIMED Atlas",
         disclosure: "Synthetic demonstration and decision-support scope only. Do not submit patient information through this website."
       },
       humanApprovalRequiredForNewCustomerClaim: true
@@ -319,7 +319,7 @@ export function getCrossPlatformEvidenceSummary(now: Date = new Date()) {
       "nonproduction migration planning"
     ],
     boundary: "This snapshot reconciles no-secret operational metadata only. It grants no deployment, PHI, clinical, payer, EHR, customer, testimonial, regulatory, certification, or go-live authority.",
-    nextBestMove: "Correct the public testimonial, then bind this working-tree build to a clean reviewed revision before any deployment promotion.",
+    nextBestMove: "Finish the exact-candidate source review path and independent review, then close Supabase Auth and disposable-migration evidence before any production authorization request.",
     auditHash: createAuditHash({
       records: records.map((record) => record.auditHash),
       approvalPath: crossPlatformApprovalPath.map((step) => step.id)

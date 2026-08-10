@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   buildScrimedWorkBrowserVerificationPayload,
   classifyScrimedWorkBrowserResponse,
@@ -65,6 +66,21 @@ assert.ok(scrimedWorkBrowserVerificationChecks.some((check) => check.id === "dur
 assert.ok(scrimedWorkBrowserVerificationChecks.some((check) => check.id === "verification-evidence" && check.mutation === false));
 assert.equal(scrimedWorkBrowserVerificationChecks.at(-1)?.id, "cancellation-cleanup");
 assert.match(scrimedWorkBrowserVerificationBoundary, /without exporting its bearer token/i);
+
+const aal2ReadinessSource = readFileSync(
+  new URL("./aal2-smoke-readiness-preflight.mjs", import.meta.url),
+  "utf8"
+);
+const durablePreflightSource = readFileSync(
+  new URL("./scrimed-work-durable-store-preflight.mjs", import.meta.url),
+  "utf8"
+);
+for (const source of [aal2ReadinessSource, durablePreflightSource]) {
+  assert.match(source, /pilot-workspace\/access/);
+  assert.match(source, /Run SCRIMED Work Verification/);
+  assert.match(source, /Run Tenant Verification/);
+  assert.match(source, /without exporting a bearer token/);
+}
 
 assert.equal(classifyScrimedWorkBrowserResponse({ actualStatus: 401, expectedStatuses: [401] }), "pass");
 assert.equal(

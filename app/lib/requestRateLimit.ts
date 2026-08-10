@@ -8,19 +8,26 @@ type MemoryBucket = {
   resetAt: number;
 };
 
-type RateLimitResult = {
+export type RateLimitProvider = "upstash-redis" | "bounded-memory" | "unavailable";
+
+export type RateLimitReason = "allowed" | "limit-exceeded" | "provider-unavailable";
+
+export type RateLimitResult = {
   allowed: boolean;
   limit: number;
   remaining: number;
   resetAt: number;
   retryAfterSeconds: number;
-  provider: "upstash-redis" | "bounded-memory";
+  provider: RateLimitProvider;
+  reason: RateLimitReason;
 };
 
-type RateLimitOptions = {
+export type RateLimitOptions = {
   namespace: string;
   limit: number;
   windowSeconds: number;
+  identifier?: string;
+  fallbackPolicy?: "bounded-memory" | "deny";
 };
 
 const globalRateLimit = globalThis as typeof globalThis & {
@@ -41,6 +48,18 @@ function requestFingerprint(request: Request, namespace: string) {
 
   return createHash("sha256")
     .update(`${namespace}|${forwardedFor}|${userAgent}|${authorization}`)
+    .digest("hex");
+}
+
+function rateLimitIdentifier(request: Request, options: RateLimitOptions) {
+  const scopedIdentifier = options.identifier?.trim();
+
+  if (!scopedIdentifier) {
+    return requestFingerprint(request, options.namespace);
+  }
+
+  return createHash("sha256")
+    .update(`${options.namespace}|scoped-identity|${scopedIdentifier}`)
     .digest("hex");
 }
 
@@ -97,7 +116,22 @@ function enforceMemoryLimit(identifier: string, options: RateLimitOptions): Rate
     remaining: Math.max(0, options.limit - bucket.count),
     resetAt: bucket.resetAt,
     retryAfterSeconds: allowed ? 0 : Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
-    provider: "bounded-memory"
+    provider: "bounded-memory",
+    reason: allowed ? "allowed" : "limit-exceeded"
+  };
+}
+
+function unavailableResult(options: RateLimitOptions): RateLimitResult {
+  const retryAfterSeconds = Math.min(30, Math.max(1, options.windowSeconds));
+
+  return {
+    allowed: false,
+    limit: options.limit,
+    remaining: 0,
+    resetAt: Date.now() + retryAfterSeconds * 1000,
+    retryAfterSeconds,
+    provider: "unavailable",
+    reason: "provider-unavailable"
   };
 }
 
@@ -105,11 +139,13 @@ export async function enforceRequestRateLimit(
   request: Request,
   options: RateLimitOptions
 ): Promise<RateLimitResult> {
-  const identifier = requestFingerprint(request, options.namespace);
+  const identifier = rateLimitIdentifier(request, options);
   const upstash = getUpstashLimiter(options);
 
   if (!upstash) {
-    return enforceMemoryLimit(identifier, options);
+    return options.fallbackPolicy === "deny"
+      ? unavailableResult(options)
+      : enforceMemoryLimit(identifier, options);
   }
 
   try {
@@ -122,10 +158,13 @@ export async function enforceRequestRateLimit(
       remaining: result.remaining,
       resetAt: result.reset,
       retryAfterSeconds: result.success ? 0 : Math.max(1, Math.ceil((result.reset - now) / 1000)),
-      provider: "upstash-redis"
+      provider: "upstash-redis",
+      reason: result.success ? "allowed" : "limit-exceeded"
     };
   } catch {
-    return enforceMemoryLimit(identifier, options);
+    return options.fallbackPolicy === "deny"
+      ? unavailableResult(options)
+      : enforceMemoryLimit(identifier, options);
   }
 }
 
@@ -135,6 +174,7 @@ export function rateLimitHeaders(result: RateLimitResult) {
     "X-RateLimit-Remaining": String(result.remaining),
     "X-RateLimit-Reset": String(Math.ceil(result.resetAt / 1000)),
     "X-RateLimit-Provider": result.provider,
+    "X-RateLimit-Reason": result.reason,
     ...(result.retryAfterSeconds > 0 ? { "Retry-After": String(result.retryAfterSeconds) } : {})
   };
 }

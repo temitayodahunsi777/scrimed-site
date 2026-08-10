@@ -14,6 +14,7 @@ import {
   validateTrustSafetyIncidentCreatePayload
 } from "../../../../lib/trustSafetyOperations";
 import { enforceRequestRateLimit, rateLimitHeaders } from "../../../../lib/requestRateLimit";
+import { classifyProtectedPilotStoreFailure } from "../../../../lib/protectedPilotStoreError";
 
 export const dynamic = "force-dynamic";
 
@@ -35,16 +36,20 @@ export async function GET(request: Request, { params }: RouteContext) {
   const dashboardResult = await getTrustSafetyIncidentDashboard(context.client, workspaceSlug);
 
   if (dashboardResult.error || !dashboardResult.dashboard) {
+    const failure = classifyProtectedPilotStoreFailure(dashboardResult.error, {
+      code: "trust-safety-incident-dashboard-unavailable",
+      message:
+        "The tenant TrustOps incident dashboard is unavailable. Verify the deployed schema, RLS/RPC grants, and protected service health before retrying.",
+      status: 503
+    });
+
     return NextResponse.json(
       {
-        error: {
-          code: "trust-safety-incident-dashboard-unavailable",
-          message:
-            "The tenant TrustOps incident dashboard is not available. Apply the TrustOps incident migration, verify RLS/RPC grants, and retry with an AAL2 tenant session."
-        },
+        error: { code: failure.code, message: failure.message },
+        reauthenticationRequired: failure.reauthenticationRequired,
         boundary: tenantTrustSafetyIncidentBoundary
       },
-      { status: 503, headers: protectedPilotNoStoreHeaders }
+      { status: failure.status, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -157,16 +162,20 @@ export async function POST(request: Request, { params }: RouteContext) {
   const persistence = await createTrustSafetyIncident(context.client, workspaceSlug, validation.value);
 
   if (persistence.error || !persistence.incidentId) {
+    const failure = classifyProtectedPilotStoreFailure(persistence.error, {
+      code: "trust-safety-incident-persistence-failed",
+      message:
+        "The TrustOps incident was not committed. Verify the deployed schema, RLS/RPC grants, tenant role, and protected service health before retrying.",
+      status: 503
+    });
+
     return NextResponse.json(
       {
-        error: {
-          code: "trust-safety-incident-persistence-failed",
-          message:
-            "The TrustOps incident was not committed. Confirm the migration, RLS policies, AAL2 session, tenant role, and server runtime token before retrying."
-        },
+        error: { code: failure.code, message: failure.message },
+        reauthenticationRequired: failure.reauthenticationRequired,
         boundary: tenantTrustSafetyIncidentBoundary
       },
-      { status: 503, headers }
+      { status: failure.status, headers }
     );
   }
 

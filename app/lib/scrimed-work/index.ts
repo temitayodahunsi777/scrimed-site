@@ -1,10 +1,22 @@
 import { evaluateScrimedSafetyGate, scrimedSafetyHeaders } from "../scrimedSafetyGovernance";
 import { getAuthenticatedGovernanceContext } from "../protectedPilotStore";
 import { scrimedWorkAgents } from "./agentRegistry";
+import { getScrimedAgentTeamSummary } from "./agentTeams";
 import { buildScrimedWorkArtifact, scrimedWorkArtifactTemplates } from "./artifactEngine";
 import { evaluateArtifactReview, parseArtifactReviewInput } from "./artifactReview";
 import { createAuditEvent, createAuditHash, envelope, errorEnvelope, scrimedWorkAuditBoundary, scrimedWorkPolicyVersion } from "./audit";
+import {
+  buildScrimedWorkCanaryAttestation,
+  getScrimedWorkRuntimeReleaseSha,
+  scrimedWorkCanaryAttestationBoundary,
+  scrimedWorkCanaryAttestationPolicyVersion
+} from "./canaryAttestation";
 import { getHealthcareOntologyRegistry, searchScrimedWorkContext } from "./contextEngine";
+import {
+  evaluateScrimedWorkWriteRequestProvenance,
+  scrimedWorkCsrfBoundary,
+  scrimedWorkCsrfPolicyVersion
+} from "./csrfProtection";
 import {
   getScrimedWorkDurableStorageMode,
   getScrimedWorkWorkspaceSlug,
@@ -35,7 +47,12 @@ import {
   scrimedWorkCompletionEvidencePolicyVersion
 } from "./completionEvidence";
 import { getScrimedWorkFeatureFlags, scrimedWorkFeatureFlagHeaders } from "./featureFlags";
-import { sampleLearningLoopArtifacts } from "./learningLoop";
+import { sampleLearningLoopArtifacts, sampleOutcomeLearningControllers } from "./learningLoop";
+import { getScrimedImpactGovernanceSummary } from "./impactGovernance";
+import { buildDevelopmentContinuityPlan } from "./developmentContinuity";
+import { priorAuthorizationFoundryBlueprint } from "./foundry";
+import { getClinicalAgentSreSummary } from "../clinicalAgentSre";
+import { getClinicalAssuranceControlPlaneSummary } from "../clinicalAssuranceControlPlane";
 import { isScrimedWorkMigrationSetVerified } from "./migrationSet";
 import {
   buildPayerIqProtectedWorkSession,
@@ -43,14 +60,27 @@ import {
   payerIqProtectedHandoffAuthority
 } from "./payerIqHandoff";
 import { sampleModelRouteInputs, routeScrimedWorkModel } from "./modelRouter";
+import { getScrimedModelQualificationSummary } from "./modelQualification";
 import { previewOrchestration } from "./orchestrationEngine";
 import { getScrimedWorkProductionHardeningGate } from "./productionHardening";
 import { scrimedWorkProviderRegistry } from "./providerRegistry";
+import {
+  enforceScrimedWorkMutationRateLimit,
+  getScrimedWorkRateLimitPosture,
+  scrimedWorkMutationRateLimitHeaders
+} from "./rateLimitPolicy";
 import {
   parseScrimedWorkReviewQueueLimit,
   scrimedWorkReviewQueueBoundary,
   scrimedWorkReviewQueuePolicyVersion
 } from "./reviewQueue";
+import { getScrimedReviewOrchestratorSummary } from "./reviewOrchestrator";
+import { getReviewRequirementsSummary } from "./reviewPolicyEngine";
+import {
+  buildReviewPolicyPreflight,
+  getReviewPolicyPreflightSummary,
+  parseReviewPolicyPreflightRequest
+} from "./reviewPolicyPreflight";
 import { containsPhiRisk, containsTokenLikeField, parseArtifactRequest, parseWorkSessionCreateInput } from "./schemas";
 import { scrimedWorkScheduleDefinitions } from "./scheduleDefinitions";
 import {
@@ -76,29 +106,54 @@ export * from "./workSessionStore";
 export * from "./modelRouter";
 export * from "./providerRegistry";
 export * from "./productionHardening";
+export * from "./rateLimitPolicy";
 export * from "./toolRegistry";
 export * from "./agentRegistry";
+export * from "./agentTeams";
 export * from "./orchestrationEngine";
 export * from "./contextEngine";
+export * from "./csrfProtection";
 export * from "./verificationEngine";
 export * from "./autonomyPolicy";
 export * from "./approvalEngine";
 export * from "./artifactEngine";
 export * from "./artifactReview";
+export * from "./canaryAttestation";
 export * from "./completionEvidence";
 export * from "./completionQueue";
 export * from "./reviewQueue";
+export * from "./reviewOrchestrator";
+export * from "./reviewPolicyEngine";
+export * from "./reviewPolicyPreflight";
+export * from "./assuranceManifest";
+export * from "./controlAttestations";
+export * from "./reviewConfidence";
+export * from "./founderInterimAcceptance";
 export * from "./reviewPreparation";
 export * from "./payerIqHandoff";
 export * from "./scheduleDefinitions";
 export * from "./learningLoop";
+export * from "./impactGovernance";
+export * from "./developmentContinuity";
+export * from "./foundry";
+export * from "./governedRuntime";
+export * from "./agentExecution";
 export * from "./migrationSet";
 export * from "./valueTelemetry";
 export * from "./audit";
 export * from "./featureFlags";
 export * from "./voiceWorkflow";
+export * from "./modelQualification";
 export * from "./durableStore";
 export * from "./sessionLifecycle";
+export * from "./p32Contracts";
+export * from "./p32GovernanceRecords";
+export * from "./p32ApprovedActions";
+export * from "./p32TechnicalGates";
+export * from "./p32AgentGovernance";
+export * from "./p32ArtifactAdmission";
+export * from "./p32InteroperabilityControls";
+export * from "./p32HumanGovernance";
 
 export const scrimedWorkRoute = "/scrimed-work";
 export const scrimedWorkApiRoute = "/api/scrimed-work";
@@ -108,7 +163,10 @@ export const scrimedWorkUpdatedAt = "2026-07-13";
 export const scrimedWorkBoundary =
   "SCRIMED Work & Intelligence Platform is a synthetic/no-PHI, verification-first control plane for workspace sessions, model/tool routing, agent orchestration, context retrieval, artifacts, schedules, voice simulation, learning loops, governance, auditability, rollback, and value telemetry. It does not authorize live PHI, autonomous clinical care, diagnosis, treatment, prescribing, patient outreach, payer submission, EHR writeback, final imaging interpretation, production connector approval, certification claims, customer go-live, or external model calls.";
 
-export function scrimedWorkHeaders(extra: Record<string, string> = {}) {
+export function scrimedWorkHeaders(
+  extra: Record<string, string> = {},
+  request?: Request
+) {
   const safety = evaluateScrimedSafetyGate({
     route: scrimedWorkApiRoute,
     requestedAction: "synthetic no-phi metadata-only work intelligence platform audit preparation internal testing",
@@ -126,6 +184,8 @@ export function scrimedWorkHeaders(extra: Record<string, string> = {}) {
     "X-SCRIMED-Patient-Outreach": "human-review-and-consent-required",
     "X-SCRIMED-External-Model-Calls": "disabled-by-default",
     "X-SCRIMED-Consequential-Actions": "disabled-by-default",
+    "X-SCRIMED-CSRF-Protection": "exact-same-origin-or-explicit-non-browser",
+    ...scrimedWorkMutationRateLimitHeaders(request),
     "X-SCRIMED-Production-Authorization": "not-production-authorized",
     "X-SCRIMED-Customer-Go-Live": "not-authorized",
     "X-SCRIMED-Audit-Boundary": scrimedWorkAuditBoundary,
@@ -143,6 +203,14 @@ export function getScrimedWorkSummary() {
     tenant: "synthetic-tenant",
     limit: 4
   });
+  const mutationRateLimit = getScrimedWorkRateLimitPosture();
+  const agentTeams = getScrimedAgentTeamSummary();
+  const modelQualification = getScrimedModelQualificationSummary();
+  const impactGovernance = getScrimedImpactGovernanceSummary();
+  const reviewOrchestrator = getScrimedReviewOrchestratorSummary();
+  const reviewPolicy = getReviewRequirementsSummary();
+  const reviewPolicyPreflight = getReviewPolicyPreflightSummary();
+  const developmentContinuity = buildDevelopmentContinuityPlan();
 
   return {
     service: "scrimed-work-intelligence-platform",
@@ -168,8 +236,10 @@ export function getScrimedWorkSummary() {
       ["active", "awaiting_approval", "verifying", "paused"].includes(session.statusHistory.at(-1)?.status ?? "")
     ).length,
     agents: scrimedWorkAgents,
+    agentTeams,
     tools: getScrimedWorkTools(),
     providers: scrimedWorkProviderRegistry,
+    modelQualification,
     modelRoutes: sampleModelRouteInputs.map(routeScrimedWorkModel),
     context: sampleContext,
     ontology: getHealthcareOntologyRegistry(),
@@ -180,6 +250,14 @@ export function getScrimedWorkSummary() {
       consentAcknowledged: true
     }),
     learningLoopArtifacts: sampleLearningLoopArtifacts,
+    outcomeLearningControllers: sampleOutcomeLearningControllers,
+    clinicianAgentFoundry: {
+      blueprint: priorAuthorizationFoundryBlueprint,
+      deploymentEnabled: featureFlags.foundryDeploymentEnabled,
+      productionActivationAllowed: false as const
+    },
+    clinicalAgentSre: getClinicalAgentSreSummary(),
+    clinicalAssuranceControlPlane: getClinicalAssuranceControlPlaneSummary(),
     orchestrationPreview: previewOrchestration(sessions[0]),
     auditEvents: [
       createAuditEvent({
@@ -197,6 +275,11 @@ export function getScrimedWorkSummary() {
       sessionId: session.id,
       telemetry: session.valueTelemetry
     })),
+    impactGovernance,
+    reviewOrchestrator,
+    reviewPolicy,
+    reviewPolicyPreflight,
+    developmentContinuity,
     lifecycle: sessions.map(getWorkSessionLifecycleSnapshot),
     governanceStatus: {
       definitionOfDoneRequired: true,
@@ -207,11 +290,15 @@ export function getScrimedWorkSummary() {
       externalProviderCallsDisabledByDefault: true,
       humanReviewForHighRisk: true,
       cancellationAndRollbackMetadataRequired: true,
-      durableWritesRequireSupabaseAal2RbacRls: true
+      durableWritesRequireSupabaseAal2RbacRls: true,
+      browserWriteCsrfEnforced: true,
+      csrfPolicyVersion: scrimedWorkCsrfPolicyVersion,
+      csrfBoundary: scrimedWorkCsrfBoundary,
+      mutationRateLimit
     },
     productionHardening: getScrimedWorkProductionHardeningGate(),
     nextProductionHardeningStep:
-      "Apply and verify the SCRIMED Work completion-queue migration in the approved no-PHI target, then use the AAL2 tenant-admin control to retain verified internal-only completion evidence without granting external authority."
+      "Verify the distributed actor/tenant mutation limiter in the exact-release two-identity canary, then add retained no-secret abuse-event evidence and provider-health circuit-breaker telemetry without expanding action authority."
   };
 }
 
@@ -236,6 +323,7 @@ export function buildScrimedWorkBrief() {
     "- Autonomy follows verification strength, reversibility, evidence quality, privacy sensitivity, and clinical/financial consequence.",
     "- Consequential tools remain disabled and approval-gated by default.",
     "- Protected write routes require AAL2 governance identity, tenant role authorization, server runtime token, idempotency, and the durable-store feature flag.",
+    "- Protected mutations use actor and tenant quotas; production requires the distributed provider and fails closed if it is unavailable.",
     "- Retrieved context is treated as untrusted data with citations, tenant metadata, and confidence scores.",
     "- Verification blocks completion when citations, scope, policy, PHI checks, rollback, budget, loop, or approval criteria fail.",
     "- Lifecycle transitions use authoritative durable state, append-only history, independent reviewer checks, and tenant-scoped idempotency.",
@@ -253,6 +341,19 @@ export function buildScrimedWorkBrief() {
     `- Evidence-ready gates: ${summary.productionHardening.summary.evidenceReady}/${summary.productionHardening.summary.totalGates}`,
     `- Operator-required gates: ${summary.productionHardening.summary.operatorRequired}`,
     "",
+    "## Development Continuity",
+    `- Policy posture: ${summary.developmentContinuity.authorizationStatus}`,
+    `- Protected exact-evidence preflight: ${summary.reviewPolicyPreflight.method} ${summary.reviewPolicyPreflight.route}`,
+    `- Caller-supplied approvals accepted: ${summary.reviewPolicyPreflight.callerSuppliedApprovalsAccepted}`,
+    `- Plan fingerprint: ${summary.developmentContinuity.planFingerprint}`,
+    `- Automatic preflight eligible: ${summary.developmentContinuity.counts.AUTOMATIC_PREFLIGHT_ELIGIBLE}`,
+    `- Founder acceptance required: ${summary.developmentContinuity.counts.FOUNDER_ACCEPTANCE_REQUIRED}`,
+    `- Qualified review required: ${summary.developmentContinuity.counts.QUALIFIED_REVIEW_REQUIRED}`,
+    `- Production authorization required: ${summary.developmentContinuity.counts.PRODUCTION_AUTHORIZATION_REQUIRED}`,
+    `- Prohibited: ${summary.developmentContinuity.counts.PROHIBITED}`,
+    `- Recommended next action: ${summary.developmentContinuity.recommendedAction?.nextAction ?? "No action is eligible; escalate to a human owner."}`,
+    "- Planner output never grants execution authority; every executable action must pass exact-fingerprint review-policy evaluation.",
+    "",
     "## Next Production-Hardening Step",
     summary.nextProductionHardeningStep
   ].join("\n");
@@ -269,7 +370,7 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
     return {
       ok: false as const,
       status: 415,
-      error: errorEnvelope("scrimed_work_unsupported_content_type", "SCRIMED Work protected writes require application/json.", action, false)
+      error: errorEnvelope("scrimed_work_unsupported_content_type", "SCRIMED Work protected requests require application/json.", action, false)
     };
   }
 
@@ -279,7 +380,7 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
     return {
       ok: false as const,
       status: 413,
-      error: errorEnvelope("scrimed_work_payload_too_large", "SCRIMED Work protected write payload is too large for metadata-only persistence.", action, false)
+      error: errorEnvelope("scrimed_work_payload_too_large", "SCRIMED Work protected request payload is too large for metadata-only processing.", action, false)
     };
   }
 
@@ -289,7 +390,7 @@ async function readBoundedJson(request: Request, action: string, maxBytes = 2400
     return {
       ok: false as const,
       status: 400,
-      error: errorEnvelope("scrimed_work_invalid_json", "SCRIMED Work protected write payload must be valid JSON.", action, false)
+      error: errorEnvelope("scrimed_work_invalid_json", "SCRIMED Work protected request payload must be valid JSON.", action, false)
     };
   }
 }
@@ -320,11 +421,28 @@ async function buildProtectedAuthorizationDecision(
       status: 503,
       error: errorEnvelope(
         "scrimed_work_protected_writes_disabled",
-        "SCRIMED Work protected write endpoints are disabled until approved auth, RBAC, CSRF, rate limiting, and durable storage are configured.",
+        "SCRIMED Work protected write endpoints are disabled until approved auth, RBAC, rate limiting, and durable storage are configured.",
         action,
         false
       )
     };
+  }
+
+  if (accessMode === "write") {
+    const provenance = evaluateScrimedWorkWriteRequestProvenance(request);
+
+    if (!provenance.allowed) {
+      return {
+        allowed: false as const,
+        status: 403,
+        error: errorEnvelope(
+          "scrimed_work_csrf_denied",
+          "SCRIMED Work rejected the protected mutation because its browser origin or non-browser request provenance could not be verified.",
+          action,
+          false
+        )
+      };
+    }
   }
 
   if (!isScrimedWorkDurableStoreEnabled()) {
@@ -423,6 +541,31 @@ async function buildProtectedAuthorizationDecision(
     };
   }
 
+  if (accessMode === "write") {
+    const mutationRateLimit = await enforceScrimedWorkMutationRateLimit({
+      request,
+      workspaceId: membership.workspaceId,
+      tenantId: membership.tenantId,
+      actorId: context.user.id,
+      action
+    });
+
+    if (!mutationRateLimit.allowed) {
+      return {
+        allowed: false as const,
+        status: mutationRateLimit.status,
+        error: errorEnvelope(
+          mutationRateLimit.code,
+          mutationRateLimit.reason === "provider-unavailable"
+            ? "SCRIMED Work protected mutations are unavailable because the required rate-limit control could not be verified."
+            : "SCRIMED Work protected mutation quota was exceeded; retry after the bounded window resets.",
+          action,
+          true
+        )
+      };
+    }
+  }
+
   return {
     allowed: true as const,
     status: 200,
@@ -446,6 +589,58 @@ export function buildWriteAuthorizationDecision(request: Request, action: string
 
 export function buildReadAuthorizationDecision(request: Request, action: string, payload?: unknown) {
   return buildProtectedAuthorizationDecision(request, action, payload, "read");
+}
+
+export async function guardedEvaluateReviewPolicyPreflight(request: Request) {
+  const body = await readBoundedJson(request, "continuity-review-policy-preflight");
+  if (!body.ok) return { allowed: false as const, status: body.status, error: body.error };
+
+  const auth = await buildReadAuthorizationDecision(
+    request,
+    "continuity-review-policy-preflight",
+    body.payload
+  );
+  if (!auth.allowed) return auth;
+
+  const parsed = parseReviewPolicyPreflightRequest(body.payload);
+  if (!parsed.ok) {
+    return {
+      allowed: false as const,
+      status: 400,
+      error: errorEnvelope(
+        "scrimed_work_review_policy_preflight_invalid",
+        parsed.reason,
+        parsed.rejectedField ?? "continuity-review-policy-preflight",
+        false
+      )
+    };
+  }
+
+  const preflight = buildReviewPolicyPreflight({
+    request: parsed.value,
+    evaluatedAt: new Date().toISOString()
+  });
+  const scopeBindingHash = createAuditHash({
+    action: "continuity-review-policy-preflight",
+    tenantId: auth.context.tenantId,
+    workspaceId: auth.context.workspaceId,
+    actorId: auth.context.user.id,
+    candidateFingerprint: parsed.value.candidateFingerprint,
+    assuranceManifestFingerprint: parsed.value.assuranceManifestFingerprint,
+    preflightAuditHash: preflight.auditHash
+  });
+
+  return {
+    allowed: true as const,
+    status: 200,
+    data: {
+      ...preflight,
+      tenantScopeVerified: true as const,
+      authenticatedActorVerified: true as const,
+      scopeBindingHash,
+      receiptPersistence: "caller-retained-advisory-receipt" as const
+    }
+  };
 }
 
 export async function guardedCreateSession(request: Request) {
@@ -1054,12 +1249,19 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
       };
     }
 
+    const canaryAttestation = await buildScrimedWorkCanaryAttestation({
+      evidence: durable.evidence,
+      releaseSha: getScrimedWorkRuntimeReleaseSha(),
+      signingSecret: process.env.SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN
+    });
+
     return {
       allowed: true as const,
       status: 200,
       data: {
         mode: "evidence" as const,
         evidence: durable.evidence,
+        canaryAttestation,
         authorization: {
           memberRole: auth.context.memberRole,
           operatorOnly: true,
@@ -1070,7 +1272,9 @@ export async function guardedListProtectedCompletionQueue(request: Request) {
           auditEventId: durable.evidence.auditEventId
         },
         policyVersion: scrimedWorkCompletionEvidencePolicyVersion,
-        boundary: scrimedWorkCompletionEvidenceBoundary
+        canaryAttestationPolicyVersion: scrimedWorkCanaryAttestationPolicyVersion,
+        boundary: scrimedWorkCompletionEvidenceBoundary,
+        canaryAttestationBoundary: scrimedWorkCanaryAttestationBoundary
       }
     };
   }

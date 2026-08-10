@@ -8,6 +8,7 @@ import {
   protectedPilotBoundary,
   protectedPilotNoStoreHeaders
 } from "../../../../../lib/protectedPilotWorkspace";
+import { classifyProtectedPilotStoreFailure } from "../../../../../lib/protectedPilotStoreError";
 import {
   summarizeDurableTrustSafetyIncidents,
   tenantTrustSafetyIncidentBoundary,
@@ -45,16 +46,20 @@ export async function GET(request: Request, { params }: RouteContext) {
   const dashboardResult = await getTrustSafetyIncidentDashboard(context.client, workspaceSlug);
 
   if (dashboardResult.error || !dashboardResult.dashboard) {
+    const failure = classifyProtectedPilotStoreFailure(dashboardResult.error, {
+      code: "trust-safety-incident-dashboard-unavailable",
+      message: "The tenant TrustOps incident dashboard is not available for this environment.",
+      status: 503
+    });
     return NextResponse.json(
       {
         error: {
-          code: "trust-safety-incident-dashboard-unavailable",
-          message:
-            "The tenant TrustOps incident dashboard is not available for this environment."
+          code: failure.code,
+          message: failure.message
         },
         boundary: tenantTrustSafetyIncidentBoundary
       },
-      { status: 503, headers: protectedPilotNoStoreHeaders }
+      { status: failure.status, headers: protectedPilotNoStoreHeaders }
     );
   }
 
@@ -180,16 +185,21 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   );
 
   if (persistence.error || !persistence.eventId) {
+    const failure = classifyProtectedPilotStoreFailure(persistence.error, {
+      code: "trust-safety-incident-update-failed",
+      message:
+        "The TrustOps incident update was not committed. Confirm the migration, tenant role, and event fields before retrying.",
+      status: 503
+    });
     return NextResponse.json(
       {
         error: {
-          code: "trust-safety-incident-update-failed",
-          message:
-            "The TrustOps incident update was not committed. Confirm the migration, RLS policies, AAL2 session, tenant role, and event fields before retrying."
+          code: failure.code,
+          message: failure.message
         },
         boundary: tenantTrustSafetyIncidentBoundary
       },
-      { status: 503, headers }
+      { status: failure.status, headers }
     );
   }
 

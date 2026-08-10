@@ -1,5 +1,29 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
+
 import { getScrimedWorkDurableStorageMode, isScrimedWorkDurableStoreEnabled } from "./durableStore";
+import {
+  scrimedWorkCsrfBoundary,
+  scrimedWorkCsrfPolicyVersion,
+  scrimedWorkRequestContextHeader
+} from "./csrfProtection";
+import {
+  getScrimedWorkCanaryAuthenticationMessage,
+  getScrimedWorkRuntimeReleaseSha,
+  isScrimedWorkCanaryEvidenceId,
+  normalizeScrimedWorkCanaryTimestamp,
+  normalizeScrimedWorkCanaryWorkspaceSlug,
+  normalizeScrimedWorkReleaseSha,
+  parseScrimedWorkCanaryEvidenceId,
+  scrimedWorkCanaryClockSkewMinutes,
+  scrimedWorkCanaryMaxAgeHours
+} from "./canaryAttestation";
 import { getScrimedWorkFeatureFlags } from "./featureFlags";
+import {
+  getScrimedWorkRateLimitPosture,
+  scrimedWorkMutationRateLimitBoundary,
+  scrimedWorkMutationRateLimitPolicyVersion,
+  type ScrimedWorkRateLimitPosture
+} from "./rateLimitPolicy";
 import {
   getScrimedWorkMigrationSetStatus,
   SCRIMED_WORK_REQUIRED_MIGRATIONS,
@@ -17,6 +41,7 @@ export type ScrimedWorkHardeningGate = {
   domain:
     | "safety"
     | "auth"
+    | "abuse-control"
     | "durable-store"
     | "operator-runtime"
     | "verification"
@@ -48,6 +73,20 @@ export type ScrimedWorkProductionHardeningGate = {
     configuredCurrent: boolean;
     verified: boolean;
   };
+  mutationRateLimit: ScrimedWorkRateLimitPosture;
+  releaseBinding: {
+    currentReleaseShaFingerprint: string;
+    canaryReleaseShaFingerprint: string;
+    evidenceIdFormatValid: boolean;
+    evidenceIdAuthenticated: boolean;
+    workspaceSlug: string;
+    workspaceBound: boolean;
+    completedAt: string | null;
+    ageHours: number | null;
+    maxAgeHours: typeof scrimedWorkCanaryMaxAgeHours;
+    fresh: boolean;
+    matched: boolean;
+  };
   summary: {
     totalGates: number;
     evidenceReady: number;
@@ -78,16 +117,64 @@ function gate(input: ScrimedWorkHardeningGate): ScrimedWorkHardeningGate {
   return input;
 }
 
+function verifyCanaryEvidenceAuthentication(input: {
+  evidenceId: string;
+  releaseSha: string;
+  signingSecret: string;
+  workspaceSlug: string;
+  completedAt: string;
+}) {
+  const parsed = parseScrimedWorkCanaryEvidenceId(input.evidenceId);
+  if (
+    !parsed ||
+    !input.releaseSha ||
+    !input.workspaceSlug ||
+    !input.completedAt ||
+    input.signingSecret.length < 24
+  ) return false;
+
+  const expected = createHmac("sha256", input.signingSecret)
+    .update(getScrimedWorkCanaryAuthenticationMessage({
+      evidenceDigest: parsed.evidenceDigest,
+      releaseSha: input.releaseSha,
+      workspaceSlug: input.workspaceSlug,
+      completedAt: input.completedAt
+    }))
+    .digest();
+  const provided = Buffer.from(parsed.authenticationTag, "hex");
+  return expected.length === provided.length && timingSafeEqual(expected, provided);
+}
+
+function getCanaryFreshness(completedAt: string, evaluatedAt: string) {
+  if (!completedAt || !evaluatedAt) {
+    return { ageHours: null, fresh: false } as const;
+  }
+
+  const ageMs = Date.parse(evaluatedAt) - Date.parse(completedAt);
+  const maxAgeMs = scrimedWorkCanaryMaxAgeHours * 60 * 60 * 1000;
+  const clockSkewMs = scrimedWorkCanaryClockSkewMinutes * 60 * 1000;
+  return {
+    ageHours: Math.max(0, ageMs / (60 * 60 * 1000)),
+    fresh: ageMs >= -clockSkewMs && ageMs <= maxAgeMs
+  } as const;
+}
+
 export function getScrimedWorkProductionHardeningGate(
   env: NodeJS.ProcessEnv = process.env,
-  generatedAt = "2026-07-16T00:00:00.000Z"
+  generatedAt = new Date().toISOString()
 ): ScrimedWorkProductionHardeningGate {
+  const evaluatedAt = normalizeScrimedWorkCanaryTimestamp(generatedAt) || new Date().toISOString();
   const flags = getScrimedWorkFeatureFlags(env);
+  const mutationRateLimit = getScrimedWorkRateLimitPosture(env);
   const durableStoreEnabled = isScrimedWorkDurableStoreEnabled(env);
   const protectedWritesEnabled = envTrue("SCRIMED_WORK_PROTECTED_WRITES_ENABLED", env);
   const supabaseConfigured = envPresent("NEXT_PUBLIC_SUPABASE_URL", env) && envPresent("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", env);
+  const runtimeToken = env["SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN"] ?? "";
   const runtimeTokenConfigured = envPresent("SCRIMED_PILOT_INTAKE_PERSISTENCE_TOKEN", env);
   const workspaceConfigured = envPresent("SCRIMED_WORKSPACE_SLUG", env) || envPresent("SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG", env);
+  const canaryWorkspaceSlug = normalizeScrimedWorkCanaryWorkspaceSlug(
+    env["SCRIMED_WORKSPACE_SLUG"]
+  );
   const bearerProvided = envPresent("SCRIMED_BEARER_TOKEN", env);
   const reviewerBearerProvided = envPresent("SCRIMED_REVIEWER_BEARER_TOKEN", env);
   const migrationEvidenceId = nonsecretEvidenceId(env["SCRIMED_WORK_MIGRATION_EVIDENCE_ID"]);
@@ -97,12 +184,37 @@ export function getScrimedWorkProductionHardeningGate(
     env["SCRIMED_WORK_REVIEW_QUEUE_APPROVAL_MIGRATION_EVIDENCE_ID"]
   );
   const migrationsVerified = migrationSetStatus.verified;
-  const twoIdentityCanaryEvidenceId = nonsecretEvidenceId(
-    env["SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID"]
+  const twoIdentityCanaryEvidenceId =
+    env["SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID"]?.trim() ?? "";
+  const twoIdentityCanaryEvidenceIdValid = isScrimedWorkCanaryEvidenceId(
+    twoIdentityCanaryEvidenceId
   );
+  const currentReleaseSha = getScrimedWorkRuntimeReleaseSha(env);
+  const twoIdentityCanaryReleaseSha = normalizeScrimedWorkReleaseSha(
+    env["SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA"]
+  );
+  const twoIdentityCanaryCompletedAt = normalizeScrimedWorkCanaryTimestamp(
+    env["SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT"]
+  );
+  const canaryFreshness = getCanaryFreshness(twoIdentityCanaryCompletedAt, evaluatedAt);
+  const canaryReleaseMatches =
+    currentReleaseSha.length > 0 &&
+    twoIdentityCanaryReleaseSha.length > 0 &&
+    currentReleaseSha === twoIdentityCanaryReleaseSha;
+  const twoIdentityCanaryEvidenceIdAuthenticated = verifyCanaryEvidenceAuthentication({
+    evidenceId: twoIdentityCanaryEvidenceId,
+    releaseSha: twoIdentityCanaryReleaseSha,
+    signingSecret: runtimeToken,
+    workspaceSlug: canaryWorkspaceSlug,
+    completedAt: twoIdentityCanaryCompletedAt
+  });
   const twoIdentityCanaryVerified =
     envTrue("SCRIMED_WORK_TWO_IDENTITY_CANARY_VERIFIED", env) &&
-    twoIdentityCanaryEvidenceId.length > 0;
+    twoIdentityCanaryEvidenceIdValid &&
+    twoIdentityCanaryEvidenceIdAuthenticated &&
+    canaryWorkspaceSlug.length > 0 &&
+    canaryFreshness.fresh &&
+    canaryReleaseMatches;
 
   const gates: ScrimedWorkHardeningGate[] = [
     gate({
@@ -122,6 +234,62 @@ export function getScrimedWorkProductionHardeningGate(
       operatorAction: "Keep boundary headers and fail-closed checks in every new SCRIMED Work route.",
       automationSafe: true,
       retainedBoundary: "No live PHI, autonomous clinical action, payer submission, EHR writeback, certification claim, or customer go-live authority."
+    }),
+    gate({
+      gateId: "scrimed-work-browser-mutation-csrf",
+      domain: "auth",
+      title: "Browser mutation origin enforcement",
+      status: "evidence_ready",
+      severity: "critical",
+      requiredFor: "Every protected SCRIMED Work browser mutation and non-browser release canary.",
+      evidence: [
+        `policyVersion=${scrimedWorkCsrfPolicyVersion}`,
+        "browser mutations require an exact same-origin Origin header",
+        "cross-origin, null-origin, navigational, and incomplete browser requests fail closed",
+        `non-browser smoke requires ${scrimedWorkRequestContextHeader}=operator-smoke-v1`,
+        "request provenance never replaces AAL2, RBAC, RLS, idempotency, or durable audit"
+      ],
+      blocker: null,
+      operatorAction: "Keep protected browser mutations same-origin and add the fixed nonsecret request-context header only to approved CLI smoke clients.",
+      automationSafe: true,
+      retainedBoundary: scrimedWorkCsrfBoundary
+    }),
+    gate({
+      gateId: "scrimed-work-distributed-mutation-rate-limit",
+      domain: "abuse-control",
+      title: "Actor and tenant mutation abuse controls",
+      status: !mutationRateLimit.configurationValid
+        ? "blocked"
+        : mutationRateLimit.mode === "distributed-required" &&
+            mutationRateLimit.distributedProviderConfigured
+          ? "evidence_ready"
+          : "operator_required",
+      severity: "critical",
+      requiredFor: "Every authenticated SCRIMED Work mutation in a production runtime.",
+      evidence: [
+        `policyVersion=${scrimedWorkMutationRateLimitPolicyVersion}`,
+        `mode=${mutationRateLimit.mode}`,
+        `actorLimit=${mutationRateLimit.actorLimit}/${mutationRateLimit.windowSeconds}s`,
+        `tenantLimit=${mutationRateLimit.tenantLimit}/${mutationRateLimit.windowSeconds}s`,
+        `distributedProviderConfigured=${mutationRateLimit.distributedProviderConfigured}`,
+        `failClosedOnProviderUnavailable=${mutationRateLimit.failClosedOnProviderUnavailable}`,
+        "stable tenant, workspace, and actor identifiers are hashed before counter storage",
+        "production configuration cannot downgrade to bounded process memory"
+      ],
+      blocker: !mutationRateLimit.configurationValid
+        ? "SCRIMED_WORK_RATE_LIMIT_MODE is invalid; protected mutations fail closed until configuration is corrected."
+        : mutationRateLimit.mode !== "distributed-required"
+          ? "Bounded process memory supports local/test validation only and does not establish distributed production enforcement."
+          : mutationRateLimit.distributedProviderConfigured
+            ? null
+            : "The required distributed Upstash rate-limit provider is not configured; production mutations fail closed.",
+      operatorAction:
+        mutationRateLimit.mode === "distributed-required" &&
+        mutationRateLimit.distributedProviderConfigured
+          ? "Retain provider configuration evidence and verify allowed, exhausted, and provider-unavailable behavior in the release canary."
+          : "Configure approved Upstash REST credentials and SCRIMED_WORK_RATE_LIMIT_MODE=distributed-required in the protected runtime; never expose provider tokens.",
+      automationSafe: false,
+      retainedBoundary: scrimedWorkMutationRateLimitBoundary
     }),
     gate({
       gateId: "scrimed-work-definition-of-done",
@@ -268,7 +436,10 @@ export function getScrimedWorkProductionHardeningGate(
       severity: "critical",
       requiredFor: "Strict authenticated durable-store smoke.",
       evidence: twoIdentityCanaryVerified
-        ? [`twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`]
+        ? [
+            `twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`,
+            `releaseShaFingerprint=${currentReleaseSha.slice(0, 12)}`
+          ]
         : bearerProvided
           ? ["SCRIMED_BEARER_TOKEN is present but must be verified by protected API during strict smoke."]
           : ["SCRIMED_BEARER_TOKEN is missing or expired."],
@@ -291,7 +462,10 @@ export function getScrimedWorkProductionHardeningGate(
       severity: "critical",
       requiredFor: "Reviewer-only queue, independent approval, artifact review, and completion evidence.",
       evidence: twoIdentityCanaryVerified
-        ? [`twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`]
+        ? [
+            `twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`,
+            `releaseShaFingerprint=${currentReleaseSha.slice(0, 12)}`
+          ]
         : reviewerBearerProvided
           ? ["SCRIMED_REVIEWER_BEARER_TOKEN is present but reviewer role and separation must be verified by protected API."]
           : ["A distinct SCRIMED_REVIEWER_BEARER_TOKEN is missing or expired."],
@@ -362,15 +536,36 @@ export function getScrimedWorkProductionHardeningGate(
       evidence: twoIdentityCanaryVerified
         ? [
             `twoIdentityCanaryEvidenceId=${twoIdentityCanaryEvidenceId}`,
-            "Strict canary proved distinct users, reviewer-only queue access, self-approval denial, independent review, verification, and internal completion."
+            `releaseShaFingerprint=${currentReleaseSha.slice(0, 12)}`,
+            `workspaceSlug=${canaryWorkspaceSlug}`,
+            `completedAt=${twoIdentityCanaryCompletedAt}`,
+            `ageHours=${canaryFreshness.ageHours?.toFixed(2) ?? "unavailable"}`,
+            "The server-held runtime authority authenticated the evidence identifier without exposing its secret.",
+            "Strict canary proved distinct users, reviewer-only queue access, self-approval denial, independent review, verification, and internal completion.",
+            `Evidence is within the ${scrimedWorkCanaryMaxAgeHours}-hour promotion window.`
           ]
-        : ["Canary requires strict preflight plus two-identity authenticated lifecycle success."],
+        : [
+            "Canary requires strict preflight plus two-identity authenticated lifecycle success.",
+            "Immutable completion evidence must derive a release-, workspace-, and freshness-bound canary identifier.",
+            "The attested release SHA and workspace must match the current deployment.",
+            `Completion evidence must be no older than ${scrimedWorkCanaryMaxAgeHours} hours.`
+          ],
       blocker: twoIdentityCanaryVerified
         ? null
-        : "A protected two-identity lifecycle canary has not been bound to reviewed nonsecret evidence.",
+        : twoIdentityCanaryEvidenceIdValid && !twoIdentityCanaryCompletedAt
+          ? "Canary completion timestamp is missing or malformed."
+          : twoIdentityCanaryEvidenceIdValid && !canaryWorkspaceSlug
+            ? "Canary evidence requires an explicit valid SCRIMED_WORKSPACE_SLUG."
+          : twoIdentityCanaryEvidenceIdValid && !canaryReleaseMatches
+          ? "Canary evidence is not bound to the exact current release SHA."
+          : twoIdentityCanaryEvidenceIdValid && !twoIdentityCanaryEvidenceIdAuthenticated
+            ? "Canary evidence was not authenticated by the current server-held runtime authority."
+            : twoIdentityCanaryEvidenceIdValid && !canaryFreshness.fresh
+              ? `Canary evidence is outside the ${scrimedWorkCanaryMaxAgeHours}-hour freshness window or is future-dated beyond clock-skew tolerance.`
+              : "A protected two-identity lifecycle canary has not been bound to derived, authenticated, release-, workspace-, and freshness-specific nonsecret evidence.",
       operatorAction: twoIdentityCanaryVerified
         ? "Retain the nonsecret evidence identifier with release provenance; do not retain bearer tokens."
-        : "Run one no-PHI protected workspace canary with distinct operator and reviewer identities, then bind reviewed evidence before buyer-facing mutations.",
+        : "Run one no-PHI protected workspace canary with distinct operator and reviewer identities, load its immutable completion evidence, and bind the derived evidence identifier, exact release SHA, workspace, and completion time before buyer-facing mutations.",
       automationSafe: false,
       retainedBoundary: "Canary success is not certification, clinical validation, production connector approval, or customer go-live."
     })
@@ -388,12 +583,13 @@ export function getScrimedWorkProductionHardeningGate(
     migrationsVerified &&
     bearerProvided &&
     reviewerBearerProvided &&
+    mutationRateLimit.readyForProtectedMutations &&
     flags.consequentialActionsEnabled === false;
 
   return {
     service: "scrimed-work-production-hardening-gate",
     status: blocked > 0 ? "blocked" : operatorRequired > 0 ? "operator_action_required" : "evidence_ready",
-    generatedAt,
+    generatedAt: evaluatedAt,
     storageMode: getScrimedWorkDurableStorageMode(env),
     canRunStrictNonProductionSmoke,
     canaryEligible: canRunStrictNonProductionSmoke,
@@ -406,6 +602,20 @@ export function getScrimedWorkProductionHardeningGate(
       configuredCurrent: migrationSetCurrent,
       verified: migrationsVerified
     },
+    mutationRateLimit,
+    releaseBinding: {
+      currentReleaseShaFingerprint: currentReleaseSha.slice(0, 12) || "unavailable",
+      canaryReleaseShaFingerprint: twoIdentityCanaryReleaseSha.slice(0, 12) || "unavailable",
+      evidenceIdFormatValid: twoIdentityCanaryEvidenceIdValid,
+      evidenceIdAuthenticated: twoIdentityCanaryEvidenceIdAuthenticated,
+      workspaceSlug: canaryWorkspaceSlug || "unavailable",
+      workspaceBound: twoIdentityCanaryEvidenceIdAuthenticated && canaryWorkspaceSlug.length > 0,
+      completedAt: twoIdentityCanaryCompletedAt || null,
+      ageHours: canaryFreshness.ageHours,
+      maxAgeHours: scrimedWorkCanaryMaxAgeHours,
+      fresh: canaryFreshness.fresh,
+      matched: canaryReleaseMatches
+    },
     summary: {
       totalGates: gates.length,
       evidenceReady,
@@ -416,16 +626,19 @@ export function getScrimedWorkProductionHardeningGate(
     gates,
     nextOperatorActions: [
       twoIdentityCanaryVerified
-        ? `Retain reviewed two-identity canary evidence ${twoIdentityCanaryEvidenceId} with release provenance.`
-        : "Refresh short-lived AAL2 tokens for a tenant-admin or pilot-lead operator and a genuinely separate reviewer immediately before strict smoke.",
+        ? `Retain reviewed two-identity canary evidence ${twoIdentityCanaryEvidenceId} for release ${currentReleaseSha.slice(0, 12)}.`
+        : "Refresh short-lived AAL2 tokens for a tenant-admin or pilot-lead operator and a genuinely separate reviewer immediately before strict smoke, then derive the release-bound evidence identifier from the protected completion-evidence response.",
       "Configure non-production Supabase URL, publishable key, runtime authorization token, workspace slug, protected writes flag, and durable-store flag.",
+      mutationRateLimit.mode === "distributed-required" && mutationRateLimit.distributedProviderConfigured
+        ? "Retain distributed mutation rate-limit configuration evidence without recording provider credentials."
+        : "Configure the distributed mutation rate-limit provider before any production protected-write target; local bounded-memory counters are non-production only.",
       migrationsVerified
         ? `Retain reviewed migration evidence ${migrationEvidenceId} with the release packet.`
         : `Apply all ten SCRIMED Work migrations in order only to an approved no-PHI Supabase target, set SCRIMED_WORK_MIGRATION_SET_VERSION=${SCRIMED_WORK_REQUIRED_MIGRATION_SET_VERSION}, and bind both migration reviews to nonsecret evidence identifiers.`,
       "Run npm run smoke:scrimed-work:durable-store-preflight:strict.",
       "Run npm run smoke:scrimed-work:strict.",
       "Run npm run smoke:scrimed-work:two-identity:strict and retain its no-secret audit identifiers.",
-      "Bind successful two-identity evidence to SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID before release promotion."
+      "Bind successful two-identity evidence to SCRIMED_WORK_TWO_IDENTITY_CANARY_EVIDENCE_ID, SCRIMED_WORK_TWO_IDENTITY_CANARY_RELEASE_SHA, SCRIMED_WORK_TWO_IDENTITY_CANARY_COMPLETED_AT, and the explicit SCRIMED_WORKSPACE_SLUG before release promotion."
     ],
     strictSmokeCommands: [
       "npm run smoke:scrimed-work:durable-store-preflight:strict",

@@ -34,7 +34,7 @@ for (const expected of [
   "release-candidate-validation-passed-source-provenance-blocked",
   "/api/release-candidate-readiness",
   "/api/release-candidate-readiness/brief",
-  "scrimed-release-candidate-2026-07-11-validation-passed-uncommitted",
+  "scrimed-release-candidate-working-tree-uncommitted",
   "not-committed-by-this-route",
   "not-deployed-by-this-route",
   "blocked-until-clean-reviewed-immutable-revision",
@@ -43,7 +43,21 @@ for (const expected of [
   "deployment-required",
   "blocked-production-delta",
   "SCRIMED_BASE_URL=https://app.scrimedsolutions.com npm run smoke:public",
-  "/scrimed-intelligence-platform",
+  "npm run release:candidate-manifest",
+  "npm run release:candidate-manifest:strict",
+  "required-before-source-review",
+  "candidateManifestPathDisclosure: false",
+  "candidateManifestReleaseAuthority: false",
+  "recorded-evidence-revalidation-required",
+  "command-catalog-not-runtime-attestation",
+  "currentCandidateAttested: false",
+  "automated-review-command-available-human-release-review-required",
+  "automated-validation-command-available-human-review-required",
+  "npm run release:candidate-validate:strict",
+  "candidateValidationAuthority: false",
+  "npm run review:investor-deck:strict",
+  "investorArtifactFingerprintAuthority: false",
+  "externalArtifactDistributionAuthority: \"not-authorized\"",
   "no live PHI",
   "no autonomous diagnosis, treatment, prescribing, or final imaging interpretation",
   "no payer submission or claim submission",
@@ -62,10 +76,20 @@ for (const expected of [
   "X-SCRIMED-Commit-Authority",
   "not-committed-by-this-route",
   "X-SCRIMED-Data-Boundary",
-  "synthetic-and-metadata-only"
+  "synthetic-and-metadata-only",
+  "X-SCRIMED-Investor-Artifact-Review",
+  "X-SCRIMED-Candidate-Validation",
+  "X-SCRIMED-Validation-Evidence",
+  "recorded-catalog-revalidation-required"
 ]) {
   requireIncludes("app/api/release-candidate-readiness/route.ts", route, expected);
 }
+
+requireIncludes(
+  "app/api/release-candidate-readiness/route.ts",
+  route,
+  "X-SCRIMED-Release-Candidate-Manifest"
+);
 
 for (const expected of [
   "buildReleaseCandidateReadinessBrief",
@@ -79,7 +103,13 @@ for (const expected of [
 for (const expected of [
   "SCRIMED Release Candidate Readiness",
   "blocked-until-clean-reviewed-immutable-revision",
-  "SCRIMED_BASE_URL=http://127.0.0.1:3044 npm run smoke:public",
+  "scrimed-release-candidate-working-tree-uncommitted",
+  "recorded-evidence-revalidation-required",
+  "command-catalog-not-runtime-attestation",
+  "npm run release:candidate-manifest",
+  "npm run release:candidate-manifest:strict",
+  "npm run release:candidate-validate:strict",
+  "npm run review:investor-deck:strict",
   "npm run release:provenance:strict",
   "Protected AAL2 durable-store happy paths and Compute Fabric migration apply remain separate operator workflows"
 ]) {

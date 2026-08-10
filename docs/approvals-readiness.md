@@ -1,6 +1,6 @@
 # SCRIMED Approvals Readiness
 
-Updated: 2026-06-23
+Updated: 2026-07-18
 
 SCRIMED Approvals Readiness is the operating ladder for public launch, healthcare buyer trust, and future regulated expansion. It keeps SCRIMED moving as healthcare operations intelligence while HIPAA, SOC 2, HITRUST, FDA, ONC, state care-delivery, and buyer-release gates remain evidence-led and human-approved.
 
@@ -23,6 +23,21 @@ SCRIMED Approvals Readiness is the operating ladder for public launch, healthcar
 - `/clinical-authority-readiness`
 - `/buyer-release-control-run`
 - `/pilot-workspace/access`
+
+## Intended Use Review Workbench
+
+The proposed company-wide memo already exists at `docs/SCRIMED_INTENDED_USE_MEMO.md`. The Approvals Readiness page now includes a browser-local, controlled-options workbench that converts a proposed workflow scope into a qualified-review packet.
+
+The workbench:
+
+- tests workflow, mode, data classification, audience, autonomy, evidence posture, and requested actions;
+- blocks live PHI, restricted clinical data, production/live operation, live care, autonomous execution, diagnosis, treatment selection, prescribing, final imaging interpretation, outreach, payer submission, EHR writeback, external sending, go-live, and unsupported certification claims;
+- requires cited and verified evidence for clinical-facing draft workflows;
+- adds founder, qualified legal, clinical governance, licensed clinical, privacy, security, buyer, pilot, communications, and release reviewers when the selected scope triggers them;
+- produces no signature, approval, legal opinion, regulatory classification, PHI authority, clinical authority, external-release authority, or production authority;
+- sends, stores, caches, and logs no entered data because all inputs are fixed local options.
+
+Reviewer identities, decisions, dates, effective date, version, expiry, and evidence references must be retained in an approved external system of record. See `docs/intended-use-review.md` for the runbook.
 
 ## Approval Tracks
 
@@ -53,7 +68,9 @@ SCRIMED Approvals Readiness is the operating ladder for public launch, healthcar
 
 ## Next Operator Actions
 
-- Draft and approve the first SCRIMED Intended Use Memo.
+- Run the Intended Use workbench against the current proposed scope.
+- Obtain named Founder/CEO, qualified legal, and clinical governance decisions and retain them outside source code.
+- Align website, decks, demos, sales scripts, investor materials, and pilot scopes only after the approved version is effective.
 - Create the HIPAA readiness evidence room with risk analysis, safeguards, BAA/DPA, incident, breach, and vendor records.
 - Start SOC 2 readiness control mapping and evidence collection.
 - Select one narrow connector or clinical classification path before pursuing formal external review.

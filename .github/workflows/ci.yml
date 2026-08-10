@@ -26,6 +26,14 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Restore Next.js build cache
+        uses: actions/cache@v5
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('app/**', 'scripts/**', 'next.config.js', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-
+
       - name: Install dependencies
         run: npm ci
 
@@ -37,6 +45,18 @@ jobs:
 
       - name: Dependency security floor
         run: npm run security:dependency-floor
+
+      - name: Candidate secret scan
+        run: npm run security:secret-scan
+
+      - name: Generate and verify local SBOM evidence
+        run: npm run security:sbom
+
+      - name: Generate migration evidence packet
+        run: npm run release:migration-packet
+
+      - name: Verify pending migration authorization packet
+        run: npm run release:pending-migrations
 
       - name: Generated workspace integrity
         run: node scripts/check-generated-integrity.mjs
@@ -66,3 +86,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify public release surfaces
+        run: npm run verify:public-release

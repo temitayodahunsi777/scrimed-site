@@ -1,0 +1,81 @@
+name: Dependency Security Evidence
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/dependency-security.yml"
+  schedule:
+    - cron: "23 9 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-evidence:
+    name: Audit lockfile and produce supply-chain evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SCRIMED_HIGH_VULNERABILITY_POLICY: report-and-review
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install exact lockfile
+        run: npm ci
+
+      - name: Create report directory
+        run: mkdir -p artifacts/security
+
+      - name: Capture machine-readable advisory report
+        shell: bash
+        run: |
+          set +e
+          npm audit --audit-level=high --json > artifacts/security/npm-audit.json
+          status=$?
+          set -e
+          printf '%s\n' "$status" > artifacts/security/npm-audit-exit-code.txt
+          npm audit --audit-level=critical
+
+      - name: Verify deterministic dependency floors and SBOM
+        run: |
+          npm run security:dependency-floor
+          npm run security:sbom
+          sha256sum package-lock.json artifacts/security/npm-audit.json > artifacts/security/dependency-evidence.sha256
+
+      - name: Review pull-request dependency delta
+        if: github.event_name == 'pull_request' && vars.SCRIMED_GITHUB_DEPENDENCY_GRAPH_ENABLED == 'true'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          license-check: true
+          comment-summary-in-pr: always
+
+      - name: Enforce connector-independent pull-request floor
+        if: github.event_name == 'pull_request' && vars.SCRIMED_GITHUB_DEPENDENCY_GRAPH_ENABLED != 'true'
+        run: |
+          npm audit --audit-level=moderate
+          npm run security:dependency-floor
+          npm run security:sbom
+          echo "::notice::GitHub dependency graph is not declared enabled; deterministic lockfile, advisory, license, and SBOM gates passed."
+
+      - name: Upload dependency evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: dependency-security-evidence-${{ github.run_id }}
+          path: artifacts/security/**
+          if-no-files-found: error
+          retention-days: 30

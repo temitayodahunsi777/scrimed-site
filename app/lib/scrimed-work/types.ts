@@ -271,6 +271,7 @@ export type RollbackMetadata = {
 };
 
 export type ModelRouteDecision = {
+  routingStatus: "selected" | "abstained-no-eligible-model" | "blocked-by-policy";
   selectedModel: string;
   modelTier: ProviderRoutingClass;
   provider: string;
@@ -282,6 +283,16 @@ export type ModelRouteDecision = {
   fallbackModels: string[];
   estimatedCostClass: "low" | "medium" | "high";
   estimatedLatencyClass: "fast" | "balanced" | "slow";
+  validatedCellIds: string[];
+  totalEstimatedCostUsd: number;
+  estimatedCostPerAcceptedOutcomeUsd: number | null;
+  fallbackPolicy: {
+    maximumFallbacks: number;
+    privacyDowngradeAllowed: false;
+    silentFallbackAllowed: false;
+  };
+  runtimeState: "NORMAL" | "CONSTRAINED" | "DEGRADED" | "SAFE_REFUSAL";
+  resourceAdmissionHash: string | null;
   auditTags: string[];
 };
 

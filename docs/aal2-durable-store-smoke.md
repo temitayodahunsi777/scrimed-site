@@ -1,6 +1,6 @@
 # SCRIMED AAL2 Durable Store Smoke
 
-Updated: 2026-06-28
+Updated: 2026-07-18
 
 This runbook obtains and preflights a short-lived AAL2 bearer token for local no-PHI durable-store smoke testing. It does not store PHI, passwords, refresh tokens, service-role keys, production connector payloads, or clinical data.
 
@@ -22,15 +22,33 @@ Use a verified Supabase session for a SCRIMED workspace member with one of these
 
 `observer` and non-member sessions must remain forbidden.
 
-## Secure Token Setup
+## Preferred Browser Verification
 
-Preferred browser path:
+For interactive operator verification, do not export a bearer token. Use the protected browser-session verifier:
 
 1. Open `https://app.scrimedsolutions.com/pilot-workspace/access`.
 2. Sign in with passkey or magic link.
 3. Complete TOTP MFA so the current access token has `aal=aal2`.
-4. Copy the current Supabase session JSON or access token from the browser session storage/local storage only for the authorized operator session.
-5. Do not commit, paste, or upload the token into chat, Git, docs, tickets, logs, or source files.
+4. Select the intended synthetic pilot workspace.
+5. Click **Run SCRIMED Work Verification**. The bounded verification session is cancelled after the lifecycle checks and its audit evidence is retained.
+6. Click **Run Tenant Verification** to validate tenant-scoped protected routes and the audited enterprise proof packet.
+
+This path uses the active AAL2 browser session without copying a token. It is the preferred path for interactive verification and remains synthetic-only, tenant-scoped, human-review-gated, and nonclinical.
+
+### Governance-session freshness
+
+An access token can still report `aal=aal2` after SCRIMED's narrower governance-session window has expired. Protected database policy additionally requires the identity-provider session to be less than twelve hours old and refreshed within two hours. When that gate expires:
+
+- protected routes return `403 governance-aal2-session-required`;
+- no workspace may be visible because row-level security remains fail-closed;
+- this is not evidence of a missing migration or lost membership;
+- sign out of the current browser session, sign in again, verify the enrolled authenticator, and rerun both browser verifiers.
+
+Do not weaken the database freshness window, bypass RLS, or reuse an old bearer token to clear this gate.
+
+## Optional CLI Token Setup
+
+Use a short-lived bearer token only when the CLI or CI smoke itself must be exercised. Do not inspect or export browser session storage when the browser verification path satisfies the test objective. Do not commit, paste, or upload a token into chat, Git, docs, tickets, logs, or source files.
 
 Local helper options:
 
@@ -64,7 +82,7 @@ The helper validates `aal=aal2`, `session_id`, short token lifetime, Supabase Au
 
 ## Smoke Commands
 
-Before strict mode, run the no-secret operator readiness preflight. It reports token freshness, workspace slug, target assumptions, and missing local protected runtime configuration without printing bearer tokens:
+Before CLI strict mode, run the no-secret operator readiness preflight. It reports token freshness, workspace slug, target assumptions, the browser-session workaround, and missing local protected runtime configuration without printing bearer tokens:
 
 ```bash
 npm run smoke:aal2:readiness
@@ -81,6 +99,8 @@ Strict smoke requires `SCRIMED_BEARER_TOKEN`, `SCRIMED_WORKSPACE_SLUG`, and a ta
 ```bash
 npm run smoke:aal2:durable-store:strict
 ```
+
+For p.32 `aal2-cli-evidence`, dispatch `.github/workflows/execution-attempt-durable-store-qa-smoke.yml` and retain the resulting manual QA packet with `workflowKind=execution-attempt-durable-store-qa`. Sales-demo, authority-reference, legacy, and unclassified packets cannot satisfy that gate. The workflow prints only the workspace target, durable-record UUID, and review audit-event UUID; it never prints the bearer token or raw execution payload.
 
 Equivalent explicit environment:
 

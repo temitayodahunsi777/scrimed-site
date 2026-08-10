@@ -283,4 +283,8 @@ if (!reviewBody.dispositionId || !reviewBody.eventId) {
 }
 
 console.log(`pass authenticated durable-store review disposition: ${reviewBody.dispositionId}`);
+console.log("safe evidence workflowKind=execution-attempt-durable-store-qa");
+console.log(`safe evidence workspaceTarget=${workspaceSlug}`);
+console.log(`safe evidence durableRecordId=${recordBody.record.id}`);
+console.log(`safe evidence reviewAuditEventId=${reviewBody.eventId}`);
 console.log("SCRIMED execution-attempt durable-store authenticated smoke completed.");

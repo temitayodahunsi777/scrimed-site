@@ -25,6 +25,7 @@ flowchart TD
   Policy --> Tools["Tool Registry"]
   Session --> Context["Healthcare Context Engine"]
   Session --> Durable["AAL2 Supabase Durable Store"]
+  Session --> CSRF["Same-Origin Mutation Guard"]
   Session --> Hardening["Production Hardening Gate"]
   Durable --> Audit["Append-Only Metadata Audit"]
   Context --> Verification["Verification Engine"]
@@ -77,13 +78,18 @@ SCRIMED Work does not authorize live PHI, autonomous clinical care, diagnosis, t
 10. Add a bounded reviewer queue that operationalizes separation of duties without exposing raw artifact payloads.
 11. Add a no-secret two-identity token policy, reviewer-token capture path, and strict lifecycle canary that proves reviewer-only queue access, self-approval denial, independent review, verification, and internal completion.
 12. Add a browser-native admin preparation control and two-step reviewer queue so session approval and artifact disposition remain separate, explicit AAL2 actions without token export.
-12. Bind successful canary evidence through nonsecret release-provenance identifiers; never retain bearer values as evidence.
-13. Run typecheck, lint, nonsecret tests, build, generated-integrity, and diff checks.
+13. Derive a deterministic canary evidence ID from immutable review/completion evidence, the exact workspace, and the exact deployed Git SHA, then reject malformed or manually shaped release bindings.
+14. Authenticate the canary with the server-held runtime authority and enforce a 72-hour freshness window with bounded clock-skew tolerance.
+15. Bind successful canary evidence through nonsecret release-provenance identifiers; never retain bearer values as evidence.
+16. Enforce exact same-origin browser mutations and explicit non-browser operator-smoke provenance at the shared write authorization boundary.
+17. Enforce shared actor and tenant mutation quotas, require the distributed provider in production, and fail closed without provider availability.
+18. Run typecheck, lint, nonsecret tests, build, generated-integrity, and diff checks.
 
 ## Production Hardening Required Later
 
-- retain the verified six-migration Supabase evidence, run `npm run smoke:scrimed-work:durable-store-preflight:strict`, then run `npm run smoke:scrimed-work:two-identity:strict` with separate operator and reviewer identities;
-- add CSRF controls for browser-origin protected write calls before any browser mutation UI is enabled;
+- retain the verified ordered Supabase migration-set evidence, run `npm run smoke:scrimed-work:durable-store-preflight:strict`, then run `npm run smoke:scrimed-work:two-identity:strict` with separate operator and reviewer identities for each exact release SHA and workspace within the 72-hour promotion window;
+- verify distributed actor/tenant mutation limits in each exact-release canary and retain only no-secret provider/decision evidence;
+- add a retained abuse-event ledger and provider-health circuit-breaker telemetry before expanding protected write volume;
 - add real queue/scheduler only after approval and feature flags;
 - add approved provider credentials only through secret-managed deployment configuration;
 - complete clinical, security, privacy, legal, procurement, and compliance reviews before live workflows.

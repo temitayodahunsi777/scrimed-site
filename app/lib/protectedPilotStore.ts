@@ -36,7 +36,8 @@ import type {
 } from "./pilotDemoReadiness";
 import type {
   QaManualRunEvidenceInput,
-  QaManualRunEvidencePacketRecord
+  QaManualRunEvidencePacketRecord,
+  QaPersistedRunWorkflowKind
 } from "./qaEvidenceLedger";
 import type {
   CommandIntelligenceHubSummary,
@@ -167,6 +168,18 @@ import type {
   ProtectedAuthorityArtifactReferenceRecord,
   ProtectedAuthorityArtifactReferenceStatus
 } from "./protectedAuthorityArtifactReferences";
+import type {
+  P32EvidenceIssuerReceipt,
+  P32EvidenceIssuerReceiptInput
+} from "./scrimedP32EvidenceIssuer";
+import type {
+  P32CandidateReviewAssignmentReceipt,
+  P32CandidateReviewAssignmentReceiptInput,
+  P32CandidateReviewDecisionReceipt,
+  P32CandidateReviewDecisionReceiptInput,
+  P32CandidateReviewFingerprints,
+  P32CandidateReviewPersistedEvidence
+} from "./scrimedP32CandidateReview";
 
 type AuthenticatedPilotContext =
   | {
@@ -190,6 +203,11 @@ type WorkspaceRow = {
   boundary: string;
   created_at: string;
   pilot_tenants: { name: string } | Array<{ name: string }> | null;
+};
+
+type PilotMembershipAccessRow = {
+  role: PilotWorkspaceRole;
+  status: "active" | "inactive";
 };
 
 type SessionRow = {
@@ -217,6 +235,7 @@ type QaManualRunEvidencePacketRow = {
   id: string;
   tenant_id: string;
   workspace_id: string;
+  workflow_kind?: string;
   workflow_run_id: string;
   workflow_run_url: string;
   executed_at: string;
@@ -1369,6 +1388,13 @@ function mapQaManualRunEvidencePacket(
     id: row.id,
     tenantId: row.tenant_id,
     workspaceId: row.workspace_id,
+    workflowKind: [
+      "sales-demo-session-qa",
+      "authority-reference-qa",
+      "execution-attempt-durable-store-qa"
+    ].includes(row.workflow_kind ?? "")
+      ? row.workflow_kind as QaPersistedRunWorkflowKind
+      : "legacy-unclassified",
     workflowRunId: row.workflow_run_id,
     workflowRunUrl: row.workflow_run_url,
     executedAt: row.executed_at,
@@ -2392,6 +2418,8 @@ const sessionSelect =
 const auditEventSelect =
   "id, workspace_id, session_id, actor_user_id, event_type, event_metadata, created_at";
 const qaManualRunEvidencePacketSelect =
+  "id, tenant_id, workspace_id, workflow_kind, workflow_run_id, workflow_run_url, executed_at, base_url, intake_id, created_session_id, packet_audit_event_id, qa_outcome, operator_attestation, token_disposal_attestation, data_boundary, packet_markdown, packet_sha256, created_by, created_at, boundary";
+const qaManualRunEvidencePacketLegacySelect =
   "id, tenant_id, workspace_id, workflow_run_id, workflow_run_url, executed_at, base_url, intake_id, created_session_id, packet_audit_event_id, qa_outcome, operator_attestation, token_disposal_attestation, data_boundary, packet_markdown, packet_sha256, created_by, created_at, boundary";
 const pilotDemoReadinessSnapshotSelect =
   "id, tenant_id, workspace_id, readiness_state, readiness_score, passed_count, review_count, blocked_count, required_actions, buyer_brief, check_results, runbook, verification, evidence_counts, snapshot, last_evidence_at, boundary, created_by, created_at";
@@ -2464,6 +2492,33 @@ export async function getAccessiblePilotWorkspace(client: SupabaseClient, worksp
   };
 }
 
+export async function getPilotWorkspaceMembershipAccess(
+  client: SupabaseClient,
+  tenantId: string,
+  userId: string
+) {
+  const { data, error } = await client
+    .from("pilot_memberships")
+    .select("role, status")
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const row = data as PilotMembershipAccessRow | null;
+  const validRole =
+    row?.role === "tenant-admin" ||
+    row?.role === "pilot-lead" ||
+    row?.role === "reviewer" ||
+    row?.role === "observer";
+
+  return {
+    membership:
+      row && row.status === "active" && validRole
+        ? { role: row.role, status: row.status }
+        : null,
+    error
+  };
+}
+
 export async function listPilotSessions(client: SupabaseClient, workspaceId: string) {
   const { data, error } = await client
     .from("pilot_demo_sessions")
@@ -2506,18 +2561,32 @@ export async function listPilotAuditEvents(client: SupabaseClient, workspaceId: 
 }
 
 export async function listQaManualRunEvidencePackets(client: SupabaseClient, workspaceId: string) {
-  const { data, error } = await client
+  const currentSchemaResult = await client
     .from("qa_manual_run_evidence_packets")
     .select(qaManualRunEvidencePacketSelect)
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false })
     .limit(50);
+  const workflowColumnUnavailable = Boolean(
+    currentSchemaResult.error &&
+      (currentSchemaResult.error.code === "42703" ||
+        currentSchemaResult.error.code === "PGRST204") &&
+      currentSchemaResult.error.message.includes("workflow_kind")
+  );
+  const result = workflowColumnUnavailable
+    ? await client
+        .from("qa_manual_run_evidence_packets")
+        .select(qaManualRunEvidencePacketLegacySelect)
+        .eq("workspace_id", workspaceId)
+        .order("created_at", { ascending: false })
+        .limit(50)
+    : currentSchemaResult;
 
   return {
-    packets: ((data ?? []) as unknown as QaManualRunEvidencePacketRow[]).map(
+    packets: ((result.data ?? []) as unknown as QaManualRunEvidencePacketRow[]).map(
       mapQaManualRunEvidencePacket
     ),
-    error
+    error: result.error
   };
 }
 
@@ -4035,6 +4104,77 @@ export async function recordQaManualRunEvidencePacket(
     boundary: typeof payload.boundary === "string" ? payload.boundary : null,
     error
   };
+}
+
+export async function recordP32EvidenceAttestationIssuance(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32EvidenceIssuerReceiptInput
+) {
+  const { data, error } = await client.rpc("record_p32_evidence_attestation_issuance", {
+    p_workspace_slug: workspaceSlug,
+    p_issuance: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32EvidenceIssuerReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function createP32CandidateReviewAssignmentReceipt(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32CandidateReviewAssignmentReceiptInput
+) {
+  const { data, error } = await client.rpc("create_p32_candidate_review_assignment", {
+    p_workspace_slug: workspaceSlug,
+    p_assignment: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32CandidateReviewAssignmentReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function recordP32CandidateReviewDecisionReceipt(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  input: P32CandidateReviewDecisionReceiptInput
+) {
+  const { data, error } = await client.rpc("record_p32_candidate_review_decision", {
+    p_workspace_slug: workspaceSlug,
+    p_decision: input
+  });
+  const payload = data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+  const receipt =
+    payload.receipt && typeof payload.receipt === "object"
+      ? (payload.receipt as unknown as P32CandidateReviewDecisionReceipt)
+      : null;
+
+  return { receipt, error };
+}
+
+export async function getP32CandidateReviewEvidence(
+  client: SupabaseClient,
+  workspaceSlug: string,
+  fingerprints: P32CandidateReviewFingerprints
+) {
+  const { data, error } = await client.rpc("get_p32_candidate_review_evidence", {
+    p_workspace_slug: workspaceSlug,
+    p_candidate: fingerprints
+  });
+  const persistedReview =
+    data && typeof data === "object"
+      ? (data as unknown as P32CandidateReviewPersistedEvidence)
+      : null;
+
+  return { persistedReview, error };
 }
 
 export async function listTrustOSDecisions(client: SupabaseClient, workspaceId: string) {

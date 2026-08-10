@@ -1,4 +1,4 @@
-import { createAuditHash } from "../scrimed-work";
+import { createAuditHash } from "../scrimed-work/audit";
 import type {
   ControlPlaneAgentDefinition,
   DefinitionOfDoneContract,

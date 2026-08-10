@@ -40,6 +40,7 @@ for (const expected of [
   "set local statement_timeout = '30s'",
   "extension_relocatable",
   "alter extension vector set schema extensions",
+  "grant usage on schema extensions to anon, authenticated, service_role",
   "scrimed-vector-extension-unexpected-schema",
   "scrimed-stored-vector-type-relocation-not-verified",
   "has_schema_privilege('anon', 'extensions', 'USAGE')",

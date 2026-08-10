@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "scrimed-p32-worktree-attribution-v1",
+  "evidenceClass": "NON_CANDIDATE",
+  "capturedAt": "2026-07-30T13:13:02Z",
+  "repository": "scrimed-site",
+  "branch": "agent/scrimed-p31-workstreams",
+  "head": "cec52cecf181faf4aa9839ff66c1c6e433852222",
+  "mergeBaseWithOriginMain": "5e77beea57f458883f7544421b2014fd4e28ac67",
+  "stagedEntryCount": 0,
+  "entries": [
+    {
+      "path": "app/lib/scrimed-work/index.ts",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "d16aaccaf909e2689cea636da0e42bfa983204e9ffd38d705f49c6c4840578ce"
+    },
+    {
+      "path": "app/lib/scrimedP32ControlPlane.ts",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "b1f76598f311e23d7f27cdc486f990e6ff3828df194866d0c333ed31e95b7ccd"
+    },
+    {
+      "path": "docs/scrimed-p32-architecture.md",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "48f7822999f310d4fd00ba9cd7e7da63c09d5b738beefe38f44161a1721c6d26"
+    },
+    {
+      "path": "docs/scrimed-p32-traceability.md",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "d8e7f1bbefa6b93392eb71f8ebba5d888b8de9159173f89e489ac49751acf704"
+    },
+    {
+      "path": "package.json",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "f90796847872d9147cc2baefbdcebd9e025353eb0e2d1d65a45d1271170b44ad"
+    },
+    {
+      "path": "scripts/scrimed-nonsecret-test-suite.mjs",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "d2c1dc4f3573c68f14e479974fef0d07e24e7ec1e46781304081b24b85f32ad1"
+    },
+    {
+      "path": "scripts/scrimed-p32-contract-check.mjs",
+      "gitStatus": "M",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "e70732726250c042c91ae64a9ee767bf6aedc7bbbc094ce2e7a46c3f92a06b05"
+    },
+    {
+      "path": "app/lib/scrimed-work/p32ApprovedActions.ts",
+      "gitStatus": "??",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "4e0a9d83307480bf5c6333b850ea9cc298ee9e51f53bb119391ec2e94a0d8aa0"
+    },
+    {
+      "path": "app/lib/scrimed-work/p32GovernanceRecords.ts",
+      "gitStatus": "??",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "b6c1d2c84cc05763f33c460167f01f283c6daed6f1f6550c815fe8abd3c2e6f2"
+    },
+    {
+      "path": "app/lib/scrimed-work/p32TechnicalGates.ts",
+      "gitStatus": "??",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "d5839d73e7e51b9a0d0f73f9332970a7e36806aea1a51fd6d93679b1b61b6959"
+    },
+    {
+      "path": "scripts/scrimed-p32-consolidated-governance-contract-check.mjs",
+      "gitStatus": "??",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "6d3dbd03e828928ff748ae4efd3ccdda06b76c469a053991ee7e77ec8bcea5ad"
+    },
+    {
+      "path": "scripts/scrimed-p32-consolidated-governance-gates.mjs",
+      "gitStatus": "??",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "9415e2f6d093941d4b576bb5818af9b57663be7872fe12b8f3361d9521b2ef2d"
+    },
+    {
+      "path": "scripts/scrimed-p32-consolidated-governance-policy-test.mjs",
+      "gitStatus": "??",
+      "attribution": "PREEXISTING_USER_CHANGE",
+      "sha256": "083521f43367a212d5d9286c91434757268e6e86773b5ded5523903495371d74"
+    }
+  ],
+  "entryCount": 13,
+  "promotionAllowed": false,
+  "reason": "Dirty worktree evidence is attributable but is not an immutable release candidate."
+}

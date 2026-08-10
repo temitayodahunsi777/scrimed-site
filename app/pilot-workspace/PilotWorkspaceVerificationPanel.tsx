@@ -20,6 +20,7 @@ type VerificationCheck = {
 
 type ErrorBody = {
   error?: { code?: string; message?: string };
+  reauthenticationRequired?: boolean;
 };
 
 const verificationBoundary =
@@ -134,12 +135,20 @@ function statusClass(status: CheckStatus) {
   return "status-pill";
 }
 
-async function readErrorMessage(response: Response) {
+async function readError(response: Response) {
   try {
     const body = (await response.json()) as ErrorBody;
-    return body.error?.message ?? body.error?.code ?? response.statusText;
+    return {
+      code: body.error?.code ?? "request-failed",
+      message: body.error?.message ?? body.error?.code ?? response.statusText,
+      reauthenticationRequired: body.reauthenticationRequired === true
+    };
   } catch {
-    return response.statusText;
+    return {
+      code: "request-failed",
+      message: response.statusText,
+      reauthenticationRequired: false
+    };
   }
 }
 
@@ -190,11 +199,46 @@ export default function PilotWorkspaceVerificationPanel({
           }
         });
 
+        if (!response.ok) {
+          const error = await readError(response);
+          const aal2Expired =
+            error.reauthenticationRequired || error.code === "governance-aal2-session-required";
+
+          if (aal2Expired) {
+            completedChecks.push({
+              ...check,
+              detail: `${response.status} ${error.message}`,
+              status: "fail"
+            });
+            setChecks([...completedChecks, ...nextChecks.slice(completedChecks.length)]);
+            continue;
+          }
+
+          if (check.id === "tenant-access" && response.status === 403) {
+            completedChecks.push({
+              ...check,
+              detail: "Tenant access administration is tenant-admin only for this identity.",
+              status: "warn"
+            });
+            setChecks([...completedChecks, ...nextChecks.slice(completedChecks.length)]);
+            continue;
+          }
+
+          if (!check.expected.includes(response.status)) {
+            completedChecks.push({
+              ...check,
+              detail: `${response.status} ${error.message}`,
+              status: "fail"
+            });
+            setChecks([...completedChecks, ...nextChecks.slice(completedChecks.length)]);
+            continue;
+          }
+        }
+
         if (!check.expected.includes(response.status)) {
-          const detail = await readErrorMessage(response);
           completedChecks.push({
             ...check,
-            detail: `${response.status} ${detail}`,
+            detail: `${response.status} ${response.statusText}`,
             status: "fail"
           });
           setChecks([...completedChecks, ...nextChecks.slice(completedChecks.length)]);
@@ -211,17 +255,10 @@ export default function PilotWorkspaceVerificationPanel({
           await response.text();
         }
 
-        const statusForCheck =
-          check.id === "tenant-access" && response.status === 403 ? "warn" : "pass";
-        const detail =
-          check.id === "tenant-access" && response.status === 403
-            ? "Tenant access administration is tenant-admin only for this identity."
-            : `${response.status} ${response.statusText || "OK"}`;
-
         completedChecks.push({
           ...check,
-          detail,
-          status: statusForCheck
+          detail: `${response.status} ${response.statusText || "OK"}`,
+          status: "pass"
         });
       } catch (error) {
         completedChecks.push({
@@ -249,7 +286,9 @@ export default function PilotWorkspaceVerificationPanel({
     });
     setMessage(
       failed > 0
-        ? "Verification completed with failures. Review failed routes before buyer demo use."
+        ? completedChecks.some((check) => check.detail.includes("fresh AAL2 governance session"))
+          ? "Verification stopped at the fresh AAL2 gate. Sign out, sign in again, verify the enrolled authenticator, and rerun verification."
+          : "Verification completed with failures. Review failed routes before buyer demo use."
         : warnings > 0
           ? "Verification completed with role-limited warnings."
           : "Verification completed. Protected tenant-session controls are responding."

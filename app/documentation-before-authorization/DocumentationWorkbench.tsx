@@ -313,6 +313,47 @@ function DocumentationReviewResult({ packet }: { packet: DocumentationBeforeAuth
             <li>Measurement mode: synthetic only</li>
           </ul>
         </article>
+
+        <article>
+          <span>Context Lens</span>
+          <h3>{packet.contextPacket.requiredReviewLevel.replaceAll("-", " ")}</h3>
+          <p>{packet.contextPacket.abstentionReason ?? "Current synthetic context is ready for qualified review."}</p>
+          <ul className="compact-list">
+            <li>Mode: {packet.contextPacket.operatingMode}</li>
+            <li>Sources: {packet.contextPacket.sources.length}</li>
+            <li>Missing data: {packet.contextPacket.missingData.length}</li>
+            <li>Authority: decision support only</li>
+          </ul>
+        </article>
+
+        <article>
+          <span>Evidence from first case</span>
+          <h3>{packet.caseEvidence.completeness.completenessPercent}% complete</h3>
+          <p>Append-only event {packet.caseEvidenceEvent.eventId} is bound to this synthetic run.</p>
+          <ul className="compact-list">
+            <li>Workflow disposition: {packet.caseEvidence.workflowDisposition.replaceAll("-", " ")}</li>
+            <li>Trust QA: {packet.caseEvidence.trustQaStatus.replaceAll("-", " ")}</li>
+            <li>Analysis plan: {packet.caseEvidence.analysisPlanStatus.replaceAll("-", " ")}</li>
+            <li>Causal and external claims: blocked</li>
+          </ul>
+        </article>
+
+        <article>
+          <span>Clinical assurance preflight</span>
+          <h3>{packet.clinicalAssuranceDecision.status.replaceAll("-", " ")}</h3>
+          <p>
+            Exact model, enclave, capacity, concentration, validated-cell, and fallback evidence are bound to this
+            synthetic packet.
+          </p>
+          <ul className="compact-list">
+            <li>CAL: {packet.clinicalAssuranceDecision.resolvedAssuranceLevel}</li>
+            <li>
+              Independent fallback: {packet.clinicalAssuranceDecision.fallbackMateriallyIndependent ? "verified" : "blocked"}
+            </li>
+            <li>Human review: required</li>
+            <li>External model call: disabled</li>
+          </ul>
+        </article>
       </div>
 
       <div className="workbench-export-lock">

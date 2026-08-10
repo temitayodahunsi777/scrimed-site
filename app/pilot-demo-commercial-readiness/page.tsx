@@ -1,10 +1,21 @@
 import Link from "next/link";
+import { applicationUrl } from "../lib/companyIdentity";
 import { getPilotDemoCommercialReadinessSummary } from "../lib/pilotDemoCommercialReadiness";
+import PilotDemoSessionPlanner from "./PilotDemoSessionPlanner";
 
 export const metadata = {
   title: "SCRIMED Demo to Pilot Accelerator",
   description:
-    "Match SCRIMED healthcare AI demos to pilot packages, price bands, proof assets, no-PHI intake, and buyer-safe next steps."
+    "Match SCRIMED healthcare AI demos to pilot packages, price bands, proof assets, no-PHI intake, and buyer-safe next steps.",
+  alternates: {
+    canonical: applicationUrl("/pilot-demo-commercial-readiness")
+  },
+  openGraph: {
+    title: "SCRIMED Demo to Pilot Accelerator",
+    description:
+      "Map synthetic SCRIMED demonstrations to governed pilot packages, evidence, and human-reviewed next steps.",
+    url: applicationUrl("/pilot-demo-commercial-readiness")
+  }
 };
 
 export default function PilotDemoCommercialReadinessPage() {
@@ -21,8 +32,11 @@ export default function PilotDemoCommercialReadinessPage() {
           gather proof assets, and start no-PHI intake without drifting into custom scope too early.
         </p>
         <div className="hero-actions" aria-label="Pilot demo commercial readiness actions">
-          <Link className="primary-action" href="/demos">
-            Start with Demos
+          <a className="primary-action" href="#demo-session-planner">
+            Build Demo Session
+          </a>
+          <Link className="secondary-action" href="/demos">
+            Browse Demos
           </Link>
           <Link className="secondary-action" href="/pilots">
             Compare Pilots
@@ -66,6 +80,8 @@ export default function PilotDemoCommercialReadinessPage() {
           <strong>{summary.hardStopCount}</strong>
         </article>
       </section>
+
+      <PilotDemoSessionPlanner catalog={summary.sessionPlanner.catalog} />
 
       <section className="section-band split-band" aria-label="Pricing decision">
         <div>

@@ -1,8 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { applicationUrl } from "../lib/companyIdentity";
+import { faithCorePublicCopy } from "../lib/faithCorePolicy";
 import { getMarketActivationSummary } from "../lib/marketActivation";
 import { operatingContext } from "../lib/operatingContext";
 
 const faithCore = operatingContext.operatingModels.find((model) => model.name === "FaithCore");
+
+export const metadata: Metadata = {
+  title: faithCorePublicCopy.seoTitle,
+  description: faithCorePublicCopy.metaDescription,
+  alternates: {
+    canonical: applicationUrl("/faithcore")
+  },
+  openGraph: {
+    type: "website",
+    title: faithCorePublicCopy.seoTitle,
+    description: faithCorePublicCopy.metaDescription,
+    url: applicationUrl("/faithcore")
+  }
+};
 
 export default function FaithCorePage() {
   const marketActivation = getMarketActivationSummary();
@@ -12,10 +29,14 @@ export default function FaithCorePage() {
       <section className="page-hero">
         <Link className="back-link" href="/operating-context">Operating Context</Link>
         <p className="eyebrow">FaithCore</p>
-        <h1>A spiritually aligned trust and encouragement layer with clear clinical boundaries.</h1>
-        <p className="hero-text">
-          {faithCore?.role} FaithCore supports whole-person dignity while preserving clinician authority, clinical excellence, consent, safety, and professional standards.
-        </p>
+        <h1>{faithCorePublicCopy.heading}</h1>
+        <p className="hero-text">{faithCorePublicCopy.body}</p>
+        <p className="section-copy">{faithCorePublicCopy.supportingStatement}</p>
+        <div className="hero-actions">
+          <Link className="primary-action" href="#faithcore-programs">
+            {faithCorePublicCopy.cta}
+          </Link>
+        </div>
       </section>
 
       <section className="section-band split-band">
@@ -43,10 +64,10 @@ export default function FaithCorePage() {
         </div>
       </section>
 
-      <section className="table-section" aria-label="FaithCore market programs">
+      <section className="table-section" id="faithcore-programs" aria-label="FaithCore market programs">
         <div className="section-heading">
           <p className="eyebrow">FaithCore programs</p>
-          <h2>FaithCore is sellable only as opt-in trust, dignity, and encouragement support with explicit clinical boundaries.</h2>
+          <h2>FaithCore is available only as an optional, explicitly consented experience with clear clinical boundaries.</h2>
           <p className="section-copy">
             These programs strengthen SCRIMED&apos;s message for faith-aligned communities while protecting consent, clinical authority, cultural sensitivity, and professional standards.
           </p>

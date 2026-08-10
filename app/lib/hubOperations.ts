@@ -52,7 +52,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "quality_gates", status: "pass", detail: "/quality and /api/quality/gates expose active build, interoperability, synthetic validation, and production-readiness gates." },
   { name: "github_actions", status: "pass", detail: "GitHub Actions CI is visible and passing deterministic install, dependency audit, lint, typecheck, and production build." },
   { name: "github_push_auth", status: "pass", detail: "GitHub CLI authentication is configured and `main` pushes now publish through the normal Git path." },
-  { name: "vercel_git_deployment", status: "pass", detail: "Vercel production deploys from pushed GitHub `main` commits and returns READY for the current product build path." },
+  { name: "vercel_git_deployment", status: "pass", detail: "Vercel previews remain available, while automatic production deployment from `main` is disabled so release requires a separate exact-candidate authorization." },
   { name: "app_subdomain_dns", status: "pass", detail: "app.scrimedsolutions.com is bound to the Vercel production deployment and its health endpoint returns ready." },
   { name: "local_package_manager", status: "pass", detail: "A controlled Node.js 22 and npm toolchain completed deterministic install, zero-vulnerability audit, lint, typecheck, and production build; the committed lockfile supports reproducible CI installs." },
   { name: "wix_cta_routing", status: "pass", detail: "The website administrator confirmed Wix CTAs are connected to SCRIMED product routes; branded app-domain routing remains a separate DNS action." },

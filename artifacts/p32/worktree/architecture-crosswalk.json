@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "scrimed-p32-architecture-crosswalk-v1",
+  "evidenceClass": "NON_CANDIDATE",
+  "capturedAt": "2026-07-30T13:13:02Z",
+  "requirements": [
+    {
+      "capability": "governed-agent-execution",
+      "existingModules": [
+        "app/lib/scrimed-work/agentExecution.ts",
+        "app/lib/scrimed-work/governedRuntime.ts",
+        "app/lib/scrimed-work/p32ApprovedActions.ts"
+      ],
+      "change": "Add explicit job, delegation, oversight, reviewer-capacity, and action-registry records without replacing the shared runtime policy path.",
+      "status": "EXTEND"
+    },
+    {
+      "capability": "artifact-and-supply-chain-admission",
+      "existingModules": [
+        "app/lib/scrimed-work/agentExecution.ts",
+        "app/lib/scrimed-work/providerRegistry.ts",
+        "app/lib/scrimed-work/p32GovernanceRecords.ts"
+      ],
+      "change": "Add artifact manifest, attestation, admission, and atomic rollback records tied to exact digests.",
+      "status": "EXTEND"
+    },
+    {
+      "capability": "permission-aware-clinical-context",
+      "existingModules": [
+        "app/lib/scrimed-work/contextEngine.ts",
+        "app/lib/scrimed-work/p32GovernanceRecords.ts",
+        "app/lib/clinicalSearchFabric.ts"
+      ],
+      "change": "Reuse context coverage and evidence synthesis; add ledger aliases and long-lived decision provenance.",
+      "status": "EXTEND"
+    },
+    {
+      "capability": "evaluation-tracing-and-error-detectability",
+      "existingModules": [
+        "app/lib/scrimed-work/agentExecution.ts",
+        "app/lib/scrimed-work/verificationEngine.ts",
+        "app/lib/scrimed-work/p32GovernanceRecords.ts"
+      ],
+      "change": "Retain the causal trace and hard safety/worst-cell gates; add propagation and correction provenance.",
+      "status": "EXTEND"
+    },
+    {
+      "capability": "provider-neutral-outcome-routing",
+      "existingModules": [
+        "app/lib/scrimed-work/modelRouter.ts",
+        "app/lib/scrimed-work/providerRegistry.ts",
+        "app/lib/scrimedP32ResourceAdmission.ts"
+      ],
+      "change": "Reuse validated-task, privacy, residency, latency, reliability, and accepted-outcome-cost routing.",
+      "status": "REUSE"
+    },
+    {
+      "capability": "interoperability-and-patient-controls",
+      "existingModules": [
+        "app/lib/interoperabilityStandards.ts",
+        "app/lib/interoperabilityConformanceEvaluations.ts",
+        "app/lib/scrimedP32HealthConversationFabric.ts",
+        "app/lib/scrimedP32PatientRecords.ts"
+      ],
+      "change": "Add a small platform-control registry for version negotiation, write-mode gating, consent, communication, clinical launch, and evidence-backed value review.",
+      "status": "EXTEND"
+    },
+    {
+      "capability": "healthcare-specialty-controls",
+      "existingModules": [
+        "app/lib/scrimedP32ResearchIntelligence.ts",
+        "app/lib/imagingWorkflowIntelligence.ts",
+        "app/lib/scrimedP32OncologyIntelligence.ts",
+        "app/lib/scrimedP32NetworkIntelligence.ts"
+      ],
+      "change": "No parallel framework; retain existing synthetic/read-only/disabled-by-default behavior and regression coverage.",
+      "status": "REUSE"
+    },
+    {
+      "capability": "technical-and-external-release-gates",
+      "existingModules": [
+        "app/lib/scrimed-work/p32TechnicalGates.ts",
+        "app/lib/scrimedP32ReleaseGates.ts",
+        "app/lib/scrimedP32GateEvidence.ts"
+      ],
+      "change": "Expand automated gate coverage, retain canonical external approvals as PENDING_HUMAN, and generate NON_CANDIDATE reviewer evidence.",
+      "status": "EXTEND"
+    }
+  ],
+  "duplicateArchitectureIntroduced": false
+}

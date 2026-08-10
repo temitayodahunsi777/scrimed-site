@@ -1,5 +1,7 @@
 # SCRIMED PayerIQ Documentation-Before-Authorization
 
+Every accepted synthetic workbench run emits a deterministic Evidence-From-First-Case packet with hashed case identity, source lineage, versions, reviewer state, descriptive outcomes, safety events, missingness, confounders, and subgroup metadata. Causal claims and external distribution remain blocked.
+
 ## Purpose
 
 PayerIQ is an interactive synthetic workflow that identifies documentation gaps before a prior-authorization packet reaches payer review. It turns a registered scenario into:

@@ -31,13 +31,13 @@ export type OperatingContext = {
 };
 
 export const operatingContext: OperatingContext = {
-  company: "SCRIMED SOLUTIONS",
+  company: companyIdentity.displayName,
   founder: "Temitayo Dahunsi",
   slogan: "Solving For A Better Tomorrow.",
-  officialWebsite: "https://www.scrimedsolutions.com",
+  officialWebsite: companyIdentity.canonicalMarketingUrl,
   websiteProvider: "Wix",
   mission:
-    "Improve healthcare worldwide through intelligent, trustworthy, scalable, secure, and interoperable AI systems that create measurable value for patients, clinicians, health systems, payers, governments, researchers, and underserved populations.",
+    "SCRIMED is a healthcare intelligence platform developing trustworthy AI-enabled workflows for clinicians, care teams, health systems, payers, researchers, and patients.",
   longTermVision:
     "Build the world's leading healthcare intelligence ecosystem and healthcare operating system, connecting workflows, AI agents, interoperability, clinical intelligence, education, governance, and transformation.",
   principles: [
@@ -210,3 +210,4 @@ export function getOperatingContextSummary() {
     updated: operatingContext.updated
   };
 }
+import { companyIdentity } from "./companyIdentity";

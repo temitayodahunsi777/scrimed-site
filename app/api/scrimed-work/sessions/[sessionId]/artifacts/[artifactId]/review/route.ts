@@ -22,7 +22,7 @@ export async function POST(
     "X-SCRIMED-Artifact-Review-Policy": scrimedWorkArtifactReviewPolicyVersion,
     "X-SCRIMED-External-Distribution": "not-authorized",
     "X-SCRIMED-Payer-Submission": "not-authorized"
-  });
+  }, request);
 
   if (!result.allowed) {
     return NextResponse.json(result.error, { status: result.status, headers });

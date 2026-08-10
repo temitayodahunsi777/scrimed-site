@@ -23,8 +23,8 @@ export default function DemosPage() {
           interoperability readiness, and AI governance, then choose the recommended pilot path without handing over PHI.
         </p>
         <div className="hero-actions" aria-label="Demo center actions">
-          <Link className="primary-action" href="/pilot-demo-commercial-readiness">
-            Match Demo to Pilot
+          <Link className="primary-action" href="/pilot-demo-commercial-readiness#demo-session-planner">
+            Build Demo Session
           </Link>
           <Link className="secondary-action" href="/pilots">
             Compare Pilots
@@ -146,10 +146,10 @@ export default function DemosPage() {
             <strong>Review pricing</strong>
             <p>Inspect recommended enterprise ranges, sales stages, and commercial guardrails.</p>
           </Link>
-          <Link className="action-card" href="/pilot-demo-commercial-readiness">
+          <Link className="action-card" href="/pilot-demo-commercial-readiness#demo-session-planner">
             <span>Accelerator</span>
-            <strong>Map demo to pilot</strong>
-            <p>Open the market-aligned path from demo proof to price band and buyer intake.</p>
+            <strong>Build the buyer run of show</strong>
+            <p>Generate a timed demo, evidence path, pilot close, and no-PHI intake handoff.</p>
           </Link>
           <Link className="action-card" href="/pilot?offer=synthetic-pilot-evaluation">
             <span>Buyer intake</span>
