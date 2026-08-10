@@ -141,14 +141,15 @@ export function getPostPr25PlatformAdvanceSummary() {
     claim: {
       claimId: "claim:investor-platform-narrative",
       text: "SCRIMED is building governed healthcare intelligence infrastructure.",
-      evidenceIds: ["claim:investor-platform-narrative", "source:pr25-exact-head"],
+      evidenceIds: ["source:pr25-exact-head"],
       evidenceMaturityRequired: "local-verified",
       owner: "Founder + Product Governance",
       reviewDate: "2026-08-09T21:01:09.000Z",
       publicationAuthorized: false,
       syntheticOrEstimated: false
     },
-    graph: evidenceGraph
+    graph: evidenceGraph,
+    evaluatedAt: "2026-08-09T21:01:09.000Z"
   });
   const mergeReadiness = evaluateMergeReadiness({
     exactHeadApproval: baseline.review.exactHeadApprovalRecorded,

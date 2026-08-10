@@ -9,6 +9,7 @@ import {
 import { getInvestorReadinessScorecard } from "../app/lib/investorReadinessScorecard.ts";
 import {
   buildPostPr25EvidenceGraph,
+  createEvidenceEdge,
   verifyPlatformEvidenceGraph
 } from "../app/lib/platformEvidenceGraph.ts";
 import { getPostPr25PlatformAdvanceSummary } from "../app/lib/postPr25PlatformAdvance.ts";
@@ -61,6 +62,24 @@ assert.deepEqual(verifyPlatformEvidenceGraph(graph).failures, []);
 const tamperedGraph = structuredClone(graph);
 tamperedGraph.nodes[0].label = "tampered";
 assert.equal(verifyPlatformEvidenceGraph(tamperedGraph).valid, false);
+const tamperedGraphClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: tamperedGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(tamperedGraphClaim.publishable, false);
+assert.ok(
+  tamperedGraphClaim.reasonCodes.includes("public-claim-evidence-graph-invalid")
+);
 
 const unsupportedClaim = resolvePublicClaim({
   claim: {
@@ -73,7 +92,8 @@ const unsupportedClaim = resolvePublicClaim({
     publicationAuthorized: false,
     syntheticOrEstimated: false
   },
-  graph
+  graph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
 });
 assert.equal(unsupportedClaim.decision, "BLOCK");
 assert.equal(unsupportedClaim.publishable, false);
@@ -82,14 +102,15 @@ const unpublishedQualitativeClaim = resolvePublicClaim({
   claim: {
     claimId: "claim:unpublished-internal-narrative",
     text: "SCRIMED is building governed healthcare intelligence infrastructure.",
-    evidenceIds: ["claim:investor-platform-narrative", "source:pr25-exact-head"],
+    evidenceIds: ["source:pr25-exact-head"],
     evidenceMaturityRequired: "local-verified",
     owner: "Claims Governance",
     reviewDate: "2026-08-09T21:01:09.000Z",
     publicationAuthorized: false,
     syntheticOrEstimated: false
   },
-  graph
+  graph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
 });
 assert.equal(unpublishedQualitativeClaim.decision, "BLOCK");
 assert.equal(unpublishedQualitativeClaim.publishable, false);
@@ -97,6 +118,105 @@ assert.ok(
   unpublishedQualitativeClaim.reasonCodes.includes(
     "public-claim-publication-approval-missing"
   )
+);
+
+const unrelatedEvidenceClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["policy:synthetic-no-phi"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(unrelatedEvidenceClaim.publishable, false);
+assert.ok(
+  unrelatedEvidenceClaim.reasonCodes.includes(
+    "public-claim-evidence-relationship-missing"
+  )
+);
+
+const contradictedGraph = structuredClone(graph);
+contradictedGraph.edges.push(
+  createEvidenceEdge({
+    id: "edge:source-contradicts-platform-narrative",
+    from: "source:pr25-exact-head",
+    to: "claim:investor-platform-narrative",
+    relation: "contradicts",
+    createdAt: "2026-08-10T12:00:00.000Z"
+  })
+);
+const contradictedClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["source:pr25-exact-head"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: contradictedGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(contradictedClaim.publishable, false);
+assert.ok(
+  contradictedClaim.reasonCodes.includes("public-claim-evidence-contradicted")
+);
+const indirectlyContradictedClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["benchmark:pr25-ci"],
+    evidenceMaturityRequired: "local-verified",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: contradictedGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(indirectlyContradictedClaim.publishable, false);
+assert.ok(
+  indirectlyContradictedClaim.reasonCodes.includes(
+    "public-claim-evidence-contradicted"
+  )
+);
+
+const expiredEvidenceGraph = structuredClone(graph);
+expiredEvidenceGraph.edges.push(
+  createEvidenceEdge({
+    id: "edge:stale-approval-supports-platform-narrative",
+    from: "approval:pr25-historical-stale",
+    to: "claim:investor-platform-narrative",
+    relation: "supports",
+    createdAt: "2026-08-09T20:40:00.000Z"
+  })
+);
+const expiredEvidenceClaim = resolvePublicClaim({
+  claim: {
+    claimId: "claim:investor-platform-narrative",
+    text: "SCRIMED is building governed healthcare intelligence infrastructure.",
+    evidenceIds: ["approval:pr25-historical-stale"],
+    evidenceMaturityRequired: "independently-reviewed",
+    owner: "Claims Governance",
+    reviewDate: "2026-08-10T12:00:00.000Z",
+    publicationAuthorized: true,
+    syntheticOrEstimated: false
+  },
+  graph: expiredEvidenceGraph,
+  evaluatedAt: "2026-08-10T12:00:00.000Z"
+});
+assert.equal(expiredEvidenceClaim.publishable, false);
+assert.ok(
+  expiredEvidenceClaim.reasonCodes.includes("public-claim-evidence-expired")
 );
 
 const economics = calculateEconomicUnitModel({
