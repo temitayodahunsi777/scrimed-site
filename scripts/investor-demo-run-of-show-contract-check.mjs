@@ -8,6 +8,7 @@ const requiredFiles = [
   "app/globals.css",
   "app/investor-audience-readiness/InvestorDemoRunOfShow.tsx",
   "app/investor-audience-readiness/page.tsx",
+  "app/pricing/page.tsx",
   "docs/investor-audience-readiness.md",
   "scripts/investor-demo-run-of-show-policy-test.mjs",
   "scripts/investor-demo-proof-route-smoke.mjs",
@@ -110,6 +111,10 @@ requireIncludes(
   "package.json",
   '"test:bounded-public-fetch-policy": "node scripts/bounded-public-fetch-policy-test.mjs"'
 );
+const pricingProofText =
+  "Start with inspectable proof. Expand only when the value and governance case hold.";
+requireIncludes("app/pricing/page.tsx", pricingProofText);
+requireIncludes("scripts/investor-demo-proof-route-smoke.mjs", pricingProofText);
 for (const expected of [
   "/documentation-before-authorization",
   "/demos/prior-authorization-support",

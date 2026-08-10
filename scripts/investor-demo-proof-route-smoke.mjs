@@ -69,7 +69,7 @@ const proofRoutes = [
   },
   {
     path: "/pricing",
-    expectedContent: "Start free, pilot with proof"
+    expectedContent: "Start with inspectable proof. Expand only when the value and governance case hold."
   }
 ];
 
