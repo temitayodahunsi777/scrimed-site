@@ -304,8 +304,13 @@ export type PlatformMoatDefinition = {
   name: string;
   basis: string;
   status: "implemented-foundation" | "evidence-in-progress" | "external-validation-required";
+  maturity: "foundation" | "integrated" | "review-ready" | "external-proof-required";
+  replicationDifficulty: 1 | 2 | 3 | 4 | 5;
   evidenceRoutes: string[];
   compoundingMechanism: string;
   replicationFriction: string;
+  dependencies: string[];
+  evidenceNeeded: string[];
+  monetizationRelevance: string;
   blockedClaim: string;
 };

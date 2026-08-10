@@ -13,7 +13,11 @@ export type AutomatedGateEvidence = {
   sourceTreeFingerprint: string;
   artifactFingerprint: string;
   validationEvidenceFingerprint: string;
-  identityAssurance: "local-deterministic-runner" | "protected-aal2-workspace" | "deployment-target";
+  identityAssurance:
+    | "local-deterministic-runner"
+    | "protected-aal2-workspace"
+    | "protected-remote-ci"
+    | "deployment-target";
   generatedAt: string;
   checkedAt: string;
   expiresAt: string;
@@ -288,6 +292,7 @@ const automatedEvidenceIdentityAssurance: Record<
 > = {
   "source-and-artifact-manifest": "local-deterministic-runner",
   "candidate-validation": "local-deterministic-runner",
+  "exact-head-remote-ci": "protected-remote-ci",
   "investor-deck-review": "local-deterministic-runner",
   "security-nonsecret-suite": "local-deterministic-runner",
   "migration-dry-run": "local-deterministic-runner",

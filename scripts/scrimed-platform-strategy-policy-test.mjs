@@ -58,6 +58,10 @@ assert.equal(
   "incubate"
 );
 assert.ok(platformMoatRegistry.every((moat) => moat.blockedClaim.length > 0));
+assert.equal(platformMoatRegistry.length, 13);
+assert.ok(platformMoatRegistry.every((moat) => moat.replicationDifficulty >= 1));
+assert.ok(platformMoatRegistry.every((moat) => moat.evidenceNeeded.length > 0));
+assert.ok(platformMoatRegistry.every((moat) => moat.dependencies.length > 0));
 
 console.log(
   "pass SCRIMED platform strategy policy tests (capability ownership, 11-plane coverage, commercial wedge, no-PHI defaults, evidence metrics, and moat boundaries)"

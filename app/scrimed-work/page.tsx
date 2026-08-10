@@ -33,7 +33,51 @@ export default function ScrimedWorkPage() {
           <Link href="/api/scrimed-work/agents">Agents</Link>
           <Link href="/api/scrimed-work/tools">Tools</Link>
           <Link href="/api/scrimed-work/production-hardening">Hardening Gate</Link>
+          <Link href="/scrimed-work/review">PR #25 Review</Link>
         </div>
+      </section>
+
+      <section className="section-band hub-summary" aria-label="Executive advancement status">
+        <article>
+          <span>Release state</span>
+          <strong>{summary.postPr25PlatformAdvance.release.currentState}</strong>
+        </article>
+        <article>
+          <span>Merge readiness</span>
+          <strong>{summary.postPr25PlatformAdvance.mergeReadiness.status}</strong>
+        </article>
+        <article>
+          <span>Investor rubric</span>
+          <strong>{summary.postPr25PlatformAdvance.investorReadiness.averageScore}/100</strong>
+        </article>
+        <article>
+          <span>Partner profiles</span>
+          <strong>{summary.postPr25PlatformAdvance.partnerReadiness.profileCount}</strong>
+        </article>
+        <article>
+          <span>Measured moats</span>
+          <strong>{summary.postPr25PlatformAdvance.moatRegistry.count}</strong>
+        </article>
+        <article>
+          <span>Evidence graph</span>
+          <strong>
+            {summary.postPr25PlatformAdvance.evidence.integrity.valid
+              ? "integrity passed"
+              : "blocked"}
+          </strong>
+        </article>
+        <article>
+          <span>Pilot boundary</span>
+          <strong>{summary.postPr25PlatformAdvance.pilot.definition.safetyStatus}</strong>
+        </article>
+        <article>
+          <span>Production authority</span>
+          <strong>
+            {summary.postPr25PlatformAdvance.productionAuthorityGranted
+              ? "granted"
+              : "not granted"}
+          </strong>
+        </article>
       </section>
 
       <section className="section-band hub-summary" aria-label="SCRIMED Work summary">

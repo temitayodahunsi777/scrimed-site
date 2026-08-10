@@ -6,10 +6,12 @@
   "investorUse": "Internal diligence preparation only; founder, finance, legal, and recipient-specific approval remain required for external distribution.",
   "moatRegistry": [
     {
-      "id": "governance-evidence-runtime",
-      "name": "Governance and evidence runtime",
+      "id": "trust-governance-plane",
+      "name": "Trust and governance plane",
       "basis": "Policy-before-action, exact evidence binding, independent review, audit receipts, rollback, and release gates.",
       "status": "implemented-foundation",
+      "maturity": "integrated",
+      "replicationDifficulty": 5,
       "evidenceRoutes": [
         "/scrimed-work",
         "/scrimed-control-plane",
@@ -17,13 +19,26 @@
       ],
       "compoundingMechanism": "Each reviewed workflow contributes reusable policy, benchmark, failure, and approval evidence.",
       "replicationFriction": "Requires integrated product, security, clinical, data, reviewer, and release controls rather than a prompt layer.",
+      "dependencies": [
+        "governed-agent-runtime",
+        "evidence-learning-system",
+        "release-control-plane"
+      ],
+      "evidenceNeeded": [
+        "independent exact-head review",
+        "protected-pilot audit evidence",
+        "external security and privacy review"
+      ],
+      "monetizationRelevance": "Supports governance assessments, protected pilots, and recurring enterprise control-plane subscriptions.",
       "blockedClaim": "Does not prove certification, regulatory approval, customer adoption, or production safety."
     },
     {
-      "id": "healthcare-semantics-provenance",
-      "name": "Healthcare semantics and provenance",
+      "id": "healthcare-evidence-graph",
+      "name": "Healthcare evidence graph",
       "basis": "FHIR, HL7, DICOM metadata, payer-policy, ontology, citation, and source-lineage contracts.",
       "status": "evidence-in-progress",
+      "maturity": "integrated",
+      "replicationDifficulty": 5,
       "evidenceRoutes": [
         "/clinical-data-fabric",
         "/interoperability",
@@ -31,13 +46,26 @@
       ],
       "compoundingMechanism": "Validated mappings and source contracts improve retrieval, verification, and implementation reuse.",
       "replicationFriction": "Depends on clinical semantics, tenant isolation, transformation lineage, and workflow-specific acceptance tests.",
+      "dependencies": [
+        "data-interoperability-fabric",
+        "context-retrieval-engine",
+        "clinical-ontology-registry"
+      ],
+      "evidenceNeeded": [
+        "graph integrity evidence",
+        "source-to-claim validation",
+        "tenant-isolation tests"
+      ],
+      "monetizationRelevance": "Improves diligence, implementation speed, grounding quality, and reusable evidence services.",
       "blockedClaim": "Does not prove live EHR integration, medical-device interoperability, or standards certification."
     },
     {
-      "id": "workflow-outcome-learning",
-      "name": "Workflow outcome learning",
+      "id": "longitudinal-benchmark-learning",
+      "name": "Longitudinal benchmark learning",
       "basis": "Case evidence, accepted outcomes, corrections, worst-cell evaluation, reviewer burden, and value telemetry.",
       "status": "evidence-in-progress",
+      "maturity": "foundation",
+      "replicationDifficulty": 4,
       "evidenceRoutes": [
         "/healthcare-value-realization",
         "/scrimed-clinical-benchmark-suite",
@@ -45,13 +73,26 @@
       ],
       "compoundingMechanism": "Reviewed failures become regression cases and workflow improvements without online clinical self-modification.",
       "replicationFriction": "Requires longitudinal evidence and operator adoption, not merely access to the same model.",
+      "dependencies": [
+        "case-evidence-ledger",
+        "clinical-evaluation-harness",
+        "human-review-workflows"
+      ],
+      "evidenceNeeded": [
+        "reviewed failure corpus",
+        "before-and-after benchmark evidence",
+        "multi-site external validation"
+      ],
+      "monetizationRelevance": "Can lower correction burden and strengthen renewal evidence once external outcomes are validated.",
       "blockedClaim": "Does not establish causality, clinical outcomes, ROI, revenue, or customer traction before formal evidence."
     },
     {
-      "id": "model-compute-portability",
-      "name": "Model and compute portability",
+      "id": "multi-model-routing",
+      "name": "Multi-model routing",
       "basis": "Provider-neutral routing, task qualification, no privacy downgrade, bounded fallback, and effective-cost accounting.",
       "status": "implemented-foundation",
+      "maturity": "integrated",
+      "replicationDifficulty": 4,
       "evidenceRoutes": [
         "/scrimed-compute-fabric",
         "/scrimed-model-router",
@@ -59,13 +100,26 @@
       ],
       "compoundingMechanism": "Per-task evidence improves model eligibility and cost choices while preserving replaceability.",
       "replicationFriction": "Requires workflow-specific evaluation and policy-compatible failover across model and deployment classes.",
+      "dependencies": [
+        "model-qualification",
+        "provider-conformance",
+        "effective-cost-telemetry"
+      ],
+      "evidenceNeeded": [
+        "provider outage tests",
+        "task-level quality comparisons",
+        "accepted-outcome cost baselines"
+      ],
+      "monetizationRelevance": "Protects gross-margin scenarios and provider leverage without weakening privacy or safety floors.",
       "blockedClaim": "Does not prove provider availability, BAA eligibility, PHI approval, or production-scale performance."
     },
     {
-      "id": "regulated-buyer-operating-evidence",
-      "name": "Regulated buyer operating evidence",
+      "id": "release-assurance",
+      "name": "Release assurance",
       "basis": "Claims-safe offers, intended-use records, review packets, security gates, migration evidence, and controlled pilot operations.",
       "status": "external-validation-required",
+      "maturity": "review-ready",
+      "replicationDifficulty": 4,
       "evidenceRoutes": [
         "/offerings",
         "/approvals-readiness",
@@ -73,10 +127,237 @@
       ],
       "compoundingMechanism": "Approved buyer and pilot evidence can shorten later diligence only when permission and scope remain current.",
       "replicationFriction": "Requires trustworthy execution history with named owners and independent review.",
+      "dependencies": [
+        "exact-head-review-binding",
+        "release-state-machine",
+        "security-evidence-packets"
+      ],
+      "evidenceNeeded": [
+        "fresh exact-head approval",
+        "merge authorization",
+        "authorized post-deployment evidence"
+      ],
+      "monetizationRelevance": "Reduces enterprise diligence friction while keeping deployment and customer activation separately controlled.",
       "blockedClaim": "Does not imply customers, partners, revenue, procurement approval, investment, or commercial deployment."
+    },
+    {
+      "id": "governed-agent-orchestration",
+      "name": "Governed agent orchestration",
+      "basis": "Bounded planner-specialist-verifier execution with least privilege, checkpoints, approvals, cancellation, and rollback metadata.",
+      "status": "implemented-foundation",
+      "maturity": "integrated",
+      "replicationDifficulty": 5,
+      "evidenceRoutes": [
+        "/scrimed-work",
+        "/scrimed-agent-governance",
+        "/scrimed-llmops-observability"
+      ],
+      "compoundingMechanism": "Reusable policies, tool receipts, failure classes, and review patterns improve each governed workflow.",
+      "replicationFriction": "Requires orchestration, identity, policy, evidence, observability, and human operations to work as one system.",
+      "dependencies": [
+        "trust-governance-plane",
+        "agent-runtime",
+        "approval-engine"
+      ],
+      "evidenceNeeded": [
+        "long-horizon resilience tests",
+        "independent reviewer evidence",
+        "protected-pilot operating metrics"
+      ],
+      "monetizationRelevance": "Enables repeatable workflow subscriptions and governed automation services.",
+      "blockedClaim": "Does not authorize autonomous clinical, financial, identity, communication, or production actions."
+    },
+    {
+      "id": "healthcare-specific-evaluation-corpus",
+      "name": "Healthcare-specific evaluation corpus",
+      "basis": "Consequence-weighted synthetic cases, specialty domains, document stress cases, worst-cell gates, and reviewer rubrics.",
+      "status": "evidence-in-progress",
+      "maturity": "integrated",
+      "replicationDifficulty": 4,
+      "evidenceRoutes": [
+        "/scrimed-clinical-benchmark-suite",
+        "/clinical-robustness-lab",
+        "/validation-evidence"
+      ],
+      "compoundingMechanism": "Reviewed failures and corrections become quarantined regression cases after governance review.",
+      "replicationFriction": "Requires domain taxonomy, clinical reviewers, contamination controls, and consequence-aware scoring.",
+      "dependencies": [
+        "eval-core",
+        "document-stress-lab",
+        "clinical-review-rubrics"
+      ],
+      "evidenceNeeded": [
+        "physician grading",
+        "site and specialty validation",
+        "temporal holdouts"
+      ],
+      "monetizationRelevance": "Supports model qualification, diligence services, and safer workflow expansion.",
+      "blockedClaim": "Synthetic and internal evaluation does not establish clinical validation or universal model superiority."
+    },
+    {
+      "id": "model-qualification",
+      "name": "Model qualification",
+      "basis": "Task-specific model passports, conformance evidence, worst-cell eligibility, canarying, and rollback controls.",
+      "status": "implemented-foundation",
+      "maturity": "review-ready",
+      "replicationDifficulty": 4,
+      "evidenceRoutes": [
+        "/scrimed-model-router",
+        "/scrimed-compute-fabric",
+        "/model-intelligence-registry"
+      ],
+      "compoundingMechanism": "Each qualified task cell expands portable routing evidence without granting authority to untested cells.",
+      "replicationFriction": "Requires model, provider, runtime, prompt, tool, privacy, and workflow evidence to remain version-bound.",
+      "dependencies": [
+        "multi-model-routing",
+        "healthcare-specific-evaluation-corpus",
+        "model-passport-registry"
+      ],
+      "evidenceNeeded": [
+        "shadow evaluations",
+        "fallback equivalence",
+        "provider documentary review"
+      ],
+      "monetizationRelevance": "Allows cost and quality optimization while preserving model independence.",
+      "blockedClaim": "No model is approved for live PHI or high-risk clinical authority merely by registration."
+    },
+    {
+      "id": "workflow-intelligence",
+      "name": "Workflow intelligence",
+      "basis": "Healthcare workflow maps, context packets, documentation gaps, outcome ledgers, and verified artifacts.",
+      "status": "evidence-in-progress",
+      "maturity": "review-ready",
+      "replicationDifficulty": 5,
+      "evidenceRoutes": [
+        "/documentation-before-authorization",
+        "/healthcare-value-realization",
+        "/scrimed-work"
+      ],
+      "compoundingMechanism": "Each scoped pilot can add reusable workflow steps, evidence requirements, and failure modes.",
+      "replicationFriction": "Depends on healthcare process expertise, integration semantics, policy, and acceptance evidence.",
+      "dependencies": [
+        "governed-agent-orchestration",
+        "healthcare-evidence-graph",
+        "outcome-telemetry"
+      ],
+      "evidenceNeeded": [
+        "buyer-specific baselines",
+        "reviewer acceptance",
+        "external pilot outcomes"
+      ],
+      "monetizationRelevance": "Anchors the assessment-to-pilot-to-subscription commercial wedge.",
+      "blockedClaim": "Does not prove denial reduction, time savings, ROI, or customer outcomes before verified evidence."
+    },
+    {
+      "id": "connector-policy-layer",
+      "name": "Connector policy layer",
+      "basis": "Capability-scoped connector manifests, official-API rules, read/write separation, terms review, and kill switches.",
+      "status": "implemented-foundation",
+      "maturity": "foundation",
+      "replicationDifficulty": 4,
+      "evidenceRoutes": [
+        "/enterprise-healthcare-infrastructure",
+        "/interoperability",
+        "/approvals-readiness"
+      ],
+      "compoundingMechanism": "Validated connector policies and conformance receipts can be reused across governed workflows.",
+      "replicationFriction": "Requires legal, security, identity, data-rights, interoperability, and operational controls.",
+      "dependencies": [
+        "connector-firewall",
+        "identity-policy",
+        "audit-ledger"
+      ],
+      "evidenceNeeded": [
+        "one read-only adapter conformance run",
+        "terms review",
+        "revocation and rollback test"
+      ],
+      "monetizationRelevance": "Supports protected integration pilots and future governed ecosystem distribution.",
+      "blockedClaim": "Does not imply live connector access, vendor approval, EHR writeback, or marketplace certification."
+    },
+    {
+      "id": "economic-value-telemetry",
+      "name": "Economic value telemetry",
+      "basis": "Cost per verified task, reviewer burden, correction burden, workflow value, and provenance-tagged outcome measures.",
+      "status": "evidence-in-progress",
+      "maturity": "foundation",
+      "replicationDifficulty": 3,
+      "evidenceRoutes": [
+        "/healthcare-value-realization",
+        "/operational-efficiency",
+        "/investor-readiness"
+      ],
+      "compoundingMechanism": "Verified pilot baselines improve pricing, capacity planning, model routing, and renewal evidence.",
+      "replicationFriction": "Requires trustworthy baselines, complete costs, acceptance evidence, and finance review.",
+      "dependencies": [
+        "value-telemetry",
+        "case-evidence-ledger",
+        "finance-review"
+      ],
+      "evidenceNeeded": [
+        "measured pilot baselines",
+        "reviewed total-cost inputs",
+        "renewal evidence"
+      ],
+      "monetizationRelevance": "Supports value-based pricing and capital-efficient model selection when evidence exists.",
+      "blockedClaim": "No simulated or estimated value is a revenue, margin, savings, or ROI guarantee."
+    },
+    {
+      "id": "synthetic-scenario-library",
+      "name": "Synthetic scenario library",
+      "basis": "No-PHI workflow cases, adversarial variants, buyer rehearsals, role-specific demos, and deterministic fixtures.",
+      "status": "implemented-foundation",
+      "maturity": "integrated",
+      "replicationDifficulty": 3,
+      "evidenceRoutes": [
+        "/demos",
+        "/pilot-demo-commercial-readiness",
+        "/clinical-robustness-lab"
+      ],
+      "compoundingMechanism": "Each reviewed scenario expands test coverage, demos, evaluation, and pilot discovery without live data.",
+      "replicationFriction": "Requires domain-realistic cases, boundary coverage, deterministic outcomes, and claims-safe presentation.",
+      "dependencies": [
+        "synthetic-fixtures",
+        "evaluation-harness",
+        "public-claims-policy"
+      ],
+      "evidenceNeeded": [
+        "buyer-specific rehearsal feedback",
+        "accessibility verification",
+        "scenario coverage trends"
+      ],
+      "monetizationRelevance": "Shortens assessment and pilot preparation while preserving no-PHI operation.",
+      "blockedClaim": "Synthetic demonstrations are not customer outcomes, clinical validation, or deployment evidence."
+    },
+    {
+      "id": "sovereign-deployment-controls",
+      "name": "Sovereign deployment controls",
+      "basis": "Assurance levels, enclave policies, residency, egress restrictions, capacity passports, and independent failover.",
+      "status": "evidence-in-progress",
+      "maturity": "foundation",
+      "replicationDifficulty": 5,
+      "evidenceRoutes": [
+        "/clinical-assurance-control-plane",
+        "/scrimed-compute-fabric",
+        "/global-enterprise-command"
+      ],
+      "compoundingMechanism": "Validated regional and private deployment profiles improve reuse without collapsing jurisdictional controls.",
+      "replicationFriction": "Requires identity, cryptographic artifacts, private networking, capacity, recovery, and policy evidence.",
+      "dependencies": [
+        "clinical-assurance-control-plane",
+        "capacity-passports",
+        "provider-portability"
+      ],
+      "evidenceNeeded": [
+        "enclave recovery drill",
+        "materially independent fallback test",
+        "regional legal and security review"
+      ],
+      "monetizationRelevance": "Creates a path to private, regulated, and sovereign enterprise deployments after external approvals.",
+      "blockedClaim": "Does not establish sovereign certification, government authorization, regional compliance, or production deployment."
     }
   ],
   "nextBestAction": "Complete one buyer-specific Workflow Intelligence Assessment rehearsal with a baseline, acceptance rubric, reviewer burden, verified-intelligence-yield inputs, healthcare-value-returned inputs, and retained no-go boundary.",
   "productionAuthorityGranted": false,
-  "auditHash": "1802ee0b64c34efbc531629872e762cebd3e0cd8faa3b9347b3c9fe2d98b66de"
+  "auditHash": "58b022ec540312bda8f2955309fbf2785271b6632a91d216566b4b0562ff4fd0"
 }

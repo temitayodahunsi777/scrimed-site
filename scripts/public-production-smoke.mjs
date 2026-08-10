@@ -15805,6 +15805,7 @@ await checkHtml("/pilot-success-review-command");
 await checkHtml("/scrimed-os");
 await checkHtml("/scrimed-intelligence-platform");
 await checkHtml("/scrimed-work");
+await checkHtml("/scrimed-work/review");
 await checkHtml("/scrimed-agent-governance");
 await checkHtml("/scrimed-reasoning-stability");
 await checkHtml("/scrimed-clinical-benchmark-suite");

@@ -196,6 +196,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     boundary: "Synthetic/no-PHI work intelligence only; not autonomous clinical care, patient outreach, payer submission, EHR writeback, external model authorization, production connector approval, certification, or customer go-live."
   },
   {
+    label: "Exact-Head Review",
+    href: "/scrimed-work/review",
+    description: "Read-only PR #25 candidate identity, validation, evidence, safety boundaries, and disposition vocabulary.",
+    boundary: "Review support only; the page cannot approve, merge, deploy, migrate, process PHI, activate customers, or grant clinical, payer, EHR, device, certification, or investor-distribution authority."
+  },
+  {
     label: "Clinical Assurance",
     href: "/clinical-assurance-control-plane",
     description: "CAL, sovereign enclave, model passport, capacity, concentration, kill-switch, worst-cell evidence, and independent-failover control plane.",

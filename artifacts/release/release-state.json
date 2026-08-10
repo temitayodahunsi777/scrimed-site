@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "scrimed.release-state.v1",
+  "frozenCandidate": {
+    "schemaVersion": "scrimed-pr25-frozen-review-baseline-v1-2026-08-09",
+    "pullRequest": 25,
+    "repository": "temitayodahunsi777/scrimed-site",
+    "headSha": "c15a79c76d59a2f94bb7f999469da8bbc1618d8c",
+    "sourceTreeGitObject": "6641124cfd01a26394289e19b7e803aed05bf9f0",
+    "fingerprints": {
+      "candidate": "44cc2b9c90c6296c54374f59a368a815d0904be8177682706f162a476362d5a6",
+      "source": "b365053c547dd358b47c576fd801fdb853fd0779244db1be0572d5cd8dd47678",
+      "validation": "d635cd6a3091b6df1ff46542bd87c5bf51230b7ab3a8d22944aedd218f5e01b1",
+      "reviewPacket": "015ac4ab896537a11eaa3052d11789dc784ca9fd6b56b0305592f14b508f47c6",
+      "sbom": "7e4897205b57e80797a6319ff661d34bcc6c05892196aeb5eef94c73ed98c51d"
+    },
+    "validation": {
+      "detachedCleanStagesPassed": 10,
+      "detachedCleanStagesTotal": 10,
+      "githubActionsPassed": 6,
+      "githubActionsTotal": 6,
+      "secretScanFiles": 1886,
+      "secretScanFindings": 0,
+      "sbomComponents": 422,
+      "dependencyDelta": 0,
+      "reviewCoverageFiles": 489,
+      "reviewCoverageTotal": 489,
+      "reviewLanes": 11,
+      "reviewBatches": 5,
+      "publicClaimsPassed": true,
+      "migrationStaticReviewPassed": true
+    },
+    "preview": {
+      "provider": "vercel",
+      "deploymentId": "dpl_Z1VpwKp6G74N318heDAZ7mKvXzb3",
+      "status": "READY",
+      "target": null,
+      "sourceSha": "c15a79c76d59a2f94bb7f999469da8bbc1618d8c",
+      "productionDeploymentCreated": false
+    },
+    "review": {
+      "state": "REVIEW_REQUESTED",
+      "requestedReviewer": "Scrimed-cpu",
+      "exactHeadApprovalRecorded": false,
+      "historicalApprovedHead": "406f0b0ffc11e6f00a623e9532d2f6a30e9eb689",
+      "historicalApprovalAcceptedForCurrentHead": false,
+      "reason": "The recorded approval is bound to an earlier head. A distinct reviewer must disposition the exact frozen head and fingerprints."
+    },
+    "releaseControls": {
+      "automaticProductionDeploymentFromMain": false,
+      "previewDeploymentsEnabled": true,
+      "mergeAuthorized": false,
+      "productionAuthorized": false,
+      "migrationAuthorized": false
+    },
+    "retainedBoundaries": [
+      "No live PHI or production customer data.",
+      "No autonomous diagnosis, treatment, prescribing, triage, or clinical care.",
+      "No payer submission, EHR writeback, medical-device activation, or customer go-live.",
+      "No merge, migration, production deployment, certification claim, or external investor distribution is authorized by this baseline."
+    ],
+    "capturedAt": "2026-08-09T21:01:09.000Z",
+    "evidenceHash": "27a098e3660f64211bd1f018a05c2eb2bc23b3a747873ffdb979b67997afa85f"
+  },
+  "release": {
+    "service": "scrimed-release-state-machine",
+    "version": "scrimed-release-state-machine-v1-2026-08-09",
+    "currentState": "REVIEW_REQUESTED",
+    "states": [
+      "DEVELOPMENT",
+      "CANDIDATE",
+      "REVIEW_REQUESTED",
+      "REVIEW_APPROVED",
+      "MERGE_AUTHORIZED",
+      "MERGED",
+      "PREVIEW_VERIFIED",
+      "PRODUCTION_AUTHORIZATION_REQUIRED",
+      "PRODUCTION_DEPLOYED",
+      "PRODUCTION_VERIFIED"
+    ],
+    "nextState": "REVIEW_APPROVED",
+    "nextEvidenceRequired": [
+      "exactHeadReviewApproved"
+    ],
+    "invariants": [
+      "Review approval does not authorize merge.",
+      "Merge authorization does not authorize production deployment.",
+      "Preview verification does not establish production readiness.",
+      "Production deployment requires separate exact-candidate authorization and rollback evidence.",
+      "Production verification is required after an authorized deployment."
+    ],
+    "mutationAuthorityGranted": false
+  },
+  "mergeReadiness": {
+    "status": "NOT_READY_FOR_MERGE",
+    "ready": false,
+    "reasonCodes": [
+      "merge-exact-head-approval-missing"
+    ],
+    "mergePerformed": false,
+    "deploymentPerformed": false,
+    "evaluationHash": "d4b5ab30c366ec4e8bf7f4c4f14e1b6121f00bafd0db053886cc9c99850acaa4"
+  },
+  "boundary": "Post-PR25 development is synthetic/no-PHI and advisory. It grants no review, merge, deployment, migration, legal, clinical, payer, EHR, certification, customer, partner, investment, or commercial authority."
+}

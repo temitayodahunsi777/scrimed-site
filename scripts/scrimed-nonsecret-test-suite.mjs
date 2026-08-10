@@ -827,6 +827,57 @@ const checks = [
     ]
   },
   {
+    label: "SCRIMED exact-head review binding policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/exact-head-review-binding-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED release state-machine policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/release-state-machine-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED merge-readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/verify-merge-readiness.mjs",
+      "--self-test"
+    ]
+  },
+  {
+    label: "SCRIMED post-PR25 platform advancement policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/post-pr25-platform-advance-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED Work exact-head reviewer contract",
+    args: ["scripts/scrimed-work-review-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED post-PR25 deterministic artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-post-pr25-artifacts.mjs",
+      "--check"
+    ]
+  },
+  {
     label: "SCRIMED Work durable-store preflight",
     args: ["scripts/scrimed-work-durable-store-preflight.mjs"]
   },
