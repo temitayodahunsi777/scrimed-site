@@ -104,8 +104,13 @@
       ],
       "featureFlag": "SCRIMED_CONTROL_PLANE_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Trust Engine",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "fd00751f6ff457a057eab807e54dc737f2558b9a7306490d1975d668dcb26726"
+      "auditHash": "58cec100a11424aecf6090762c0e3a4dad37caa9bb12b0baeb3a8fb6251a40cb"
     },
     {
       "id": "governed-agent-runtime",
@@ -185,8 +190,13 @@
       ],
       "featureFlag": "SCRIMED_MULTI_AGENT_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Work",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "8cfcd93ef4bde28f29318616d87bb389b7cb359751bd7663400925aac4e94a1e"
+      "auditHash": "e5d129493b7c790bc56362c64c5a1ee3dcc5896ae9be37b1981f5e0168bdebb4"
     },
     {
       "id": "clinical-context-lens",
@@ -264,8 +274,13 @@
       ],
       "featureFlag": "SCRIMED_CONTEXT_FABRIC_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Healthcare Intelligence OS",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "9ed6956246dda4e470d44553688020b76e4211fb8dcf77439a51a34071d652fb"
+      "auditHash": "0c93f893e2b8225ac36a3472c859fe7b1e44b7ae4a6a783c870d6073ffcb6c04"
     },
     {
       "id": "data-interoperability-fabric",
@@ -340,8 +355,13 @@
       ],
       "featureFlag": "SCRIMED_CONTEXT_FABRIC_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Interoperability Control Plane",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "a5492c83d143b81c462da45a56e3a3d16dbd58ece76436a5178e523fb39d3853"
+      "auditHash": "54e333bd455cdb33ae478492ce2836644d01911b4f620c36bfdc766e3c7dfbf5"
     },
     {
       "id": "model-compute-gateway",
@@ -419,8 +439,13 @@
       ],
       "featureFlag": "SCRIMED_MODEL_ROUTER_ENABLED",
       "highRiskDefaultOff": false,
+      "product": "SCRIMED Compute Fabric",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "29c804601d6a8d5730beb232e60f5da912bfb32a56a729622fddd267a66a1c59"
+      "auditHash": "06b298dfd1db4740060c1db3ed0333f3b5c792836e8e3574a918dd067a5c511b"
     },
     {
       "id": "outcome-learning-loop",
@@ -496,8 +521,13 @@
       ],
       "featureFlag": "SCRIMED_LEARNING_LOOP_ENABLED",
       "highRiskDefaultOff": false,
+      "product": "SCRIMED EvidenceOps",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "1a9f1b0d67884c2846e8635fc16fb3547b298ae85880f35f11ab4ddf86488c8b"
+      "auditHash": "61628eb6a3fa531915eaf83cfe48677fa692f2a9c6c589cf79bcc17fb7f4328c"
     },
     {
       "id": "developer-conformance-platform",
@@ -568,8 +598,13 @@
       ],
       "featureFlag": "SCRIMED_CONTROL_PLANE_ENABLED",
       "highRiskDefaultOff": false,
+      "product": "SCRIMED Studio",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "65b949d149a08326967545b6b057e5c4783c22dd0e117da8e13364988b50d107"
+      "auditHash": "d9dcf39ba267db37c11fe68baab551d5faccb8ef42f95f750db77c3b098a6cb5"
     },
     {
       "id": "governed-partner-marketplace",
@@ -637,8 +672,13 @@
       ],
       "featureFlag": "SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Partner Platform",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "bddb0d4a8c090e49d0e7f0221ca97cc6912e0fe0472d73a785e1ef96e5622e63"
+      "auditHash": "c3175db3c2fda77fe424d7eb8db6f12c299371d63e74d1acbb950cc2b4c8e4e4"
     },
     {
       "id": "trialcore-research-operations",
@@ -716,8 +756,13 @@
       ],
       "featureFlag": "SCRIMED_CONTEXT_FABRIC_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "TrialCore",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "82206795b98c4fdb6a8fa8c1c9c2f7947e18d0ca2e9c277e622882e821122cb9"
+      "auditHash": "5048d804e4bed42f8e0ef8ca8e594ee814f5bb47cd60f4c84ed5cce35a17ab95"
     },
     {
       "id": "capital-commercial-intelligence",
@@ -793,8 +838,13 @@
       ],
       "featureFlag": "SCRIMED_CAPITAL_INTELLIGENCE_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Capital and Commercial Intelligence",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "b16f9cd11967f338611fff754b795d427375c71e720ba4a5294a51825d19e77c"
+      "auditHash": "aa64b3112e8604447f4cc9694474b8ff4d80f1d9666e6dcba44974946a462efb"
     },
     {
       "id": "continuity-release-operations",
@@ -867,8 +917,13 @@
       ],
       "featureFlag": "SCRIMED_CONTROL_PLANE_ENABLED",
       "highRiskDefaultOff": false,
+      "product": "SCRIMED Release and Continuity Operations",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "64dc00def58926a53d1cf4e3c93e029139a041ce6ed6fd71a16ad8e0ba850868"
+      "auditHash": "91632ea79a19591981a0e3de069822e4ae374410f96af211f7818882ed79f5af"
     },
     {
       "id": "documentation-authorization-wedge",
@@ -949,8 +1004,13 @@
       ],
       "featureFlag": "SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED",
       "highRiskDefaultOff": true,
+      "product": "SCRIMED Work",
+      "permittedJurisdictions": [
+        "synthetic-internal-global"
+      ],
+      "externalSideEffects": [],
       "externalActionsEnabled": false,
-      "auditHash": "7a020726e298d9df690a2faddbcb21ac8dd26b790fd75ce5040d22852b020b1f"
+      "auditHash": "0d9a306f0eb32b8202d4fbc981f82544aab98513280d877fcf59875bf0e49ac5"
     }
   ],
   "strategicMetrics": [
@@ -1002,5 +1062,5 @@
     "sourceOfferExists": true
   },
   "productionAuthorityGranted": false,
-  "auditHash": "1802ee0b64c34efbc531629872e762cebd3e0cd8faa3b9347b3c9fe2d98b66de"
+  "auditHash": "86bd733a9c96d6e2efaea1d770a8f92892875b8d4ad95badb63c836350a62a19"
 }

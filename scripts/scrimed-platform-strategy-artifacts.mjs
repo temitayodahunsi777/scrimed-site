@@ -4,9 +4,19 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
 import { getPlatformStrategySummary } from "../app/lib/scrimed-control-plane/platformStrategy.ts";
+import { getScrimedPlatformGraph } from "../app/lib/scrimed-control-plane/platformGraph.ts";
+import {
+  getHumanGateMinimizationReport,
+  getInvestorReadinessEngine,
+  strategicPartnerReadinessProfiles,
+  strategicRoadmap
+} from "../app/lib/scrimed-control-plane/strategicDecisionIntelligence.ts";
 
 const checkOnly = process.argv.includes("--check");
 const summary = getPlatformStrategySummary();
+const platformGraph = getScrimedPlatformGraph();
+const humanGateMinimization = getHumanGateMinimizationReport();
+const investorReadiness = getInvestorReadinessEngine();
 
 const artifacts = {
   "artifacts/platform/platform-map.json": {
@@ -24,6 +34,7 @@ const artifacts = {
     productionAuthorityGranted: summary.productionAuthorityGranted,
     auditHash: summary.auditHash
   },
+  "artifacts/platform/scrimed-platform-graph.json": platformGraph,
   "artifacts/product/product-portfolio.json": {
     schemaVersion: "scrimed.product-portfolio.v1",
     version: summary.version,
@@ -36,6 +47,16 @@ const artifacts = {
     externalActionsExecuted: summary.externalActionsExecuted,
     auditHash: summary.auditHash
   },
+  "artifacts/product/portfolio-scorecard.json": {
+    schemaVersion: "scrimed.portfolio-scorecard.v1",
+    version: summary.version,
+    status: "internal-prioritization-no-commercial-authority",
+    boundary: summary.boundary,
+    scorecards: summary.portfolioScorecards,
+    coreWedge: summary.coreWedge,
+    externalActionsExecuted: summary.externalActionsExecuted,
+    auditHash: summary.auditHash
+  },
   "artifacts/investor/moat-registry.json": {
     schemaVersion: "scrimed.moat-registry.v1",
     version: summary.version,
@@ -45,6 +66,20 @@ const artifacts = {
     moatRegistry: summary.moatRegistry,
     nextBestAction: summary.nextBestAction,
     productionAuthorityGranted: summary.productionAuthorityGranted,
+    auditHash: summary.auditHash
+  },
+  "artifacts/investor/investor-readiness.json": {
+    ...investorReadiness,
+    strategicPartnerReadinessProfiles,
+    partnerBoundary: "Internal strategic readiness profiles only; no partnership, investment, endorsement, procurement, or outreach authority is implied."
+  },
+  "artifacts/governance/human-gate-minimization.json": humanGateMinimization,
+  "artifacts/strategy/strategic-roadmap.json": {
+    schemaVersion: "scrimed.strategic-roadmap.v1",
+    version: summary.version,
+    roadmap: strategicRoadmap,
+    boundary: summary.boundary,
+    productionAuthorityGranted: false,
     auditHash: summary.auditHash
   }
 };

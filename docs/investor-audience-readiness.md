@@ -126,6 +126,8 @@ Run `SCRIMED_BASE_URL=https://app.scrimedsolutions.com npm run smoke:investor-de
 
 The guided demonstration does not authorize external distribution, investment solicitation, customer claims, live PHI, clinical execution, payer submission, EHR writeback, production deployment, or customer activation. A founder or approved human presenter remains responsible for the meeting and every external statement.
 
+The dedicated `/investor-demo-command-room` turns the same plan into a presentation control surface. It runs bounded same-origin proof-route and safety-header checks, requires four reversible presenter confirmations, enforces chapter order, tracks the selected timebox, and generates a browser-local no-PII internal rehearsal receipt only after completion. A passing command-room gate is operational preparation, not independent review, investor approval, solicitation authority, external distribution authority, or evidence of a meeting outcome.
+
 ## Competitive Edge
 
 The strongest sellable signals are:

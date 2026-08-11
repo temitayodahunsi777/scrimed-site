@@ -1,5 +1,10 @@
 import Link from "next/link";
+import {
+  getProofPacketShareReadinessSummary,
+  proofPacketShareReadinessApiRoute
+} from "../lib/proofPacketShareReadiness";
 import { getScrimedProofPacketStudioSummary, scrimedProofPacketBriefRouteFor } from "../lib/scrimedProofPacketStudio";
+import ProofPacketShareReadinessWorkbench from "./ProofPacketShareReadinessWorkbench";
 
 export const metadata = {
   title: "SCRIMED Proof Packet Studio",
@@ -9,6 +14,7 @@ export const metadata = {
 
 export default function ScrimedProofPacketStudioPage() {
   const summary = getScrimedProofPacketStudioSummary();
+  const shareReadiness = getProofPacketShareReadinessSummary();
 
   return (
     <main>
@@ -68,6 +74,24 @@ export default function ScrimedProofPacketStudioPage() {
           </p>
           <p>Markdown packet exports require human operator review before external sharing.</p>
         </div>
+      </section>
+
+      <section className="section-band" aria-label="Protected share readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Protected Share Readiness</p>
+          <h2>Move exact packet fingerprints into governed review without sending anything.</h2>
+          <p>
+            This no-PII preflight maps an external-facing packet into the canonical protected
+            Distribution Lockbox. A successful assessment prepares a disabled handoff draft; it
+            does not create approval, customer permission, solicitation authority, or external
+            distribution authority.
+          </p>
+        </div>
+        <ProofPacketShareReadinessWorkbench
+          apiRoute={proofPacketShareReadinessApiRoute}
+          packets={shareReadiness.eligiblePackets}
+          requiredConfirmations={shareReadiness.requiredConfirmations}
+        />
       </section>
 
       <section className="table-section" aria-label="Proof packet manifests">

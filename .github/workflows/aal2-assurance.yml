@@ -1,0 +1,68 @@
+name: AAL2 assurance
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Authorized nonproduction SCRIMED target
+        required: true
+        type: string
+      workspace_slug:
+        description: Protected synthetic workspace slug
+        required: true
+        default: atlas-synthetic-evaluation
+        type: string
+      candidate_sha256:
+        description: Exact candidate SHA-256
+        required: true
+        type: string
+      evidence_nonce:
+        description: Single-run nonsecret evidence nonce
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aal2-assurance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  policy-self-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: node scripts/aal2-token-policy-selftest.mjs
+      - run: node scripts/verify-aal2-evidence.mjs --self-test
+
+  protected-nonproduction-verification:
+    needs: policy-self-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: aal2-assurance
+    env:
+      SCRIMED_BASE_URL: ${{ inputs.base_url }}
+      SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+      SCRIMED_AAL2_CANDIDATE_SHA256: ${{ inputs.candidate_sha256 }}
+      SCRIMED_AAL2_EVIDENCE_NONCE: ${{ inputs.evidence_nonce }}
+      SCRIMED_AAL2_EXPECTED_ISSUER: ${{ secrets.SCRIMED_AAL2_EXPECTED_ISSUER }}
+      SCRIMED_AAL2_EXPECTED_AUDIENCE: ${{ secrets.SCRIMED_AAL2_EXPECTED_AUDIENCE }}
+      SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_AAL2_BEARER_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Reject production target
+        run: node -e "const host=new URL(process.env.SCRIMED_BASE_URL).hostname;if(host==='app.scrimedsolutions.com'){console.error('Production target is prohibited for this assurance workflow.');process.exit(1)}"
+      - run: node scripts/verify-aal2-evidence.mjs --strict
+      - run: node scripts/scrimed-work-durable-store-preflight.mjs --strict
+      - run: node scripts/scrimed-work-authenticated-smoke.mjs --strict

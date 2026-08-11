@@ -2,7 +2,8 @@
 
 **Status:** Internal diligence preparation; synthetic/no-PHI foundation only
 **Source of truth:** `app/lib/scrimed-control-plane/platformStrategy.ts`
-**Machine-readable artifact:** `artifacts/platform/platform-map.json`
+**Machine-readable artifacts:** `artifacts/platform/platform-map.json`,
+`artifacts/platform/scrimed-platform-graph.json`
 
 SCRIMED is organized as one governed healthcare work and intelligence platform. Models are
 replaceable components. The durable platform assets are the workflow contracts, healthcare

@@ -22,7 +22,10 @@ import {
 } from "./registries";
 import { getApprovalAchievementSummary } from "./approvalAchievement";
 import { getCrossPlatformEvidenceSummary } from "./platformEvidence";
+import { getScrimedPlatformGraph } from "./platformGraph";
 import { getPlatformStrategySummary } from "./platformStrategy";
+import { getStrategicDecisionIntelligenceSummary } from "./strategicDecisionIntelligence";
+import { getTrustReadinessSummary } from "./trustReadiness";
 
 export * from "./types";
 export * from "./featureFlags";
@@ -37,7 +40,10 @@ export * from "./outcomeIntelligence";
 export * from "./governance";
 export * from "./approvalAchievement";
 export * from "./platformEvidence";
+export * from "./platformGraph";
 export * from "./platformStrategy";
+export * from "./strategicDecisionIntelligence";
+export * from "./trustReadiness";
 
 export const controlPlaneRoute = "/scrimed-control-plane";
 export const controlPlaneApiRoute = "/api/scrimed-control-plane";
@@ -54,6 +60,8 @@ export function controlPlaneHeaders(extra: Record<string, string> = {}) {
     "X-SCRIMED-Capital-Outbound": "disabled-ceo-approval-required",
     "X-SCRIMED-Approval-Achievement": "technical-gate-only-human-external-approvals-required",
     "X-SCRIMED-Platform-Evidence": "snapshot-only-no-production-authority",
+    "X-SCRIMED-Platform-Graph": "synthetic-metadata-only",
+    "X-SCRIMED-Trust-Readiness": "internal-signal-not-certification",
     "X-SCRIMED-Voice": "simulation-only",
     "X-SCRIMED-Data": "synthetic-deidentified-no-live-phi",
     ...extra
@@ -146,6 +154,9 @@ export function getControlPlaneSummary() {
     approvalAchievement: getApprovalAchievementSummary(),
     platformEvidence: getCrossPlatformEvidenceSummary(),
     platformStrategy: getPlatformStrategySummary(),
+    platformGraph: getScrimedPlatformGraph(),
+    trustReadiness: getTrustReadinessSummary(),
+    strategicDecisionIntelligence: getStrategicDecisionIntelligenceSummary(),
     voiceSimulation: work.voiceSimulation,
     capitalIntelligence: getCapitalIntelligenceSummary(),
     computeResilience: getComputeResilienceSummary(),
@@ -212,6 +223,9 @@ export function buildControlPlaneBrief() {
     `- Platform capabilities: ${summary.platformStrategy.capabilityCount} across ${summary.platformStrategy.platformPlanes.length} planes`,
     `- Capability registry valid: ${summary.platformStrategy.validation.valid}`,
     `- Core commercial wedge: ${summary.platformStrategy.coreWedge.offer} + ${summary.platformStrategy.coreWedge.productWorkflow}`,
+    `- Platform graph: ${summary.platformGraph.validation.nodeCount} nodes / ${summary.platformGraph.validation.edgeCount} edges / valid ${summary.platformGraph.validation.valid}`,
+    `- Trust readiness scenarios: ${summary.trustReadiness.decisions.allowSynthetic} allow synthetic / ${summary.trustReadiness.decisions.requireHuman} require human / ${summary.trustReadiness.decisions.blocked} blocked`,
+    `- Investor readiness heuristic: ${summary.strategicDecisionIntelligence.investorReadiness.score} (not investment probability)`,
     "",
     "## Safety Boundary",
     summary.boundary,

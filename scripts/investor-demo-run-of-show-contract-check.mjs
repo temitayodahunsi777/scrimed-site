@@ -70,7 +70,11 @@ for (const expected of [
 
 requireIncludes(
   "app/investor-audience-readiness/page.tsx",
-  "Start Guided Demo"
+  "Open Demo Command Room"
+);
+requireIncludes(
+  "app/investor-audience-readiness/page.tsx",
+  "View Guided Outline"
 );
 requireIncludes(
   "app/lib/investorAudienceReadiness.ts",

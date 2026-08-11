@@ -170,6 +170,10 @@ const checks = [
     args: ["scripts/aal2-token-policy-selftest.mjs"]
   },
   {
+    label: "AAL2 candidate-bound evidence verifier",
+    args: ["scripts/verify-aal2-evidence.mjs", "--self-test"]
+  },
+  {
     label: "AAL2 smoke readiness preflight",
     args: ["scripts/aal2-smoke-readiness-preflight.mjs"]
   },
@@ -464,6 +468,19 @@ const checks = [
     args: ["scripts/investor-demo-proof-route-smoke.mjs", "--self-test"]
   },
   {
+    label: "Investor demo command-room policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/investor-demo-command-room-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Investor demo command-room contract",
+    args: ["scripts/investor-demo-command-room-contract-check.mjs"]
+  },
+  {
     label: "Bounded public fetch policy",
     args: ["scripts/bounded-public-fetch-policy-test.mjs"]
   },
@@ -710,6 +727,15 @@ const checks = [
     args: ["scripts/scrimed-guided-execution-contract-check.mjs"]
   },
   {
+    label: "SCRIMED Proof Packet Share Readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/proof-packet-share-readiness-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED Proof Packet Studio contract",
     args: ["scripts/scrimed-proof-packet-studio-contract-check.mjs"]
   },
@@ -835,6 +861,24 @@ const checks = [
       "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
       "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
       "scripts/scrimed-platform-strategy-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED platform graph policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-platform-graph-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED strategic decision intelligence policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-strategic-decision-policy-test.mjs"
     ]
   },
   {

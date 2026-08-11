@@ -7,6 +7,8 @@ import type {
   PlatformMoatDefinition,
   PlatformPlane,
   PlatformPortfolioDisposition,
+  PortfolioScore,
+  PortfolioScorecardEntry,
   StrategicMetricDefinition
 } from "./types";
 
@@ -29,11 +31,35 @@ const platformPlanes: PlatformPlane[] = [
   "operations-continuity"
 ];
 
+const productByPlane: Record<PlatformPlane, string> = {
+  "clinical-experience": "SCRIMED Healthcare Intelligence OS",
+  "workflows-agents": "SCRIMED Work",
+  "data-interoperability": "SCRIMED Interoperability Control Plane",
+  "model-compute": "SCRIMED Compute Fabric",
+  "trust-governance": "SCRIMED Trust Engine",
+  "evidence-learning": "SCRIMED EvidenceOps",
+  "developer-ecosystem": "SCRIMED Studio",
+  "partner-marketplace": "SCRIMED Partner Platform",
+  "research-trials": "TrialCore",
+  "business-capital": "SCRIMED Capital and Commercial Intelligence",
+  "operations-continuity": "SCRIMED Release and Continuity Operations"
+};
+
 function capability(
-  input: Omit<PlatformCapabilityDefinition, "auditHash" | "externalActionsEnabled">
+  input: Omit<
+    PlatformCapabilityDefinition,
+    | "auditHash"
+    | "externalActionsEnabled"
+    | "externalSideEffects"
+    | "permittedJurisdictions"
+    | "product"
+  >
 ): PlatformCapabilityDefinition {
   const definition = {
     ...input,
+    product: productByPlane[input.plane],
+    permittedJurisdictions: ["synthetic-internal-global"],
+    externalSideEffects: [] as string[],
     externalActionsEnabled: false as const
   };
 
@@ -486,6 +512,183 @@ export const platformPortfolioRationalization: PlatformPortfolioDisposition[] = 
   }
 ];
 
+function calculatePortfolioPriority(scores: PortfolioScore) {
+  return Math.round(
+    scores.buyerUrgency * 0.15 +
+      scores.differentiation * 0.12 +
+      scores.evidenceMaturity * 0.1 +
+      scores.technicalReadiness * 0.11 +
+      (100 - scores.regulatoryBurden) * 0.1 +
+      (100 - scores.integrationEffort) * 0.08 +
+      scores.monetization * 0.13 +
+      scores.grossMarginPotential * 0.08 +
+      scores.expansionValue * 0.08 +
+      scores.timeToMeasurableRoi * 0.05
+  );
+}
+
+function portfolioScorecard(
+  input: Omit<PortfolioScorecardEntry, "auditHash" | "externalAuthorityGranted" | "priorityScore">
+): PortfolioScorecardEntry {
+  const definition = {
+    ...input,
+    priorityScore: calculatePortfolioPriority(input.scores),
+    externalAuthorityGranted: false as const
+  };
+
+  return {
+    ...definition,
+    auditHash: createClinicalEvidenceHash({
+      ...definition,
+      boundary: scrimedPlatformStrategyBoundary,
+      version: scrimedPlatformStrategyVersion
+    })
+  };
+}
+
+export const platformPortfolioScorecards: PortfolioScorecardEntry[] = [
+  portfolioScorecard({
+    id: "governance-evidence-platform",
+    category: "CORE_PLATFORM",
+    scores: {
+      buyerUrgency: 86,
+      differentiation: 91,
+      evidenceMaturity: 78,
+      technicalReadiness: 84,
+      regulatoryBurden: 48,
+      integrationEffort: 46,
+      monetization: 82,
+      grossMarginPotential: 84,
+      expansionValue: 94,
+      timeToMeasurableRoi: 72
+    },
+    confidence: "high",
+    evidenceRoutes: ["/scrimed-control-plane", "/validation-evidence", "/trust-center"],
+    rationale: "Governance, evidence, policy, and release assurance connect every other SCRIMED product and remain useful across model vendors.",
+    nextAction: "Package the control plane as the common evidence and governance layer behind every paid assessment and synthetic pilot."
+  }),
+  portfolioScorecard({
+    id: "workflow-intelligence-entry-wedge",
+    category: "NEAR_TERM_COMMERCIAL",
+    scores: {
+      buyerUrgency: 92,
+      differentiation: 82,
+      evidenceMaturity: 74,
+      technicalReadiness: 88,
+      regulatoryBurden: 24,
+      integrationEffort: 28,
+      monetization: 90,
+      grossMarginPotential: 86,
+      expansionValue: 87,
+      timeToMeasurableRoi: 91
+    },
+    confidence: "high",
+    evidenceRoutes: ["/offerings", "/documentation-before-authorization", "/pilot-demo-commercial-readiness"],
+    rationale: "A bounded no-PHI workflow assessment reaches urgent administrative pain with the lowest current activation burden.",
+    nextAction: "Run three buyer-specific rehearsals and retain baseline, acceptance, reviewer-burden, and expansion evidence."
+  }),
+  portfolioScorecard({
+    id: "governed-synthetic-evaluation",
+    category: "NEAR_TERM_COMMERCIAL",
+    scores: {
+      buyerUrgency: 84,
+      differentiation: 88,
+      evidenceMaturity: 80,
+      technicalReadiness: 86,
+      regulatoryBurden: 30,
+      integrationEffort: 32,
+      monetization: 84,
+      grossMarginPotential: 82,
+      expansionValue: 90,
+      timeToMeasurableRoi: 83
+    },
+    confidence: "high",
+    evidenceRoutes: ["/validation-evidence", "/scrimed-control-plane", "/scrimed-clinical-benchmark-suite"],
+    rationale: "Synthetic evaluation converts SCRIMED's governance infrastructure into buyer-reviewable proof without requiring live data.",
+    nextAction: "Standardize one fixed-scope benchmark and evidence-readout package for the commercial wedge."
+  }),
+  portfolioScorecard({
+    id: "protected-workflow-pilots",
+    category: "ENTERPRISE_EXPANSION",
+    scores: {
+      buyerUrgency: 88,
+      differentiation: 90,
+      evidenceMaturity: 60,
+      technicalReadiness: 72,
+      regulatoryBurden: 78,
+      integrationEffort: 76,
+      monetization: 92,
+      grossMarginPotential: 76,
+      expansionValue: 96,
+      timeToMeasurableRoi: 56
+    },
+    confidence: "medium",
+    evidenceRoutes: ["/pilot-workspace/access", "/approvals-readiness", "/clinical-production-readiness"],
+    rationale: "Protected pilots can create renewal evidence, but identity, migration, buyer, legal, privacy, security, and reviewer gates remain material.",
+    nextAction: "Complete disposable migration evidence and one exact-candidate AAL2 protected workflow rehearsal before requesting pilot activation."
+  }),
+  portfolioScorecard({
+    id: "healthcare-evidence-graph",
+    category: "STRATEGIC_MOAT",
+    scores: {
+      buyerUrgency: 80,
+      differentiation: 94,
+      evidenceMaturity: 67,
+      technicalReadiness: 77,
+      regulatoryBurden: 54,
+      integrationEffort: 60,
+      monetization: 79,
+      grossMarginPotential: 88,
+      expansionValue: 98,
+      timeToMeasurableRoi: 61
+    },
+    confidence: "medium",
+    evidenceRoutes: ["/validation-evidence", "/clinical-data-fabric", "/scrimed-hybrid-retrieval"],
+    rationale: "Evidence lineage, contradictions, expiry, and approvals can compound across products even as models change.",
+    nextAction: "Bind one assessment workflow's claims, source lineage, review, value metric, and release artifact into the platform graph."
+  }),
+  portfolioScorecard({
+    id: "clinical-experience-catalog",
+    category: "R_AND_D_OPTION",
+    scores: {
+      buyerUrgency: 76,
+      differentiation: 84,
+      evidenceMaturity: 48,
+      technicalReadiness: 70,
+      regulatoryBurden: 86,
+      integrationEffort: 74,
+      monetization: 64,
+      grossMarginPotential: 71,
+      expansionValue: 89,
+      timeToMeasurableRoi: 43
+    },
+    confidence: "medium",
+    evidenceRoutes: ["/demos", "/healthcare-intelligence-os", "/scrimed-patient-context-gateway"],
+    rationale: "The catalog strengthens buyer storytelling, but broad commercialization would dilute focus and increase evidence and regulatory burden.",
+    nextAction: "Retain only the modules needed for a specific buyer narrative and keep them synthetic demonstration-only."
+  }),
+  portfolioScorecard({
+    id: "partner-agent-marketplace",
+    category: "DEFER",
+    scores: {
+      buyerUrgency: 48,
+      differentiation: 82,
+      evidenceMaturity: 32,
+      technicalReadiness: 52,
+      regulatoryBurden: 88,
+      integrationEffort: 86,
+      monetization: 58,
+      grossMarginPotential: 70,
+      expansionValue: 91,
+      timeToMeasurableRoi: 28
+    },
+    confidence: "medium",
+    evidenceRoutes: ["/scrimed-studio", "/approvals-readiness"],
+    rationale: "Marketplace upside does not yet outweigh admission, liability, security, quality, and commercial complexity.",
+    nextAction: "Validate one read-only partner adapter before revisiting marketplace activation."
+  })
+];
+
 export const platformMoatRegistry: PlatformMoatDefinition[] = [
   {
     id: "governance-evidence-runtime",
@@ -569,10 +772,21 @@ export function validatePlatformCapabilityRegistry() {
       failures.push(`protected-pilot-without-approval:${entry.id}`);
     }
     if (entry.externalActionsEnabled !== false) failures.push(`external-action-enabled:${entry.id}`);
+    if (!entry.product.trim()) failures.push(`capability-product-missing:${entry.id}`);
+    if (!entry.permittedJurisdictions.length) failures.push(`capability-jurisdiction-missing:${entry.id}`);
+    if (entry.externalSideEffects.length) failures.push(`capability-side-effect-declared:${entry.id}`);
   }
   for (const item of platformPortfolioRationalization) {
     if (item.sourceOfferSlug && !offerSlugs.has(item.sourceOfferSlug)) {
       failures.push(`unknown-portfolio-offer:${item.id}:${item.sourceOfferSlug}`);
+    }
+  }
+  for (const item of platformPortfolioScorecards) {
+    if (item.priorityScore < 0 || item.priorityScore > 100) {
+      failures.push(`invalid-portfolio-priority:${item.id}`);
+    }
+    if (item.externalAuthorityGranted !== false) {
+      failures.push(`portfolio-external-authority-granted:${item.id}`);
     }
   }
 
@@ -603,6 +817,7 @@ export function getPlatformStrategySummary() {
     capabilities: platformCapabilityRegistry,
     strategicMetrics: strategicMetricRegistry,
     portfolioRationalization: platformPortfolioRationalization,
+    portfolioScorecards: platformPortfolioScorecards,
     moatRegistry: platformMoatRegistry,
     coreWedge: {
       offer: "Workflow Intelligence Assessment",

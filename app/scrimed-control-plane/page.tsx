@@ -23,6 +23,7 @@ export default function ScrimedControlPlanePage() {
         <div className="hero-actions" aria-label="Control-plane resources">
           <Link href="/api/scrimed-control-plane">Inspect API</Link>
           <Link href="/api/scrimed-control-plane/brief">Download Brief</Link>
+          <Link href="/api/scrimed-control-plane/platform-graph">Inspect Platform Graph</Link>
           <Link href="/scrimed-work">Open SCRIMED Work</Link>
         </div>
       </section>
@@ -35,6 +36,8 @@ export default function ScrimedControlPlanePage() {
         <article><span>Workflows</span><strong>{summary.workflows.length}</strong></article>
         <article><span>Semantic definitions</span><strong>{summary.ontology.length}</strong></article>
         <article><span>Trust score</span><strong>{summary.verification.trustScore.total}</strong></article>
+        <article><span>Graph integrity</span><strong>{summary.platformGraph.validation.valid ? "valid" : "review"}</strong></article>
+        <article><span>Investor heuristic</span><strong>{summary.strategicDecisionIntelligence.investorReadiness.score}</strong></article>
         <article><span>Consequential actions</span><strong>{summary.featureFlags.consequentialActionsEnabled ? "enabled" : "disabled"}</strong></article>
       </section>
 
@@ -173,6 +176,62 @@ export default function ScrimedControlPlanePage() {
             <p>{metric.formula}</p>
             <div><strong>Current value</strong><p>{metric.currentValue ?? "baseline not collected"}</p></div>
             <div><strong>Boundary</strong><p>{metric.blockedInterpretation}</p></div>
+          </article>
+        ))}
+        {summary.platformStrategy.portfolioScorecards.map((entry) => (
+          <article className="module-row" key={entry.id}>
+            <div><span>{entry.category}</span><h2>{entry.id}</h2></div>
+            <p>{entry.rationale}</p>
+            <div><strong>Priority</strong><ul className="compact-list"><li>Score: {entry.priorityScore}/100</li><li>Confidence: {entry.confidence}</li><li>External authority: none</li></ul></div>
+            <div><strong>Next action</strong><p>{entry.nextAction}</p></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Platform graph and trust readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Platform Graph + Trust Readiness</p>
+          <h2>Architecture relationships and execution eligibility are machine-checkable without becoming authority.</h2>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.platformGraph.status}</span><h2>Canonical platform graph</h2></div>
+          <p>{summary.platformGraph.boundary}</p>
+          <div><strong>Coverage</strong><ul className="compact-list"><li>{summary.platformGraph.validation.nodeCount} nodes</li><li>{summary.platformGraph.validation.edgeCount} edges</li><li>{summary.platformGraph.validation.orphanNodeIds.length} orphan nodes</li></ul></div>
+          <div><strong>Integrity</strong><p>{summary.platformGraph.integrityHash}</p></div>
+        </article>
+        {summary.trustReadiness.scenarios.map((scenario) => (
+          <article className="module-row" key={scenario.auditHash}>
+            <div><span>{scenario.decision}</span><h2>{scenario.capability?.product ?? "Unknown capability"}</h2></div>
+            <p>{scenario.reasonCodes.join(", ") || "All synthetic execution checks passed."}</p>
+            <div><strong>Internal readiness</strong><ul className="compact-list"><li>Score: {scenario.internalScore}</li><li>Human approval: {scenario.requiredHumanApproval ? "required" : "not required for this synthetic read-only scenario"}</li><li>Certification claim: prohibited</li></ul></div>
+            <div><strong>Authority</strong><p>Production and distribution authority: not granted</p></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="Strategic decision intelligence">
+        <div className="section-heading">
+          <p className="eyebrow">Strategic Decision Intelligence</p>
+          <h2>Commercial focus, investor diligence, partner fit, and human gates remain evidence-bound.</h2>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.strategicDecisionIntelligence.investorReadiness.status}</span><h2>Investor readiness evidence heuristic</h2></div>
+          <p>{summary.strategicDecisionIntelligence.investorReadiness.scoreMeaning}</p>
+          <div><strong>Coverage</strong><ul className="compact-list"><li>Score: {summary.strategicDecisionIntelligence.investorReadiness.score}/100</li><li>Dimensions: {summary.strategicDecisionIntelligence.investorReadiness.dimensions.length}</li><li>Material gaps: {summary.strategicDecisionIntelligence.investorReadiness.materialNoGoCount}</li></ul></div>
+          <div><strong>Outbound</strong><p>Distribution authorized: no</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>PENDING_EXTERNAL_EVIDENCE</span><h2>Human-gate minimization</h2></div>
+          <p>{summary.strategicDecisionIntelligence.humanGateMinimization.designObjective}</p>
+          <div><strong>Accountability</strong><ul className="compact-list"><li>Human: {summary.strategicDecisionIntelligence.humanGateMinimization.counts.humanAccountability}</li><li>Commercial: {summary.strategicDecisionIntelligence.humanGateMinimization.counts.commercialAuthority}</li><li>Operator: {summary.strategicDecisionIntelligence.humanGateMinimization.counts.operatorAction}</li></ul></div>
+          <div><strong>Approvals created by software</strong><p>{summary.strategicDecisionIntelligence.humanGateMinimization.externalApprovalsAchievedByThisReport}</p></div>
+        </article>
+        {summary.strategicDecisionIntelligence.ceoDecisions.map((decision) => (
+          <article className="module-row" key={decision.decisionId}>
+            <div><span>{decision.status}</span><h2>{decision.decisionRequired}</h2></div>
+            <p>{decision.recommendation}</p>
+            <div><strong>Default safe action</strong><p>{decision.defaultSafeAction}</p></div>
+            <div><strong>Evidence</strong><p>{decision.evidence.join(", ")}</p></div>
           </article>
         ))}
       </section>

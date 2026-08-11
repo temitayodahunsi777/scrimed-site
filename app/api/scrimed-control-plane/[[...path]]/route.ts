@@ -27,7 +27,10 @@ import {
   getControlPlaneSummary,
   getCrossPlatformEvidenceSummary,
   getOutcomeIntelligenceSummary,
+  getScrimedPlatformGraph,
   getPlatformStrategySummary,
+  getStrategicDecisionIntelligenceSummary,
+  getTrustReadinessSummary,
   routeControlPlaneModel,
   runConsequenceBench,
   searchControlPlaneContext,
@@ -144,6 +147,11 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "approvals") return json(getApprovalAchievementSummary(), "control-plane-approvals");
   if (endpoint === "platform-evidence") return json(getCrossPlatformEvidenceSummary(), "control-plane-platform-evidence");
   if (endpoint === "platform-strategy") return json(getPlatformStrategySummary(), "control-plane-platform-strategy");
+  if (endpoint === "platform-graph") return json(getScrimedPlatformGraph(), "control-plane-platform-graph");
+  if (endpoint === "trust-readiness") return json(getTrustReadinessSummary(), "control-plane-trust-readiness");
+  if (endpoint === "strategic-decision-intelligence") {
+    return json(getStrategicDecisionIntelligenceSummary(), "control-plane-strategic-decision-intelligence");
+  }
 
   return failure("control_plane_route_not_found", "SCRIMED control-plane route was not found.", endpoint || "root", 404);
 }

@@ -1,0 +1,3731 @@
+{
+  "schemaVersion": "scrimed.platform-graph.v1",
+  "version": "scrimed-platform-graph-v1-2026-08-11",
+  "strategyVersion": "scrimed-platform-strategy-v1-2026-08-08",
+  "status": "VALID_SYNTHETIC_ARCHITECTURE_GRAPH",
+  "boundary": "This graph is synthetic, metadata-only architecture evidence. It grants no production, clinical, PHI, payer, EHR, device, commercial, partnership, or distribution authority. This registry describes SCRIMED's locally implemented, synthetic/no-PHI platform foundations and evidence paths. It does not authorize PHI, autonomous clinical care, diagnosis, treatment, prescribing, payer submission, EHR writeback, medical-device connectivity, production deployment, certification claims, customer activation, investor outreach, valuation claims, or revenue guarantees.",
+  "validation": {
+    "valid": true,
+    "failures": [],
+    "orphanNodeIds": [],
+    "nodeCount": 120,
+    "edgeCount": 279
+  },
+  "nodes": [
+    {
+      "id": "policy:synthetic-no-phi-boundary",
+      "type": "policy",
+      "label": "Synthetic/no-PHI consequential-action boundary",
+      "owner": "Trust Engineering + Clinical Governance",
+      "maturity": "enforced",
+      "riskTier": "high",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "2554001b2b2f590c0bd36540746658c45ef7f01637184e39dc2b291d9440c77a"
+    },
+    {
+      "id": "plane:trust-governance",
+      "type": "platform-plane",
+      "label": "trust-governance",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "63e36d2c56905a157cbbd1625ae57c4df18145531c17db431a44b354d648f2c0"
+    },
+    {
+      "id": "plane:workflows-agents",
+      "type": "platform-plane",
+      "label": "workflows-agents",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5baf2ae1d5826ebb94e94412ebf699618e68f4ba75cb153b1b5aa4edf6fb87a1"
+    },
+    {
+      "id": "plane:clinical-experience",
+      "type": "platform-plane",
+      "label": "clinical-experience",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "4092ede3aa7e660212fdd5c078b1b986263ffde75748f607a8cb9022487d7293"
+    },
+    {
+      "id": "plane:data-interoperability",
+      "type": "platform-plane",
+      "label": "data-interoperability",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "3b7140b9ce7d83a676823426a95a63f74c0f556d32eced2ec0a45c1858ea66a9"
+    },
+    {
+      "id": "plane:model-compute",
+      "type": "platform-plane",
+      "label": "model-compute",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "cac86fde5a13d8b75d4f1386b8c2a83e3d5878290233f87f946ea56eff6cdfc6"
+    },
+    {
+      "id": "plane:evidence-learning",
+      "type": "platform-plane",
+      "label": "evidence-learning",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "75888cbba48c388f73cc08d200b01c7bb18f00747f1de9193ffff648666fb551"
+    },
+    {
+      "id": "plane:developer-ecosystem",
+      "type": "platform-plane",
+      "label": "developer-ecosystem",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "4a990d5bba98ad8a213a9885061c9d3c2c61ee8f0b04934f281c0daf6f753418"
+    },
+    {
+      "id": "plane:partner-marketplace",
+      "type": "platform-plane",
+      "label": "partner-marketplace",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "6bb5bed6ec5b6b41e83a644f57cc6682cf2a947aeb1aebaaf6ea946cce4fba09"
+    },
+    {
+      "id": "plane:research-trials",
+      "type": "platform-plane",
+      "label": "research-trials",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "000d677566ae6d7d555ef85cfbae0721c29cc29e28af260eb9136dcc9703b825"
+    },
+    {
+      "id": "plane:business-capital",
+      "type": "platform-plane",
+      "label": "business-capital",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "b66b665856c2be30c18f695c4991d5ad7abf80f25926a7661d44b12fbdf15efc"
+    },
+    {
+      "id": "plane:operations-continuity",
+      "type": "platform-plane",
+      "label": "operations-continuity",
+      "owner": "SCRIMED Platform",
+      "maturity": "mapped",
+      "evidenceStatus": "registry-derived",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "63ea294ae3f63bd9085ffa68df8badd8206208b2cfc4027e0e5562d249f61e4e"
+    },
+    {
+      "id": "product:scrimed-trust-engine",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Trust Engine",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "7b5173faaec7bc3825c13353e1654bfb5f2abd55d5fab3d74560308103e925b3"
+    },
+    {
+      "id": "product:scrimed-work",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Work",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "4a881ad2b7d9b68901f7ea64d4cbad531c7dc2b641cf83c587bfa19b9b7fbef1"
+    },
+    {
+      "id": "product:scrimed-healthcare-intelligence-os",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Healthcare Intelligence OS",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "029a4407ed14c36fff4b02f971c58caed7b0532f062674fb9f16f868d239b046"
+    },
+    {
+      "id": "product:scrimed-interoperability-control-plane",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Interoperability Control Plane",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "fee1a801fb26076c77b7746b4041b6a062e42b8e25a8b41fc42b3335fad696f4"
+    },
+    {
+      "id": "product:scrimed-compute-fabric",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Compute Fabric",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "86bcf9b5890b5a6c958102c452fae6698b61b25fc50efcf59eec6cd9e89a4f21"
+    },
+    {
+      "id": "product:scrimed-evidenceops",
+      "type": "portfolio-offer",
+      "label": "SCRIMED EvidenceOps",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5b7e736ace408c4a3ee58a11826cb9433b7448968b211e4a5949e1135cc48cd4"
+    },
+    {
+      "id": "product:scrimed-studio",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Studio",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "74b4a0fa741be9d6c0c1bec1fdae05125d11e20a281ac4bdc7ae688770cddaf3"
+    },
+    {
+      "id": "product:scrimed-partner-platform",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Partner Platform",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "bca01951d4b05fa967e4ccab33dceaac2f2003e34f2b2266a51cbdc0474fb233"
+    },
+    {
+      "id": "product:trialcore",
+      "type": "portfolio-offer",
+      "label": "TrialCore",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "c160c963aacaa70e702e9f0789617feb7c93adbc6edd8142a3f7b335367bba72"
+    },
+    {
+      "id": "product:scrimed-capital-and-commercial-intelligence",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Capital and Commercial Intelligence",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "033b2018ffaff75a31dcc29c3e7c98af5fa9b04f941bb8a089bd546d7fd87c2e"
+    },
+    {
+      "id": "product:scrimed-release-and-continuity-operations",
+      "type": "portfolio-offer",
+      "label": "SCRIMED Release and Continuity Operations",
+      "owner": "Product + Commercial Strategy",
+      "maturity": "portfolio-classified",
+      "evidenceStatus": "internal-strategy-evidence",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "342cd652226557c2193ed4e0e5e7ae50edf42c9aa0a124c827be4e2ca32b9fe8"
+    },
+    {
+      "id": "capability:trust-evidence-control",
+      "type": "capability",
+      "label": "Trust Engine and EvidenceOps",
+      "owner": "Trust Engineering + Clinical Governance",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "f22f09d7e81be48617f1a2dc5af3f2242a3736326fee6fee2cfae1913532e099"
+    },
+    {
+      "id": "capability:governed-agent-runtime",
+      "type": "capability",
+      "label": "Governed Agent Runtime",
+      "owner": "Platform Engineering + Trust Engineering",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "1b108b3b5e5c5380136536cdfb04f1848c0ac1803a55aa53d507936efcba4d38"
+    },
+    {
+      "id": "capability:clinical-context-lens",
+      "type": "capability",
+      "label": "Clinical Context Lens",
+      "owner": "Clinical Product + Clinical Governance",
+      "maturity": "review-ready",
+      "riskTier": "high",
+      "evidenceStatus": "synthetic-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5e64bc61889fa7c5e710f2dc3e4ab6533da99a6febc16d7284ef40fdc0278423"
+    },
+    {
+      "id": "capability:data-interoperability-fabric",
+      "type": "capability",
+      "label": "Healthcare Data and Interoperability Fabric",
+      "owner": "Interoperability + Data Governance",
+      "maturity": "review-ready",
+      "riskTier": "high",
+      "evidenceStatus": "synthetic-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "efc56a3ae0c2c61fb34da77988a4c6b685491548a901e9b0ba822a9fe3b08278"
+    },
+    {
+      "id": "capability:model-compute-gateway",
+      "type": "capability",
+      "label": "Model Gateway and Compute Fabric",
+      "owner": "AI Platform + Reliability",
+      "maturity": "integrated",
+      "riskTier": "moderate",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "7ea396854eef1889a036dbfd79b6a0262c7eacaacdaddfbae801b95416016a9e"
+    },
+    {
+      "id": "capability:outcome-learning-loop",
+      "type": "capability",
+      "label": "Outcome Intelligence and Learning Loop",
+      "owner": "Evaluation + Product Operations",
+      "maturity": "integrated",
+      "riskTier": "moderate",
+      "evidenceStatus": "synthetic-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "66981ebe72fc82a49c5ee215e0da94373df572e456f268b775fd6ffd33a90df1"
+    },
+    {
+      "id": "capability:developer-conformance-platform",
+      "type": "capability",
+      "label": "Developer and Conformance Platform",
+      "owner": "Developer Experience + Security",
+      "maturity": "foundation",
+      "riskTier": "moderate",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "a30cc260728a6ff489f9231983103d33812bd2fb32bff00da8195c6428e7389c"
+    },
+    {
+      "id": "capability:governed-partner-marketplace",
+      "type": "capability",
+      "label": "Governed Agent and Partner Marketplace",
+      "owner": "Partnerships + Security + Clinical Governance",
+      "maturity": "foundation",
+      "riskTier": "high",
+      "evidenceStatus": "external-validation-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "90d756311757344e141824252c873db049121d37ce4a430add46773277071247"
+    },
+    {
+      "id": "capability:trialcore-research-operations",
+      "type": "capability",
+      "label": "TrialCore and ResearchOps",
+      "owner": "Research Operations + Clinical Governance",
+      "maturity": "review-ready",
+      "riskTier": "high",
+      "evidenceStatus": "synthetic-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "07fddc780a4d28073f3d2affbfaeff22474c500db738af83834948c4c678a485"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence",
+      "type": "capability",
+      "label": "Capital and Commercial Intelligence",
+      "owner": "Founder + Capital Strategy",
+      "maturity": "integrated",
+      "riskTier": "high",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "b95452e2ef4c742506f755a189bf0a5a2f57e6684eae955edb04666cd66b1c8a"
+    },
+    {
+      "id": "capability:continuity-release-operations",
+      "type": "capability",
+      "label": "Continuity and Release Operations",
+      "owner": "Engineering Release Steward + Security",
+      "maturity": "integrated",
+      "riskTier": "moderate",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "6c25b20324cef971779cc2d469b712f26676121c476516a389b1558501998864"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge",
+      "type": "capability",
+      "label": "Documentation Before Authorization",
+      "owner": "Revenue Cycle Governance + Clinical Documentation",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "30875d34fd2033c7d06467f709608b49f3221023486952cf9877d3729ab577ec"
+    },
+    {
+      "id": "agent:coordinator",
+      "type": "agent",
+      "label": "coordinator",
+      "owner": "Platform Engineering",
+      "maturity": "review-ready",
+      "riskTier": "moderate",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "efddc34038e071a2e9e7d11c5b5207de5a529394418508638fc0563220f0cf2b"
+    },
+    {
+      "id": "agent:clinical-context",
+      "type": "agent",
+      "label": "clinical-context",
+      "owner": "Clinical Governance",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-read-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "16766f43ffb2249575c1a18aeb3e0ffa262c5a15713905e11b558b53b46ed336"
+    },
+    {
+      "id": "agent:interoperability",
+      "type": "agent",
+      "label": "interoperability",
+      "owner": "Interoperability",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "aa3feceba32eea70c5fdf29143afa7f4471f9427a9c14b509b623023392a3811"
+    },
+    {
+      "id": "agent:research",
+      "type": "agent",
+      "label": "research",
+      "owner": "Research Operations",
+      "maturity": "review-ready",
+      "riskTier": "moderate",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "35b5c7b11443de104eded6fea4dfc52b2b809713c665d1dfe917bd392a82d2d1"
+    },
+    {
+      "id": "agent:evidence-validator",
+      "type": "agent",
+      "label": "evidence-validator",
+      "owner": "Trust Engineering",
+      "maturity": "review-ready",
+      "riskTier": "low",
+      "evidenceStatus": "enabled-read-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "67f79fc72adaffe76ca75a5bf047ea192cf60fbfb12d685ac700eb630eb7bb47"
+    },
+    {
+      "id": "agent:clinical-safety",
+      "type": "agent",
+      "label": "clinical-safety",
+      "owner": "Clinical Safety",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-read-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "9aea177138b6f0f20ba97f5f7b78af74058db5db4ae3b85aa017b954f36b6be9"
+    },
+    {
+      "id": "agent:revenue-cycle",
+      "type": "agent",
+      "label": "revenue-cycle",
+      "owner": "RCM Governance",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "77dcdd711cfeccea8f216baf9399ff97ebf153ebc01febb8f741a5eaded2bed4"
+    },
+    {
+      "id": "agent:patient-access",
+      "type": "agent",
+      "label": "patient-access",
+      "owner": "Patient Access",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "2858af63f205bfce03c864137697203d6924345ece2d58fe0fe2f73009b0c7b8"
+    },
+    {
+      "id": "agent:documentation",
+      "type": "agent",
+      "label": "documentation",
+      "owner": "Clinical Documentation",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "24832609064aa2ad9c2bba0a1618e9ee4d9e2112d0c8c308db18ad35ff02187a"
+    },
+    {
+      "id": "agent:artifact-writer",
+      "type": "agent",
+      "label": "artifact-writer",
+      "owner": "Product Operations",
+      "maturity": "review-ready",
+      "riskTier": "moderate",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "4edf91c3f36d80d246efdc75321cb734fdcd02b9836ed202c393b71d914922ed"
+    },
+    {
+      "id": "agent:executive-intelligence",
+      "type": "agent",
+      "label": "executive-intelligence",
+      "owner": "Executive Operations",
+      "maturity": "review-ready",
+      "riskTier": "moderate",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "a65e614cbf0e11b58e3c941ef413c788cb23a7adeba35ea99d67076fa611f2e2"
+    },
+    {
+      "id": "agent:capital-intelligence",
+      "type": "agent",
+      "label": "capital-intelligence",
+      "owner": "CEO + Capital Strategy",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-prepare-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "fe2b646b7039cc81e14f8830e3de9681719c6ab5bd1a6b19e80aa0d61a9c5e47"
+    },
+    {
+      "id": "agent:infrastructure-observer",
+      "type": "agent",
+      "label": "infrastructure-observer",
+      "owner": "Platform Reliability",
+      "maturity": "review-ready",
+      "riskTier": "moderate",
+      "evidenceStatus": "enabled-read-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "3df0d891a57114f32a07cfd11f0ecfd8fa496b182366c068261e82d83d6fa248"
+    },
+    {
+      "id": "agent:policy-reviewer",
+      "type": "agent",
+      "label": "policy-reviewer",
+      "owner": "Trust + Compliance",
+      "maturity": "protected-pilot",
+      "riskTier": "high",
+      "evidenceStatus": "enabled-read-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "50c7f72d166fad9f48715b91238b616864b04bcd8c2989103f04868558233ec9"
+    },
+    {
+      "id": "workflow:patient-intake-preparation",
+      "type": "workflow",
+      "label": "Patient Intake Preparation",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "ad73522d2a8854c6b569188266644af0f270f26da01ebf1b4e6c837494422589"
+    },
+    {
+      "id": "workflow:referral-coordination",
+      "type": "workflow",
+      "label": "Referral Coordination",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "739bcea76dbae3b37e1309cf7179cc8dc7c06ef66c912c02a0c60c1323848f47"
+    },
+    {
+      "id": "workflow:prior-authorization-preparation",
+      "type": "workflow",
+      "label": "Prior Authorization Preparation",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "c19cf789211f2e9d5ef0926bb06dc27480b410593b32035f5be1dec48e03f940"
+    },
+    {
+      "id": "workflow:denial-analysis",
+      "type": "workflow",
+      "label": "Denial Analysis",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "605fffc816edbd08f342ffd57cd21e3d695f97c5278a12d1d9b2e30ebd06a54a"
+    },
+    {
+      "id": "workflow:clinical-documentation-preparation",
+      "type": "workflow",
+      "label": "Clinical Documentation Preparation",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "0907d5f8fe371c4617804088d0e91e96dfa9319837d605fc34d8e3acb05a11dc"
+    },
+    {
+      "id": "workflow:patient-education-drafting",
+      "type": "workflow",
+      "label": "Patient Education Drafting",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "29e354b158e92f3aeac03e0ce0b3f8e9a4664b733c04262bf1052fd05327e310"
+    },
+    {
+      "id": "workflow:research-brief-generation",
+      "type": "workflow",
+      "label": "Research Brief Generation",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "86f2356c68f796ff5173f321af805ea5f845f8ae46652d868a352322de25cf10"
+    },
+    {
+      "id": "workflow:executive-reporting",
+      "type": "workflow",
+      "label": "Executive Reporting",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "50b09928370ec93eaeee8bd5d5db6125cc6a5cc3a3ff116bcb7d0272a3ecae28"
+    },
+    {
+      "id": "workflow:investor-diligence-preparation",
+      "type": "workflow",
+      "label": "Investor Diligence Preparation",
+      "owner": "Workflow Governance",
+      "maturity": "synthetic-evaluable",
+      "riskTier": "high",
+      "evidenceStatus": "contract-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "d3ff3e836b6141e13b702f6515604e60df36469c2e79721dedb3e300c23a1a05"
+    },
+    {
+      "id": "model-policy:deterministic",
+      "type": "model-policy",
+      "label": "deterministic",
+      "owner": "AI Platform + Reliability",
+      "maturity": "available-no-secret",
+      "riskTier": "moderate",
+      "evidenceStatus": "local-verified",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "53fdc7f8460eec9b615b94c7943cb226743b1ae63b9fe6c1e50e76c17f1111cc"
+    },
+    {
+      "id": "model-policy:openai-compatible",
+      "type": "model-policy",
+      "label": "openai-compatible",
+      "owner": "AI Platform + Reliability",
+      "maturity": "configuration-required",
+      "riskTier": "moderate",
+      "evidenceStatus": "configuration-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "fdf5b752f4eda213703fdcddcb7993c881c97097b2df77b7203588b3bf0a5830"
+    },
+    {
+      "id": "model-policy:anthropic-compatible",
+      "type": "model-policy",
+      "label": "anthropic-compatible",
+      "owner": "AI Platform + Reliability",
+      "maturity": "configuration-required",
+      "riskTier": "moderate",
+      "evidenceStatus": "configuration-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "dbcd8e54619aa29b970bb32581076bcd4eee1f0abdd92f910b2fb0d7e2a1e7f1"
+    },
+    {
+      "id": "model-policy:google-compatible",
+      "type": "model-policy",
+      "label": "google-compatible",
+      "owner": "AI Platform + Reliability",
+      "maturity": "future-adapter",
+      "riskTier": "moderate",
+      "evidenceStatus": "configuration-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "753dc4d801ac5ca72fbc2f612203bbbd52c030bacd2bc44f334fb6f8b134d8a3"
+    },
+    {
+      "id": "model-policy:meta-compatible",
+      "type": "model-policy",
+      "label": "meta-compatible",
+      "owner": "AI Platform + Reliability",
+      "maturity": "future-adapter",
+      "riskTier": "moderate",
+      "evidenceStatus": "configuration-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "e7f83907a44443e8fde4f964cede7ec79b2774b9480ceee5dc5ebfb0711f2ba6"
+    },
+    {
+      "id": "model-policy:local-open-weight",
+      "type": "model-policy",
+      "label": "local-open-weight",
+      "owner": "AI Platform + Reliability",
+      "maturity": "deployment-required",
+      "riskTier": "moderate",
+      "evidenceStatus": "configuration-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "7d83a17760dcebf333346534dadf92d3016eb6c4d226ca71c5d853523ea3ba91"
+    },
+    {
+      "id": "approval:automated-no-phi-technical-quality-gate",
+      "type": "approval",
+      "label": "Automated no-PHI technical quality gate",
+      "owner": "Release Engineering",
+      "maturity": "machine-verifiable",
+      "riskTier": "moderate",
+      "evidenceStatus": "must-be-regenerated-for-exact-candidate",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "a70ef34b2fa54192ed5da49c4acdccdda98f1926f85031c02a2fca93395934c8"
+    },
+    {
+      "id": "approval:clean-reviewed-commit-provenance",
+      "type": "approval",
+      "label": "A clean exact candidate has attributable source and independent review.",
+      "owner": "release-steward",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "dc340dd1c7b0b18b723f03e9beea86333b4ca79162baa234d899c0619e3135ed"
+    },
+    {
+      "id": "approval:named-independent-reviewer",
+      "type": "approval",
+      "label": "A distinct named reviewer approves the exact candidate.",
+      "owner": "principal-reviewer",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "771a1ef435e1c79fc0f2ea0a912db9c163783e7fd1481615d1811265d9194321"
+    },
+    {
+      "id": "approval:aal2-operator-evidence",
+      "type": "approval",
+      "label": "A current AAL2 operator credential is bound to the action and candidate.",
+      "owner": "authorized-operator",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "69b101cb3a4401be74c11efd63095708e6d59e3b055ffe0d46de52b66eb87a57"
+    },
+    {
+      "id": "approval:migration-approval",
+      "type": "approval",
+      "label": "Database owner approves the exact migration set after disposable dry run.",
+      "owner": "database-owner",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "98846a69663a2a8334b329b61418c68cd2c42c8ada00ff594ffd9e235e223445"
+    },
+    {
+      "id": "approval:intended-use-approval",
+      "type": "approval",
+      "label": "Clinical governance and counsel approve intended and prohibited use.",
+      "owner": "founder-clinical-governance-counsel",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "6ab391918d141832cb7e6ff2148d258f1a721b0116c3013170178b1dfb9b1c37"
+    },
+    {
+      "id": "approval:clinical-safety-approval",
+      "type": "approval",
+      "label": "Qualified clinical safety leadership approves the exact evidence and boundaries.",
+      "owner": "clinical-safety-officer",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "0b20d65cce3be09437328eea230a40fce1bec4a4ba9fbc2b44f8f95058f10e98"
+    },
+    {
+      "id": "approval:privacy-approval",
+      "type": "approval",
+      "label": "Privacy owner approves data purpose, minimization, retention, and disclosures.",
+      "owner": "privacy-officer",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "a133f65089f5ac6a154bd45cc0d7a9cb52b31021400357e07b0cd01eaec73e9d"
+    },
+    {
+      "id": "approval:legal-regulatory-approval",
+      "type": "approval",
+      "label": "Qualified counsel approves claims, contracts, and regulatory posture.",
+      "owner": "qualified-healthcare-counsel",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "4ee6068eb184049fa5a838ed4414a66a76efbb7db62f25f736f5ca8c47493e90"
+    },
+    {
+      "id": "approval:security-approval",
+      "type": "approval",
+      "label": "Security owner approves identity, isolation, threat model, and incident controls.",
+      "owner": "security-officer",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "e32f576d77ae0536f5fb341db0d1b0140b555193dc5827f92bf46f23bc35ea9f"
+    },
+    {
+      "id": "approval:baa-subprocessor-residency-approval",
+      "type": "approval",
+      "label": "Provider service scope, contract, subprocessors, residency, logs, and retention are approved.",
+      "owner": "privacy-security-counsel",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "000d721b8479aba1f7b4627ca5fc6756dacc150888aaf683a687d565d78353c3"
+    },
+    {
+      "id": "approval:deployment-authorization",
+      "type": "approval",
+      "label": "Deployment authority approves exact candidate, target, window, monitoring, and rollback.",
+      "owner": "deployment-authority",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "ef43a5ab54c0b9ef5c76ef04a9452461d70c2828b56b97e6f446362f62ef5941"
+    },
+    {
+      "id": "approval:post-deployment-smoke-validation",
+      "type": "approval",
+      "label": "Authorized production deployment passes environment-bound smoke and rollback checks.",
+      "owner": "release-operator",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "37b34bde81da9978effa94961b7b4821f1ef05ea3e2d2bcc4562d71ffef2547b"
+    },
+    {
+      "id": "approval:customer-go-live-authorization",
+      "type": "approval",
+      "label": "Customer-specific intended use, contracts, operators, support, acceptance, and rollback are approved.",
+      "owner": "customer-authority-and-scrimed-founder",
+      "maturity": "external-evidence-pending",
+      "riskTier": "high",
+      "evidenceStatus": "external-or-human-evidence-required",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "f277a69d2a7972632a63ca5886f9e1253e170f7ecd047492293cb8ecaf95e060"
+    },
+    {
+      "id": "metric:verified-intelligence-yield",
+      "type": "metric",
+      "label": "Verified intelligence yield",
+      "owner": "Evidence + Value Operations",
+      "maturity": "baseline-not-collected",
+      "evidenceStatus": "baseline-not-collected",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "ad9d8bbf4269aa2fe60a53fc5baae4b06babf94f791a579f351c0f5b3a77be2c"
+    },
+    {
+      "id": "metric:healthcare-value-returned",
+      "type": "metric",
+      "label": "Healthcare value returned",
+      "owner": "Evidence + Value Operations",
+      "maturity": "baseline-not-collected",
+      "evidenceStatus": "baseline-not-collected",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "b79ac0b8ea32f60c1ef193f95de7a470ebff1ce3ada70b43cd5b02b4bbe0fd54"
+    },
+    {
+      "id": "metric:cost-per-verified-successful-task",
+      "type": "metric",
+      "label": "Cost per verified successful task",
+      "owner": "Evidence + Value Operations",
+      "maturity": "baseline-not-collected",
+      "evidenceStatus": "baseline-not-collected",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "eca8b94b3d460efcf7dabb565536cc4244f0b05e582c9b83671e5511dfc6103f"
+    },
+    {
+      "id": "proof-route:/scrimed-control-plane",
+      "type": "proof-route",
+      "label": "/scrimed-control-plane",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5b9e4c2263a4097541cf309171b3d9f9434071273b48a4d08bbc87d9fd8c3fec"
+    },
+    {
+      "id": "proof-route:/validation-evidence",
+      "type": "proof-route",
+      "label": "/validation-evidence",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "fad7fc1b54c85ff740176384480ec884340a72ef03c22ffe6893cea3bb7d9c82"
+    },
+    {
+      "id": "proof-route:/approvals-readiness",
+      "type": "proof-route",
+      "label": "/approvals-readiness",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "b6f51f8bb33291f032845d3b5daff7bd2b1a968cc187ebe8483ed15f489143a6"
+    },
+    {
+      "id": "proof-route:/scrimed-work",
+      "type": "proof-route",
+      "label": "/scrimed-work",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "8824a374a41937207af3f458c5ae0af3c3b7888fc688731c910b8675f9214d85"
+    },
+    {
+      "id": "proof-route:/scrimed-agent-governance",
+      "type": "proof-route",
+      "label": "/scrimed-agent-governance",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "e177826614376281ee4028ace80edd33f11e8a5ff3c98f6221687404776a5fc1"
+    },
+    {
+      "id": "proof-route:/scrimed-llmops-observability",
+      "type": "proof-route",
+      "label": "/scrimed-llmops-observability",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "35f070467399831675b8707d7fabda5a12545110527d65d4e7e608145af1ab10"
+    },
+    {
+      "id": "proof-route:/healthcare-intelligence-os",
+      "type": "proof-route",
+      "label": "/healthcare-intelligence-os",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "7b2bdac129b719789c4897c4f207a780665dd792f10fb46675b9dd37915b0ef5"
+    },
+    {
+      "id": "proof-route:/scrimed-patient-context-gateway",
+      "type": "proof-route",
+      "label": "/scrimed-patient-context-gateway",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "dfc00e2af900cef5da0baa68a7be131eadb93d54931b1a3f6fb04c8bca1e7803"
+    },
+    {
+      "id": "proof-route:/clinical-context-gateway",
+      "type": "proof-route",
+      "label": "/clinical-context-gateway",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "22439ed83c93ea3a154640b97b3aca2b2a44b0a0eb6571211b87502a8f7764f9"
+    },
+    {
+      "id": "proof-route:/clinical-data-fabric",
+      "type": "proof-route",
+      "label": "/clinical-data-fabric",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "2c5f6093a1c85fe65d34ef201d2c20fbc64214c2406b1930ebce5933c03d863f"
+    },
+    {
+      "id": "proof-route:/interoperability",
+      "type": "proof-route",
+      "label": "/interoperability",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "05a79bbb83a92ecb4fbc756e859f883f3fe2e740533412ffcafe757975a6fb66"
+    },
+    {
+      "id": "proof-route:/enterprise-healthcare-infrastructure",
+      "type": "proof-route",
+      "label": "/enterprise-healthcare-infrastructure",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "35b2103859c5a09aef05e0c8e2ffa991105cecc9e6434997f0452867a1d2fa6a"
+    },
+    {
+      "id": "proof-route:/scrimed-compute-fabric",
+      "type": "proof-route",
+      "label": "/scrimed-compute-fabric",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5df3635ea1d48662d00459b2e614d0df9e5b6539936c71f4ca2ecd314ab49328"
+    },
+    {
+      "id": "proof-route:/scrimed-model-router",
+      "type": "proof-route",
+      "label": "/scrimed-model-router",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "2fe4a8c77d9e40f10536cffd100614e594360247635bfba60854afb21666d10a"
+    },
+    {
+      "id": "proof-route:/healthcare-value-realization",
+      "type": "proof-route",
+      "label": "/healthcare-value-realization",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "22539acd4285e1d022ff8dc2529ac5ea69ce25a1ef209084ed4d31f8b9ec2d75"
+    },
+    {
+      "id": "proof-route:/scrimed-clinical-benchmark-suite",
+      "type": "proof-route",
+      "label": "/scrimed-clinical-benchmark-suite",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "b775fce99314868ae049b6cf0e9247a1973c262280ebc22e91a370c34b08423b"
+    },
+    {
+      "id": "proof-route:/scrimed-studio",
+      "type": "proof-route",
+      "label": "/scrimed-studio",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "17dda6f35b5b23c78c8976edd2155eed1989192ac0699e40bc66e613a05606a9"
+    },
+    {
+      "id": "proof-route:/scrimed-governance-learning-loop",
+      "type": "proof-route",
+      "label": "/scrimed-governance-learning-loop",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "d66b06dbd563ab288155a558217d21898725e9e483973692d5d43f1968476edc"
+    },
+    {
+      "id": "proof-route:/research",
+      "type": "proof-route",
+      "label": "/research",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "ec0f4f2f34928db4c0d2928e1d67d7699dd54c0bac856af6a826ff93b9cfd83c"
+    },
+    {
+      "id": "proof-route:/investor-audience-readiness",
+      "type": "proof-route",
+      "label": "/investor-audience-readiness",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "c032fc5eb3571ba936fca8cd4763427e7323fa8e8b3edee6ee27055b692f3031"
+    },
+    {
+      "id": "proof-route:/offerings",
+      "type": "proof-route",
+      "label": "/offerings",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "cb9463664f9957d496981c9c6d8e56fbbd00a4f7477784ea43925f7ba95971c8"
+    },
+    {
+      "id": "proof-route:/capital-vitality",
+      "type": "proof-route",
+      "label": "/capital-vitality",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "1b4eccf5e0dd2824d1da195e68d2e6508ad45291b5f2f74085bd31ab1ac3720d"
+    },
+    {
+      "id": "proof-route:/release-continuity",
+      "type": "proof-route",
+      "label": "/release-continuity",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "3dbb44aa527d8262464b9e0a0168a6d6a4d00836f30360680d494631c5bf4235"
+    },
+    {
+      "id": "proof-route:/deployment-drift-guard",
+      "type": "proof-route",
+      "label": "/deployment-drift-guard",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "3015bf7dd6ef0a988bd240a93e482ab00e4e74b8cba1476b2287d7ec5ca2bdef"
+    },
+    {
+      "id": "proof-route:/documentation-before-authorization",
+      "type": "proof-route",
+      "label": "/documentation-before-authorization",
+      "owner": "Product Evidence",
+      "maturity": "repository-route",
+      "evidenceStatus": "local-route-reference",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "d2831657033be91449a64fec6063b287d782dba5528a232d519030a19530c0e8"
+    },
+    {
+      "id": "moat:governance-evidence-runtime",
+      "type": "moat",
+      "label": "Governance and evidence runtime",
+      "owner": "Strategy + Product",
+      "maturity": "implemented-foundation",
+      "evidenceStatus": "implemented-foundation",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "210b6566252995effcb9f880522b4f11c0dc89f9fe8afe415edf1982ffc587b0"
+    },
+    {
+      "id": "moat:healthcare-semantics-provenance",
+      "type": "moat",
+      "label": "Healthcare semantics and provenance",
+      "owner": "Strategy + Product",
+      "maturity": "evidence-in-progress",
+      "evidenceStatus": "evidence-in-progress",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "0913837773263278e07c134fb207fda68aa45f76772a3545f0021659353e89e3"
+    },
+    {
+      "id": "moat:workflow-outcome-learning",
+      "type": "moat",
+      "label": "Workflow outcome learning",
+      "owner": "Strategy + Product",
+      "maturity": "evidence-in-progress",
+      "evidenceStatus": "evidence-in-progress",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "ae3b529347522d008ccb3713be72e284b8c4f9d9d7763307ef775e1f60429ff1"
+    },
+    {
+      "id": "moat:model-compute-portability",
+      "type": "moat",
+      "label": "Model and compute portability",
+      "owner": "Strategy + Product",
+      "maturity": "implemented-foundation",
+      "evidenceStatus": "implemented-foundation",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5efef6edf06442e91c80d40c2a5ccdb01fe0a8e66bdac7fa2d64882c1773bfda"
+    },
+    {
+      "id": "moat:regulated-buyer-operating-evidence",
+      "type": "moat",
+      "label": "Regulated buyer operating evidence",
+      "owner": "Strategy + Product",
+      "maturity": "external-validation-required",
+      "evidenceStatus": "external-validation-required",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5ebda491e45fe8bf753dfd580138806ba5e16563abc6ab74e787a92d8ae94cc7"
+    },
+    {
+      "id": "api:scrimed-control-plane",
+      "type": "api",
+      "label": "/api/scrimed-control-plane",
+      "owner": "Platform Engineering",
+      "maturity": "integrated",
+      "riskTier": "moderate",
+      "evidenceStatus": "contract-tested",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "52fc480e8de1d4b6ce42d249f90a6444351d972aa56f193d9d073d6a6fef22d3"
+    },
+    {
+      "id": "database:scrimed-durable-store",
+      "type": "database",
+      "label": "SCRIMED durable control-plane store",
+      "owner": "Data Platform + Security",
+      "maturity": "migration-authorization-pending",
+      "riskTier": "high",
+      "evidenceStatus": "static-migration-review-only",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "b6dac555a5567b6860d0e2072245d6dfbecd98b45092c9535a3a50b040122e99"
+    },
+    {
+      "id": "release:working-tree-candidate",
+      "type": "release",
+      "label": "Working-tree follow-on candidate",
+      "owner": "Release Steward",
+      "maturity": "review-required",
+      "riskTier": "high",
+      "evidenceStatus": "mutable-working-tree",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "e34bae2a4cdf579d4873d51377b570175c3990edc18b844502f8864f16e75641"
+    },
+    {
+      "id": "evidence:deterministic-platform-artifacts",
+      "type": "evidence",
+      "label": "Deterministic platform evidence artifacts",
+      "owner": "Evidence Operations",
+      "maturity": "generated-and-checked",
+      "evidenceStatus": "local-machine-verifiable",
+      "riskTier": "not-applicable",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "4fb856902fcd374465eec44b9b051e67f9ac9297879a493bcb3c4ef36a532278"
+    },
+    {
+      "id": "environment:local",
+      "type": "environment",
+      "label": "local",
+      "owner": "Platform Reliability",
+      "maturity": "synthetic-only",
+      "riskTier": "low",
+      "evidenceStatus": "local-policy-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "d5fa119e02cca261bc36825b552361a0d67ff5d6ef62b940b7b79065e1d159a9"
+    },
+    {
+      "id": "environment:test",
+      "type": "environment",
+      "label": "test",
+      "owner": "Platform Reliability",
+      "maturity": "synthetic-only",
+      "riskTier": "low",
+      "evidenceStatus": "local-policy-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "5bfafa4fb6b88056766950d309e3043bcabbfd13ed0159cf1ff479ccf2b96cc8"
+    },
+    {
+      "id": "environment:preview",
+      "type": "environment",
+      "label": "preview",
+      "owner": "Platform Reliability",
+      "maturity": "synthetic-only",
+      "riskTier": "low",
+      "evidenceStatus": "local-policy-defined",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "3373b59887a836e83d6681c3cc082682c343d858c4a9e8437b8bf3e3b58e5a08"
+    },
+    {
+      "id": "environment:protected-pilot",
+      "type": "environment",
+      "label": "protected-pilot",
+      "owner": "Platform Reliability",
+      "maturity": "external-gates-required",
+      "riskTier": "high",
+      "evidenceStatus": "not-authorized",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "630a2afe876cf435887ffd27a0402edc721fe283880c01c71f2d7d0c53dcce71"
+    },
+    {
+      "id": "connector:synthetic-healthcare-adapters",
+      "type": "connector",
+      "label": "Synthetic FHIR, HL7, DICOM metadata, payer, and document adapters",
+      "owner": "Interoperability + Security",
+      "maturity": "read-only-synthetic",
+      "riskTier": "high",
+      "evidenceStatus": "no-production-connection",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "8cc8184a8a69d7377d5447fed49937090e32d0da90c704cd092a019e9b1e1a04"
+    }
+  ],
+  "edges": [
+    {
+      "id": "plane:trust-governance:contains:capability:trust-evidence-control",
+      "from": "plane:trust-governance",
+      "to": "capability:trust-evidence-control",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "4034310634f6121e05283af45d28abdb43683c0cb5487d06ed9df8660d697eba"
+    },
+    {
+      "id": "product:scrimed-trust-engine:contains:capability:trust-evidence-control",
+      "from": "product:scrimed-trust-engine",
+      "to": "capability:trust-evidence-control",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "cd14bda6c56d7df757a04f9e5bc8c961c48f9a89157be439bb12111377c5d6af"
+    },
+    {
+      "id": "capability:trust-evidence-control:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:trust-evidence-control",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "eb5e16bbd4ce9a19017caff9578c2c278c59b012af1a049b65a347cf2fdaa72d"
+    },
+    {
+      "id": "capability:trust-evidence-control:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:trust-evidence-control",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "31f0a2c4a3cf1b577773a6fb45ffc130f0bd779182cc51dc724a4311d75f097c"
+    },
+    {
+      "id": "capability:trust-evidence-control:invokes:agent:evidence-validator",
+      "from": "capability:trust-evidence-control",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "b10106142958158f3adeef7825244865dd8fa37f029c957b53326ad7c667125f"
+    },
+    {
+      "id": "capability:trust-evidence-control:invokes:agent:clinical-safety",
+      "from": "capability:trust-evidence-control",
+      "to": "agent:clinical-safety",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "5e51cec918ec78a0a2e273a6f73041b19bde1f9b54b5f389202f611928472e6c"
+    },
+    {
+      "id": "capability:trust-evidence-control:invokes:agent:policy-reviewer",
+      "from": "capability:trust-evidence-control",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "b9710d08648c651d62ade8ee5b4c866077b9a770d0997159b7adbe61cd3e120d"
+    },
+    {
+      "id": "capability:trust-evidence-control:routes_to:workflow:clinical-documentation-preparation",
+      "from": "capability:trust-evidence-control",
+      "to": "workflow:clinical-documentation-preparation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "b61e4a5c970aeeb8104a2d8e902a5e3f26e008c065b5c4be62a05aa48c8903ed"
+    },
+    {
+      "id": "capability:trust-evidence-control:routes_to:workflow:research-brief-generation",
+      "from": "capability:trust-evidence-control",
+      "to": "workflow:research-brief-generation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "032c90d5afc0f1c2c5719898152281d31d7362dd538ebfc064cc30cc94843784"
+    },
+    {
+      "id": "proof-route:/scrimed-control-plane:provides_evidence_for:capability:trust-evidence-control",
+      "from": "proof-route:/scrimed-control-plane",
+      "to": "capability:trust-evidence-control",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "59826400f40a289887d5ab2ad4277faff5f60351d1d3e18a03bd5f9cf13a5eee"
+    },
+    {
+      "id": "proof-route:/validation-evidence:provides_evidence_for:capability:trust-evidence-control",
+      "from": "proof-route:/validation-evidence",
+      "to": "capability:trust-evidence-control",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "922e5db2095213c27036ec03d63918368904327c41011e8e2c857e4845834bad"
+    },
+    {
+      "id": "proof-route:/approvals-readiness:provides_evidence_for:capability:trust-evidence-control",
+      "from": "proof-route:/approvals-readiness",
+      "to": "capability:trust-evidence-control",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "6b9c4bae3c788653415b1b30e8b7d61a6e37c211d13c5da13b242c711a7c5f36"
+    },
+    {
+      "id": "capability:trust-evidence-control:activated_by:environment:local",
+      "from": "capability:trust-evidence-control",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "8c7a70700a6b1558e8e2ce028c6f0bbac1181de479e38ee60b8ad29c25eb4199"
+    },
+    {
+      "id": "capability:trust-evidence-control:activated_by:environment:test",
+      "from": "capability:trust-evidence-control",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "ddc2f65981de4855c157fc6d8f115b55858231e53b26ba3f57e4d5ce1100ddd5"
+    },
+    {
+      "id": "capability:trust-evidence-control:activated_by:environment:preview",
+      "from": "capability:trust-evidence-control",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "baffa17f6639992c99118a98dbeaec9c7d7e30f1ff9bd420350c03585421f05d"
+    },
+    {
+      "id": "capability:trust-evidence-control:activated_by:environment:protected-pilot",
+      "from": "capability:trust-evidence-control",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "1b1f4cc2f564a4ef8e9b1823793a6aa7be6fc5f8af48e35802cb037ebc602939"
+    },
+    {
+      "id": "plane:workflows-agents:contains:capability:governed-agent-runtime",
+      "from": "plane:workflows-agents",
+      "to": "capability:governed-agent-runtime",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "283e47cd4317dcdee34608a6c6e480147dc6bfefbcf075010b2516402aeaf765"
+    },
+    {
+      "id": "product:scrimed-work:contains:capability:governed-agent-runtime",
+      "from": "product:scrimed-work",
+      "to": "capability:governed-agent-runtime",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "2010f413a1e74c7bee4c177c414cf25f5c6b3f1c5e9c2b95193750f99fe2a77c"
+    },
+    {
+      "id": "capability:governed-agent-runtime:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:governed-agent-runtime",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "742ba423a99e11bd47a5af85cb78f3cbdcbaa5a3c5d3a61263370d93daea1a74"
+    },
+    {
+      "id": "capability:governed-agent-runtime:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:governed-agent-runtime",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "7591bb1a662568d60ddb086dce95baf75ce3d29b56f87b697487342e221e2d6d"
+    },
+    {
+      "id": "capability:governed-agent-runtime:depends_on:capability:trust-evidence-control",
+      "from": "capability:governed-agent-runtime",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "d15089cc5164580e5fbcfc5b87f503b4d8651de5d6dccbbfd83db8aa59d712f6"
+    },
+    {
+      "id": "capability:governed-agent-runtime:invokes:agent:coordinator",
+      "from": "capability:governed-agent-runtime",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "8ea7b0fd4ba5020c19255c5e4818173b845182943d7afaab90495ad9407f4c52"
+    },
+    {
+      "id": "capability:governed-agent-runtime:invokes:agent:evidence-validator",
+      "from": "capability:governed-agent-runtime",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "3bdccf39ff5ba822d20031f91f3675f1689c0c3d5db9739777f7d3d3a89b0c68"
+    },
+    {
+      "id": "capability:governed-agent-runtime:invokes:agent:policy-reviewer",
+      "from": "capability:governed-agent-runtime",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "210a900b6c9a6f74df9e0cf2d89778bb6c18ceef6b4f68d41ec47aa8bb0c001c"
+    },
+    {
+      "id": "capability:governed-agent-runtime:routes_to:workflow:referral-coordination",
+      "from": "capability:governed-agent-runtime",
+      "to": "workflow:referral-coordination",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "6af905bf69e9e7c9ee0f8b2eedee11f6dad80d91796849dd168c7070aacc3434"
+    },
+    {
+      "id": "capability:governed-agent-runtime:routes_to:workflow:prior-authorization-preparation",
+      "from": "capability:governed-agent-runtime",
+      "to": "workflow:prior-authorization-preparation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "4b3954244a9f66d23b96235ba174e74e334d1c909d9a26d2d5fae98dd16fba60"
+    },
+    {
+      "id": "capability:governed-agent-runtime:routes_to:workflow:research-brief-generation",
+      "from": "capability:governed-agent-runtime",
+      "to": "workflow:research-brief-generation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "1fac7298031e95030e7ff926a7babb578beadd5abdb32a74256746fd2884cf43"
+    },
+    {
+      "id": "proof-route:/scrimed-work:provides_evidence_for:capability:governed-agent-runtime",
+      "from": "proof-route:/scrimed-work",
+      "to": "capability:governed-agent-runtime",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "82262796e468ad034eb24683390bd1e15baf431a402375405a9021b0c649fd0b"
+    },
+    {
+      "id": "proof-route:/scrimed-agent-governance:provides_evidence_for:capability:governed-agent-runtime",
+      "from": "proof-route:/scrimed-agent-governance",
+      "to": "capability:governed-agent-runtime",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "b70399d6a167f32958788782c881d01da2a3778ea9169e9863ab1ddcb9d1f76e"
+    },
+    {
+      "id": "proof-route:/scrimed-llmops-observability:provides_evidence_for:capability:governed-agent-runtime",
+      "from": "proof-route:/scrimed-llmops-observability",
+      "to": "capability:governed-agent-runtime",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "5f918cd4fd1e5de086cc09f9e74cd783759690c73af9abcbd27688ff94452bfd"
+    },
+    {
+      "id": "capability:governed-agent-runtime:activated_by:environment:local",
+      "from": "capability:governed-agent-runtime",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "6546b2139bb0c0fe11dab97508effc05f36994602c2cce58e03b2deebde89ddd"
+    },
+    {
+      "id": "capability:governed-agent-runtime:activated_by:environment:test",
+      "from": "capability:governed-agent-runtime",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "43a97ec8e83be6cb68bbfe159d5db566095165d4fd7d44eee43416725600c3f1"
+    },
+    {
+      "id": "capability:governed-agent-runtime:activated_by:environment:preview",
+      "from": "capability:governed-agent-runtime",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "8c7c8c3c151c8931ef44516555487366393054efd9d2fdf7f6a9487173d7190d"
+    },
+    {
+      "id": "capability:governed-agent-runtime:activated_by:environment:protected-pilot",
+      "from": "capability:governed-agent-runtime",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "6dbb1d710585b87e19a1df9a2b813801f966e9fd0d878723c655ba21807adce5"
+    },
+    {
+      "id": "plane:clinical-experience:contains:capability:clinical-context-lens",
+      "from": "plane:clinical-experience",
+      "to": "capability:clinical-context-lens",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "26c399a56acd727ea19d6af5c0e727d1048d355ae1126de0ce073a4b545db419"
+    },
+    {
+      "id": "product:scrimed-healthcare-intelligence-os:contains:capability:clinical-context-lens",
+      "from": "product:scrimed-healthcare-intelligence-os",
+      "to": "capability:clinical-context-lens",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "a9e848b9379965bed40d2b9a664d186f660381117c0d2c245cf8c855655e703c"
+    },
+    {
+      "id": "capability:clinical-context-lens:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:clinical-context-lens",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "0d41b4fd4a5ecbd5933e2374fa37b9eaf3276fe4b01d00b29f5acee85f5c75b3"
+    },
+    {
+      "id": "capability:clinical-context-lens:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:clinical-context-lens",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "38d424c0504e5e6eeb446596d4437a83a94b36891f5c69c29f7de5e2e5f0fde3"
+    },
+    {
+      "id": "capability:clinical-context-lens:depends_on:capability:trust-evidence-control",
+      "from": "capability:clinical-context-lens",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "5dda9b71930cbdc20b046f82b564fab809e897b485889d313781d76988dd8b48"
+    },
+    {
+      "id": "capability:clinical-context-lens:depends_on:capability:data-interoperability-fabric",
+      "from": "capability:clinical-context-lens",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "d09abdce63a04d5b2ffc57b540bfbd0932619936cca913c95a2326602c960a57"
+    },
+    {
+      "id": "capability:clinical-context-lens:invokes:agent:clinical-context",
+      "from": "capability:clinical-context-lens",
+      "to": "agent:clinical-context",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "81a459047f946ca3def9eaa46870b1b988fde4cdc419b00a482244f2681d9b5d"
+    },
+    {
+      "id": "capability:clinical-context-lens:invokes:agent:clinical-safety",
+      "from": "capability:clinical-context-lens",
+      "to": "agent:clinical-safety",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "d2f4be402dff50b193af93d48da1c50ee72fb741e5f693dce5ac29f2646a9e74"
+    },
+    {
+      "id": "capability:clinical-context-lens:invokes:agent:documentation",
+      "from": "capability:clinical-context-lens",
+      "to": "agent:documentation",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "4251f79db87ee37b9c733adcd96e3f7561cf7859537aae6cd4c5c9558197e874"
+    },
+    {
+      "id": "capability:clinical-context-lens:routes_to:workflow:clinical-documentation-preparation",
+      "from": "capability:clinical-context-lens",
+      "to": "workflow:clinical-documentation-preparation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "f03ac488f7baf2fb5a1ff62b04a8500edf67326fcb472d8e46e75a94d3731bb3"
+    },
+    {
+      "id": "capability:clinical-context-lens:routes_to:workflow:patient-education-drafting",
+      "from": "capability:clinical-context-lens",
+      "to": "workflow:patient-education-drafting",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "a8c34b082c48d9797266d5a1f9967d208794cfcdf585ee447d7fa34c3054124b"
+    },
+    {
+      "id": "capability:clinical-context-lens:routes_to:workflow:referral-coordination",
+      "from": "capability:clinical-context-lens",
+      "to": "workflow:referral-coordination",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "dad0bf45505e351b46950c558b209337da9b95b8f601309966994ffae0df556d"
+    },
+    {
+      "id": "proof-route:/healthcare-intelligence-os:provides_evidence_for:capability:clinical-context-lens",
+      "from": "proof-route:/healthcare-intelligence-os",
+      "to": "capability:clinical-context-lens",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "4332d5b4bff44f9992b8dfe936e50914f2451122c0b5af448214711ba859a44e"
+    },
+    {
+      "id": "proof-route:/scrimed-patient-context-gateway:provides_evidence_for:capability:clinical-context-lens",
+      "from": "proof-route:/scrimed-patient-context-gateway",
+      "to": "capability:clinical-context-lens",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "aee64791ac724f23520409f894809c8de8157ed7fc403118eb0a7dda31628c7f"
+    },
+    {
+      "id": "proof-route:/clinical-context-gateway:provides_evidence_for:capability:clinical-context-lens",
+      "from": "proof-route:/clinical-context-gateway",
+      "to": "capability:clinical-context-lens",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "a888a891869c1c9ab7f2a1738774bb6372c2a24937ace51748eaec33badb08f6"
+    },
+    {
+      "id": "capability:clinical-context-lens:activated_by:environment:local",
+      "from": "capability:clinical-context-lens",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "cd25c701ff1720da03a338bd0a713226cb580f7a553a23e0bd8c3da395fbd558"
+    },
+    {
+      "id": "capability:clinical-context-lens:activated_by:environment:test",
+      "from": "capability:clinical-context-lens",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "b4c10b98ac66c7d2137847468ab09943a02e10924442b2bfe38660f802aa638f"
+    },
+    {
+      "id": "capability:clinical-context-lens:activated_by:environment:preview",
+      "from": "capability:clinical-context-lens",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "9dd146a9afd35757a87b5207148bdeab9271cd13f132123a6737725376e602a4"
+    },
+    {
+      "id": "capability:clinical-context-lens:activated_by:environment:protected-pilot",
+      "from": "capability:clinical-context-lens",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "f0b2dc96d70fb12bbbe6f7df34172f6bfbc7100c715e0b26e5876d4f452dd1be"
+    },
+    {
+      "id": "plane:data-interoperability:contains:capability:data-interoperability-fabric",
+      "from": "plane:data-interoperability",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "d4b6f93f0c25006456572f730b6574c7825ec718ba568a0219bb738a7560fc94"
+    },
+    {
+      "id": "product:scrimed-interoperability-control-plane:contains:capability:data-interoperability-fabric",
+      "from": "product:scrimed-interoperability-control-plane",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "8ce0f1b09f04c18682e4f97726d874da73e5bcc3e5a4e449cf73191a18edd2ee"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:data-interoperability-fabric",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "d1946e0bf89b5f8b0ac6d3292f5547b8bf1b4f4e6b18e323148f12c29c7749c9"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:data-interoperability-fabric",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "f8aea147c022034541b0bec4e45a5bb63e3213e8a405a409360e63fc50a8aee8"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:depends_on:capability:trust-evidence-control",
+      "from": "capability:data-interoperability-fabric",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "7fc6a5d2f3b1fa814dc328f439c7822d2c377e7ed0ae5a8c22ea594b25a48f6c"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:invokes:agent:interoperability",
+      "from": "capability:data-interoperability-fabric",
+      "to": "agent:interoperability",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "8177da5b25e6d6ffe8fb58cdf6e34e039709802da0045208fd03e5b82f543e43"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:invokes:agent:evidence-validator",
+      "from": "capability:data-interoperability-fabric",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "e0b98999aa40b661fbb65ffa859e59f2df3830199e11436bface9f84c49aa62b"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:routes_to:workflow:referral-coordination",
+      "from": "capability:data-interoperability-fabric",
+      "to": "workflow:referral-coordination",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "5cfe1b8cce39f1288a7b58ea3406e107c09f0cfe387167d6e474451623917dd7"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:routes_to:workflow:clinical-documentation-preparation",
+      "from": "capability:data-interoperability-fabric",
+      "to": "workflow:clinical-documentation-preparation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "454e833049814346d9e756ab21f59b62c6e9aeec4e2761c12e027b45fbcdd75d"
+    },
+    {
+      "id": "proof-route:/clinical-data-fabric:provides_evidence_for:capability:data-interoperability-fabric",
+      "from": "proof-route:/clinical-data-fabric",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "f85725d9337cfc9b0ee1b7d883efe5e5145e8b1f1e199fe17ff48b489784c77b"
+    },
+    {
+      "id": "proof-route:/interoperability:provides_evidence_for:capability:data-interoperability-fabric",
+      "from": "proof-route:/interoperability",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "f0d302c02df944ae123002d3329cdd631670181145b241a7db491113adf8610b"
+    },
+    {
+      "id": "proof-route:/enterprise-healthcare-infrastructure:provides_evidence_for:capability:data-interoperability-fabric",
+      "from": "proof-route:/enterprise-healthcare-infrastructure",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "8bb8b7f693b8f29a11da764e562a40ca67479acb8b7226a727ffb5deb1014f06"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:activated_by:environment:local",
+      "from": "capability:data-interoperability-fabric",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "ba3b9c77653c80ce9ccf5d4b9f2a68625ba7f30a96d090c4258c0a810031c6d7"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:activated_by:environment:test",
+      "from": "capability:data-interoperability-fabric",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "be849bc414b14741f3f810f26ef262eaecb4f47cce76f269a3af16923a5cd171"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:activated_by:environment:preview",
+      "from": "capability:data-interoperability-fabric",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "377a3bffcce2326436340d6521075d689703924ff01519d93cc200f0413f0ba3"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:activated_by:environment:protected-pilot",
+      "from": "capability:data-interoperability-fabric",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "b15585ad3859c2c605b2665e8fc2553db99ff86580fcf5074d4aecb4c76a7108"
+    },
+    {
+      "id": "plane:model-compute:contains:capability:model-compute-gateway",
+      "from": "plane:model-compute",
+      "to": "capability:model-compute-gateway",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "caa7da6e0b0c24dc9e66447427b24d6c481c579dda424da912dd4702f4d9f8a2"
+    },
+    {
+      "id": "product:scrimed-compute-fabric:contains:capability:model-compute-gateway",
+      "from": "product:scrimed-compute-fabric",
+      "to": "capability:model-compute-gateway",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "89456435ff8c6e60f1e712c36ff58a469e56b9a1344e3c2ec7704a54a299051a"
+    },
+    {
+      "id": "capability:model-compute-gateway:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:model-compute-gateway",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "b00fa1d6ff1382703716e067e326b162919de031e059d0ea9a24fccf7596df61"
+    },
+    {
+      "id": "capability:model-compute-gateway:reviewed_by:approval:automated-no-phi-technical-quality-gate",
+      "from": "capability:model-compute-gateway",
+      "to": "approval:automated-no-phi-technical-quality-gate",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "2c258805887796cb252ed7e96ae3e2202c9016d2069ebdb28657434eb6129eda"
+    },
+    {
+      "id": "capability:model-compute-gateway:depends_on:capability:trust-evidence-control",
+      "from": "capability:model-compute-gateway",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "101c984809e0658ce0c242308c091649614ad4fe6b69a05c7cc9f2a83361a33a"
+    },
+    {
+      "id": "capability:model-compute-gateway:invokes:agent:infrastructure-observer",
+      "from": "capability:model-compute-gateway",
+      "to": "agent:infrastructure-observer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "f85bb34468045d8073f58c429461ecb4a0b8dc8e05914c12995014607ec7713e"
+    },
+    {
+      "id": "capability:model-compute-gateway:invokes:agent:policy-reviewer",
+      "from": "capability:model-compute-gateway",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "2f88eeb83970cabc74964c8b4672d8ac120e6aa3b9e150e9968f119a8dee8b0a"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:workflow:research-brief-generation",
+      "from": "capability:model-compute-gateway",
+      "to": "workflow:research-brief-generation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "a83f5cb24a13210f3f885190588bddb04f1384ab3115e9237d0e0aadbfb9c962"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:workflow:executive-reporting",
+      "from": "capability:model-compute-gateway",
+      "to": "workflow:executive-reporting",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "dc027edc1fb214139489eaafd7c8ccba58a7dcdbfc7dcdf88fb19cccbcc2e9ca"
+    },
+    {
+      "id": "proof-route:/scrimed-compute-fabric:provides_evidence_for:capability:model-compute-gateway",
+      "from": "proof-route:/scrimed-compute-fabric",
+      "to": "capability:model-compute-gateway",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "4f620e7ff470cf1a7412f9e916c91a143f5126b7fb9b8723e657a5f370835044"
+    },
+    {
+      "id": "proof-route:/scrimed-model-router:provides_evidence_for:capability:model-compute-gateway",
+      "from": "proof-route:/scrimed-model-router",
+      "to": "capability:model-compute-gateway",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "45bbe447bf3a494776b1caae206d28c7c72f69e5028317606eafa6d4ce2cbd1a"
+    },
+    {
+      "id": "proof-route:/scrimed-control-plane:provides_evidence_for:capability:model-compute-gateway",
+      "from": "proof-route:/scrimed-control-plane",
+      "to": "capability:model-compute-gateway",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "c262a8bbaca64dc2fc397ef5e9bc001a2af5a49e52ba14b8e2ee4151adf54af9"
+    },
+    {
+      "id": "capability:model-compute-gateway:activated_by:environment:local",
+      "from": "capability:model-compute-gateway",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "6cead49af7f2e61dbd975caff2d5b47bfab20ff59cfe87b248c219e85e486c3f"
+    },
+    {
+      "id": "capability:model-compute-gateway:activated_by:environment:test",
+      "from": "capability:model-compute-gateway",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "a10eb35646bf1088aa5bac47c627bb5c5bdcd199dc0e86171788b66e85de2c60"
+    },
+    {
+      "id": "capability:model-compute-gateway:activated_by:environment:preview",
+      "from": "capability:model-compute-gateway",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "ec6b84b4f689a023af7f18a277ecab089a49af32352ffe2f5a0fa8eb5b511b2d"
+    },
+    {
+      "id": "capability:model-compute-gateway:activated_by:environment:protected-pilot",
+      "from": "capability:model-compute-gateway",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "7cb1176f7c12c0adc5801e44390abd05ed15ef8ed7f7535736e74c17c0abb992"
+    },
+    {
+      "id": "plane:evidence-learning:contains:capability:outcome-learning-loop",
+      "from": "plane:evidence-learning",
+      "to": "capability:outcome-learning-loop",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "aeb55c56ca08d40638163474a7a85df650c684f773fbe54d303169d207aa9823"
+    },
+    {
+      "id": "product:scrimed-evidenceops:contains:capability:outcome-learning-loop",
+      "from": "product:scrimed-evidenceops",
+      "to": "capability:outcome-learning-loop",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "11d528419149d042226cdecae9896514f0fdb6683fc6095c35a6d18e822d12e6"
+    },
+    {
+      "id": "capability:outcome-learning-loop:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:outcome-learning-loop",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "9350510cc41583d2096ebeed432fbaa2170125d54a813a589146d5dadea53e65"
+    },
+    {
+      "id": "capability:outcome-learning-loop:reviewed_by:approval:automated-no-phi-technical-quality-gate",
+      "from": "capability:outcome-learning-loop",
+      "to": "approval:automated-no-phi-technical-quality-gate",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "6e943b9befc101d775b4098eab8575a1c4a3aeb411e589d2694522c771b4ab37"
+    },
+    {
+      "id": "capability:outcome-learning-loop:depends_on:capability:trust-evidence-control",
+      "from": "capability:outcome-learning-loop",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "4db137b8e38b8d7fc4f932ff6f1e38b47adc883fb4f17ee5240b8a933c5eb82e"
+    },
+    {
+      "id": "capability:outcome-learning-loop:depends_on:capability:governed-agent-runtime",
+      "from": "capability:outcome-learning-loop",
+      "to": "capability:governed-agent-runtime",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "d34e3f28be35116cc1b6741c8f912cfe9d8c6e470a413dca443201b5028625a5"
+    },
+    {
+      "id": "capability:outcome-learning-loop:invokes:agent:evidence-validator",
+      "from": "capability:outcome-learning-loop",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "8220ee35f3d2cd3858c30285391282eb2fb52a10dbd2476693509f35145df361"
+    },
+    {
+      "id": "capability:outcome-learning-loop:invokes:agent:policy-reviewer",
+      "from": "capability:outcome-learning-loop",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "7d7b57ea2ef217660645b5b4d2f1e9b97d65505ba9068a8352c916b2614818bf"
+    },
+    {
+      "id": "capability:outcome-learning-loop:routes_to:workflow:research-brief-generation",
+      "from": "capability:outcome-learning-loop",
+      "to": "workflow:research-brief-generation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "37791c2b4d8b992179fec6ec76216dad2f2ab64a0c31b177bc17d07aaeae03a1"
+    },
+    {
+      "id": "capability:outcome-learning-loop:routes_to:workflow:executive-reporting",
+      "from": "capability:outcome-learning-loop",
+      "to": "workflow:executive-reporting",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "e0a85e08d30d38893d318c112480d0aabefdf3b4b69805ad21f04e64182decc3"
+    },
+    {
+      "id": "proof-route:/healthcare-value-realization:provides_evidence_for:capability:outcome-learning-loop",
+      "from": "proof-route:/healthcare-value-realization",
+      "to": "capability:outcome-learning-loop",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "fca4cdb6a5b1d4ffe1c31428c16cc5f1e3ddbdc7dd5aeace5ce3e81f40b10267"
+    },
+    {
+      "id": "proof-route:/scrimed-clinical-benchmark-suite:provides_evidence_for:capability:outcome-learning-loop",
+      "from": "proof-route:/scrimed-clinical-benchmark-suite",
+      "to": "capability:outcome-learning-loop",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "95fe6c8f37d6f09e0a8d57b031dd7285c331617c5338ad7a68a25ad7520a24cb"
+    },
+    {
+      "id": "proof-route:/validation-evidence:provides_evidence_for:capability:outcome-learning-loop",
+      "from": "proof-route:/validation-evidence",
+      "to": "capability:outcome-learning-loop",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "f0975ede0e3cb45e8eea91006d9f44612213322fca682a16153abd5713751227"
+    },
+    {
+      "id": "capability:outcome-learning-loop:activated_by:environment:local",
+      "from": "capability:outcome-learning-loop",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "b4435092408ba9e85fb8b751a0645d0b8614565cf75f989dd81ae43ef249d5c8"
+    },
+    {
+      "id": "capability:outcome-learning-loop:activated_by:environment:test",
+      "from": "capability:outcome-learning-loop",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "e0ad220d8bcdcb34af90ce52404273631e62d06678780eb9cee39cd30951bd1e"
+    },
+    {
+      "id": "capability:outcome-learning-loop:activated_by:environment:preview",
+      "from": "capability:outcome-learning-loop",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "c6cd6b4f372c96d42486ab889da1499ad1d74512ba3e65f1c8bfa8942d687829"
+    },
+    {
+      "id": "capability:outcome-learning-loop:activated_by:environment:protected-pilot",
+      "from": "capability:outcome-learning-loop",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "2c134549c891d1c0208654ad72175a733e7a033deb5b736cc7c31aa6a7454d3d"
+    },
+    {
+      "id": "plane:developer-ecosystem:contains:capability:developer-conformance-platform",
+      "from": "plane:developer-ecosystem",
+      "to": "capability:developer-conformance-platform",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "610b3645793e0ade6b2b99d46a6d0863ad937237887192973057e850fc6f5c70"
+    },
+    {
+      "id": "product:scrimed-studio:contains:capability:developer-conformance-platform",
+      "from": "product:scrimed-studio",
+      "to": "capability:developer-conformance-platform",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "b2f171e697dc34066062d1c03d5fff0d79a1d96fdf9479083eb311ed8c1b08f1"
+    },
+    {
+      "id": "capability:developer-conformance-platform:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:developer-conformance-platform",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "956546a1332e8fab3caf69ce64e1e70bfba6d7db750b719ea0c015ca0b0c3ba1"
+    },
+    {
+      "id": "capability:developer-conformance-platform:reviewed_by:approval:automated-no-phi-technical-quality-gate",
+      "from": "capability:developer-conformance-platform",
+      "to": "approval:automated-no-phi-technical-quality-gate",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "f2c87005912487bb16cea0c08663555416a9dfade67593521786712dbc2ceada"
+    },
+    {
+      "id": "capability:developer-conformance-platform:depends_on:capability:trust-evidence-control",
+      "from": "capability:developer-conformance-platform",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "a290f1b127c7400e6f38c8e5ded29289098f5325970693deac6ac83196a0800a"
+    },
+    {
+      "id": "capability:developer-conformance-platform:depends_on:capability:governed-agent-runtime",
+      "from": "capability:developer-conformance-platform",
+      "to": "capability:governed-agent-runtime",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "299369eaffa26ebd83fad320434fd531e39c4a0da40c6423f9819cc49b3bc71a"
+    },
+    {
+      "id": "capability:developer-conformance-platform:invokes:agent:interoperability",
+      "from": "capability:developer-conformance-platform",
+      "to": "agent:interoperability",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "5d06db94a43c75143a57bf7beb989b877a0d8373a8515788379d536e7478c313"
+    },
+    {
+      "id": "capability:developer-conformance-platform:invokes:agent:infrastructure-observer",
+      "from": "capability:developer-conformance-platform",
+      "to": "agent:infrastructure-observer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "4200a513488464ecc3483af29002794d9128d14b527be38db5f59ebaa4ca6c35"
+    },
+    {
+      "id": "capability:developer-conformance-platform:invokes:agent:policy-reviewer",
+      "from": "capability:developer-conformance-platform",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "7d76f53493aa8bea04e58f07c6d7aaff6fca2de5e93529acab1b09f1c3e7458d"
+    },
+    {
+      "id": "capability:developer-conformance-platform:routes_to:workflow:research-brief-generation",
+      "from": "capability:developer-conformance-platform",
+      "to": "workflow:research-brief-generation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "7e0d53f5c9fabab2ce5af3d0a0f1e4f8fc15b70db1187cdbf53611dbdfa7b500"
+    },
+    {
+      "id": "proof-route:/scrimed-studio:provides_evidence_for:capability:developer-conformance-platform",
+      "from": "proof-route:/scrimed-studio",
+      "to": "capability:developer-conformance-platform",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "03162d01e167a1cfc311a32aa4fabada7d565f5e0c556380e238ef5d8bbb8891"
+    },
+    {
+      "id": "proof-route:/scrimed-governance-learning-loop:provides_evidence_for:capability:developer-conformance-platform",
+      "from": "proof-route:/scrimed-governance-learning-loop",
+      "to": "capability:developer-conformance-platform",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "4bc30a23469f7fd207a611d2c92f1991b55c5b07d1ede662ee696aa96244b40d"
+    },
+    {
+      "id": "proof-route:/scrimed-control-plane:provides_evidence_for:capability:developer-conformance-platform",
+      "from": "proof-route:/scrimed-control-plane",
+      "to": "capability:developer-conformance-platform",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "22c54f80770021e217df23a4232a494228dfbc1a892abfbc89a0cffac1dc3e35"
+    },
+    {
+      "id": "capability:developer-conformance-platform:activated_by:environment:local",
+      "from": "capability:developer-conformance-platform",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "82f3fab359bc891d191ebd254f5449f31a2a0f706a7b5e2a995239d7a63ff6a7"
+    },
+    {
+      "id": "capability:developer-conformance-platform:activated_by:environment:test",
+      "from": "capability:developer-conformance-platform",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "ed3058271c4f38a4872de8504e46b34aba26c61c79348211d750878e514d6f28"
+    },
+    {
+      "id": "capability:developer-conformance-platform:activated_by:environment:preview",
+      "from": "capability:developer-conformance-platform",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "f82dc5b9642e125c4898fbe51135e828da0d96eec07e138677a94c6f8811f732"
+    },
+    {
+      "id": "plane:partner-marketplace:contains:capability:governed-partner-marketplace",
+      "from": "plane:partner-marketplace",
+      "to": "capability:governed-partner-marketplace",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "b725f33e4cb5fe48c4c2c3140707f94a8c858a58ddb4e254357449ac0f2f1bfe"
+    },
+    {
+      "id": "product:scrimed-partner-platform:contains:capability:governed-partner-marketplace",
+      "from": "product:scrimed-partner-platform",
+      "to": "capability:governed-partner-marketplace",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "3935c56375bed5c26f4350a46dfae3263975bc1541fda9215ab3cd1d1534f26e"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:governed-partner-marketplace",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "cb2dffafa708ec8146c04e5a08405c96a983620801274f9d585fceebd6de084c"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:governed-partner-marketplace",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "3404f0d3a9044c918d34bafaf6f4d59dddfe0a12aa14a8f93b5692a7b21f4393"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:depends_on:capability:developer-conformance-platform",
+      "from": "capability:governed-partner-marketplace",
+      "to": "capability:developer-conformance-platform",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "9e7077a7cdb7a9c422b0961bdfdbf270bbcfc352c75ca30424a4b10d61550771"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:depends_on:capability:trust-evidence-control",
+      "from": "capability:governed-partner-marketplace",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "933f13e54990f58a07d16ed03fdf19b54ad8e304884d32fa9fd202f0372b2a89"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:invokes:agent:policy-reviewer",
+      "from": "capability:governed-partner-marketplace",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "8d6d8a8b36afd01be21e887adebd66ddbc61140b68175fc710981e3ddfc00a39"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:invokes:agent:infrastructure-observer",
+      "from": "capability:governed-partner-marketplace",
+      "to": "agent:infrastructure-observer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "44d278d02a80737563db43ff3a81f40fd45d7fa3ade9e6eaf991badef64ad1f6"
+    },
+    {
+      "id": "proof-route:/scrimed-studio:provides_evidence_for:capability:governed-partner-marketplace",
+      "from": "proof-route:/scrimed-studio",
+      "to": "capability:governed-partner-marketplace",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "a2ca61cb4878620a8656b9c4270e329228eb932c648a45cc70af4d0e6047349e"
+    },
+    {
+      "id": "proof-route:/approvals-readiness:provides_evidence_for:capability:governed-partner-marketplace",
+      "from": "proof-route:/approvals-readiness",
+      "to": "capability:governed-partner-marketplace",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "32519fe17299308c29cc736e019b75d6d5ff6f9447ae1f1ed5bc91805db88db0"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:activated_by:environment:local",
+      "from": "capability:governed-partner-marketplace",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "ef69ef0d41ac8bb83f914d649b9c117242867f73649cadb88d09ead64b018787"
+    },
+    {
+      "id": "capability:governed-partner-marketplace:activated_by:environment:test",
+      "from": "capability:governed-partner-marketplace",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "b0d9d4b0a081e10717e9ec8469f1d64dda46e1413438a271f54b9e218ec191ca"
+    },
+    {
+      "id": "plane:research-trials:contains:capability:trialcore-research-operations",
+      "from": "plane:research-trials",
+      "to": "capability:trialcore-research-operations",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "6284d38fda479bcff241fbe30e8b86f77d3d3666eb9df3223d9dded7c14c3f3f"
+    },
+    {
+      "id": "product:trialcore:contains:capability:trialcore-research-operations",
+      "from": "product:trialcore",
+      "to": "capability:trialcore-research-operations",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "7341d7ee127b3cba102daaf2931ce1fc37b6c44356e8d252a069f0d238d949be"
+    },
+    {
+      "id": "capability:trialcore-research-operations:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:trialcore-research-operations",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "a4199538d461df5c98f0b5d09694f5392217a9fe4f30ab58e7dc4cd6053bab85"
+    },
+    {
+      "id": "capability:trialcore-research-operations:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:trialcore-research-operations",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "fc334735c5e89da4b7eb29385c3ec75a02d5afdd6af6ec9a4b2676d922c16bd0"
+    },
+    {
+      "id": "capability:trialcore-research-operations:depends_on:capability:trust-evidence-control",
+      "from": "capability:trialcore-research-operations",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "f58c58c425322ff5db47b723fd68a905136a603822e1555d93a4e1475b7f9486"
+    },
+    {
+      "id": "capability:trialcore-research-operations:depends_on:capability:data-interoperability-fabric",
+      "from": "capability:trialcore-research-operations",
+      "to": "capability:data-interoperability-fabric",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "94c3c016002ab3b01ae2d6e87e3706b9d4c560cceea9475e6e5dadb7fc48ecd3"
+    },
+    {
+      "id": "capability:trialcore-research-operations:depends_on:capability:outcome-learning-loop",
+      "from": "capability:trialcore-research-operations",
+      "to": "capability:outcome-learning-loop",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "0b9410a49267e3df1e1a92e2680c151cd51dfbe44777e358ad92206d9b91be2b"
+    },
+    {
+      "id": "capability:trialcore-research-operations:invokes:agent:research",
+      "from": "capability:trialcore-research-operations",
+      "to": "agent:research",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "372e7f877fc087e85d6ff43545a5ac1caf8c38867eef9a04748f803d6d51ff0b"
+    },
+    {
+      "id": "capability:trialcore-research-operations:invokes:agent:clinical-context",
+      "from": "capability:trialcore-research-operations",
+      "to": "agent:clinical-context",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "059414eaab272b8321f414b821eede124b039711d3ed49afef71ae096cbadeff"
+    },
+    {
+      "id": "capability:trialcore-research-operations:invokes:agent:evidence-validator",
+      "from": "capability:trialcore-research-operations",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "31d0005a985941cb0415a069fd64d64dac41897ceeeb45a66b57a18f3520ec39"
+    },
+    {
+      "id": "capability:trialcore-research-operations:routes_to:workflow:research-brief-generation",
+      "from": "capability:trialcore-research-operations",
+      "to": "workflow:research-brief-generation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "88b35b38a534e394708fff68491d8835cd953e055c9c82a7a23876e815c51bc5"
+    },
+    {
+      "id": "proof-route:/research:provides_evidence_for:capability:trialcore-research-operations",
+      "from": "proof-route:/research",
+      "to": "capability:trialcore-research-operations",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "c39d97b408fac743a95eeaa657a46a017c5f5238ab87de2bef76bf266b3569d1"
+    },
+    {
+      "id": "proof-route:/scrimed-clinical-benchmark-suite:provides_evidence_for:capability:trialcore-research-operations",
+      "from": "proof-route:/scrimed-clinical-benchmark-suite",
+      "to": "capability:trialcore-research-operations",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "2efc8ddbe107270eefac6a5e674c5404eac3ef3bf3452389389ebbfc0f5ff7fe"
+    },
+    {
+      "id": "proof-route:/validation-evidence:provides_evidence_for:capability:trialcore-research-operations",
+      "from": "proof-route:/validation-evidence",
+      "to": "capability:trialcore-research-operations",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "38aa4b7a0e5c5df8c54aedf98a3aaa057a24bc4621d95eee9093e29627427a1a"
+    },
+    {
+      "id": "capability:trialcore-research-operations:activated_by:environment:local",
+      "from": "capability:trialcore-research-operations",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "8730da90f43552bb2aa328e63371743b43f31ca075a983f1fe9b5475b9ea84f0"
+    },
+    {
+      "id": "capability:trialcore-research-operations:activated_by:environment:test",
+      "from": "capability:trialcore-research-operations",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "f6d0ba480a86fc1614f4d0616105967d739aa4ceabd3477a9202ddbf5a9c9dba"
+    },
+    {
+      "id": "capability:trialcore-research-operations:activated_by:environment:preview",
+      "from": "capability:trialcore-research-operations",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "0d7962b4f44a7c1baa9c078a8aa6fd6b65bb9ae26ab5a03d93a2a15a08b46b23"
+    },
+    {
+      "id": "capability:trialcore-research-operations:activated_by:environment:protected-pilot",
+      "from": "capability:trialcore-research-operations",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "657ea6b35ed89d344f18cfe663505d70fa9e34aa8f3b04e7b977c41d8e0ee0e2"
+    },
+    {
+      "id": "plane:business-capital:contains:capability:capital-commercial-intelligence",
+      "from": "plane:business-capital",
+      "to": "capability:capital-commercial-intelligence",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "cc2764d7d505b8080257e6cfa330e5772db2639536fc132098588eda013d3db8"
+    },
+    {
+      "id": "product:scrimed-capital-and-commercial-intelligence:contains:capability:capital-commercial-intelligence",
+      "from": "product:scrimed-capital-and-commercial-intelligence",
+      "to": "capability:capital-commercial-intelligence",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "389878148dbe8e3037f2e53918273448cb961d6aaf4a65cfb61ca82fb7b50216"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "d51f723b443eba40051ea9fd049be013dc8417e408fc3ea6eda7965549bfac13"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "edeca798f31a1f4982438c84b04791046f9c3cce9daf3fd83962e5754e4681bf"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:depends_on:capability:trust-evidence-control",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "77768d54fb7a40030d79a0cf67b47a6a4a4962a3327244c82e39bb597c92245f"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:depends_on:capability:outcome-learning-loop",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "capability:outcome-learning-loop",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "20ae164e3f55d851b7ccf6228be524429c7ecdb654f4995270867297822afbc9"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:invokes:agent:capital-intelligence",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "agent:capital-intelligence",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "4f1afbcbf76219daf344fa2e3c3b5d0ee9368b7bd044d9f9af3128c59ca8ec40"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:invokes:agent:executive-intelligence",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "agent:executive-intelligence",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "9da9a4d13865914a4e4d6b53c0c702c7b38095fe6df78ec2df55d910ba6a0a96"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:invokes:agent:policy-reviewer",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "068379291c5e5ad17bfa3589a1707061670a6814c10ea7d69d4b0fbcd9cff27d"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:routes_to:workflow:investor-diligence-preparation",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "workflow:investor-diligence-preparation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "f0b67a3dcdba4c0507456ee69c6ed1f4de77986684d2766ff39f2567982307a2"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:routes_to:workflow:executive-reporting",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "workflow:executive-reporting",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "8ba5e8f5b30c455d1d7febd841da0f0d5f3b8e6910d960aa7d9207d38ba6f93a"
+    },
+    {
+      "id": "proof-route:/investor-audience-readiness:provides_evidence_for:capability:capital-commercial-intelligence",
+      "from": "proof-route:/investor-audience-readiness",
+      "to": "capability:capital-commercial-intelligence",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "f7ec0439a741087cd04f8ea201a1c528b8ff133f6f801e345c175f6411c82bce"
+    },
+    {
+      "id": "proof-route:/offerings:provides_evidence_for:capability:capital-commercial-intelligence",
+      "from": "proof-route:/offerings",
+      "to": "capability:capital-commercial-intelligence",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "488948ca084f348e4e2f1db496310baf46f9cffeb6965f185aaf89653ac21db7"
+    },
+    {
+      "id": "proof-route:/capital-vitality:provides_evidence_for:capability:capital-commercial-intelligence",
+      "from": "proof-route:/capital-vitality",
+      "to": "capability:capital-commercial-intelligence",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "687c2fa81822389fdcbbcf3fed6dfdff82047cdec1364dfbbb4c61be810de6b2"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:activated_by:environment:local",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "78f7bda71412883702ebc1adf504b55db3fc74bfc3024953596995fca9194518"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:activated_by:environment:test",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "c8e7b46190d4d2b470f7851acbdb3e11b96c1f35db008b6d762b3f37c0d17bfb"
+    },
+    {
+      "id": "capability:capital-commercial-intelligence:activated_by:environment:preview",
+      "from": "capability:capital-commercial-intelligence",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "35160fcaa22b57ac358e656f6394ed6a5b48193cbf4d7ce36ca1dfab88e1ac87"
+    },
+    {
+      "id": "plane:operations-continuity:contains:capability:continuity-release-operations",
+      "from": "plane:operations-continuity",
+      "to": "capability:continuity-release-operations",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "14eb48bfcfa93fe0e2acaf8842566b2155e1ba6bd506dc0fbf33373458435297"
+    },
+    {
+      "id": "product:scrimed-release-and-continuity-operations:contains:capability:continuity-release-operations",
+      "from": "product:scrimed-release-and-continuity-operations",
+      "to": "capability:continuity-release-operations",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "ce0804c04b964fbfa88d22a9ab9660ae7996b319a76f6395f58c8e0ff5d3c136"
+    },
+    {
+      "id": "capability:continuity-release-operations:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:continuity-release-operations",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "999d005934bb2abdfcf59f2ac38857a8d214feb4fe89b8f949107bb3e560fd53"
+    },
+    {
+      "id": "capability:continuity-release-operations:reviewed_by:approval:automated-no-phi-technical-quality-gate",
+      "from": "capability:continuity-release-operations",
+      "to": "approval:automated-no-phi-technical-quality-gate",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "43cefbd0d25801377aadef8e36ac2ec501514cdd6350ee419bf5849eaa5c0db0"
+    },
+    {
+      "id": "capability:continuity-release-operations:depends_on:capability:trust-evidence-control",
+      "from": "capability:continuity-release-operations",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "fe8ee108a88addd0aaf6af003c83f7d71159868bd3739b246d9b40f495556159"
+    },
+    {
+      "id": "capability:continuity-release-operations:invokes:agent:coordinator",
+      "from": "capability:continuity-release-operations",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "b3f0d323d4880267332aa3724ac4e560a81f88323a7aa54b1439f7d5e4d2ec6d"
+    },
+    {
+      "id": "capability:continuity-release-operations:invokes:agent:infrastructure-observer",
+      "from": "capability:continuity-release-operations",
+      "to": "agent:infrastructure-observer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "9cc94fe9bebade74b659e2e00be8302d2500df87dd41cf7d4d8b7786d53aecfb"
+    },
+    {
+      "id": "capability:continuity-release-operations:invokes:agent:policy-reviewer",
+      "from": "capability:continuity-release-operations",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "27a34490c04f4093f0f80f25bcf4ee2b8b96cf2d325ff90d00cbe59839a57083"
+    },
+    {
+      "id": "capability:continuity-release-operations:routes_to:workflow:executive-reporting",
+      "from": "capability:continuity-release-operations",
+      "to": "workflow:executive-reporting",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "c27ffb7bc3f49345acc150bceb8682fc522b38600e7fc79529a59b907524df2f"
+    },
+    {
+      "id": "proof-route:/scrimed-work:provides_evidence_for:capability:continuity-release-operations",
+      "from": "proof-route:/scrimed-work",
+      "to": "capability:continuity-release-operations",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "9042e6b559fe6cc081c2cf05ce32fea4943cb360c338fcc31d23d84288433bbc"
+    },
+    {
+      "id": "proof-route:/release-continuity:provides_evidence_for:capability:continuity-release-operations",
+      "from": "proof-route:/release-continuity",
+      "to": "capability:continuity-release-operations",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "b1680574d661992a6779b9efdcadd967d254a34a2bf35efc786140d338910fbe"
+    },
+    {
+      "id": "proof-route:/deployment-drift-guard:provides_evidence_for:capability:continuity-release-operations",
+      "from": "proof-route:/deployment-drift-guard",
+      "to": "capability:continuity-release-operations",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "bfef9b31def75ffa903b1b3712c90091b6f050562d8ae91de28add40580d5bb6"
+    },
+    {
+      "id": "capability:continuity-release-operations:activated_by:environment:local",
+      "from": "capability:continuity-release-operations",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "af9431a1e78c75cb2f3d1830f3649b1af2d31fd10d2e0cc6aabece16b4932713"
+    },
+    {
+      "id": "capability:continuity-release-operations:activated_by:environment:test",
+      "from": "capability:continuity-release-operations",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "991bf11d13d73e4353f276a25357e4088ae29750836ad834863074586c73ecba"
+    },
+    {
+      "id": "capability:continuity-release-operations:activated_by:environment:preview",
+      "from": "capability:continuity-release-operations",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "d1f822137fe5508f207099c1b2391679fe3f0fe433378314708386458475fc8e"
+    },
+    {
+      "id": "capability:continuity-release-operations:activated_by:environment:protected-pilot",
+      "from": "capability:continuity-release-operations",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "9dc1b6f21eeec7f9a6c19ee2fb43c67d9b61099c4674d4c8529941b500db9842"
+    },
+    {
+      "id": "plane:workflows-agents:contains:capability:documentation-authorization-wedge",
+      "from": "plane:workflows-agents",
+      "to": "capability:documentation-authorization-wedge",
+      "relation": "contains",
+      "reason": "The capability is owned by this platform plane.",
+      "auditHash": "43d9fe7f2d3f72699b22dc16115d6aac4595d70d53bf4c5175d43fa02ee7a599"
+    },
+    {
+      "id": "product:scrimed-work:contains:capability:documentation-authorization-wedge",
+      "from": "product:scrimed-work",
+      "to": "capability:documentation-authorization-wedge",
+      "relation": "contains",
+      "reason": "The product exposes this governed capability.",
+      "auditHash": "93de1f8fad479f982dc4adafd584ec4e189f758cfc2fa3c6b9d83a2acd70bc90"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Every capability is bound by the synthetic/no-PHI policy.",
+      "auditHash": "8fe7714cc251948d3169467de739c29a5ace7a352e9adade6f305f6e325deed0"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:reviewed_by:approval:named-independent-reviewer",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "Activation requires the applicable technical or human gate.",
+      "auditHash": "cc8b35495fb891c5559d2a4d3a3df45b416a6fdda447efc4fc8287acee2adc17"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:depends_on:capability:governed-agent-runtime",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "capability:governed-agent-runtime",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "e1e55271ae508ed98991187a2dd0e831cb04a45cdb9aa6c6bf7d3bca6cb55581"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:depends_on:capability:clinical-context-lens",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "capability:clinical-context-lens",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "5515e213403d4866e0fd77f3f1d805db0ba62e9dfb35e17a9241965c9275f8b5"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:depends_on:capability:trust-evidence-control",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "capability:trust-evidence-control",
+      "relation": "depends_on",
+      "reason": "Declared capability dependency.",
+      "auditHash": "024e1d23de5ca198115687b9e8240487a2377edb19fec42e396c7a421fb3afeb"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:invokes:agent:revenue-cycle",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "agent:revenue-cycle",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "9121f29bf9e4c1bb0a936b6bfcba9aeda0690fd0e9f52b98f9d6dacff16529eb"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:invokes:agent:clinical-context",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "agent:clinical-context",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "c74a39c2b01a8d0587d9342f43bdac755fc2b03457e51b025b028a43dd159e0f"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:invokes:agent:evidence-validator",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "7403bc03a2a2954639a5da719f6e42533d5e5f7504ef1a85f7a2576f7b6978d8"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:invokes:agent:policy-reviewer",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Capability may invoke only a declared agent identity.",
+      "auditHash": "6cdf42fede9d765dfd50f33c345c7ea02a83fc4a63ad66f12eece4b060eb24f1"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:routes_to:workflow:prior-authorization-preparation",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "workflow:prior-authorization-preparation",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "b3ab70ffaa79f87828f1dd6ef77775766c71c616a185186b8d0bafd624eb5220"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:routes_to:workflow:denial-analysis",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "workflow:denial-analysis",
+      "relation": "routes_to",
+      "reason": "Capability supports this bounded workflow definition.",
+      "auditHash": "43c0d79aad57c04ee4f8a325f8874ec4e379c310ad9454b961be92d0bf5e71ef"
+    },
+    {
+      "id": "proof-route:/documentation-before-authorization:provides_evidence_for:capability:documentation-authorization-wedge",
+      "from": "proof-route:/documentation-before-authorization",
+      "to": "capability:documentation-authorization-wedge",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "2dd9b5b755b6db5d64e1f67cd41a45889b0968a987d0fa48f7263fa2b33e4773"
+    },
+    {
+      "id": "proof-route:/offerings:provides_evidence_for:capability:documentation-authorization-wedge",
+      "from": "proof-route:/offerings",
+      "to": "capability:documentation-authorization-wedge",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "96859767312d05755b43e4e965b38d6e9898a470e4bb8cd0ce47ab95f94a6051"
+    },
+    {
+      "id": "proof-route:/healthcare-value-realization:provides_evidence_for:capability:documentation-authorization-wedge",
+      "from": "proof-route:/healthcare-value-realization",
+      "to": "capability:documentation-authorization-wedge",
+      "relation": "provides_evidence_for",
+      "reason": "Repository route exposes reviewable synthetic evidence.",
+      "auditHash": "75e18dd3b8579205e2adbbafff41d0c89735d7049f07d7becef1816fb4af6a98"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:activated_by:environment:local",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "environment:local",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "6431dbcefee478fd205c169aafad3396537dd70ee03a77561fd9b193894d3eee"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:activated_by:environment:test",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "environment:test",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "39b0c0fb0272bac00957ecab66131047dc78d9127cb5c8faf3df2284647bb21e"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:activated_by:environment:preview",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "environment:preview",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "f42fcb17e0f71f852a1f3d5ed746723e6e8528656edb9e53ff309994d91833c9"
+    },
+    {
+      "id": "capability:documentation-authorization-wedge:activated_by:environment:protected-pilot",
+      "from": "capability:documentation-authorization-wedge",
+      "to": "environment:protected-pilot",
+      "relation": "activated_by",
+      "reason": "Environment is declared in capability activation policy.",
+      "auditHash": "eff60ab8c9d03e4116be87fb186e5f94e8f7eea38a0a2664e9f8e2e0454ac8af"
+    },
+    {
+      "id": "workflow:patient-intake-preparation:invokes:agent:coordinator",
+      "from": "workflow:patient-intake-preparation",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "faecca711586650008667284473edfb490a25441a37533d355c5947267bd62c2"
+    },
+    {
+      "id": "workflow:patient-intake-preparation:invokes:agent:patient-access",
+      "from": "workflow:patient-intake-preparation",
+      "to": "agent:patient-access",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "a78d513041d188f446bc17e546b2dff55a6aa29bfe5ed095548267bea2b1be14"
+    },
+    {
+      "id": "workflow:patient-intake-preparation:invokes:agent:documentation",
+      "from": "workflow:patient-intake-preparation",
+      "to": "agent:documentation",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "57629db7f204aa1922abc7dd4264d8a63e442f343c4c5e42cfab4777ad5d504e"
+    },
+    {
+      "id": "workflow:patient-intake-preparation:invokes:agent:evidence-validator",
+      "from": "workflow:patient-intake-preparation",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "b5c51ccd6b6a311072a50a05dd4a0f9b6b01b56da9d218ad8cb0a6813095cac5"
+    },
+    {
+      "id": "workflow:patient-intake-preparation:invokes:agent:policy-reviewer",
+      "from": "workflow:patient-intake-preparation",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "f3c4477efd5d9212d4b1fcffb0294fd754a8f12b13a973a33cbafefecd20e336"
+    },
+    {
+      "id": "workflow:referral-coordination:invokes:agent:coordinator",
+      "from": "workflow:referral-coordination",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "26aaa01b460a0c9a2fe757f8e039fef687019bb8b4236c52e97d58323bd5280b"
+    },
+    {
+      "id": "workflow:referral-coordination:invokes:agent:patient-access",
+      "from": "workflow:referral-coordination",
+      "to": "agent:patient-access",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "f89587357f3fa9e1c2889bf87b216df137e95732bb3b3b39faf6d2fe4afb9af7"
+    },
+    {
+      "id": "workflow:referral-coordination:invokes:agent:clinical-context",
+      "from": "workflow:referral-coordination",
+      "to": "agent:clinical-context",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "ba8e3a45167247fe5617f874f109ce110c29fc0a6185eee6c118171b93b77135"
+    },
+    {
+      "id": "workflow:referral-coordination:invokes:agent:evidence-validator",
+      "from": "workflow:referral-coordination",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "501a89d0555aea8c4ef5c7600ceb7c65e1b7c42a6460116c50f64fab21696977"
+    },
+    {
+      "id": "workflow:referral-coordination:invokes:agent:policy-reviewer",
+      "from": "workflow:referral-coordination",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "d9d66810a5ab2bacb23867733fe145fbb152d0acf32960ceb77d2d6f6aaf39c4"
+    },
+    {
+      "id": "workflow:prior-authorization-preparation:invokes:agent:coordinator",
+      "from": "workflow:prior-authorization-preparation",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "e40332a3872360a19d15b1195418e17a2c8ca3bbaaede44471b46db0a57cda76"
+    },
+    {
+      "id": "workflow:prior-authorization-preparation:invokes:agent:revenue-cycle",
+      "from": "workflow:prior-authorization-preparation",
+      "to": "agent:revenue-cycle",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "7c54a76094fe50bed6c428a6429438cc38ff2c6b247de1934b2ec0d271bf3573"
+    },
+    {
+      "id": "workflow:prior-authorization-preparation:invokes:agent:clinical-context",
+      "from": "workflow:prior-authorization-preparation",
+      "to": "agent:clinical-context",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "029882db8c3c3f0d053e0f7faefabf3f06ce7fac5d9ac3148ecc55fd10cafc29"
+    },
+    {
+      "id": "workflow:prior-authorization-preparation:invokes:agent:evidence-validator",
+      "from": "workflow:prior-authorization-preparation",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "8977ba6e66525c88d683c94347d30d37a5b277364b1fd60de7b0ca33714ec9a9"
+    },
+    {
+      "id": "workflow:prior-authorization-preparation:invokes:agent:policy-reviewer",
+      "from": "workflow:prior-authorization-preparation",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "78b16f3158321bdbf8cb4c2450652ca0f8ea978dcb89ef595a4f8e937e19cb91"
+    },
+    {
+      "id": "workflow:denial-analysis:invokes:agent:coordinator",
+      "from": "workflow:denial-analysis",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "e737ca7e8cbeb6dea003b3e441de685e2dec1e3a14283d10d49f8bf9052bce04"
+    },
+    {
+      "id": "workflow:denial-analysis:invokes:agent:revenue-cycle",
+      "from": "workflow:denial-analysis",
+      "to": "agent:revenue-cycle",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "849f5c31f07239c3d492d952fd48ab174fd94d68774227130a9be127e9c8c49e"
+    },
+    {
+      "id": "workflow:denial-analysis:invokes:agent:evidence-validator",
+      "from": "workflow:denial-analysis",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "9f18508b9d54970b7e8e4b52cbec5d4150d532bbae75680ce2133d542446866d"
+    },
+    {
+      "id": "workflow:denial-analysis:invokes:agent:policy-reviewer",
+      "from": "workflow:denial-analysis",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "ac3b2c3056d4c9db65a022920eabee6e6035ab76e6ba569df071a61c88ec3f4c"
+    },
+    {
+      "id": "workflow:clinical-documentation-preparation:invokes:agent:coordinator",
+      "from": "workflow:clinical-documentation-preparation",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "b092e89e653f80223d43e1bcafee23f411e7aa3eaf047145e85e84e354198d4e"
+    },
+    {
+      "id": "workflow:clinical-documentation-preparation:invokes:agent:documentation",
+      "from": "workflow:clinical-documentation-preparation",
+      "to": "agent:documentation",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "8275295d3f69d2f3b3ad5d68074815c12785109e9071ead7ff852b965b1b6ec9"
+    },
+    {
+      "id": "workflow:clinical-documentation-preparation:invokes:agent:clinical-safety",
+      "from": "workflow:clinical-documentation-preparation",
+      "to": "agent:clinical-safety",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "298e06c71f39adfc5dbde43727e98f54571d91f1d8208bd5699c7967f55a6a39"
+    },
+    {
+      "id": "workflow:clinical-documentation-preparation:invokes:agent:evidence-validator",
+      "from": "workflow:clinical-documentation-preparation",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "e5b76313e42fdcc2eead4216a1cf5e9956ab7a3abc94300ce2dade558406bebb"
+    },
+    {
+      "id": "workflow:clinical-documentation-preparation:invokes:agent:policy-reviewer",
+      "from": "workflow:clinical-documentation-preparation",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "927ce8e4b02a8c1e87b1f5dfcd0a073e7f85f917a78a96a8bd426c7d6a90e64e"
+    },
+    {
+      "id": "workflow:patient-education-drafting:invokes:agent:coordinator",
+      "from": "workflow:patient-education-drafting",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "3c0fa72ace8c80a6106cdc57042f4f9d86ca9df092a806a1df3a9d5081bd73a9"
+    },
+    {
+      "id": "workflow:patient-education-drafting:invokes:agent:clinical-context",
+      "from": "workflow:patient-education-drafting",
+      "to": "agent:clinical-context",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "8a5dc9cc761a33ea53cd89a5db272df016cf0ee948b69f0b5e40322b53d4bda7"
+    },
+    {
+      "id": "workflow:patient-education-drafting:invokes:agent:artifact-writer",
+      "from": "workflow:patient-education-drafting",
+      "to": "agent:artifact-writer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "b76aa5233fd2699d805c49dd61375a310b6a2a3570ec85ebec4a7a0781fe42ce"
+    },
+    {
+      "id": "workflow:patient-education-drafting:invokes:agent:evidence-validator",
+      "from": "workflow:patient-education-drafting",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "7c495d1fa5865069eabd0d1320d4ec079b44643f002671855e2232dbd30451c1"
+    },
+    {
+      "id": "workflow:patient-education-drafting:invokes:agent:policy-reviewer",
+      "from": "workflow:patient-education-drafting",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "ecb48e8dc0a22702adc015914a55c5ea5cbf2bc533d346cc68cf392ebcd31b94"
+    },
+    {
+      "id": "workflow:research-brief-generation:invokes:agent:coordinator",
+      "from": "workflow:research-brief-generation",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "1b48a4686036df57297116a00d523d0cc17d92a914e6b37faa6b612e52a01db8"
+    },
+    {
+      "id": "workflow:research-brief-generation:invokes:agent:research",
+      "from": "workflow:research-brief-generation",
+      "to": "agent:research",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "9508ad554254e959e0a20eb9c06e877fd00f9b2d0d50d697cfe6d438d2ce1115"
+    },
+    {
+      "id": "workflow:research-brief-generation:invokes:agent:artifact-writer",
+      "from": "workflow:research-brief-generation",
+      "to": "agent:artifact-writer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "4af87bdf5cd743edef62d17d34c0abd4537f7483a7039568953dfa33c4c486db"
+    },
+    {
+      "id": "workflow:research-brief-generation:invokes:agent:evidence-validator",
+      "from": "workflow:research-brief-generation",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "e6016aa9366d8fceb14f930dc9e959ada0ecfdc12226e70deb52c92d17df359e"
+    },
+    {
+      "id": "workflow:research-brief-generation:invokes:agent:policy-reviewer",
+      "from": "workflow:research-brief-generation",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "e9c820c017fc6c63272e171e6260ffb3ae8ac0c6a4a29f207f3c09d9456e2c8d"
+    },
+    {
+      "id": "workflow:executive-reporting:invokes:agent:coordinator",
+      "from": "workflow:executive-reporting",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "a803c80e0aeee8b4fa3e11f972fbe3926052d1008ae01548e83ddae5e6313913"
+    },
+    {
+      "id": "workflow:executive-reporting:invokes:agent:executive-intelligence",
+      "from": "workflow:executive-reporting",
+      "to": "agent:executive-intelligence",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "32ad73a7f5da10dd25d440f9311b62b1b34fa52ce0031c7fb04d8c04f098970f"
+    },
+    {
+      "id": "workflow:executive-reporting:invokes:agent:artifact-writer",
+      "from": "workflow:executive-reporting",
+      "to": "agent:artifact-writer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "c1e5ee8d8e1536cdd31498ba11acc2c7092c22ef73fc724f7a93784c3f648beb"
+    },
+    {
+      "id": "workflow:executive-reporting:invokes:agent:evidence-validator",
+      "from": "workflow:executive-reporting",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "0223ef5f89de4813c4e3f84c111f370fd4666515a2301e961fd6db958080cfc4"
+    },
+    {
+      "id": "workflow:executive-reporting:invokes:agent:policy-reviewer",
+      "from": "workflow:executive-reporting",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "114cc706ca558a6e6b3c1c2a9d0b358a8575ab1bbe233462a539f2b096acc31a"
+    },
+    {
+      "id": "workflow:investor-diligence-preparation:invokes:agent:coordinator",
+      "from": "workflow:investor-diligence-preparation",
+      "to": "agent:coordinator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "26907a637ef4009d143c0b71e5515c90f9a8b6c06e3e77784cefbf6226cc84e1"
+    },
+    {
+      "id": "workflow:investor-diligence-preparation:invokes:agent:capital-intelligence",
+      "from": "workflow:investor-diligence-preparation",
+      "to": "agent:capital-intelligence",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "2c12a5cea6a32c4900dd67f7e60b3b7f93c4ec15976dff63183bd5ae918138d7"
+    },
+    {
+      "id": "workflow:investor-diligence-preparation:invokes:agent:executive-intelligence",
+      "from": "workflow:investor-diligence-preparation",
+      "to": "agent:executive-intelligence",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "cadb81df19bd5e33918b212a801395bb8f36d1412e2c269f9c4ca54d6715f88b"
+    },
+    {
+      "id": "workflow:investor-diligence-preparation:invokes:agent:evidence-validator",
+      "from": "workflow:investor-diligence-preparation",
+      "to": "agent:evidence-validator",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "6cf53afef9512517c276404c8afb7845b1169c9a8f56928841b35b0f3520a6ee"
+    },
+    {
+      "id": "workflow:investor-diligence-preparation:invokes:agent:policy-reviewer",
+      "from": "workflow:investor-diligence-preparation",
+      "to": "agent:policy-reviewer",
+      "relation": "invokes",
+      "reason": "Workflow task graph declares this agent role.",
+      "auditHash": "937079762d3d934bfa89ade2c40033ae8510f3acf3a088d82436b750de0063a8"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:model-policy:deterministic",
+      "from": "capability:model-compute-gateway",
+      "to": "model-policy:deterministic",
+      "relation": "routes_to",
+      "reason": "The model gateway evaluates this configured provider policy; availability does not imply admission.",
+      "auditHash": "f2463b49e72b6ddb71ba40a773b657b6571774f512ef603ac1eb030b13c2110f"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:model-policy:openai-compatible",
+      "from": "capability:model-compute-gateway",
+      "to": "model-policy:openai-compatible",
+      "relation": "routes_to",
+      "reason": "The model gateway evaluates this configured provider policy; availability does not imply admission.",
+      "auditHash": "09094bd937d90540ed370b5b04d6bc2a572c324989a67f834435f7fe555e6325"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:model-policy:anthropic-compatible",
+      "from": "capability:model-compute-gateway",
+      "to": "model-policy:anthropic-compatible",
+      "relation": "routes_to",
+      "reason": "The model gateway evaluates this configured provider policy; availability does not imply admission.",
+      "auditHash": "037f5cd62fd289d2f2f8e3d45ad8539658275ff34c9968a36abd5311275093f6"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:model-policy:google-compatible",
+      "from": "capability:model-compute-gateway",
+      "to": "model-policy:google-compatible",
+      "relation": "routes_to",
+      "reason": "The model gateway evaluates this configured provider policy; availability does not imply admission.",
+      "auditHash": "96547fa244a7fa92891e126707c4165d39a63049cede68da1df5f9d9927169a4"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:model-policy:meta-compatible",
+      "from": "capability:model-compute-gateway",
+      "to": "model-policy:meta-compatible",
+      "relation": "routes_to",
+      "reason": "The model gateway evaluates this configured provider policy; availability does not imply admission.",
+      "auditHash": "7b80572809c6cda5d5730b4320095b429fa4be424af49afbf911d16bba627785"
+    },
+    {
+      "id": "capability:model-compute-gateway:routes_to:model-policy:local-open-weight",
+      "from": "capability:model-compute-gateway",
+      "to": "model-policy:local-open-weight",
+      "relation": "routes_to",
+      "reason": "The model gateway evaluates this configured provider policy; availability does not imply admission.",
+      "auditHash": "5d7c778306d6b944213f9aa55a205fd8565527f8ece2cc2cfc19a667c70cfdaa"
+    },
+    {
+      "id": "metric:verified-intelligence-yield:measures:capability:outcome-learning-loop",
+      "from": "metric:verified-intelligence-yield",
+      "to": "capability:outcome-learning-loop",
+      "relation": "measures",
+      "reason": "Portfolio prioritization requires evidence-backed value and cost measurement.",
+      "auditHash": "259d1e5e910841e64a63644379c4ff9a7197d697cd764e5a225eddd4e53245d5"
+    },
+    {
+      "id": "metric:healthcare-value-returned:measures:capability:outcome-learning-loop",
+      "from": "metric:healthcare-value-returned",
+      "to": "capability:outcome-learning-loop",
+      "relation": "measures",
+      "reason": "Portfolio prioritization requires evidence-backed value and cost measurement.",
+      "auditHash": "a8262fddfa7e8acac68bce58fa231d0a00d4146730a223d1aedb35d5f77756cb"
+    },
+    {
+      "id": "metric:cost-per-verified-successful-task:measures:capability:outcome-learning-loop",
+      "from": "metric:cost-per-verified-successful-task",
+      "to": "capability:outcome-learning-loop",
+      "relation": "measures",
+      "reason": "Portfolio prioritization requires evidence-backed value and cost measurement.",
+      "auditHash": "f33181b919507b88af47c017f7315592272f79bf32e3bb9e0bd77fca198bcfbf"
+    },
+    {
+      "id": "api:scrimed-control-plane:routes_to:capability:trust-evidence-control",
+      "from": "api:scrimed-control-plane",
+      "to": "capability:trust-evidence-control",
+      "relation": "routes_to",
+      "reason": "The API exposes the control-plane read model and guarded commands.",
+      "auditHash": "5a0bd6f2dbb0257a072d231b8b990c6a30b0700e2e83daa243ee327789a81857"
+    },
+    {
+      "id": "database:scrimed-durable-store:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "database:scrimed-durable-store",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Persistence remains tenant-scoped and migration-authorized.",
+      "auditHash": "d7d5c514a3281c7a5b6568f17e32678219a7a12e8e7fc7ca80fdc582a5a8458b"
+    },
+    {
+      "id": "evidence:deterministic-platform-artifacts:provides_evidence_for:release:working-tree-candidate",
+      "from": "evidence:deterministic-platform-artifacts",
+      "to": "release:working-tree-candidate",
+      "relation": "provides_evidence_for",
+      "reason": "Generated artifacts describe the exact working-tree candidate until committed.",
+      "auditHash": "098aaa5d62c4487b2b9531fb29fb61d3954a2cdbcb7ad697fddcb59e9b0d1f3e"
+    },
+    {
+      "id": "connector:synthetic-healthcare-adapters:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "connector:synthetic-healthcare-adapters",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Connector write authority and production data remain disabled.",
+      "auditHash": "937453aefd5920aba14f69db6bf3edd7897a2c3d60c4a4ee38178e5f6cf84521"
+    },
+    {
+      "id": "capability:data-interoperability-fabric:invokes:connector:synthetic-healthcare-adapters",
+      "from": "capability:data-interoperability-fabric",
+      "to": "connector:synthetic-healthcare-adapters",
+      "relation": "invokes",
+      "reason": "The interoperability fabric may use only scoped synthetic adapters.",
+      "auditHash": "f65c777d93d49ea2107724f417e62fd6c665e0059433f092d79bd0e259783ba1"
+    },
+    {
+      "id": "environment:protected-pilot:activated_by:approval:aal2-operator-evidence",
+      "from": "environment:protected-pilot",
+      "to": "approval:aal2-operator-evidence",
+      "relation": "activated_by",
+      "reason": "Protected-pilot access requires real AAL2 operator evidence.",
+      "auditHash": "30cac86438aadcc827c0114f703344cf2cf85fb2099d8f47a4e236ff68181d0c"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:automated-no-phi-technical-quality-gate",
+      "from": "release:working-tree-candidate",
+      "to": "approval:automated-no-phi-technical-quality-gate",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "ea608e42acb0ff580acba68ded232fffcc9eb7f8422be0b25c59ed15b117c5ad"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:clean-reviewed-commit-provenance",
+      "from": "release:working-tree-candidate",
+      "to": "approval:clean-reviewed-commit-provenance",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "36d0ed0d3f92a1e05e11276d708ec8682544c8236e3327447a7ff3304f1dbe26"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:named-independent-reviewer",
+      "from": "release:working-tree-candidate",
+      "to": "approval:named-independent-reviewer",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "2e478911a98e98ea9f05a3afc4ebbba86c6776ae03440f7189fe1da2956bead8"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:aal2-operator-evidence",
+      "from": "release:working-tree-candidate",
+      "to": "approval:aal2-operator-evidence",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "2001338873bd05c9896ac3e8c88ee01267ac6761ba2151b8981a78bf5b017147"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:migration-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:migration-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "a4df81f8980e9c12c56478dc6d77454b47c892eb09a17f8a4049f81abcd92cfb"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:intended-use-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:intended-use-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "5fc0ca36e23a0e1b7ab3e52891ada88574a6250fac1e72aa6f394766ae86526c"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:clinical-safety-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:clinical-safety-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "9a04a713733cc0b1149f40b741e91c806b4714838f61c21582fa1394d2b4dfb8"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:privacy-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:privacy-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "8b48e527430c5632715b4bfe7946629689d7f0ddf996374f772744a50175741c"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:legal-regulatory-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:legal-regulatory-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "a6210cdcfbf31c675a74f11f51107e128804264e8377f538b9d9062cf8cca4ba"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:security-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:security-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "912b80a7bfb47662aa649780ce534c48da23c0ddfac9bf3b2ed7efdeb20efde1"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:baa-subprocessor-residency-approval",
+      "from": "release:working-tree-candidate",
+      "to": "approval:baa-subprocessor-residency-approval",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "f7d817a318db88f08cb3536cb7f241f67e36874cf43283c0f830898f9b204ed7"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:deployment-authorization",
+      "from": "release:working-tree-candidate",
+      "to": "approval:deployment-authorization",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "db6b532e6ae58a579e9c3ed3ef69c85916d786513d0471847dec91496002c779"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:post-deployment-smoke-validation",
+      "from": "release:working-tree-candidate",
+      "to": "approval:post-deployment-smoke-validation",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "c82b07b0becc034dbd8d0b02e9415c8266825ac959047648cd447fd70b84a67a"
+    },
+    {
+      "id": "release:working-tree-candidate:reviewed_by:approval:customer-go-live-authorization",
+      "from": "release:working-tree-candidate",
+      "to": "approval:customer-go-live-authorization",
+      "relation": "reviewed_by",
+      "reason": "The release retains this approval as an explicit scoped gate; graph presence does not satisfy it.",
+      "auditHash": "741b1e7f0cc52f47675e587a6cd4e7ee510070736d1313a2f287fe58b5942bc3"
+    },
+    {
+      "id": "moat:governance-evidence-runtime:depends_on:evidence:deterministic-platform-artifacts",
+      "from": "moat:governance-evidence-runtime",
+      "to": "evidence:deterministic-platform-artifacts",
+      "relation": "depends_on",
+      "reason": "Moat statements remain bounded by current evidence artifacts.",
+      "auditHash": "2086db22dc008e3813bb86a53804a40a6c767c6d96325c290fe9ab8b92bd7c2d"
+    },
+    {
+      "id": "moat:healthcare-semantics-provenance:depends_on:evidence:deterministic-platform-artifacts",
+      "from": "moat:healthcare-semantics-provenance",
+      "to": "evidence:deterministic-platform-artifacts",
+      "relation": "depends_on",
+      "reason": "Moat statements remain bounded by current evidence artifacts.",
+      "auditHash": "0adff9f1409bfc16b91c0fa6b8d6e7cc331c4b6dc3ae90bbe6a89722786c0295"
+    },
+    {
+      "id": "moat:workflow-outcome-learning:depends_on:evidence:deterministic-platform-artifacts",
+      "from": "moat:workflow-outcome-learning",
+      "to": "evidence:deterministic-platform-artifacts",
+      "relation": "depends_on",
+      "reason": "Moat statements remain bounded by current evidence artifacts.",
+      "auditHash": "e5ceffbf3377cb94b40da55ed68e249ff38daf11ebc08b2bedfeb5aebb3a6dbc"
+    },
+    {
+      "id": "moat:model-compute-portability:depends_on:evidence:deterministic-platform-artifacts",
+      "from": "moat:model-compute-portability",
+      "to": "evidence:deterministic-platform-artifacts",
+      "relation": "depends_on",
+      "reason": "Moat statements remain bounded by current evidence artifacts.",
+      "auditHash": "a257ba9b2a15db6dc60d7de48967517a392beea4f8e09f734dc058782b479604"
+    },
+    {
+      "id": "moat:regulated-buyer-operating-evidence:depends_on:evidence:deterministic-platform-artifacts",
+      "from": "moat:regulated-buyer-operating-evidence",
+      "to": "evidence:deterministic-platform-artifacts",
+      "relation": "depends_on",
+      "reason": "Moat statements remain bounded by current evidence artifacts.",
+      "auditHash": "a665e050f19fb2170153f91566f31c73b413dc21450b6229ed15a24447802967"
+    }
+  ],
+  "summaries": {
+    "byNodeType": {
+      "policy": 1,
+      "platform-plane": 11,
+      "portfolio-offer": 11,
+      "capability": 12,
+      "agent": 14,
+      "workflow": 9,
+      "model-policy": 6,
+      "approval": 14,
+      "metric": 3,
+      "proof-route": 25,
+      "moat": 5,
+      "api": 1,
+      "database": 1,
+      "release": 1,
+      "evidence": 1,
+      "environment": 4,
+      "connector": 1
+    },
+    "byRelation": {
+      "contains": 24,
+      "governed_by": 14,
+      "reviewed_by": 26,
+      "invokes": 78,
+      "routes_to": 28,
+      "provides_evidence_for": 36,
+      "activated_by": 45,
+      "depends_on": 25,
+      "measures": 3
+    },
+    "unsafeExternalActionPaths": 0,
+    "productionAuthorityGranted": false,
+    "externalDistributionAuthorityGranted": false
+  },
+  "knownConstraints": [
+    "The working-tree release node is mutable until a clean candidate commit is created.",
+    "Protected-pilot activation, migration, AAL2, named review, distribution, and deployment remain separate gates.",
+    "Graph membership does not establish production maturity, regulatory status, customer adoption, partnership, revenue, or ROI."
+  ],
+  "integrityHash": "436426044ec85f0c3a1246eb8d2e9680a208e1eca2b90686e7010bb898940607"
+}

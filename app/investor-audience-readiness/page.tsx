@@ -21,7 +21,8 @@ export default function InvestorAudienceReadinessPage() {
           This control plane packages angel, corporate strategic, private investor, faith-based clinic, health system, payer, public-sector, clinician, global partner, and transformation-sponsor paths while preserving no-securities, no-solicitation, no-tax-advice, no-PHI, and no-live-care boundaries.
         </p>
         <div className="hero-actions">
-          <a className="primary-action" href="#investor-demo-run-of-show">Start Guided Demo</a>
+          <Link className="primary-action" href="/investor-demo-command-room">Open Demo Command Room</Link>
+          <a className="secondary-action" href="#investor-demo-run-of-show">View Guided Outline</a>
           <a className="secondary-action" href={summary.briefRoute}>Download Audience Brief</a>
           <a className="secondary-action" href={summary.apiRoute}>Inspect API</a>
           <Link className="secondary-action" href="/capital-vitality">Capital Vitality</Link>

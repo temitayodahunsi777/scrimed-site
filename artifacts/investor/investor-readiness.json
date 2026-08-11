@@ -1,0 +1,700 @@
+{
+  "service": "scrimed-investor-readiness-engine",
+  "version": "scrimed-strategic-decision-intelligence-v1-2026-08-11",
+  "status": "INTERNAL_HEURISTIC_REVIEW_REQUIRED",
+  "score": 76,
+  "scoreMeaning": "Internal evidence-completeness heuristic only; not a probability of investment, valuation, endorsement, or fundraising outcome.",
+  "dimensions": [
+    {
+      "id": "architecture",
+      "score": 88,
+      "confidence": "high",
+      "evidence": [
+        "/scrimed-control-plane",
+        "/enterprise-scalability"
+      ],
+      "gap": "Exact committed-candidate evidence remains pending.",
+      "nextAction": "Close the stated architecture gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "product-clarity",
+      "score": 82,
+      "confidence": "high",
+      "evidence": [
+        "/offerings",
+        "/product"
+      ],
+      "gap": "Founder adoption of the primary wedge remains pending.",
+      "nextAction": "Close the stated product-clarity gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "customer-value-hypothesis",
+      "score": 68,
+      "confidence": "medium",
+      "evidence": [
+        "/healthcare-value-realization",
+        "/commercial-strategy"
+      ],
+      "gap": "No buyer-approved baseline or outcome exists.",
+      "nextAction": "Close the stated customer-value-hypothesis gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "technical-moat",
+      "score": 81,
+      "confidence": "medium",
+      "evidence": [
+        "/validation-evidence",
+        "/scrimed-control-plane"
+      ],
+      "gap": "Compounding external evidence remains limited.",
+      "nextAction": "Close the stated technical-moat gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "healthcare-differentiation",
+      "score": 79,
+      "confidence": "medium",
+      "evidence": [
+        "/healthcare-intelligence-os",
+        "/clinical-data-fabric"
+      ],
+      "gap": "No comparative buyer study has been approved.",
+      "nextAction": "Close the stated healthcare-differentiation gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "governance",
+      "score": 90,
+      "confidence": "high",
+      "evidence": [
+        "/approvals-readiness",
+        "/trust-center"
+      ],
+      "gap": "Human and external gates remain pending.",
+      "nextAction": "Close the stated governance gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "security",
+      "score": 76,
+      "confidence": "medium",
+      "evidence": [
+        "/security-posture",
+        "/enterprise-readiness"
+      ],
+      "gap": "Leaked-password protection and independent assurance remain open.",
+      "nextAction": "Close the stated security gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "evidence",
+      "score": 73,
+      "confidence": "high",
+      "evidence": [
+        "/validation-evidence",
+        "/scrimed-proof-packet-studio"
+      ],
+      "gap": "Current working-tree evidence is mutable until committed and reviewed.",
+      "nextAction": "Close the stated evidence gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "commercialization",
+      "score": 64,
+      "confidence": "medium",
+      "evidence": [
+        "/offerings",
+        "/pilot-demo-commercial-readiness"
+      ],
+      "gap": "No contracted customer or verified revenue is represented.",
+      "nextAction": "Close the stated commercialization gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "capital-efficiency",
+      "score": 61,
+      "confidence": "low",
+      "evidence": [
+        "/scrimed-llmops-observability",
+        "/healthcare-value-realization"
+      ],
+      "gap": "Measured operating cost baseline is incomplete.",
+      "nextAction": "Close the stated capital-efficiency gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "model-portability",
+      "score": 84,
+      "confidence": "high",
+      "evidence": [
+        "/scrimed-model-router",
+        "/scrimed-compute-fabric"
+      ],
+      "gap": "Provider conformance evidence remains configuration-dependent.",
+      "nextAction": "Close the stated model-portability gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "ecosystem-readiness",
+      "score": 66,
+      "confidence": "medium",
+      "evidence": [
+        "/global-reach",
+        "/interoperability"
+      ],
+      "gap": "No partnership, procurement, or integration approval is implied.",
+      "nextAction": "Close the stated ecosystem-readiness gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "regulatory-discipline",
+      "score": 88,
+      "confidence": "high",
+      "evidence": [
+        "/clinical-production-readiness",
+        "/global-certification-readiness"
+      ],
+      "gap": "Discipline is implemented; approvals and classifications remain external.",
+      "nextAction": "Close the stated regulatory-discipline gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "release-discipline",
+      "score": 86,
+      "confidence": "high",
+      "evidence": [
+        "/release-continuity",
+        "/approvals-readiness"
+      ],
+      "gap": "Exact-head review and immutable candidate provenance remain pending.",
+      "nextAction": "Close the stated release-discipline gap with dated, attributable, independently reviewable evidence."
+    },
+    {
+      "id": "ip-maturity",
+      "score": 57,
+      "confidence": "low",
+      "evidence": [
+        "/scrimed-control-plane",
+        "/validation-evidence"
+      ],
+      "gap": "Inventions are inventor-asserted and require qualified IP review.",
+      "nextAction": "Close the stated ip-maturity gap with dated, attributable, independently reviewable evidence."
+    }
+  ],
+  "materialNoGoCount": 5,
+  "investmentProbabilityCalculated": false,
+  "distributionAuthorized": false,
+  "boundary": "Internal planning only. This system does not provide investment, securities, legal, clinical, regulatory, accounting, tax, procurement, partnership, valuation, revenue, customer, distribution, migration, deployment, or go-live authority.",
+  "auditHash": "79b76c42baa528062fca84da27dbf9922bfbf088ce5bb929873da4d81d6fd823",
+  "strategicPartnerReadinessProfiles": [
+    {
+      "name": "NVIDIA",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "model portability, compute, identity, and governed deployment",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "provider-neutral model gateway and deployment profiles",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "9ed0182f334b90c69216fb283cb43a6699a0417970fd8f2e915c6eed28f1e05f"
+    },
+    {
+      "name": "Apple",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "administrative workflow and policy intelligence",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "read-only payer policy and workflow adapters",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "6d43199bf36bb3f038d1280cb68d9be5a06537b87d42dc15c12476fe72da5bf9"
+    },
+    {
+      "name": "Microsoft",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "model portability, compute, identity, and governed deployment",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "provider-neutral model gateway and deployment profiles",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "572ab00499ff832dd0805f503a888a4817d4fb04569234ba6b73a5ba1011afb4"
+    },
+    {
+      "name": "OpenAI",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "model portability, compute, identity, and governed deployment",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "provider-neutral model gateway and deployment profiles",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "e29eee69db38f9461627865f129bd7d6f7a2f28aff2adcd4cb7340a857f5183f"
+    },
+    {
+      "name": "Anthropic",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "model portability, compute, identity, and governed deployment",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "provider-neutral model gateway and deployment profiles",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "72ba40836d15100de42db3048df9a5c400afe57ccc1d2b1388d61dd5dfaaae7f"
+    },
+    {
+      "name": "Siemens",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "governed imaging metadata and workflow conformance",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "read-only DICOM/DICOMweb and FHIR metadata contracts",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "DICOM",
+        "DICOMweb",
+        "FHIR ImagingStudy",
+        "Provenance"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "bbcf5b6f751dafcb9bb0d6cb066d04b28d38db9b24875af235addf5af8ed12b1"
+    },
+    {
+      "name": "Siemens Healthineers",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "governed imaging metadata and workflow conformance",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "read-only DICOM/DICOMweb and FHIR metadata contracts",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "DICOM",
+        "DICOMweb",
+        "FHIR ImagingStudy",
+        "Provenance"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "be50e1ebb04202680034a6e40e4285e3012ebd4cb15b9fae15b943b1ce39bf88"
+    },
+    {
+      "name": "Philips",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "governed imaging metadata and workflow conformance",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "read-only DICOM/DICOMweb and FHIR metadata contracts",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "DICOM",
+        "DICOMweb",
+        "FHIR ImagingStudy",
+        "Provenance"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "7cdc3c413f96490cf65852416582edf09f3f2d9104325a4e71d14e9a0abd376b"
+    },
+    {
+      "name": "GE HealthCare",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "governed imaging metadata and workflow conformance",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "read-only DICOM/DICOMweb and FHIR metadata contracts",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "DICOM",
+        "DICOMweb",
+        "FHIR ImagingStudy",
+        "Provenance"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "9a61e8e1ee6ae4beda20ed23fb514c30c68b4061df5af8629f42808043ec3611"
+    },
+    {
+      "name": "Emory",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "synthetic workflow research and evidence generation",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "synthetic evaluation and study governance",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "385704a8c201500041bd96c0155e90f057abbebcd7b6f816e9fc8147e4c952f3"
+    },
+    {
+      "name": "academic medical centers",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "synthetic workflow research and evidence generation",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "synthetic evaluation and study governance",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "db40c17f14ebd02648dc2fba3931301d9d2a1d855f1d3e333e2a645c0c37cb3f"
+    },
+    {
+      "name": "hyperscalers",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "model portability, compute, identity, and governed deployment",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "provider-neutral model gateway and deployment profiles",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "53aee48eda99a7bc19d168e69b0a2c5a3df8a3f3050dc61b0ac0a7d82a1edfa0"
+    },
+    {
+      "name": "sovereign AI platforms",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "model portability, compute, identity, and governed deployment",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "provider-neutral model gateway and deployment profiles",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "70822495603d9f5138233f84d245cb80b9a2095b4703e70cbfaabf7c3ed572ac"
+    },
+    {
+      "name": "payers",
+      "label": "Internal strategic readiness profile — no partnership implied.",
+      "technicalFit": "administrative workflow and policy intelligence",
+      "complementaryValue": "SCRIMED contributes healthcare workflow governance, evidence, evaluation, and integration controls.",
+      "probableIntegrationSurface": "read-only payer policy and workflow adapters",
+      "missingProof": [
+        "organization-specific technical validation",
+        "approved commercial thesis",
+        "named security/legal owner",
+        "permissioned introduction"
+      ],
+      "procurementConsiderations": [
+        "data rights",
+        "security review",
+        "contract authority",
+        "intended use",
+        "support and rollback"
+      ],
+      "securityExpectations": [
+        "least privilege",
+        "tenant isolation",
+        "signed artifacts",
+        "auditability",
+        "no silent fallback"
+      ],
+      "interoperabilityRequirements": [
+        "scoped APIs",
+        "portable export",
+        "identity",
+        "audit receipts"
+      ],
+      "strategicUpside": "Could accelerate validated distribution or infrastructure leverage only after mutual diligence and written authorization.",
+      "externalRelationshipVerified": false,
+      "outreachAuthorized": false,
+      "auditHash": "2c89cd5cbb4eace221d7d66f755b4221558c9e074878798039ed61470c91c550"
+    }
+  ],
+  "partnerBoundary": "Internal strategic readiness profiles only; no partnership, investment, endorsement, procurement, or outreach authority is implied."
+}
