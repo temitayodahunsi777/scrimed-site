@@ -197,18 +197,35 @@ function runSelfTest() {
       artifactReviewRequired: false
     }
   });
-  if (
-    !packet.candidateReviewPacketReady ||
-    packet.immutableProvenanceReady ||
-    packet.allGateEvidenceSatisfied ||
-    packet.releasePromotionAllowed ||
-    packet.aggregateReleaseAuthorityGranted ||
-    packet.packetHash !== repeated.packetHash ||
-    sourceOnlyPacket.expectedFingerprints.artifact !== reports.investorDeckReview.artifactFingerprintSha256 ||
-    packet.registry.gates.find((gate) => gate.gateId === "clean-reviewed-source-commit")?.status !== "BLOCKED" ||
-    packet.registry.gates.find((gate) => gate.gateId === "security-privacy-review")?.status === "FAIL"
-  ) {
-    throw new Error("SCRIMED p.32 release gate evidence self-test failed.");
+  const missingDeckPacket = buildP32GateEvidencePacket({
+    ...input,
+    validation: {
+      ...input.validation,
+      artifactFingerprintSha256: null,
+      artifactReviewRequired: false
+    },
+    investorDeckReview: {
+      artifactFingerprintSha256: null,
+      automatedReviewPassed: false,
+      humanReleaseReviewRequired: true
+    }
+  });
+  const invariantChecks = [
+    ["candidate-review-ready", packet.candidateReviewPacketReady],
+    ["immutable-provenance-retained", !packet.immutableProvenanceReady],
+    ["all-gates-retained", !packet.allGateEvidenceSatisfied],
+    ["release-promotion-retained", !packet.releasePromotionAllowed],
+    ["aggregate-authority-retained", !packet.aggregateReleaseAuthorityGranted],
+    ["deterministic-packet", packet.packetHash === repeated.packetHash],
+    ["source-only-artifact-binding", sourceOnlyPacket.expectedFingerprints.artifact === reports.investorDeckReview.artifactFingerprintSha256],
+    ["missing-deck-state", missingDeckPacket.artifactFingerprintState === "artifact-unavailable"],
+    ["missing-deck-review-blocked", !missingDeckPacket.candidateReviewPacketReady],
+    ["dirty-source-blocked", packet.registry.gates.find((gate) => gate.gateId === "clean-reviewed-source-commit")?.status === "BLOCKED"],
+    ["security-review-not-failed", packet.registry.gates.find((gate) => gate.gateId === "security-privacy-review")?.status !== "FAIL"]
+  ];
+  const failedInvariants = invariantChecks.filter(([, passed]) => !passed).map(([id]) => id);
+  if (failedInvariants.length > 0) {
+    throw new Error(`SCRIMED p.32 release gate evidence self-test failed: ${failedInvariants.join(", ")}.`);
   }
   let rejectedTamper = false;
   try {

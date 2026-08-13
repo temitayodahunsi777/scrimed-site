@@ -423,6 +423,7 @@ for (const text of [
   "verifyP32SupplementalEvidenceAttestation",
   "readJsonCommand(\"scripts/investor-deck-review.mjs\", [\"--json\"])",
   "artifactReviewRequired",
+  "artifact-unavailable",
   "ts-extension-loader.mjs",
   "loaderActive"
 ]) requireIncludes("scripts/scrimed-p32-release-gate-evidence.mjs", text);
