@@ -422,6 +422,7 @@ for (const text of [
   "SCRIMED_P32_EVIDENCE_TRUSTED_PUBLIC_KEYS_JSON",
   "verifyP32SupplementalEvidenceAttestation",
   "readJsonCommand(\"scripts/investor-deck-review.mjs\", [\"--json\"])",
+  "artifactReviewRequired",
   "ts-extension-loader.mjs",
   "loaderActive"
 ]) requireIncludes("scripts/scrimed-p32-release-gate-evidence.mjs", text);

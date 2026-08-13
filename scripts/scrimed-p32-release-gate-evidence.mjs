@@ -157,6 +157,7 @@ function syntheticReports() {
       candidateFingerprintSha256: candidateFingerprint,
       sourceFingerprintSha256: sourceFingerprint,
       artifactFingerprintSha256: artifactFingerprint,
+      artifactReviewRequired: true,
       validationEvidenceHashSha256: validationEvidenceFingerprint,
       candidateStable: true,
       sourceReviewReady: true,
@@ -188,6 +189,14 @@ function runSelfTest() {
   };
   const packet = buildP32GateEvidencePacket(input);
   const repeated = buildP32GateEvidencePacket(input);
+  const sourceOnlyPacket = buildP32GateEvidencePacket({
+    ...input,
+    validation: {
+      ...input.validation,
+      artifactFingerprintSha256: null,
+      artifactReviewRequired: false
+    }
+  });
   if (
     !packet.candidateReviewPacketReady ||
     packet.immutableProvenanceReady ||
@@ -195,6 +204,7 @@ function runSelfTest() {
     packet.releasePromotionAllowed ||
     packet.aggregateReleaseAuthorityGranted ||
     packet.packetHash !== repeated.packetHash ||
+    sourceOnlyPacket.expectedFingerprints.artifact !== reports.investorDeckReview.artifactFingerprintSha256 ||
     packet.registry.gates.find((gate) => gate.gateId === "clean-reviewed-source-commit")?.status !== "BLOCKED" ||
     packet.registry.gates.find((gate) => gate.gateId === "security-privacy-review")?.status === "FAIL"
   ) {

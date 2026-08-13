@@ -36,6 +36,7 @@ export type ReleaseCandidateValidationReport = {
   candidateFingerprintSha256: string | null;
   sourceFingerprintSha256: string | null;
   artifactFingerprintSha256: string | null;
+  artifactReviewRequired: boolean;
   validationEvidenceHashSha256: string | null;
   candidateStable: boolean;
   sourceReviewReady: boolean;
@@ -178,7 +179,14 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
   requireValidInput(isGitCommitSha(input.validation.sourceCommitSha), "validation source commit is missing or malformed");
   requireValidInput(isSha256(input.validation.candidateFingerprintSha256), "validation candidate fingerprint is missing or malformed");
   requireValidInput(isSha256(input.validation.sourceFingerprintSha256), "validation source fingerprint is missing or malformed");
-  requireValidInput(isSha256(input.validation.artifactFingerprintSha256), "validation artifact fingerprint is missing or malformed");
+  requireValidInput(
+    typeof input.validation.artifactReviewRequired === "boolean",
+    "validation artifact-review requirement is missing"
+  );
+  requireValidInput(
+    !input.validation.artifactReviewRequired || isSha256(input.validation.artifactFingerprintSha256),
+    "required validation artifact fingerprint is missing or malformed"
+  );
   requireValidInput(isSha256(input.validation.validationEvidenceHashSha256), "validation evidence fingerprint is missing or malformed");
   requireValidInput(isSha256(input.investorDeckReview.artifactFingerprintSha256), "investor artifact fingerprint is missing or malformed");
   requireValidInput(isGitCommitSha(input.candidateReview.baseHeadSha), "review packet source commit is missing or malformed");
@@ -188,7 +196,7 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
   const sourceCommit = input.manifest.baseHeadSha as string;
   const candidateFingerprint = input.manifest.candidateDigestSha256 as string;
   const sourceFingerprint = input.manifest.sourceCandidateDigestSha256 as string;
-  const artifactFingerprint = input.validation.artifactFingerprintSha256 as string;
+  const artifactFingerprint = input.validation.artifactFingerprintSha256 ?? input.investorDeckReview.artifactFingerprintSha256 as string;
   const validationEvidenceFingerprint = input.validation.validationEvidenceHashSha256 as string;
   const reviewPacketFingerprint = input.candidateReview.candidateReviewPacketSha256 as string;
 
@@ -210,8 +218,12 @@ export function buildP32GateEvidencePacket(input: P32GateEvidencePacketInput) {
     },
     {
       id: "artifact-fingerprint-alignment",
-      passed: input.validation.artifactFingerprintSha256 === input.investorDeckReview.artifactFingerprintSha256,
-      evidence: "Validation and investor artifact review fingerprints match."
+      passed: input.validation.artifactReviewRequired
+        ? input.validation.artifactFingerprintSha256 === input.investorDeckReview.artifactFingerprintSha256
+        : input.validation.artifactFingerprintSha256 === null || input.validation.artifactFingerprintSha256 === input.investorDeckReview.artifactFingerprintSha256,
+      evidence: input.validation.artifactReviewRequired
+        ? "Validation and investor artifact review fingerprints match."
+        : "The source candidate has no separate artifact deliverable; the investor review provides the controlled artifact fingerprint."
     },
     {
       id: "candidate-stability",

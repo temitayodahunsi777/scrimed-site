@@ -42,6 +42,7 @@ exist.
 
 - `app/lib/evidence/publicSurfaceClaimRegistry.ts`
 - `app/lib/proofPacketShareReadiness.ts`
+- `app/lib/scrimedP32GateEvidence.ts`
 - `app/lib/scrimed-control-plane/outcomeIntelligence.ts`
 - `app/lib/scrimed-control-plane/platformGraph.ts`
 - `app/lib/scrimed-control-plane/strategicDecisionIntelligence.ts`
@@ -126,7 +127,7 @@ exist.
 
 ## Review Boundary
 
-The change set contains 96 attributable source, generated-evidence, workflow, test, and
+The change set contains 97 attributable source, generated-evidence, workflow, test, and
 documentation paths. It does not include a Supabase setting change, migration application,
 Vercel deployment or promotion, Figma canvas mutation, live AAL2 evidence, external distribution,
 PHI, customer activation, clinical authority, or production authorization.

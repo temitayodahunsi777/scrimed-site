@@ -29,7 +29,7 @@ const required = {
   "app/lib/scrimed-control-plane/outcomeIntelligence.ts": ["verified-intelligence-yield", "SYNTHETIC MODEL - NOT AN OBSERVED CUSTOMER OUTCOME"],
   "docs/release/CURRENT_EXTERNAL_AND_REPOSITORY_BASELINE.md": ["Vercel", "Supabase", "Figma"],
   "docs/release/CANDIDATE_BRANCH_DECISION.md": ["agent/scrimed-enterprise-gap-closure"],
-  "docs/release/ENTERPRISE_GAP_CLOSURE_COMMIT_MANIFEST.md": ["96 attributable", "does not include a Supabase setting change"],
+  "docs/release/ENTERPRISE_GAP_CLOSURE_COMMIT_MANIFEST.md": ["97 attributable", "does not include a Supabase setting change"],
   "docs/release/ENTERPRISE_GAP_CLOSURE_IMPLEMENTATION_REPORT.md": ["Distribution Lockbox", "Production promotion"],
   "docs/design/FIGMA_SYNC_SPEC.md": ["view-only", "Code Connect"],
   "docs/operators/VERCEL_PREVIEW_RELEASE_ASSURANCE.md": ["exact 40-character candidate", "does not authorize production"],
