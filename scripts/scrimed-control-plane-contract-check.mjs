@@ -273,7 +273,7 @@ for (const expected of [
 for (const path of ["app/lib/siteNavigation.ts", "app/lib/navigationAudit.ts"]) {
   requireIncludes(path, "/scrimed-control-plane");
 }
-requireIncludes("app/lib/navigationAudit.ts", "expectedApiRoutePatternCount = 448");
+requireIncludes("app/lib/navigationAudit.ts", "expectedApiRoutePatternCount = 452");
 
 const packageJson = JSON.parse(files["package.json"]);
 if (packageJson.scripts?.["contract:scrimed-control-plane"] !== "node scripts/scrimed-control-plane-contract-check.mjs") {

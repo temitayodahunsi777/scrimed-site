@@ -11,6 +11,7 @@ import { createScrimedRequestContext } from "../app/lib/observability/requestCon
 import { evaluateInternalErrorBudget } from "../app/lib/reliability/errorBudget.ts";
 import { getScrimedReleaseReadiness } from "../app/lib/release/vercelReleaseAssurance.ts";
 import { buildInvestorDemoRunOfShow } from "../app/lib/investorDemoRunOfShow.ts";
+import { getProductConsoleApiSummary } from "../app/lib/productConsole.ts";
 import {
   evaluateDistributionLockboxDecision
 } from "../app/lib/proofPacketShareReadiness.ts";
@@ -85,6 +86,11 @@ assert.equal(scrimedDesignTokens.accessibility.minimumTouchTargetPx, 44);
 assert.equal(designSystemComponentContracts.length, 18);
 assert.equal(designSystemComponentContracts.every((component) => component.figmaNodeId === null), true);
 assert.equal(buildInvestorDemoRunOfShow("diligence-walkthrough").durationSeconds, 1800);
+const productConsoleApiSummary = getProductConsoleApiSummary();
+assert.equal(productConsoleApiSummary.payloadProfile, "compact-api-v1");
+assert.ok(Buffer.byteLength(JSON.stringify(productConsoleApiSummary)) < 1_000_000);
+assert.equal(getProductConsoleApiSummary(), productConsoleApiSummary);
+assert.equal(productConsoleApiSummary.companyAssessmentSummary.detailAvailableAt, "/api/company-assessment");
 
 const trust = evaluateTrustReadiness({
   capabilityId: "model-compute-gateway",

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getProductConsoleSummary } from "../../../lib/productConsole";
+import { getProductConsoleApiSummary } from "../../../lib/productConsole";
 
 export async function GET() {
-  return NextResponse.json(getProductConsoleSummary());
+  return NextResponse.json(getProductConsoleApiSummary());
 }

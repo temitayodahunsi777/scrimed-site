@@ -2648,6 +2648,61 @@ export function getProductConsoleSummary() {
   };
 }
 
+const productConsoleApiNestedSummaryAllowlist = new Set([
+  "executionAttemptEnvelopeSummary",
+  "healthcareIntelligenceOSSummary",
+  "healthcareOptimizationCommandSummary",
+  "healthcareValueRealizationSummary",
+  "pilotActivationPlannerSummary",
+  "pilotHandoffCommandSummary",
+  "pilotSuccessReviewCommandSummary",
+  "pilotValueEvidenceSummary",
+  "productionArchitectureSummary",
+  "salesOperationsSummary",
+  "strategicPlatformIntelligenceSummary"
+]);
+
+let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
+
+export function getProductConsoleApiSummary() {
+  if (productConsoleApiSummaryCache) return productConsoleApiSummaryCache;
+
+  const summary = getProductConsoleSummary();
+  const { companyAssessmentSummary } = summary;
+  const apiSummary = Object.fromEntries(
+    Object.entries(summary).filter(
+      ([key]) => !key.endsWith("Summary") || productConsoleApiNestedSummaryAllowlist.has(key)
+    )
+  );
+
+  productConsoleApiSummaryCache = {
+    ...apiSummary,
+    payloadProfile: "compact-api-v1",
+    detailRoutes: {
+      companyAssessment: companyAssessmentSummary.apiRoute,
+      enterpriseBusinessOperations: summary.enterpriseBusinessOpsApiRoute,
+      boundaryResolution: summary.boundaryResolutionApiRoute,
+      operationalEfficiency: summary.operationalEfficiencyApiRoute,
+      growthEngine: summary.growthEngineApiRoute,
+      investorAudienceReadiness: summary.investorAudienceReadinessApiRoute
+    },
+    companyAssessmentSummary: {
+      route: companyAssessmentSummary.route,
+      apiRoute: companyAssessmentSummary.apiRoute,
+      briefRoute: companyAssessmentSummary.briefRoute,
+      status: companyAssessmentSummary.status,
+      overallScore: companyAssessmentSummary.overallScore,
+      dimensionCount: companyAssessmentSummary.dimensionCount,
+      weaknessCount: companyAssessmentSummary.weaknessCount,
+      hardStopCount: companyAssessmentSummary.hardStopCount,
+      boundary: companyAssessmentSummary.boundary,
+      detailAvailableAt: companyAssessmentSummary.apiRoute
+    }
+  };
+
+  return productConsoleApiSummaryCache;
+}
+
 export function getProductReadinessBrief() {
   const summary = getProductConsoleSummary();
 

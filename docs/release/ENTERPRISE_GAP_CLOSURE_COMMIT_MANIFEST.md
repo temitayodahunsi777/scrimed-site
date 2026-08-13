@@ -15,11 +15,14 @@ exist.
 - `app/icon.svg`
 - `app/api/health/route.ts`
 - `app/api/readiness/route.ts`
+- `app/api/product/console/route.ts`
 - `app/lib/operatingMode.ts`
+- `app/lib/productConsole.ts`
 - `app/lib/observability/errorTaxonomy.ts`
 - `app/lib/observability/logger.ts`
 - `app/lib/observability/performanceTelemetry.ts`
 - `app/lib/observability/requestContext.ts`
+- `app/lib/navigationAudit.ts`
 - `app/lib/release/vercelReleaseAssurance.ts`
 - `app/lib/reliability/errorBudget.ts`
 - `scripts/verify-preview-ui.mjs`
@@ -95,9 +98,33 @@ exist.
 - `scripts/scrimed-nonsecret-test-suite.mjs`
 - `scripts/scrimed-cyber-defense-contract-check.mjs`
 
+## Route Inventory Contract Synchronization
+
+- `scripts/boundary-release-approval-matrix-contract-check.mjs`
+- `scripts/boundary-release-evidence-intake-contract-check.mjs`
+- `scripts/clinical-context-gateway-contract-check.mjs`
+- `scripts/clinical-data-fabric-contract-check.mjs`
+- `scripts/clinical-data-governance-contract-check.mjs`
+- `scripts/deployment-drift-guard-contract-check.mjs`
+- `scripts/enterprise-healthcare-infrastructure-contract-check.mjs`
+- `scripts/global-enterprise-command-contract-check.mjs`
+- `scripts/healthcare-optimization-command-contract-check.mjs`
+- `scripts/healthcare-value-realization-contract-check.mjs`
+- `scripts/pilot-activation-planner-contract-check.mjs`
+- `scripts/pilot-handoff-command-contract-check.mjs`
+- `scripts/pilot-success-review-command-contract-check.mjs`
+- `scripts/pilot-value-evidence-contract-check.mjs`
+- `scripts/scrimed-automation-autopilot-contract-check.mjs`
+- `scripts/scrimed-control-plane-contract-check.mjs`
+- `scripts/scrimed-execution-focus-contract-check.mjs`
+- `scripts/scrimed-operating-command-contract-check.mjs`
+- `scripts/scrimed-os-upgrade-batch-contract-check.mjs`
+- `scripts/scrimed-work-contract-check.mjs`
+- `scripts/strategic-problem-resolution-contract-check.mjs`
+
 ## Review Boundary
 
-The change set contains 70 attributable source, generated-evidence, workflow, test, and
+The change set contains 94 attributable source, generated-evidence, workflow, test, and
 documentation paths. It does not include a Supabase setting change, migration application,
 Vercel deployment or promotion, Figma canvas mutation, live AAL2 evidence, external distribution,
 PHI, customer activation, clinical authority, or production authorization.
