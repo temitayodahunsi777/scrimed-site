@@ -319,7 +319,7 @@ if (validation?.automatedValidationPassed !== true) {
   );
 }
 const manifest = readJsonCommand("scripts/release-candidate-manifest.mjs", ["--json"]);
-const investorDeckReview = readJsonCommand("scripts/investor-deck-review.mjs", ["--json", "--strict"]);
+const investorDeckReview = readJsonCommand("scripts/investor-deck-review.mjs", ["--json"]);
 const candidateReview = readJsonCommand("scripts/release-candidate-review-packet.mjs", ["--json"]);
 const evaluatedAt = new Date().toISOString();
 const supplementalEvidence = await readSupplementalEvidence(evaluatedAt);

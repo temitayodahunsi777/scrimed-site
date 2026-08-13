@@ -119,12 +119,14 @@ exist.
 - `scripts/scrimed-execution-focus-contract-check.mjs`
 - `scripts/scrimed-operating-command-contract-check.mjs`
 - `scripts/scrimed-os-upgrade-batch-contract-check.mjs`
+- `scripts/scrimed-p32-contract-check.mjs`
+- `scripts/scrimed-p32-release-gate-evidence.mjs`
 - `scripts/scrimed-work-contract-check.mjs`
 - `scripts/strategic-problem-resolution-contract-check.mjs`
 
 ## Review Boundary
 
-The change set contains 94 attributable source, generated-evidence, workflow, test, and
+The change set contains 96 attributable source, generated-evidence, workflow, test, and
 documentation paths. It does not include a Supabase setting change, migration application,
 Vercel deployment or promotion, Figma canvas mutation, live AAL2 evidence, external distribution,
 PHI, customer activation, clinical authority, or production authorization.
