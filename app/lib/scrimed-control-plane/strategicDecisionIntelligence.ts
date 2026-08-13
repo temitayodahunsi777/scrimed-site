@@ -217,22 +217,46 @@ export const ceoDecisionRegister: CeoDecision[] = [
   })
 ];
 
+const ceoDecisionCategories = new Set<CeoDecision["category"]>([
+  "investor",
+  "funding",
+  "partnership",
+  "customer",
+  "legal",
+  "product-strategy",
+  "production",
+  "security",
+  "regulatory",
+  "capital"
+]);
+
+export function selectCeoRelevantDecisions(decisions: CeoDecision[]) {
+  return decisions.filter(
+    (decision) =>
+      ceoDecisionCategories.has(decision.category) &&
+      decision.decisionRequired.trim().length > 20 &&
+      decision.defaultSafeAction.trim().length > 10 &&
+      (decision.status === "FOUNDER_DECISION_REQUIRED" ||
+        decision.status === "DEFERRED_BY_SAFE_DEFAULT")
+  );
+}
+
 const investorDimensions = [
-  ["architecture", 88, "high", ["/scrimed-control-plane", "/enterprise-scalability"], "Exact committed-candidate evidence remains pending."],
   ["product-clarity", 82, "high", ["/offerings", "/product"], "Founder adoption of the primary wedge remains pending."],
-  ["customer-value-hypothesis", 68, "medium", ["/healthcare-value-realization", "/commercial-strategy"], "No buyer-approved baseline or outcome exists."],
-  ["technical-moat", 81, "medium", ["/validation-evidence", "/scrimed-control-plane"], "Compounding external evidence remains limited."],
-  ["healthcare-differentiation", 79, "medium", ["/healthcare-intelligence-os", "/clinical-data-fabric"], "No comparative buyer study has been approved."],
-  ["governance", 90, "high", ["/approvals-readiness", "/trust-center"], "Human and external gates remain pending."],
+  ["commercial-wedge", 72, "medium", ["/documentation-before-authorization", "/pilot-demo-commercial-readiness"], "No buyer has approved a baseline, scope, or conversion criterion."],
+  ["architecture", 88, "high", ["/scrimed-control-plane", "/enterprise-scalability"], "Exact committed-candidate evidence remains pending."],
+  ["moat", 81, "medium", ["/validation-evidence", "/scrimed-control-plane"], "Compounding external evidence and independent comparison remain limited."],
   ["security", 76, "medium", ["/security-posture", "/enterprise-readiness"], "Leaked-password protection and independent assurance remain open."],
   ["evidence", 73, "high", ["/validation-evidence", "/scrimed-proof-packet-studio"], "Current working-tree evidence is mutable until committed and reviewed."],
-  ["commercialization", 64, "medium", ["/offerings", "/pilot-demo-commercial-readiness"], "No contracted customer or verified revenue is represented."],
-  ["capital-efficiency", 61, "low", ["/scrimed-llmops-observability", "/healthcare-value-realization"], "Measured operating cost baseline is incomplete."],
-  ["model-portability", 84, "high", ["/scrimed-model-router", "/scrimed-compute-fabric"], "Provider conformance evidence remains configuration-dependent."],
-  ["ecosystem-readiness", 66, "medium", ["/global-reach", "/interoperability"], "No partnership, procurement, or integration approval is implied."],
   ["regulatory-discipline", 88, "high", ["/clinical-production-readiness", "/global-certification-readiness"], "Discipline is implemented; approvals and classifications remain external."],
+  ["capital-efficiency", 61, "low", ["/scrimed-llmops-observability", "/healthcare-value-realization"], "Measured operating cost baseline is incomplete."],
+  ["partner-readiness", 66, "medium", ["/global-reach", "/scrimed-proof-packet-studio"], "No partnership, procurement, or platform relationship is implied."],
+  ["integration-readiness", 78, "medium", ["/interoperability", "/clinical-data-fabric"], "Production endpoint conformance and customer integration approval remain external."],
+  ["model-neutrality", 84, "high", ["/scrimed-work", "/scrimed-compute-fabric"], "Provider conformance evidence remains configuration-dependent."],
+  ["sovereign-readiness", 74, "medium", ["/scrimed-compute-fabric", "/global-reach"], "Jurisdiction, residency, capacity, and enclave evidence remain deployment-specific."],
+  ["customer-proof", 45, "high", ["/validation-evidence", "/pilot-value-evidence"], "No contracted customer, approved outcome baseline, or verified customer result is represented."],
   ["release-discipline", 86, "high", ["/release-continuity", "/approvals-readiness"], "Exact-head review and immutable candidate provenance remain pending."],
-  ["ip-maturity", 57, "low", ["/scrimed-control-plane", "/validation-evidence"], "Inventions are inventor-asserted and require qualified IP review."]
+  ["team-key-person-risk", 50, "medium", ["/company", "/investor-audience-readiness"], "Team depth, succession coverage, and named control owners require founder-confirmed evidence."]
 ] as const;
 
 export function getInvestorReadinessEngine() {
@@ -334,7 +358,8 @@ export function getStrategicDecisionIntelligenceSummary() {
     version: strategicDecisionIntelligenceVersion,
     status: "INTERNAL_DECISION_SUPPORT_ACTIVE" as const,
     humanGateMinimization,
-    ceoDecisions: ceoDecisionRegister,
+    ceoDecisions: selectCeoRelevantDecisions(ceoDecisionRegister),
+    routineEngineeringAlertsIncluded: false as const,
     investorReadiness,
     strategicPartnerReadinessProfiles,
     strategicRoadmap,

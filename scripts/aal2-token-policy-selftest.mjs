@@ -31,6 +31,7 @@ const nowSeconds = 1_800_000_000;
 const nowMs = nowSeconds * 1000;
 const validClaims = {
   aal: "aal2",
+  amr: [{ method: "totp", timestamp: nowSeconds }],
   exp: nowSeconds + 1800,
   iat: nowSeconds,
   role: "authenticated",
@@ -64,6 +65,13 @@ const aal1 = analyzeAal2BearerToken({
   nowMs
 });
 assertPolicy("aal1 rejected", !aal1.ok && aal1.errors.some((error) => error.includes("aal=aal2")), aal1);
+
+const expired = analyzeAal2BearerToken({
+  bearerToken: unsignedToken({ ...validClaims, exp: nowSeconds - 1 }),
+  workspaceSlug,
+  nowMs
+});
+assertPolicy("expired token rejected", !expired.ok && expired.errors.some((error) => error.includes("expired")), expired);
 
 const valid = analyzeAal2BearerToken({
   bearerToken: validToken,

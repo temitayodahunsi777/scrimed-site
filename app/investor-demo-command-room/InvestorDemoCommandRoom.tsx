@@ -307,6 +307,25 @@ export default function InvestorDemoCommandRoom() {
 
       <p className="investor-command-opening">{plan.openingQuestion}</p>
 
+      <section className="investor-command-checklist" aria-labelledby="investor-evidence-map-title">
+        <div className="investor-command-section-heading">
+          <div>
+            <p className="eyebrow">Evidence map</p>
+            <h3 id="investor-evidence-map-title">One narrative, eleven inspectable dimensions</h3>
+          </div>
+          <strong>{plan.evidenceMap.length}/11</strong>
+        </div>
+        <div className="investor-command-route-list">
+          {plan.evidenceMap.map((item) => (
+            <div key={item.id}>
+              <span>{item.evidenceStatus.replaceAll("-", " ")}</span>
+              <strong>{item.label}</strong>
+              <small>{item.statement}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <ol className="investor-command-chapters">
         {plan.chapters.map((chapter) => {
           const completed = completedChapterIds.includes(chapter.id);

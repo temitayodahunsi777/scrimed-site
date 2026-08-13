@@ -10,6 +10,7 @@ import {
 
 const supportedModes = new Set<InvestorDemoMode>([
   "executive-preview",
+  "technical-walkthrough",
   "diligence-walkthrough"
 ]);
 
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
         error: {
           code: "unsupported-investor-demo-mode",
           message:
-            "mode must be executive-preview or diligence-walkthrough",
+            "mode must be executive-preview, technical-walkthrough, or diligence-walkthrough",
           retryable: false
         }
       },

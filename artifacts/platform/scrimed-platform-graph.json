@@ -8,6 +8,7 @@
     "valid": true,
     "failures": [],
     "orphanNodeIds": [],
+    "dependencyCycles": [],
     "nodeCount": 120,
     "edgeCount": 279
   },
@@ -3727,5 +3728,5 @@
     "Protected-pilot activation, migration, AAL2, named review, distribution, and deployment remain separate gates.",
     "Graph membership does not establish production maturity, regulatory status, customer adoption, partnership, revenue, or ROI."
   ],
-  "integrityHash": "436426044ec85f0c3a1246eb8d2e9680a208e1eca2b90686e7010bb898940607"
+  "integrityHash": "397d94e93794bfce6c11913e80d9ddd5aa753b4f9b8ec811c36d6fe7cd7ddcbc"
 }

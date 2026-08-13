@@ -1,0 +1,492 @@
+{
+  "version": "scrimed-code-connect-readiness-v1-2026-08-12",
+  "status": "READY_FOR_FIGMA_MAPPING",
+  "figmaWritePerformed": false,
+  "mappings": [
+    {
+      "component": "Button",
+      "source": "app/globals.css",
+      "props": [
+        "label",
+        "disabled",
+        "type"
+      ],
+      "variants": [
+        "primary",
+        "secondary",
+        "danger"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "focus-visible",
+        "disabled"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "Card",
+      "source": "app/globals.css",
+      "props": [
+        "title",
+        "content"
+      ],
+      "variants": [
+        "default",
+        "evidence",
+        "decision"
+      ],
+      "states": [
+        "default",
+        "selected"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "MetricCard",
+      "source": "app/globals.css",
+      "props": [
+        "label",
+        "value",
+        "status"
+      ],
+      "variants": [
+        "neutral",
+        "positive",
+        "caution"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "StatusBadge",
+      "source": "app/globals.css",
+      "props": [
+        "status"
+      ],
+      "variants": [
+        "pass",
+        "review",
+        "blocked"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "GateStatus",
+      "source": "app/globals.css",
+      "props": [
+        "label",
+        "status",
+        "reason"
+      ],
+      "variants": [
+        "pass",
+        "operator-required",
+        "blocked",
+        "fail"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "EvidenceCard",
+      "source": "app/globals.css",
+      "props": [
+        "title",
+        "source",
+        "freshness"
+      ],
+      "variants": [
+        "verified",
+        "synthetic",
+        "missing"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "DecisionCard",
+      "source": "app/globals.css",
+      "props": [
+        "decision",
+        "owner",
+        "evidence"
+      ],
+      "variants": [
+        "founder",
+        "reviewer",
+        "operator"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "WorkflowStep",
+      "source": "app/globals.css",
+      "props": [
+        "order",
+        "label",
+        "status"
+      ],
+      "variants": [
+        "planned",
+        "active",
+        "complete",
+        "blocked"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "AgentRunCard",
+      "source": "app/globals.css",
+      "props": [
+        "runId",
+        "status",
+        "budget"
+      ],
+      "variants": [
+        "active",
+        "paused",
+        "complete",
+        "failed"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "ModelRouteCard",
+      "source": "app/globals.css",
+      "props": [
+        "route",
+        "reason",
+        "qualification"
+      ],
+      "variants": [
+        "selected",
+        "fallback",
+        "abstain"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "ProofPacketCard",
+      "source": "app/globals.css",
+      "props": [
+        "packet",
+        "fingerprint",
+        "distribution"
+      ],
+      "variants": [
+        "review",
+        "ready",
+        "locked"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "TrustReadinessCard",
+      "source": "app/globals.css",
+      "props": [
+        "decision",
+        "dimensions"
+      ],
+      "variants": [
+        "allow",
+        "review",
+        "block"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "InvestorReadinessCard",
+      "source": "app/globals.css",
+      "props": [
+        "dimension",
+        "score",
+        "evidence"
+      ],
+      "variants": [
+        "strong",
+        "developing",
+        "blocked"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "Navigation",
+      "source": "app/components/SiteNavigation.tsx",
+      "props": [
+        "groups",
+        "journeys"
+      ],
+      "variants": [
+        "desktop",
+        "mobile"
+      ],
+      "states": [
+        "default",
+        "open",
+        "focus"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "Modal",
+      "source": "app/globals.css",
+      "props": [
+        "title",
+        "open",
+        "onClose"
+      ],
+      "variants": [
+        "standard",
+        "approval"
+      ],
+      "states": [
+        "open",
+        "closed"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "Table",
+      "source": "app/globals.css",
+      "props": [
+        "columns",
+        "rows"
+      ],
+      "variants": [
+        "compact",
+        "standard"
+      ],
+      "states": [
+        "default",
+        "empty"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "EmptyState",
+      "source": "app/globals.css",
+      "props": [
+        "title",
+        "description",
+        "action"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    },
+    {
+      "component": "Alert",
+      "source": "app/globals.css",
+      "props": [
+        "title",
+        "message"
+      ],
+      "variants": [
+        "info",
+        "caution",
+        "blocked"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokenDependencies": [
+        "color",
+        "spacing",
+        "radii",
+        "typography",
+        "elevation",
+        "motion"
+      ],
+      "figmaNodeId": null,
+      "mappingStatus": "READY_FOR_FIGMA_MAPPING"
+    }
+  ]
+}

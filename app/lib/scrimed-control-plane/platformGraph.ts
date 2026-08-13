@@ -377,36 +377,90 @@ export const scrimedPlatformGraphEdges: PlatformGraphEdge[] = [
   ...infrastructureEdges
 ];
 
-export function validateScrimedPlatformGraph() {
-  const nodeIds = new Set(scrimedPlatformGraphNodes.map((entry) => entry.id));
-  const edgeIds = new Set(scrimedPlatformGraphEdges.map((entry) => entry.id));
+function findDependencyCycles(nodes: PlatformGraphNode[], edges: PlatformGraphEdge[]) {
+  const adjacency = new Map(nodes.map((entry) => [entry.id, [] as string[]]));
+  for (const graphEdge of edges.filter((entry) => entry.relation === "depends_on")) {
+    adjacency.get(graphEdge.from)?.push(graphEdge.to);
+  }
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const cycles = new Set<string>();
+
+  function visit(nodeId: string, path: string[]) {
+    if (visiting.has(nodeId)) {
+      const cycleStart = path.indexOf(nodeId);
+      cycles.add([...path.slice(cycleStart), nodeId].join(" -> "));
+      return;
+    }
+    if (visited.has(nodeId)) return;
+    visiting.add(nodeId);
+    for (const dependency of adjacency.get(nodeId) ?? []) visit(dependency, [...path, nodeId]);
+    visiting.delete(nodeId);
+    visited.add(nodeId);
+  }
+
+  for (const node of nodes) visit(node.id, []);
+  return [...cycles].sort();
+}
+
+export function validatePlatformGraphTopology(
+  nodes: PlatformGraphNode[],
+  edges: PlatformGraphEdge[]
+) {
+  const nodeIds = new Set(nodes.map((entry) => entry.id));
+  const edgeIds = new Set(edges.map((entry) => entry.id));
   const failures: string[] = [];
 
-  if (nodeIds.size !== scrimedPlatformGraphNodes.length) failures.push("duplicate-node-id");
-  if (edgeIds.size !== scrimedPlatformGraphEdges.length) failures.push("duplicate-edge-id");
+  if (nodeIds.size !== nodes.length) failures.push("duplicate-node-id");
+  if (edgeIds.size !== edges.length) failures.push("duplicate-edge-id");
 
-  for (const graphEdge of scrimedPlatformGraphEdges) {
+  for (const graphEdge of edges) {
     if (!nodeIds.has(graphEdge.from)) failures.push(`dangling-edge-from:${graphEdge.id}`);
     if (!nodeIds.has(graphEdge.to)) failures.push(`dangling-edge-to:${graphEdge.id}`);
   }
 
-  for (const capability of platformCapabilityRegistry) {
-    const capabilityId = `capability:${capability.id}`;
-    if (!scrimedPlatformGraphEdges.some((entry) => entry.from === capabilityId && entry.relation === "governed_by")) {
+  for (const capability of nodes.filter((entry) => entry.type === "capability")) {
+    if (!edges.some((entry) => entry.from === capability.id && entry.relation === "governed_by")) {
       failures.push(`ungoverned-capability:${capability.id}`);
     }
     if (
       capability.riskTier === "high" &&
-      !scrimedPlatformGraphEdges.some((entry) => entry.from === capabilityId && entry.relation === "reviewed_by")
+      !edges.some((entry) => entry.from === capability.id && entry.relation === "reviewed_by")
     ) {
       failures.push(`high-risk-capability-without-review:${capability.id}`);
     }
   }
 
+  for (const agent of nodes.filter((entry) => entry.type === "agent")) {
+    if (!agent.owner.trim()) failures.push(`agent-without-owner:${agent.id}`);
+  }
+
+  for (const api of nodes.filter((entry) => entry.type === "api")) {
+    const declaredRoute = edges.some((entry) => entry.from === api.id && entry.relation === "routes_to");
+    if (!declaredRoute) failures.push(`route-without-capability:${api.id}`);
+  }
+
+  for (const modelPolicy of nodes.filter((entry) => entry.type === "model-policy")) {
+    const gatewayEdges = edges.filter(
+      (entry) => entry.to === modelPolicy.id && entry.relation === "routes_to"
+    );
+    const qualifiedThroughGovernedCapability = gatewayEdges.some((gatewayEdge) =>
+      edges.some(
+        (entry) => entry.from === gatewayEdge.from && entry.relation === "governed_by"
+      )
+    );
+    if (!qualifiedThroughGovernedCapability) {
+      failures.push(`model-without-qualification-path:${modelPolicy.id}`);
+    }
+  }
+
+  const dependencyCycles = findDependencyCycles(nodes, edges);
+  failures.push(...dependencyCycles.map((cycle) => `forbidden-dependency-cycle:${cycle}`));
+
   const connectedNodeIds = new Set(
-    scrimedPlatformGraphEdges.flatMap((entry) => [entry.from, entry.to])
+    edges.flatMap((entry) => [entry.from, entry.to])
   );
-  const orphanNodeIds = scrimedPlatformGraphNodes
+  const orphanNodeIds = nodes
     .filter((entry) => !connectedNodeIds.has(entry.id))
     .map((entry) => entry.id);
   if (orphanNodeIds.length) failures.push(...orphanNodeIds.map((id) => `orphan-node:${id}`));
@@ -415,9 +469,17 @@ export function validateScrimedPlatformGraph() {
     valid: failures.length === 0,
     failures,
     orphanNodeIds,
-    nodeCount: scrimedPlatformGraphNodes.length,
-    edgeCount: scrimedPlatformGraphEdges.length
+    dependencyCycles,
+    nodeCount: nodes.length,
+    edgeCount: edges.length
   };
+}
+
+export function validateScrimedPlatformGraph() {
+  return validatePlatformGraphTopology(
+    scrimedPlatformGraphNodes,
+    scrimedPlatformGraphEdges
+  );
 }
 
 export function getScrimedPlatformGraph() {

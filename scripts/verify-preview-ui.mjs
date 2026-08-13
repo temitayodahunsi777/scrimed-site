@@ -99,6 +99,10 @@ export function evaluatePreviewSnapshot(snapshot, policy) {
   if (snapshot.documentWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal-overflow:${policy.path}:${snapshot.documentWidth}`);
   }
+  if ((snapshot.consoleErrors ?? []).length > 0) failures.push(`console-error:${policy.path}`);
+  if ((snapshot.pageErrors ?? []).length > 0) failures.push(`page-error:${policy.path}`);
+  if ((snapshot.http5xx ?? []).length > 0) failures.push(`http-5xx:${policy.path}`);
+  if ((snapshot.redirectCount ?? 0) > 10) failures.push(`redirect-loop:${policy.path}`);
   if (!snapshot.title.trim()) failures.push(`missing-title:${policy.path}`);
   const expectedCanonical = new URL(policy.path, `${snapshot.canonicalOrigin}/`).href;
   let normalizedCanonical = null;
@@ -154,7 +158,11 @@ function safeSnapshot(policy, width = 390) {
     jsonLd: '{"@type":"Organization"}',
     viewportWidth: width,
     documentWidth: width,
-    formCount: 0
+    formCount: 0,
+    consoleErrors: [],
+    pageErrors: [],
+    http5xx: [],
+    redirectCount: 0
   };
 }
 
@@ -223,6 +231,16 @@ try {
     try {
       for (const policy of routePolicy) {
         const page = await context.newPage();
+        const consoleErrors = [];
+        const pageErrors = [];
+        const http5xx = [];
+        page.on("console", (message) => {
+          if (message.type() === "error") consoleErrors.push(message.text().slice(0, 240));
+        });
+        page.on("pageerror", (error) => pageErrors.push(error.message.slice(0, 240)));
+        page.on("response", (response) => {
+          if (response.status() >= 500) http5xx.push({ status: response.status(), url: response.url().split("?", 1)[0] });
+        });
         const response = await page.goto(`${baseUrl}${policy.path}`, {
           waitUntil: "networkidle",
           timeout: 30_000
@@ -248,13 +266,19 @@ try {
           expectedCanonicalOrigin: canonicalOrigin
         });
         snapshot.status = response?.status() ?? 0;
+        let redirectCount = 0;
+        for (let request = response?.request().redirectedFrom(); request; request = request.redirectedFrom()) redirectCount += 1;
+        snapshot.consoleErrors = consoleErrors;
+        snapshot.pageErrors = pageErrors;
+        snapshot.http5xx = http5xx;
+        snapshot.redirectCount = redirectCount;
         const failures = evaluatePreviewSnapshot(snapshot, policy);
         const screenshotPath = path.join(
           outputDir,
           `${viewport.name}-${policy.path === "/" ? "home" : policy.path.slice(1)}.png`
         );
         await page.screenshot({ path: screenshotPath, fullPage: true });
-        results.push({ viewport: viewport.name, path: policy.path, failures, screenshotPath });
+        results.push({ viewport: viewport.name, path: policy.path, failures, screenshotPath, consoleErrors, pageErrors, http5xx, redirectCount });
         await page.close();
       }
     } finally {

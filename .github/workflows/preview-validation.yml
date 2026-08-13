@@ -29,6 +29,8 @@ jobs:
       SCRIMED_EXTERNAL_PROVIDER_CALLS_ENABLED: "false"
       SCRIMED_SCHEDULES_ENABLED: "false"
       SCRIMED_VOICE_SIMULATION_ENABLED: "true"
+      SCRIMED_BUILD_COMMIT_SHA: ${{ github.sha }}
+      VERCEL_ENV: preview
 
     steps:
       - name: Checkout
@@ -76,6 +78,14 @@ jobs:
           --canonical-origin=https://app.scrimedsolutions.com
           --output-dir=artifacts/ui-verification
 
+      - name: Bind preview evidence to the exact candidate
+        run: >-
+          node scripts/verify-vercel-preview.mjs --strict
+          --base-url=http://127.0.0.1:3000
+          --candidate-sha=${GITHUB_SHA}
+          --ui-evidence=artifacts/ui-verification/preview-ui-verification.json
+          --output=artifacts/vercel/vercel-preview-evidence.json
+
       - name: Verify rendered public output and prohibited claims
         run: npm run verify:public-release
 
@@ -93,5 +103,6 @@ jobs:
           name: synthetic-preview-evidence-${{ github.run_id }}
           path: |
             artifacts/ui-verification/**
+            artifacts/vercel/vercel-preview-evidence.json
           if-no-files-found: warn
           retention-days: 7

@@ -934,6 +934,51 @@ const checks = [
   {
     label: "sales demo QA token policy",
     args: ["scripts/sales-demo-session-qa-token-policy-selftest.mjs"]
+  },
+  {
+    label: "SCRIMED enterprise gap-closure policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-enterprise-gap-closure-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED enterprise gap-closure contract",
+    args: ["scripts/scrimed-enterprise-gap-closure-contract-check.mjs"]
+  },
+  {
+    label: "Vercel preview evidence verifier policy",
+    args: ["scripts/verify-vercel-preview.mjs", "--self-test"]
+  },
+  {
+    label: "Supabase repository security assurance",
+    args: ["scripts/verify-supabase-security.mjs", "--strict"]
+  },
+  {
+    label: "Supabase RLS contract",
+    args: ["tests/security/supabase-rls-contract.test.mjs"]
+  },
+  {
+    label: "design-system artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/design-system-artifacts.mjs",
+      "--check"
+    ]
+  },
+  {
+    label: "investor demo rehearsal gate",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/rehearse-investor-demo.mjs",
+      "--self-test"
+    ]
   }
 ];
 

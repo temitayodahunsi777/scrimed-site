@@ -118,7 +118,7 @@ The Investor and Audience Readiness page includes a timed run-of-show that reduc
 2. Atlas and TrustOS show policy, provenance, human review, auditability, and fail-closed execution as the platform moat.
 3. The Demo-to-Pilot Accelerator converts interest into a bounded synthetic evaluation and a controlled diligence decision.
 
-The `3-minute preview` is intended for an executive first meeting. The `12-minute walkthrough` supports technical, product, clinical-operations, or diligence follow-up. Timing is deterministic and tested. Both modes retain the same evidence standard and blocked claims.
+The `3-minute preview` is intended for an executive first meeting. The `12-minute walkthrough` supports technical, product, security, or clinical-operations follow-up. The `30-minute diligence` mode adds structured product, evidence, economics, governance, and risk review. Timing is deterministic and tested. All modes retain the same evidence standard and blocked claims.
 
 An automated rehearsal assessment verifies timebox integrity, chapter order, internal proof-route scope, evidence and decision coverage, and explicit authority boundaries. Passing these checks means the run-of-show is ready for an internal founder rehearsal. Before any external meeting, a human presenter must still confirm the audience and ask, rehearse the live proof routes on the meeting device, validate meeting-specific claims against current evidence and permissions, and keep downloadable artifacts internal unless recipient-specific distribution is separately authorized.
 

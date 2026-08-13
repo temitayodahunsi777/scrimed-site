@@ -171,7 +171,14 @@ assert.match(receipt, /Operator-confirmation hash: scrimed-intel-/);
 assert.doesNotMatch(receipt, /buyer@example\.com|patient|bearer\s+[a-z0-9._-]+/i);
 
 const summary = getInvestorDemoCommandRoomSummary();
-assert.equal(summary.modes.length, 2);
+assert.deepEqual(
+  summary.modes.map(({ id, durationMinutes }) => ({ id, durationMinutes })),
+  [
+    { id: "executive-preview", durationMinutes: 3 },
+    { id: "technical-walkthrough", durationMinutes: 12 },
+    { id: "diligence-walkthrough", durationMinutes: 30 }
+  ]
+);
 assert.equal(summary.routeCheckPolicy.method, "HEAD");
 assert.equal(summary.routeCheckPolicy.sameOriginOnly, true);
 assert.equal(summary.externalSendAuthorized, false);

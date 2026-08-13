@@ -1,6 +1,9 @@
 import { generateScrimedAuditHash } from "./scrimedIntelligencePlatform";
 
-export type InvestorDemoMode = "executive-preview" | "diligence-walkthrough";
+export type InvestorDemoMode =
+  | "executive-preview"
+  | "technical-walkthrough"
+  | "diligence-walkthrough";
 
 export type InvestorDemoProofRoute = {
   label: string;
@@ -24,12 +27,13 @@ export type InvestorDemoRunOfShow = {
   version: typeof investorDemoRunOfShowVersion;
   mode: InvestorDemoMode;
   modeLabel: string;
-  durationMinutes: 3 | 12;
+  durationMinutes: 3 | 12 | 30;
   durationSeconds: number;
   status: "ready-for-synthetic-guided-demonstration";
   audience: string;
   openingQuestion: string;
   chapters: InvestorDemoChapter[];
+  evidenceMap: InvestorDemoEvidenceMapItem[];
   closingDecision: string;
   evidenceStandard: string;
   blockedClaims: string[];
@@ -48,6 +52,7 @@ export type InvestorDemoRehearsalCheck = {
     | "chapter-sequence"
     | "proof-route-scope"
     | "evidence-and-decision"
+    | "evidence-map-completeness"
     | "boundary-coverage";
   label: string;
   status: "pass" | "fail";
@@ -68,7 +73,26 @@ export type InvestorDemoRehearsalAssessment = {
 };
 
 export const investorDemoRunOfShowVersion =
-  "scrimed-investor-demo-run-of-show-v1-2026-08-10";
+  "scrimed-investor-demo-run-of-show-v2-2026-08-12";
+
+export type InvestorDemoEvidenceMapItem = {
+  id:
+    | "problem"
+    | "workflow"
+    | "synthetic-input"
+    | "agents"
+    | "model-routing"
+    | "trust-engine"
+    | "evidence"
+    | "cost"
+    | "value"
+    | "safety-boundaries"
+    | "pilot-conversion";
+  label: string;
+  statement: string;
+  proofRoutes: string[];
+  evidenceStatus: "synthetic-verified" | "implemented-local" | "human-review-required";
+};
 
 export const investorDemoRunOfShowBoundary =
   "This guided demonstration uses public, synthetic, and readiness metadata only. It is not investment advice, securities offering material, solicitation, audited financial reporting, valuation assurance, customer evidence, clinical validation, PHI authorization, live-care authority, payer submission, EHR writeback, production deployment approval, or customer go-live authorization.";
@@ -77,7 +101,7 @@ export const investorDemoModes: Array<{
   id: InvestorDemoMode;
   label: string;
   description: string;
-  durationMinutes: 3 | 12;
+  durationMinutes: 3 | 12 | 30;
 }> = [
   {
     id: "executive-preview",
@@ -86,17 +110,38 @@ export const investorDemoModes: Array<{
     durationMinutes: 3
   },
   {
-    id: "diligence-walkthrough",
+    id: "technical-walkthrough",
     label: "12-minute walkthrough",
-    description: "A deeper workflow, governance, evidence, and pilot discussion.",
+    description: "Architecture, agent controls, model routing, evidence, and pilot mechanics.",
     durationMinutes: 12
+  },
+  {
+    id: "diligence-walkthrough",
+    label: "30-minute diligence",
+    description: "A controlled product, security, evidence, economics, and risk review.",
+    durationMinutes: 30
   }
 ];
 
 const durationAllocations: Record<InvestorDemoMode, readonly [number, number, number]> = {
   "executive-preview": [60, 75, 45],
-  "diligence-walkthrough": [300, 270, 150]
+  "technical-walkthrough": [300, 270, 150],
+  "diligence-walkthrough": [720, 660, 420]
 };
+
+const investorDemoEvidenceMap: InvestorDemoEvidenceMapItem[] = [
+  { id: "problem", label: "Problem", statement: "Administrative evidence gaps delay review and increase avoidable rework.", proofRoutes: ["/documentation-before-authorization"], evidenceStatus: "implemented-local" },
+  { id: "workflow", label: "Workflow", statement: "A bounded synthetic workflow prepares evidence while retaining human decision authority.", proofRoutes: ["/demos/prior-authorization-support"], evidenceStatus: "synthetic-verified" },
+  { id: "synthetic-input", label: "Synthetic input", statement: "Demonstration records contain no PHI and are explicitly labeled synthetic.", proofRoutes: ["/demos"], evidenceStatus: "synthetic-verified" },
+  { id: "agents", label: "Agents", statement: "Specialists operate through scoped tools, bounded delegation, checkpoints, and review gates.", proofRoutes: ["/scrimed-work"], evidenceStatus: "implemented-local" },
+  { id: "model-routing", label: "Model routing", statement: "Provider-neutral routing requires task qualification and cannot silently lower safety constraints.", proofRoutes: ["/scrimed-work"], evidenceStatus: "implemented-local" },
+  { id: "trust-engine", label: "Trust Engine", statement: "Policy, evidence, approvals, audit, and rollback determine permitted execution.", proofRoutes: ["/trust-os", "/atlas"], evidenceStatus: "implemented-local" },
+  { id: "evidence", label: "Evidence", statement: "Claims and outputs remain linked to inspectable routes, provenance, and current limitations.", proofRoutes: ["/validation-evidence"], evidenceStatus: "implemented-local" },
+  { id: "cost", label: "Cost", statement: "Cost is evaluated per accepted evidence-backed output and remains synthetic until measured in an approved pilot.", proofRoutes: ["/pricing"], evidenceStatus: "human-review-required" },
+  { id: "value", label: "Value", statement: "Baseline and outcome evidence are required before SCRIMED represents realized customer value.", proofRoutes: ["/pilot-value-evidence"], evidenceStatus: "human-review-required" },
+  { id: "safety-boundaries", label: "Safety boundaries", statement: "No PHI, autonomous clinical care, payer submission, EHR writeback, or customer activation is authorized.", proofRoutes: ["/quality"], evidenceStatus: "synthetic-verified" },
+  { id: "pilot-conversion", label: "Pilot conversion", statement: "The controlled next step is a scoped synthetic evaluation with acceptance criteria and named owners.", proofRoutes: ["/pilot-demo-commercial-readiness"], evidenceStatus: "human-review-required" }
+];
 
 const chapterDefinitions: Array<Omit<InvestorDemoChapter, "durationSeconds">> = [
   {
@@ -194,14 +239,19 @@ export function buildInvestorDemoRunOfShow(
     audience:
       mode === "executive-preview"
         ? "Investor, strategic sponsor, or executive first meeting"
-        : "Technical, product, clinical-operations, or diligence follow-up",
+        : mode === "technical-walkthrough"
+          ? "Technical, product, security, or clinical-operations follow-up"
+          : "Structured technical, commercial, governance, and risk diligence",
     openingQuestion:
       "Can SCRIMED turn a measurable healthcare workflow problem into governed evidence without crossing live-care boundaries?",
     chapters,
+    evidenceMap: investorDemoEvidenceMap,
     closingDecision:
       mode === "executive-preview"
         ? "Schedule a focused workflow and technical diligence session."
-        : "Define the evidence needed for a synthetic design-partner evaluation and a founder-led capital conversation.",
+        : mode === "technical-walkthrough"
+          ? "Define the evidence and integration questions for a synthetic design-partner evaluation."
+          : "Record diligence findings, owners, unresolved risks, and the exact evidence needed for the next controlled decision.",
     evidenceStandard:
       "Use inspectable product behavior and clearly labeled synthetic evidence. State unknowns and blocked claims directly.",
     blockedClaims,
@@ -272,6 +322,14 @@ export function assessInvestorDemoRehearsal(
           chapter.decisionPoint.trim().endsWith("?")
       ),
       `${plan.chapters.length} evidence statements and decision questions checked.`
+    ),
+    buildRehearsalCheck(
+      "evidence-map-completeness",
+      "The plan covers the complete investor evidence narrative without presenting estimates as outcomes.",
+      plan.evidenceMap.length === 11 &&
+        new Set(plan.evidenceMap.map((item) => item.id)).size === 11 &&
+        plan.evidenceMap.every((item) => item.proofRoutes.length > 0),
+      `${plan.evidenceMap.length} evidence dimensions mapped to inspectable routes.`
     ),
     buildRehearsalCheck(
       "boundary-coverage",

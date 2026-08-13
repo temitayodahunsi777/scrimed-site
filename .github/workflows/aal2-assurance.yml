@@ -64,5 +64,8 @@ jobs:
       - name: Reject production target
         run: node -e "const host=new URL(process.env.SCRIMED_BASE_URL).hostname;if(host==='app.scrimedsolutions.com'){console.error('Production target is prohibited for this assurance workflow.');process.exit(1)}"
       - run: node scripts/verify-aal2-evidence.mjs --strict
+      - name: Verify downgrade and token-policy denials
+        run: node scripts/aal2-token-policy-selftest.mjs
       - run: node scripts/scrimed-work-durable-store-preflight.mjs --strict
-      - run: node scripts/scrimed-work-authenticated-smoke.mjs --strict
+      - name: Verify candidate-bound privileged endpoint and durable replay controls
+        run: node scripts/scrimed-work-authenticated-smoke.mjs --strict

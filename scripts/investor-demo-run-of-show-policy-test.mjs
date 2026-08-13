@@ -13,7 +13,7 @@ import {
 const summary = getInvestorDemoRunOfShowSummary();
 
 assert.equal(summary.status, "guided-synthetic-investor-demo-ready");
-assert.equal(summary.modeCount, 2);
+assert.equal(summary.modeCount, 3);
 assert.equal(summary.proofChapterCount, 3);
 assert.equal(summary.plans.length, investorDemoModes.length);
 assert.match(investorDemoRunOfShowBoundary, /synthetic/i);
@@ -22,7 +22,8 @@ assert.match(investorDemoRunOfShowBoundary, /not.*solicitation/i);
 
 const expectedDurationSeconds = new Map([
   ["executive-preview", 180],
-  ["diligence-walkthrough", 720]
+  ["technical-walkthrough", 720],
+  ["diligence-walkthrough", 1800]
 ]);
 
 for (const plan of summary.plans) {
@@ -42,6 +43,8 @@ for (const plan of summary.plans) {
   assert.equal(plan.investmentSolicitationAuthorized, false);
   assert.equal(plan.externalSendAuthorized, false);
   assert.equal(plan.humanReviewRequired, true);
+  assert.equal(plan.evidenceMap.length, 11);
+  assert.equal(new Set(plan.evidenceMap.map((item) => item.id)).size, 11);
   assert.match(plan.auditHash, /^scrimed-intel-[0-9a-f]{8}$/);
   assert.ok(plan.blockedClaims.length >= 5);
 
@@ -54,8 +57,8 @@ for (const plan of summary.plans) {
   const rehearsal = assessInvestorDemoRehearsal(plan.mode);
   assert.equal(rehearsal.status, "ready-for-internal-rehearsal");
   assert.equal(rehearsal.internalRehearsalReady, true);
-  assert.equal(rehearsal.automatedChecksPassed, 5);
-  assert.equal(rehearsal.automatedCheckCount, 5);
+  assert.equal(rehearsal.automatedChecksPassed, 6);
+  assert.equal(rehearsal.automatedCheckCount, 6);
   assert.equal(
     rehearsal.checks.every((check) => check.status === "pass"),
     true

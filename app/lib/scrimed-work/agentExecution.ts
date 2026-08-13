@@ -203,6 +203,56 @@ export type RunReceipt = {
   receiptHash: string;
 };
 
+export type AgentRunFailureCategory =
+  | "policy-denial"
+  | "runtime-timeout"
+  | "tool-budget-exhausted"
+  | "retry-budget-exhausted"
+  | "cost-budget-exhausted"
+  | "watchdog-nonprogress"
+  | "operator-cancelled"
+  | "emergency-revoked";
+
+export type AgentRunCheckpoint = {
+  checkpointId: string;
+  sequence: number;
+  stateDigest: string;
+  summary: string;
+  createdAt: string;
+  checkpointHash: string;
+};
+
+export type AgentRunControl = {
+  runId: string;
+  tenantId: string;
+  environmentId: string;
+  identityId: string;
+  leaseId: string;
+  status: "planned" | "running" | "paused" | "completed" | "failed" | "cancelled" | "emergency-stopped";
+  limits: {
+    runtimeMs: number;
+    toolCalls: number;
+    retries: number;
+    costUsd: number;
+    nonprogressSteps: number;
+  };
+  usage: {
+    runtimeMs: number;
+    toolCalls: number;
+    retries: number;
+    costUsd: number;
+    nonprogressSteps: number;
+  };
+  checkpoints: AgentRunCheckpoint[];
+  lastCheckpointId: string | null;
+  failureCategory: AgentRunFailureCategory | null;
+  incidentHookRequired: boolean;
+  cancellationRequested: boolean;
+  createdAt: string;
+  updatedAt: string;
+  controlHash: string;
+};
+
 const hashPattern = /^[0-9a-f]{64}$/i;
 const safeIdentifierPattern = /^[A-Za-z0-9][A-Za-z0-9._:/-]{2,159}$/;
 const riskOrder: Record<RiskLevel, number> = { low: 0, moderate: 1, high: 2, prohibited: 3 };
@@ -225,6 +275,176 @@ function assertSafeIdentifier(value: string, label: string) {
   if (!safeIdentifierPattern.test(value) || sensitivePattern.test(value)) {
     throw new Error(`${label} must be a bounded metadata identifier`);
   }
+}
+
+function signRunControl(
+  input: Omit<AgentRunControl, "controlHash"> | AgentRunControl
+): AgentRunControl {
+  const unsigned = { ...input } as Partial<AgentRunControl>;
+  delete unsigned.controlHash;
+  return {
+    ...(unsigned as Omit<AgentRunControl, "controlHash">),
+    controlHash: createAuditHash({ type: "agent-run-control", input: unsigned })
+  };
+}
+
+export function createAgentRunControl(input: {
+  tenantId: string;
+  environmentId: string;
+  identityId: string;
+  leaseId: string;
+  objectiveDigest: string;
+  limits: AgentRunControl["limits"];
+  createdAt: string;
+}): AgentRunControl {
+  for (const [label, value] of Object.entries(input.limits)) {
+    if (!Number.isFinite(value) || value <= 0) throw new Error(`Agent run ${label} limit must be positive.`);
+  }
+  if (!hashPattern.test(input.objectiveDigest) || !validIso(input.createdAt)) {
+    throw new Error("Agent runs require a digest-only objective and valid timestamp.");
+  }
+  for (const [label, value] of Object.entries({
+    tenantId: input.tenantId,
+    environmentId: input.environmentId,
+    identityId: input.identityId,
+    leaseId: input.leaseId
+  })) assertSafeIdentifier(value, label);
+
+  const runId = `run_${createAuditHash({
+    tenantId: input.tenantId,
+    environmentId: input.environmentId,
+    identityId: input.identityId,
+    leaseId: input.leaseId,
+    objectiveDigest: input.objectiveDigest
+  }).replace(/[^a-z0-9]/gi, "").slice(-24)}`;
+  return signRunControl({
+    runId,
+    tenantId: input.tenantId,
+    environmentId: input.environmentId,
+    identityId: input.identityId,
+    leaseId: input.leaseId,
+    status: "planned",
+    limits: { ...input.limits },
+    usage: { runtimeMs: 0, toolCalls: 0, retries: 0, costUsd: 0, nonprogressSteps: 0 },
+    checkpoints: [],
+    lastCheckpointId: null,
+    failureCategory: null,
+    incidentHookRequired: false,
+    cancellationRequested: false,
+    createdAt: input.createdAt,
+    updatedAt: input.createdAt
+  });
+}
+
+export function checkpointAgentRun(
+  control: AgentRunControl,
+  input: {
+    stateDigest: string;
+    summary: string;
+    usage: AgentRunControl["usage"];
+    createdAt: string;
+  }
+): AgentRunControl {
+  if (!new Set(["planned", "running"]).has(control.status)) {
+    throw new Error("Only a planned or running agent run can checkpoint.");
+  }
+  if (!hashPattern.test(input.stateDigest) || !validIso(input.createdAt) || sensitivePattern.test(input.summary)) {
+    throw new Error("Agent checkpoints require PHI-safe metadata, a state digest, and valid timestamp.");
+  }
+  if (Object.values(input.usage).some((value) => !Number.isFinite(value) || value < 0)) {
+    throw new Error("Agent checkpoint usage must be finite and nonnegative.");
+  }
+  const sequence = control.checkpoints.length + 1;
+  const checkpointBase = {
+    checkpointId: `${control.runId}:checkpoint:${sequence}`,
+    sequence,
+    stateDigest: input.stateDigest,
+    summary: input.summary.trim().slice(0, 240),
+    createdAt: input.createdAt
+  };
+  const checkpoint: AgentRunCheckpoint = {
+    ...checkpointBase,
+    checkpointHash: createAuditHash({ type: "agent-run-checkpoint", checkpointBase })
+  };
+  const next = signRunControl({
+    ...control,
+    status: "running",
+    usage: { ...input.usage },
+    checkpoints: [...control.checkpoints, checkpoint],
+    lastCheckpointId: checkpoint.checkpointId,
+    updatedAt: input.createdAt
+  });
+  return evaluateAgentRunWatchdog(next, input.createdAt);
+}
+
+export function evaluateAgentRunWatchdog(
+  control: AgentRunControl,
+  evaluatedAt: string
+): AgentRunControl {
+  if (!validIso(evaluatedAt)) throw new Error("Agent watchdog requires a valid timestamp.");
+  const failureCategory: AgentRunFailureCategory | null =
+    control.usage.runtimeMs > control.limits.runtimeMs
+      ? "runtime-timeout"
+      : control.usage.toolCalls > control.limits.toolCalls
+        ? "tool-budget-exhausted"
+        : control.usage.retries > control.limits.retries
+          ? "retry-budget-exhausted"
+          : control.usage.costUsd > control.limits.costUsd
+            ? "cost-budget-exhausted"
+            : control.usage.nonprogressSteps > control.limits.nonprogressSteps
+              ? "watchdog-nonprogress"
+              : null;
+  if (!failureCategory) return control;
+  return signRunControl({
+    ...control,
+    status: "failed",
+    failureCategory,
+    incidentHookRequired: true,
+    updatedAt: evaluatedAt
+  });
+}
+
+export function pauseAgentRun(control: AgentRunControl, pausedAt: string): AgentRunControl {
+  if (control.status !== "running" || !control.lastCheckpointId || !validIso(pausedAt)) {
+    throw new Error("A running checkpointed agent run is required before pause.");
+  }
+  return signRunControl({ ...control, status: "paused", updatedAt: pausedAt });
+}
+
+export function resumeAgentRun(control: AgentRunControl, resumedAt: string): AgentRunControl {
+  if (control.status !== "paused" || !control.lastCheckpointId || !validIso(resumedAt)) {
+    throw new Error("Only a checkpointed paused run can resume.");
+  }
+  return signRunControl({ ...control, status: "running", updatedAt: resumedAt });
+}
+
+export function cancelAgentRun(control: AgentRunControl, cancelledAt: string): AgentRunControl {
+  if (!validIso(cancelledAt)) throw new Error("Agent cancellation requires a valid timestamp.");
+  if (new Set(["completed", "cancelled", "emergency-stopped"]).has(control.status)) return control;
+  return signRunControl({
+    ...control,
+    status: "cancelled",
+    failureCategory: "operator-cancelled",
+    cancellationRequested: true,
+    updatedAt: cancelledAt
+  });
+}
+
+export function emergencyStopAgentRun(
+  control: AgentRunControl,
+  revocation: EmergencyRevocation
+): AgentRunControl {
+  if (!revocation.blocksNewActions || !revocation.revokesActiveLeases) {
+    throw new Error("Emergency stop requires a complete revocation control.");
+  }
+  return signRunControl({
+    ...control,
+    status: "emergency-stopped",
+    failureCategory: "emergency-revoked",
+    incidentHookRequired: true,
+    cancellationRequested: true,
+    updatedAt: revocation.activatedAt
+  });
 }
 
 export function createWorkloadIdentity(

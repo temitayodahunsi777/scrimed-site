@@ -6,7 +6,7 @@ The Investor Demo Command Room converts the existing guided run of show into a h
 
 - Page: `/investor-demo-command-room`
 - Read-only API: `/api/investor-demo-command-room`
-- Mode API: `/api/investor-demo-command-room?mode=executive-preview|diligence-walkthrough`
+- Mode API: `/api/investor-demo-command-room?mode=executive-preview|technical-walkthrough|diligence-walkthrough`
 
 ## Control Flow
 

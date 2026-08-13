@@ -1,0 +1,87 @@
+{
+  "version": "scrimed-design-system-v1-2026-08-12",
+  "color": {
+    "ink": "#101612",
+    "muted": "#536058",
+    "line": "#d9e2dd",
+    "surface": "#ffffff",
+    "wash": "#f3f7f5",
+    "success": "#10613f",
+    "successStrong": "#0b3d2a",
+    "caution": "#c89b2d",
+    "information": "#275f8f",
+    "danger": "#b95d4d",
+    "focus": "#275f8f"
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": "Arial, Helvetica, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "md": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.375rem",
+      "display": "clamp(2rem, 4vw, 4rem)"
+    },
+    "lineHeight": {
+      "tight": 1.2,
+      "body": 1.55,
+      "relaxed": 1.7
+    },
+    "fontWeight": {
+      "regular": 400,
+      "medium": 600,
+      "strong": 800,
+      "brand": 900
+    }
+  },
+  "spacing": {
+    "0": "0",
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "10": "2.5rem",
+    "12": "3rem",
+    "16": "4rem"
+  },
+  "radii": {
+    "none": "0",
+    "control": "4px",
+    "card": "8px",
+    "pill": "999px"
+  },
+  "elevation": {
+    "none": "none",
+    "low": "0 4px 16px rgba(16, 22, 18, 0.06)",
+    "medium": "0 12px 32px rgba(16, 22, 18, 0.1)",
+    "overlay": "0 20px 50px rgba(16, 22, 18, 0.14)"
+  },
+  "motion": {
+    "duration": {
+      "immediate": "0ms",
+      "fast": "120ms",
+      "standard": "200ms",
+      "deliberate": "320ms"
+    },
+    "easing": {
+      "standard": "ease",
+      "enter": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+    },
+    "reducedMotionRule": "Disable nonessential transforms and transitions when prefers-reduced-motion is reduce."
+  },
+  "accessibility": {
+    "minimumTouchTargetPx": 44,
+    "focusIndicator": "2px solid #275f8f",
+    "focusOffsetPx": 2,
+    "reducedMotionSupported": true,
+    "colorAloneConveysStatus": false
+  },
+  "figmaSyncStatus": "SPEC_READY_VIEW_ONLY_NO_CANVAS_MUTATION"
+}

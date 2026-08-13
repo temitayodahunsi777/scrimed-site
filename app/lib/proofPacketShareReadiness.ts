@@ -30,6 +30,29 @@ export type ProofPacketShareReadinessDecision =
   | "BLOCKED"
   | "READY_FOR_PROTECTED_INTAKE";
 
+export type DistributionLockboxDecision =
+  | "NOT_AUTHORIZED"
+  | "READY_FOR_AUTHORIZATION"
+  | "AUTHORIZED";
+
+export type DistributionLockboxDecisionInput = {
+  packetFingerprint: string;
+  expectedPacketFingerprint: string;
+  artifactFingerprint: string;
+  expectedArtifactFingerprint: string;
+  candidateFingerprint: string;
+  expectedCandidateFingerprint: string;
+  recipientClassConfirmed: boolean;
+  aal2Verified: boolean;
+  requiredApprovalIds: string[];
+  verifiedApprovalIds: string[];
+  expiresAt: string;
+  evaluatedAt: string;
+  publicClaimsState: "CLEAR" | "BLOCKED" | "NOT_CHECKED";
+  explicitDistributionAuthorizationReference?: string | null;
+  explicitDistributionAuthorizationVerified?: boolean;
+};
+
 export type ProofPacketShareReadinessInput = {
   packetId: string;
   packetAuditHash: string;
@@ -133,6 +156,72 @@ export const proofPacketShareReadinessPolicyVersion =
 export const protectedDistributionLockboxRoute = "/pilot-workspace/access";
 export const proofPacketShareReadinessBoundary =
   "Proof Packet Share Readiness validates a no-PII handoff draft for the existing protected Distribution Lockbox. It never sends a packet, names a recipient, records an external approval, creates customer permission, authorizes investment solicitation, releases protected material, enables PHI, approves production use, or authorizes live clinical execution.";
+
+const distributionAuthorizationReferencePattern =
+  /^[A-Za-z0-9][A-Za-z0-9._:/#()-]{7,159}$/;
+
+export function evaluateDistributionLockboxDecision(
+  input: DistributionLockboxDecisionInput
+) {
+  const reasons: string[] = [];
+  const fingerprints = [
+    input.packetFingerprint,
+    input.expectedPacketFingerprint,
+    input.artifactFingerprint,
+    input.expectedArtifactFingerprint,
+    input.candidateFingerprint,
+    input.expectedCandidateFingerprint
+  ];
+  if (!fingerprints.every((value) => /^[0-9a-f]{64}$/i.test(value))) {
+    reasons.push("exact-fingerprints-required");
+  }
+  if (input.packetFingerprint !== input.expectedPacketFingerprint) reasons.push("packet-fingerprint-mismatch");
+  if (input.artifactFingerprint !== input.expectedArtifactFingerprint) reasons.push("artifact-fingerprint-mismatch");
+  if (input.candidateFingerprint !== input.expectedCandidateFingerprint) reasons.push("candidate-fingerprint-mismatch");
+  if (!input.recipientClassConfirmed) reasons.push("recipient-class-confirmation-required");
+  if (!input.aal2Verified) reasons.push("aal2-verification-required");
+  if (input.publicClaimsState !== "CLEAR") reasons.push("public-claims-clearance-required");
+  if (
+    !Number.isFinite(Date.parse(input.evaluatedAt)) ||
+    !Number.isFinite(Date.parse(input.expiresAt)) ||
+    Date.parse(input.expiresAt) <= Date.parse(input.evaluatedAt)
+  ) reasons.push("authorization-window-expired-or-invalid");
+  const missingApprovals = [...new Set(input.requiredApprovalIds)]
+    .filter((approvalId) => !input.verifiedApprovalIds.includes(approvalId));
+  if (missingApprovals.length) reasons.push("required-approvals-incomplete");
+
+  const authorizationReference = input.explicitDistributionAuthorizationReference?.trim() || null;
+  if (authorizationReference && !distributionAuthorizationReferencePattern.test(authorizationReference)) {
+    reasons.push("distribution-authorization-reference-invalid");
+  }
+  if (authorizationReference && input.explicitDistributionAuthorizationVerified !== true) {
+    reasons.push("distribution-authorization-evidence-unverified");
+  }
+  const ready = reasons.length === 0;
+  const decision: DistributionLockboxDecision = !ready
+    ? "NOT_AUTHORIZED"
+    : authorizationReference &&
+        input.explicitDistributionAuthorizationVerified === true &&
+        distributionAuthorizationReferencePattern.test(authorizationReference)
+      ? "AUTHORIZED"
+      : "READY_FOR_AUTHORIZATION";
+  const result = {
+    service: "scrimed-distribution-lockbox-decision" as const,
+    decision,
+    reasonCodes: reasons,
+    missingApprovals,
+    explicitAuthorizationReferenceRetained: Boolean(authorizationReference),
+    externalDistributionAuthorized: decision === "AUTHORIZED",
+    externalSendExecuted: false as const,
+    productionAuthorityGranted: false as const,
+    boundary:
+      "READY_FOR_AUTHORIZATION is not AUTHORIZED. This decision validates metadata only and never sends, uploads, publishes, or distributes an artifact."
+  };
+  return {
+    ...result,
+    decisionHash: createHash("sha256").update(JSON.stringify(result)).digest("hex")
+  };
+}
 
 const requiredInputKeys = [
   "packetId",

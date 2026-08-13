@@ -50,8 +50,8 @@ const defaultOperatingMode: ScrimedOperatingMode = {
   faithAffectsClinicalLogic: false
 };
 
-function envBoolean(name: string, fallback: boolean) {
-  const value = process.env[name]?.trim().toLowerCase();
+function envBoolean(name: string, fallback: boolean, env: NodeJS.ProcessEnv) {
+  const value = env[name]?.trim().toLowerCase();
 
   if (value === undefined || value === "") return fallback;
   if (value === "true") return true;
@@ -60,42 +60,52 @@ function envBoolean(name: string, fallback: boolean) {
   throw new Error(`Invalid boolean value for ${name}; expected "true" or "false".`);
 }
 
-export function resolveScrimedOperatingMode(): ScrimedOperatingMode {
+export function resolveScrimedOperatingMode(
+  env: NodeJS.ProcessEnv = process.env
+): ScrimedOperatingMode {
   return {
     version: defaultOperatingMode.version,
-    syntheticOnly: envBoolean("SCRIMED_SYNTHETIC_ONLY", defaultOperatingMode.syntheticOnly),
-    allowPHI: envBoolean("SCRIMED_ALLOW_PHI", defaultOperatingMode.allowPHI),
+    syntheticOnly: envBoolean("SCRIMED_SYNTHETIC_ONLY", defaultOperatingMode.syntheticOnly, env),
+    allowPHI: envBoolean("SCRIMED_ALLOW_PHI", defaultOperatingMode.allowPHI, env),
     liveClinicalExecution: envBoolean(
       "SCRIMED_LIVE_CLINICAL_EXECUTION",
-      defaultOperatingMode.liveClinicalExecution
+      defaultOperatingMode.liveClinicalExecution,
+      env
     ),
     productionEHRConnections: envBoolean(
       "SCRIMED_PRODUCTION_EHR_CONNECTIONS",
-      defaultOperatingMode.productionEHRConnections
+      defaultOperatingMode.productionEHRConnections,
+      env
     ),
     medicalDeviceConnections: envBoolean(
       "SCRIMED_MEDICAL_DEVICE_CONNECTIONS",
-      defaultOperatingMode.medicalDeviceConnections
+      defaultOperatingMode.medicalDeviceConnections,
+      env
     ),
     emergencyMonitoring: envBoolean(
       "SCRIMED_EMERGENCY_MONITORING",
-      defaultOperatingMode.emergencyMonitoring
+      defaultOperatingMode.emergencyMonitoring,
+      env
     ),
     autonomousTreatmentActions: envBoolean(
       "SCRIMED_AUTONOMOUS_TREATMENT_ACTIONS",
-      defaultOperatingMode.autonomousTreatmentActions
+      defaultOperatingMode.autonomousTreatmentActions,
+      env
     ),
     autonomousEligibilityDecisions: envBoolean(
       "SCRIMED_AUTONOMOUS_ELIGIBILITY_DECISIONS",
-      defaultOperatingMode.autonomousEligibilityDecisions
+      defaultOperatingMode.autonomousEligibilityDecisions,
+      env
     ),
     autonomousPayerDecisions: envBoolean(
       "SCRIMED_AUTONOMOUS_PAYER_DECISIONS",
-      defaultOperatingMode.autonomousPayerDecisions
+      defaultOperatingMode.autonomousPayerDecisions,
+      env
     ),
     faithAffectsClinicalLogic: envBoolean(
       "SCRIMED_FAITH_AFFECTS_CLINICAL_LOGIC",
-      defaultOperatingMode.faithAffectsClinicalLogic
+      defaultOperatingMode.faithAffectsClinicalLogic,
+      env
     )
   };
 }

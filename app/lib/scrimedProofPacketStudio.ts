@@ -13,6 +13,7 @@ export type ScrimedProofPacketType =
   | "enterprise_buyer_packet"
   | "clinical_reviewer_packet"
   | "security_reviewer_packet"
+  | "privacy_reviewer_packet"
   | "legal_reviewer_packet"
   | "regulatory_reviewer_packet"
   | "technical_diligence_packet"
@@ -69,12 +70,14 @@ export type ScrimedProofPacketRecipientClass =
   | "enterprise-buyer"
   | "clinical-reviewer"
   | "security-reviewer"
+  | "privacy-reviewer"
   | "legal-reviewer"
   | "regulatory-reviewer"
   | "technical-diligence-reviewer";
 
 export type ScrimedProofPacketCandidateBinding = {
   packetId: string;
+  packetType: ScrimedProofPacketType;
   exactCandidateSha: string;
   sourceFingerprint: string;
   evidenceFingerprint: string;
@@ -82,6 +85,7 @@ export type ScrimedProofPacketCandidateBinding = {
   recipientClass: ScrimedProofPacketRecipientClass;
   intendedPurpose: string;
   evidenceInventory: string[];
+  claimInventory: ScrimedProofPacketClaimInventoryItem[];
   prohibitedClaims: string[];
   expiresAt: string;
   distributionStatus: "NOT_AUTHORIZED";
@@ -89,6 +93,12 @@ export type ScrimedProofPacketCandidateBinding = {
   exactArtifactHashes: Record<string, string>;
   externalDistributionAuthorized: false;
   auditHash: string;
+};
+
+export type ScrimedProofPacketClaimInventoryItem = {
+  claimId: string;
+  status: "VERIFIED" | "QUALIFIED" | "SYNTHETIC" | "ESTIMATED" | "PLANNED";
+  evidenceReference: string;
 };
 
 export const scrimedProofPacketStudioApiRoute = "/api/scrimed-proof-packet-studio";
@@ -134,6 +144,7 @@ export function createScrimedProofPacketCandidateBinding(
     recipientClass: ScrimedProofPacketRecipientClass;
     intendedPurpose: string;
     evidenceInventory: string[];
+    claimInventory?: ScrimedProofPacketClaimInventoryItem[];
     expiresAt: string;
     approvalsRequired: string[];
     exactArtifactHashes: Record<string, string>;
@@ -144,6 +155,7 @@ export function createScrimedProofPacketCandidateBinding(
   const evaluatedAtMs = Date.parse(evaluatedAt);
   const expiresAtMs = Date.parse(input.expiresAt);
   const artifactEntries = Object.entries(input.exactArtifactHashes);
+  const claimInventory = input.claimInventory ?? [];
 
   if (!packet) throw new Error("Proof packet candidate binding requires a canonical packet.");
   if (![input.exactCandidateSha, input.sourceFingerprint, input.evidenceFingerprint].every((value) => sha256Pattern.test(value))) {
@@ -168,6 +180,15 @@ export function createScrimedProofPacketCandidateBinding(
   ) {
     throw new Error("Proof packet candidate binding contains invalid metadata or artifact hashes.");
   }
+  if (
+    claimInventory.some(
+      (claim) =>
+        !safeBindingTextPattern.test(claim.claimId) ||
+        !safeBindingTextPattern.test(claim.evidenceReference)
+    )
+  ) {
+    throw new Error("Proof packet candidate binding contains invalid claim inventory metadata.");
+  }
 
   const prohibitedClaims = [
     "production authorization",
@@ -179,6 +200,7 @@ export function createScrimedProofPacketCandidateBinding(
   ];
   const fingerprintInput = {
     packetId: packet.id,
+    packetType: packet.packetType,
     packetAuditHash: packet.auditHash,
     exactCandidateSha: input.exactCandidateSha,
     sourceFingerprint: input.sourceFingerprint,
@@ -186,6 +208,7 @@ export function createScrimedProofPacketCandidateBinding(
     recipientClass: input.recipientClass,
     intendedPurpose: input.intendedPurpose,
     evidenceInventory: [...input.evidenceInventory].sort(),
+    claimInventory: [...claimInventory].sort((left, right) => left.claimId.localeCompare(right.claimId)),
     prohibitedClaims,
     expiresAt: new Date(expiresAtMs).toISOString(),
     approvalsRequired: [...input.approvalsRequired].sort(),

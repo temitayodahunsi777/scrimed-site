@@ -36,17 +36,38 @@ export function verifyAal2Evidence(input, nowMs = Date.now()) {
   });
   const claims = tokenAnalysis.claims ?? {};
   const audience = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+  const amr = Array.isArray(claims.amr) ? claims.amr : [];
+  const mfaMethodPresent = amr.some((entry) => {
+    const method = typeof entry === "string" ? entry : entry?.method;
+    return typeof method === "string" && !new Set(["password", "otp", "anonymous"]).has(method.toLowerCase());
+  });
+  const issuedAt = typeof claims.iat === "number" ? claims.iat * 1000 : Number.NaN;
+  const stepUpFresh = Number.isFinite(issuedAt) && nowMs - issuedAt >= 0 && nowMs - issuedAt <= 15 * 60 * 1000;
   const checks = [
     { id: "token-claims", passed: tokenAnalysis.ok, detail: tokenAnalysis.errors.join(" ") || "AAL2 claims and freshness passed local parsing." },
+    { id: "mfa-challenge", passed: claims.aal === "aal2" && mfaMethodPresent, detail: "The signed token must represent AAL2 and a non-password MFA method; signature verification remains external." },
+    { id: "step-up-freshness", passed: stepUpFresh, detail: "The AAL2 step-up must be recent enough for the privileged verification window." },
+    { id: "downgrade-rejection", passed: claims.aal === "aal2", detail: "AAL1 and missing-assurance tokens fail local policy before protected API verification." },
+    { id: "expiration", passed: tokenAnalysis.ok && typeof claims.exp === "number" && claims.exp * 1000 > nowMs, detail: "Expired or insufficiently fresh tokens are rejected." },
     { id: "issuer", passed: typeof input.expectedIssuer === "string" && claims.iss === input.expectedIssuer, detail: "Issuer must match the configured protected identity provider." },
     { id: "audience", passed: typeof input.expectedAudience === "string" && audience.includes(input.expectedAudience), detail: "Audience must include the configured protected SCRIMED audience." },
     { id: "subject", passed: typeof claims.sub === "string" && claims.sub.length > 0, detail: "A non-empty authenticated subject is required." },
     { id: "candidate-binding", passed: sha256Pattern.test(input.candidateFingerprint ?? ""), detail: "AAL2 evidence preparation must name the exact candidate SHA-256." },
     { id: "nonce", passed: noncePattern.test(input.nonce ?? ""), detail: "A bounded nonce is required; durable replay rejection remains a protected-API responsibility." },
+    { id: "mfa-enrollment", passed: false, detail: "MFA enrollment must be verified by Supabase Auth or the protected identity endpoint." },
+    { id: "replay-rejection", passed: false, detail: "One-use nonce rejection must be verified against protected durable state." },
+    { id: "privileged-endpoint", passed: false, detail: "The candidate-bound protected endpoint must return an authorized AAL2 receipt." },
     { id: "signature-verification", passed: false, detail: "Local parsing cannot verify the token signature; Supabase Auth and the protected SCRIMED API must verify it." },
     { id: "role-and-tenant-authorization", passed: false, detail: "Protected SCRIMED APIs remain the authority for role, tenant membership, feature flags, and action scope." }
   ];
-  const locallyPassed = checks.filter((entry) => entry.id !== "signature-verification" && entry.id !== "role-and-tenant-authorization").every((entry) => entry.passed);
+  const externallyVerifiedChecks = new Set([
+    "mfa-enrollment",
+    "replay-rejection",
+    "privileged-endpoint",
+    "signature-verification",
+    "role-and-tenant-authorization"
+  ]);
+  const locallyPassed = checks.filter((entry) => !externallyVerifiedChecks.has(entry.id)).every((entry) => entry.passed);
   const report = {
     service: "scrimed-aal2-evidence-verifier",
     status: locallyPassed ? "READY_FOR_PROTECTED_API_VERIFICATION" : "OPERATOR_EVIDENCE_REQUIRED",
@@ -72,6 +93,7 @@ if (selfTest) {
   const valid = verifyAal2Evidence({
     bearerToken: syntheticToken({
       aal: "aal2",
+      amr: [{ method: "totp", timestamp: nowSeconds }],
       exp: nowSeconds + 1800,
       iat: nowSeconds,
       session_id: "synthetic-session",
@@ -95,6 +117,7 @@ if (selfTest) {
   const wrongCandidate = verifyAal2Evidence({
     bearerToken: syntheticToken({
       aal: "aal2",
+      amr: [{ method: "totp", timestamp: nowSeconds }],
       exp: nowSeconds + 1800,
       iat: nowSeconds,
       session_id: "synthetic-session",

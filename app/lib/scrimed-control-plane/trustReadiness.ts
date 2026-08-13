@@ -6,7 +6,7 @@ import type {
   ToolRiskClass
 } from "./types";
 
-export const scrimedTrustReadinessVersion = "scrimed-trust-readiness-v1-2026-08-11";
+export const scrimedTrustReadinessVersion = "scrimed-trust-readiness-v2-2026-08-12";
 export const scrimedTrustReadinessBoundary =
   "Trust Readiness is an internal engineering signal, not certification, compliance assurance, clinical validation, production authorization, customer activation, or distribution authority.";
 
@@ -25,6 +25,18 @@ export type TrustReadinessInput = {
   candidateBound: boolean;
   rollbackAvailable: boolean;
   externalDistributionRequested: boolean;
+  assurance?: {
+    productionSafety: boolean;
+    phiBoundaryVerified: boolean;
+    modelQualified: boolean;
+    agentSafetyVerified: boolean;
+    evidenceComplete: boolean;
+    securityVerified: boolean;
+    migrationsReady: boolean;
+    publicClaimsClear: boolean;
+    aal2Verified: boolean;
+    externalOperatorActionsComplete: boolean;
+  };
 };
 
 function clamp(value: number) {
@@ -43,6 +55,30 @@ export function evaluateTrustReadiness(input: TrustReadinessInput) {
   if (!input.candidateBound) reviews.push("EXACT_CANDIDATE_BINDING_REQUIRED");
   if (!input.rollbackAvailable) reviews.push("ROLLBACK_EVIDENCE_REQUIRED");
   if (!input.reviewFresh) reviews.push("REVIEW_FRESHNESS_REQUIRED");
+
+  if (input.assurance) {
+    if (!input.assurance.productionSafety) blocks.push("PRODUCTION_SAFETY_GATE_FAILED");
+    if (!input.assurance.phiBoundaryVerified) blocks.push("PHI_BOUNDARY_GATE_FAILED");
+    if (!input.assurance.modelQualified) blocks.push("MODEL_QUALIFICATION_GATE_FAILED");
+    if (!input.assurance.agentSafetyVerified) reviews.push("AGENT_SAFETY_EVIDENCE_REQUIRED");
+    if (!input.assurance.evidenceComplete) reviews.push("EVIDENCE_COMPLETENESS_REQUIRED");
+    if (!input.assurance.securityVerified) blocks.push("SECURITY_GATE_FAILED");
+    if (
+      !input.assurance.migrationsReady &&
+      new Set(["protected-pilot", "production"]).has(input.environment)
+    ) reviews.push("MIGRATION_READINESS_REQUIRED");
+    if (!input.assurance.publicClaimsClear && input.externalDistributionRequested) {
+      blocks.push("PUBLIC_CLAIMS_GATE_FAILED");
+    }
+    if (
+      !input.assurance.aal2Verified &&
+      new Set(["protected-pilot", "production"]).has(input.environment)
+    ) reviews.push("AAL2_EVIDENCE_REQUIRED");
+    if (
+      !input.assurance.externalOperatorActionsComplete &&
+      new Set(["protected-pilot", "production"]).has(input.environment)
+    ) reviews.push("EXTERNAL_OPERATOR_ACTION_REQUIRED");
+  }
 
   if (capability) {
     if (
@@ -95,7 +131,16 @@ export function evaluateTrustReadiness(input: TrustReadinessInput) {
     reviewFreshness: input.reviewFresh ? 100 : 25,
     rollbackReadiness: input.rollbackAvailable ? 100 : 20,
     jurisdictionReadiness: uniqueReviews.includes("JURISDICTION_REVIEW_REQUIRED") ? 30 : 100,
-    environmentEligibility: uniqueBlocks.includes("ENVIRONMENT_NOT_AUTHORIZED") || uniqueBlocks.includes("PRODUCTION_AUTHORITY_NOT_GRANTED") ? 0 : 100
+    environmentEligibility: uniqueBlocks.includes("ENVIRONMENT_NOT_AUTHORIZED") || uniqueBlocks.includes("PRODUCTION_AUTHORITY_NOT_GRANTED") ? 0 : 100,
+    productionSafety: input.assurance ? (input.assurance.productionSafety ? 100 : 0) : 50,
+    phiBoundary: input.assurance ? (input.assurance.phiBoundaryVerified ? 100 : 0) : 50,
+    modelQualification: input.assurance ? (input.assurance.modelQualified ? 100 : 0) : 50,
+    agentSafety: input.assurance ? (input.assurance.agentSafetyVerified ? 100 : 0) : 50,
+    security: input.assurance ? (input.assurance.securityVerified ? 100 : 0) : 50,
+    migrationReadiness: input.assurance ? (input.assurance.migrationsReady ? 100 : 0) : 50,
+    publicClaims: input.assurance ? (input.assurance.publicClaimsClear ? 100 : 0) : 50,
+    aal2: input.assurance ? (input.assurance.aal2Verified ? 100 : 0) : 50,
+    externalOperatorActions: input.assurance ? (input.assurance.externalOperatorActionsComplete ? 100 : 0) : 50
   };
   const internalScore = Math.round(
     Object.values(dimensions).reduce((total, value) => total + value, 0) /
@@ -147,7 +192,19 @@ export function getTrustReadinessSummary() {
     reviewFresh: true,
     candidateBound: true,
     rollbackAvailable: true,
-    externalDistributionRequested: false
+    externalDistributionRequested: false,
+    assurance: {
+      productionSafety: true,
+      phiBoundaryVerified: true,
+      modelQualified: true,
+      agentSafetyVerified: true,
+      evidenceComplete: true,
+      securityVerified: true,
+      migrationsReady: true,
+      publicClaimsClear: true,
+      aal2Verified: true,
+      externalOperatorActionsComplete: true
+    }
   });
   const protectedClinicalDraft = evaluateTrustReadiness({
     capabilityId: "clinical-context-lens",
@@ -161,7 +218,19 @@ export function getTrustReadinessSummary() {
     reviewFresh: true,
     candidateBound: true,
     rollbackAvailable: true,
-    externalDistributionRequested: false
+    externalDistributionRequested: false,
+    assurance: {
+      productionSafety: true,
+      phiBoundaryVerified: true,
+      modelQualified: true,
+      agentSafetyVerified: true,
+      evidenceComplete: false,
+      securityVerified: true,
+      migrationsReady: false,
+      publicClaimsClear: true,
+      aal2Verified: false,
+      externalOperatorActionsComplete: false
+    }
   });
   const prohibitedPhiRoute = evaluateTrustReadiness({
     capabilityId: "clinical-context-lens",
@@ -175,7 +244,19 @@ export function getTrustReadinessSummary() {
     reviewFresh: false,
     candidateBound: false,
     rollbackAvailable: false,
-    externalDistributionRequested: true
+    externalDistributionRequested: true,
+    assurance: {
+      productionSafety: false,
+      phiBoundaryVerified: false,
+      modelQualified: false,
+      agentSafetyVerified: false,
+      evidenceComplete: false,
+      securityVerified: false,
+      migrationsReady: false,
+      publicClaimsClear: false,
+      aal2Verified: false,
+      externalOperatorActionsComplete: false
+    }
   });
 
   const scenarios = [syntheticModelRoute, protectedClinicalDraft, prohibitedPhiRoute];
@@ -195,7 +276,14 @@ export function getTrustReadinessSummary() {
       "environment authorization",
       "exact candidate binding",
       "human accountability",
-      "external distribution authority"
+      "external distribution authority",
+      "model qualification",
+      "agent safety",
+      "security",
+      "migration readiness",
+      "public claims",
+      "AAL2",
+      "external operator actions"
     ],
     boundary: scrimedTrustReadinessBoundary,
     productionAuthorityGranted: false as const

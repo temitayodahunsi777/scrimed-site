@@ -33,9 +33,12 @@ function requireIncludes(path, expected) {
 for (const expected of [
   "InvestorDemoRunOfShow",
   "executive-preview",
+  "technical-walkthrough",
   "diligence-walkthrough",
   "3-minute preview",
   "12-minute walkthrough",
+  "30-minute diligence",
+  "evidenceMap",
   "documentation-before-authorization",
   "governance-moat",
   "commercial-path",
