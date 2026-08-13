@@ -10,6 +10,7 @@ exist.
 ## Release, Reliability, and Observability
 
 - `.github/workflows/preview-validation.yml`
+- `next.config.js`
 - `app/api/build-info/route.ts`
 - `app/api/health/route.ts`
 - `app/api/readiness/route.ts`
@@ -91,10 +92,11 @@ exist.
 - `scripts/scrimed-enterprise-gap-closure-contract-check.mjs`
 - `scripts/scrimed-enterprise-gap-closure-policy-test.mjs`
 - `scripts/scrimed-nonsecret-test-suite.mjs`
+- `scripts/scrimed-cyber-defense-contract-check.mjs`
 
 ## Review Boundary
 
-The change set contains 67 attributable source, generated-evidence, workflow, test, and
+The change set contains 69 attributable source, generated-evidence, workflow, test, and
 documentation paths. It does not include a Supabase setting change, migration application,
 Vercel deployment or promotion, Figma canvas mutation, live AAL2 evidence, external distribution,
 PHI, customer activation, clinical authority, or production authorization.

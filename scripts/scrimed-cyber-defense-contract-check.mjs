@@ -44,7 +44,6 @@ for (const expected of [
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "media-src 'self' data:",
-  "prefetch-src 'self'",
   "X-SCRIMED-Cyber-Defense",
   "X-SCRIMED-Security-Certification",
   "not-security-certified",

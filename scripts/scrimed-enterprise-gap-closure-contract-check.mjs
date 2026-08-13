@@ -3,6 +3,7 @@
 import { readFile } from "node:fs/promises";
 
 const required = {
+  "next.config.js": ["Content-Security-Policy", "worker-src 'self' blob:"],
   "app/lib/release/vercelReleaseAssurance.ts": ["getScrimedHealth", "getScrimedReleaseReadiness", "productionReleaseAuthorized: false"],
   "app/api/build-info/route.ts": ["getScrimedBuildInfo", "no-store"],
   "app/lib/observability/logger.ts": ["redactForTelemetry", "no raw prompts"],
@@ -26,12 +27,16 @@ const required = {
   "app/lib/scrimed-control-plane/outcomeIntelligence.ts": ["verified-intelligence-yield", "SYNTHETIC MODEL - NOT AN OBSERVED CUSTOMER OUTCOME"],
   "docs/release/CURRENT_EXTERNAL_AND_REPOSITORY_BASELINE.md": ["Vercel", "Supabase", "Figma"],
   "docs/release/CANDIDATE_BRANCH_DECISION.md": ["agent/scrimed-enterprise-gap-closure"],
-  "docs/release/ENTERPRISE_GAP_CLOSURE_COMMIT_MANIFEST.md": ["67 attributable", "does not include a Supabase setting change"],
+  "docs/release/ENTERPRISE_GAP_CLOSURE_COMMIT_MANIFEST.md": ["69 attributable", "does not include a Supabase setting change"],
   "docs/release/ENTERPRISE_GAP_CLOSURE_IMPLEMENTATION_REPORT.md": ["Distribution Lockbox", "Production promotion"],
   "docs/design/FIGMA_SYNC_SPEC.md": ["view-only", "Code Connect"],
   "docs/operators/VERCEL_PREVIEW_RELEASE_ASSURANCE.md": ["exact 40-character candidate", "does not authorize production"],
   "docs/operators/SEARCH_INDEX_RECONCILIATION.md": ["canonical", "reindexing"]
 };
+
+if ((await readFile("next.config.js", "utf8")).includes("prefetch-src")) {
+  throw new Error("next.config.js contains obsolete CSP directive prefetch-src");
+}
 
 for (const [filePath, expectedValues] of Object.entries(required)) {
   const content = await readFile(filePath, "utf8");

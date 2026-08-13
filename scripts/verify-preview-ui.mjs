@@ -101,6 +101,7 @@ export function evaluatePreviewSnapshot(snapshot, policy) {
   }
   if ((snapshot.consoleErrors ?? []).length > 0) failures.push(`console-error:${policy.path}`);
   if ((snapshot.pageErrors ?? []).length > 0) failures.push(`page-error:${policy.path}`);
+  if ((snapshot.http4xx ?? []).length > 0) failures.push(`http-4xx:${policy.path}`);
   if ((snapshot.http5xx ?? []).length > 0) failures.push(`http-5xx:${policy.path}`);
   if ((snapshot.redirectCount ?? 0) > 10) failures.push(`redirect-loop:${policy.path}`);
   if (!snapshot.title.trim()) failures.push(`missing-title:${policy.path}`);
@@ -161,6 +162,7 @@ function safeSnapshot(policy, width = 390) {
     formCount: 0,
     consoleErrors: [],
     pageErrors: [],
+    http4xx: [],
     http5xx: [],
     redirectCount: 0
   };
@@ -233,12 +235,14 @@ try {
         const page = await context.newPage();
         const consoleErrors = [];
         const pageErrors = [];
+        const http4xx = [];
         const http5xx = [];
         page.on("console", (message) => {
           if (message.type() === "error") consoleErrors.push(message.text().slice(0, 240));
         });
         page.on("pageerror", (error) => pageErrors.push(error.message.slice(0, 240)));
         page.on("response", (response) => {
+          if (response.status() >= 400 && response.status() < 500) http4xx.push({ status: response.status(), url: response.url().split("?", 1)[0] });
           if (response.status() >= 500) http5xx.push({ status: response.status(), url: response.url().split("?", 1)[0] });
         });
         const response = await page.goto(`${baseUrl}${policy.path}`, {
@@ -270,6 +274,7 @@ try {
         for (let request = response?.request().redirectedFrom(); request; request = request.redirectedFrom()) redirectCount += 1;
         snapshot.consoleErrors = consoleErrors;
         snapshot.pageErrors = pageErrors;
+        snapshot.http4xx = http4xx;
         snapshot.http5xx = http5xx;
         snapshot.redirectCount = redirectCount;
         const failures = evaluatePreviewSnapshot(snapshot, policy);
@@ -278,7 +283,7 @@ try {
           `${viewport.name}-${policy.path === "/" ? "home" : policy.path.slice(1)}.png`
         );
         await page.screenshot({ path: screenshotPath, fullPage: true });
-        results.push({ viewport: viewport.name, path: policy.path, failures, screenshotPath, consoleErrors, pageErrors, http5xx, redirectCount });
+        results.push({ viewport: viewport.name, path: policy.path, failures, screenshotPath, consoleErrors, pageErrors, http4xx, http5xx, redirectCount });
         await page.close();
       }
     } finally {

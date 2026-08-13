@@ -82,6 +82,7 @@ export function evaluateVercelPreviewEvidence(snapshot) {
   if (!content.includes("synthetic") || !content.includes("no phi")) failures.push("PUBLIC_BOUNDARY_BANNER_MISSING");
   if (!snapshot.uiEvidence?.passed) failures.push("DESKTOP_MOBILE_UI_EVIDENCE_REQUIRED");
   if ((snapshot.uiEvidence?.consoleErrorCount ?? 1) > 0) failures.push("BROWSER_CONSOLE_ERRORS");
+  if ((snapshot.uiEvidence?.http4xxCount ?? 1) > 0) failures.push("BROWSER_HTTP_4XX");
   if ((snapshot.uiEvidence?.http5xxCount ?? 1) > 0) failures.push("BROWSER_HTTP_5XX");
 
   return {
@@ -108,7 +109,7 @@ if (selfTest) {
     },
     routes: expectedRoutes.map((route) => ({ path: route, status: 200, redirectLoop: false })),
     publicHtml: "Synthetic demonstration environment - no PHI - human review.",
-    uiEvidence: { passed: true, consoleErrorCount: 0, http5xxCount: 0 }
+    uiEvidence: { passed: true, consoleErrorCount: 0, http4xxCount: 0, http5xxCount: 0 }
   };
   assert.equal(evaluateVercelPreviewEvidence(snapshot).passed, true);
   assert.ok(evaluateVercelPreviewEvidence({ ...snapshot, buildInfo: { ...snapshot.buildInfo, commitSha: "b".repeat(40) } }).failures.includes("CANDIDATE_SHA_MISMATCH"));
@@ -159,6 +160,7 @@ const uiEvidence = uiReport
   ? {
       passed: uiReport.passed === true,
       consoleErrorCount: uiReport.results?.reduce((total, result) => total + (result.consoleErrors?.length ?? 0), 0) ?? 0,
+      http4xxCount: uiReport.results?.reduce((total, result) => total + (result.http4xx?.length ?? 0), 0) ?? 0,
       http5xxCount: uiReport.results?.reduce((total, result) => total + (result.http5xx?.length ?? 0), 0) ?? 0,
       evidencePath: uiEvidencePath
     }
