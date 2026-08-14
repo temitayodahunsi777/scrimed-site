@@ -219,6 +219,7 @@ import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
+import { getP33IntegratedSummary } from "./scrimed-p33/index";
 import {
   pilotDemoReadinessPacketProofStackStatus,
   pilotDemoReadinessProofStackStatus
@@ -1278,6 +1279,7 @@ export function getProductWorkflows(): ProductWorkflow[] {
 }
 
 export function getProductConsoleSummary() {
+  const p33IntegratedSummary = getP33IntegratedSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
   const workflowResultValidationSummary = getWorkflowResultValidationResults();
@@ -1367,6 +1369,11 @@ export function getProductConsoleSummary() {
 
   return {
     service: "scrimed-product-console",
+    p33IntegratedRoute: p33IntegratedSummary.route,
+    p33IntegratedApiRoute: p33IntegratedSummary.apiRoute,
+    p33IntegratedStatus: p33IntegratedSummary.status,
+    p33OpportunityModuleCount: p33IntegratedSummary.opportunities.modules.length,
+    p33BlockedGateCount: p33IntegratedSummary.gateCounts.BLOCKED,
     route: "/product",
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",

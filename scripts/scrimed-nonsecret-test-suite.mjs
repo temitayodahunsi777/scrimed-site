@@ -949,6 +949,29 @@ const checks = [
     args: ["scripts/scrimed-enterprise-gap-closure-contract-check.mjs"]
   },
   {
+    label: "SCRIMED p.33 integrated policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p33-integrated-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.33 integrated contract",
+    args: ["scripts/scrimed-p33-integrated-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.33 artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p33-artifacts.mjs",
+      "--check"
+    ]
+  },
+  {
     label: "Vercel preview evidence verifier policy",
     args: ["scripts/verify-vercel-preview.mjs", "--self-test"]
   },

@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "scrimed-p33-investor-deck-manifest-v1",
+  "source": "docs/investor/SCRIMED_P33_INVESTOR_DECK.md",
+  "slideCount": 12,
+  "status": "INTERNAL_PREPARATION_DRAFT",
+  "dataBoundary": "NO_PHI",
+  "externalDistributionAuthorized": false,
+  "renderedArtifact": {
+    "path": "outputs/SCRIMED_Strategic_Investor_Deck.pptx",
+    "sha256": "b042b32834de48bceb337d8b33fe14242ca7bff8869722ca41e096b75999b4b9",
+    "slideCount": 12,
+    "strictReview": "PASS",
+    "overflowReview": "PASS",
+    "humanReleaseReviewRequired": true
+  },
+  "reviewRequired": [
+    "founder",
+    "counsel-claims",
+    "finance"
+  ],
+  "claimPolicy": {
+    "externalClaimsRequireRegistryEvidence": true,
+    "customerClaimsAllowed": false,
+    "revenueClaimsAllowed": false,
+    "valuationClaimsAllowed": false,
+    "pilotOutcomeClaimsAllowed": false,
+    "regulatoryClaimsAllowed": false,
+    "relationshipClaimsAllowed": false
+  },
+  "claims": [
+    {
+      "claimId": "deck-human-supervised-platform",
+      "slides": [1, 3, 5, 12],
+      "status": "QUALIFIED",
+      "evidence": [
+        "docs/SCRIMED_P33_INTEGRATED_UPGRADES.md",
+        "app/lib/scrimed-p33/index.ts"
+      ]
+    },
+    {
+      "claimId": "deck-context-fabric",
+      "slides": [4],
+      "status": "SYNTHETIC",
+      "evidence": [
+        "app/lib/scrimed-p33/contextFabric.ts",
+        "scripts/scrimed-p33-integrated-policy-test.mjs"
+      ]
+    },
+    {
+      "claimId": "deck-evidence-ledger",
+      "slides": [5],
+      "status": "SYNTHETIC",
+      "evidence": [
+        "app/lib/scrimed-p33/decisionEvidenceLedger.ts",
+        "scripts/scrimed-p33-integrated-policy-test.mjs"
+      ]
+    },
+    {
+      "claimId": "deck-oversight-controls",
+      "slides": [6],
+      "status": "SYNTHETIC",
+      "evidence": [
+        "app/lib/scrimed-p33/regulatoryOversight.ts"
+      ]
+    },
+    {
+      "claimId": "deck-portable-routing",
+      "slides": [7],
+      "status": "SYNTHETIC",
+      "evidence": [
+        "app/lib/scrimed-p33/agentPortability.ts",
+        "app/lib/scrimed-work/modelQualification.ts"
+      ]
+    },
+    {
+      "claimId": "deck-trajectory-evaluation",
+      "slides": [8],
+      "status": "SYNTHETIC",
+      "evidence": [
+        "app/lib/scrimed-p33/clinicalTrajectoryLab.ts"
+      ]
+    },
+    {
+      "claimId": "deck-opportunity-modules",
+      "slides": [9],
+      "status": "PLANNED_AND_SYNTHETIC",
+      "evidence": [
+        "app/lib/scrimed-p33/opportunityModules.ts"
+      ]
+    },
+    {
+      "claimId": "deck-demo-modes",
+      "slides": [10],
+      "status": "LOCAL_VERIFIED",
+      "evidence": [
+        "app/lib/investorDemoRunOfShow.ts",
+        "scripts/rehearse-investor-demo.mjs"
+      ]
+    },
+    {
+      "claimId": "deck-value-framework",
+      "slides": [11],
+      "status": "FRAMEWORK_ONLY",
+      "evidence": [
+        "app/lib/scrimed-control-plane/outcomeIntelligence.ts"
+      ]
+    }
+  ],
+  "prohibitedClaims": [
+    "unverified revenue",
+    "unverified valuation",
+    "unverified customers",
+    "unverified pilot outcomes",
+    "unverified accuracy",
+    "unverified savings",
+    "unverified funding",
+    "unverified partnerships",
+    "unverified regulatory status"
+  ]
+}

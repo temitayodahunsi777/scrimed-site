@@ -23,6 +23,9 @@ export default function ProductConsolePage() {
           <Link className="secondary-action" href="/demos">
             Watch Demos
           </Link>
+          <Link className="secondary-action" href={summary.p33IntegratedRoute}>
+            Inspect p.33 Controls
+          </Link>
           <a className="secondary-action" href={summary.pilotDemoCommercialReadinessBriefRoute}>
             Download Buyer Brief
           </a>
@@ -33,6 +36,18 @@ export default function ProductConsolePage() {
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
+        </article>
+        <article>
+          <span>p.33 controls</span>
+          <strong>{summary.p33IntegratedStatus}</strong>
+        </article>
+        <article>
+          <span>p.33 opportunities</span>
+          <strong>{summary.p33OpportunityModuleCount}</strong>
+        </article>
+        <article>
+          <span>p.33 blocked gates</span>
+          <strong>{summary.p33BlockedGateCount}</strong>
         </article>
         <article>
           <span>Company score</span>

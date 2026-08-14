@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "scrimed-p33-gate-matrix-v1",
+  "candidateBinding": "generated-before-final-candidate-fingerprint-use-release-tooling-for-exact-binding",
+  "statusesAllowed": [
+    "PASS",
+    "OPERATOR_REQUIRED",
+    "BLOCKED",
+    "FAIL"
+  ],
+  "counts": {
+    "PASS": 1,
+    "OPERATOR_REQUIRED": 8,
+    "BLOCKED": 7,
+    "FAIL": 0
+  },
+  "gates": [
+    {
+      "gateId": "p33-local-contracts",
+      "status": "PASS",
+      "ownerRole": "principal-engineer",
+      "evidence": [
+        "p33 module integrity hashes",
+        "policy and contract tests"
+      ],
+      "reason": "Deterministic local contracts emit valid integrity evidence; full candidate validation remains separately reported."
+    },
+    {
+      "gateId": "named-technical-review",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "independent-technical-reviewer",
+      "evidence": [
+        "P33_REVIEW_PACKET.md",
+        "exact candidate fingerprint"
+      ],
+      "reason": "A distinct named reviewer must approve the exact candidate."
+    },
+    {
+      "gateId": "named-clinical-safety-review",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "qualified-clinical-safety-reviewer",
+      "evidence": [
+        "clinical release-gate tests",
+        "Regulatory Label Twin",
+        "ClinicalTrajectory report"
+      ],
+      "reason": "Clinical-safety authority cannot be self-issued by software."
+    },
+    {
+      "gateId": "claims-legal-review",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "counsel-and-claims-owner",
+      "evidence": [
+        "public claims registry",
+        "investor deck source and artifact fingerprint"
+      ],
+      "reason": "Counsel and the claims owner must approve public and investor-facing language."
+    },
+    {
+      "gateId": "security-privacy-review",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "security-privacy-reviewer",
+      "evidence": [
+        "secret scan",
+        "RLS contracts",
+        "no-PHI tests",
+        "decision-ledger tests"
+      ],
+      "reason": "Named security/privacy review remains external."
+    },
+    {
+      "gateId": "platform-review",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "platform-owner",
+      "evidence": [
+        "provider portability",
+        "local worker admission",
+        "Vercel preview evidence"
+      ],
+      "reason": "Platform owner review is required before activation or promotion."
+    },
+    {
+      "gateId": "investor-deck-review",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "founder-counsel-finance",
+      "evidence": [
+        "evidence-bound deck source",
+        "automated deck review",
+        "exact artifact fingerprint"
+      ],
+      "reason": "Founder, counsel, and finance must review the exact artifact before distribution."
+    },
+    {
+      "gateId": "disposable-migration-dry-run",
+      "status": "BLOCKED",
+      "ownerRole": "database-owner",
+      "evidence": [
+        "pending migration packet",
+        "disposable PostgreSQL execution"
+      ],
+      "reason": "Static analysis is available, but disposable-database execution and owner approval remain outstanding."
+    },
+    {
+      "gateId": "fresh-protected-aal2-evidence",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "authorized-aal2-operator",
+      "evidence": [
+        "fresh candidate-bound AAL2 receipt"
+      ],
+      "reason": "Real operator evidence cannot be minted or simulated by the repository."
+    },
+    {
+      "gateId": "supabase-leaked-password-protection",
+      "status": "BLOCKED",
+      "ownerRole": "supabase-project-owner",
+      "evidence": [
+        "non-sensitive setting evidence"
+      ],
+      "reason": "Connected project setting remains an external operator action."
+    },
+    {
+      "gateId": "vercel-preview-authorization",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "vercel-project-owner",
+      "evidence": [
+        "exact-SHA preview deployment authorization",
+        "preview smoke evidence"
+      ],
+      "reason": "No Vercel deployment or production mutation is authorized in this candidate."
+    },
+    {
+      "gateId": "production-promotion",
+      "status": "BLOCKED",
+      "ownerRole": "release-owner",
+      "evidence": [
+        "deployment authorization",
+        "all prerequisite approvals"
+      ],
+      "reason": "Production promotion remains prohibited."
+    },
+    {
+      "gateId": "post-deployment-evidence",
+      "status": "BLOCKED",
+      "ownerRole": "release-owner",
+      "evidence": [
+        "authorized deployment",
+        "post-deployment smoke and rollback evidence"
+      ],
+      "reason": "Cannot exist before an authorized deployment."
+    },
+    {
+      "gateId": "customer-activation",
+      "status": "BLOCKED",
+      "ownerRole": "customer-and-scrimed-authorities",
+      "evidence": [
+        "customer-specific intended use",
+        "contracts",
+        "operator training",
+        "acceptance evidence"
+      ],
+      "reason": "Customer activation requires separate authorization."
+    },
+    {
+      "gateId": "phi-capable-pilot",
+      "status": "BLOCKED",
+      "ownerRole": "privacy-security-clinical-owners",
+      "evidence": [
+        "BAA",
+        "eligible product path",
+        "AAL2",
+        "RLS",
+        "retention",
+        "incident",
+        "named reviews"
+      ],
+      "reason": "PHI-capable pilot remains fail-closed with no bypass."
+    },
+    {
+      "gateId": "linux-local-agent-pilot",
+      "status": "BLOCKED",
+      "ownerRole": "platform-security-owner",
+      "evidence": [
+        "official platform support",
+        "sandbox",
+        "filesystem",
+        "network",
+        "update",
+        "audit controls"
+      ],
+      "reason": "Linux local-agent pilot remains fail-closed with no bypass."
+    }
+  ],
+  "productionReadiness": false,
+  "externalDistributionAuthorized": false,
+  "summaryHash": "c362d1c30786bcd1622f987330d6040d591bf288a404041627f40815e0cd165e"
+}

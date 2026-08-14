@@ -214,6 +214,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     boundary: "Synthetic/de-identified metadata only; consequential actions, investor outreach, clinical authority, payer submission, EHR writeback, production deployment, certification, and customer activation remain blocked."
   },
   {
+    label: "p.33 Integrated Upgrades",
+    href: "/scrimed-p33",
+    description: "Shared clinical context, signal compression, decision evidence, regulatory labels, oversight drift, portable agents, trajectory evaluation, opportunity workflows, and pilot gates.",
+    boundary: "Synthetic/no-PHI decision support only; no autonomous clinical care, provider calls, payer submission, EHR writeback, PHI-capable pilot, Linux local-agent pilot, production promotion, or external distribution."
+  },
+  {
     label: "Automation Autopilot",
     href: "/scrimed-automation-autopilot",
     description: "Automation control plane for autonomy scoring, approval routing, bottleneck workarounds, and review-gated service execution.",

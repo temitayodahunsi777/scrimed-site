@@ -26,6 +26,7 @@ import { getScrimedPlatformGraph } from "./platformGraph";
 import { getPlatformStrategySummary } from "./platformStrategy";
 import { getStrategicDecisionIntelligenceSummary } from "./strategicDecisionIntelligence";
 import { getTrustReadinessSummary } from "./trustReadiness";
+import { getP33IntegratedSummary } from "../scrimed-p33/index";
 
 export * from "./types";
 export * from "./featureFlags";
@@ -44,6 +45,7 @@ export * from "./platformGraph";
 export * from "./platformStrategy";
 export * from "./strategicDecisionIntelligence";
 export * from "./trustReadiness";
+export * from "../scrimed-p33/index";
 
 export const controlPlaneRoute = "/scrimed-control-plane";
 export const controlPlaneApiRoute = "/api/scrimed-control-plane";
@@ -99,6 +101,7 @@ export function getControlPlaneSummary() {
     currentVersions: { "ctx-care-coordination-sop": "1.0" },
     calculationsChanged: false
   });
+  const p33 = getP33IntegratedSummary();
 
   return {
     service: "scrimed-intelligence-control-plane",
@@ -157,6 +160,7 @@ export function getControlPlaneSummary() {
     platformGraph: getScrimedPlatformGraph(),
     trustReadiness: getTrustReadinessSummary(),
     strategicDecisionIntelligence: getStrategicDecisionIntelligenceSummary(),
+    p33,
     voiceSimulation: work.voiceSimulation,
     capitalIntelligence: getCapitalIntelligenceSummary(),
     computeResilience: getComputeResilienceSummary(),
@@ -226,6 +230,7 @@ export function buildControlPlaneBrief() {
     `- Platform graph: ${summary.platformGraph.validation.nodeCount} nodes / ${summary.platformGraph.validation.edgeCount} edges / valid ${summary.platformGraph.validation.valid}`,
     `- Trust readiness scenarios: ${summary.trustReadiness.decisions.allowSynthetic} allow synthetic / ${summary.trustReadiness.decisions.requireHuman} require human / ${summary.trustReadiness.decisions.blocked} blocked`,
     `- Investor readiness heuristic: ${summary.strategicDecisionIntelligence.investorReadiness.score} (not investment probability)`,
+    `- p.33 integrated controls: ${summary.p33.opportunities.modules.length} opportunity modules / ledger valid ${summary.p33.decisionEvidence.verification.valid}`,
     "",
     "## Safety Boundary",
     summary.boundary,
