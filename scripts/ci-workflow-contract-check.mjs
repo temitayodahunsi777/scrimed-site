@@ -93,6 +93,16 @@ for (const pathname of [...workflowPaths, ...securityWorkflowPaths]) {
   }
 }
 
+for (const pathname of [
+  ".github/workflows/ci.yml",
+  ".github/workflows/dependency-review.yml",
+  ".github/workflows/dependency-security.yml",
+  ".github/workflows/node24-certification.yml"
+]) {
+  requireIncludes(pathname, "fetch-depth: 0");
+  requireIncludes(pathname, "SCRIMED_SBOM_BASE_REF:");
+}
+
 for (const expected of [
   "name: Node 24 Certification",
   "SCRIMED_SYNTHETIC_ONLY: \"true\"",

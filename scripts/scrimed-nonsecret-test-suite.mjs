@@ -191,6 +191,10 @@ const checks = [
     args: ["scripts/verify-aal2-evidence.mjs", "--self-test"]
   },
   {
+    label: "AAL2 exact-target and candidate binding",
+    args: ["scripts/verify-aal2-target-binding.mjs", "--self-test"]
+  },
+  {
     label: "AAL2 smoke readiness preflight",
     args: ["scripts/aal2-smoke-readiness-preflight.mjs"]
   },

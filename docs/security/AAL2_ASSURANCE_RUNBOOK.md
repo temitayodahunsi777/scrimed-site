@@ -16,15 +16,21 @@ Set these only in the local ignored environment or protected CI environment:
 - `SCRIMED_AAL2_EXPECTED_AUDIENCE`
 - `SCRIMED_AAL2_CANDIDATE_SHA256`
 - `SCRIMED_AAL2_EVIDENCE_NONCE`
+- `SCRIMED_AAL2_EXPECTED_COMMIT_SHA`
+- `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` (comma-separated exact HTTPS origins)
 
 Run:
 
 ```bash
+npm run verify:aal2:target-binding
 npm run verify:aal2:evidence -- --strict
 ```
 
-The preflight checks AAL2 claims, expiry, minted lifetime, issuer, audience, subject, candidate
-binding, and nonce presence. It emits only fingerprints. It deliberately leaves signature, role,
+The preflight checks AAL2 claims, expiry, minted lifetime, issuer, audience, subject, exact local
+candidate-manifest equality, and nonce presence. The target verifier requires an allowlisted preview
+origin whose uncached build metadata matches the local Git commit, Node 24 runtime, SCRIMED project,
+preview environment, and closed production/customer authority boundaries. It emits only public
+identifiers and fingerprints. It deliberately leaves signature, role,
 tenant membership, feature flags, action scope, and replay enforcement to Supabase Auth and the
 protected SCRIMED API.
 
@@ -32,8 +38,9 @@ protected SCRIMED API.
 
 Use the manually dispatched `AAL2 assurance` workflow in the protected `aal2-assurance` GitHub
 environment. A human environment approver must verify the target, candidate hash, synthetic
-workspace, and nonce. Secrets remain GitHub environment secrets and must not be pasted into task
-comments or artifacts.
+workspace, nonce, and exact `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` environment variable. The
+workflow validates target identity before bearer, issuer, or audience secrets are injected into any
+step. Secrets remain GitHub environment secrets and must not be pasted into task comments or artifacts.
 
 The protected job runs the strict verifier, durable-store preflight, and authenticated SCRIMED
 Work smoke. A local parser pass alone never closes the AAL2 gate.

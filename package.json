@@ -234,6 +234,8 @@
     "test:scrimed-strategic-decision-intelligence": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-strategic-decision-policy-test.mjs",
     "test:aal2:evidence": "node scripts/verify-aal2-evidence.mjs --self-test",
     "verify:aal2:evidence": "node scripts/verify-aal2-evidence.mjs",
+    "test:aal2:target-binding": "node scripts/verify-aal2-target-binding.mjs --self-test",
+    "verify:aal2:target-binding": "node scripts/verify-aal2-target-binding.mjs --strict",
     "evidence:scrimed-platform-strategy": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-platform-strategy-artifacts.mjs",
     "check:scrimed-platform-strategy": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-platform-strategy-artifacts.mjs --check",
     "smoke:scrimed-work:durable-store-preflight": "node scripts/scrimed-work-durable-store-preflight.mjs",

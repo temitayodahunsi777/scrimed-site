@@ -8,6 +8,7 @@ import {
   tokenFingerprint,
   userFingerprint
 } from "./lib/aal2-token-policy.mjs";
+import { readLocalAal2CandidateBinding } from "./lib/aal2-target-binding.mjs";
 import { loadLocalEnv } from "./lib/local-env.mjs";
 
 const selfTest = process.argv.includes("--self-test");
@@ -43,6 +44,11 @@ export function verifyAal2Evidence(input, nowMs = Date.now()) {
   });
   const issuedAt = typeof claims.iat === "number" ? claims.iat * 1000 : Number.NaN;
   const stepUpFresh = Number.isFinite(issuedAt) && nowMs - issuedAt >= 0 && nowMs - issuedAt <= 15 * 60 * 1000;
+  const candidateFingerprint = input.candidateFingerprint?.toLowerCase() ?? "";
+  const expectedCandidateFingerprint = input.expectedCandidateFingerprint?.toLowerCase() ?? "";
+  const candidateBound = sha256Pattern.test(candidateFingerprint)
+    && sha256Pattern.test(expectedCandidateFingerprint)
+    && candidateFingerprint === expectedCandidateFingerprint;
   const checks = [
     { id: "token-claims", passed: tokenAnalysis.ok, detail: tokenAnalysis.errors.join(" ") || "AAL2 claims and freshness passed local parsing." },
     { id: "mfa-challenge", passed: claims.aal === "aal2" && mfaMethodPresent, detail: "The signed token must represent AAL2 and a non-password MFA method; signature verification remains external." },
@@ -52,7 +58,7 @@ export function verifyAal2Evidence(input, nowMs = Date.now()) {
     { id: "issuer", passed: typeof input.expectedIssuer === "string" && claims.iss === input.expectedIssuer, detail: "Issuer must match the configured protected identity provider." },
     { id: "audience", passed: typeof input.expectedAudience === "string" && audience.includes(input.expectedAudience), detail: "Audience must include the configured protected SCRIMED audience." },
     { id: "subject", passed: typeof claims.sub === "string" && claims.sub.length > 0, detail: "A non-empty authenticated subject is required." },
-    { id: "candidate-binding", passed: sha256Pattern.test(input.candidateFingerprint ?? ""), detail: "AAL2 evidence preparation must name the exact candidate SHA-256." },
+    { id: "candidate-binding", passed: candidateBound, detail: "The supplied candidate SHA-256 must equal the candidate manifest generated from the exact local Git revision." },
     { id: "nonce", passed: noncePattern.test(input.nonce ?? ""), detail: "A bounded nonce is required; durable replay rejection remains a protected-API responsibility." },
     { id: "mfa-enrollment", passed: false, detail: "MFA enrollment must be verified by Supabase Auth or the protected identity endpoint." },
     { id: "replay-rejection", passed: false, detail: "One-use nonce rejection must be verified against protected durable state." },
@@ -74,7 +80,7 @@ export function verifyAal2Evidence(input, nowMs = Date.now()) {
     locallyPassed,
     protectedApiVerificationRequired: true,
     productionAuthorityGranted: false,
-    candidateFingerprint: sha256Pattern.test(input.candidateFingerprint ?? "") ? input.candidateFingerprint : null,
+    candidateFingerprint: candidateBound ? candidateFingerprint : null,
     tokenFingerprint: input.bearerToken ? tokenFingerprint(input.bearerToken) : null,
     subjectFingerprint: typeof claims.sub === "string" ? userFingerprint(claims.sub) : null,
     nonceFingerprint: noncePattern.test(input.nonce ?? "") ? hash(input.nonce).slice(0, 16) : null,
@@ -106,6 +112,7 @@ if (selfTest) {
     expectedIssuer: "https://synthetic.invalid/auth/v1",
     expectedAudience: "authenticated",
     candidateFingerprint,
+    expectedCandidateFingerprint: candidateFingerprint,
     nonce: "synthetic-nonce-001"
   }, nowSeconds * 1000);
   if (!valid.locallyPassed || valid.status !== "READY_FOR_PROTECTED_API_VERIFICATION") {
@@ -128,7 +135,8 @@ if (selfTest) {
     workspaceSlug: "atlas-synthetic-evaluation",
     expectedIssuer: "https://synthetic.invalid/auth/v1",
     expectedAudience: "authenticated",
-    candidateFingerprint: "wrong-candidate",
+    candidateFingerprint: "b".repeat(64),
+    expectedCandidateFingerprint: candidateFingerprint,
     nonce: "synthetic-nonce-002"
   }, nowSeconds * 1000);
   if (wrongCandidate.locallyPassed || wrongCandidate.status !== "OPERATOR_EVIDENCE_REQUIRED") {
@@ -139,12 +147,19 @@ if (selfTest) {
 }
 
 loadLocalEnv();
+let localCandidateFingerprint = "";
+try {
+  localCandidateFingerprint = readLocalAal2CandidateBinding().candidateFingerprint;
+} catch {
+  // The candidate-binding check below fails closed without exposing local repository details.
+}
 const report = verifyAal2Evidence({
   bearerToken: process.env.SCRIMED_BEARER_TOKEN?.trim() ?? "",
   workspaceSlug: process.env.SCRIMED_WORKSPACE_SLUG?.trim() ?? "",
   expectedIssuer: process.env.SCRIMED_AAL2_EXPECTED_ISSUER?.trim() ?? "",
   expectedAudience: process.env.SCRIMED_AAL2_EXPECTED_AUDIENCE?.trim() ?? "",
   candidateFingerprint: process.env.SCRIMED_AAL2_CANDIDATE_SHA256?.trim() ?? "",
+  expectedCandidateFingerprint: localCandidateFingerprint,
   nonce: process.env.SCRIMED_AAL2_EVIDENCE_NONCE?.trim() ?? ""
 });
 

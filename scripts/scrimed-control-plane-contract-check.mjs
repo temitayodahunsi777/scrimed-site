@@ -58,6 +58,8 @@ const requiredFiles = [
   "scripts/scrimed-platform-strategy-policy-test.mjs",
   "scripts/scrimed-platform-graph-policy-test.mjs",
   "scripts/scrimed-strategic-decision-policy-test.mjs",
+  "scripts/lib/aal2-target-binding.mjs",
+  "scripts/verify-aal2-target-binding.mjs",
   "scripts/verify-aal2-evidence.mjs",
   "artifacts/platform/platform-map.json",
   "artifacts/platform/scrimed-platform-graph.json",
@@ -317,14 +319,24 @@ if (!packageJson.scripts?.["test:scrimed-strategic-decision-intelligence"]?.incl
 if (packageJson.scripts?.["test:aal2:evidence"] !== "node scripts/verify-aal2-evidence.mjs --self-test") {
   throw new Error("package.json missing test:aal2:evidence.");
 }
+if (packageJson.scripts?.["test:aal2:target-binding"] !== "node scripts/verify-aal2-target-binding.mjs --self-test") {
+  throw new Error("package.json missing test:aal2:target-binding.");
+}
 for (const expected of [
   "workflow_dispatch:",
   "environment: aal2-assurance",
-  "Production target is prohibited",
+  "SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS",
+  "SCRIMED_AAL2_EXPECTED_COMMIT_SHA: ${{ github.sha }}",
+  "node scripts/verify-aal2-target-binding.mjs --self-test",
+  "node scripts/verify-aal2-target-binding.mjs --strict",
+  "fetch-depth: 0",
   "node scripts/verify-aal2-evidence.mjs --strict",
   "node scripts/scrimed-work-authenticated-smoke.mjs --strict"
 ]) {
   requireIncludes(".github/workflows/aal2-assurance.yml", expected);
+}
+if (/^\s{6}SCRIMED_BEARER_TOKEN:/m.test(files[".github/workflows/aal2-assurance.yml"])) {
+  throw new Error("AAL2 bearer token must be scoped to authenticated steps, not the job environment.");
 }
 
 for (const expected of [
