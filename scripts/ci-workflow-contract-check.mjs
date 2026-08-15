@@ -101,6 +101,8 @@ for (const expected of [
   "npm run test:scrimed-p33",
   "npm run contract:scrimed-p33",
   "npm run test:nonsecret",
+  "npm audit --audit-level=high",
+  "npm run security:dependency-floor",
   "npm run security:secret-scan",
   "npm run security:sbom",
   "npm run build",
@@ -155,7 +157,8 @@ for (const expected of [
 
 for (const expected of [
   "npm audit --audit-level=high --json",
-  "npm audit --audit-level=critical",
+  "SCRIMED_HIGH_VULNERABILITY_POLICY: block",
+  "npm audit --audit-level=high",
   "npm run security:dependency-floor",
   "npm run security:sbom",
   "actions/dependency-review-action@v4"

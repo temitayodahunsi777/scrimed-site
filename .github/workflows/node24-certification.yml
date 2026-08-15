@@ -37,6 +37,11 @@ jobs:
       - name: Install exact lockfile
         run: npm ci
 
+      - name: Enforce dependency security floor
+        run: |
+          npm audit --audit-level=high
+          npm run security:dependency-floor
+
       - name: Verify runtime declaration
         run: node scripts/verify-node24-vercel-build.mjs --prebuild
 

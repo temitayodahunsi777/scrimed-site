@@ -27,10 +27,31 @@ function stableHash(value) {
   return sha256(JSON.stringify(canonicalize(value)));
 }
 
-function gitHeadPackageJson() {
-  const result = spawnSync("git", ["show", "HEAD:package.json"], { encoding: "utf8", shell: false });
+function gitHeadJson(path) {
+  const result = spawnSync("git", ["show", `HEAD:${path}`], { encoding: "utf8", shell: false });
   if (result.status !== 0) return null;
   try { return JSON.parse(result.stdout); } catch { return null; }
+}
+
+function lockComponentVersions(lock) {
+  return new Map(Object.entries(lock?.packages ?? {})
+    .filter(([path, record]) => path.startsWith("node_modules/") && record?.version)
+    .map(([path, record]) => [path.slice("node_modules/".length), record.version]));
+}
+
+function compareLockComponents(priorLock, currentLock) {
+  if (!priorLock) return [];
+  const before = lockComponentVersions(priorLock);
+  const after = lockComponentVersions(currentLock);
+  return [...new Set([...before.keys(), ...after.keys()])]
+    .sort()
+    .filter((name) => before.get(name) !== after.get(name))
+    .map((name) => ({
+      name,
+      before: before.get(name) ?? null,
+      after: after.get(name) ?? null,
+      change: !before.has(name) ? "added" : !after.has(name) ? "removed" : "upgraded"
+    }));
 }
 
 async function buildReport() {
@@ -47,7 +68,8 @@ async function buildReport() {
       purl: `pkg:npm/${encodeURIComponent(path.slice("node_modules/".length))}@${encodeURIComponent(record.version)}`
     }))
     .sort((left, right) => `${left.name}@${left.version}`.localeCompare(`${right.name}@${right.version}`));
-  const prior = gitHeadPackageJson();
+  const prior = gitHeadJson("package.json");
+  const componentDelta = compareLockComponents(gitHeadJson("package-lock.json"), lock);
   const currentDependencies = { ...(packageJson.dependencies ?? {}), ...(packageJson.devDependencies ?? {}) };
   const priorDependencies = { ...(prior?.dependencies ?? {}), ...(prior?.devDependencies ?? {}) };
   const dependencyDelta = [...new Set([...Object.keys(currentDependencies), ...Object.keys(priorDependencies)])]
@@ -73,6 +95,8 @@ async function buildReport() {
     status: "LOCAL_SBOM_GENERATED_REVIEW_REQUIRED",
     componentCount: components.length,
     dependencyDeltaCount: dependencyDelta.length,
+    componentDeltaCount: componentDelta.length,
+    componentDelta,
     packageLockHash: sha256(JSON.stringify(lock)),
     sbomHash: stableHash(bom),
     bom,
@@ -86,6 +110,13 @@ if (args.has("--self-test")) {
   const first = stableHash({ b: 2, a: 1 });
   const second = stableHash({ a: 1, b: 2 });
   if (first !== second) throw new Error("SBOM canonical hashing self-test failed");
+  const delta = compareLockComponents(
+    { packages: { "node_modules/example": { version: "1.0.0" } } },
+    { packages: { "node_modules/example": { version: "1.0.1" } } }
+  );
+  if (delta.length !== 1 || delta[0]?.change !== "upgraded") {
+    throw new Error("SBOM lockfile component delta self-test failed");
+  }
   console.log("pass SCRIMED deterministic SBOM hashing self-test");
   process.exit(0);
 }
@@ -95,4 +126,4 @@ if (!/^[0-9a-f]{64}$/.test(report.sbomHash) || report.componentCount < 1) {
   throw new Error("SCRIMED SBOM verification failed");
 }
 if (args.has("--json")) console.log(JSON.stringify(report, null, 2));
-else console.log(`pass SCRIMED local SBOM component_count=${report.componentCount} dependency_delta=${report.dependencyDeltaCount} sbom_hash=${report.sbomHash.slice(0, 16)} signing=external-review-required`);
+else console.log(`pass SCRIMED local SBOM component_count=${report.componentCount} direct_delta=${report.dependencyDeltaCount} component_delta=${report.componentDeltaCount} sbom_hash=${report.sbomHash.slice(0, 16)} signing=external-review-required`);
