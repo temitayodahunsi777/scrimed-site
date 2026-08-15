@@ -30,11 +30,11 @@ The managed local shell exposed neither `node` nor `npm`. SCRIMED validation the
 
 Read-only connected-project inspection on 2026-08-14 found:
 
-- `scrimed-site` (`prj_94JBnKm2BsZ7qHtEDbUvWmiDWLjn`): project setting Node `22.x`; latest deployment `dpl_DTbW64iEeyPaxzcDNjZPhjmFT2Y6`, READY preview, not the p.33 commit.
+- `scrimed-site` (`prj_94JBnKm2BsZ7qHtEDbUvWmiDWLjn`): project setting Node `24.x`; latest deployment `dpl_DTbW64iEeyPaxzcDNjZPhjmFT2Y6`, READY preview, not the Node 24 candidate.
 - `nextjs-boilerplate` (`prj_dksCaA0qDJOF206DAV99hQlqTqJX`): project setting Node `22.x`; latest historical deployment READY with production target.
 - `scrimed-site` runtime errors: no clusters returned for the preceding seven days.
 
-The repository engine is the authoritative target because Vercel documents that `engines.node` overrides the project setting. Project settings should still be reconciled to remove operational ambiguity.
+The repository engine is the authoritative target because Vercel documents that `engines.node` overrides the project setting. The primary Vercel project setting is now reconciled with that target; an exact-candidate preview remains separately authorization-gated.
 
 ## Baseline Fingerprints
 
