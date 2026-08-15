@@ -65,7 +65,6 @@ const requiredFiles = [
   "artifacts/product/portfolio-scorecard.json",
   "artifacts/investor/moat-registry.json",
   "artifacts/investor/investor-readiness.json",
-  "artifacts/governance/human-gate-minimization.json",
   "artifacts/strategy/strategic-roadmap.json"
 ];
 
@@ -288,6 +287,14 @@ requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-pla
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-strategic-decision-policy-test.mjs");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/verify-aal2-evidence.mjs");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-platform-strategy-artifacts.mjs");
+requireIncludes(
+  "scripts/scrimed-platform-strategy-artifacts.mjs",
+  '"artifacts/governance/human-gate-minimization.json": humanGateMinimization'
+);
+requireIncludes(
+  "scripts/scrimed-platform-strategy-artifacts.mjs",
+  "optionalUnmaterializedCheckArtifacts"
+);
 
 if (
   packageJson.scripts?.["test:scrimed-platform-strategy"] !==

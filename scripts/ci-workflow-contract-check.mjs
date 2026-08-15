@@ -148,8 +148,13 @@ for (const expected of [
   "SCRIMED_SYNTHETIC_ONLY: \"true\"",
   "SCRIMED_ALLOW_PHI: \"false\"",
   "SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: \"false\"",
+  "SCRIMED_PREVIEW_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+  "VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+  "VERCEL_GIT_COMMIT_REF: ${{ github.head_ref || github.ref_name }}",
+  "ref: ${{ github.event.pull_request.head.sha || github.sha }}",
   "npm run test:preproduction-assurance",
   "node scripts/verify-preview-ui.mjs --strict",
+  "--candidate-sha=${SCRIMED_PREVIEW_CANDIDATE_SHA}",
   "retention-days: 7"
 ]) {
   requireIncludes(".github/workflows/preview-validation.yml", expected);

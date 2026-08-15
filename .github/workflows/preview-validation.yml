@@ -29,12 +29,17 @@ jobs:
       SCRIMED_EXTERNAL_PROVIDER_CALLS_ENABLED: "false"
       SCRIMED_SCHEDULES_ENABLED: "false"
       SCRIMED_VOICE_SIMULATION_ENABLED: "true"
-      SCRIMED_BUILD_COMMIT_SHA: ${{ github.sha }}
+      SCRIMED_PREVIEW_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      SCRIMED_BUILD_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      VERCEL_GIT_COMMIT_REF: ${{ github.head_ref || github.ref_name }}
       VERCEL_ENV: preview
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node
         uses: actions/setup-node@v6
@@ -82,7 +87,7 @@ jobs:
         run: >-
           node scripts/verify-vercel-preview.mjs --strict
           --base-url=http://127.0.0.1:3000
-          --candidate-sha=${GITHUB_SHA}
+          --candidate-sha=${SCRIMED_PREVIEW_CANDIDATE_SHA}
           --ui-evidence=artifacts/ui-verification/preview-ui-verification.json
           --output=artifacts/vercel/vercel-preview-evidence.json
 
