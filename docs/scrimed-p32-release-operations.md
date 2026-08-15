@@ -76,7 +76,7 @@ Candidate-review readiness also resolves the authenticated actor's active worksp
 
 ## Supply Chain
 
-`npm run security:sbom` creates a deterministic CycloneDX-compatible local report from `package-lock.json`, records dependency and license metadata when available, and reports the dependency delta against `HEAD`. External signing and qualified license review remain incomplete. `npm run security:secret-scan` scans the candidate without printing secret values.
+`npm run security:sbom` creates a deterministic CycloneDX-compatible local report from `package-lock.json`, records dependency and license metadata when available, and reports the dependency delta against an actual prior Git revision. CI binds `SCRIMED_SBOM_BASE_REF` to the pull-request base commit and fetches complete history; local runs default to `HEAD^` or may pass `--base-ref=<reviewed-ancestor>`. A current-`HEAD` baseline is rejected. External signing and qualified license review remain incomplete. `npm run security:secret-scan` scans the candidate without printing secret values.
 
 Repository code includes CODEOWNERS, Dependabot, dependency review, and CodeQL definitions. An authorized GitHub administrator must separately verify branch protection, private vulnerability reporting, secret scanning, push protection, required reviews, force-push protection, and required status checks. No remote setting is changed by these files.
 

@@ -15,6 +15,7 @@ import {
 } from "../../../lib/scrimed-work";
 import {
   buildControlPlaneBrief,
+  buildP33IntegratedBrief,
   consequenceBenchCases,
   controlPlaneAgentRegistry,
   controlPlaneHeaders,
@@ -25,9 +26,13 @@ import {
   getApprovalAchievementSummary,
   getComputeResilienceSummary,
   getControlPlaneSummary,
+  getP33IntegratedSummary,
   getCrossPlatformEvidenceSummary,
   getOutcomeIntelligenceSummary,
+  getScrimedPlatformGraph,
   getPlatformStrategySummary,
+  getStrategicDecisionIntelligenceSummary,
+  getTrustReadinessSummary,
   routeControlPlaneModel,
   runConsequenceBench,
   searchControlPlaneContext,
@@ -144,6 +149,35 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "approvals") return json(getApprovalAchievementSummary(), "control-plane-approvals");
   if (endpoint === "platform-evidence") return json(getCrossPlatformEvidenceSummary(), "control-plane-platform-evidence");
   if (endpoint === "platform-strategy") return json(getPlatformStrategySummary(), "control-plane-platform-strategy");
+  if (endpoint === "platform-graph") return json(getScrimedPlatformGraph(), "control-plane-platform-graph");
+  if (endpoint === "trust-readiness") return json(getTrustReadinessSummary(), "control-plane-trust-readiness");
+  if (endpoint === "strategic-decision-intelligence") {
+    return json(getStrategicDecisionIntelligenceSummary(), "control-plane-strategic-decision-intelligence");
+  }
+  if (endpoint === "p33") {
+    return json(getP33IntegratedSummary(), "control-plane-p33-integrated");
+  }
+  if (endpoint === "p33/brief") {
+    return new NextResponse(buildP33IntegratedBrief(), {
+      headers: {
+        "Content-Disposition": 'attachment; filename="scrimed-p33-integrated-upgrades.md"',
+        "Content-Type": "text/markdown; charset=utf-8",
+        ...controlPlaneHeaders({ "X-SCRIMED-P33": "synthetic-human-review-required" })
+      }
+    });
+  }
+  if (endpoint === "p33/context") {
+    return json(getP33IntegratedSummary().contextFabric, "control-plane-p33-context");
+  }
+  if (endpoint === "p33/evidence") {
+    return json(getP33IntegratedSummary().decisionEvidence, "control-plane-p33-evidence");
+  }
+  if (endpoint === "p33/opportunities") {
+    return json(getP33IntegratedSummary().opportunities, "control-plane-p33-opportunities");
+  }
+  if (endpoint === "p33/pilots") {
+    return json(getP33IntegratedSummary().pilotProfiles, "control-plane-p33-pilots");
+  }
 
   return failure("control_plane_route_not_found", "SCRIMED control-plane route was not found.", endpoint || "root", 404);
 }

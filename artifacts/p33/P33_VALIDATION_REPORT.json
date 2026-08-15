@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "scrimed-p33-validation-report-v1",
+  "scope": "deterministic-p33-domain-contracts",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
+  "status": "PASS",
+  "checkCount": 10,
+  "passedCount": 10,
+  "failedCount": 0,
+  "checks": [
+    {
+      "id": "context-artifact-integrity",
+      "passed": true,
+      "evidence": "c43003a33f06c4440a6d8169fdeeb8b3b5e1c8076e5dec35aefb95164257d07b"
+    },
+    {
+      "id": "source-span-coverage",
+      "passed": true,
+      "evidence": "6 span-grounded facts"
+    },
+    {
+      "id": "clinical-release-fails-closed",
+      "passed": true,
+      "evidence": "873ba459e320040134da21e511632b3760a9a20e224df2606bd021a6b5044643"
+    },
+    {
+      "id": "decision-ledger-chain",
+      "passed": true,
+      "evidence": "950fe5e69320dcbcd3c0263a14d3eed8185ac066d97c01dc93b37e02aed4ae8a"
+    },
+    {
+      "id": "oversight-sentinel",
+      "passed": true,
+      "evidence": "69463e435907205fd65a71e7a0abbe91938ceee9eb37e6cb741cb44bc551f206"
+    },
+    {
+      "id": "portable-route-no-provider-call",
+      "passed": true,
+      "evidence": "6e3e35e005f33490ef68c581a8261884a692b8a93acf9c651b4d41004e7fa7c8"
+    },
+    {
+      "id": "local-worker-admission",
+      "passed": true,
+      "evidence": "337a9c53970d9c739094f4e6aa116b2b2eb2b03f374e87d92f90fc9663683f28"
+    },
+    {
+      "id": "trajectory-evaluation-boundary",
+      "passed": true,
+      "evidence": "9acc12649c96e6633fe48b955c3db67a3e2a898d0d85b8b0cdb54764210cf731"
+    },
+    {
+      "id": "opportunity-actions-disabled",
+      "passed": true,
+      "evidence": "10 modules"
+    },
+    {
+      "id": "restricted-pilots-blocked",
+      "passed": true,
+      "evidence": "b89d82dca69dc927253f84185c524e35204141e026f04714b7fb8bc1c38b88eb,9e5007fab1090ebe77953a6ec67fefffae8b92cca75661907fef58aa54bc4c83,e87ca8d2236fac23c048cfcca85d5a70252e716fcc55e9bf2bb1e71d2e899714"
+    }
+  ],
+  "fullCandidateValidation": "reported-by-release-candidate-validation-after-final-source-mutation",
+  "externalApprovalsCreated": false,
+  "productionAuthorityGranted": false,
+  "summaryHash": "c362d1c30786bcd1622f987330d6040d591bf288a404041627f40815e0cd165e"
+}

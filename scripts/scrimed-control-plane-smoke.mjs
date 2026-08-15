@@ -99,6 +99,21 @@ await requireGet(
   '"service":"scrimed-platform-capability-registry"',
   "application/json"
 );
+await requireGet(
+  "/api/scrimed-control-plane/platform-graph",
+  '"status":"VALID_SYNTHETIC_ARCHITECTURE_GRAPH"',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/trust-readiness",
+  '"status":"INTERNAL_ENGINEERING_SIGNAL_ONLY"',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/strategic-decision-intelligence",
+  '"status":"INTERNAL_DECISION_SUPPORT_ACTIVE"',
+  "application/json"
+);
 
 await requireProtectedPost("/api/scrimed-control-plane/sessions", {
   tenantId: "synthetic-tenant",

@@ -72,6 +72,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     boundary: "Readiness only; not investment advice, securities material, solicitation, valuation assurance, legal advice, tax advice, donor advice, or approval."
   },
   {
+    label: "Investor Demo Command",
+    href: "/investor-demo-command-room",
+    description: "Timed investor presentation control with proof-route preflight, chapter progress, human confirmations, and an internal rehearsal receipt.",
+    boundary: "Synthetic operator rehearsal only; not securities material, solicitation, external-send authority, independent approval, PHI authority, clinical authority, production release, or customer go-live."
+  },
+  {
     label: "Investor Command",
     href: "/investor-readiness",
     description: "Enterprise diligence snapshot for deployment, smoke, safety, PHI, clinical, evidence, model, integration, risk, product, and no-go readiness.",
@@ -206,6 +212,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     href: "/scrimed-control-plane",
     description: "Executive mission control for governed agents, skills, workflows, context, routing, verification, ConsequenceBench, capital intelligence, compute resilience, learning, outcomes, and audit evidence.",
     boundary: "Synthetic/de-identified metadata only; consequential actions, investor outreach, clinical authority, payer submission, EHR writeback, production deployment, certification, and customer activation remain blocked."
+  },
+  {
+    label: "p.33 Integrated Upgrades",
+    href: "/scrimed-p33",
+    description: "Shared clinical context, signal compression, decision evidence, regulatory labels, oversight drift, portable agents, trajectory evaluation, opportunity workflows, and pilot gates.",
+    boundary: "Synthetic/no-PHI decision support only; no autonomous clinical care, provider calls, payer submission, EHR writeback, PHI-capable pilot, Linux local-agent pilot, production promotion, or external distribution."
   },
   {
     label: "Automation Autopilot",
@@ -348,6 +360,7 @@ export const siteNavigationSections: SiteNavigationSection[] = [
       { label: "Workarounds", href: "/limitations-workarounds", description: "Safe alternatives for blocked issues, hard limits, and retained gates." },
       { label: "Service Delivery", href: "/service-delivery", description: "Scoped work orders, artifacts, acceptance criteria, and delivery gates." },
       { label: "Investor Readiness", href: "/investor-audience-readiness", description: "Weakness relief, moat, sellable value, and audience-specific capital or clinic packets." },
+      { label: "Investor Demo Command", href: "/investor-demo-command-room", description: "Preflight proof routes, hold the timebox, advance the guided story, and retain a no-PII internal rehearsal receipt." },
       { label: "Investor Command", href: "/investor-readiness", description: "Enterprise diligence snapshot, readiness evidence, no-go boundaries, model/router status, risk register, and product readiness." },
       { label: "Enterprise Acceleration", href: "/scrimed-enterprise-acceleration", description: "Strategic command for systems, agents, UI, performance, validity, revenue motions, demo assets, sales pitch, and investor confidence." },
       { label: "Market Execution", href: "/scrimed-market-execution", description: "Clean-room market execution lanes that turn competitor research into sales motions, revenue levers, proof artifacts, privacy controls, PR language, and investor narratives." },

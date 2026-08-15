@@ -17,7 +17,6 @@ const contentSecurityPolicy = [
   "font-src 'self' data:",
   "manifest-src 'self'",
   "media-src 'self' data:",
-  "prefetch-src 'self'",
   "worker-src 'self' blob:",
   "connect-src 'self' https://*.vercel-insights.com https://*.vercel.com https://*.supabase.co wss://*.supabase.co",
   "upgrade-insecure-requests"

@@ -6,7 +6,7 @@
       "main": false
     }
   },
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": ".next"
 }

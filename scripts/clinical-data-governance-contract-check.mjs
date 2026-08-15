@@ -133,7 +133,7 @@ requireIncludes("hub route registry", contents.hub, [
 ]);
 
 requireIncludes("navigation audit", contents.navigation, [
-  "expectedApiRoutePatternCount = 448"
+  "expectedApiRoutePatternCount = 452"
 ]);
 
 requireIncludes("clinical data governance docs", contents.docs, [

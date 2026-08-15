@@ -6,6 +6,7 @@ import {
   getPlatformStrategySummary,
   platformCapabilityRegistry,
   platformMoatRegistry,
+  platformPortfolioScorecards,
   platformPortfolioRationalization,
   strategicMetricRegistry,
   validatePlatformCapabilityRegistry
@@ -26,6 +27,9 @@ assert.match(summary.auditHash, /^[0-9a-f]{64}$/);
 assert.equal(getPlatformStrategySummary().auditHash, summary.auditHash);
 
 assert.ok(platformCapabilityRegistry.every((entry) => entry.externalActionsEnabled === false));
+assert.ok(platformCapabilityRegistry.every((entry) => entry.product.length > 0));
+assert.ok(platformCapabilityRegistry.every((entry) => entry.permittedJurisdictions.length > 0));
+assert.ok(platformCapabilityRegistry.every((entry) => entry.externalSideEffects.length === 0));
 assert.ok(
   platformCapabilityRegistry
     .filter((entry) => entry.riskTier === "high")
@@ -58,6 +62,13 @@ assert.equal(
   "incubate"
 );
 assert.ok(platformMoatRegistry.every((moat) => moat.blockedClaim.length > 0));
+assert.equal(platformPortfolioScorecards.length, 7);
+assert.ok(platformPortfolioScorecards.every((entry) => entry.priorityScore >= 0 && entry.priorityScore <= 100));
+assert.ok(platformPortfolioScorecards.every((entry) => entry.externalAuthorityGranted === false));
+assert.equal(
+  [...platformPortfolioScorecards].sort((a, b) => b.priorityScore - a.priorityScore)[0]?.id,
+  "workflow-intelligence-entry-wedge"
+);
 
 console.log(
   "pass SCRIMED platform strategy policy tests (capability ownership, 11-plane coverage, commercial wedge, no-PHI defaults, evidence metrics, and moat boundaries)"

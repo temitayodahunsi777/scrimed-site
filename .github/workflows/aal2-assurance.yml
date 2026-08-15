@@ -1,0 +1,85 @@
+name: AAL2 assurance
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Authorized nonproduction SCRIMED target
+        required: true
+        type: string
+      workspace_slug:
+        description: Protected synthetic workspace slug
+        required: true
+        default: atlas-synthetic-evaluation
+        type: string
+      candidate_sha256:
+        description: Exact candidate SHA-256
+        required: true
+        type: string
+      evidence_nonce:
+        description: Single-run nonsecret evidence nonce
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aal2-assurance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  policy-self-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: node scripts/aal2-token-policy-selftest.mjs
+      - run: node scripts/verify-aal2-target-binding.mjs --self-test
+      - run: node scripts/verify-aal2-evidence.mjs --self-test
+
+  protected-nonproduction-verification:
+    needs: policy-self-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: aal2-assurance
+    env:
+      SCRIMED_BASE_URL: ${{ inputs.base_url }}
+      SCRIMED_WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+      SCRIMED_AAL2_CANDIDATE_SHA256: ${{ inputs.candidate_sha256 }}
+      SCRIMED_AAL2_EVIDENCE_NONCE: ${{ inputs.evidence_nonce }}
+      SCRIMED_AAL2_EXPECTED_COMMIT_SHA: ${{ github.sha }}
+      SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS: ${{ vars.SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS }}
+    steps:
+      - name: Check out exact workflow candidate
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Verify allowlisted exact-candidate preview before exposing credentials
+        run: node scripts/verify-aal2-target-binding.mjs --strict
+      - name: Verify exact-candidate AAL2 evidence inputs
+        env:
+          SCRIMED_AAL2_EXPECTED_ISSUER: ${{ secrets.SCRIMED_AAL2_EXPECTED_ISSUER }}
+          SCRIMED_AAL2_EXPECTED_AUDIENCE: ${{ secrets.SCRIMED_AAL2_EXPECTED_AUDIENCE }}
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_AAL2_BEARER_TOKEN }}
+        run: node scripts/verify-aal2-evidence.mjs --strict
+      - name: Verify downgrade and token-policy denials
+        run: node scripts/aal2-token-policy-selftest.mjs
+      - name: Verify protected durable-store prerequisites
+        env:
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_AAL2_BEARER_TOKEN }}
+        run: node scripts/scrimed-work-durable-store-preflight.mjs --strict
+      - name: Verify candidate-bound privileged endpoint and durable replay controls
+        env:
+          SCRIMED_BEARER_TOKEN: ${{ secrets.SCRIMED_AAL2_BEARER_TOKEN }}
+        run: node scripts/scrimed-work-authenticated-smoke.mjs --strict

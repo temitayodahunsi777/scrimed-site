@@ -36,6 +36,23 @@ const checks = [
     args: ["scripts/ci-workflow-contract-check.mjs"]
   },
   {
+    label: "Node 24 runtime policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/node24-runtime-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Node 24 certification self-test",
+    args: ["scripts/verify-node24-vercel-build.mjs", "--self-test"]
+  },
+  {
+    label: "Node 24 and Vercel repository contract",
+    args: ["scripts/node24-vercel-contract-check.mjs"]
+  },
+  {
     label: "Vercel production deployment policy",
     args: ["scripts/vercel-production-deployment-policy-test.mjs"]
   },
@@ -168,6 +185,14 @@ const checks = [
   {
     label: "AAL2 bearer-token policy",
     args: ["scripts/aal2-token-policy-selftest.mjs"]
+  },
+  {
+    label: "AAL2 candidate-bound evidence verifier",
+    args: ["scripts/verify-aal2-evidence.mjs", "--self-test"]
+  },
+  {
+    label: "AAL2 exact-target and candidate binding",
+    args: ["scripts/verify-aal2-target-binding.mjs", "--self-test"]
   },
   {
     label: "AAL2 smoke readiness preflight",
@@ -447,6 +472,40 @@ const checks = [
     args: ["scripts/strategic-investor-outreach-contract-check.mjs"]
   },
   {
+    label: "Investor demo run-of-show contract",
+    args: ["scripts/investor-demo-run-of-show-contract-check.mjs"]
+  },
+  {
+    label: "Investor demo run-of-show policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/investor-demo-run-of-show-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Investor demo proof-route smoke policy",
+    args: ["scripts/investor-demo-proof-route-smoke.mjs", "--self-test"]
+  },
+  {
+    label: "Investor demo command-room policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/investor-demo-command-room-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Investor demo command-room contract",
+    args: ["scripts/investor-demo-command-room-contract-check.mjs"]
+  },
+  {
+    label: "Bounded public fetch policy",
+    args: ["scripts/bounded-public-fetch-policy-test.mjs"]
+  },
+  {
     label: "Strategic investor meeting policy",
     args: [
       "--disable-warning=ExperimentalWarning",
@@ -689,6 +748,15 @@ const checks = [
     args: ["scripts/scrimed-guided-execution-contract-check.mjs"]
   },
   {
+    label: "SCRIMED Proof Packet Share Readiness policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/proof-packet-share-readiness-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED Proof Packet Studio contract",
     args: ["scripts/scrimed-proof-packet-studio-contract-check.mjs"]
   },
@@ -817,6 +885,24 @@ const checks = [
     ]
   },
   {
+    label: "SCRIMED platform graph policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-platform-graph-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED strategic decision intelligence policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-strategic-decision-policy-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED platform strategy artifact integrity",
     args: [
       "--disable-warning=ExperimentalWarning",
@@ -869,6 +955,74 @@ const checks = [
   {
     label: "sales demo QA token policy",
     args: ["scripts/sales-demo-session-qa-token-policy-selftest.mjs"]
+  },
+  {
+    label: "SCRIMED enterprise gap-closure policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-enterprise-gap-closure-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED enterprise gap-closure contract",
+    args: ["scripts/scrimed-enterprise-gap-closure-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.33 integrated policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p33-integrated-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.33 integrated contract",
+    args: ["scripts/scrimed-p33-integrated-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.33 artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p33-artifacts.mjs",
+      "--check"
+    ]
+  },
+  {
+    label: "Vercel preview evidence verifier policy",
+    args: ["scripts/verify-vercel-preview.mjs", "--self-test"]
+  },
+  {
+    label: "Supabase repository security assurance",
+    args: ["scripts/verify-supabase-security.mjs", "--strict"]
+  },
+  {
+    label: "Supabase RLS contract",
+    args: ["tests/security/supabase-rls-contract.test.mjs"]
+  },
+  {
+    label: "design-system artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/design-system-artifacts.mjs",
+      "--check"
+    ]
+  },
+  {
+    label: "investor demo rehearsal gate",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/rehearse-investor-demo.mjs",
+      "--self-test"
+    ]
   }
 ];
 

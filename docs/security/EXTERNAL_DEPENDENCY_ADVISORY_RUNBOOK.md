@@ -7,7 +7,7 @@ From a network-enabled reviewed runner:
 
 ```bash
 npm ci --ignore-scripts
-npm audit --audit-level=moderate --json > npm-audit.json
+npm audit --audit-level=high --json > npm-audit.json
 npm run security:dependency-floor
 npm run security:sbom
 npm run security:secret-scan

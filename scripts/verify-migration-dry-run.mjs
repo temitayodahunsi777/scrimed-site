@@ -103,10 +103,13 @@ function inspectSchema(databaseUrl) {
     "--field-separator=|",
     "--command",
     `select 'tables', count(*) from pg_tables where schemaname in ('public','auth')
-     union all select 'rls', count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relrowsecurity
+     union all select 'indexes', count(*) from pg_indexes where schemaname in ('public','private','auth')
+     union all select 'constraints', count(*) from pg_constraint c join pg_namespace n on n.oid=c.connamespace where n.nspname in ('public','private','auth')
+     union all select 'grants', count(*) from information_schema.role_table_grants where table_schema in ('public','private')
+     union all select 'rls', count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname in ('public','private') and c.relrowsecurity
      union all select 'functions', count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','auth')
      union all select 'triggers', count(*) from pg_trigger where not tgisinternal
-     union all select 'policies', count(*) from pg_policies where schemaname='public'
+     union all select 'policies', count(*) from pg_policies where schemaname in ('public','private')
      order by 1;`
   ]);
   const summary = Object.fromEntries(
@@ -165,26 +168,33 @@ const recoveredSchema = inspectSchema(databaseUrl);
 const forwardRecoveryVerified = initialSchema.fingerprint === recoveredSchema.fingerprint;
 const generatedAt = new Date().toISOString();
 const report = {
-  schemaVersion: "scrimed-disposable-migration-dry-run-v1-2026-08-01",
+  schemaVersion: "scrimed-disposable-migration-dry-run-v2-2026-08-12",
   status: forwardRecoveryVerified ? "DISPOSABLE_DRY_RUN_PASSED" : "DISPOSABLE_DRY_RUN_FAILED",
   generatedAt,
   databaseTargetClass: "local-disposable-postgresql",
   migrationCount: migrations.length,
   migrationSetFingerprint: canonicalHash(migrations.map(({ path: migrationPath, sha256: hash }) => ({ path: migrationPath, sha256: hash }))),
   pendingMigrationChecksums: pendingChecksums,
+  pendingMigrations: authorization.migrations.map((entry) => ({
+    path: entry.path,
+    sha256: entry.sha256,
+    classification: forwardRecoveryVerified ? "DRY_RUN_PASSED" : "NEEDS_REVISION"
+  })),
   initialSchema,
   recoveredSchema,
   forwardMigrationPassed: true,
   forwardRecoveryVerified,
   rlsInspected: (recoveredSchema.summary.rls ?? 0) > 0,
   policiesInspected: (recoveredSchema.summary.policies ?? 0) > 0,
-  grantsInspected: true,
-  functionsInspected: true,
-  triggersInspected: true,
+  indexesInspected: Number.isFinite(recoveredSchema.summary.indexes),
+  constraintsInspected: Number.isFinite(recoveredSchema.summary.constraints),
+  grantsInspected: Number.isFinite(recoveredSchema.summary.grants),
+  functionsInspected: Number.isFinite(recoveredSchema.summary.functions),
+  triggersInspected: Number.isFinite(recoveredSchema.summary.triggers),
   productionConnectionUsed: false,
   productionMigrationAuthorized: false
 };
-const outputPath = path.resolve(valueArg("output", "artifacts/migrations/disposable-migration-dry-run.json"));
+const outputPath = path.resolve(valueArg("output", "artifacts/migrations/migration-dry-run.json"));
 await mkdir(path.dirname(outputPath), { recursive: true });
 await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 if (flags.has("--json")) console.log(JSON.stringify(report, null, 2));

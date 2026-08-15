@@ -23,6 +23,9 @@ export default function ProductConsolePage() {
           <Link className="secondary-action" href="/demos">
             Watch Demos
           </Link>
+          <Link className="secondary-action" href={summary.p33IntegratedRoute}>
+            Inspect p.33 Controls
+          </Link>
           <a className="secondary-action" href={summary.pilotDemoCommercialReadinessBriefRoute}>
             Download Buyer Brief
           </a>
@@ -33,6 +36,44 @@ export default function ProductConsolePage() {
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
+        </article>
+        <article>
+          <span>Runtime</span>
+          <strong>Node {summary.nodeMajor ?? "unknown"}</strong>
+        </article>
+        <article>
+          <span>Environment</span>
+          <strong>{summary.runtimeEnvironment}</strong>
+        </article>
+        <article>
+          <span>Runtime assurance</span>
+          <strong>{summary.runtimeCompatibilityLabel}</strong>
+        </article>
+        <article>
+          <span>Vercel status</span>
+          <strong>{summary.vercelProjectStatus}</strong>
+        </article>
+        <article>
+          <span>Vercel build</span>
+          <strong>{summary.vercelBuildStatus}</strong>
+        </article>
+        <article>
+          <span>Release fingerprint</span>
+          <strong title={summary.runtimeReleaseFingerprint}>
+            {summary.runtimeReleaseFingerprint.slice(0, 12)}
+          </strong>
+        </article>
+        <article>
+          <span>p.33 controls</span>
+          <strong>{summary.p33IntegratedStatus}</strong>
+        </article>
+        <article>
+          <span>p.33 opportunities</span>
+          <strong>{summary.p33OpportunityModuleCount}</strong>
+        </article>
+        <article>
+          <span>p.33 blocked gates</span>
+          <strong>{summary.p33BlockedGateCount}</strong>
         </article>
         <article>
           <span>Company score</span>

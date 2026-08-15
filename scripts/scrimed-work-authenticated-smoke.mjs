@@ -2,13 +2,13 @@
 
 import { randomUUID } from "node:crypto";
 import { analyzeAal2BearerToken, formatAal2TokenReport, redactSensitive } from "./lib/aal2-token-policy.mjs";
+import { verifyAal2TargetBinding } from "./lib/aal2-target-binding.mjs";
 import { loadLocalEnv } from "./lib/local-env.mjs";
 
 loadLocalEnv();
 
 const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.com").replace(/\/$/, "");
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG ?? process.env.SCRIMED_WORK_DEFAULT_WORKSPACE_SLUG ?? "atlas-synthetic-evaluation";
-const bearerToken = process.env.SCRIMED_BEARER_TOKEN?.trim();
 const strict = ["1", "true", "yes"].includes((process.env.SCRIMED_REQUIRE_AUTHENTICATED_SMOKE ?? "").toLowerCase()) || process.argv.includes("--strict");
 const nonBrowserRequestContext = "operator-smoke-v1";
 
@@ -128,6 +128,7 @@ const unauth = await request("/api/scrimed-work/sessions", {
 requireStatus("unauthenticated SCRIMED Work session create", unauth.response.status, [401, 503], unauth.body);
 console.log(`pass unauthenticated SCRIMED Work session create fail-closed: ${unauth.response.status} ${unauth.response.statusText}`);
 
+const bearerToken = process.env.SCRIMED_BEARER_TOKEN?.trim();
 if (!bearerToken) {
   const missingTokenMessage = "set SCRIMED_BEARER_TOKEN to a tenant-admin, pilot-lead, or reviewer AAL2 bearer token";
 
@@ -138,6 +139,21 @@ if (!bearerToken) {
   console.log(`skip authenticated SCRIMED Work happy path: ${missingTokenMessage}.`);
   process.exit(0);
 }
+
+const targetBinding = await verifyAal2TargetBinding();
+if (!targetBinding.passed) {
+  const targetFailureMessage = `authenticated SCRIMED Work smoke target binding failed closed: ${targetBinding.failures.join(", ")}`;
+
+  if (strict) {
+    failClosed(targetFailureMessage);
+  }
+
+  console.log(`skip authenticated SCRIMED Work happy path: ${redactSensitive(targetFailureMessage)}`);
+  process.exit(0);
+}
+console.log(
+  `pass authenticated SCRIMED Work exact-target binding: commit=${targetBinding.commitSha} candidate=${targetBinding.candidateFingerprint}`
+);
 
 const tokenAnalysis = analyzeAal2BearerToken({ bearerToken, workspaceSlug });
 

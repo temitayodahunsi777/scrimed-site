@@ -65,6 +65,7 @@ import {
   releaseContinuityBriefProofStackStatus,
   releaseContinuityProofStackStatus
 } from "./releaseContinuity";
+import { getScrimedBuildInfo } from "./release/vercelReleaseAssurance";
 import {
   getNavigationAuditSummary,
   navigationAuditBriefProofStackStatus,
@@ -219,6 +220,7 @@ import { getSalesAttributionSummary } from "./salesAttribution";
 import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
+import { getP33IntegratedSummary } from "./scrimed-p33/index";
 import {
   pilotDemoReadinessPacketProofStackStatus,
   pilotDemoReadinessProofStackStatus
@@ -1277,7 +1279,29 @@ export function getProductWorkflows(): ProductWorkflow[] {
   }));
 }
 
+export function getProductRuntimePresentation(
+  buildInfo: ReturnType<typeof getScrimedBuildInfo> = getScrimedBuildInfo()
+) {
+  const previewRuntimeActive =
+    buildInfo.environment === "preview" &&
+    buildInfo.candidateBound &&
+    buildInfo.nodeMajor === 24 &&
+    buildInfo.runtimeCompatibilityStatus === "NODE24_CERTIFIED_RUNTIME_ACTIVE";
+
+  return {
+    runtimeCompatibilityLabel: previewRuntimeActive
+      ? "verified in preview"
+      : buildInfo.runtimeCompatibilityStatus === "NODE24_CERTIFIED_RUNTIME_ACTIVE"
+        ? "certified locally"
+        : "upgrade required",
+    vercelBuildStatus: previewRuntimeActive ? "preview active" : "preview pending"
+  };
+}
+
 export function getProductConsoleSummary() {
+  const buildInfo = getScrimedBuildInfo();
+  const runtimePresentation = getProductRuntimePresentation(buildInfo);
+  const p33IntegratedSummary = getP33IntegratedSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
   const workflowResultValidationSummary = getWorkflowResultValidationResults();
@@ -1367,6 +1391,19 @@ export function getProductConsoleSummary() {
 
   return {
     service: "scrimed-product-console",
+    runtime: buildInfo.runtime,
+    nodeMajor: buildInfo.nodeMajor,
+    runtimeEnvironment: buildInfo.environment,
+    runtimeCompatibilityStatus: buildInfo.runtimeCompatibilityStatus,
+    runtimeCompatibilityLabel: runtimePresentation.runtimeCompatibilityLabel,
+    runtimeReleaseFingerprint: buildInfo.releaseFingerprint,
+    vercelProjectStatus: "Node 24 pinned",
+    vercelBuildStatus: runtimePresentation.vercelBuildStatus,
+    p33IntegratedRoute: p33IntegratedSummary.route,
+    p33IntegratedApiRoute: p33IntegratedSummary.apiRoute,
+    p33IntegratedStatus: p33IntegratedSummary.status,
+    p33OpportunityModuleCount: p33IntegratedSummary.opportunities.modules.length,
+    p33BlockedGateCount: p33IntegratedSummary.gateCounts.BLOCKED,
     route: "/product",
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",
@@ -2646,6 +2683,120 @@ export function getProductConsoleSummary() {
       "Use Pilot Demo Commercial Readiness before every demo, pilot, pricing, or buyer-call conversation so each demo resolves to one recommended pilot path, price band, proof asset list, no-PHI intake route, market benchmark, margin rule, and hard stop before custom work expands; use Clinical Production Readiness before any PHI, live-care, connector, clinical AI, certification, global production, customer go-live, or clinical-production language expands so required tasks, incomplete gates, external-review needs, current capability motions, source references, and hard stops stay explicit while SCRIMED keeps selling no-PHI demos, paid readiness services, synthetic pilots, diligence packets, and governance assessments; use Company Assessment first before launch, buyer campaigns, investor packet release, service expansion, board review, platform claims, certification conversations, protected proof release, or broader app promotion so product, service, revenue, margin, legal, finance, accounting, tax, security, AI, health-record, launch, approval, investor, limitation, team-lane, and hard-stop posture is explicit; use Launch Readiness before public launch, buyer campaigns, investor packet release, board review, or broader app promotion so branded-domain smoke, sandbox DNS classification, fallback-only boundaries, product/service launch tracks, and protected proof hard stops are explicit; use Competitive Defense before public competitor comparisons, sales decks, investor packets, privacy/security claims, or launch expansion so biggest-competitor threat profiles, weakness relief, no-copy boundaries, legal/privacy/cyber controls, infiltration-deterrence layers, and external review gates are explicit without creating partnership, parity, PHI, security-certification, penetration-test, legal, privacy, or protection-guarantee claims; use Service Delivery Workbench before any paid service kickoff so every package has no-PHI intake, scope matrix, acceptance criteria, work-order templates, artifacts, margin protections, buyer handoff, and retained no-SLA, no-contract, no-PHI, no-live-care gates; use Enterprise Business Ops to route every enterprise opportunity through deal desk, price floor, margin model, counsel review, accounting/revenue-recognition triage, tax awareness, billing readiness, contract authority, and blocked-claim controls before proposal release; use Growth Engine to prioritize buyer segments, sellable offers, conversion lanes, revenue proof steps, bottlenecks, owners, and proof routes without crossing revenue guarantee, securities, valuation, legal, tax, reimbursement, PHI, security, connector, or live-care boundaries; use Investor and Audience Readiness to turn weaknesses into owned relief tracks and route angel, corporate strategic, private investor, faith-based clinic, public-sector, payer, health-system, clinician, global-partner, and transformation-sponsor conversations into the right packet without crossing securities, solicitation, valuation, tax, legal, donor, customer-permission, PHI, clinical, reimbursement, certification, partnership, revenue, or profit boundaries; use Capital Vitality to keep revenue capabilities, competitive moat evidence, investor-readiness milestones, funding workstreams, and external-review gates visible without crossing securities, valuation, legal, reimbursement, PHI, security, or live-care boundaries; use Service Reliability to keep product and service controls, fault classes, efficiency improvements, owners, proof routes, open gates, and retained approval boundaries visible before claims expand; use Operational Efficiency to centralize cross-system gaps, inefficiencies, bottlenecks, hard stops, proof-route density, owners, and resolution sprints before work becomes informal process memory; use Limitations and Workaround Operations whenever a request is blocked so SCRIMED has a safe packet, escalation owner, proof route, expiration rule, and graduation gate instead of informal exceptions; use Navigation Audit to keep the page route inventory, API route count, navigation groups, smoke scope, protected fail-closed checks, and retained AAL2 or external-review boundaries visible before each release; use Release Continuity to keep production, GitHub, smoke checks, and AAL2 operator boundaries checkpointed after every deploy; use Approvals Readiness as the public operating ladder for intended use, HIPAA/BAA, SOC 2/HITRUST, FDA/CDS/SaMD, ONC/connectors, state care-delivery review, and buyer-specific release gates; use Global Certification Readiness to turn HIPAA, FDA, SOC 2, HITRUST, ISO, EU AI Act, GDPR, NHS DTAC, MHRA, Australia Essential Eight, and regional certification questions into evidence packets without claiming approval early; use Continuous Review and Audit to run 24/7 agent-assisted accuracy review, evidence attribution, claims guard, security drift, QA regression, incident learning, and internal innovation research without autonomous production remediation or public quantum claims; use Boundary Resolution Register to keep every known hard gate owned, evidenced, and safely worked around; use Clinical Authority Readiness to prepare live-care, PHI, legal, regional, reimbursement, security-certification, connector, and production-authorization gates without crossing them; use Global Reach to choose region, buyer pack, partner channel, procurement path, and retained approval gates; use Sales Attribution to convert every safe buyer signal into source-aware opportunity routing; use Attribution Analytics to compare source-to-pilot cohorts; use Tenant TrustOps incident workspaces to prove enterprise risk governance; use Market Activation to focus message; use Sales Operations to qualify retained buyer intake; use Deployment Profiles to scope infrastructure readiness; use Manual AAL2 QA Launch Kit to hand an approved operator exact no-secret dispatch, evidence, and secret-disposal instructions; use QA Human Run Packet to validate the bounded human AAL2 dispatch before workflow execution; use the protected Manual QA Execution Console as the operator command lane for dispatch, retained packet visibility, audit signals, and Buyer Proof Release state; use QA Completion Bridge to validate the post-run candidate before protected persistence; use QA Claim Guard to prevent sales, investor, buyer, PR, and operator overclaims while retained packet proof is pending; use QA Activation Seal as the final no-secret seal check before buyer proof language; use Manual QA Proof Promotion to prevent retained authenticated QA claims until protected no-secret packet hashes are visible; use QA Buyer Proof Release as the protected go/no-go gate before Buyer Diligence references retained QA proof; use Buyer Release Control Runbook to complete the external approval, release decision, reviewer signoff, lockbox, authority, recipient, and access-log chain before any buyer-specific external sharing; then use the authenticated Buyer Demo Execution Path plus persisted Buyer Demo Sessions, AAL2 buyer-demo QA harness, external approval evidence linkage, and protected release decision claim registry to sequence, record, verify, and release audited Pilot Deal Room, Buyer Pilot Room, lifecycle, production-readiness, paid-pilot activation approval, buyer diligence, and secure evidence vault readiness packets before any customer SSO, automated invitation, signed document storage, public distribution, or production connector step.",
     updated: "2026-06-26"
   };
+}
+
+let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
+
+export function getProductConsoleApiSummary() {
+  if (productConsoleApiSummaryCache) return productConsoleApiSummaryCache;
+
+  const summary = getProductConsoleSummary();
+  const {
+    companyAssessmentSummary,
+    executionAttemptEnvelopeSummary,
+    healthcareIntelligenceOSSummary,
+    healthcareOptimizationCommandSummary,
+    healthcareValueRealizationSummary,
+    pilotActivationPlannerSummary,
+    pilotHandoffCommandSummary,
+    pilotSuccessReviewCommandSummary,
+    pilotValueEvidenceSummary,
+    productionArchitectureSummary,
+    salesOperationsSummary,
+    strategicPlatformIntelligenceSummary
+  } = summary;
+  const apiSummary = Object.fromEntries(
+    Object.entries(summary).filter(([key]) => !key.endsWith("Summary"))
+  );
+
+  productConsoleApiSummaryCache = {
+    ...apiSummary,
+    payloadProfile: "compact-api-v2",
+    detailRoutes: {
+      companyAssessment: companyAssessmentSummary.apiRoute,
+      enterpriseBusinessOperations: summary.enterpriseBusinessOpsApiRoute,
+      boundaryResolution: summary.boundaryResolutionApiRoute,
+      operationalEfficiency: summary.operationalEfficiencyApiRoute,
+      growthEngine: summary.growthEngineApiRoute,
+      investorAudienceReadiness: summary.investorAudienceReadinessApiRoute
+    },
+    companyAssessmentSummary: {
+      route: companyAssessmentSummary.route,
+      apiRoute: companyAssessmentSummary.apiRoute,
+      briefRoute: companyAssessmentSummary.briefRoute,
+      status: companyAssessmentSummary.status,
+      overallScore: companyAssessmentSummary.overallScore,
+      dimensionCount: companyAssessmentSummary.dimensionCount,
+      weaknessCount: companyAssessmentSummary.weaknessCount,
+      hardStopCount: companyAssessmentSummary.hardStopCount,
+      boundary: companyAssessmentSummary.boundary,
+      detailAvailableAt: companyAssessmentSummary.apiRoute
+    },
+    healthcareOptimizationCommandSummary: {
+      blockedActions: healthcareOptimizationCommandSummary.blockedActions,
+      detailAvailableAt: healthcareOptimizationCommandSummary.apiRoute
+    },
+    healthcareValueRealizationSummary: {
+      blockedActions: healthcareValueRealizationSummary.blockedActions,
+      detailAvailableAt: healthcareValueRealizationSummary.apiRoute
+    },
+    pilotValueEvidenceSummary: {
+      blockedClaims: pilotValueEvidenceSummary.blockedClaims,
+      detailAvailableAt: pilotValueEvidenceSummary.apiRoute
+    },
+    pilotActivationPlannerSummary: {
+      blockedActions: pilotActivationPlannerSummary.blockedActions,
+      detailAvailableAt: pilotActivationPlannerSummary.apiRoute
+    },
+    pilotHandoffCommandSummary: {
+      blockedActions: pilotHandoffCommandSummary.blockedActions,
+      detailAvailableAt: pilotHandoffCommandSummary.apiRoute
+    },
+    pilotSuccessReviewCommandSummary: {
+      blockedClaims: pilotSuccessReviewCommandSummary.blockedClaims,
+      detailAvailableAt: pilotSuccessReviewCommandSummary.apiRoute
+    },
+    productionArchitectureSummary: {
+      readinessAssessment: productionArchitectureSummary.readinessAssessment,
+      modelProviderMesh: productionArchitectureSummary.modelProviderMesh.map(({ name }) => ({
+        name
+      })),
+      detailAvailableAt: productionArchitectureSummary.apiRoute
+    },
+    executionAttemptEnvelopeSummary: {
+      boundary: executionAttemptEnvelopeSummary.boundary,
+      detailAvailableAt: executionAttemptEnvelopeSummary.apiRoute
+    },
+    healthcareIntelligenceOSSummary: {
+      clinicalWorkflowAutomation: {
+        blockedActions: healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.blockedActions
+      },
+      detailAvailableAt: healthcareIntelligenceOSSummary.apiRoute
+    },
+    strategicPlatformIntelligenceSummary: {
+      executionScorecards: strategicPlatformIntelligenceSummary.executionScorecards.map(
+        ({ commandSlug, evidenceState, scoreState }) => ({
+          commandSlug,
+          evidenceState,
+          scoreState
+        })
+      ),
+      recommendedStrategicSequence:
+        strategicPlatformIntelligenceSummary.recommendedStrategicSequence,
+      executionCommands: strategicPlatformIntelligenceSummary.executionCommands.map(({ slug }) => ({
+        slug
+      })),
+      executionBets: strategicPlatformIntelligenceSummary.executionBets.map(({ slug }) => ({ slug })),
+      decisionGates: strategicPlatformIntelligenceSummary.decisionGates.map(({ slug }) => ({ slug })),
+      detailAvailableAt: strategicPlatformIntelligenceSummary.apiRoute
+    },
+    salesOperationsSummary: {
+      authentication: salesOperationsSummary.authentication,
+      detailAvailableAt: salesOperationsSummary.apiRoute
+    }
+  };
+
+  return productConsoleApiSummaryCache;
 }
 
 export function getProductReadinessBrief() {

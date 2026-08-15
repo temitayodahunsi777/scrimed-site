@@ -48,7 +48,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -69,6 +69,6 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: disposable-migration-evidence-${{ github.run_id }}
-          path: artifacts/migrations/disposable-migration-dry-run.json
+          path: artifacts/migrations/migration-dry-run.json
           if-no-files-found: error
           retention-days: 14

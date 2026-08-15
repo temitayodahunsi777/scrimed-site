@@ -348,7 +348,7 @@ export const qaEvidenceEntries: QaEvidenceEntry[] = [
       "TypeScript, ESLint, generated integrity, production build, and local production smoke passed using the bundled Node runtime when the managed shell omitted node/npm from PATH.",
     limitation: "The local Codex shell may not expose npm or node on PATH consistently.",
     workaround:
-      "Use the bundled Node absolute path for local verification; GitHub Actions and Vercel continue to run standard Node 22 commands.",
+      "Use the bundled Node 24 absolute path for local verification; GitHub Actions and the repository-owned Vercel engine declaration target Node 24.",
     nextAction: "Restore normal local package-manager PATH when convenient; keep absolute-Node fallback documented."
   },
   {
@@ -800,7 +800,7 @@ export const qaKnownLimitations: QaKnownLimitation[] = [
     currentControl:
       "Bundled Node absolute path verifies TypeScript, ESLint, generated integrity, Next build, and smoke scripts without changing the product.",
     resolutionPath:
-      "Restore PATH in the local Codex shell when available; keep CI and Vercel on standard Node 22.",
+      "Restore PATH in the local Codex shell when available; keep CI and the repository-owned Vercel engine declaration on Node 24.",
     status: "contained"
   },
   {

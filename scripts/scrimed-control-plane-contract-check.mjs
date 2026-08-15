@@ -16,6 +16,16 @@ const requiredFiles = [
   "docs/investor/SCRIMED_PLATFORM_MAP.md",
   "docs/investor/MOAT_AND_DILIGENCE_INDEX.md",
   "docs/product/PORTFOLIO_RATIONALIZATION.md",
+  "docs/product/CORE_COMMERCIAL_WEDGE.md",
+  "docs/architecture/SCRIMED_PLATFORM_GRAPH.md",
+  "docs/governance/HUMAN_GATE_MINIMIZATION_REPORT.md",
+  "docs/strategy/SCRIMED_STRATEGIC_ROADMAP.md",
+  "docs/legal/IP_INVENTION_REGISTER.md",
+  "docs/investor/DATA_ROOM_INDEX.md",
+  "docs/brand/PUBLIC_SURFACE_CONSISTENCY_REPORT.md",
+  "docs/release/CURRENT_PLATFORM_BASELINE.md",
+  "docs/security/AAL2_ASSURANCE_RUNBOOK.md",
+  ".github/workflows/aal2-assurance.yml",
   "docs/release/PR_22_23_CONSOLIDATION_REPORT.md",
   "docs/release/PRODUCTION_DELTA_REPORT.md",
   "docs/SCRIMED_INTENDED_USE_MEMO.md",
@@ -33,6 +43,9 @@ const requiredFiles = [
   "app/lib/scrimed-control-plane/approvalAchievement.ts",
   "app/lib/scrimed-control-plane/platformEvidence.ts",
   "app/lib/scrimed-control-plane/platformStrategy.ts",
+  "app/lib/scrimed-control-plane/platformGraph.ts",
+  "app/lib/scrimed-control-plane/trustReadiness.ts",
+  "app/lib/scrimed-control-plane/strategicDecisionIntelligence.ts",
   "app/lib/scrimed-control-plane/index.ts",
   "app/api/scrimed-control-plane/[[...path]]/route.ts",
   "app/scrimed-control-plane/page.tsx",
@@ -43,9 +56,18 @@ const requiredFiles = [
   "scripts/scrimed-control-plane-smoke.mjs",
   "scripts/scrimed-platform-strategy-artifacts.mjs",
   "scripts/scrimed-platform-strategy-policy-test.mjs",
+  "scripts/scrimed-platform-graph-policy-test.mjs",
+  "scripts/scrimed-strategic-decision-policy-test.mjs",
+  "scripts/lib/aal2-target-binding.mjs",
+  "scripts/verify-aal2-target-binding.mjs",
+  "scripts/verify-aal2-evidence.mjs",
   "artifacts/platform/platform-map.json",
+  "artifacts/platform/scrimed-platform-graph.json",
   "artifacts/product/product-portfolio.json",
-  "artifacts/investor/moat-registry.json"
+  "artifacts/product/portfolio-scorecard.json",
+  "artifacts/investor/moat-registry.json",
+  "artifacts/investor/investor-readiness.json",
+  "artifacts/strategy/strategic-roadmap.json"
 ];
 
 const files = Object.fromEntries(
@@ -156,7 +178,25 @@ for (const expected of [
   "externalActionsEnabled: false",
   "governed-partner-marketplace",
   "No public marketplace",
-  "Does not imply customers, partners, revenue"
+  "Does not imply customers, partners, revenue",
+  "PlatformGraphNode",
+  "getScrimedPlatformGraph",
+  "VALID_SYNTHETIC_ARCHITECTURE_GRAPH",
+  "orphan-node",
+  "unsafeExternalActionPaths: 0",
+  "evaluateTrustReadiness",
+  "ALLOW_SYNTHETIC",
+  "PRODUCTION_AUTHORITY_NOT_GRANTED",
+  "certificationClaimAllowed: false",
+  "getHumanGateMinimizationReport",
+  "PENDING_EXTERNAL_EVIDENCE",
+  "externalApprovalsAchievedByThisReport: 0",
+  "getInvestorReadinessEngine",
+  "investmentProbabilityCalculated: false",
+  "Internal strategic readiness profile — no partnership implied.",
+  "externalRelationshipVerified: false",
+  "ceoDecisionRegister",
+  "defaultSafeAction"
 ]) {
   requireCombined(domainFiles, expected);
 }
@@ -180,6 +220,9 @@ for (const endpoint of [
   "approvals",
   "platform-evidence",
   "platform-strategy",
+  "platform-graph",
+  "trust-readiness",
+  "strategic-decision-intelligence",
   "plan",
   "run",
   "pause",
@@ -221,6 +264,8 @@ for (const expected of [
   "Approval Achievement",
   "Cross-Platform Evidence",
   "Platform Map + Portfolio Discipline",
+  "Platform Graph + Trust Readiness",
+  "Strategic Decision Intelligence",
   "Synthetic"
 ]) {
   requireIncludes(pagePath, expected);
@@ -229,7 +274,7 @@ for (const expected of [
 for (const path of ["app/lib/siteNavigation.ts", "app/lib/navigationAudit.ts"]) {
   requireIncludes(path, "/scrimed-control-plane");
 }
-requireIncludes("app/lib/navigationAudit.ts", "expectedApiRoutePatternCount = 448");
+requireIncludes("app/lib/navigationAudit.ts", "expectedApiRoutePatternCount = 452");
 
 const packageJson = JSON.parse(files["package.json"]);
 if (packageJson.scripts?.["contract:scrimed-control-plane"] !== "node scripts/scrimed-control-plane-contract-check.mjs") {
@@ -240,7 +285,18 @@ if (packageJson.scripts?.["smoke:scrimed-control-plane"] !== "node scripts/scrim
 }
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-control-plane-contract-check.mjs");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-platform-strategy-policy-test.mjs");
+requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-platform-graph-policy-test.mjs");
+requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-strategic-decision-policy-test.mjs");
+requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/verify-aal2-evidence.mjs");
 requireIncludes("scripts/scrimed-nonsecret-test-suite.mjs", "scripts/scrimed-platform-strategy-artifacts.mjs");
+requireIncludes(
+  "scripts/scrimed-platform-strategy-artifacts.mjs",
+  '"artifacts/governance/human-gate-minimization.json": humanGateMinimization'
+);
+requireIncludes(
+  "scripts/scrimed-platform-strategy-artifacts.mjs",
+  "optionalUnmaterializedCheckArtifacts"
+);
 
 if (
   packageJson.scripts?.["test:scrimed-platform-strategy"] !==
@@ -254,6 +310,34 @@ if (
 ) {
   throw new Error("package.json missing check:scrimed-platform-strategy.");
 }
+if (!packageJson.scripts?.["test:scrimed-platform-graph"]?.includes("scrimed-platform-graph-policy-test.mjs")) {
+  throw new Error("package.json missing test:scrimed-platform-graph.");
+}
+if (!packageJson.scripts?.["test:scrimed-strategic-decision-intelligence"]?.includes("scrimed-strategic-decision-policy-test.mjs")) {
+  throw new Error("package.json missing test:scrimed-strategic-decision-intelligence.");
+}
+if (packageJson.scripts?.["test:aal2:evidence"] !== "node scripts/verify-aal2-evidence.mjs --self-test") {
+  throw new Error("package.json missing test:aal2:evidence.");
+}
+if (packageJson.scripts?.["test:aal2:target-binding"] !== "node scripts/verify-aal2-target-binding.mjs --self-test") {
+  throw new Error("package.json missing test:aal2:target-binding.");
+}
+for (const expected of [
+  "workflow_dispatch:",
+  "environment: aal2-assurance",
+  "SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS",
+  "SCRIMED_AAL2_EXPECTED_COMMIT_SHA: ${{ github.sha }}",
+  "node scripts/verify-aal2-target-binding.mjs --self-test",
+  "node scripts/verify-aal2-target-binding.mjs --strict",
+  "fetch-depth: 0",
+  "node scripts/verify-aal2-evidence.mjs --strict",
+  "node scripts/scrimed-work-authenticated-smoke.mjs --strict"
+]) {
+  requireIncludes(".github/workflows/aal2-assurance.yml", expected);
+}
+if (/^\s{6}SCRIMED_BEARER_TOKEN:/m.test(files[".github/workflows/aal2-assurance.yml"])) {
+  throw new Error("AAL2 bearer token must be scoped to authenticated steps, not the job environment.");
+}
 
 for (const expected of [
   "/scrimed-control-plane",
@@ -266,6 +350,9 @@ for (const expected of [
   "/api/scrimed-control-plane/approvals",
   "/api/scrimed-control-plane/platform-evidence",
   "/api/scrimed-control-plane/platform-strategy",
+  "/api/scrimed-control-plane/platform-graph",
+  "/api/scrimed-control-plane/trust-readiness",
+  "/api/scrimed-control-plane/strategic-decision-intelligence",
   "expected fail-closed 401, 403, or 503",
   "--compiled",
   "routeModule.userland",

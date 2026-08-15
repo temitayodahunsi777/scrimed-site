@@ -2,8 +2,28 @@
 
 import { readdir } from "node:fs/promises";
 import { redactSensitive } from "./lib/aal2-token-policy.mjs";
+import {
+  boundedPublicFetch,
+  normalizePublicSmokeBaseUrl,
+  parsePublicSmokeMaxAttempts,
+  parsePublicSmokeMaxResponseBytes,
+  parsePublicSmokeTimeoutMs,
+  readBoundedResponseText
+} from "./lib/bounded-public-fetch.mjs";
 
-const baseUrl = (process.env.SCRIMED_BASE_URL ?? "https://app.scrimedsolutions.com").replace(/\/$/, "");
+const baseUrl = normalizePublicSmokeBaseUrl(
+  process.env.SCRIMED_BASE_URL,
+  "https://app.scrimedsolutions.com"
+);
+const requestTimeoutMs = parsePublicSmokeTimeoutMs(
+  process.env.SCRIMED_SMOKE_REQUEST_TIMEOUT_MS
+);
+const maxResponseBytes = parsePublicSmokeMaxResponseBytes(
+  process.env.SCRIMED_SMOKE_MAX_RESPONSE_BYTES
+);
+const maxReadAttempts = parsePublicSmokeMaxAttempts(
+  process.env.SCRIMED_SMOKE_MAX_ATTEMPTS
+);
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG?.trim() || "atlas-synthetic-evaluation";
 if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(workspaceSlug)) {
   throw new Error("SCRIMED_WORKSPACE_SLUG must be a bounded lowercase workspace slug.");
@@ -20,7 +40,9 @@ async function countRouteFiles(root, fileName) {
 }
 
 async function readResponse(response) {
-  const text = await response.text();
+  const text = await readBoundedResponseText(response, maxResponseBytes, {
+    timeoutMs: requestTimeoutMs
+  });
 
   try {
     return { json: JSON.parse(text), text };
@@ -33,7 +55,10 @@ async function request(path) {
   let response;
 
   try {
-    response = await fetch(endpoint(path));
+    response = await boundedPublicFetch(endpoint(path), {}, {
+      timeoutMs: requestTimeoutMs,
+      maxAttempts: maxReadAttempts
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const cause = error instanceof Error && error.cause instanceof Error ? ` Cause: ${error.cause.message}` : "";
@@ -53,14 +78,18 @@ async function postJson(path, payload, extraHeaders = {}) {
   let response;
 
   try {
-    response = await fetch(endpoint(path), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...extraHeaders
+    response = await boundedPublicFetch(
+      endpoint(path),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...extraHeaders
+        },
+        body: JSON.stringify(payload)
       },
-      body: JSON.stringify(payload)
-    });
+      { timeoutMs: requestTimeoutMs }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const cause = error instanceof Error && error.cause instanceof Error ? ` Cause: ${error.cause.message}` : "";
@@ -11554,6 +11583,10 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /platform-power in smoke-covered HTML routes.");
   }
 
+  if (!body.smokeCoveredHtmlRoutes.includes("/scrimed-p33")) {
+    throw new Error("Navigation Audit expected /scrimed-p33 in smoke-covered HTML routes.");
+  }
+
   if (!body.smokeCoveredHtmlRoutes.includes("/limitations-workarounds")) {
     throw new Error("Navigation Audit expected /limitations-workarounds in smoke-covered HTML routes.");
   }
@@ -15805,6 +15838,7 @@ await checkHtml("/pilot-success-review-command");
 await checkHtml("/scrimed-os");
 await checkHtml("/scrimed-intelligence-platform");
 await checkHtml("/scrimed-work");
+await checkHtml("/scrimed-p33");
 await checkHtml("/scrimed-agent-governance");
 await checkHtml("/scrimed-reasoning-stability");
 await checkHtml("/scrimed-clinical-benchmark-suite");

@@ -192,7 +192,7 @@ requireIncludes("public smoke", contents.publicSmoke, [
 ]);
 
 requireIncludes("navigation audit", contents.navigation, [
-  "expectedApiRoutePatternCount = 448"
+  "expectedApiRoutePatternCount = 452"
 ]);
 
 requireIncludes("readme", contents.readme, [
