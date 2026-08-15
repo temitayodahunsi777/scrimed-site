@@ -11,7 +11,10 @@ import {
   getScrimedBuildInfo,
   getScrimedReleaseReadiness
 } from "../app/lib/release/vercelReleaseAssurance.ts";
-import { getProductConsoleApiSummary } from "../app/lib/productConsole.ts";
+import {
+  getProductConsoleApiSummary,
+  getProductRuntimePresentation
+} from "../app/lib/productConsole.ts";
 import { getScrimedPlatformGraph } from "../app/lib/scrimed-control-plane/platformGraph.ts";
 import { buildDevelopmentContinuityPlan } from "../app/lib/scrimed-work/developmentContinuity.ts";
 import { getScrimedOperatingCommandCenterSummary } from "../app/lib/scrimedOperatingCommandCenter.ts";
@@ -40,6 +43,24 @@ assert.equal(buildInfo.nodeMajor, 24);
 assert.equal(buildInfo.nodeTarget, "24.x");
 assert.equal(buildInfo.productionReleaseAuthorized, false);
 assert.equal(JSON.stringify(buildInfo).includes("synthetic-secret-marker"), false);
+
+const previewBuildInfo = getScrimedBuildInfo(
+  {
+    ...safeEnv,
+    VERCEL_ENV: "preview",
+    VERCEL_GIT_COMMIT_SHA: "a".repeat(40),
+    VERCEL_PROJECT_PRODUCTION_URL: "app.scrimedsolutions.com"
+  },
+  "24.0.0"
+);
+assert.deepEqual(getProductRuntimePresentation(previewBuildInfo), {
+  runtimeCompatibilityLabel: "verified in preview",
+  vercelBuildStatus: "preview active"
+});
+assert.deepEqual(getProductRuntimePresentation(buildInfo), {
+  runtimeCompatibilityLabel: "certified locally",
+  vercelBuildStatus: "preview pending"
+});
 
 const ready = getScrimedReleaseReadiness(safeEnv, "24.0.0");
 assert.equal(ready.ok, true);
@@ -102,4 +123,4 @@ assert.equal(
 );
 assert.ok(productConsoleBytes <= budgets.budgets.productConsoleApiBytes);
 
-console.log(`pass SCRIMED Node 24 runtime policy tests (24 checks; Product Console API ${productConsoleBytes} bytes)`);
+console.log(`pass SCRIMED Node 24 runtime policy tests (26 checks; Product Console API ${productConsoleBytes} bytes)`);

@@ -1279,8 +1279,28 @@ export function getProductWorkflows(): ProductWorkflow[] {
   }));
 }
 
+export function getProductRuntimePresentation(
+  buildInfo: ReturnType<typeof getScrimedBuildInfo> = getScrimedBuildInfo()
+) {
+  const previewRuntimeActive =
+    buildInfo.environment === "preview" &&
+    buildInfo.candidateBound &&
+    buildInfo.nodeMajor === 24 &&
+    buildInfo.runtimeCompatibilityStatus === "NODE24_CERTIFIED_RUNTIME_ACTIVE";
+
+  return {
+    runtimeCompatibilityLabel: previewRuntimeActive
+      ? "verified in preview"
+      : buildInfo.runtimeCompatibilityStatus === "NODE24_CERTIFIED_RUNTIME_ACTIVE"
+        ? "certified locally"
+        : "upgrade required",
+    vercelBuildStatus: previewRuntimeActive ? "preview active" : "preview pending"
+  };
+}
+
 export function getProductConsoleSummary() {
   const buildInfo = getScrimedBuildInfo();
+  const runtimePresentation = getProductRuntimePresentation(buildInfo);
   const p33IntegratedSummary = getP33IntegratedSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
@@ -1375,13 +1395,10 @@ export function getProductConsoleSummary() {
     nodeMajor: buildInfo.nodeMajor,
     runtimeEnvironment: buildInfo.environment,
     runtimeCompatibilityStatus: buildInfo.runtimeCompatibilityStatus,
-    runtimeCompatibilityLabel:
-      buildInfo.runtimeCompatibilityStatus === "NODE24_CERTIFIED_RUNTIME_ACTIVE"
-        ? "certified locally"
-        : "upgrade required",
+    runtimeCompatibilityLabel: runtimePresentation.runtimeCompatibilityLabel,
     runtimeReleaseFingerprint: buildInfo.releaseFingerprint,
     vercelProjectStatus: "Node 24 pinned",
-    vercelBuildStatus: "preview pending",
+    vercelBuildStatus: runtimePresentation.vercelBuildStatus,
     p33IntegratedRoute: p33IntegratedSummary.route,
     p33IntegratedApiRoute: p33IntegratedSummary.apiRoute,
     p33IntegratedStatus: p33IntegratedSummary.status,
