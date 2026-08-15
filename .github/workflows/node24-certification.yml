@@ -1,0 +1,78 @@
+name: Node 24 Certification
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: node24-certification-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SCRIMED_SYNTHETIC_ONLY: "true"
+  SCRIMED_ALLOW_PHI: "false"
+  SCRIMED_LIVE_CLINICAL_EXECUTION: "false"
+  SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: "false"
+  SCRIMED_EXTERNAL_PROVIDER_CALLS_ENABLED: "false"
+  SCRIMED_SCHEDULES_ENABLED: "false"
+
+jobs:
+  certify:
+    name: Certify Node 24 runtime and p.33 controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@v6
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install exact lockfile
+        run: npm ci
+
+      - name: Verify runtime declaration
+        run: node scripts/verify-node24-vercel-build.mjs --prebuild
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Verify p.33 policies and contracts
+        run: |
+          npm run test:scrimed-p33
+          npm run contract:scrimed-p33
+          npm run check:scrimed-p33-artifacts
+
+      - name: Run nonsecret regression suite
+        run: npm run test:nonsecret
+
+      - name: Scan secrets and regenerate SBOM evidence
+        run: |
+          npm run security:secret-scan
+          npm run security:sbom
+
+      - name: Build production candidate
+        run: npm run build
+
+      - name: Certify built route inventory and release fingerprint
+        run: npm run certify:node24 -- --output=.next/node24-certification.json
+
+      - name: Verify generated integrity
+        run: npm run integrity
+
+      - name: Upload Node 24 certification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: node24-certification-${{ github.sha }}
+          path: .next/node24-certification.json
+          if-no-files-found: error
+          retention-days: 14

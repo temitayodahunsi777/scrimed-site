@@ -2,6 +2,9 @@
   "name": "scrimed-site",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev --webpack",
     "clean:generated": "node scripts/clean-generated-cache.mjs",
@@ -253,6 +256,11 @@
     "smoke:scrimed-p33": "node scripts/scrimed-p33-integrated-contract-check.mjs",
     "generate:scrimed-p33-artifacts": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p33-artifacts.mjs",
     "check:scrimed-p33-artifacts": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p33-artifacts.mjs --check",
+    "test:node24-runtime": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/node24-runtime-policy-test.mjs",
+    "test:node24-certification": "node scripts/verify-node24-vercel-build.mjs --self-test",
+    "contract:node24-vercel": "node scripts/node24-vercel-contract-check.mjs",
+    "certify:node24": "node scripts/verify-node24-vercel-build.mjs",
+    "smoke:node24-vercel": "node scripts/verify-node24-vercel-build.mjs",
     "test:vercel-preview-evidence": "node scripts/verify-vercel-preview.mjs --self-test",
     "verify:vercel-preview": "node scripts/verify-vercel-preview.mjs --strict --json",
     "test:supabase-security": "node scripts/verify-supabase-security.mjs --self-test",

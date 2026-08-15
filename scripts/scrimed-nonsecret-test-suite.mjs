@@ -36,6 +36,23 @@ const checks = [
     args: ["scripts/ci-workflow-contract-check.mjs"]
   },
   {
+    label: "Node 24 runtime policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/node24-runtime-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Node 24 certification self-test",
+    args: ["scripts/verify-node24-vercel-build.mjs", "--self-test"]
+  },
+  {
+    label: "Node 24 and Vercel repository contract",
+    args: ["scripts/node24-vercel-contract-check.mjs"]
+  },
+  {
     label: "Vercel production deployment policy",
     args: ["scripts/vercel-production-deployment-policy-test.mjs"]
   },

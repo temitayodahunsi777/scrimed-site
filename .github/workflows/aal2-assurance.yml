@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: node scripts/aal2-token-policy-selftest.mjs
       - run: node scripts/verify-aal2-evidence.mjs --self-test
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - name: Reject production target

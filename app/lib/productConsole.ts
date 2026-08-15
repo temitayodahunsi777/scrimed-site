@@ -65,6 +65,7 @@ import {
   releaseContinuityBriefProofStackStatus,
   releaseContinuityProofStackStatus
 } from "./releaseContinuity";
+import { getScrimedBuildInfo } from "./release/vercelReleaseAssurance";
 import {
   getNavigationAuditSummary,
   navigationAuditBriefProofStackStatus,
@@ -1279,6 +1280,7 @@ export function getProductWorkflows(): ProductWorkflow[] {
 }
 
 export function getProductConsoleSummary() {
+  const buildInfo = getScrimedBuildInfo();
   const p33IntegratedSummary = getP33IntegratedSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
@@ -1369,6 +1371,17 @@ export function getProductConsoleSummary() {
 
   return {
     service: "scrimed-product-console",
+    runtime: buildInfo.runtime,
+    nodeMajor: buildInfo.nodeMajor,
+    runtimeEnvironment: buildInfo.environment,
+    runtimeCompatibilityStatus: buildInfo.runtimeCompatibilityStatus,
+    runtimeCompatibilityLabel:
+      buildInfo.runtimeCompatibilityStatus === "NODE24_CERTIFIED_RUNTIME_ACTIVE"
+        ? "certified locally"
+        : "upgrade required",
+    runtimeReleaseFingerprint: buildInfo.releaseFingerprint,
+    vercelProjectStatus: "Node 24 pinned",
+    vercelBuildStatus: "preview pending",
     p33IntegratedRoute: p33IntegratedSummary.route,
     p33IntegratedApiRoute: p33IntegratedSummary.apiRoute,
     p33IntegratedStatus: p33IntegratedSummary.status,
@@ -2655,36 +2668,33 @@ export function getProductConsoleSummary() {
   };
 }
 
-const productConsoleApiNestedSummaryAllowlist = new Set([
-  "executionAttemptEnvelopeSummary",
-  "healthcareIntelligenceOSSummary",
-  "healthcareOptimizationCommandSummary",
-  "healthcareValueRealizationSummary",
-  "pilotActivationPlannerSummary",
-  "pilotHandoffCommandSummary",
-  "pilotSuccessReviewCommandSummary",
-  "pilotValueEvidenceSummary",
-  "productionArchitectureSummary",
-  "salesOperationsSummary",
-  "strategicPlatformIntelligenceSummary"
-]);
-
 let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
 
 export function getProductConsoleApiSummary() {
   if (productConsoleApiSummaryCache) return productConsoleApiSummaryCache;
 
   const summary = getProductConsoleSummary();
-  const { companyAssessmentSummary } = summary;
+  const {
+    companyAssessmentSummary,
+    executionAttemptEnvelopeSummary,
+    healthcareIntelligenceOSSummary,
+    healthcareOptimizationCommandSummary,
+    healthcareValueRealizationSummary,
+    pilotActivationPlannerSummary,
+    pilotHandoffCommandSummary,
+    pilotSuccessReviewCommandSummary,
+    pilotValueEvidenceSummary,
+    productionArchitectureSummary,
+    salesOperationsSummary,
+    strategicPlatformIntelligenceSummary
+  } = summary;
   const apiSummary = Object.fromEntries(
-    Object.entries(summary).filter(
-      ([key]) => !key.endsWith("Summary") || productConsoleApiNestedSummaryAllowlist.has(key)
-    )
+    Object.entries(summary).filter(([key]) => !key.endsWith("Summary"))
   );
 
   productConsoleApiSummaryCache = {
     ...apiSummary,
-    payloadProfile: "compact-api-v1",
+    payloadProfile: "compact-api-v2",
     detailRoutes: {
       companyAssessment: companyAssessmentSummary.apiRoute,
       enterpriseBusinessOperations: summary.enterpriseBusinessOpsApiRoute,
@@ -2704,6 +2714,68 @@ export function getProductConsoleApiSummary() {
       hardStopCount: companyAssessmentSummary.hardStopCount,
       boundary: companyAssessmentSummary.boundary,
       detailAvailableAt: companyAssessmentSummary.apiRoute
+    },
+    healthcareOptimizationCommandSummary: {
+      blockedActions: healthcareOptimizationCommandSummary.blockedActions,
+      detailAvailableAt: healthcareOptimizationCommandSummary.apiRoute
+    },
+    healthcareValueRealizationSummary: {
+      blockedActions: healthcareValueRealizationSummary.blockedActions,
+      detailAvailableAt: healthcareValueRealizationSummary.apiRoute
+    },
+    pilotValueEvidenceSummary: {
+      blockedClaims: pilotValueEvidenceSummary.blockedClaims,
+      detailAvailableAt: pilotValueEvidenceSummary.apiRoute
+    },
+    pilotActivationPlannerSummary: {
+      blockedActions: pilotActivationPlannerSummary.blockedActions,
+      detailAvailableAt: pilotActivationPlannerSummary.apiRoute
+    },
+    pilotHandoffCommandSummary: {
+      blockedActions: pilotHandoffCommandSummary.blockedActions,
+      detailAvailableAt: pilotHandoffCommandSummary.apiRoute
+    },
+    pilotSuccessReviewCommandSummary: {
+      blockedClaims: pilotSuccessReviewCommandSummary.blockedClaims,
+      detailAvailableAt: pilotSuccessReviewCommandSummary.apiRoute
+    },
+    productionArchitectureSummary: {
+      readinessAssessment: productionArchitectureSummary.readinessAssessment,
+      modelProviderMesh: productionArchitectureSummary.modelProviderMesh.map(({ name }) => ({
+        name
+      })),
+      detailAvailableAt: productionArchitectureSummary.apiRoute
+    },
+    executionAttemptEnvelopeSummary: {
+      boundary: executionAttemptEnvelopeSummary.boundary,
+      detailAvailableAt: executionAttemptEnvelopeSummary.apiRoute
+    },
+    healthcareIntelligenceOSSummary: {
+      clinicalWorkflowAutomation: {
+        blockedActions: healthcareIntelligenceOSSummary.clinicalWorkflowAutomation.blockedActions
+      },
+      detailAvailableAt: healthcareIntelligenceOSSummary.apiRoute
+    },
+    strategicPlatformIntelligenceSummary: {
+      executionScorecards: strategicPlatformIntelligenceSummary.executionScorecards.map(
+        ({ commandSlug, evidenceState, scoreState }) => ({
+          commandSlug,
+          evidenceState,
+          scoreState
+        })
+      ),
+      recommendedStrategicSequence:
+        strategicPlatformIntelligenceSummary.recommendedStrategicSequence,
+      executionCommands: strategicPlatformIntelligenceSummary.executionCommands.map(({ slug }) => ({
+        slug
+      })),
+      executionBets: strategicPlatformIntelligenceSummary.executionBets.map(({ slug }) => ({ slug })),
+      decisionGates: strategicPlatformIntelligenceSummary.decisionGates.map(({ slug }) => ({ slug })),
+      detailAvailableAt: strategicPlatformIntelligenceSummary.apiRoute
+    },
+    salesOperationsSummary: {
+      authentication: salesOperationsSummary.authentication,
+      detailAvailableAt: salesOperationsSummary.apiRoute
     }
   };
 

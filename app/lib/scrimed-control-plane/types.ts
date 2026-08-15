@@ -286,6 +286,7 @@ export type PlatformGraphNodeType =
   | "connector"
   | "api"
   | "database"
+  | "runtime"
   | "environment"
   | "release"
   | "evidence"

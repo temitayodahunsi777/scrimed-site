@@ -9,8 +9,8 @@
     "failures": [],
     "orphanNodeIds": [],
     "dependencyCycles": [],
-    "nodeCount": 120,
-    "edgeCount": 279
+    "nodeCount": 121,
+    "edgeCount": 282
   },
   "nodes": [
     {
@@ -1368,6 +1368,18 @@
       "syntheticOnly": true,
       "externalAuthorityGranted": false,
       "auditHash": "b6dac555a5567b6860d0e2072245d6dfbecd98b45092c9535a3a50b040122e99"
+    },
+    {
+      "id": "runtime:nodejs-24",
+      "type": "runtime",
+      "label": "Node.js 24 governed application runtime",
+      "owner": "Platform Engineering + Release Steward",
+      "maturity": "repository-pinned-certification-gated",
+      "riskTier": "moderate",
+      "evidenceStatus": "node24-certification-required-per-candidate",
+      "syntheticOnly": true,
+      "externalAuthorityGranted": false,
+      "auditHash": "33d3f7cc6abde7f1cdaacec3d86e42876de762ff3144a6ebff9753bb7959b5ee"
     },
     {
       "id": "release:working-tree-candidate",
@@ -3504,6 +3516,30 @@
       "auditHash": "d7d5c514a3281c7a5b6568f17e32678219a7a12e8e7fc7ca80fdc582a5a8458b"
     },
     {
+      "id": "runtime:nodejs-24:governed_by:policy:synthetic-no-phi-boundary",
+      "from": "runtime:nodejs-24",
+      "to": "policy:synthetic-no-phi-boundary",
+      "relation": "governed_by",
+      "reason": "Runtime changes remain bound to synthetic/no-PHI and release-stage policy.",
+      "auditHash": "1a14beadeee5fa222f23dda5e3ad9f16f83d6b11f5ea982a711b53a14268091c"
+    },
+    {
+      "id": "environment:preview:depends_on:runtime:nodejs-24",
+      "from": "environment:preview",
+      "to": "runtime:nodejs-24",
+      "relation": "depends_on",
+      "reason": "Preview execution must certify the repository-pinned Node.js 24 runtime.",
+      "auditHash": "fb5d3e9bf201086f425af2fce3ae90a9597d8b2040981303a41bdf62f707be2b"
+    },
+    {
+      "id": "environment:protected-pilot:depends_on:runtime:nodejs-24",
+      "from": "environment:protected-pilot",
+      "to": "runtime:nodejs-24",
+      "relation": "depends_on",
+      "reason": "Protected pilots cannot run on an uncertified application runtime.",
+      "auditHash": "28cdc09e75b83260bc48082b1bbc11f1a88f04797877592e089297f06ccc8a4d"
+    },
+    {
       "id": "evidence:deterministic-platform-artifacts:provides_evidence_for:release:working-tree-candidate",
       "from": "evidence:deterministic-platform-artifacts",
       "to": "release:working-tree-candidate",
@@ -3703,6 +3739,7 @@
       "moat": 5,
       "api": 1,
       "database": 1,
+      "runtime": 1,
       "release": 1,
       "evidence": 1,
       "environment": 4,
@@ -3710,13 +3747,13 @@
     },
     "byRelation": {
       "contains": 24,
-      "governed_by": 14,
+      "governed_by": 15,
       "reviewed_by": 26,
       "invokes": 78,
       "routes_to": 28,
       "provides_evidence_for": 36,
       "activated_by": 45,
-      "depends_on": 25,
+      "depends_on": 27,
       "measures": 3
     },
     "unsafeExternalActionPaths": 0,
@@ -3728,5 +3765,5 @@
     "Protected-pilot activation, migration, AAL2, named review, distribution, and deployment remain separate gates.",
     "Graph membership does not establish production maturity, regulatory status, customer adoption, partnership, revenue, or ROI."
   ],
-  "integrityHash": "397d94e93794bfce6c11913e80d9ddd5aa753b4f9b8ec811c36d6fe7cd7ddcbc"
+  "integrityHash": "9ae0571c921315bc00c34437ca71788ec5808788485a1d378dc0f47fb2ad93a1"
 }

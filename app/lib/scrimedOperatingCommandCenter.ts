@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { getScrimedNodeRuntimeStatus } from "./platform/nodeRuntime";
 
 export type ScrimedOperatingDomain =
   | "agent-runtime"
@@ -612,6 +613,7 @@ export function validateScrimedOperatingCommandCenter() {
 
 export function getScrimedOperatingCommandCenterSummary() {
   const validation = validateScrimedOperatingCommandCenter();
+  const runtimeStatus = getScrimedNodeRuntimeStatus();
   const evidencePackets = buildScrimedOperatingEvidencePackets();
   const domainCounts = scrimedOperatingCommandLanes.reduce<Record<ScrimedOperatingDomain, number>>(
     (counts, lane) => {
@@ -639,6 +641,7 @@ export function getScrimedOperatingCommandCenterSummary() {
     apiRoute: scrimedOperatingCommandCenterApiRoute,
     briefRoute: scrimedOperatingCommandCenterBriefRoute,
     boundary: scrimedOperatingCommandCenterBoundary,
+    runtimeStatus,
     laneCount: scrimedOperatingCommandLanes.length,
     p0LaneCount: scrimedOperatingCommandLanes.filter((lane) => lane.priority === "P0").length,
     highControlLaneCount: highControlLanes.length,
@@ -673,6 +676,7 @@ export function buildScrimedOperatingCommandCenterBrief() {
     "",
     `Status: ${summary.status}`,
     `API: ${summary.apiRoute}`,
+    `Runtime: Node ${summary.runtimeStatus.actualNodeMajor ?? "unknown"} (${summary.runtimeStatus.compatibilityStatus})`,
     "",
     "## Boundary",
     summary.boundary,

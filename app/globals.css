@@ -578,6 +578,10 @@ h3 {
   grid-template-columns: 0.95fr 1.05fr;
 }
 
+.split-band > * {
+  min-width: 0;
+}
+
 .layer-list {
   border-top: 1px solid var(--line);
 }
@@ -1720,6 +1724,8 @@ h3 {
 
 .layer-row strong {
   font-size: 20px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .roadmap-band {
@@ -3656,7 +3662,7 @@ h3 {
   .pricing-planner-grid,
   .pricing-scope-summary,
   .scope-authority-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .pricing-input-panel {

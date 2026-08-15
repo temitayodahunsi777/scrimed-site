@@ -8,7 +8,8 @@ const workflowPaths = [
   ".github/workflows/authority-reference-qa-smoke.yml",
   ".github/workflows/sales-demo-session-qa-smoke.yml",
   ".github/workflows/migration-dry-run.yml",
-  ".github/workflows/preview-validation.yml"
+  ".github/workflows/preview-validation.yml",
+  ".github/workflows/node24-certification.yml"
 ];
 const securityWorkflowPaths = [
   ".github/workflows/dependency-review.yml",
@@ -36,7 +37,7 @@ for (const pathname of workflowPaths) {
   requireIncludes(pathname, "permissions:\n  contents: read");
   requireIncludes(pathname, "uses: actions/checkout@v6");
   requireIncludes(pathname, "uses: actions/setup-node@v6");
-  requireIncludes(pathname, "node-version: 22");
+  requireIncludes(pathname, "node-version: 24");
 
   for (const forbidden of [
     "continue-on-error: true",
@@ -83,6 +84,30 @@ for (const pathname of securityWorkflowPaths) {
   for (const forbidden of ["continue-on-error: true", "|| true", "set -x", "printenv", "cat .env", "echo ${{ secrets."]) {
     forbidIncludes(pathname, forbidden);
   }
+}
+
+for (const pathname of [...workflowPaths, ...securityWorkflowPaths]) {
+  forbidIncludes(pathname, "node-version: 22");
+  if (files[pathname].includes("uses: actions/setup-node@v6")) {
+    requireIncludes(pathname, "node-version: 24");
+  }
+}
+
+for (const expected of [
+  "name: Node 24 Certification",
+  "SCRIMED_SYNTHETIC_ONLY: \"true\"",
+  "SCRIMED_ALLOW_PHI: \"false\"",
+  "node scripts/verify-node24-vercel-build.mjs --prebuild",
+  "npm run test:scrimed-p33",
+  "npm run contract:scrimed-p33",
+  "npm run test:nonsecret",
+  "npm run security:secret-scan",
+  "npm run security:sbom",
+  "npm run build",
+  "npm run certify:node24",
+  "npm run integrity"
+]) {
+  requireIncludes(".github/workflows/node24-certification.yml", expected);
 }
 
 for (const expected of [

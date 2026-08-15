@@ -87,7 +87,12 @@ assert.equal(designSystemComponentContracts.length, 18);
 assert.equal(designSystemComponentContracts.every((component) => component.figmaNodeId === null), true);
 assert.equal(buildInvestorDemoRunOfShow("diligence-walkthrough").durationSeconds, 1800);
 const productConsoleApiSummary = getProductConsoleApiSummary();
-assert.equal(productConsoleApiSummary.payloadProfile, "compact-api-v1");
+assert.equal(productConsoleApiSummary.payloadProfile, "compact-api-v2");
+assert.ok(
+  productConsoleApiSummary.healthcareOptimizationCommandSummary.blockedActions.includes(
+    "live PHI processing"
+  )
+);
 assert.ok(Buffer.byteLength(JSON.stringify(productConsoleApiSummary)) < 1_000_000);
 assert.equal(getProductConsoleApiSummary(), productConsoleApiSummary);
 assert.equal(productConsoleApiSummary.companyAssessmentSummary.detailAvailableAt, "/api/company-assessment");

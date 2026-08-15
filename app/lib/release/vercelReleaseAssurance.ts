@@ -4,10 +4,19 @@ import {
   resolveScrimedOperatingMode,
   validateScrimedOperatingMode
 } from "../operatingMode";
+import {
+  getScrimedNodeRuntimeStatus,
+  scrimedNodeRuntimeBoundary,
+  scrimedNodeRuntimeTarget
+} from "../platform/nodeRuntime";
+import {
+  p33DecisionEvidenceLedgerVersion
+} from "../scrimed-p33/decisionEvidenceLedger";
+import { p33PortableAgentContractVersion } from "../scrimed-p33/agentPortability";
 import { scrimedSafetyPolicyVersion } from "../scrimedSafetyGovernance";
 
 export const vercelReleaseAssuranceVersion =
-  "scrimed-vercel-release-assurance-v1-2026-08-12";
+  "scrimed-vercel-release-assurance-v2-2026-08-14";
 
 export const vercelReleaseAssuranceBoundary =
   "Safe operational metadata only. These endpoints expose no secret values, credentials, tenant data, PHI, deployment authorization, migration approval, customer activation, certification, or production claim.";
@@ -59,15 +68,28 @@ function publicBuildTimestamp(env: NodeJS.ProcessEnv) {
   return value && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : null;
 }
 
-export function getScrimedBuildInfo(env: NodeJS.ProcessEnv = process.env) {
+export function getScrimedBuildInfo(
+  env: NodeJS.ProcessEnv = process.env,
+  runtimeVersion = process.versions.node
+) {
+  const runtime = getScrimedNodeRuntimeStatus({ env, runtimeVersion });
+  const commit = publicCommitSha(env);
   const base = {
     service: "scrimed-build-info" as const,
     version: vercelReleaseAssuranceVersion,
-    commitSha: publicCommitSha(env),
+    runtime: runtime.runtime,
+    nodeMajor: runtime.actualNodeMajor,
+    nodeTarget: scrimedNodeRuntimeTarget.engineRange,
+    packageManager: scrimedNodeRuntimeTarget.packageManager,
+    lockfileVersion: scrimedNodeRuntimeTarget.lockfileVersion,
+    nextVersion: "16.2.12" as const,
+    commit,
+    commitSha: commit,
     buildTimestamp: publicBuildTimestamp(env),
     environment: releaseEnvironment(env),
     project: env.VERCEL_PROJECT_PRODUCTION_URL ? "scrimed-site" : "local-unbound",
-    candidateBound: Boolean(publicCommitSha(env)),
+    candidateBound: Boolean(commit),
+    runtimeCompatibilityStatus: runtime.compatibilityStatus,
     productionReleaseAuthorized: false as const,
     customerActivationAuthorized: false as const
   };
@@ -75,7 +97,8 @@ export function getScrimedBuildInfo(env: NodeJS.ProcessEnv = process.env) {
   return {
     ...base,
     releaseFingerprint: sha256(base),
-    boundary: vercelReleaseAssuranceBoundary
+    runtimeFingerprint: runtime.runtimeFingerprint,
+    boundary: `${vercelReleaseAssuranceBoundary} ${scrimedNodeRuntimeBoundary}`
   };
 }
 
@@ -83,9 +106,12 @@ function flagEnabled(env: NodeJS.ProcessEnv, key: string) {
   return env[key]?.trim().toLowerCase() === "true";
 }
 
-export function getScrimedHealth(env: NodeJS.ProcessEnv = process.env) {
+export function getScrimedHealth(
+  env: NodeJS.ProcessEnv = process.env,
+  runtimeVersion = process.versions.node
+) {
   const operatingMode = resolveScrimedOperatingMode(env);
-  const build = getScrimedBuildInfo(env);
+  const build = getScrimedBuildInfo(env, runtimeVersion);
 
   return {
     ok: true,
@@ -93,6 +119,9 @@ export function getScrimedHealth(env: NodeJS.ProcessEnv = process.env) {
     status: "healthy" as const,
     version: vercelReleaseAssuranceVersion,
     environment: build.environment,
+    runtime: build.runtime,
+    nodeMajor: build.nodeMajor,
+    runtimeCompatibilityStatus: build.runtimeCompatibilityStatus,
     releaseFingerprint: build.releaseFingerprint,
     operatingMode: operatingMode.syntheticOnly ? "synthetic-no-phi" : "invalid-review-required",
     productionReleaseAuthorized: false as const,
@@ -100,9 +129,13 @@ export function getScrimedHealth(env: NodeJS.ProcessEnv = process.env) {
   };
 }
 
-export function getScrimedReleaseReadiness(env: NodeJS.ProcessEnv = process.env) {
+export function getScrimedReleaseReadiness(
+  env: NodeJS.ProcessEnv = process.env,
+  runtimeVersion = process.versions.node
+) {
   const operatingMode = resolveScrimedOperatingMode(env);
   const operatingModeValidation = validateScrimedOperatingMode(operatingMode);
+  const runtime = getScrimedNodeRuntimeStatus({ env, runtimeVersion });
   const protectedStoreRequested =
     flagEnabled(env, "SCRIMED_EXECUTION_ATTEMPT_DURABLE_STORE_ENABLED") ||
     flagEnabled(env, "SCRIMED_WORK_DURABLE_STORE_ENABLED") ||
@@ -122,6 +155,14 @@ export function getScrimedReleaseReadiness(env: NodeJS.ProcessEnv = process.env)
       detail: "Next.js release assurance initialized."
     },
     {
+      id: "node24-runtime-certified",
+      status: runtime.certified ? "pass" : "fail",
+      mandatory: true,
+      detail: runtime.certified
+        ? "Node.js 24 runtime matches the repository and Vercel target."
+        : `Runtime major ${runtime.actualNodeMajor ?? "unknown"} does not match required major 24.`
+    },
+    {
       id: "operating-mode-safe",
       status: operatingModeValidation.valid ? "pass" : "fail",
       mandatory: true,
@@ -134,6 +175,18 @@ export function getScrimedReleaseReadiness(env: NodeJS.ProcessEnv = process.env)
       status: scrimedSafetyPolicyVersion ? "pass" : "fail",
       mandatory: true,
       detail: `Policy engine ${scrimedSafetyPolicyVersion || "missing"}.`
+    },
+    {
+      id: "evidence-subsystem-initialized",
+      status: p33DecisionEvidenceLedgerVersion ? "pass" : "fail",
+      mandatory: true,
+      detail: `Decision evidence subsystem ${p33DecisionEvidenceLedgerVersion || "missing"}.`
+    },
+    {
+      id: "model-router-initialized",
+      status: p33PortableAgentContractVersion ? "pass" : "fail",
+      mandatory: true,
+      detail: `Provider-neutral route contract ${p33PortableAgentContractVersion || "missing"}.`
     },
     {
       id: "forbidden-capabilities-disabled",
@@ -159,7 +212,7 @@ export function getScrimedReleaseReadiness(env: NodeJS.ProcessEnv = process.env)
     }
   ];
   const failed = checks.filter((check) => check.mandatory && check.status !== "pass");
-  const build = getScrimedBuildInfo(env);
+  const build = getScrimedBuildInfo(env, runtimeVersion);
 
   return {
     ok: failed.length === 0,
@@ -169,6 +222,7 @@ export function getScrimedReleaseReadiness(env: NodeJS.ProcessEnv = process.env)
     checks,
     failedCheckIds: failed.map((check) => check.id),
     operatingMode,
+    runtime,
     build,
     databaseProbeExecuted: false as const,
     productionReleaseAuthorized: false as const,

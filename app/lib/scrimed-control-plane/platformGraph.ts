@@ -238,6 +238,15 @@ const infrastructureNodes = [
     evidenceStatus: "static-migration-review-only"
   }),
   node({
+    id: "runtime:nodejs-24",
+    type: "runtime",
+    label: "Node.js 24 governed application runtime",
+    owner: "Platform Engineering + Release Steward",
+    maturity: "repository-pinned-certification-gated",
+    riskTier: "moderate",
+    evidenceStatus: "node24-certification-required-per-candidate"
+  }),
+  node({
     id: "release:working-tree-candidate",
     type: "release",
     label: "Working-tree follow-on candidate",
@@ -352,6 +361,9 @@ const metricEdges = strategicMetricRegistry.map((metric) =>
 const infrastructureEdges: PlatformGraphEdge[] = [
   edge("api:scrimed-control-plane", "capability:trust-evidence-control", "routes_to", "The API exposes the control-plane read model and guarded commands."),
   edge("database:scrimed-durable-store", policyNode.id, "governed_by", "Persistence remains tenant-scoped and migration-authorized."),
+  edge("runtime:nodejs-24", policyNode.id, "governed_by", "Runtime changes remain bound to synthetic/no-PHI and release-stage policy."),
+  edge("environment:preview", "runtime:nodejs-24", "depends_on", "Preview execution must certify the repository-pinned Node.js 24 runtime."),
+  edge("environment:protected-pilot", "runtime:nodejs-24", "depends_on", "Protected pilots cannot run on an uncertified application runtime."),
   edge("evidence:deterministic-platform-artifacts", "release:working-tree-candidate", "provides_evidence_for", "Generated artifacts describe the exact working-tree candidate until committed."),
   edge("connector:synthetic-healthcare-adapters", policyNode.id, "governed_by", "Connector write authority and production data remain disabled."),
   edge("capability:data-interoperability-fabric", "connector:synthetic-healthcare-adapters", "invokes", "The interoperability fabric may use only scoped synthetic adapters."),

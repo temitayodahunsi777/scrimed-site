@@ -11,6 +11,18 @@ export type ScrimedErrorCategory =
   | "INTERNAL"
   | "UNKNOWN";
 
+export type ScrimedOperationalErrorCategory =
+  | "SYSTEM"
+  | "AUTH"
+  | "POLICY"
+  | "DATABASE"
+  | "MODEL"
+  | "AGENT"
+  | "CONNECTOR"
+  | "VALIDATION"
+  | "RATE_LIMIT"
+  | "EXTERNAL_SERVICE";
+
 export type SafeErrorDescriptor = {
   category: ScrimedErrorCategory;
   code: string;
@@ -40,4 +52,18 @@ export function classifyHttpError(status: number): SafeErrorDescriptor {
   if (status === 429) return { category: "RATE_LIMIT", code: "RATE_LIMITED", retryable: true };
   if (status >= 500) return { category: "INTERNAL", code: "SERVER_FAILURE", retryable: true };
   return { category: "UNKNOWN", code: "UNCLASSIFIED_ERROR", retryable: false };
+}
+
+export function toOperationalErrorCategory(
+  category: ScrimedErrorCategory | null
+): ScrimedOperationalErrorCategory | null {
+  if (category === null) return null;
+  if (category === "AUTHENTICATION" || category === "AUTHORIZATION") return "AUTH";
+  if (category === "POLICY_DENIAL") return "POLICY";
+  if (category === "VALIDATION") return "VALIDATION";
+  if (category === "RATE_LIMIT") return "RATE_LIMIT";
+  if (category === "PROVIDER") return "MODEL";
+  if (category === "TOOL") return "AGENT";
+  if (category === "DEPENDENCY") return "EXTERNAL_SERVICE";
+  return "SYSTEM";
 }
