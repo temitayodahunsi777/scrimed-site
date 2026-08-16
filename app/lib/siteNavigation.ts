@@ -220,6 +220,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     boundary: "Synthetic/no-PHI decision support only; no autonomous clinical care, provider calls, payer submission, EHR writeback, PHI-capable pilot, Linux local-agent pilot, production promotion, or external distribution."
   },
   {
+    label: "p.34 Adaptive Governance",
+    href: "/scrimed-p34",
+    description: "Vendor-neutral capability admission, deterministic-first routing, provenance, DICOM privacy, contemporaneous evidence, quality ratchets, FinOps, and operator accountability.",
+    boundary: "Synthetic/no-PHI controls only; no provider calls, live clinical care, PHI, DICOM export, payer submission, EHR/device mutation, deployment, customer activation, or external distribution."
+  },
+  {
     label: "Automation Autopilot",
     href: "/scrimed-automation-autopilot",
     description: "Automation control plane for autonomy scoring, approval routing, bottleneck workarounds, and review-gated service execution.",
@@ -356,6 +362,7 @@ export const siteNavigationSections: SiteNavigationSection[] = [
       { label: "Clinical Assurance", href: "/clinical-assurance-control-plane", description: "Inspect CAL resolution, sovereign enclaves, exact model passports, capacity and concentration admission, kill switches, worst-cell evidence, and independent fallback." },
       { label: "PayerIQ Workbench", href: "/documentation-before-authorization", description: "Interactive synthetic documentation completeness, evidence-gap, reviewer-queue, and no-submission workflow for prior-authorization teams." },
       { label: "Intelligence Control Plane", href: "/scrimed-control-plane", description: "Unified executive control plane for agent, skill, workflow, context, model, benchmark, capital, compute, outcome, and audit governance." },
+      { label: "p.34 Adaptive Governance", href: "/scrimed-p34", description: "Inspect deterministic-first routing, capability admission, provenance, synthetic DICOM privacy, quality, task economics, operator ownership, and retained gates." },
       { label: "Automation Autopilot", href: "/scrimed-automation-autopilot", description: "Automation control for safe autonomy modes, human approval gates, bottleneck workarounds, proof routes, and no-production-authority decisions." },
       { label: "Workarounds", href: "/limitations-workarounds", description: "Safe alternatives for blocked issues, hard limits, and retained gates." },
       { label: "Service Delivery", href: "/service-delivery", description: "Scoped work orders, artifacts, acceptance criteria, and delivery gates." },

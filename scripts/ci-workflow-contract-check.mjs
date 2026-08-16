@@ -110,6 +110,8 @@ for (const expected of [
   "node scripts/verify-node24-vercel-build.mjs --prebuild",
   "npm run test:scrimed-p33",
   "npm run contract:scrimed-p33",
+  "npm run test:scrimed-p34",
+  "npm run contract:scrimed-p34",
   "npm run test:nonsecret",
   "npm audit --audit-level=high",
   "npm run security:dependency-floor",

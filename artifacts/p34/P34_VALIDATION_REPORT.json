@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "scrimed-p34-validation-report-v1",
+  "scope": "deterministic synthetic p.34 domain contracts",
+  "generatedAt": "2026-08-15T00:00:00.000Z",
+  "status": "PASS",
+  "checkCount": 12,
+  "passedCount": 12,
+  "failedCount": 0,
+  "checks": [
+    {
+      "id": "capability-registry-integrity",
+      "passed": true,
+      "evidence": "ff08b8a79cbce52c7ad07b5277df40a68befe321f2cd2bbebe50db60a850429a"
+    },
+    {
+      "id": "unknown-capability-default-deny",
+      "passed": true,
+      "evidence": "scrimed-p34-adaptive-governance-v1-2026-08-15"
+    },
+    {
+      "id": "deterministic-first-route",
+      "passed": true,
+      "evidence": "06208793bc2ee50a4fb0c760c3811267f23273e493846a6d154eab9126be913f"
+    },
+    {
+      "id": "context-provenance-and-conflict-retention",
+      "passed": true,
+      "evidence": "30a540d48a997befe730f761e68631a6178772debffe5194da54daf213f94413"
+    },
+    {
+      "id": "grounded-claims",
+      "passed": true,
+      "evidence": "9053d641fd970a1e51f95cab2c06257777f31ff9996fd4ed76abb0ee8b214505"
+    },
+    {
+      "id": "dicom-export-fails-closed",
+      "passed": true,
+      "evidence": "527afeac0c85221402e8d86e37960e29fc9e32c9e47d83a80937cc1fbd8cfb6a"
+    },
+    {
+      "id": "governance-chain",
+      "passed": true,
+      "evidence": "b96f3b7e480267dafa2ccfd1a3c5e5cd7a8bcd31f7cd1d127ae28161410b97e8"
+    },
+    {
+      "id": "quality-no-auto-promotion",
+      "passed": true,
+      "evidence": "a7aa1b8ba0cff4b4ca548dec6bea645e7e2865d8fa5f65d10639b5e90694ef80"
+    },
+    {
+      "id": "task-level-economics",
+      "passed": true,
+      "evidence": "b561663482fc74ee39e2b6603b73afd60cd6e91e185d1740e141cf2a5b199cbb"
+    },
+    {
+      "id": "offline-placement",
+      "passed": true,
+      "evidence": "4b38f3ff2da3f778ba02c70100f47ba6d31d17300f7486e82b321e38b089ff66"
+    },
+    {
+      "id": "high-risk-flags-default-off",
+      "passed": true,
+      "evidence": "five high-risk flags disabled"
+    },
+    {
+      "id": "release-authority-retained",
+      "passed": true,
+      "evidence": "1fc1c07fc8361effd5052388f760d5d4c1aac0404e8612c217e81b7173c825fc"
+    }
+  ],
+  "externalEvidenceVerified": false,
+  "productionAuthorityGranted": false,
+  "summaryHash": "1fc1c07fc8361effd5052388f760d5d4c1aac0404e8612c217e81b7173c825fc"
+}

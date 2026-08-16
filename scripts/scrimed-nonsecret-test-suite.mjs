@@ -993,6 +993,29 @@ const checks = [
     ]
   },
   {
+    label: "SCRIMED p.34 adaptive governance policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-adaptive-governance-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 adaptive governance contract",
+    args: ["scripts/scrimed-p34-adaptive-governance-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.34 artifact integrity",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-artifacts.mjs",
+      "--check"
+    ]
+  },
+  {
     label: "Vercel preview evidence verifier policy",
     args: ["scripts/verify-vercel-preview.mjs", "--self-test"]
   },

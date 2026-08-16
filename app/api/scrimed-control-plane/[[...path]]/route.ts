@@ -16,6 +16,7 @@ import {
 import {
   buildControlPlaneBrief,
   buildP33IntegratedBrief,
+  buildP34AdaptiveGovernanceBrief,
   consequenceBenchCases,
   controlPlaneAgentRegistry,
   controlPlaneHeaders,
@@ -27,6 +28,7 @@ import {
   getComputeResilienceSummary,
   getControlPlaneSummary,
   getP33IntegratedSummary,
+  getP34AdaptiveGovernanceSummary,
   getCrossPlatformEvidenceSummary,
   getOutcomeIntelligenceSummary,
   getScrimedPlatformGraph,
@@ -180,6 +182,40 @@ export async function GET(request: Request, context: RouteContext) {
   }
   if (endpoint === "p33/assurance") {
     return json(getP33IntegratedSummary().continuousAssurance, "control-plane-p33-continuous-assurance");
+  }
+  if (endpoint === "p34") {
+    return json(getP34AdaptiveGovernanceSummary(), "control-plane-p34-adaptive-governance");
+  }
+  if (endpoint === "p34/brief") {
+    return new NextResponse(buildP34AdaptiveGovernanceBrief(), {
+      headers: {
+        "Content-Disposition": 'attachment; filename="scrimed-p34-adaptive-governance.md"',
+        "Content-Type": "text/markdown; charset=utf-8",
+        ...controlPlaneHeaders({ "X-SCRIMED-P34": "synthetic-human-review-required" })
+      }
+    });
+  }
+  if (endpoint === "p34/registry") {
+    return json(getP34AdaptiveGovernanceSummary().registry, "control-plane-p34-registry");
+  }
+  if (endpoint === "p34/operations") {
+    return json(getP34AdaptiveGovernanceSummary().operations, "control-plane-p34-operations");
+  }
+  if (endpoint === "p34/context") {
+    return json(getP34AdaptiveGovernanceSummary().context, "control-plane-p34-context");
+  }
+  if (endpoint === "p34/dicom-privacy") {
+    return json(getP34AdaptiveGovernanceSummary().dicomPrivacy, "control-plane-p34-dicom-privacy");
+  }
+  if (endpoint === "p34/assurance") {
+    const summary = getP34AdaptiveGovernanceSummary();
+    return json({
+      gateMatrix: summary.gateMatrix,
+      gateCounts: summary.gateCounts,
+      governance: summary.governance.verification,
+      evaluation: summary.evaluation,
+      boundary: summary.boundary
+    }, "control-plane-p34-assurance");
   }
 
   return failure("control_plane_route_not_found", "SCRIMED control-plane route was not found.", endpoint || "root", 404);

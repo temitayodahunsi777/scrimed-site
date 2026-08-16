@@ -27,6 +27,7 @@ import { getPlatformStrategySummary } from "./platformStrategy";
 import { getStrategicDecisionIntelligenceSummary } from "./strategicDecisionIntelligence";
 import { getTrustReadinessSummary } from "./trustReadiness";
 import { getP33IntegratedSummary } from "../scrimed-p33/index";
+import { getP34AdaptiveGovernanceSummary } from "../scrimed-p34/index";
 
 export * from "./types";
 export * from "./featureFlags";
@@ -46,6 +47,7 @@ export * from "./platformStrategy";
 export * from "./strategicDecisionIntelligence";
 export * from "./trustReadiness";
 export * from "../scrimed-p33/index";
+export * from "../scrimed-p34/index";
 
 export const controlPlaneRoute = "/scrimed-control-plane";
 export const controlPlaneApiRoute = "/api/scrimed-control-plane";
@@ -102,6 +104,7 @@ export function getControlPlaneSummary() {
     calculationsChanged: false
   });
   const p33 = getP33IntegratedSummary();
+  const p34 = getP34AdaptiveGovernanceSummary();
 
   return {
     service: "scrimed-intelligence-control-plane",
@@ -161,6 +164,7 @@ export function getControlPlaneSummary() {
     trustReadiness: getTrustReadinessSummary(),
     strategicDecisionIntelligence: getStrategicDecisionIntelligenceSummary(),
     p33,
+    p34,
     voiceSimulation: work.voiceSimulation,
     capitalIntelligence: getCapitalIntelligenceSummary(),
     computeResilience: getComputeResilienceSummary(),
@@ -223,6 +227,8 @@ export function buildControlPlaneBrief() {
     `- Trust score: ${summary.verification.trustScore.total}`,
     `- Objective drift detected: ${summary.reasoningObservatory.objectiveDriftFlags.length > 0}`,
     `- ConsequenceBench status: ${summary.consequenceBench.evaluationStatus}`,
+    `- p.34 deterministic route: ${summary.p34.taskRoute.selectedTechnique ?? "safe refusal"}`,
+    `- p.34 governance chain valid: ${summary.p34.governance.verification.valid}`,
     `- Cross-platform release blockers: ${summary.platformEvidence.summary.blockedProviderCount}`,
     `- Platform capabilities: ${summary.platformStrategy.capabilityCount} across ${summary.platformStrategy.platformPlanes.length} planes`,
     `- Capability registry valid: ${summary.platformStrategy.validation.valid}`,

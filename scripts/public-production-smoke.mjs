@@ -11587,6 +11587,10 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /scrimed-p33 in smoke-covered HTML routes.");
   }
 
+  if (!body.smokeCoveredHtmlRoutes.includes("/scrimed-p34")) {
+    throw new Error("Navigation Audit expected /scrimed-p34 in smoke-covered HTML routes.");
+  }
+
   if (!body.smokeCoveredHtmlRoutes.includes("/limitations-workarounds")) {
     throw new Error("Navigation Audit expected /limitations-workarounds in smoke-covered HTML routes.");
   }
@@ -15839,6 +15843,7 @@ await checkHtml("/scrimed-os");
 await checkHtml("/scrimed-intelligence-platform");
 await checkHtml("/scrimed-work");
 await checkHtml("/scrimed-p33");
+await checkHtml("/scrimed-p34");
 await checkHtml("/scrimed-agent-governance");
 await checkHtml("/scrimed-reasoning-stability");
 await checkHtml("/scrimed-clinical-benchmark-suite");
