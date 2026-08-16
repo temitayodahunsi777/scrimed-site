@@ -24,7 +24,8 @@ flowchart LR
   L --> E["Trace-to-Eval Foundry"]
   E --> T["Synthetic ClinicalTrajectory Lab"]
   T --> O["Oversight Drift Sentinel"]
-  O --> Q["Release gate matrix"]
+  O --> Q["Continuous Assurance quality ratchet"]
+  Q --> Z["G21-G25 and separate readiness decisions"]
 ```
 
 ## Context Fabric
@@ -96,6 +97,12 @@ Every module declares a feature flag, typed workflow, evidence requirements, ope
 
 Restricted profiles have no bypass flag. Unsafe environment variables are ignored by the feature-flag resolver and the profile gate remains authoritative.
 
+## Continuous Assurance
+
+`app/lib/scrimed-p33/continuousAssurance.ts` adds one policy and evidence extension to the existing p.33 control plane. It separates tool discovery from authorization, binds approvals to the exact actor/candidate/action/arguments/target/policy/expiry, enforces tenant and filesystem/network scope, and blocks PHI, production targets, stale evidence, self-approval, and consequential execution in this local candidate.
+
+The same module validates materially independent provider failover, applies a hard-floor and worst-cell quality ratchet, evaluates a typed pilot value contract, tracks G21-G25 with evidence age and expiry, and reports local, controlled non-PHI, Linux non-PHI, PHI-capable, and production/customer readiness independently. See `docs/assurance/CONTINUOUS_ASSURANCE_AND_PILOT_READINESS.md`.
+
 ## Feature Flags
 
 Safe local controls default on:
@@ -134,6 +141,7 @@ High-risk and external capabilities remain off:
 - Evidence: `/api/scrimed-control-plane/p33/evidence`
 - Opportunities: `/api/scrimed-control-plane/p33/opportunities`
 - Pilot profiles: `/api/scrimed-control-plane/p33/pilots`
+- Continuous assurance: `/api/scrimed-control-plane/p33/assurance`
 
 ## Operations And Rollback
 
@@ -149,6 +157,6 @@ No production migration is introduced by p.33. Existing unapplied migrations ret
 
 The final pre-commit candidate pass verifies the deterministic p.33 policy and contract suites, full nonsecret suite, typecheck, lint, production build, generated integrity, secret scan, SBOM, public-release contracts, and `git diff --check`. The built p.33 page was also inspected at 1280px and 390px without horizontal overflow or browser console warnings.
 
-All six p.33 control-plane endpoints and the Product Console endpoint returned HTTP 200 from the local production build. The Product Console payload measured 775,065 bytes, preserving the existing compact aggregation approach rather than embedding full p.33 domain payloads.
+The p.33 control plane exposes seven logical endpoints, including continuous assurance. Final-candidate validation must recheck each endpoint and the Product Console from the final production build; the compact Product Console must not embed the full p.33 domain payload.
 
 The rendered 12-slide internal investor artifact has SHA-256 `b042b32834de48bceb337d8b33fe14242ca7bff8869722ca41e096b75999b4b9`. Automated structure, prohibited-claim, boundary, and overflow checks pass. External distribution remains explicitly unauthorized pending founder, counsel, and finance review of that exact artifact.

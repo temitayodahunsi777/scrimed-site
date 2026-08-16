@@ -440,3 +440,225 @@ export type PilotProfileEvaluation = {
   liveClinicalOperationAllowed: false;
   integrityHash: string;
 };
+
+export type ContinuousAssuranceGateId = "G21" | "G22" | "G23" | "G24" | "G25";
+
+export type ContinuousAssuranceGateRecord = {
+  gateId: ContinuousAssuranceGateId;
+  key: string;
+  description: string;
+  status: P33GateStatus;
+  ownerRole: string;
+  requiredEvidence: string[];
+  observedEvidence: string[];
+  reasonCodes: string[];
+  candidateHash: string;
+  evidenceAgeHours: number | null;
+  expiresAt: string | null;
+  remediationSteps: string[];
+  evidenceDigest: string;
+};
+
+export type AgentActionClass = "read" | "write" | "consequential";
+
+export type AgentActionApproval = {
+  approvalId: string;
+  nonce: string;
+  idempotencyKey: string;
+  approverIdHash: string;
+  actorIdHash: string;
+  tenantId: string;
+  candidateHash: string;
+  actionId: string;
+  argumentsHash: string;
+  target: string;
+  policyVersion: string;
+  disposition: "approved" | "rejected";
+  issuedAt: string;
+  expiresAt: string;
+};
+
+export type AgentActionPolicyRequest = {
+  actionId: string;
+  approvalNonce: string;
+  idempotencyKey: string;
+  tenantId: string;
+  actorIdHash: string;
+  candidateHash: string;
+  policyVersion: string;
+  toolId: string;
+  actionClass: AgentActionClass;
+  argumentsHash: string;
+  target: string;
+  environment: "local" | "test" | "preview" | "production";
+  mode: "dry-run" | "shadow" | "execute";
+  dataClassification: ContextDataClassification;
+  networkDestinations: string[];
+  filesystemPaths: string[];
+};
+
+export type AgentActionAuthorization = {
+  tenantId: string;
+  candidateHash: string;
+  authorizedToolIds: string[];
+  allowedNetworkDestinations: string[];
+  allowedFilesystemRoots: string[];
+  expiresAt: string;
+};
+
+export type AgentActionPolicyDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  discoveryGrantsAuthority: false;
+  dryRunRequired: boolean;
+  externalExecutionAuthorized: false;
+  humanApprovalRequired: boolean;
+  policyReceiptHash: string;
+};
+
+export type ProviderDependencyFootprint = {
+  providerId: string;
+  controllingCorporateFamily: string;
+  cloud: string;
+  region: string;
+  acceleratorPool: string;
+  identityProvider: string;
+  network: string;
+  safetyTier: number;
+  privacyTier: number;
+  jurisdiction: string;
+  eligible: boolean;
+};
+
+export type ProviderFailoverDecision = {
+  decision: PolicyDecision;
+  primaryProviderId: string;
+  fallbackProviderId: string | null;
+  sharedMaterialDependencies: string[];
+  reasonCodes: string[];
+  silentDowngradeAllowed: false;
+  providerCallExecuted: false;
+  evidenceHash: string;
+};
+
+export type QualityRatchetScore = {
+  taskQuality: number;
+  severeErrorRate: number;
+  unauthorizedActionRate: number;
+  grounding: number;
+  costPerCompletedTaskUsd: number;
+  p95LatencyMs: number;
+};
+
+export type QualityRatchetDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  hardFloorsPassed: boolean;
+  qualityNonRegressionPassed: boolean;
+  softRegressionApprovalRequired: boolean;
+  automaticPromotionAllowed: false;
+  eligibleForIndependentReview: boolean;
+  decisionHash: string;
+};
+
+export type PilotValueRealizationContract = {
+  contractId: string;
+  tenantId: string;
+  workflow: string;
+  baseline: string;
+  comparator: string;
+  intendedUser: string;
+  businessOwnerRole: string;
+  clinicalOwnerRole: string | null;
+  measurementWindow: string;
+  successThresholds: string[];
+  safetyStopThresholds: string[];
+  rollbackCriteria: string[];
+  costAndCapacityMetrics: string[];
+  adoptionAndTrainingPlan: string[];
+  affectedSystems: string[];
+  exitAndExportPlan: string[];
+  approvedByActorHashes: string[];
+};
+
+export type PilotReadinessProfileId =
+  | "LOCAL_TECHNICAL_CANDIDATE"
+  | "CONTROLLED_NON_PHI_PILOT"
+  | "LINUX_NON_PHI_PILOT"
+  | "PHI_CAPABLE_PILOT"
+  | "PRODUCTION_CUSTOMER_GO_LIVE";
+
+export type PilotReadinessDecision = {
+  profileId: PilotReadinessProfileId;
+  status: P33GateStatus;
+  reasonCodes: string[];
+  requiredEvidence: string[];
+  livePhiAllowed: false;
+  clinicalActionAllowed: false;
+  deploymentAuthorized: false;
+  customerActivationAuthorized: false;
+  decisionHash: string;
+};
+
+export type ContinuousAssuranceDecisionRecord = {
+  eventId: string;
+  occurredAt: string;
+  tenantId: string;
+  workspaceId: string;
+  operatingMode: "synthetic-development" | "controlled-non-phi-pilot";
+  actorType: "human" | "agent" | "service";
+  actorIdentityHash: string;
+  authority: string[];
+  authorizedScope: string[];
+  policyVersion: string;
+  inputClassifications: ContextDataClassification[];
+  model: {
+    providerId: string;
+    modelId: string;
+    harnessId: string;
+    version: string;
+    reasoningEffort: "low" | "standard" | "high";
+  };
+  promptConfigHash: string;
+  toolSchemaHashes: string[];
+  retrievedSources: Array<{
+    sourceId: string;
+    sourceHash: string;
+    page: number | null;
+    span: string;
+  }>;
+  proposedToolCalls: string[];
+  executedToolCalls: string[];
+  executionScope: {
+    filesystemRoots: string[];
+    networkDestinations: string[];
+    sandboxId: string;
+  };
+  approval: {
+    approvalId: string | null;
+    disposition: "not-required" | "pending" | "approved" | "rejected";
+    reviewerIdHash: string | null;
+  };
+  outputHash: string | null;
+  finalDisposition: "allowed" | "blocked" | "review-required" | "failed" | "verified";
+  safetyChecks: string[];
+  reviewerOverrides: string[];
+  rollbackOrCompensation: string[];
+  metrics: {
+    latencyMs: number;
+    inputTokens: number;
+    outputTokens: number;
+    costUsd: number;
+    cacheHit: boolean;
+  };
+  retentionPolicy: {
+    policyId: string;
+    expiresAt: string;
+    legalHold: boolean;
+  };
+  previousRecordHash: string | null;
+  containsRawPhi: false;
+  containsSecrets: false;
+  hiddenChainOfThoughtStored: false;
+  evidenceDigest: string;
+};

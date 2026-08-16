@@ -6,6 +6,8 @@ Candidate binding: generated source manifest and release tooling must replace th
 
 The candidate integrates one p.33 layer into the existing SCRIMED control plane. It does not create a competing runtime, policy engine, model registry, or audit system. The implementation composes existing p.32 context, governance, agent, model qualification, imaging, oncology, network, Product Console, claims, evidence, release, and observability controls.
 
+The continuous-assurance delta adds G21-G25, exact action/approval binding, materially independent failover, a hard-floor quality ratchet, a typed pilot value contract, an enriched no-PHI evidence record, and five separate readiness decisions. It adds no dependency, migration, external provider, or consequential execution path.
+
 ## Risk Classification
 
 Overall: high review significance, low current operational blast radius.
@@ -36,6 +38,8 @@ Security/privacy reviewer:
 - Local worker filesystem/network/tool/resource controls
 - Restricted pilot bypass resistance
 - Decision-ledger tamper evidence
+- Exact action, argument, target, tenant, policy, candidate, and expiry binding
+- G24 stale-evidence and candidate-mismatch rejection
 
 Claims/legal reviewer:
 
@@ -48,6 +52,8 @@ Platform reviewer:
 
 - Provider-neutral route policy
 - Safe refusal and fallback behavior
+- Material independence across controlling family, cloud, region, accelerator, identity, network, and jurisdiction
+- G21/G25 failover and exitability evidence
 - Product Console and control-plane payload impact
 - Feature-flag defaults and rollback
 
@@ -67,11 +73,12 @@ Founder/counsel/finance:
 - Typecheck, lint, production build, generated integrity, secret scan, SBOM
 - Public smoke and desktop/390px browser checks
 - Exact candidate/review/gate fingerprints
+- G21-G25 evidence digest, age, expiry, owner, and remediation records
 
 ## Measured Local Surface
 
 - `/scrimed-p33`: rendered at 1280px and 390px with no horizontal overflow or console warnings.
-- Six p.33 control-plane endpoints: HTTP 200 from the local production build.
+- Seven logical p.33 control-plane endpoints, including `/api/scrimed-control-plane/p33/assurance`: local production verification required against the final source mutation.
 - `/api/product/console`: HTTP 200, 775,065-byte response, retaining compact p.33 summary fields.
 - Internal investor deck: 12 slides, SHA-256 `b042b32834de48bceb337d8b33fe14242ca7bff8869722ca41e096b75999b4b9`; strict automated review passed.
 

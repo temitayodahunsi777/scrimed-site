@@ -11,11 +11,12 @@ const gateMatrixPath = "artifacts/p33/P33_GATE_MATRIX.json";
 const validationReportPath = "artifacts/p33/P33_VALIDATION_REPORT.json";
 
 const gateMatrix = {
-  schemaVersion: "scrimed-p33-gate-matrix-v1",
+  schemaVersion: "scrimed-p33-gate-matrix-v2",
   candidateBinding: "generated-before-final-candidate-fingerprint-use-release-tooling-for-exact-binding",
   statusesAllowed: ["PASS", "OPERATOR_REQUIRED", "BLOCKED", "FAIL"],
   counts: summary.gateCounts,
   gates: summary.gateMatrix,
+  strategicGates: summary.continuousAssurance.strategicGates,
   productionReadiness: false,
   externalDistributionAuthorized: false,
   summaryHash: summary.summaryHash
@@ -73,10 +74,55 @@ const validationChecks = [
       .filter((profile) => profile.profileId !== "NON_PHI_CONTROLLED_PILOT")
       .every((profile) => profile.status === "BLOCKED" && profile.bypassAllowed === false),
     evidence: summary.pilotProfiles.profiles.map((profile) => profile.integrityHash).join(",")
+  },
+  {
+    id: "continuous-assurance-ledger-chain",
+    passed: summary.continuousAssurance.decisionEvidence.verification.valid,
+    evidence: summary.continuousAssurance.decisionEvidence.verification.chainDigest
+  },
+  {
+    id: "strategic-gate-coverage",
+    passed: ["G21", "G22", "G23", "G24", "G25"].every((gateId) =>
+      summary.continuousAssurance.strategicGates.some((gate) => gate.gateId === gateId)
+    ),
+    evidence: summary.continuousAssurance.strategicGates.map((gate) => gate.evidenceDigest).join(",")
+  },
+  {
+    id: "candidate-binding-fails-closed",
+    passed: summary.continuousAssurance.strategicGates.find((gate) => gate.gateId === "G24")?.status === "BLOCKED",
+    evidence: summary.continuousAssurance.candidateBinding.localReferenceHash
+  },
+  {
+    id: "quality-ratchet-no-auto-promotion",
+    passed: summary.continuousAssurance.qualityRatchet.automaticPromotionAllowed === false,
+    evidence: summary.continuousAssurance.qualityRatchet.decisionHash
+  },
+  {
+    id: "readiness-profiles-retain-authority",
+    passed: summary.continuousAssurance.readinessProfiles.every((profile) =>
+      profile.livePhiAllowed === false &&
+      profile.clinicalActionAllowed === false &&
+      profile.deploymentAuthorized === false &&
+      profile.customerActivationAuthorized === false
+    ),
+    evidence: summary.continuousAssurance.readinessProfiles.map((profile) => profile.decisionHash).join(",")
+  },
+  {
+    id: "provider-resilience-drill",
+    passed: summary.continuousAssurance.resilienceDrill.status === "PASS" &&
+      summary.continuousAssurance.resilienceDrill.primaryReentryAuthorized === false,
+    evidence: summary.continuousAssurance.resilienceDrill.drillHash
+  },
+  {
+    id: "shadow-pilot-retains-owner-gate",
+    passed: summary.continuousAssurance.shadowRehearsal.technicalStatus === "PASS" &&
+      summary.continuousAssurance.shadowRehearsal.status === "OPERATOR_REQUIRED" &&
+      summary.continuousAssurance.shadowRehearsal.externalActionsExecuted === false,
+    evidence: summary.continuousAssurance.shadowRehearsal.rehearsalHash
   }
 ];
 const validationReport = {
-  schemaVersion: "scrimed-p33-validation-report-v1",
+  schemaVersion: "scrimed-p33-validation-report-v2",
   scope: "deterministic-p33-domain-contracts",
   generatedAt: "2026-08-13T00:00:00.000Z",
   status: validationChecks.every((item) => item.passed) ? "PASS" : "FAIL",

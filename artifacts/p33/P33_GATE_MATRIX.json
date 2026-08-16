@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "scrimed-p33-gate-matrix-v1",
+  "schemaVersion": "scrimed-p33-gate-matrix-v2",
   "candidateBinding": "generated-before-final-candidate-fingerprint-use-release-tooling-for-exact-binding",
   "statusesAllowed": [
     "PASS",
@@ -8,9 +8,9 @@
     "FAIL"
   ],
   "counts": {
-    "PASS": 1,
-    "OPERATOR_REQUIRED": 8,
-    "BLOCKED": 7,
+    "PASS": 3,
+    "OPERATOR_REQUIRED": 10,
+    "BLOCKED": 8,
     "FAIL": 0
   },
   "gates": [
@@ -187,9 +187,202 @@
         "audit controls"
       ],
       "reason": "Linux local-agent pilot remains fail-closed with no bypass."
+    },
+    {
+      "gateId": "G21",
+      "status": "PASS",
+      "ownerRole": "platform-security-owner",
+      "evidence": [
+        "circuit-breaker-recovery-test",
+        "materially-independent-fallback",
+        "qualified-primary-route"
+      ],
+      "reason": "Dependency resilience and materially independent provider failover."
+    },
+    {
+      "gateId": "G22",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "business-and-clinical-owners",
+      "evidence": [
+        "baseline-and-comparator",
+        "complete-value-contract"
+      ],
+      "reason": "Pilot value-realization contract with baselines, stop rules, owners, measurement, and exit plan. NAMED_OPERATOR_APPROVAL_REQUIRED, OPERATOR_REQUIRED_NAMED_OWNER_APPROVAL."
+    },
+    {
+      "gateId": "G23",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "pilot-owner",
+      "evidence": [
+        "adoption-training-plan",
+        "shadow-rehearsal",
+        "stop-and-rollback-rules"
+      ],
+      "reason": "Behavior adoption, training, shadow rehearsal, stop rules, and controlled pilot readiness. NAMED_OPERATOR_APPROVAL_REQUIRED, OPERATOR_REQUIRED_NAMED_PILOT_OWNER_APPROVAL."
+    },
+    {
+      "gateId": "G24",
+      "status": "BLOCKED",
+      "ownerRole": "release-owner-and-independent-reviewer",
+      "evidence": [
+        "exact-source-manifest",
+        "fresh-validation-packet"
+      ],
+      "reason": "Evidence freshness, attestation, expiry, and exact-candidate binding. NAMED_OPERATOR_APPROVAL_REQUIRED, OPERATOR_REQUIRED_CANDIDATE_BOUND_REVIEWER_ATTESTATION, STALE_EXACT_SOURCE_MANIFEST_CANDIDATE, STALE_FRESH_VALIDATION_PACKET_CANDIDATE."
+    },
+    {
+      "gateId": "G25",
+      "status": "PASS",
+      "ownerRole": "platform-owner",
+      "evidence": [
+        "configuration-export-path",
+        "exit-runbook",
+        "independent-route-test",
+        "provider-neutral-adapter-contract"
+      ],
+      "reason": "Build/buy exitability, provider-neutral contracts, export path, and tested portability."
+    }
+  ],
+  "strategicGates": [
+    {
+      "gateId": "G21",
+      "key": "dependency-resilience-provider-failover",
+      "description": "Dependency resilience and materially independent provider failover.",
+      "status": "PASS",
+      "ownerRole": "platform-security-owner",
+      "requiredEvidence": [
+        "qualified-primary-route",
+        "materially-independent-fallback",
+        "circuit-breaker-recovery-test"
+      ],
+      "observedEvidence": [
+        "circuit-breaker-recovery-test",
+        "materially-independent-fallback",
+        "qualified-primary-route"
+      ],
+      "reasonCodes": [],
+      "candidateHash": "ab0523a860915300d6fe8a8b748cb8905b282a3399226dfac132b613d7cd2ff2",
+      "evidenceAgeHours": 1,
+      "expiresAt": "2026-08-22T12:00:00.000Z",
+      "remediationSteps": [
+        "Retest primary failure and independent fallback without lowering safety, privacy, or jurisdiction requirements."
+      ],
+      "evidenceDigest": "72cab0d776e3c0bd087f9044eaba0bd88beacc3760e1e6d9306180483f7d42e3"
+    },
+    {
+      "gateId": "G22",
+      "key": "value-realization-contract",
+      "description": "Pilot value-realization contract with baselines, stop rules, owners, measurement, and exit plan.",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "business-and-clinical-owners",
+      "requiredEvidence": [
+        "complete-value-contract",
+        "baseline-and-comparator",
+        "named-owner-approval"
+      ],
+      "observedEvidence": [
+        "baseline-and-comparator",
+        "complete-value-contract"
+      ],
+      "reasonCodes": [
+        "NAMED_OPERATOR_APPROVAL_REQUIRED",
+        "OPERATOR_REQUIRED_NAMED_OWNER_APPROVAL"
+      ],
+      "candidateHash": "ab0523a860915300d6fe8a8b748cb8905b282a3399226dfac132b613d7cd2ff2",
+      "evidenceAgeHours": 1,
+      "expiresAt": "2026-08-22T12:00:00.000Z",
+      "remediationSteps": [
+        "Obtain candidate-bound business and clinical owner approval of the complete value contract."
+      ],
+      "evidenceDigest": "cf01bfb040bc10b685040d465eaefadd3439d17c51d133874283db79fe2acf1b"
+    },
+    {
+      "gateId": "G23",
+      "key": "behavior-adoption-shadow-pilot-readiness",
+      "description": "Behavior adoption, training, shadow rehearsal, stop rules, and controlled pilot readiness.",
+      "status": "OPERATOR_REQUIRED",
+      "ownerRole": "pilot-owner",
+      "requiredEvidence": [
+        "shadow-rehearsal",
+        "adoption-training-plan",
+        "stop-and-rollback-rules",
+        "named-pilot-owner-approval"
+      ],
+      "observedEvidence": [
+        "adoption-training-plan",
+        "shadow-rehearsal",
+        "stop-and-rollback-rules"
+      ],
+      "reasonCodes": [
+        "NAMED_OPERATOR_APPROVAL_REQUIRED",
+        "OPERATOR_REQUIRED_NAMED_PILOT_OWNER_APPROVAL"
+      ],
+      "candidateHash": "ab0523a860915300d6fe8a8b748cb8905b282a3399226dfac132b613d7cd2ff2",
+      "evidenceAgeHours": 1,
+      "expiresAt": "2026-08-22T12:00:00.000Z",
+      "remediationSteps": [
+        "Complete a synthetic shadow rehearsal and obtain named pilot-owner approval."
+      ],
+      "evidenceDigest": "9e661b122fd59b04339f71b3eaf8b623127bafc72c6b4fce83f7a46251133999"
+    },
+    {
+      "gateId": "G24",
+      "key": "evidence-freshness-attestation-candidate-binding",
+      "description": "Evidence freshness, attestation, expiry, and exact-candidate binding.",
+      "status": "BLOCKED",
+      "ownerRole": "release-owner-and-independent-reviewer",
+      "requiredEvidence": [
+        "exact-source-manifest",
+        "fresh-validation-packet",
+        "candidate-bound-reviewer-attestation"
+      ],
+      "observedEvidence": [
+        "exact-source-manifest",
+        "fresh-validation-packet"
+      ],
+      "reasonCodes": [
+        "NAMED_OPERATOR_APPROVAL_REQUIRED",
+        "OPERATOR_REQUIRED_CANDIDATE_BOUND_REVIEWER_ATTESTATION",
+        "STALE_EXACT_SOURCE_MANIFEST_CANDIDATE",
+        "STALE_FRESH_VALIDATION_PACKET_CANDIDATE"
+      ],
+      "candidateHash": "ab0523a860915300d6fe8a8b748cb8905b282a3399226dfac132b613d7cd2ff2",
+      "evidenceAgeHours": 1,
+      "expiresAt": "2026-08-22T12:00:00.000Z",
+      "remediationSteps": [
+        "Regenerate evidence after the final source mutation and obtain an exact-candidate reviewer attestation."
+      ],
+      "evidenceDigest": "58d446870b256d012b0950ebac0ffa6e3155e005aa243ae3062f8f7594ea388c"
+    },
+    {
+      "gateId": "G25",
+      "key": "build-buy-exitability-provider-portability",
+      "description": "Build/buy exitability, provider-neutral contracts, export path, and tested portability.",
+      "status": "PASS",
+      "ownerRole": "platform-owner",
+      "requiredEvidence": [
+        "provider-neutral-adapter-contract",
+        "configuration-export-path",
+        "independent-route-test",
+        "exit-runbook"
+      ],
+      "observedEvidence": [
+        "configuration-export-path",
+        "exit-runbook",
+        "independent-route-test",
+        "provider-neutral-adapter-contract"
+      ],
+      "reasonCodes": [],
+      "candidateHash": "ab0523a860915300d6fe8a8b748cb8905b282a3399226dfac132b613d7cd2ff2",
+      "evidenceAgeHours": 1,
+      "expiresAt": "2026-08-22T12:00:00.000Z",
+      "remediationSteps": [
+        "Retest provider removal, configuration export, and independent-route activation."
+      ],
+      "evidenceDigest": "f933369e27dfad451a6205266e752110a57794e0b5f6bd7a2e6ba950ab101dac"
     }
   ],
   "productionReadiness": false,
   "externalDistributionAuthorized": false,
-  "summaryHash": "c362d1c30786bcd1622f987330d6040d591bf288a404041627f40815e0cd165e"
+  "summaryHash": "c2423a7fe0f04744034efcfc142d67e3246ae251399de5bc2ae49a0a5c145c74"
 }

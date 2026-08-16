@@ -1,10 +1,10 @@
 {
-  "schemaVersion": "scrimed-p33-validation-report-v1",
+  "schemaVersion": "scrimed-p33-validation-report-v2",
   "scope": "deterministic-p33-domain-contracts",
   "generatedAt": "2026-08-13T00:00:00.000Z",
   "status": "PASS",
-  "checkCount": 10,
-  "passedCount": 10,
+  "checkCount": 17,
+  "passedCount": 17,
   "failedCount": 0,
   "checks": [
     {
@@ -56,10 +56,45 @@
       "id": "restricted-pilots-blocked",
       "passed": true,
       "evidence": "b89d82dca69dc927253f84185c524e35204141e026f04714b7fb8bc1c38b88eb,9e5007fab1090ebe77953a6ec67fefffae8b92cca75661907fef58aa54bc4c83,e87ca8d2236fac23c048cfcca85d5a70252e716fcc55e9bf2bb1e71d2e899714"
+    },
+    {
+      "id": "continuous-assurance-ledger-chain",
+      "passed": true,
+      "evidence": "8bb657ee039a433812c6231a19aa174789eea0136ea39ee0ad7085a8e7c13e88"
+    },
+    {
+      "id": "strategic-gate-coverage",
+      "passed": true,
+      "evidence": "72cab0d776e3c0bd087f9044eaba0bd88beacc3760e1e6d9306180483f7d42e3,cf01bfb040bc10b685040d465eaefadd3439d17c51d133874283db79fe2acf1b,9e661b122fd59b04339f71b3eaf8b623127bafc72c6b4fce83f7a46251133999,58d446870b256d012b0950ebac0ffa6e3155e005aa243ae3062f8f7594ea388c,f933369e27dfad451a6205266e752110a57794e0b5f6bd7a2e6ba950ab101dac"
+    },
+    {
+      "id": "candidate-binding-fails-closed",
+      "passed": true,
+      "evidence": "ab0523a860915300d6fe8a8b748cb8905b282a3399226dfac132b613d7cd2ff2"
+    },
+    {
+      "id": "quality-ratchet-no-auto-promotion",
+      "passed": true,
+      "evidence": "cecaecd49d13ba2fed1c2f58e902d96098c5bfc2ebb06f46dae527801550d92c"
+    },
+    {
+      "id": "readiness-profiles-retain-authority",
+      "passed": true,
+      "evidence": "8fcc979fa010602ee2dfd899f1b97823c2064147b95cbf321bfe85095ae6c92f,1a5e09e4bfb8a7d2a409ac344587871f956dfb6f3f6ad3e10003ac38ccf61cf6,3ac6d5a8d6a833a9626cc903d6a630724f1f21a9975600f4bb03d4bc9ff20e47,31ee01894771ec9edd089a967c7ed5b4a3a69ebc681ee5ce829f70dd2edcaab0,8ff4201226e81be95666c65479755ca3e6f891f2de8b1025803e5921e65f46fc"
+    },
+    {
+      "id": "provider-resilience-drill",
+      "passed": true,
+      "evidence": "1f408ed6d06b8a1eb6abbce4b2b10278ddb0200b67fe3b90bba9bf57b04f7991"
+    },
+    {
+      "id": "shadow-pilot-retains-owner-gate",
+      "passed": true,
+      "evidence": "bd00995bb9416df162f035fa62978ed83c9cfab4ef7844760c41388f70e77460"
     }
   ],
   "fullCandidateValidation": "reported-by-release-candidate-validation-after-final-source-mutation",
   "externalApprovalsCreated": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "c362d1c30786bcd1622f987330d6040d591bf288a404041627f40815e0cd165e"
+  "summaryHash": "c2423a7fe0f04744034efcfc142d67e3246ae251399de5bc2ae49a0a5c145c74"
 }

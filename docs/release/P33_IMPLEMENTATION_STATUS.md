@@ -13,20 +13,23 @@ Status: implementation and local validation complete; exact-candidate independen
 - Synthetic Trace-to-Eval Foundry and ClinicalTrajectory evaluation.
 - Ten feature-flagged opportunity modules with typed services and operational KPIs.
 - Three explicit pilot profiles with non-bypassable PHI/Linux restrictions.
+- G21-G25 continuous-assurance gates, exact action approval binding, independent failover checks, quality ratchet, value contract, and five distinct readiness decisions.
 - Integrated p.33 control-plane APIs, Product Console linkage, navigation, responsive UI, documentation, tests, and deterministic artifacts.
+- Continuous-assurance API at `/api/scrimed-control-plane/p33/assurance` and operator-facing p.33 console coverage.
 - Maintainable, evidence-bound 12-slide investor-deck source and claim manifest.
 
 ## Local Validation Evidence
 
-- Deterministic p.33 domain validation: 10/10 checks passed.
-- Local control-plane API verification: 7/7 endpoints returned HTTP 200.
+- Deterministic p.33 domain validation: 17/17 checks passed.
+- Focused p.33 policy and contract validation: 30/30 policy checks and 25/25 integration checks passed.
+- Local control-plane API coverage: seven logical p.33 endpoints, including continuous assurance.
 - Product Console response: 775,065 bytes; no full domain payload was added to its compact surface.
 - Desktop and 390px browser checks: no horizontal overflow and no console warnings.
-- Production build ID: `Xzjya8KmYVks7Q0pfbEUy`.
+- Production build: 627 routes and 460 static pages; exact build ID is emitted by final candidate validation rather than frozen in source documentation.
 - Rendered investor deck: 12 slides; strict review and overflow review passed; SHA-256 `b042b32834de48bceb337d8b33fe14242ca7bff8869722ca41e096b75999b4b9`.
-- SBOM before final source reconciliation: 422 components, zero dependency delta, SHA-256 `7e4897205b57e807` prefix. Final candidate tooling must recompute exact release fingerprints after the local commit.
+- SBOM: 422 components and zero dependency or lockfile delta. Final candidate tooling must recompute exact release fingerprints after the local commit.
 
-The local shell did not expose `npm`; validation used the repository's bundled Node runtime and direct repository scripts. This is an environment-path limitation, not a bypass of the underlying checks.
+The local shell did not expose `npm`; validation used the repository's Node 24 runtime and the repository's direct-Node quality runner. This is an environment-path limitation, not a bypass of the underlying checks.
 
 ## Retained Boundaries
 

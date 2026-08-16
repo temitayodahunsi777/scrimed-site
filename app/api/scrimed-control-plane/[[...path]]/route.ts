@@ -178,6 +178,9 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "p33/pilots") {
     return json(getP33IntegratedSummary().pilotProfiles, "control-plane-p33-pilots");
   }
+  if (endpoint === "p33/assurance") {
+    return json(getP33IntegratedSummary().continuousAssurance, "control-plane-p33-continuous-assurance");
+  }
 
   return failure("control_plane_route_not_found", "SCRIMED control-plane route was not found.", endpoint || "root", 404);
 }

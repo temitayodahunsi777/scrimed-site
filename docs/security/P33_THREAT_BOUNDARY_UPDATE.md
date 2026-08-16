@@ -10,6 +10,7 @@ Status: local synthetic implementation; independent security, privacy, clinical-
 - Agent identities, capability leases, tool allowlists, budgets, and kill-switch state.
 - Evaluation fixtures, expected trajectories, reviewer dispositions, and release thresholds.
 - Pilot-profile eligibility evidence and exact release fingerprints.
+- Exact action approvals, G21-G25 evidence, value contracts, failover dependency maps, and readiness decisions.
 
 ## Trust Boundaries
 
@@ -19,6 +20,7 @@ Status: local synthetic implementation; independent security, privacy, clinical-
 4. Router to worker: a fresh task-bound identity and active lease are required; network defaults to deny.
 5. Consequential result to release: evidence, policy, qualified review, and applicable Regulatory Label must pass.
 6. Local candidate to pilot or deployment: restricted profiles have no bypass and external authority remains required.
+7. Tool discovery to action authorization: discovery is non-authoritative; exact tenant, candidate, tool, arguments, target, scope, policy, and expiry are evaluated independently.
 
 ## Principal Threats And Controls
 
@@ -36,6 +38,11 @@ Status: local synthetic implementation; independent security, privacy, clinical-
 | Local worker escape | Sandbox, explicit roots, tool allowlist, deny-by-default network, resource limits | BLOCK |
 | Secret or PHI leakage | Digest-only evidence, redacted telemetry, prohibited-content checks | BLOCK |
 | Restricted pilot bypass | Authoritative pilot-profile gate ignores unsafe environment flags | BLOCK |
+| Stale or replayed approval | Exact actor/candidate/action/arguments/target/policy/expiry binding | BLOCK |
+| Correlated provider failure | Material-dependency comparison and equal safety/privacy tier | BLOCK or SAFE_REFUSAL |
+| Aggregate score hides harm | Hard floors and worst-material-cell quality ratchet | BLOCK |
+| Value claim outruns evidence | Complete value contract plus named owner approval | OPERATOR_REQUIRED |
+| Evidence reused after mutation | G24 candidate, age, expiry, and attestation checks | BLOCK |
 
 ## Residual Risks
 
@@ -44,6 +51,7 @@ Status: local synthetic implementation; independent security, privacy, clinical-
 - Ledger chaining is tamper-evident application logic, not independently anchored immutable infrastructure.
 - Terminology coverage depends on caller-supplied, authorized offline snapshots.
 - Named clinical-safety, security/privacy, claims/legal, technical, and platform review remains external.
+- The deterministic independent-failover fixture proves policy behavior, not real provider capacity or availability.
 
 ## Incident Response
 

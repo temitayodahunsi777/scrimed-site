@@ -25,7 +25,7 @@ export default function ScrimedP33Page() {
         <p className="hero-text">
           One integrated, synthetic-only operating view across source-grounded context, clinical signal
           compression, decision evidence, regulatory labels, oversight drift, portable agents,
-          trajectory evaluation, opportunity workflows, and pilot gates.
+          trajectory evaluation, continuous assurance, opportunity workflows, and pilot gates.
         </p>
         <div className="hero-actions" aria-label="p.33 resources">
           <Link href={summary.apiRoute}>Inspect API</Link>
@@ -41,6 +41,7 @@ export default function ScrimedP33Page() {
         <article><span>Opportunity modules</span><strong>{summary.opportunities.modules.length}</strong></article>
         <article><span>External actions</span><strong>{summary.opportunities.externalActionModuleCount}</strong></article>
         <article><span>Local pass gates</span><strong>{summary.gateCounts.PASS}</strong></article>
+        <article><span>Strategic gates</span><strong>{summary.continuousAssurance.strategicGates.length}</strong></article>
         <article><span>Operator gates</span><strong>{summary.gateCounts.OPERATOR_REQUIRED}</strong></article>
         <article><span>Blocked gates</span><strong>{summary.gateCounts.BLOCKED}</strong></article>
       </section>
@@ -135,6 +136,47 @@ export default function ScrimedP33Page() {
           <div><strong>Scores</strong><ul className="compact-list"><li>Semantic match: {summary.clinicalTrajectory.evaluation.semanticMatch.toFixed(2)}</li><li>Required steps: {summary.clinicalTrajectory.evaluation.requiredStepSpecificity.toFixed(2)}</li><li>Groundedness: {summary.clinicalTrajectory.evaluation.groundedness.toFixed(2)}</li></ul></div>
           <div><strong>Promotion</strong><p>{summary.clinicalTrajectory.evaluation.promotionEligible ? "eligible" : "qualified human review required"}</p></div>
         </article>
+      </section>
+
+      <section className="table-section" aria-label="Continuous assurance and pilot readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Continuous Assurance</p>
+          <h2>Hard floors, exact evidence, independent failover, and explicit pilot boundaries.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.continuousAssurance.policyDecision.decision} /><h2>Agent action policy</h2></div>
+          <p>Tool discovery grants no authority. Writes remain dry-run and exact-approval bound; production and PHI targets fail closed.</p>
+          <div><strong>Decision reasons</strong><p>{summary.continuousAssurance.policyDecision.reasonCodes.join(", ") || "All declared read-only gates passed."}</p></div>
+          <div><strong>External execution</strong><p>{summary.continuousAssurance.policyDecision.externalExecutionAuthorized ? "authorized" : "not authorized"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.continuousAssurance.failoverDecision.decision} /><h2>Independent provider failover</h2></div>
+          <p>Fallback must preserve safety and privacy tiers while avoiding shared material dependencies.</p>
+          <div><strong>Fallback</strong><p>{summary.continuousAssurance.failoverDecision.fallbackProviderId ?? "safe refusal"}</p></div>
+          <div><strong>Provider call</strong><p>{summary.continuousAssurance.failoverDecision.providerCallExecuted ? "executed" : "not executed"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.continuousAssurance.qualityRatchet.decision} /><h2>Quality ratchet</h2></div>
+          <p>Safety, authorization, privacy, clinical, provenance, and worst-cell performance cannot be averaged away.</p>
+          <div><strong>Hard floors</strong><p>{summary.continuousAssurance.qualityRatchet.hardFloorsPassed ? "passed" : "blocked"}</p></div>
+          <div><strong>Automatic promotion</strong><p>{summary.continuousAssurance.qualityRatchet.automaticPromotionAllowed ? "allowed" : "never allowed"}</p></div>
+        </article>
+        {summary.continuousAssurance.strategicGates.map((gate) => (
+          <article className="module-row" key={gate.gateId}>
+            <div><Status value={gate.status} /><h2>{gate.gateId}: {gate.key}</h2></div>
+            <p>{gate.description}</p>
+            <div><strong>Owner</strong><p>{gate.ownerRole}</p></div>
+            <div><strong>Next control</strong><p>{gate.remediationSteps.join(" ")}</p></div>
+          </article>
+        ))}
+        {summary.continuousAssurance.readinessProfiles.map((profile) => (
+          <article className="module-row" key={profile.profileId}>
+            <div><Status value={profile.status} /><h2>{profile.profileId}</h2></div>
+            <p>{profile.reasonCodes.join(", ") || "Declared local technical controls passed."}</p>
+            <div><strong>Evidence</strong><p>{profile.requiredEvidence.join(", ")}</p></div>
+            <div><strong>Authority</strong><p>PHI: no · Clinical action: no · Deployment: no · Activation: no</p></div>
+          </article>
+        ))}
       </section>
 
       <section className="table-section" aria-label="Opportunity modules">

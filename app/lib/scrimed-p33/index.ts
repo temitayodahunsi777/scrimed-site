@@ -2,6 +2,7 @@ import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
 import { getP33AgentPortabilitySummary } from "./agentPortability";
 import { getP33ChangeControlSummary } from "./changeControl";
 import { getP33ClinicalTrajectorySummary } from "./clinicalTrajectoryLab";
+import { getP33ContinuousAssuranceSummary } from "./continuousAssurance";
 import { getP33ContextFabricSummary } from "./contextFabric";
 import { getP33DecisionEvidenceSummary } from "./decisionEvidenceLedger";
 import { getP33OpportunitySummary } from "./opportunityModules";
@@ -16,11 +17,12 @@ export * from "./regulatoryOversight";
 export * from "./changeControl";
 export * from "./agentPortability";
 export * from "./clinicalTrajectoryLab";
+export * from "./continuousAssurance";
 export * from "./opportunityModules";
 export * from "./pilotProfiles";
 
 export const p33IntegratedUpgradesVersion =
-  "scrimed-p33-integrated-upgrades-v1-2026-08-13";
+  "scrimed-p33-integrated-upgrades-v2-2026-08-15";
 export const p33IntegratedRoute = "/scrimed-p33";
 export const p33IntegratedApiRoute = "/api/scrimed-control-plane/p33";
 export const p33IntegratedBriefRoute = "/api/scrimed-control-plane/p33/brief";
@@ -28,7 +30,9 @@ export const p33IntegratedBriefRoute = "/api/scrimed-control-plane/p33/brief";
 export const p33IntegratedBoundary =
   "SCRIMED p.33 integrates synthetic clinical context, signal compression, evidence, regulatory-label, oversight, change-control, portable-agent, trajectory-evaluation, opportunity, and pilot-profile controls. It walks with doctors rather than replacing them and does not authorize live PHI, autonomous diagnosis, treatment, prescribing, triage, coverage, payer submission, claims submission, EHR writeback, production deployment, customer activation, certification claims, or external distribution.";
 
-export function getP33GateMatrix(): Array<{
+export function getP33GateMatrix(
+  continuousAssurance = getP33ContinuousAssuranceSummary()
+): Array<{
   gateId: string;
   status: P33GateStatus;
   ownerRole: string;
@@ -147,7 +151,16 @@ export function getP33GateMatrix(): Array<{
       ownerRole: "platform-security-owner",
       evidence: ["official platform support", "sandbox", "filesystem", "network", "update", "audit controls"],
       reason: "Linux local-agent pilot remains fail-closed with no bypass."
-    }
+    },
+    ...continuousAssurance.strategicGates.map((gate) => ({
+      gateId: gate.gateId,
+      status: gate.status,
+      ownerRole: gate.ownerRole,
+      evidence: gate.observedEvidence,
+      reason: gate.reasonCodes.length
+        ? `${gate.description} ${gate.reasonCodes.join(", ")}.`
+        : gate.description
+    }))
   ];
 }
 
@@ -160,7 +173,8 @@ export function getP33IntegratedSummary() {
   const clinicalTrajectory = getP33ClinicalTrajectorySummary();
   const opportunities = getP33OpportunitySummary();
   const pilotProfiles = getP33PilotProfileSummary();
-  const gateMatrix = getP33GateMatrix();
+  const continuousAssurance = getP33ContinuousAssuranceSummary();
+  const gateMatrix = getP33GateMatrix(continuousAssurance);
   const summary = {
     service: "scrimed-p33-integrated-upgrades" as const,
     version: p33IntegratedUpgradesVersion,
@@ -178,6 +192,7 @@ export function getP33IntegratedSummary() {
     clinicalTrajectory,
     opportunities,
     pilotProfiles,
+    continuousAssurance,
     gateMatrix,
     gateCounts: {
       PASS: gateMatrix.filter((gate) => gate.status === "PASS").length,
@@ -217,6 +232,8 @@ export function buildP33IntegratedBrief() {
     `- Portable route: ${summary.portableAgents.routeDecision.status}; provider call executed ${summary.portableAgents.routeDecision.providerCallExecuted}`,
     `- Trajectory evaluation: ${summary.clinicalTrajectory.evaluation.decision}; promotion eligible ${summary.clinicalTrajectory.evaluation.promotionEligible}`,
     `- Opportunity modules: ${summary.opportunities.modules.length}; external actions enabled ${summary.opportunities.externalActionModuleCount}`,
+    `- Continuous assurance: ${summary.continuousAssurance.strategicGateCounts.PASS} PASS, ${summary.continuousAssurance.strategicGateCounts.OPERATOR_REQUIRED} OPERATOR_REQUIRED, ${summary.continuousAssurance.strategicGateCounts.BLOCKED} BLOCKED`,
+    `- Quality ratchet: ${summary.continuousAssurance.qualityRatchet.decision}; automatic promotion ${summary.continuousAssurance.qualityRatchet.automaticPromotionAllowed}`,
     "",
     "## Gate Matrix",
     `- PASS: ${summary.gateCounts.PASS}`,
