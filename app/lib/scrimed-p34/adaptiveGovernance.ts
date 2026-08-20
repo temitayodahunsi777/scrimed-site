@@ -95,6 +95,11 @@ export function getP34FeatureFlags(env: NodeJS.ProcessEnv = process.env): P34Fea
     twoLoopEvaluationEnabled: read("SCRIMED_P34_TWO_LOOP_EVALUATION_ENABLED", true),
     finOpsResilienceEnabled: read("SCRIMED_P34_FINOPS_RESILIENCE_ENABLED", true),
     hybridPlacementEnabled: read("SCRIMED_P34_HYBRID_PLACEMENT_ENABLED", true),
+    workflowContractsEnabled: read("SCRIMED_P34_WORKFLOW_CONTRACTS_ENABLED", true),
+    continuityMetricsEnabled: read("SCRIMED_P34_CONTINUITY_METRICS_ENABLED", true),
+    challengerEvaluationEnabled: read("SCRIMED_P34_CHALLENGER_EVALUATION_ENABLED", false),
+    trustExpansionEnabled: read("SCRIMED_P34_TRUST_EXPANSION_ENABLED", false),
+    publicSectorClaimsEnabled: read("SCRIMED_P34_PUBLIC_SECTOR_CLAIMS_ENABLED", false),
     externalProviderCallsEnabled: read("SCRIMED_P34_EXTERNAL_PROVIDER_CALLS_ENABLED", false),
     dicomExportEnabled: read("SCRIMED_P34_DICOM_EXPORT_ENABLED", false),
     livePhiEnabled: read("SCRIMED_P34_LIVE_PHI_ENABLED", false),
@@ -112,6 +117,11 @@ export const p34FeatureFlagDefaults = {
   SCRIMED_P34_TWO_LOOP_EVALUATION_ENABLED: "true",
   SCRIMED_P34_FINOPS_RESILIENCE_ENABLED: "true",
   SCRIMED_P34_HYBRID_PLACEMENT_ENABLED: "true",
+  SCRIMED_P34_WORKFLOW_CONTRACTS_ENABLED: "true",
+  SCRIMED_P34_CONTINUITY_METRICS_ENABLED: "true",
+  SCRIMED_P34_CHALLENGER_EVALUATION_ENABLED: "false",
+  SCRIMED_P34_TRUST_EXPANSION_ENABLED: "false",
+  SCRIMED_P34_PUBLIC_SECTOR_CLAIMS_ENABLED: "false",
   SCRIMED_P34_EXTERNAL_PROVIDER_CALLS_ENABLED: "false",
   SCRIMED_P34_DICOM_EXPORT_ENABLED: "false",
   SCRIMED_P34_LIVE_PHI_ENABLED: "false",
@@ -153,6 +163,44 @@ export function createP34CapabilityRegistry(): CapabilityRegistry {
       allowedOperations: ["read", "propose"],
       approvalPolicy: "human-for-write",
       fallbackRouteId: null,
+      deploymentLocation: "local",
+      dataResidency: {
+        jurisdictions: ["local"],
+        regions: ["local"],
+        verified: true
+      },
+      phiProductPathEvidence: {
+        signedBaaRecorded: false,
+        baaEvidenceHash: null,
+        coveredProductPaths: [],
+        expiresAt: null
+      },
+      licensing: {
+        licenseId: "scrimed-repository-local-policy-v1",
+        commercialUsePermitted: true,
+        openWeight: false,
+        restrictions: ["repository-local-deterministic-runtime"],
+        evidenceSource: "repository policy and regression tests"
+      },
+      interoperability: {
+        ehr: "unsupported",
+        fhir: "supported",
+        dicom: "supported"
+      },
+      localEvaluation: {
+        status: "verified-local",
+        overallScore: 1,
+        taskSuccessRate: 1,
+        criticalErrorRate: 0,
+        p95LatencyMs: 8,
+        costPerCompletedWorkflowUsd: 0,
+        reliability: 1,
+        evidenceDate: "2026-08-15T00:00:00.000Z",
+        evidenceSource: "scripts/scrimed-p34-adaptive-governance-policy-test.mjs",
+        expiresAt: "2026-11-15T00:00:00.000Z"
+      },
+      publicBenchmarkRank: null,
+      operationalStatus: "healthy",
       enabled: true
     },
     {
@@ -187,6 +235,44 @@ export function createP34CapabilityRegistry(): CapabilityRegistry {
       allowedOperations: [],
       approvalPolicy: "qualified-human",
       fallbackRouteId: null,
+      deploymentLocation: "unverified",
+      dataResidency: {
+        jurisdictions: [],
+        regions: [],
+        verified: false
+      },
+      phiProductPathEvidence: {
+        signedBaaRecorded: false,
+        baaEvidenceHash: null,
+        coveredProductPaths: [],
+        expiresAt: null
+      },
+      licensing: {
+        licenseId: null,
+        commercialUsePermitted: false,
+        openWeight: false,
+        restrictions: ["unverified"],
+        evidenceSource: null
+      },
+      interoperability: {
+        ehr: "unverified",
+        fhir: "unverified",
+        dicom: "unverified"
+      },
+      localEvaluation: {
+        status: "unverified",
+        overallScore: 0,
+        taskSuccessRate: 0,
+        criticalErrorRate: 1,
+        p95LatencyMs: 0,
+        costPerCompletedWorkflowUsd: 0,
+        reliability: 0,
+        evidenceDate: null,
+        evidenceSource: null,
+        expiresAt: null
+      },
+      publicBenchmarkRank: null,
+      operationalStatus: "unverified",
       enabled: false
     }
   ];
@@ -281,6 +367,7 @@ export function evaluateCapabilityAdmission(
   if (!route) reasonCodes.push("UNKNOWN_MODEL_OR_ROUTE_DENIED");
   if (request.riskTier === "prohibited") reasonCodes.push("PROHIBITED_RISK_TIER");
   if (request.dataClassification === "phi-restricted") reasonCodes.push("LIVE_PHI_NOT_AUTHORIZED");
+  if (!request.productPath.trim()) reasonCodes.push("PRODUCT_PATH_REQUIRED");
   if (route) {
     if (!route.enabled) reasonCodes.push("CAPABILITY_DISABLED");
     if (!["verified-local", "verified-documentary"].includes(route.verification.status)) {
@@ -298,10 +385,38 @@ export function evaluateCapabilityAdmission(
     }
     if (!route.regions.includes(request.region)) reasonCodes.push("REGION_NOT_AUTHORIZED");
     if (!route.executionEnvironmentIds.includes(request.environmentId)) reasonCodes.push("ENVIRONMENT_NOT_AUTHORIZED");
+    if (!route.dataResidency.verified || !route.dataResidency.regions.includes(request.region)) {
+      reasonCodes.push("DATA_RESIDENCY_NOT_VERIFIED");
+    }
     if (!route.inputModalities.includes(request.requiredInputModality)) reasonCodes.push("INPUT_MODALITY_UNSUPPORTED");
     if (!route.outputModalities.includes(request.requiredOutputModality)) reasonCodes.push("OUTPUT_MODALITY_UNSUPPORTED");
     if (request.requiredToolIds.some((toolId) => !route.allowedToolIds.includes(toolId))) {
       reasonCodes.push("TOOL_CAPABILITY_NOT_AUTHORIZED");
+    }
+    if (request.requiredCompatibility.some((kind) => route.interoperability[kind] !== "supported")) {
+      reasonCodes.push("INTEROPERABILITY_CAPABILITY_NOT_VERIFIED");
+    }
+    if (!route.licensing.commercialUsePermitted || !route.licensing.evidenceSource) {
+      reasonCodes.push("LICENSE_OR_USE_RIGHTS_NOT_VERIFIED");
+    }
+    if (route.localEvaluation.status !== "verified-local" || !route.localEvaluation.evidenceSource) {
+      reasonCodes.push("LOCAL_TASK_EVALUATION_REQUIRED");
+    }
+    if (!route.localEvaluation.expiresAt || Date.parse(route.localEvaluation.expiresAt) <= Date.parse(request.evaluatedAt)) {
+      reasonCodes.push("LOCAL_TASK_EVALUATION_EXPIRED");
+    }
+    if (route.operationalStatus !== "healthy") reasonCodes.push("PROVIDER_NOT_HEALTHY");
+    if (request.dataClassification === "phi-restricted") {
+      if (route.phiPermission !== "authorized-by-external-evidence") reasonCodes.push("PHI_PERMISSION_NOT_VERIFIED");
+      if (!route.phiProductPathEvidence.signedBaaRecorded || !route.phiProductPathEvidence.baaEvidenceHash) {
+        reasonCodes.push("SIGNED_BAA_EVIDENCE_REQUIRED");
+      }
+      if (!route.phiProductPathEvidence.coveredProductPaths.includes(request.productPath)) {
+        reasonCodes.push("PRODUCT_PATH_NOT_COVERED_BY_BAA");
+      }
+      if (!route.phiProductPathEvidence.expiresAt || Date.parse(route.phiProductPathEvidence.expiresAt) <= Date.parse(request.evaluatedAt)) {
+        reasonCodes.push("BAA_EVIDENCE_EXPIRED_OR_MISSING");
+      }
     }
     if (route.latencyBudgetMs > request.maximumLatencyMs) reasonCodes.push("LATENCY_BUDGET_EXCEEDED");
     if (route.costBudgetUsd > request.maximumCostUsd) reasonCodes.push("COST_BUDGET_EXCEEDED");
@@ -313,6 +428,9 @@ export function evaluateCapabilityAdmission(
     decision,
     routeId: decision === "ALLOW" ? route?.routeId ?? null : null,
     reasonCodes: normalizedReasons,
+    localEvaluationScore: route?.localEvaluation.overallScore ?? null,
+    routeEvidenceFresh: Boolean(route?.localEvaluation.expiresAt) &&
+      Date.parse(route?.localEvaluation.expiresAt ?? "") > Date.parse(request.evaluatedAt),
     phiAuthorized: false,
     providerCallAuthorized: false,
     decisionHash: createClinicalEvidenceHash({
@@ -381,6 +499,8 @@ export function routeDeterministicFirstTask(input: {
             requiredInputModality: "text",
             requiredOutputModality: "structured",
             requiredToolIds: candidate.toolIds,
+            productPath: "scrimed-p34-synthetic-evaluation",
+            requiredCompatibility: [],
             maximumLatencyMs: policy.maximumLatencyMs,
             maximumCostUsd: policy.maximumCostUsd,
             evaluatedAt: input.evaluatedAt

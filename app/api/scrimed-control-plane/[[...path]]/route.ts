@@ -201,6 +201,28 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "p34/operations") {
     return json(getP34AdaptiveGovernanceSummary().operations, "control-plane-p34-operations");
   }
+  if (endpoint === "p34/workflows") {
+    const summary = getP34AdaptiveGovernanceSummary();
+    return json({ contract: summary.workflowContract, decision: summary.workflowContractDecision }, "control-plane-p34-workflows");
+  }
+  if (endpoint === "p34/model-fit") {
+    return json(getP34AdaptiveGovernanceSummary().workflowModelFit, "control-plane-p34-model-fit");
+  }
+  if (endpoint === "p34/actions") {
+    return json(getP34AdaptiveGovernanceSummary().actionMaturity, "control-plane-p34-actions");
+  }
+  if (endpoint === "p34/continuity") {
+    return json(getP34AdaptiveGovernanceSummary().continuity, "control-plane-p34-continuity");
+  }
+  if (endpoint === "p34/public-sector") {
+    return json(getP34AdaptiveGovernanceSummary().publicSectorReadiness, "control-plane-p34-public-sector");
+  }
+  if (endpoint === "p34/challengers") {
+    return json(getP34AdaptiveGovernanceSummary().challengerHarness, "control-plane-p34-challengers");
+  }
+  if (endpoint === "p34/roi") {
+    return json(getP34AdaptiveGovernanceSummary().roiDashboard, "control-plane-p34-roi");
+  }
   if (endpoint === "p34/context") {
     return json(getP34AdaptiveGovernanceSummary().context, "control-plane-p34-context");
   }

@@ -6,7 +6,8 @@ Status: local synthetic/no-PHI candidate. Independent review and every external 
 
 ```mermaid
 flowchart LR
-  I["Synthetic task intent"] --> P["Task policy"]
+  I["Synthetic task intent"] --> W["Workflow contract"]
+  W --> P["Task policy"]
   P --> D["Deterministic-first router"]
   D --> C["Capability admission"]
   C --> X["Contained tool stage"]
@@ -19,6 +20,10 @@ flowchart LR
   R["Human review"] --> X
   R --> E
   E --> G["Release gate matrix"]
+  X --> A["Action maturity"]
+  A --> V["Verified outcome or rollback"]
+  V --> O["ROI and continuity metrics"]
+  O --> T["Trust expansion gate"]
 ```
 
 The p.34 layer extends p.33 rather than replacing it:
@@ -29,6 +34,7 @@ The p.34 layer extends p.33 rather than replacing it:
 - p.33 provider-dependency checks remain the failover independence test.
 - p.33 quality ratchet remains the noncompensable promotion gate.
 - p.34 adds capability expiry, deterministic-first technique selection, document hierarchy, DICOM privacy manifests, richer action details, two-loop evidence, task economics, placement policy, and operator visibility.
+- The v2 extension adds versioned workflow contracts, documentary model-fit evidence, approval-bound action maturity, trust expansion thresholds, non-PHI continuity metrics, public-sector evidence profiles, isolated challenger research, and workflow ROI telemetry.
 
 ## Governance Hierarchy
 
@@ -68,6 +74,30 @@ Ownership:
 - Every consequential decision binds tenant, actor, delegated authority, intended use, task/risk class, evidence, policy, route, tools, approvals, result, exception, escalation, time, and predecessor hash.
 - Cache identities include tenant and namespace. Retries, fallbacks, turns, time, tokens, and cost are bounded.
 
+## Workflow, Model Fit, And Action Maturity
+
+Every bounded run begins with a `WorkflowContract` naming the intended use, owner, target user, baseline, outcome and safety KPIs, data sources and locality, required authority, approval policy, rollback policy, risk, review requirement, and fresh release evidence. Missing, unverified, stale, or incomplete evidence blocks the workflow before routing.
+
+Model fit uses only enabled, healthy, locally evaluated candidates with verified task, modality, locality, licensing, interoperability, context, safety, privacy, and authorization evidence. Public benchmark rank is retained only as non-authoritative metadata and is never a selection input. Quality and reliability are hard floors; cost and latency are soft constraints that require an attributable justification when degraded.
+
+Action maturity advances only through `ANSWER_ONLY`, `RECOMMENDATION`, `DRAFT_ACTION`, `PENDING_APPROVAL`, `AUTHORIZED_EXECUTION`, `VERIFIED_OUTCOME`, or `FAILED_OR_REVERSED`. Every accepted transition binds actor, authority, input and result hashes, policy, timestamp, idempotency key, approval, predecessor, and rollback status. This candidate blocks every external or system-of-record write.
+
+## Trust Expansion And Continuity
+
+Pilot expansion checks a defined synthetic cohort and duration, completion, verified outcomes, critical errors, overrides, rollbacks, review burden, abandonment, latency, and cost. Evidence must be fresh, and named clinical, privacy/security, and operational approvals remain external. Passing metrics only makes a workflow eligible for review; it does not authorize expansion.
+
+Continuity records hashed care-team relationship periods, transfers, interruptions, reconnects, and human-reviewed follow-up work. It reports segmented non-PHI operational metrics only. No observational association is encoded as causal, and no therapeutic or clinical claim is authorized.
+
+## Public Sector And Challengers
+
+Public-sector readiness is an evidence profile for security controls, residency, auditability, accessibility, procurement artifacts, and contract-vehicle references. Empty or stale documentary lanes fail closed. The profile cannot claim FedRAMP, HIPAA compliance, government authorization, or purchasing eligibility.
+
+Qwen3.8 and MAI-Code labels are stored only as disabled, unverified research references in an isolated non-PHI challenger registry. The repository makes no vendor-performance assertion. Any future candidate requires reproducible local task evidence, reviewed license and infrastructure evidence, named approval, regression testing, and rollback readiness before a separate promotion decision.
+
+## Workflow ROI
+
+The privacy-safe dashboard reports asking-versus-doing distribution, verified and failed or rolled-back outcomes, human-review minutes, continuity measures, cost per completed workflow, provider/model distribution, routing rationale, evidence freshness, and expansion-gate state. It does not store raw prompts, PHI, secrets, or sensitive source content.
+
 ### Guidelines And Runbooks
 
 Operational procedures are in `docs/runbooks/P34_ADAPTIVE_GOVERNANCE_RUNBOOK.md`. Threat and residual-risk changes are in `docs/security/P34_THREAT_BOUNDARY_UPDATE.md`.
@@ -92,6 +122,8 @@ Safe local evaluation defaults on:
 - `SCRIMED_P34_TWO_LOOP_EVALUATION_ENABLED`
 - `SCRIMED_P34_FINOPS_RESILIENCE_ENABLED`
 - `SCRIMED_P34_HYBRID_PLACEMENT_ENABLED`
+- `SCRIMED_P34_WORKFLOW_CONTRACTS_ENABLED`
+- `SCRIMED_P34_CONTINUITY_METRICS_ENABLED`
 
 High-risk capability defaults off:
 
@@ -100,6 +132,9 @@ High-risk capability defaults off:
 - `SCRIMED_P34_LIVE_PHI_ENABLED`
 - `SCRIMED_P34_CONSEQUENTIAL_EXECUTION_ENABLED`
 - `SCRIMED_P34_PRODUCTION_PROMOTION_ENABLED`
+- `SCRIMED_P34_CHALLENGER_EVALUATION_ENABLED`
+- `SCRIMED_P34_TRUST_EXPANSION_ENABLED`
+- `SCRIMED_P34_PUBLIC_SECTOR_CLAIMS_ENABLED`
 
 Changing a flag does not satisfy policy, evidence, approval, identity, legal, clinical, privacy, security, migration, deployment, or customer gates.
 
@@ -137,11 +172,19 @@ Blocked in this candidate. Requires a clean exact commit, generated evidence int
 - Context: `/api/scrimed-control-plane/p34/context`
 - DICOM privacy: `/api/scrimed-control-plane/p34/dicom-privacy`
 - Assurance: `/api/scrimed-control-plane/p34/assurance`
+- Workflows: `/api/scrimed-control-plane/p34/workflows`
+- Model fit: `/api/scrimed-control-plane/p34/model-fit`
+- Action maturity: `/api/scrimed-control-plane/p34/actions`
+- Continuity: `/api/scrimed-control-plane/p34/continuity`
+- Public-sector evidence: `/api/scrimed-control-plane/p34/public-sector`
+- Challenger registry: `/api/scrimed-control-plane/p34/challengers`
+- Workflow ROI: `/api/scrimed-control-plane/p34/roi`
 
 ## Validation
 
 ```bash
 npm run test:scrimed-p34
+npm run test:scrimed-p34-workflow-continuity
 npm run contract:scrimed-p34
 npm run check:scrimed-p34-artifacts
 npm run typecheck

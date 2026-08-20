@@ -52,6 +52,44 @@ export type ProviderCapabilityEntry = {
   allowedOperations: Array<"read" | "propose" | "execute-with-approval">;
   approvalPolicy: "none-read-only" | "human-for-write" | "qualified-human";
   fallbackRouteId: string | null;
+  deploymentLocation: "local" | "approved-edge" | "private-cloud" | "managed-cloud" | "unverified";
+  dataResidency: {
+    jurisdictions: string[];
+    regions: string[];
+    verified: boolean;
+  };
+  phiProductPathEvidence: {
+    signedBaaRecorded: boolean;
+    baaEvidenceHash: string | null;
+    coveredProductPaths: string[];
+    expiresAt: string | null;
+  };
+  licensing: {
+    licenseId: string | null;
+    commercialUsePermitted: boolean;
+    openWeight: boolean;
+    restrictions: string[];
+    evidenceSource: string | null;
+  };
+  interoperability: {
+    ehr: "supported" | "unsupported" | "unverified";
+    fhir: "supported" | "unsupported" | "unverified";
+    dicom: "supported" | "unsupported" | "unverified";
+  };
+  localEvaluation: {
+    status: "verified-local" | "unverified" | "expired";
+    overallScore: number;
+    taskSuccessRate: number;
+    criticalErrorRate: number;
+    p95LatencyMs: number;
+    costPerCompletedWorkflowUsd: number;
+    reliability: number;
+    evidenceDate: string | null;
+    evidenceSource: string | null;
+    expiresAt: string | null;
+  };
+  publicBenchmarkRank: number | null;
+  operationalStatus: "healthy" | "degraded" | "unavailable" | "unverified";
   enabled: boolean;
 };
 
@@ -102,6 +140,8 @@ export type CapabilityAdmissionRequest = {
   requiredInputModality: ProviderCapabilityEntry["inputModalities"][number];
   requiredOutputModality: ProviderCapabilityEntry["outputModalities"][number];
   requiredToolIds: string[];
+  productPath: string;
+  requiredCompatibility: Array<"ehr" | "fhir" | "dicom">;
   maximumLatencyMs: number;
   maximumCostUsd: number;
   evaluatedAt: string;
@@ -111,6 +151,8 @@ export type CapabilityAdmissionDecision = {
   decision: PolicyDecision;
   routeId: string | null;
   reasonCodes: string[];
+  localEvaluationScore: number | null;
+  routeEvidenceFresh: boolean;
   phiAuthorized: false;
   providerCallAuthorized: false;
   decisionHash: string;
@@ -525,6 +567,367 @@ export type P34GateRecord = {
   gateHash: string;
 };
 
+export type WorkflowMetricDefinition = {
+  metricId: string;
+  label: string;
+  unit: string;
+  direction: "increase" | "decrease" | "maintain";
+  threshold: number;
+};
+
+export type WorkflowReleaseEvidence = {
+  evidenceId: string;
+  evidenceType: "baseline" | "safety" | "quality" | "privacy" | "security" | "rollback";
+  evidenceHash: string;
+  source: string;
+  status: "verified-local" | "verified-documentary" | "pending" | "rejected";
+  recordedAt: string;
+  expiresAt: string;
+};
+
+export type WorkflowContract = {
+  schemaVersion: "scrimed-workflow-contract-v1";
+  workflowId: string;
+  intendedUse: string;
+  namedOwner: string;
+  targetUser: string;
+  baselineMeasurement: {
+    metricId: string;
+    value: number;
+    unit: string;
+    measuredAt: string;
+    evidenceHash: string;
+  };
+  outcomeKpis: WorkflowMetricDefinition[];
+  safetyKpis: WorkflowMetricDefinition[];
+  dataSources: Array<{
+    sourceId: string;
+    sourceType: "repository-fixture" | "public-reference" | "approved-deidentified" | "fhir" | "dicom" | "ehr";
+    required: boolean;
+    evidenceHash: string;
+  }>;
+  dataClassification: P34DataClassification;
+  dataLocality: {
+    jurisdiction: string;
+    region: string;
+    environmentId: string;
+  };
+  requiredAuthority: string[];
+  approvalPolicy: {
+    requiredRoles: string[];
+    exactPayloadBinding: true;
+    approvalTtlMinutes: number;
+  };
+  rollbackPolicy: {
+    ownerRole: string;
+    rollbackSteps: string[];
+    maximumRecoveryMinutes: number;
+    testedEvidenceHash: string;
+  };
+  riskClass: P34RiskTier;
+  clinicalReviewRequired: boolean;
+  releaseEvidence: WorkflowReleaseEvidence[];
+  effectiveAt: string;
+  expiresAt: string;
+};
+
+export type WorkflowContractDecision = {
+  decision: PolicyDecision;
+  contractValid: boolean;
+  executionEligibleForPolicyEvaluation: boolean;
+  executionAuthorized: false;
+  reasonCodes: string[];
+  evidenceFreshness: "fresh" | "stale" | "missing";
+  contractHash: string;
+};
+
+export type WorkflowModelFitDecision = {
+  decision: PolicyDecision;
+  selectedRouteId: string | null;
+  selectedTechnique: TaskTechnique | null;
+  eligibleRouteIds: string[];
+  rejectedRoutes: Array<{ routeId: string; reasonCodes: string[] }>;
+  routeReasons: string[];
+  softConstraintJustifications: string[];
+  publicBenchmarkRankUsed: false;
+  providerCallExecuted: false;
+  decisionHash: string;
+};
+
+export type ActionMaturityState =
+  | "ANSWER_ONLY"
+  | "RECOMMENDATION"
+  | "DRAFT_ACTION"
+  | "PENDING_APPROVAL"
+  | "AUTHORIZED_EXECUTION"
+  | "VERIFIED_OUTCOME"
+  | "FAILED_OR_REVERSED";
+
+export type ActionAuthorityEvidence = {
+  approvalId: string;
+  nonce: string;
+  approverIdHash: string;
+  authority: string;
+  tenantId: string;
+  workflowId: string;
+  actionId: string;
+  candidateHash: string;
+  payloadHash: string;
+  issuedAt: string;
+  expiresAt: string;
+};
+
+export type ActionMaturityEvent = {
+  eventId: string;
+  actionId: string;
+  workflowId: string;
+  tenantId: string;
+  previousState: ActionMaturityState | null;
+  nextState: ActionMaturityState;
+  actorIdHash: string;
+  authority: string;
+  inputHashes: string[];
+  policyVersion: string;
+  occurredAt: string;
+  resultHash: string | null;
+  rollbackStatus: "not-required" | "ready" | "pending" | "completed" | "failed";
+  approvalId: string | null;
+  idempotencyKey: string;
+  previousEventHash: string | null;
+  containsRawPhi: false;
+  containsSecrets: false;
+  eventHash: string;
+};
+
+export type ActionMaturityTransitionInput = {
+  eventId: string;
+  actionId: string;
+  workflowId: string;
+  tenantId: string;
+  fromState: ActionMaturityState | null;
+  toState: ActionMaturityState;
+  actorIdHash: string;
+  authority: string;
+  inputHashes: string[];
+  policyVersion: string;
+  occurredAt: string;
+  resultHash: string | null;
+  rollbackStatus: ActionMaturityEvent["rollbackStatus"];
+  approval: ActionAuthorityEvidence | null;
+  candidateHash: string;
+  payloadHash: string;
+  idempotencyKey: string;
+  targetClass: "internal-metadata" | "clinical-system-of-record" | "payer-system" | "ehr" | "other-system-of-record";
+  executionMode: "dry-run" | "synthetic-simulation" | "external";
+};
+
+export type ActionMaturityTransitionDecision = {
+  decision: PolicyDecision;
+  transitionAccepted: boolean;
+  reasonCodes: string[];
+  event: ActionMaturityEvent | null;
+  externalWriteAuthorized: false;
+  approvalConsumed: boolean;
+  decisionHash: string;
+};
+
+export type PilotExpansionEvidence = {
+  expansionId: string;
+  workflowId: string;
+  cohort: { description: string; size: number; syntheticOnly: true };
+  pilotStartedAt: string;
+  pilotEndedAt: string;
+  evidenceRecordedAt: string;
+  evidenceExpiresAt: string;
+  thresholds: {
+    minimumTaskCompletionRate: number;
+    minimumVerifiedOutcomeRate: number;
+    maximumCriticalErrorRate: number;
+    maximumOverrideRate: number;
+    maximumRollbackRate: number;
+    maximumReviewMinutesPerWorkflow: number;
+    maximumAbandonmentRate: number;
+    maximumP95LatencyMs: number;
+    maximumCostPerCompletedWorkflowUsd: number;
+  };
+  observed: {
+    taskCompletionRate: number;
+    verifiedOutcomeRate: number;
+    criticalErrorRate: number;
+    overrideRate: number;
+    rollbackRate: number;
+    reviewMinutesPerWorkflow: number;
+    abandonmentRate: number;
+    p95LatencyMs: number;
+    costPerCompletedWorkflowUsd: number;
+  };
+  approvals: Array<{
+    role: "clinical" | "privacy-security" | "operational";
+    approverIdHash: string;
+    status: "approved" | "pending" | "rejected";
+    evidenceHash: string;
+    expiresAt: string;
+  }>;
+  evidenceHashes: string[];
+};
+
+export type TrustExpansionDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  thresholdsPassed: boolean;
+  evidenceFresh: boolean;
+  namedApprovalsComplete: boolean;
+  eligibleForExpansionReview: boolean;
+  expansionAuthorized: false;
+  decisionHash: string;
+};
+
+export type CareTeamRelationshipPeriod = {
+  relationshipId: string;
+  tenantId: string;
+  subjectReferenceHash: string;
+  careTeamReferenceHash: string;
+  ownerRole: string;
+  startedAt: string;
+  endedAt: string | null;
+};
+
+export type ContinuityEvent = {
+  eventId: string;
+  tenantId: string;
+  subjectReferenceHash: string;
+  type: "relationship-start" | "transfer" | "interruption" | "reconnect" | "follow-up-created" | "follow-up-completed";
+  occurredAt: string;
+  fromCareTeamReferenceHash: string | null;
+  toCareTeamReferenceHash: string | null;
+  reasonCode: string;
+  sourceEvidenceHash: string;
+};
+
+export type ContinuityAssessment = {
+  decision: PolicyDecision;
+  continuityDurationDays: number;
+  transferCount: number;
+  interruptionCount: number;
+  reconnectCount: number;
+  unresolvedInterruptionCount: number;
+  providerTransitionRiskSignals: string[];
+  followUpWorkQueue: Array<{
+    workItemId: string;
+    ownerRole: string;
+    reasonCode: string;
+    priority: "routine" | "elevated";
+    humanReviewRequired: true;
+  }>;
+  segmentedKpis: Array<{
+    segmentHash: string;
+    relationshipDays: number;
+    transfers: number;
+    interruptions: number;
+    reconnects: number;
+  }>;
+  containsRawPhi: false;
+  causalClaimAuthorized: false;
+  therapeuticClaimAuthorized: false;
+  assessmentHash: string;
+};
+
+export type PublicSectorReadinessEvidenceProfile = {
+  profileId: string;
+  evidenceOwner: string;
+  recordedAt: string;
+  expiresAt: string;
+  securityControls: WorkflowReleaseEvidence[];
+  dataResidencyEvidence: WorkflowReleaseEvidence[];
+  auditabilityEvidence: WorkflowReleaseEvidence[];
+  accessibilityEvidence: WorkflowReleaseEvidence[];
+  procurementArtifacts: WorkflowReleaseEvidence[];
+  contractVehicleReferences: WorkflowReleaseEvidence[];
+  status: "research" | "evidence-collection" | "review-ready" | "approved-documentary";
+};
+
+export type PublicSectorReadinessDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  evidenceFresh: boolean;
+  documentaryCoverage: number;
+  readyForProcurementReview: boolean;
+  complianceClaimAuthorized: false;
+  purchasingEligibilityClaimAuthorized: false;
+  decisionHash: string;
+};
+
+export type ChallengerModelProfile = {
+  challengerId: string;
+  modelReference: string;
+  sourceClassification: "unverified-research-input" | "locally-reproduced";
+  supportedTaskCandidates: string[];
+  modalities: Array<"text" | "structured" | "image" | "tool-call">;
+  licenseStatus: "unverified" | "reviewed";
+  infrastructureRequirements: string[];
+  isolatedNonPhiOnly: true;
+  phiPermitted: false;
+  productionRegistered: false;
+  providerCallsEnabled: false;
+  enabled: false;
+};
+
+export type ChallengerEvaluationRun = {
+  runId: string;
+  challengerId: string;
+  taskProfileId: string;
+  fixtureSetHash: string;
+  harnessHash: string;
+  seed: number;
+  evaluatedAt: string;
+  isolatedEnvironmentId: string;
+  dataClassification: "public" | "synthetic-no-phi";
+  providerCallExecuted: false;
+  metrics: {
+    quality: number;
+    instructionFollowing: number;
+    toolAccuracy: number;
+    p95LatencyMs: number;
+    costPerCompletedWorkflowUsd: number;
+    reliability: number;
+  };
+  licenseEvidenceHash: string | null;
+  infrastructureEvidenceHash: string | null;
+  locallyReproduced: boolean;
+  namedApprovalRecorded: boolean;
+};
+
+export type ChallengerEvaluationDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  locallyReproducedEvidenceAccepted: boolean;
+  eligibleForNamedReview: boolean;
+  productionPromotionAuthorized: false;
+  phiAuthorized: false;
+  decisionHash: string;
+};
+
+export type WorkflowRoiDashboard = {
+  schemaVersion: "scrimed-workflow-roi-v1";
+  askingVersusDoing: { asking: number; doing: number; total: number };
+  verifiedOutcomes: number;
+  failedOrRolledBackActions: number;
+  humanReviewMinutes: number;
+  continuity: {
+    relationshipDays: number;
+    transfers: number;
+    interruptions: number;
+    reconnects: number;
+  };
+  costPerCompletedWorkflowUsd: number | null;
+  providerDistribution: Array<{ providerId: string; modelId: string; workflowCount: number }>;
+  routingRationale: string[];
+  evidenceFreshness: "fresh" | "stale" | "missing";
+  expansionGateStatus: PolicyDecision;
+  containsRawPhi: false;
+  dashboardHash: string;
+};
+
 export type P34FeatureFlags = {
   adaptiveGovernanceEnabled: boolean;
   deterministicRouterEnabled: boolean;
@@ -534,6 +937,11 @@ export type P34FeatureFlags = {
   twoLoopEvaluationEnabled: boolean;
   finOpsResilienceEnabled: boolean;
   hybridPlacementEnabled: boolean;
+  workflowContractsEnabled: boolean;
+  continuityMetricsEnabled: boolean;
+  challengerEvaluationEnabled: boolean;
+  trustExpansionEnabled: boolean;
+  publicSectorClaimsEnabled: boolean;
   externalProviderCallsEnabled: boolean;
   dicomExportEnabled: boolean;
   livePhiEnabled: boolean;

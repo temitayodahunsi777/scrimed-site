@@ -24,6 +24,37 @@ Stop automation and route to the named qualified human when evidence is missing,
 4. Require named human promotion approval and rollback readiness.
 5. Never silently substitute the route or reduce the required safety tier.
 
+## Workflow Admission
+
+1. Validate the exact versioned workflow contract before planning or routing.
+2. Stop when owner, intended use, baseline, outcome/safety KPIs, sources, classification, locality, authority, approval, rollback, or fresh release evidence is missing.
+3. Revalidate provider task fit, local evidence, context capacity, residency, license, interoperability, and health.
+4. Record any cost or latency degradation justification; safety, privacy, authorization, and critical-error floors cannot be degraded.
+5. Fail closed when no eligible route remains.
+
+## Action And Rollback
+
+1. Advance only one permitted action-maturity state at a time.
+2. Bind each transition to actor, authority, input/result hashes, policy, timestamp, idempotency key, predecessor, and rollback state.
+3. Require a fresh, independent, exact candidate/payload approval before `AUTHORIZED_EXECUTION`.
+4. Reject approval replay, duplicate attempts, transition skips, self-approval, and every external system-of-record write in this candidate.
+5. Record `VERIFIED_OUTCOME` only with result evidence; record failures and reversals with rollback disposition.
+
+## Pilot Expansion
+
+1. Fix the synthetic cohort, duration, thresholds, and evidence expiry before evaluation.
+2. Check completion, verified outcomes, critical errors, overrides, rollback, review burden, abandonment, latency, and cost per completed workflow.
+3. Require named clinical, privacy/security, and operational approval tied to fresh evidence.
+4. Treat a passing result as review eligibility only. Expansion remains disabled until a separate authorized release decision.
+
+## Continuity And Public-Sector Evidence
+
+Record only hashed relationship and event references. Route transfers, unresolved interruptions, and long gaps to human work queues. Do not infer causality, treatment benefit, or therapeutic effect. Public-sector readiness requires documentary security, residency, auditability, accessibility, procurement, and contract-vehicle evidence; never infer certification, authorization, compliance, or purchasing eligibility.
+
+## Challenger Evaluation
+
+Keep challenger interfaces disabled and non-PHI. Record vendor claims as unverified research inputs, then use fixed fixtures, seeds, harness digests, license evidence, infrastructure evidence, quality, instruction following, tool accuracy, latency, cost, and reliability. Local reproduction only permits named review; it does not register or promote a production model.
+
 ## DICOM De-identification
 
 1. Preserve the source object unchanged and hash it.
@@ -36,4 +67,4 @@ Stop automation and route to the named qualified human when evidence is missing,
 
 ## Local Verification
 
-Run `npm run test:scrimed-p34`, `npm run contract:scrimed-p34`, `npm run check:scrimed-p34-artifacts`, then the full nonsecret, typecheck, lint, build, secret, SBOM, generated-integrity, and diff checks. Use the repository direct-Node runner when shell `npm` is unavailable and report that environment limitation.
+Run `npm run test:scrimed-p34`, `npm run test:scrimed-p34-workflow-continuity`, `npm run contract:scrimed-p34`, `npm run check:scrimed-p34-artifacts`, then the full nonsecret, typecheck, lint, build, secret, SBOM, generated-integrity, and diff checks. Use the repository direct-Node runner when shell `npm` is unavailable and report that environment limitation.

@@ -60,6 +60,7 @@ jobs:
           npm run contract:scrimed-p33
           npm run check:scrimed-p33-artifacts
           npm run test:scrimed-p34
+          npm run test:scrimed-p34-workflow-continuity
           npm run contract:scrimed-p34
           npm run check:scrimed-p34-artifacts
 

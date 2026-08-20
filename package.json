@@ -259,6 +259,7 @@
     "generate:scrimed-p33-artifacts": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p33-artifacts.mjs",
     "check:scrimed-p33-artifacts": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p33-artifacts.mjs --check",
     "test:scrimed-p34": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p34-adaptive-governance-policy-test.mjs",
+    "test:scrimed-p34-workflow-continuity": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p34-workflow-continuity-policy-test.mjs",
     "contract:scrimed-p34": "node scripts/scrimed-p34-adaptive-governance-contract-check.mjs",
     "smoke:scrimed-p34": "node scripts/scrimed-p34-adaptive-governance-contract-check.mjs",
     "generate:scrimed-p34-artifacts": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/scrimed-p34-artifacts.mjs",

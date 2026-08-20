@@ -45,6 +45,8 @@ function admission(overrides = {}) {
     requiredInputModality: "structured",
     requiredOutputModality: "structured",
     requiredToolIds: ["validator"],
+    productPath: "scrimed-p34-synthetic-evaluation",
+    requiredCompatibility: [],
     maximumLatencyMs: 2_000,
     maximumCostUsd: 0,
     evaluatedAt: "2026-08-15T12:00:00.000Z",
@@ -532,6 +534,9 @@ check("high-risk-feature-flags-default-off", () => {
   assert.equal(flags.livePhiEnabled, false);
   assert.equal(flags.consequentialExecutionEnabled, false);
   assert.equal(flags.productionPromotionEnabled, false);
+  assert.equal(flags.challengerEvaluationEnabled, false);
+  assert.equal(flags.trustExpansionEnabled, false);
+  assert.equal(flags.publicSectorClaimsEnabled, false);
 });
 
 check("integrated-summary-retains-boundaries", () => {

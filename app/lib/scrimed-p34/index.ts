@@ -30,20 +30,38 @@ import {
   p34BasicDicomDeidentificationProfile,
   p34DicomPrivacyBoundary
 } from "./dicomPrivacy";
+import {
+  buildWorkflowRoiDashboard,
+  createP34SyntheticActionHistory,
+  createP34SyntheticContinuityAssessment,
+  createP34SyntheticExpansionEvidence,
+  createP34SyntheticPublicSectorProfile,
+  createP34SyntheticWorkflowContract,
+  evaluateIsolatedChallenger,
+  evaluatePublicSectorReadiness,
+  evaluateTrustExpansion,
+  p34IsolatedChallengerProfiles,
+  p34WorkflowContinuityBoundary,
+  p34WorkflowContinuityVersion,
+  selectWorkflowModelFitRoute,
+  validateWorkflowContract,
+  verifyActionMaturityChain
+} from "./workflowContinuity";
 import type { P34GateRecord, P34GateStatus, TaskPolicy } from "./types";
 
 export * from "./types";
 export * from "./adaptiveGovernance";
 export * from "./contextProvenance";
 export * from "./dicomPrivacy";
+export * from "./workflowContinuity";
 
 export const p34IntegratedRoute = "/scrimed-p34";
 export const p34IntegratedApiRoute = "/api/scrimed-control-plane/p34";
 export const p34IntegratedBriefRoute = "/api/scrimed-control-plane/p34/brief";
-export const p34IntegratedVersion = "scrimed-p34-integrated-v1-2026-08-15";
+export const p34IntegratedVersion = "scrimed-p34-integrated-v2-2026-08-19";
 
 export const p34IntegratedBoundary =
-  "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI control-plane candidate. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, or external distribution.";
+  "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI control-plane candidate with bounded workflow contracts, model-fit routing, action maturity, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
 
 function gate(input: Omit<P34GateRecord, "gateHash">): P34GateRecord {
   return {
@@ -58,6 +76,26 @@ function gate(input: Omit<P34GateRecord, "gateHash">): P34GateRecord {
 
 export function getP34AdaptiveGovernanceSummary() {
   const registry = createP34CapabilityRegistry();
+  const workflowContract = createP34SyntheticWorkflowContract();
+  const workflowContractDecision = validateWorkflowContract(workflowContract, "2026-08-19T12:00:00.000Z");
+  const workflowModelFit = selectWorkflowModelFitRoute({
+    contract: workflowContract,
+    registry,
+    taskClass: "validation",
+    productPath: "scrimed-p34-synthetic-evaluation",
+    requiredInputModality: "structured",
+    requiredOutputModality: "structured",
+    requiredCompatibility: [],
+    requiredToolIds: ["validator"],
+    requiredContextTokens: 8_000,
+    minimumQuality: 0.95,
+    minimumReliability: 0.99,
+    preferredMaximumLatencyMs: 100,
+    preferredMaximumCostUsd: 0.01,
+    deterministicSufficient: true,
+    degradationJustificationByRoute: {},
+    evaluatedAt: "2026-08-19T12:00:00.000Z"
+  });
   const capabilityAdmission = evaluateCapabilityAdmission(registry, {
     routeId: "route-local-deterministic-v1",
     taskClass: "validation",
@@ -68,6 +106,8 @@ export function getP34AdaptiveGovernanceSummary() {
     requiredInputModality: "structured",
     requiredOutputModality: "structured",
     requiredToolIds: ["validator"],
+    productPath: "scrimed-p34-synthetic-evaluation",
+    requiredCompatibility: [],
     maximumLatencyMs: 2_000,
     maximumCostUsd: 0,
     evaluatedAt: "2026-08-15T12:00:00.000Z"
@@ -302,6 +342,54 @@ export function getP34AdaptiveGovernanceSummary() {
     legalApprovalRecorded: false
   }, "2026-08-15T12:00:00.000Z");
   const operation = createP34SyntheticOperation(taskRoute, finOps);
+  const actionEvents = createP34SyntheticActionHistory(candidateHash, context.envelopeHash);
+  const actionMaturityVerification = verifyActionMaturityChain(actionEvents);
+  const trustExpansion = evaluateTrustExpansion(
+    createP34SyntheticExpansionEvidence(),
+    "2026-08-19T12:00:00.000Z"
+  );
+  const continuity = createP34SyntheticContinuityAssessment();
+  const publicSectorReadiness = evaluatePublicSectorReadiness(
+    createP34SyntheticPublicSectorProfile(),
+    "2026-08-19T12:00:00.000Z"
+  );
+  const challengerEvaluation = evaluateIsolatedChallenger(
+    p34IsolatedChallengerProfiles[0],
+    {
+      runId: "p34-challenger-evaluation-not-executed",
+      challengerId: p34IsolatedChallengerProfiles[0].challengerId,
+      taskProfileId: "bounded-code-evaluation",
+      fixtureSetHash: createClinicalEvidenceHash("p34-challenger-fixture-set"),
+      harnessHash: createClinicalEvidenceHash("p34-challenger-harness"),
+      seed: 34,
+      evaluatedAt: "2026-08-19T12:00:00.000Z",
+      isolatedEnvironmentId: "env-local-sandbox-v1",
+      dataClassification: "synthetic-no-phi",
+      providerCallExecuted: false,
+      metrics: {
+        quality: 0,
+        instructionFollowing: 0,
+        toolAccuracy: 0,
+        p95LatencyMs: 0,
+        costPerCompletedWorkflowUsd: 0,
+        reliability: 0
+      },
+      licenseEvidenceHash: null,
+      infrastructureEvidenceHash: null,
+      locallyReproduced: false,
+      namedApprovalRecorded: false
+    }
+  );
+  const roiDashboard = buildWorkflowRoiDashboard({
+    actionEvents,
+    operations: [operation],
+    continuity,
+    routingDecisions: [workflowModelFit],
+    expansion: trustExpansion,
+    humanReviewMinutes: 4,
+    completedWorkflowCostsUsd: [0],
+    evidenceFreshness: workflowContractDecision.evidenceFreshness
+  });
   const featureFlags = getP34FeatureFlags();
 
   const gateMatrix: P34GateRecord[] = [
@@ -314,7 +402,15 @@ export function getP34AdaptiveGovernanceSummary() {
     gate({ gateId: "P34-07", status: finOps.runtimeState === "NORMAL" && placement.selectedPlacementId !== null ? "PASS" : "FAIL", ownerRole: "platform-operations-owner", description: "FinOps, resilience, cache isolation, and placement controls pass the synthetic fixture.", evidence: [finOps.decisionHash, placement.decisionHash], reasonCodes: [...finOps.reasonCodes, ...placement.reasonCodes], candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-08", status: "OPERATOR_REQUIRED", ownerRole: "independent-technical-reviewer", description: "A named reviewer must approve the exact local commit and evidence fingerprints.", evidence: ["exact candidate review packet after local commit"], reasonCodes: ["NAMED_REVIEW_PENDING"], candidateBound: true, externalActionRequired: true }),
     gate({ gateId: "P34-09", status: "BLOCKED", ownerRole: "privacy-security-clinical-owners", description: "PHI-capable and clinical pilots require documentary, technical, legal, clinical, and security authorization.", evidence: ["no qualifying external evidence in local candidate"], reasonCodes: ["LIVE_PHI_DISABLED", "CLINICAL_AUTHORITY_ABSENT"], candidateBound: true, externalActionRequired: true }),
-    gate({ gateId: "P34-10", status: "BLOCKED", ownerRole: "release-owner", description: "Production deployment, migration, external distribution, and customer activation remain prohibited.", evidence: ["release authorization absent"], reasonCodes: ["PRODUCTION_AUTHORITY_ABSENT", "CUSTOMER_ACTIVATION_AUTHORITY_ABSENT"], candidateBound: true, externalActionRequired: true })
+    gate({ gateId: "P34-10", status: "BLOCKED", ownerRole: "release-owner", description: "Production deployment, migration, external distribution, and customer activation remain prohibited.", evidence: ["release authorization absent"], reasonCodes: ["PRODUCTION_AUTHORITY_ABSENT", "CUSTOMER_ACTIVATION_AUTHORITY_ABSENT"], candidateBound: true, externalActionRequired: true }),
+    gate({ gateId: "P34-11", status: workflowContractDecision.contractValid ? "PASS" : "FAIL", ownerRole: "workflow-owner", description: "Versioned workflow contract binds intended use, owner, metrics, data, authority, rollback, and fresh release evidence.", evidence: [workflowContractDecision.contractHash], reasonCodes: workflowContractDecision.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-12", status: workflowModelFit.selectedRouteId === "route-local-deterministic-v1" && workflowModelFit.publicBenchmarkRankUsed === false ? "PASS" : "FAIL", ownerRole: "model-governance-owner", description: "Model-fit routing selects only eligible locally evaluated routes and never routes from public rank alone.", evidence: [workflowModelFit.decisionHash], reasonCodes: workflowModelFit.routeReasons, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-13", status: actionMaturityVerification.valid && actionEvents.at(-1)?.nextState === "PENDING_APPROVAL" ? "PASS" : "FAIL", ownerRole: "action-governance-owner", description: "Action maturity remains approval-pending with immutable actor, authority, input, policy, result, and rollback evidence.", evidence: [actionMaturityVerification.chainHash], reasonCodes: actionMaturityVerification.failures.map((failure) => failure.reasonCode), candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-14", status: "OPERATOR_REQUIRED", ownerRole: "clinical-privacy-security-operational-owners", description: "Pilot expansion requires fresh threshold evidence and named clinical, privacy/security, and operational approval.", evidence: [trustExpansion.decisionHash], reasonCodes: trustExpansion.reasonCodes, candidateBound: true, externalActionRequired: true }),
+    gate({ gateId: "P34-15", status: continuity.containsRawPhi === false && continuity.causalClaimAuthorized === false && continuity.therapeuticClaimAuthorized === false ? "PASS" : "FAIL", ownerRole: "care-continuity-research-owner", description: "Continuity is measured as a non-PHI operational and research metric with human-reviewed transition work queues.", evidence: [continuity.assessmentHash], reasonCodes: continuity.providerTransitionRiskSignals, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-16", status: "BLOCKED", ownerRole: "public-sector-readiness-owner", description: "Public-sector claims require fresh documentary security, residency, auditability, accessibility, procurement, and contract-vehicle evidence.", evidence: [publicSectorReadiness.decisionHash], reasonCodes: publicSectorReadiness.reasonCodes, candidateBound: true, externalActionRequired: true }),
+    gate({ gateId: "P34-17", status: "BLOCKED", ownerRole: "model-governance-owner", description: "Named challenger references remain isolated, disabled, non-PHI research inputs until locally reproduced and independently approved.", evidence: [challengerEvaluation.decisionHash], reasonCodes: challengerEvaluation.reasonCodes, candidateBound: true, externalActionRequired: true }),
+    gate({ gateId: "P34-18", status: roiDashboard.containsRawPhi === false && /^[0-9a-f]{64}$/.test(roiDashboard.dashboardHash) ? "PASS" : "FAIL", ownerRole: "value-telemetry-owner", description: "ROI telemetry exposes asking versus doing, verified outcomes, failures, review burden, continuity, cost, routing, and evidence freshness without PHI.", evidence: [roiDashboard.dashboardHash], reasonCodes: [], candidateBound: false, externalActionRequired: false })
   ];
   const statuses: P34GateStatus[] = ["PASS", "OPERATOR_REQUIRED", "BLOCKED", "FAIL"];
   const gateCounts = Object.fromEntries(statuses.map((status) => [
@@ -325,15 +421,18 @@ export function getP34AdaptiveGovernanceSummary() {
     service: "scrimed-p34-adaptive-governance" as const,
     version: p34IntegratedVersion,
     status: gateCounts.FAIL > 0 ? "local-validation-failed" : "local-synthetic-candidate-review-required",
-    mission: "Optimize cost per safe, clinically accepted outcome with deterministic-first, vendor-neutral, contemporaneously governed execution.",
+    mission: "Optimize cost per safe, verified workflow outcome with deterministic-first, vendor-neutral, contemporaneously governed execution and continuity evidence.",
     boundary: p34IntegratedBoundary,
-    componentBoundaries: [p34AdaptiveGovernanceBoundary, p34ContextProvenanceBoundary, p34DicomPrivacyBoundary],
+    componentBoundaries: [p34AdaptiveGovernanceBoundary, p34ContextProvenanceBoundary, p34DicomPrivacyBoundary, p34WorkflowContinuityBoundary],
     route: p34IntegratedRoute,
     apiRoute: p34IntegratedApiRoute,
     briefRoute: p34IntegratedBriefRoute,
     featureFlags,
     featureFlagDefaults: p34FeatureFlagDefaults,
     registry,
+    workflowContract,
+    workflowContractDecision,
+    workflowModelFit,
     capabilityAdmission,
     taskPolicy,
     taskRoute,
@@ -342,10 +441,21 @@ export function getP34AdaptiveGovernanceSummary() {
     dicomPrivacy,
     controlledAction,
     governance: { records, verification: governanceVerification },
+    actionMaturity: { events: actionEvents, verification: actionMaturityVerification },
     evaluation,
     finOps,
     placement,
     operations: [operation],
+    trustExpansion,
+    continuity,
+    publicSectorReadiness,
+    challengerHarness: {
+      version: p34WorkflowContinuityVersion,
+      profiles: p34IsolatedChallengerProfiles,
+      evaluation: challengerEvaluation,
+      enabled: featureFlags.challengerEvaluationEnabled
+    },
+    roiDashboard,
     pilotObjectives: p34PilotObjectives,
     publicClaimDecision,
     gateMatrix,
@@ -381,13 +491,21 @@ export function buildP34AdaptiveGovernanceBrief() {
     "",
     "## Technical Evidence",
     `- Capability registry: ${summary.registry.providers.length} routes; admission ${summary.capabilityAdmission.decision}`,
+    `- Workflow contract: ${summary.workflowContractDecision.decision}; evidence ${summary.workflowContractDecision.evidenceFreshness}`,
+    `- Model fit: ${summary.workflowModelFit.selectedRouteId ?? "safe refusal"}; public rank used ${summary.workflowModelFit.publicBenchmarkRankUsed}`,
     `- Deterministic route: ${summary.taskRoute.selectedTechnique ?? "safe refusal"}`,
     `- Context: ${summary.context.chunks.length} provenance chunks; ${summary.context.conflictGroupIds.length} retained conflict groups`,
     `- DICOM privacy: ${summary.dicomPrivacy.disposition}; export authorized ${summary.dicomPrivacy.exportAuthorized}`,
     `- Governance chain: ${summary.governance.verification.valid}; ${summary.governance.verification.recordCount} records`,
+    `- Action maturity: ${summary.actionMaturity.events.at(-1)?.nextState ?? "none"}; chain ${summary.actionMaturity.verification.valid}`,
     `- Evaluation: ${summary.evaluation.decision}; automatic promotion ${summary.evaluation.automaticPromotionAllowed}`,
     `- Runtime: ${summary.finOps.runtimeState}; cost per completed synthetic task ${summary.finOps.costPerCompletedTaskUsd}`,
     `- Placement: ${summary.placement.selectedPlacementId ?? "safe refusal"}`,
+    `- Continuity: ${summary.continuity.continuityDurationDays} days; ${summary.continuity.transferCount} transfers; causal claims ${summary.continuity.causalClaimAuthorized}`,
+    `- Expansion: ${summary.trustExpansion.decision}; authorized ${summary.trustExpansion.expansionAuthorized}`,
+    `- Public sector: ${summary.publicSectorReadiness.decision}; compliance claims ${summary.publicSectorReadiness.complianceClaimAuthorized}`,
+    `- Challengers: ${summary.challengerHarness.profiles.length} disabled research profiles; promotion ${summary.challengerHarness.evaluation.productionPromotionAuthorized}`,
+    `- ROI: asking ${summary.roiDashboard.askingVersusDoing.asking}; doing ${summary.roiDashboard.askingVersusDoing.doing}; cost per completed workflow ${summary.roiDashboard.costPerCompletedWorkflowUsd}`,
     "",
     "## Gates",
     ...summary.gateMatrix.map((gateRecord) => `- ${gateRecord.gateId}: ${gateRecord.status} — ${gateRecord.description}`),

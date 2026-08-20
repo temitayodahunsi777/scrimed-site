@@ -1,16 +1,16 @@
 {
-  "schemaVersion": "scrimed-p34-validation-report-v1",
-  "scope": "deterministic synthetic p.34 domain contracts",
-  "generatedAt": "2026-08-15T00:00:00.000Z",
+  "schemaVersion": "scrimed-p34-validation-report-v2",
+  "scope": "deterministic synthetic p.34 governance, workflow, model-fit, action, continuity, and evidence contracts",
+  "generatedAt": "2026-08-19T00:00:00.000Z",
   "status": "PASS",
-  "checkCount": 12,
-  "passedCount": 12,
+  "checkCount": 20,
+  "passedCount": 20,
   "failedCount": 0,
   "checks": [
     {
       "id": "capability-registry-integrity",
       "passed": true,
-      "evidence": "ff08b8a79cbce52c7ad07b5277df40a68befe321f2cd2bbebe50db60a850429a"
+      "evidence": "003ffd892275a2e205c62a33d325c2a520cf5a0ad90ec9835c4368485c60a032"
     },
     {
       "id": "unknown-capability-default-deny",
@@ -58,17 +58,57 @@
       "evidence": "4b38f3ff2da3f778ba02c70100f47ba6d31d17300f7486e82b321e38b089ff66"
     },
     {
+      "id": "workflow-contract-complete",
+      "passed": true,
+      "evidence": "a26a2f12f838f93621ea311955d4f695f93589fb30a579b990ee1e84d83f10c2"
+    },
+    {
+      "id": "model-fit-local-evidence-only",
+      "passed": true,
+      "evidence": "b4730a1656a3de0a7b031b28f4e97ec7dad279c0e9e59bad1d06585ff072b035"
+    },
+    {
+      "id": "action-maturity-approval-pending",
+      "passed": true,
+      "evidence": "471376b76c26a352766c92907a264d5f6a0c756000fb9097251027716c710504"
+    },
+    {
+      "id": "trust-expansion-not-authorized",
+      "passed": true,
+      "evidence": "f29991c0c0a215cde9a71b8a0df701d5fa050918cd2f23eaa6fd17deee564b8c"
+    },
+    {
+      "id": "continuity-no-causal-claim",
+      "passed": true,
+      "evidence": "bfdcaecefdd7234c7aa158196808f056a052313eaadd4ac7cbf2a8050ddfb286"
+    },
+    {
+      "id": "public-sector-claims-disabled",
+      "passed": true,
+      "evidence": "45ed6544c8a9fb5c934023c7394661eca4ebfc873c299f1a363856b28559a2cf"
+    },
+    {
+      "id": "challenger-isolated-and-disabled",
+      "passed": true,
+      "evidence": "83e25e67dd2db18f571de262874fdab7292702bcf9f69fc13245f41be6cf19a9"
+    },
+    {
+      "id": "workflow-roi-redacted",
+      "passed": true,
+      "evidence": "f0409d4faab5adbb2eb8d0c44bdc85afc383512196cfaed0f7b56f8898446a59"
+    },
+    {
       "id": "high-risk-flags-default-off",
       "passed": true,
-      "evidence": "five high-risk flags disabled"
+      "evidence": "eight high-risk flags disabled"
     },
     {
       "id": "release-authority-retained",
       "passed": true,
-      "evidence": "1fc1c07fc8361effd5052388f760d5d4c1aac0404e8612c217e81b7173c825fc"
+      "evidence": "3b4f818d05c9a30df956f36012d92575a6b7c6476e4ac3cee79c03639d369ccb"
     }
   ],
   "externalEvidenceVerified": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "1fc1c07fc8361effd5052388f760d5d4c1aac0404e8612c217e81b7173c825fc"
+  "summaryHash": "3b4f818d05c9a30df956f36012d92575a6b7c6476e4ac3cee79c03639d369ccb"
 }

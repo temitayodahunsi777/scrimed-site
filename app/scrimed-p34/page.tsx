@@ -5,7 +5,7 @@ import { getP34AdaptiveGovernanceSummary } from "../lib/scrimed-p34";
 export const metadata = {
   title: "SCRIMED p.34 Adaptive Governance",
   description:
-    "Synthetic, human-supervised capability admission, deterministic routing, provenance, DICOM privacy, assurance, FinOps, and operator accountability."
+    "Synthetic, human-supervised workflow contracts, model-fit routing, action maturity, continuity, provenance, assurance, and operator accountability."
 };
 
 function Status({ value }: { value: string }) {
@@ -28,9 +28,9 @@ export default function ScrimedP34Page() {
         <p className="eyebrow">SCRIMED p.34</p>
         <h1>Adaptive governance with proof at every decision.</h1>
         <p className="hero-text">
-          Vendor-neutral capability admission, deterministic-first routing, provenance-preserving context,
-          DICOM privacy controls, contemporaneous evidence, quality ratchets, and task-level economics in
-          one synthetic operator surface.
+          Vendor-neutral capability admission, deterministic-first model fit, versioned workflow contracts,
+          approval-bound action maturity, continuity evidence, DICOM privacy, quality ratchets, and task-level
+          economics in one synthetic operator surface.
         </p>
         <div className="hero-actions" aria-label="p.34 resources">
           <Link href={summary.apiRoute}>Inspect API</Link>
@@ -44,6 +44,9 @@ export default function ScrimedP34Page() {
         <article><span>Provider routes</span><strong>{summary.registry.providers.length}</strong></article>
         <article><span>Technique</span><strong>{summary.taskRoute.selectedTechnique ?? "safe refusal"}</strong></article>
         <article><span>Context chunks</span><strong>{summary.context.chunks.length}</strong></article>
+        <article><span>Workflow evidence</span><strong>{summary.workflowContractDecision.evidenceFreshness}</strong></article>
+        <article><span>Action state</span><strong>{summary.actionMaturity.events.at(-1)?.nextState ?? "none"}</strong></article>
+        <article><span>Continuity days</span><strong>{summary.continuity.continuityDurationDays}</strong></article>
         <article><span>Gate passes</span><strong>{summary.gateCounts.PASS}</strong></article>
         <article><span>Operator gates</span><strong>{summary.gateCounts.OPERATOR_REQUIRED}</strong></article>
         <article><span>Blocked gates</span><strong>{summary.gateCounts.BLOCKED}</strong></article>
@@ -136,6 +139,75 @@ export default function ScrimedP34Page() {
             <div><strong>Review</strong><p>{(operation.humanReviewRate * 100).toFixed(0)}% · {operation.approvalState}</p></div>
           </article>
         ))}
+      </section>
+
+      <section className="table-section" aria-label="Workflow and action maturity">
+        <div className="section-heading">
+          <p className="eyebrow">Workflow + Action</p>
+          <h2>Execution starts with a complete contract and advances one authorized state at a time.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.workflowContractDecision.decision} /><h2>{summary.workflowContract.workflowId}</h2></div>
+          <p>{summary.workflowContract.intendedUse}</p>
+          <div><strong>Owner</strong><p>{summary.workflowContract.namedOwner}</p></div>
+          <div><strong>Release evidence</strong><p>{summary.workflowContract.releaseEvidence.length} records · {summary.workflowContractDecision.evidenceFreshness}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.workflowModelFit.decision} /><h2>Model-fit route</h2></div>
+          <p>{summary.workflowModelFit.routeReasons.join(" · ")}</p>
+          <div><strong>Selected route</strong><p>{summary.workflowModelFit.selectedRouteId ?? "safe refusal"}</p></div>
+          <div><strong>Public rank</strong><p>{summary.workflowModelFit.publicBenchmarkRankUsed ? "used" : "never used"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.actionMaturity.events.at(-1)?.nextState ?? "blocked"} /><h2>Action maturity</h2></div>
+          <p>{summary.actionMaturity.events.length} attributable transitions; external writes remain disabled.</p>
+          <div><strong>Chain</strong><p>{summary.actionMaturity.verification.valid ? "valid" : "failed"}</p></div>
+          <div><strong>Execution</strong><p>human approval pending</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Continuity and expansion evidence">
+        <div className="section-heading">
+          <p className="eyebrow">Continuity + Expansion</p>
+          <h2>Relationship continuity is measurable; expansion is earned through fresh evidence.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.continuity.decision} /><h2>Continuity operations</h2></div>
+          <p>{summary.continuity.transferCount} transfer · {summary.continuity.interruptionCount} interruption · {summary.continuity.reconnectCount} reconnect</p>
+          <div><strong>Follow-up queue</strong><p>{summary.continuity.followUpWorkQueue.length} human-reviewed items</p></div>
+          <div><strong>Claims</strong><p>no causal or therapeutic authority</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.trustExpansion.decision} /><h2>Trust-based expansion</h2></div>
+          <p>{summary.trustExpansion.thresholdsPassed ? "Thresholds met" : "Thresholds missed"}; named approvals {summary.trustExpansion.namedApprovalsComplete ? "complete" : "pending"}.</p>
+          <div><strong>Evidence</strong><p>{summary.trustExpansion.evidenceFresh ? "fresh" : "stale or missing"}</p></div>
+          <div><strong>Expansion</strong><p>{summary.trustExpansion.expansionAuthorized ? "authorized" : "disabled"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.publicSectorReadiness.decision} /><h2>Public-sector evidence</h2></div>
+          <p>Documentary coverage {(summary.publicSectorReadiness.documentaryCoverage * 100).toFixed(0)}%.</p>
+          <div><strong>Procurement review</strong><p>{summary.publicSectorReadiness.readyForProcurementReview ? "eligible" : "evidence pending"}</p></div>
+          <div><strong>Eligibility claim</strong><p>not authorized</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Challenger and return on investment telemetry">
+        <div className="section-heading">
+          <p className="eyebrow">Challengers + ROI</p>
+          <h2>Research candidates stay isolated while value telemetry follows verified workflows.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.challengerHarness.enabled ? "review" : "blocked"} /><h2>Isolated challenger harness</h2></div>
+          <p>{summary.challengerHarness.profiles.length} unverified research profiles; no provider calls or PHI.</p>
+          <div><strong>Promotion</strong><p>{summary.challengerHarness.evaluation.productionPromotionAuthorized ? "authorized" : "disabled"}</p></div>
+          <div><strong>Local evidence</strong><p>{summary.challengerHarness.evaluation.locallyReproducedEvidenceAccepted ? "accepted" : "not reproduced"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.roiDashboard.expansionGateStatus} /><h2>Workflow ROI</h2></div>
+          <p>Asking {summary.roiDashboard.askingVersusDoing.asking} · doing {summary.roiDashboard.askingVersusDoing.doing} · verified outcomes {summary.roiDashboard.verifiedOutcomes}</p>
+          <div><strong>Human review</strong><p>{summary.roiDashboard.humanReviewMinutes} minutes</p></div>
+          <div><strong>Cost/workflow</strong><p>${summary.roiDashboard.costPerCompletedWorkflowUsd?.toFixed(4) ?? "not available"}</p></div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="p.34 gates">
