@@ -47,6 +47,10 @@ import {
   validateWorkflowContract,
   verifyActionMaturityChain
 } from "./workflowContinuity";
+import {
+  createP34ClinicalOperatingSystemSummary,
+  p34ClinicalOperatingSystemBoundary
+} from "./clinicalOperatingSystem";
 import type { P34GateRecord, P34GateStatus, TaskPolicy } from "./types";
 
 export * from "./types";
@@ -54,14 +58,15 @@ export * from "./adaptiveGovernance";
 export * from "./contextProvenance";
 export * from "./dicomPrivacy";
 export * from "./workflowContinuity";
+export * from "./clinicalOperatingSystem";
 
 export const p34IntegratedRoute = "/scrimed-p34";
 export const p34IntegratedApiRoute = "/api/scrimed-control-plane/p34";
 export const p34IntegratedBriefRoute = "/api/scrimed-control-plane/p34/brief";
-export const p34IntegratedVersion = "scrimed-p34-integrated-v2-2026-08-19";
+export const p34IntegratedVersion = "scrimed-p34-integrated-v3-2026-08-20";
 
 export const p34IntegratedBoundary =
-  "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI control-plane candidate with bounded workflow contracts, model-fit routing, action maturity, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
+  "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI clinical operating-system candidate with bounded workflow and autonomy contracts, model-fit routing, action maturity, tenant-first retrieval, PHI and sandbox controls, external-validation gates, patient-education previews, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, billing or payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
 
 function gate(input: Omit<P34GateRecord, "gateHash">): P34GateRecord {
   return {
@@ -76,6 +81,7 @@ function gate(input: Omit<P34GateRecord, "gateHash">): P34GateRecord {
 
 export function getP34AdaptiveGovernanceSummary() {
   const registry = createP34CapabilityRegistry();
+  const clinicalOperatingSystem = createP34ClinicalOperatingSystemSummary();
   const workflowContract = createP34SyntheticWorkflowContract();
   const workflowContractDecision = validateWorkflowContract(workflowContract, "2026-08-19T12:00:00.000Z");
   const workflowModelFit = selectWorkflowModelFitRoute({
@@ -410,7 +416,17 @@ export function getP34AdaptiveGovernanceSummary() {
     gate({ gateId: "P34-15", status: continuity.containsRawPhi === false && continuity.causalClaimAuthorized === false && continuity.therapeuticClaimAuthorized === false ? "PASS" : "FAIL", ownerRole: "care-continuity-research-owner", description: "Continuity is measured as a non-PHI operational and research metric with human-reviewed transition work queues.", evidence: [continuity.assessmentHash], reasonCodes: continuity.providerTransitionRiskSignals, candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-16", status: "BLOCKED", ownerRole: "public-sector-readiness-owner", description: "Public-sector claims require fresh documentary security, residency, auditability, accessibility, procurement, and contract-vehicle evidence.", evidence: [publicSectorReadiness.decisionHash], reasonCodes: publicSectorReadiness.reasonCodes, candidateBound: true, externalActionRequired: true }),
     gate({ gateId: "P34-17", status: "BLOCKED", ownerRole: "model-governance-owner", description: "Named challenger references remain isolated, disabled, non-PHI research inputs until locally reproduced and independently approved.", evidence: [challengerEvaluation.decisionHash], reasonCodes: challengerEvaluation.reasonCodes, candidateBound: true, externalActionRequired: true }),
-    gate({ gateId: "P34-18", status: roiDashboard.containsRawPhi === false && /^[0-9a-f]{64}$/.test(roiDashboard.dashboardHash) ? "PASS" : "FAIL", ownerRole: "value-telemetry-owner", description: "ROI telemetry exposes asking versus doing, verified outcomes, failures, review burden, continuity, cost, routing, and evidence freshness without PHI.", evidence: [roiDashboard.dashboardHash], reasonCodes: [], candidateBound: false, externalActionRequired: false })
+    gate({ gateId: "P34-18", status: roiDashboard.containsRawPhi === false && /^[0-9a-f]{64}$/.test(roiDashboard.dashboardHash) ? "PASS" : "FAIL", ownerRole: "value-telemetry-owner", description: "ROI telemetry exposes asking versus doing, verified outcomes, failures, review burden, continuity, cost, routing, and evidence freshness without PHI.", evidence: [roiDashboard.dashboardHash], reasonCodes: [], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-19", status: clinicalOperatingSystem.autonomy.decision === "REQUIRE_HUMAN" && clinicalOperatingSystem.autonomy.authorizationState === "verification-required" && !clinicalOperatingSystem.autonomy.approvalConsumed && !clinicalOperatingSystem.autonomy.executionAuthorized ? "PASS" : "FAIL", ownerRole: "autonomy-policy-owner", description: "A0-A3 autonomy validates exact approval scope but cannot execute until a trusted approval store atomically verifies and consumes the approval.", evidence: [clinicalOperatingSystem.autonomy.decisionHash], reasonCodes: clinicalOperatingSystem.autonomy.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-20", status: clinicalOperatingSystem.phi.startupValidation.startupAllowed && clinicalOperatingSystem.phi.egress.decision === "ALLOW" && clinicalOperatingSystem.phi.egress.providerCallAuthorized === false ? "PASS" : "FAIL", ownerRole: "privacy-security-owner", description: "Sensitive schema fields are classified before startup and no raw PHI, secret, or unauthorized provider route crosses egress.", evidence: [clinicalOperatingSystem.phi.startupValidation.validationHash, clinicalOperatingSystem.phi.egress.decisionHash], reasonCodes: [...clinicalOperatingSystem.phi.startupValidation.missingClassifications, ...clinicalOperatingSystem.phi.egress.reasonCodes], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-21", status: clinicalOperatingSystem.sandbox.policyCompliant && clinicalOperatingSystem.sandbox.decision === "REQUIRE_HUMAN" && !clinicalOperatingSystem.sandbox.isolatedWorkspaceAuthorized && clinicalOperatingSystem.sandbox.externalSandboxActivated === false ? "PASS" : "FAIL", ownerRole: "platform-security-owner", description: "Provider-neutral sandbox policy validates tenant, egress, resources, credentials, and cleanup while runtime containment remains unauthorized until canonical open-time verification exists.", evidence: [clinicalOperatingSystem.sandbox.decisionHash], reasonCodes: clinicalOperatingSystem.sandbox.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-22", status: clinicalOperatingSystem.retrieval.decision === "ALLOW" && clinicalOperatingSystem.retrieval.tenantFilterAppliedBeforeRanking ? "PASS" : "FAIL", ownerRole: "clinical-context-owner", description: "Clinical context retrieval filters tenant and purpose before ranking, preserves citations and freshness, and abstains on ambiguity or insufficient evidence.", evidence: [clinicalOperatingSystem.retrieval.decisionHash], reasonCodes: clinicalOperatingSystem.retrieval.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-23", status: "BLOCKED", ownerRole: "external-clinical-validation-owner", description: "Clinical production eligibility requires fresh, named, multisite external validation; internal synthetic evidence cannot satisfy this gate.", evidence: [clinicalOperatingSystem.externalValidation.decisionHash], reasonCodes: clinicalOperatingSystem.externalValidation.reasonCodes, candidateBound: true, externalActionRequired: true }),
+    gate({ gateId: "P34-24", status: clinicalOperatingSystem.oversight.decision === "ALLOW" && clinicalOperatingSystem.oversight.oversightReductionAuthorized === false ? "PASS" : "FAIL", ownerRole: "clinical-safety-owner", description: "Oversight drift tracks review, corrections, absolute error volume, silent acceptance, latency, and cohort coverage without automatic review reduction.", evidence: [clinicalOperatingSystem.oversight.decisionHash], reasonCodes: clinicalOperatingSystem.oversight.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-25", status: clinicalOperatingSystem.patientTakeHome.decision === "REQUIRE_HUMAN" && clinicalOperatingSystem.patientTakeHome.deliveryAuthorized === false ? "PASS" : "FAIL", ownerRole: "patient-communication-owner", description: "Patient Take-Home previews use approved cited facts, preferences, accessibility, proxy rules, and clinician review while delivery remains disabled.", evidence: [clinicalOperatingSystem.patientTakeHome.documentHash], reasonCodes: clinicalOperatingSystem.patientTakeHome.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-26", status: clinicalOperatingSystem.coding.draftAuthorized && clinicalOperatingSystem.coding.billingSubmissionAuthorized === false ? "PASS" : "FAIL", ownerRole: "coding-governance-owner", description: "Medical coding defaults to assisted, evidence-bound drafting with human review and no billing release authority.", evidence: [clinicalOperatingSystem.coding.decisionHash], reasonCodes: clinicalOperatingSystem.coding.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-27", status: clinicalOperatingSystem.operations.retryAllowed && clinicalOperatingSystem.operations.idempotencyPreserved ? "PASS" : "FAIL", ownerRole: "clinical-agent-sre-owner", description: "Operational recovery classifies bounded retries, verifies checkpoints, preserves idempotency, and routes terminal failures to recovery evidence.", evidence: [clinicalOperatingSystem.operations.decisionHash], reasonCodes: clinicalOperatingSystem.operations.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-28", status: clinicalOperatingSystem.claims.structurallyValid && clinicalOperatingSystem.claims.decision === "REQUIRE_HUMAN" && !clinicalOperatingSystem.claims.publicationAuthorized ? "PASS" : "FAIL", ownerRole: "claims-governance-owner", description: "Machine-readable claims validate structure and evidence metadata but cannot publish without trusted evidence lookup and named publication approval.", evidence: [clinicalOperatingSystem.claims.claimHash], reasonCodes: clinicalOperatingSystem.claims.reasonCodes, candidateBound: false, externalActionRequired: false })
   ];
   const statuses: P34GateStatus[] = ["PASS", "OPERATOR_REQUIRED", "BLOCKED", "FAIL"];
   const gateCounts = Object.fromEntries(statuses.map((status) => [
@@ -421,9 +437,9 @@ export function getP34AdaptiveGovernanceSummary() {
     service: "scrimed-p34-adaptive-governance" as const,
     version: p34IntegratedVersion,
     status: gateCounts.FAIL > 0 ? "local-validation-failed" : "local-synthetic-candidate-review-required",
-    mission: "Optimize cost per safe, verified workflow outcome with deterministic-first, vendor-neutral, contemporaneously governed execution and continuity evidence.",
+    mission: "Optimize cost per safe, clinically accepted workflow outcome with deterministic-first, vendor-neutral, contemporaneously governed execution, bounded autonomy, and continuity evidence.",
     boundary: p34IntegratedBoundary,
-    componentBoundaries: [p34AdaptiveGovernanceBoundary, p34ContextProvenanceBoundary, p34DicomPrivacyBoundary, p34WorkflowContinuityBoundary],
+    componentBoundaries: [p34AdaptiveGovernanceBoundary, p34ContextProvenanceBoundary, p34DicomPrivacyBoundary, p34WorkflowContinuityBoundary, p34ClinicalOperatingSystemBoundary],
     route: p34IntegratedRoute,
     apiRoute: p34IntegratedApiRoute,
     briefRoute: p34IntegratedBriefRoute,
@@ -456,6 +472,7 @@ export function getP34AdaptiveGovernanceSummary() {
       enabled: featureFlags.challengerEvaluationEnabled
     },
     roiDashboard,
+    clinicalOperatingSystem,
     pilotObjectives: p34PilotObjectives,
     publicClaimDecision,
     gateMatrix,
@@ -506,6 +523,13 @@ export function buildP34AdaptiveGovernanceBrief() {
     `- Public sector: ${summary.publicSectorReadiness.decision}; compliance claims ${summary.publicSectorReadiness.complianceClaimAuthorized}`,
     `- Challengers: ${summary.challengerHarness.profiles.length} disabled research profiles; promotion ${summary.challengerHarness.evaluation.productionPromotionAuthorized}`,
     `- ROI: asking ${summary.roiDashboard.askingVersusDoing.asking}; doing ${summary.roiDashboard.askingVersusDoing.doing}; cost per completed workflow ${summary.roiDashboard.costPerCompletedWorkflowUsd}`,
+    `- Autonomy: requested ${summary.clinicalOperatingSystem.autonomy.requestedTier}; granted ${summary.clinicalOperatingSystem.autonomy.grantedTier}; authorization ${summary.clinicalOperatingSystem.autonomy.authorizationState}`,
+    `- PHI boundary: startup ${summary.clinicalOperatingSystem.phi.startupValidation.decision}; egress ${summary.clinicalOperatingSystem.phi.egress.decision}; provider calls ${summary.clinicalOperatingSystem.phi.egress.providerCallAuthorized}`,
+    `- Sandbox: ${summary.clinicalOperatingSystem.sandbox.decision}; external vendor activated ${summary.clinicalOperatingSystem.sandbox.externalSandboxActivated}`,
+    `- Retrieval: ${summary.clinicalOperatingSystem.retrieval.decision}; citation coverage ${summary.clinicalOperatingSystem.retrieval.citationCoverage}`,
+    `- External validation: ${summary.clinicalOperatingSystem.externalValidation.decision}; clinical production eligible ${summary.clinicalOperatingSystem.externalValidation.clinicalProductionEligible}`,
+    `- Patient Take-Home: ${summary.clinicalOperatingSystem.patientTakeHome.decision}; delivery ${summary.clinicalOperatingSystem.patientTakeHome.deliveryAuthorized}`,
+    `- Medical coding: ${summary.clinicalOperatingSystem.coding.effectiveMode}; billing submission ${summary.clinicalOperatingSystem.coding.billingSubmissionAuthorized}`,
     "",
     "## Gates",
     ...summary.gateMatrix.map((gateRecord) => `- ${gateRecord.gateId}: ${gateRecord.status} — ${gateRecord.description}`),

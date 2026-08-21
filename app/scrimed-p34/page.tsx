@@ -29,8 +29,8 @@ export default function ScrimedP34Page() {
         <h1>Adaptive governance with proof at every decision.</h1>
         <p className="hero-text">
           Vendor-neutral capability admission, deterministic-first model fit, versioned workflow contracts,
-          approval-bound action maturity, continuity evidence, DICOM privacy, quality ratchets, and task-level
-          economics in one synthetic operator surface.
+          approval-bound autonomy, PHI and sandbox boundaries, continuity evidence, DICOM privacy, external
+          validation, quality ratchets, and task-level economics in one synthetic operator surface.
         </p>
         <div className="hero-actions" aria-label="p.34 resources">
           <Link href={summary.apiRoute}>Inspect API</Link>
@@ -46,11 +46,89 @@ export default function ScrimedP34Page() {
         <article><span>Context chunks</span><strong>{summary.context.chunks.length}</strong></article>
         <article><span>Workflow evidence</span><strong>{summary.workflowContractDecision.evidenceFreshness}</strong></article>
         <article><span>Action state</span><strong>{summary.actionMaturity.events.at(-1)?.nextState ?? "none"}</strong></article>
+        <article><span>Autonomy</span><strong>{summary.clinicalOperatingSystem.autonomy.grantedTier}</strong></article>
+        <article><span>PHI route</span><strong>{summary.clinicalOperatingSystem.phi.egress.providerCallAuthorized ? "authorized" : "disabled"}</strong></article>
+        <article><span>Sandbox</span><strong>{summary.clinicalOperatingSystem.sandbox.decision}</strong></article>
         <article><span>Continuity days</span><strong>{summary.continuity.continuityDurationDays}</strong></article>
         <article><span>Gate passes</span><strong>{summary.gateCounts.PASS}</strong></article>
         <article><span>Operator gates</span><strong>{summary.gateCounts.OPERATOR_REQUIRED}</strong></article>
         <article><span>Blocked gates</span><strong>{summary.gateCounts.BLOCKED}</strong></article>
         <article><span>Provider calls</span><strong>{summary.externalProviderCallsExecuted ? "executed" : "none"}</strong></article>
+      </section>
+
+      <section className="table-section" aria-label="Autonomy privacy and sandbox controls">
+        <div className="section-heading">
+          <p className="eyebrow">Authority + Isolation</p>
+          <h2>Every action stays inside its exact identity, scope, and stopping condition.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.autonomy.decision} /><h2>Autonomy contract</h2></div>
+          <p>{summary.clinicalOperatingSystem.autonomy.stoppingCondition}</p>
+          <div><strong>Tier</strong><p>{summary.clinicalOperatingSystem.autonomy.requestedTier} requested · {summary.clinicalOperatingSystem.autonomy.grantedTier} granted</p></div>
+          <div><strong>Approval</strong><p>{summary.clinicalOperatingSystem.autonomy.authorizationState}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.phi.startupValidation.decision} /><h2>PHI and secret boundary</h2></div>
+          <p>{summary.clinicalOperatingSystem.phi.registry.fields.length} classified fields · unknown fields fail closed.</p>
+          <div><strong>Egress</strong><p>{summary.clinicalOperatingSystem.phi.egress.decision}</p></div>
+          <div><strong>Break glass</strong><p>{summary.clinicalOperatingSystem.phi.breakGlass.decision}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.sandbox.decision} /><h2>Agent sandbox</h2></div>
+          <p>Tenant workspace admitted with default-deny network and disposable state.</p>
+          <div><strong>Egress destinations</strong><p>{summary.clinicalOperatingSystem.sandbox.networkDestinationsAllowed.length}</p></div>
+          <div><strong>External runtime</strong><p>{summary.clinicalOperatingSystem.sandbox.externalSandboxActivated ? "active" : "not activated"}</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Retrieval validation and oversight controls">
+        <div className="section-heading">
+          <p className="eyebrow">Evidence + Oversight</p>
+          <h2>Tenant-first retrieval and external proof keep apparent success from weakening review.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.retrieval.decision} /><h2>Clinical retrieval</h2></div>
+          <p>{summary.clinicalOperatingSystem.retrieval.resultIds.length} current result · citation coverage {(summary.clinicalOperatingSystem.retrieval.citationCoverage * 100).toFixed(0)}%</p>
+          <div><strong>Ambiguity</strong><p>{summary.clinicalOperatingSystem.retrieval.ambiguousEntityIds.length ? "abstained" : "none"}</p></div>
+          <div><strong>Tenant filter</strong><p>{summary.clinicalOperatingSystem.retrieval.tenantFilterAppliedBeforeRanking ? "before ranking" : "failed"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.externalValidation.decision} /><h2>External validation</h2></div>
+          <p>{summary.clinicalOperatingSystem.externalValidation.reasonCodes.join(" · ")}</p>
+          <div><strong>Evidence</strong><p>{summary.clinicalOperatingSystem.externalValidation.evidenceFresh ? "fresh internal" : "stale or missing"}</p></div>
+          <div><strong>Clinical production</strong><p>not eligible</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.oversight.decision} /><h2>Oversight drift</h2></div>
+          <p>Reviewed {(summary.clinicalOperatingSystem.oversight.reviewedActionPercentage * 100).toFixed(0)}% · {summary.clinicalOperatingSystem.oversight.errorVolume} errors</p>
+          <div><strong>Silent acceptance</strong><p>{(summary.clinicalOperatingSystem.oversight.silentAcceptanceRate * 100).toFixed(0)}%</p></div>
+          <div><strong>Review reduction</strong><p>{summary.clinicalOperatingSystem.oversight.oversightReductionAuthorized ? "authorized" : "not authorized"}</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="Patient coding and recovery controls">
+        <div className="section-heading">
+          <p className="eyebrow">Outputs + Recovery</p>
+          <h2>Approved information can be prepared while delivery, billing, and unsafe retries stay blocked.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.patientTakeHome.decision} /><h2>Patient Take-Home</h2></div>
+          <p>{summary.clinicalOperatingSystem.patientTakeHome.sections.length} grounded section · {summary.clinicalOperatingSystem.patientTakeHome.language}</p>
+          <div><strong>Channel</strong><p>{summary.clinicalOperatingSystem.patientTakeHome.channel}</p></div>
+          <div><strong>Delivery</strong><p>{summary.clinicalOperatingSystem.patientTakeHome.deliveryAuthorized ? "authorized" : "clinician review pending"}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.coding.decision} /><h2>Medical coding contract</h2></div>
+          <p>{summary.clinicalOperatingSystem.coding.effectiveMode} mode</p>
+          <div><strong>Draft</strong><p>{summary.clinicalOperatingSystem.coding.draftAuthorized ? "review draft allowed" : "blocked"}</p></div>
+          <div><strong>Billing submission</strong><p>disabled</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.clinicalOperatingSystem.operations.nextState} /><h2>Retry and recovery</h2></div>
+          <p>{summary.clinicalOperatingSystem.operations.retryAllowed ? "Bounded checkpoint retry" : "Dead-letter review"}</p>
+          <div><strong>Idempotency</strong><p>{summary.clinicalOperatingSystem.operations.idempotencyPreserved ? "preserved" : "failed"}</p></div>
+          <div><strong>Claim evidence</strong><p>{summary.clinicalOperatingSystem.claims.decision}</p></div>
+        </article>
       </section>
 
       <section className="section-band split-band" aria-label="p.34 boundary">

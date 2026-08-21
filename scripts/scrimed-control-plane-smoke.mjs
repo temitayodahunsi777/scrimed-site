@@ -53,7 +53,7 @@ async function requireGet(path, expectedText, contentType) {
   if (!body.includes(expectedText)) {
     throw new Error(`${path} missing expected control-plane marker: ${expectedText}`);
   }
-  if (/Bearer\s+eyJ[A-Za-z0-9_-]+\.|sk-[A-Za-z0-9_-]{12,}/.test(body)) {
+  if (/Bearer\s+eyJ[A-Za-z0-9_-]+\.|\bsk-[A-Za-z0-9_-]{12,}/.test(body)) {
     throw new Error(`${path} exposed a token-like value.`);
   }
   console.log(`pass GET ${path}`);
@@ -112,6 +112,66 @@ await requireGet(
 await requireGet(
   "/api/scrimed-control-plane/strategic-decision-intelligence",
   '"status":"INTERNAL_DECISION_SUPPORT_ACTIVE"',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34",
+  '"service":"scrimed-p34-adaptive-governance"',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/clinical-os",
+  '"version":"scrimed-p34-clinical-operating-system-v1-2026-08-20"',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/autonomy",
+  '"externalWriteAuthorized":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/phi-boundary",
+  '"providerCallAuthorized":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/sandbox",
+  '"externalSandboxActivated":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/retrieval",
+  '"tenantFilterAppliedBeforeRanking":true',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/external-validation",
+  '"clinicalProductionEligible":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/oversight",
+  '"oversightReductionAuthorized":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/patient-take-home",
+  '"deliveryAuthorized":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/medical-coding",
+  '"billingSubmissionAuthorized":false',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/recovery",
+  '"idempotencyPreserved":true',
+  "application/json"
+);
+await requireGet(
+  "/api/scrimed-control-plane/p34/claims",
+  '"publicationAuthorized":false',
   "application/json"
 );
 

@@ -1,10 +1,10 @@
 {
-  "schemaVersion": "scrimed-p34-validation-report-v2",
-  "scope": "deterministic synthetic p.34 governance, workflow, model-fit, action, continuity, and evidence contracts",
+  "schemaVersion": "scrimed-p34-validation-report-v3",
+  "scope": "deterministic synthetic p.34 governance, autonomy, PHI boundary, sandbox, retrieval, validation, workflow, model-fit, action, continuity, operations, and evidence contracts",
   "generatedAt": "2026-08-19T00:00:00.000Z",
   "status": "PASS",
-  "checkCount": 20,
-  "passedCount": 20,
+  "checkCount": 31,
+  "passedCount": 31,
   "failedCount": 0,
   "checks": [
     {
@@ -98,6 +98,61 @@
       "evidence": "f0409d4faab5adbb2eb8d0c44bdc85afc383512196cfaed0f7b56f8898446a59"
     },
     {
+      "id": "exact-autonomy-approval",
+      "passed": true,
+      "evidence": "832506ad8ec4ec6d468fb017ed370c45a65f1dc31cef48cde1a1fd593dc1e053"
+    },
+    {
+      "id": "clinical-governance-chain",
+      "passed": true,
+      "evidence": "d531bfd47ec9ef7aa13e2d829dd1df5e98b422f6a76588070ba479ca0bd4611e"
+    },
+    {
+      "id": "phi-and-secret-egress",
+      "passed": true,
+      "evidence": "560ccd8151b28d02c6b11c9833dc7af979f8339527e5875e887b431dd6b92cc1"
+    },
+    {
+      "id": "sandbox-default-deny",
+      "passed": true,
+      "evidence": "d712c1ad6abc3ce1038e5066b4de64fe9d8a60107a2a7c9e93f3dea4eeafd945"
+    },
+    {
+      "id": "tenant-first-retrieval",
+      "passed": true,
+      "evidence": "40e27aeefb2d6e2146e4b92cc561a82fae9d6bec11d7bd435c116f1e8f5d6473"
+    },
+    {
+      "id": "external-validation-fails-closed",
+      "passed": true,
+      "evidence": "ab1c2ec3231867ce6ea09f0332d84ee659b37fac995a4ee81230c8cd555356b4"
+    },
+    {
+      "id": "oversight-cannot-auto-reduce",
+      "passed": true,
+      "evidence": "e06f8c3190b07927ca672fb441ca2c76fed9a6e95767fbe5fd96e1ca40570577"
+    },
+    {
+      "id": "patient-delivery-review-gated",
+      "passed": true,
+      "evidence": "67ab6dda87df1b45880bc853a89617bd21dcc7ca87bda951a8d01cb7359fb628"
+    },
+    {
+      "id": "coding-and-billing-boundary",
+      "passed": true,
+      "evidence": "63161a8127fe0535bc23b03846574c41032174a0d89e5f803beb4730df433135"
+    },
+    {
+      "id": "operational-idempotency",
+      "passed": true,
+      "evidence": "a6474f8b67379e7d71ed578072defbdab95ba8e850e827a31dc7a92a606c8738"
+    },
+    {
+      "id": "evidence-bound-claim",
+      "passed": true,
+      "evidence": "7ec9e13238c536a24feedd6b0a6d9b4d3ada1451272ec277073bbb66ccf4f767"
+    },
+    {
       "id": "high-risk-flags-default-off",
       "passed": true,
       "evidence": "eight high-risk flags disabled"
@@ -105,10 +160,10 @@
     {
       "id": "release-authority-retained",
       "passed": true,
-      "evidence": "3b4f818d05c9a30df956f36012d92575a6b7c6476e4ac3cee79c03639d369ccb"
+      "evidence": "03b3cd3968ef3685c938bcda9168a252069bea3b0610dffec45918bae7031965"
     }
   ],
   "externalEvidenceVerified": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "3b4f818d05c9a30df956f36012d92575a6b7c6476e4ac3cee79c03639d369ccb"
+  "summaryHash": "03b3cd3968ef3685c938bcda9168a252069bea3b0610dffec45918bae7031965"
 }

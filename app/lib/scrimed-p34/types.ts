@@ -930,6 +930,13 @@ export type WorkflowRoiDashboard = {
 
 export type P34FeatureFlags = {
   adaptiveGovernanceEnabled: boolean;
+  clinicalOperatingSystemEnabled: boolean;
+  autonomyContractEnabled: boolean;
+  phiBoundaryEnabled: boolean;
+  sandboxPolicyEnabled: boolean;
+  externalValidationEnabled: boolean;
+  patientTakeHomePreviewEnabled: boolean;
+  medicalCodingDraftEnabled: boolean;
   deterministicRouterEnabled: boolean;
   contextProvenanceEnabled: boolean;
   syntheticDicomPrivacyEnabled: boolean;
@@ -947,6 +954,542 @@ export type P34FeatureFlags = {
   livePhiEnabled: boolean;
   consequentialExecutionEnabled: boolean;
   productionPromotionEnabled: boolean;
+};
+
+export type AutonomyTier = "A0" | "A1" | "A2" | "A3";
+
+export type ConsequentialActionClass =
+  | "information-display"
+  | "draft-recommendation"
+  | "reversible-internal-write"
+  | "external-communication"
+  | "clinical-decision"
+  | "medication-or-order"
+  | "patient-result-release"
+  | "billing-submission"
+  | "payer-submission"
+  | "system-of-record-write"
+  | "destructive-action"
+  | "permission-change";
+
+export type ScopedAutonomyApproval = {
+  approvalId: string;
+  tenantId: string;
+  actorIdHash: string;
+  approverIdHash: string;
+  actionId: string;
+  actionClass: ConsequentialActionClass;
+  resourceId: string;
+  payloadHash: string;
+  idempotencyKey: string;
+  policyVersion: string;
+  authorityScope: string[];
+  issuedAt: string;
+  expiresAt: string;
+  evidenceHash: string;
+};
+
+export type AutonomyContractRequest = {
+  tenantId: string;
+  actorIdHash: string;
+  authenticatedIdentityHash: string;
+  accountableHumanIdHash: string | null;
+  task: string;
+  actionId: string;
+  actionClass: ConsequentialActionClass;
+  resourceId: string;
+  payloadHash: string;
+  idempotencyKey: string;
+  requestedTier: AutonomyTier;
+  maximumAuthorizedTier: AutonomyTier;
+  reversible: boolean;
+  syntheticOnly: boolean;
+  dataClassification: P34DataClassification;
+  policyVersion: string;
+  stoppingCondition: string;
+  approval: ScopedAutonomyApproval | null;
+  usedApprovalIds: string[];
+  evaluatedAt: string;
+};
+
+export type AutonomyContractDecision = {
+  decision: PolicyDecision;
+  requestedTier: AutonomyTier;
+  grantedTier: AutonomyTier;
+  accountablePartyHash: string | null;
+  authorizationState: "not-required" | "missing" | "verification-required" | "invalid";
+  stoppingCondition: string;
+  reasonCodes: string[];
+  executionAuthorized: boolean;
+  externalWriteAuthorized: false;
+  clinicalAuthorityGranted: false;
+  approvalConsumed: boolean;
+  decisionHash: string;
+};
+
+export type ClinicalOperatingGovernanceRecord = {
+  recordId: string;
+  ledgerId: string;
+  tenantId: string;
+  caseReferenceHash: string | null;
+  traceId: string;
+  correlationId: string;
+  occurredAt: string;
+  task: string;
+  autonomyTier: AutonomyTier;
+  initiatingActorIdHash: string;
+  authenticatedIdentityHash: string;
+  accountableHumanIdHash: string | null;
+  authorityScope: string[];
+  providerId: string;
+  modelId: string;
+  modelVersion: string;
+  harnessVersion: string;
+  promptVersion: string;
+  policyVersion: string;
+  toolVersions: string[];
+  sourceHashes: string[];
+  retrievalCitationIds: string[];
+  constraintsApplied: string[];
+  requestedToolIds: string[];
+  executedToolIds: string[];
+  approvals: Array<{
+    approvalId: string;
+    approverIdHash: string;
+    authorityScope: string[];
+    approvedAt: string;
+    expiresAt: string;
+    approvalHash: string;
+  }>;
+  proposedAction: string;
+  disposition: "allowed" | "blocked" | "review-required" | "failed" | "verified";
+  outcomeHash: string | null;
+  confidence: number | null;
+  calibration: "not-applicable" | "uncalibrated" | "calibrated" | "insufficient-evidence";
+  supersededByRecordHash: string | null;
+  replayOfRecordHash: string | null;
+  rolledBackByRecordHash: string | null;
+  previousRecordHash: string | null;
+  containsRawPhi: false;
+  containsSecrets: false;
+  hiddenChainOfThoughtStored: false;
+  recordHash: string;
+};
+
+export type PhiFieldRegistration = {
+  fieldId: string;
+  schemaId: string;
+  fieldPath: string;
+  classification: "direct-identifier" | "quasi-identifier" | "clinical-sensitive" | "secret" | "non-sensitive";
+  dataType: "string" | "number" | "date" | "object" | "array" | "boolean";
+  reversibleTokenizationRequired: boolean;
+  minimumNecessaryPurposes: string[];
+  retentionClass: "ephemeral" | "operational" | "regulated" | "none";
+  ownerRole: string;
+};
+
+export type PhiFieldRegistry = {
+  registryId: string;
+  version: string;
+  fields: PhiFieldRegistration[];
+  defaultUnknownFieldDecision: "BLOCK";
+  registryHash: string;
+};
+
+export type PhiSchemaField = {
+  schemaId: string;
+  fieldPath: string;
+  sensitive: boolean;
+};
+
+export type PhiRegistryValidation = {
+  decision: PolicyDecision;
+  missingClassifications: string[];
+  duplicateRegistrations: string[];
+  startupAllowed: boolean;
+  validationHash: string;
+};
+
+export type OpaqueTokenReceipt = {
+  token: string;
+  tenantId: string;
+  fieldId: string;
+  purpose: string;
+  issuedAt: string;
+  expiresAt: string;
+  reversible: true;
+  containsPlaintext: false;
+  receiptHash: string;
+};
+
+export type TokenResolutionGrant = {
+  grantId: string;
+  tenantId: string;
+  token: string;
+  purpose: string;
+  validatorIdHash: string;
+  validationEvidenceHash: string;
+  issuedAt: string;
+  expiresAt: string;
+  grantHash: string;
+};
+
+export type SecretHandle = {
+  handleId: string;
+  secretClass: "provider-credential" | "connector-credential" | "encryption-key";
+  tenantId: string;
+  allowedRuntimeId: string;
+  allowedPurpose: string;
+  expiresAt: string;
+  plaintextExposedToModel: false;
+};
+
+export type PhiEgressRequest = {
+  tenantId: string;
+  purpose: string;
+  productPath: string;
+  dataClassification: P34DataClassification;
+  fieldIds: string[];
+  payload: unknown;
+  tokenReceipts: OpaqueTokenReceipt[];
+  providerRoute: ProviderCapabilityEntry | null;
+  minimumNecessary: boolean;
+  consentVerified: boolean;
+  postResponseValidated: boolean;
+  evaluatedAt: string;
+};
+
+export type PhiEgressDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  detectedSensitivePaths: string[];
+  tokenRoundTripValid: boolean;
+  reidentificationAuthorized: boolean;
+  providerCallAuthorized: boolean;
+  containsRawPhi: false;
+  decisionHash: string;
+};
+
+export type BreakGlassRequest = {
+  requestId: string;
+  tenantId: string;
+  actorIdHash: string;
+  approverIdHash: string | null;
+  reasonCode: string;
+  incidentReferenceHash: string;
+  requestedScope: string[];
+  issuedAt: string;
+  expiresAt: string;
+  auditEventHash: string | null;
+};
+
+export type BreakGlassDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  grantedScope: string[];
+  timeLimited: boolean;
+  mandatoryReviewRequired: true;
+  clinicalAuthorityGranted: false;
+  decisionHash: string;
+};
+
+export type AgentSandboxPolicy = {
+  policyId: string;
+  version: string;
+  tenantId: string;
+  workspaceRoot: string;
+  allowedFilesystemRoots: string[];
+  allowedNetworkDomains: string[];
+  networkDefault: "deny";
+  maximumCpuMillis: number;
+  maximumMemoryBytes: number;
+  maximumDiskBytes: number;
+  maximumProcesses: number;
+  maximumToolCalls: number;
+  maximumWallClockMs: number;
+  immutableBaseImageDigest: string;
+  disposableWritableLayer: true;
+  hostCredentialInheritance: false;
+};
+
+export type AgentSandboxRequest = {
+  tenantId: string;
+  runId: string;
+  workspacePath: string;
+  filesystemPaths: string[];
+  networkDestinations: string[];
+  requestedMounts: string[];
+  requestedCpuMillis: number;
+  requestedMemoryBytes: number;
+  requestedDiskBytes: number;
+  requestedProcesses: number;
+  requestedToolCalls: number;
+  requestedWallClockMs: number;
+  secretHandles: SecretHandle[];
+  hostCredentialsRequested: boolean;
+  privilegeEscalationRequested: boolean;
+  cleanupVerified: boolean;
+};
+
+export type AgentSandboxDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  policyCompliant: boolean;
+  isolatedWorkspaceAuthorized: boolean;
+  runtimeContainmentVerified: false;
+  networkDestinationsAllowed: string[];
+  cleanupRequired: true;
+  externalSandboxActivated: false;
+  decisionHash: string;
+};
+
+export type ClinicalEntityAlias = {
+  canonicalEntityId: string;
+  alias: string;
+  aliasKind: "official" | "common" | "abbreviation" | "legacy";
+  terminologyVersion: string;
+};
+
+export type ClinicalRetrievalCandidate = {
+  candidateId: string;
+  tenantId: string;
+  canonicalEntityId: string;
+  aliases: string[];
+  hierarchyPath: string[];
+  sourceAuthority: "authoritative" | "reviewed" | "unverified";
+  sourceSpanIds: string[];
+  effectiveAt: string;
+  expiresAt: string;
+  lexicalScore: number;
+  semanticScore: number;
+  rerankScore: number;
+  contradictionGroupId: string | null;
+  dataClassification: P34DataClassification;
+  authorizedPurposes: string[];
+  contentHash: string;
+};
+
+export type ClinicalRetrievalRequest = {
+  tenantId: string;
+  purpose: string;
+  query: string;
+  canonicalEntityId: string | null;
+  authorizedDataClassifications: P34DataClassification[];
+  maximumResults: number;
+  minimumEvidenceCount: number;
+  minimumRerankScore: number;
+  evaluatedAt: string;
+};
+
+export type ClinicalRetrievalAuthorizationContext = {
+  authenticatedTenantId: string;
+  authenticatedActorIdHash: string;
+  authorizedPurposes: string[];
+  authorizedDataClassifications: P34DataClassification[];
+  authorizationEvidenceHash: string;
+  evaluatedAt: string;
+};
+
+export type ClinicalRetrievalDecision = {
+  decision: PolicyDecision;
+  resultIds: string[];
+  reasonCodes: string[];
+  ambiguousEntityIds: string[];
+  staleCandidateIds: string[];
+  conflictingGroupIds: string[];
+  citationCoverage: number;
+  abstained: boolean;
+  tenantFilterAppliedBeforeRanking: true;
+  decisionHash: string;
+};
+
+export type ExternalValidationEvidence = {
+  validationId: string;
+  capabilityId: string;
+  internalOnly: boolean;
+  siteIds: string[];
+  healthSystemIds: string[];
+  acquisitionSystemIds: string[];
+  cohortIds: string[];
+  demographicSubgroups: string[];
+  workflowSettings: string[];
+  timePeriods: string[];
+  distributionShiftEvaluated: boolean;
+  metrics: {
+    discrimination: number | null;
+    sensitivity: number | null;
+    specificity: number | null;
+    calibrationError: number;
+    abstentionRate: number;
+    missingCriticalStepRate: number;
+    unsupportedExtraRate: number;
+    clinicianOverrideRate: number;
+    downstreamHarmProxyRate: number;
+  };
+  subgroupWorstCellPassed: boolean;
+  evidenceHash: string;
+  recordedAt: string;
+  expiresAt: string;
+  namedReviewerApprovalHashes: string[];
+};
+
+export type ExternalValidationDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  evidenceFresh: boolean;
+  externallyValidated: boolean;
+  clinicalProductionEligible: false;
+  decisionHash: string;
+};
+
+export type OversightDriftMetrics = {
+  totalActions: number;
+  reviewedActions: number;
+  overrides: number;
+  corrections: number;
+  errors: number;
+  silentAcceptances: number;
+  medianReviewLatencyMs: number;
+  riskCohortCoverage: number;
+  requestedReviewRate: number;
+  approvedReviewRate: number;
+  oversightReductionApprovalHash: string | null;
+};
+
+export type OversightDriftDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  reviewedActionPercentage: number;
+  errorRate: number;
+  errorVolume: number;
+  silentAcceptanceRate: number;
+  oversightReductionAuthorized: boolean;
+  decisionHash: string;
+};
+
+export type PatientCommunicationPreferences = {
+  preferenceId: string;
+  channel: "portal" | "print" | "email-draft" | "caregiver-proxy";
+  timing: "immediate-after-review" | "scheduled" | "clinician-directed";
+  language: string;
+  accessibility: string[];
+  proxyIdHash: string | null;
+  proxyAuthorizationHash: string | null;
+  clinicianReviewRequired: boolean;
+  sensitiveResultRestriction: "clinician-release-only" | "approved-education-only";
+  effectiveAt: string;
+  expiresAt: string;
+};
+
+export type PatientTakeHomeInput = {
+  documentId: string;
+  tenantId: string;
+  sourceFacts: Array<{
+    factId: string;
+    approvedText: string;
+    sourceSpanIds: string[];
+    approvedForEducation: boolean;
+  }>;
+  preferences: PatientCommunicationPreferences;
+  clinicianReview: {
+    reviewerIdHash: string | null;
+    decision: "approved" | "rejected" | "pending";
+    reviewedAt: string | null;
+  };
+  generatedAt: string;
+};
+
+export type PatientTakeHomeDocument = {
+  decision: PolicyDecision;
+  title: string;
+  sections: Array<{ heading: string; body: string; sourceSpanIds: string[] }>;
+  channel: PatientCommunicationPreferences["channel"];
+  language: string;
+  accessibility: string[];
+  disclaimer: string;
+  reasonCodes: string[];
+  deliveryAuthorized: boolean;
+  containsDiagnosisOrAdvice: false;
+  documentHash: string;
+};
+
+export type MedicalCodingMode = "assisted" | "computer-assisted" | "autonomous";
+
+export type MedicalCodingContract = {
+  contractId: string;
+  capabilityId: string;
+  mode: MedicalCodingMode;
+  specialtyCoverage: string[];
+  humanReviewRequired: boolean;
+  auditRequired: true;
+  ruleSetOwner: string;
+  ruleVersion: string;
+  evidenceHashes: string[];
+  effectiveAt: string;
+  expiresAt: string;
+  rollbackPath: string[];
+  billingReleaseAuthorityHash: string | null;
+};
+
+export type MedicalCodingDecision = {
+  decision: PolicyDecision;
+  effectiveMode: "assisted" | "computer-assisted";
+  reasonCodes: string[];
+  draftAuthorized: boolean;
+  billingSubmissionAuthorized: false;
+  decisionHash: string;
+};
+
+export type OperationalInvocation = {
+  invocationId: string;
+  tenantId: string;
+  traceId: string;
+  idempotencyKey: string;
+  attempt: number;
+  maximumAttempts: number;
+  failureClass: "transient" | "permanent" | "policy" | "unknown" | null;
+  state: "ready" | "retrying" | "dead-letter" | "suspended" | "completed";
+  checkpointHash: string | null;
+  checkpointVerified: boolean;
+  suspended: boolean;
+  costUsd: number;
+  latencyMs: number;
+  containsRawPhi: false;
+  containsSecrets: false;
+};
+
+export type OperationalRecoveryDecision = {
+  decision: PolicyDecision;
+  nextState: OperationalInvocation["state"];
+  retryAllowed: boolean;
+  idempotencyPreserved: boolean;
+  deadLetterRequired: boolean;
+  reasonCodes: string[];
+  decisionHash: string;
+};
+
+export type ApprovedPublicClaim = {
+  claimId: string;
+  category: "clinical" | "security" | "performance" | "interoperability" | "customer" | "regulatory" | "savings";
+  ownerRole: string;
+  approvedWording: string;
+  primaryEvidence: Array<{ sourceId: string; sourceUrl: string; evidenceHash: string }>;
+  scope: string;
+  limitations: string[];
+  approvalHashes: string[];
+  approvedAt: string;
+  expiresAt: string;
+  targetAudience: string;
+  channel: string;
+  revalidateAt: string;
+};
+
+export type ApprovedPublicClaimDecision = {
+  decision: PolicyDecision;
+  reasonCodes: string[];
+  structurallyValid: boolean;
+  publicationAuthorized: false;
+  claimHash: string;
 };
 
 export type P34ProviderFootprint = ProviderDependencyFootprint;

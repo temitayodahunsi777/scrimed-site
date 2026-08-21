@@ -221,6 +221,7 @@ import { getSourceIntelligenceSummary } from "./sourceIntelligence";
 import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getP33IntegratedSummary } from "./scrimed-p33/index";
+import { getP34AdaptiveGovernanceSummary } from "./scrimed-p34/index";
 import {
   pilotDemoReadinessPacketProofStackStatus,
   pilotDemoReadinessProofStackStatus
@@ -1302,6 +1303,7 @@ export function getProductConsoleSummary() {
   const buildInfo = getScrimedBuildInfo();
   const runtimePresentation = getProductRuntimePresentation(buildInfo);
   const p33IntegratedSummary = getP33IntegratedSummary();
+  const p34IntegratedSummary = getP34AdaptiveGovernanceSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
   const workflowResultValidationSummary = getWorkflowResultValidationResults();
@@ -1404,6 +1406,13 @@ export function getProductConsoleSummary() {
     p33IntegratedStatus: p33IntegratedSummary.status,
     p33OpportunityModuleCount: p33IntegratedSummary.opportunities.modules.length,
     p33BlockedGateCount: p33IntegratedSummary.gateCounts.BLOCKED,
+    p34IntegratedRoute: p34IntegratedSummary.route,
+    p34IntegratedApiRoute: p34IntegratedSummary.apiRoute,
+    p34IntegratedStatus: p34IntegratedSummary.status,
+    p34PassedGateCount: p34IntegratedSummary.gateCounts.PASS,
+    p34BlockedGateCount: p34IntegratedSummary.gateCounts.BLOCKED,
+    p34OperatorRequiredGateCount: p34IntegratedSummary.gateCounts.OPERATOR_REQUIRED,
+    p34ClinicalOperatingSystem: p34IntegratedSummary.clinicalOperatingSystem,
     route: "/product",
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",

@@ -88,6 +88,13 @@ export function getP34FeatureFlags(env: NodeJS.ProcessEnv = process.env): P34Fea
   };
   return {
     adaptiveGovernanceEnabled: read("SCRIMED_P34_ADAPTIVE_GOVERNANCE_ENABLED", true),
+    clinicalOperatingSystemEnabled: read("SCRIMED_P34_CLINICAL_OPERATING_SYSTEM_ENABLED", true),
+    autonomyContractEnabled: read("SCRIMED_P34_AUTONOMY_CONTRACT_ENABLED", true),
+    phiBoundaryEnabled: read("SCRIMED_P34_PHI_BOUNDARY_ENABLED", true),
+    sandboxPolicyEnabled: read("SCRIMED_P34_SANDBOX_POLICY_ENABLED", true),
+    externalValidationEnabled: read("SCRIMED_P34_EXTERNAL_VALIDATION_ENABLED", true),
+    patientTakeHomePreviewEnabled: read("SCRIMED_P34_PATIENT_TAKE_HOME_PREVIEW_ENABLED", true),
+    medicalCodingDraftEnabled: read("SCRIMED_P34_MEDICAL_CODING_DRAFT_ENABLED", true),
     deterministicRouterEnabled: read("SCRIMED_P34_DETERMINISTIC_ROUTER_ENABLED", true),
     contextProvenanceEnabled: read("SCRIMED_P34_CONTEXT_PROVENANCE_ENABLED", true),
     syntheticDicomPrivacyEnabled: read("SCRIMED_P34_SYNTHETIC_DICOM_PRIVACY_ENABLED", true),
@@ -110,6 +117,13 @@ export function getP34FeatureFlags(env: NodeJS.ProcessEnv = process.env): P34Fea
 
 export const p34FeatureFlagDefaults = {
   SCRIMED_P34_ADAPTIVE_GOVERNANCE_ENABLED: "true",
+  SCRIMED_P34_CLINICAL_OPERATING_SYSTEM_ENABLED: "true",
+  SCRIMED_P34_AUTONOMY_CONTRACT_ENABLED: "true",
+  SCRIMED_P34_PHI_BOUNDARY_ENABLED: "true",
+  SCRIMED_P34_SANDBOX_POLICY_ENABLED: "true",
+  SCRIMED_P34_EXTERNAL_VALIDATION_ENABLED: "true",
+  SCRIMED_P34_PATIENT_TAKE_HOME_PREVIEW_ENABLED: "true",
+  SCRIMED_P34_MEDICAL_CODING_DRAFT_ENABLED: "true",
   SCRIMED_P34_DETERMINISTIC_ROUTER_ENABLED: "true",
   SCRIMED_P34_CONTEXT_PROVENANCE_ENABLED: "true",
   SCRIMED_P34_SYNTHETIC_DICOM_PRIVACY_ENABLED: "true",

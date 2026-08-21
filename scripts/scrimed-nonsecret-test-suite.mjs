@@ -1015,6 +1015,19 @@ const checks = [
     ]
   },
   {
+    label: "SCRIMED p.34 clinical operating system policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-clinical-operating-system-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 clinical operating system contract",
+    args: ["scripts/scrimed-p34-clinical-operating-system-contract-check.mjs"]
+  },
+  {
     label: "SCRIMED p.34 artifact integrity",
     args: [
       "--disable-warning=ExperimentalWarning",

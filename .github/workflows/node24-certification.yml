@@ -61,7 +61,9 @@ jobs:
           npm run check:scrimed-p33-artifacts
           npm run test:scrimed-p34
           npm run test:scrimed-p34-workflow-continuity
+          npm run test:scrimed-p34-clinical-os
           npm run contract:scrimed-p34
+          npm run contract:scrimed-p34-clinical-os
           npm run check:scrimed-p34-artifacts
 
       - name: Run nonsecret regression suite

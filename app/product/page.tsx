@@ -26,6 +26,9 @@ export default function ProductConsolePage() {
           <Link className="secondary-action" href={summary.p33IntegratedRoute}>
             Inspect p.33 Controls
           </Link>
+          <Link className="secondary-action" href={summary.p34IntegratedRoute}>
+            Inspect p.34 Clinical OS
+          </Link>
           <a className="secondary-action" href={summary.pilotDemoCommercialReadinessBriefRoute}>
             Download Buyer Brief
           </a>
@@ -74,6 +77,18 @@ export default function ProductConsolePage() {
         <article>
           <span>p.33 blocked gates</span>
           <strong>{summary.p33BlockedGateCount}</strong>
+        </article>
+        <article>
+          <span>p.34 controls</span>
+          <strong>{summary.p34IntegratedStatus}</strong>
+        </article>
+        <article>
+          <span>p.34 local passes</span>
+          <strong>{summary.p34PassedGateCount}</strong>
+        </article>
+        <article>
+          <span>p.34 blocked gates</span>
+          <strong>{summary.p34BlockedGateCount}</strong>
         </article>
         <article>
           <span>Company score</span>
@@ -798,6 +813,36 @@ export default function ProductConsolePage() {
         <article>
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED p.34 clinical operating system controls">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical operating system</p>
+          <h2>Authority, evidence, isolation, and review remain visible at the point of work.</h2>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.p34IntegratedRoute}>
+              Open p.34 Console
+            </Link>
+            <a className="secondary-action" href={summary.p34IntegratedApiRoute}>
+              Inspect p.34 API
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.p34ClinicalOperatingSystem.autonomy.decision}</span><h2>Autonomy and approval</h2></div>
+          <p>{summary.p34ClinicalOperatingSystem.autonomy.stoppingCondition}</p>
+          <div><strong>{summary.p34ClinicalOperatingSystem.autonomy.grantedTier}</strong><p>{summary.p34ClinicalOperatingSystem.autonomy.authorizationState}</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ClinicalOperatingSystem.phi.egress.decision}</span><h2>PHI route and sandbox</h2></div>
+          <p>Startup classification {summary.p34ClinicalOperatingSystem.phi.startupValidation.decision}; provider calls remain disabled.</p>
+          <div><strong>{summary.p34ClinicalOperatingSystem.sandbox.decision}</strong><p>default-deny egress</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ClinicalOperatingSystem.externalValidation.decision}</span><h2>External validation and oversight</h2></div>
+          <p>Clinical production eligibility remains blocked while local oversight stays at {(summary.p34ClinicalOperatingSystem.oversight.reviewedActionPercentage * 100).toFixed(0)}%.</p>
+          <div><strong>{summary.p34ClinicalOperatingSystem.patientTakeHome.decision}</strong><p>patient preview review state</p></div>
         </article>
       </section>
 

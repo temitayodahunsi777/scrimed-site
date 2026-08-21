@@ -35,6 +35,7 @@ The p.34 layer extends p.33 rather than replacing it:
 - p.33 quality ratchet remains the noncompensable promotion gate.
 - p.34 adds capability expiry, deterministic-first technique selection, document hierarchy, DICOM privacy manifests, richer action details, two-loop evidence, task economics, placement policy, and operator visibility.
 - The v2 extension adds versioned workflow contracts, documentary model-fit evidence, approval-bound action maturity, trust expansion thresholds, non-PHI continuity metrics, public-sector evidence profiles, isolated challenger research, and workflow ROI telemetry.
+- The clinical operating-system hardening adds review-only A0-A3 exact-approval evaluation, tenant-scoped governance evidence, PHI/secret egress controls, sandbox policy review, authenticated tenant-first clinical retrieval, external-validation and oversight gates, Patient Take-Home previews, assisted coding boundaries, operational recovery, and evidence-bound claim review.
 
 ## Governance Hierarchy
 
@@ -60,11 +61,11 @@ Ownership:
 - Unknown, missing, disabled, expired, revoked, or unverified capability is denied.
 - Deterministic validation, transformation, graph, optimization, and retrieval techniques precede generation.
 - Clinical, identity, authorization, consent, billing, and irreversible-write decisions cannot fall through to unrestricted generation.
-- State-changing actions require exact payload-bound human approval and remain disabled in this candidate.
+- State-changing actions require exact payload-bound human approval plus trusted-store verification and atomic consumption; they remain disabled in this candidate.
 - Retrieved content is data, not executable instruction.
 - DICOM metadata removal does not establish anonymization; uncertain pixels are quarantined.
 - No challenger self-promotes and no safety, privacy, authorization, provenance, or clinical floor can be traded away.
-- Public claims require primary evidence, owner, approved wording, retrieval date, expiry, and applicable legal review.
+- Public claims require trusted primary-evidence resolution, owner, approved wording, retrieval date, expiry, named publication approval, and applicable legal review; publication remains disabled in this candidate.
 
 ### Standards
 
@@ -124,6 +125,13 @@ Safe local evaluation defaults on:
 - `SCRIMED_P34_HYBRID_PLACEMENT_ENABLED`
 - `SCRIMED_P34_WORKFLOW_CONTRACTS_ENABLED`
 - `SCRIMED_P34_CONTINUITY_METRICS_ENABLED`
+- `SCRIMED_P34_CLINICAL_OPERATING_SYSTEM_ENABLED`
+- `SCRIMED_P34_AUTONOMY_CONTRACT_ENABLED`
+- `SCRIMED_P34_PHI_BOUNDARY_ENABLED`
+- `SCRIMED_P34_SANDBOX_POLICY_ENABLED`
+- `SCRIMED_P34_EXTERNAL_VALIDATION_ENABLED`
+- `SCRIMED_P34_PATIENT_TAKE_HOME_PREVIEW_ENABLED`
+- `SCRIMED_P34_MEDICAL_CODING_DRAFT_ENABLED`
 
 High-risk capability defaults off:
 
@@ -179,13 +187,26 @@ Blocked in this candidate. Requires a clean exact commit, generated evidence int
 - Public-sector evidence: `/api/scrimed-control-plane/p34/public-sector`
 - Challenger registry: `/api/scrimed-control-plane/p34/challengers`
 - Workflow ROI: `/api/scrimed-control-plane/p34/roi`
+- Clinical OS: `/api/scrimed-control-plane/p34/clinical-os`
+- Autonomy: `/api/scrimed-control-plane/p34/autonomy`
+- PHI boundary: `/api/scrimed-control-plane/p34/phi-boundary`
+- Sandbox: `/api/scrimed-control-plane/p34/sandbox`
+- Retrieval: `/api/scrimed-control-plane/p34/retrieval`
+- External validation: `/api/scrimed-control-plane/p34/external-validation`
+- Oversight: `/api/scrimed-control-plane/p34/oversight`
+- Patient Take-Home: `/api/scrimed-control-plane/p34/patient-take-home`
+- Medical coding: `/api/scrimed-control-plane/p34/medical-coding`
+- Recovery: `/api/scrimed-control-plane/p34/recovery`
+- Claims: `/api/scrimed-control-plane/p34/claims`
 
 ## Validation
 
 ```bash
 npm run test:scrimed-p34
 npm run test:scrimed-p34-workflow-continuity
+npm run test:scrimed-p34-clinical-os
 npm run contract:scrimed-p34
+npm run contract:scrimed-p34-clinical-os
 npm run check:scrimed-p34-artifacts
 npm run typecheck
 npm run lint

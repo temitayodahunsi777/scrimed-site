@@ -229,6 +229,39 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "p34/dicom-privacy") {
     return json(getP34AdaptiveGovernanceSummary().dicomPrivacy, "control-plane-p34-dicom-privacy");
   }
+  if (endpoint === "p34/clinical-os") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem, "control-plane-p34-clinical-os");
+  }
+  if (endpoint === "p34/autonomy") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.autonomy, "control-plane-p34-autonomy");
+  }
+  if (endpoint === "p34/phi-boundary") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.phi, "control-plane-p34-phi-boundary");
+  }
+  if (endpoint === "p34/sandbox") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.sandbox, "control-plane-p34-sandbox");
+  }
+  if (endpoint === "p34/retrieval") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.retrieval, "control-plane-p34-retrieval");
+  }
+  if (endpoint === "p34/external-validation") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.externalValidation, "control-plane-p34-external-validation");
+  }
+  if (endpoint === "p34/oversight") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.oversight, "control-plane-p34-oversight");
+  }
+  if (endpoint === "p34/patient-take-home") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.patientTakeHome, "control-plane-p34-patient-take-home");
+  }
+  if (endpoint === "p34/medical-coding") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.coding, "control-plane-p34-medical-coding");
+  }
+  if (endpoint === "p34/recovery") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.operations, "control-plane-p34-clinical-operations");
+  }
+  if (endpoint === "p34/claims") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.claims, "control-plane-p34-claims");
+  }
   if (endpoint === "p34/assurance") {
     const summary = getP34AdaptiveGovernanceSummary();
     return json({
