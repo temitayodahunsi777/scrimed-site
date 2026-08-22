@@ -1,10 +1,16 @@
 {
-  "schemaVersion": "scrimed-p34-validation-report-v3",
-  "scope": "deterministic synthetic p.34 governance, autonomy, PHI boundary, sandbox, retrieval, validation, workflow, model-fit, action, continuity, operations, and evidence contracts",
-  "generatedAt": "2026-08-19T00:00:00.000Z",
-  "status": "PASS",
-  "checkCount": 31,
-  "passedCount": 31,
+  "schemaVersion": "scrimed-p34-validation-report-v4",
+  "scope": "deterministic synthetic p.34 governance, autonomy, trusted evidence expiry, atomic approval verification, kill switch, PHI boundary, egress, sandbox, retrieval, validation, workflow, model-fit, action, continuity, operations, trace-to-eval, and evidence contracts",
+  "generatedAt": "2026-08-21T00:00:00.000Z",
+  "expiresAt": "2026-08-22T05:11:03.000Z",
+  "evaluatedAt": "2026-08-22T05:12:30.000Z",
+  "sourceCandidate": "1455b7028912d862d92faa715759cc37d0d154f63124e840b65263a24182a6b6",
+  "validationVersion": "scrimed-p34-control-plane-v2.1-2026-08-21",
+  "status": "REVIEW_REQUIRED",
+  "behaviorChecksStatus": "PASS",
+  "releaseEvidenceStatus": "EXPIRED_REGENERATE_REQUIRED",
+  "checkCount": 38,
+  "passedCount": 38,
   "failedCount": 0,
   "checks": [
     {
@@ -153,6 +159,41 @@
       "evidence": "7ec9e13238c536a24feedd6b0a6d9b4d3ada1451272ec277073bbb66ccf4f767"
     },
     {
+      "id": "synthetic-evidence-expiry-boundary",
+      "passed": true,
+      "evidence": "829374b230842367ee555779ce4636a1f2a09e0016af241e53d4e57007bdcb5d"
+    },
+    {
+      "id": "synthetic-approval-replay-self-test",
+      "passed": true,
+      "evidence": "1a163113b82ac9b501e702c29c1a3af4ac86b7cd7ce921b77807a7939b234f36"
+    },
+    {
+      "id": "shared-egress-firewall",
+      "passed": true,
+      "evidence": "f4de2cde7f8afd38b3ee3e64779d09a24d51281cb6816d486f29c8ac5be0b6e8,2c1ae6463617af605f68677af3c58267a453c223cab7663a229d31761ebfdc2d,fabdd92d55c5c45d71196e1da6e4ce3b38b70f2f3622238914a4998773e1e5d0,fed39851c7d6734761c311c448c04353d42e72a4078c588b34c6d0af3550b774,59bd4973bdd8911084196e80c80e6bffda5fa78ff9f5d94abccbcd5b51b737dd,d28b5d7df4cafbe497aed09d27deb314bcfdcb8712d64024a49de6bdac622432,5628e479efa9a98fac61c5d62b3e259ae78a03b3000bcf05fd5bf5ab610deed4,7413c97edad0cb00b44c7f5ed5df883a9815c4f53887ac9b94e1bc94666ec37c"
+    },
+    {
+      "id": "global-kill-switch-server-mode",
+      "passed": true,
+      "evidence": "1c37d46d3d42d301a79a8d04414a4f9de467f59dd74972e55bd640a3ca2f6ed5"
+    },
+    {
+      "id": "oversight-sentinel-no-authority",
+      "passed": true,
+      "evidence": "9702747aa31068e99ea09d3414506d9214ea9d4a5225042526c11d0c76302098,0aff290a2e3e81c8ff0b89f349743e45efe35276d76dac18e9697f27d1f36a38,ae7189fc6fb4f70457f5d8a6f8c8b9b44a77637425d110517094128f64ee0c45,bf49a93e280f68bb69d979718d260433d7ddb4c491db62349246c4c510903bbd,9cf9e0454c7751a57e2acdd06c8a75fd77003caf97699353570bf5fee264c155,ab1c4859a7b1bca6f5e393378147984a48e1831569b578d9cc4ddc78805a8de8,0dd601f4dd65f7a0c1c4010d3708a58ee9fde03af5b2f245d395282af0bec32b,162977d8ef48cdb9656bb9ff8a371bf6bb0e745f92fc3064a1378dee0436f89f,87db096a25031226711214f27091778c8ad2c856ef9850254c59902a602b9e80,e5be27dbe74587bad40565da31921447a1af33fd5069a53a8da51e5bf54d4b32,e9e33f87a22c6ba1c55dc6fedb1bdbe36d1aa4d4087a1231c52ab6d1e1dff75a,fca6ccac6e0b68f641fd71d7efc10a3f54af377e56b4196bdbd63f24d376b17f"
+    },
+    {
+      "id": "trace-to-eval-redacted",
+      "passed": true,
+      "evidence": "28bfaee7642f224fa12d43cde708242c415361e2ebfb5dfa65a2ab523556300e"
+    },
+    {
+      "id": "synthetic-validation-artifact-not-release-evidence",
+      "passed": true,
+      "evidence": "1455b7028912d862d92faa715759cc37d0d154f63124e840b65263a24182a6b6"
+    },
+    {
       "id": "high-risk-flags-default-off",
       "passed": true,
       "evidence": "eight high-risk flags disabled"
@@ -160,10 +201,17 @@
     {
       "id": "release-authority-retained",
       "passed": true,
-      "evidence": "03b3cd3968ef3685c938bcda9168a252069bea3b0610dffec45918bae7031965"
+      "evidence": "dd1b26fac5cf6908f50b973f741287821bb92219baae4a0cebdbe4da197dc551"
     }
   ],
+  "evidenceClassification": "synthetic-fixture-only",
+  "integritySemantics": "deterministic-byte-integrity-only-not-release-evidence",
+  "releaseGateEligible": false,
+  "regenerationRequiredAfterExpiry": true,
+  "freshnessMode": "fixed-synthetic-test-only",
+  "exactCandidateEvidenceVerified": false,
+  "durableApprovalReplayProtectionVerified": false,
   "externalEvidenceVerified": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "03b3cd3968ef3685c938bcda9168a252069bea3b0610dffec45918bae7031965"
+  "summaryHash": "dd1b26fac5cf6908f50b973f741287821bb92219baae4a0cebdbe4da197dc551"
 }

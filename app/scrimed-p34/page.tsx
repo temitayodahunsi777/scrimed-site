@@ -54,6 +54,43 @@ export default function ScrimedP34Page() {
         <article><span>Operator gates</span><strong>{summary.gateCounts.OPERATOR_REQUIRED}</strong></article>
         <article><span>Blocked gates</span><strong>{summary.gateCounts.BLOCKED}</strong></article>
         <article><span>Provider calls</span><strong>{summary.externalProviderCallsExecuted ? "executed" : "none"}</strong></article>
+        <article><span>Kill switch</span><strong>{summary.controlPlane2.killSwitchMode}</strong></article>
+        <article><span>Release state</span><strong>{summary.controlPlane2.release.resultingState}</strong></article>
+        <article><span>Evidence</span><strong>{summary.controlPlane2.action.evidenceFresh ? "fresh synthetic fixture" : "expired fixture"}</strong></article>
+        <article><span>Node target</span><strong>{summary.controlPlane2.runtime.nodeTarget}</strong></article>
+        <article><span>Migrations</span><strong>3 unapplied</strong></article>
+        <article><span>AAL2</span><strong>operator evidence required</strong></article>
+      </section>
+
+      <section className="table-section" aria-label="Control Plane 2.0 release controls">
+        <div className="section-heading">
+          <p className="eyebrow">Control Plane 2.0</p>
+          <h2>Fresh evidence, one-use approvals, and a global stop remain separate from authority.</h2>
+        </div>
+        <article className="module-row">
+          <div><Status value={summary.controlPlane2.action.decision} /><h2>Governed action declaration</h2></div>
+          <p>{summary.controlPlane2.declaration.actionId}</p>
+          <div><strong>Autonomy</strong><p>{summary.controlPlane2.declaration.autonomyClass}; A3 unavailable</p></div>
+          <div><strong>Maturity</strong><p>{summary.controlPlane2.action.currentMaturity}</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.atomicApproval.decision} /><h2>Atomic approval</h2></div>
+          <p>One in-process synthetic store rejects a repeated token. Exact-candidate approval and durable cross-request replay protection remain unverified.</p>
+          <div><strong>Replay test</strong><p>{summary.atomicApproval.replayAttemptBlocked ? "blocked in synthetic self-test" : "failed"}</p></div>
+          <div><strong>Execution</strong><p>not authorized</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.controlPlane2.killSwitchMode} /><h2>Kill switch and release ceiling</h2></div>
+          <p>Read-only diagnostics remain visible while all governed writes stay disabled.</p>
+          <div><strong>Release</strong><p>{summary.controlPlane2.release.resultingState}</p></div>
+          <div><strong>External effects</strong><p>not authorized</p></div>
+        </article>
+        <article className="module-row">
+          <div><Status value={summary.egressFirewall.decision} /><h2>Egress and trace safety</h2></div>
+          <p>Model, agent, telemetry, connector, proof, investor, and public channels share one redaction boundary.</p>
+          <div><strong>Trace</strong><p>{summary.controlPlane2.trace.traceId}</p></div>
+          <div><strong>Raw PHI</strong><p>none</p></div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="Autonomy privacy and sandbox controls">

@@ -1028,6 +1028,19 @@ const checks = [
     args: ["scripts/scrimed-p34-clinical-operating-system-contract-check.mjs"]
   },
   {
+    label: "SCRIMED p.34 gap-closure policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-gap-closure-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 gap-closure contract",
+    args: ["scripts/scrimed-p34-gap-closure-contract-check.mjs"]
+  },
+  {
     label: "SCRIMED p.34 artifact integrity",
     args: [
       "--disable-warning=ExperimentalWarning",

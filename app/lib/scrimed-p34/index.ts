@@ -51,6 +51,19 @@ import {
   createP34ClinicalOperatingSystemSummary,
   p34ClinicalOperatingSystemBoundary
 } from "./clinicalOperatingSystem";
+import {
+  consumeAtomicApproval,
+  createSyntheticApprovalSignature,
+  createSyntheticApprovalVerifier,
+  InMemorySyntheticAtomicApprovalStore,
+  type AtomicApprovalToken
+} from "./atomicApproval";
+import {
+  createP34ControlPlane2Summary,
+  p34ControlPlane2Boundary
+} from "./controlPlane2";
+import { evaluateP34EgressFirewall, p34EgressChannels } from "./egressFirewall";
+import { FixedTrustedClock } from "./trustedClock";
 import type { P34GateRecord, P34GateStatus, TaskPolicy } from "./types";
 
 export * from "./types";
@@ -59,14 +72,19 @@ export * from "./contextProvenance";
 export * from "./dicomPrivacy";
 export * from "./workflowContinuity";
 export * from "./clinicalOperatingSystem";
+export * from "./atomicApproval";
+export * from "./controlPlane2";
+export * from "./egressFirewall";
+export * from "./evidenceExpiry";
+export * from "./trustedClock";
 
 export const p34IntegratedRoute = "/scrimed-p34";
 export const p34IntegratedApiRoute = "/api/scrimed-control-plane/p34";
 export const p34IntegratedBriefRoute = "/api/scrimed-control-plane/p34/brief";
-export const p34IntegratedVersion = "scrimed-p34-integrated-v3-2026-08-20";
+export const p34IntegratedVersion = "scrimed-p34-integrated-v5-2026-08-21";
 
 export const p34IntegratedBoundary =
-  "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI clinical operating-system candidate with bounded workflow and autonomy contracts, model-fit routing, action maturity, tenant-first retrieval, PHI and sandbox controls, external-validation gates, patient-education previews, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, billing or payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
+  "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI clinical operating-system candidate with bounded workflow and autonomy contracts, model-fit routing, action maturity, tenant-first retrieval, PHI and sandbox controls, trusted evidence expiry, atomic approval verification, a global kill switch, external-validation gates, patient-education previews, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, billing or payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
 
 function gate(input: Omit<P34GateRecord, "gateHash">): P34GateRecord {
   return {
@@ -82,6 +100,105 @@ function gate(input: Omit<P34GateRecord, "gateHash">): P34GateRecord {
 export function getP34AdaptiveGovernanceSummary() {
   const registry = createP34CapabilityRegistry();
   const clinicalOperatingSystem = createP34ClinicalOperatingSystemSummary();
+  const controlPlane2 = createP34ControlPlane2Summary();
+  const atomicApprovalStore = new InMemorySyntheticAtomicApprovalStore();
+  const atomicApprovalVerifierId = "p34-synthetic-atomic-verifier";
+  const atomicApprovalUnsigned: Omit<AtomicApprovalToken, "signature"> = {
+    schemaVersion: "scrimed-p34-atomic-approval-v1",
+    approvalId: "p34-synthetic-atomic-approval",
+    candidateFingerprint: controlPlane2.declaration.candidateFingerprint,
+    actionId: "prepare-synthetic-internal-receipt",
+    tenantId: "synthetic-tenant",
+    environmentId: "local-synthetic",
+    requesterClass: "synthetic-policy-runner",
+    issuedAt: "2026-08-21T03:45:00.000Z",
+    expiresAt: "2026-08-21T04:15:00.000Z",
+    permittedSideEffect: "reversible-synthetic-internal-write",
+    nonce: "p34-synthetic-nonce-001",
+    approvalOwnerHash: createClinicalEvidenceHash("p34-synthetic-atomic-approval-owner")
+  };
+  const atomicApprovalToken: AtomicApprovalToken = {
+    ...atomicApprovalUnsigned,
+    signature: createSyntheticApprovalSignature(atomicApprovalUnsigned, atomicApprovalVerifierId)
+  };
+  const atomicApprovalFirstAttempt = consumeAtomicApproval({
+    token: atomicApprovalToken,
+    expected: {
+      candidateFingerprint: atomicApprovalToken.candidateFingerprint,
+      actionId: atomicApprovalToken.actionId,
+      tenantId: atomicApprovalToken.tenantId,
+      environmentId: atomicApprovalToken.environmentId,
+      requesterClass: atomicApprovalToken.requesterClass,
+      permittedSideEffect: atomicApprovalToken.permittedSideEffect
+    },
+    clock: new FixedTrustedClock("2026-08-21T04:00:00.000Z"),
+    store: atomicApprovalStore,
+    verifier: createSyntheticApprovalVerifier(atomicApprovalVerifierId)
+  });
+  const atomicApprovalReplayAttempt = consumeAtomicApproval({
+    token: atomicApprovalToken,
+    expected: {
+      candidateFingerprint: atomicApprovalToken.candidateFingerprint,
+      actionId: atomicApprovalToken.actionId,
+      tenantId: atomicApprovalToken.tenantId,
+      environmentId: atomicApprovalToken.environmentId,
+      requesterClass: atomicApprovalToken.requesterClass,
+      permittedSideEffect: atomicApprovalToken.permittedSideEffect
+    },
+    clock: new FixedTrustedClock("2026-08-21T04:00:00.000Z"),
+    store: atomicApprovalStore,
+    verifier: createSyntheticApprovalVerifier(atomicApprovalVerifierId)
+  });
+  const atomicApproval = {
+    ...atomicApprovalFirstAttempt,
+    evidenceClassification: "synthetic-in-process-self-test" as const,
+    replayAttemptBlocked: atomicApprovalReplayAttempt.decision === "BLOCK" &&
+      atomicApprovalReplayAttempt.reasonCodes.includes("APPROVAL_REPLAY_DETECTED"),
+    replayAttemptReceiptHash: atomicApprovalReplayAttempt.receiptHash,
+    persistentReplayProtectionAvailable: false as const,
+    exactCandidateApprovalVerified: false as const,
+    durableTrustedStoreRequiredForExecution: true as const
+  };
+  const egressFirewall = evaluateP34EgressFirewall({
+    channel: "telemetry",
+    dataClassification: "synthetic-no-phi",
+    tenantId: "synthetic-tenant",
+    purpose: "p34-safe-operational-observability",
+    payload: {
+      requestId: "p34-synthetic-request",
+      workflowId: "p34-synthetic-workflow",
+      actionId: controlPlane2.declaration.actionId,
+      policyResult: controlPlane2.action.decision,
+      releaseFingerprint: controlPlane2.declaration.candidateFingerprint
+    }
+  });
+  const egressChannelCoverage = p34EgressChannels.map((channel) => {
+    const result = evaluateP34EgressFirewall({
+      channel,
+      dataClassification: "synthetic-no-phi",
+      tenantId: "synthetic-tenant",
+      purpose: "p34-channel-coverage",
+      payload: { authorization: "Bearer synthetic_example_token_123456789" }
+    });
+    const expectedDecision = channel === "log" || channel === "telemetry"
+      ? "REQUIRE_HUMAN"
+      : "BLOCK";
+    return {
+      channel,
+      decision: result.decision,
+      detectedClasses: result.detectedClasses,
+      reasonCodes: result.reasonCodes,
+      forwardingAuthorized: result.forwardingAuthorized,
+      containsRawPhi: result.containsRawPhi,
+      containsSecrets: result.containsSecrets,
+      passed: result.decision === expectedDecision &&
+        result.detectedClasses.includes("secret") &&
+        !result.forwardingAuthorized &&
+        !result.containsRawPhi &&
+        !result.containsSecrets,
+      decisionHash: result.decisionHash
+    };
+  });
   const workflowContract = createP34SyntheticWorkflowContract();
   const workflowContractDecision = validateWorkflowContract(workflowContract, "2026-08-19T12:00:00.000Z");
   const workflowModelFit = selectWorkflowModelFitRoute({
@@ -426,7 +543,13 @@ export function getP34AdaptiveGovernanceSummary() {
     gate({ gateId: "P34-25", status: clinicalOperatingSystem.patientTakeHome.decision === "REQUIRE_HUMAN" && clinicalOperatingSystem.patientTakeHome.deliveryAuthorized === false ? "PASS" : "FAIL", ownerRole: "patient-communication-owner", description: "Patient Take-Home previews use approved cited facts, preferences, accessibility, proxy rules, and clinician review while delivery remains disabled.", evidence: [clinicalOperatingSystem.patientTakeHome.documentHash], reasonCodes: clinicalOperatingSystem.patientTakeHome.reasonCodes, candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-26", status: clinicalOperatingSystem.coding.draftAuthorized && clinicalOperatingSystem.coding.billingSubmissionAuthorized === false ? "PASS" : "FAIL", ownerRole: "coding-governance-owner", description: "Medical coding defaults to assisted, evidence-bound drafting with human review and no billing release authority.", evidence: [clinicalOperatingSystem.coding.decisionHash], reasonCodes: clinicalOperatingSystem.coding.reasonCodes, candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-27", status: clinicalOperatingSystem.operations.retryAllowed && clinicalOperatingSystem.operations.idempotencyPreserved ? "PASS" : "FAIL", ownerRole: "clinical-agent-sre-owner", description: "Operational recovery classifies bounded retries, verifies checkpoints, preserves idempotency, and routes terminal failures to recovery evidence.", evidence: [clinicalOperatingSystem.operations.decisionHash], reasonCodes: clinicalOperatingSystem.operations.reasonCodes, candidateBound: false, externalActionRequired: false }),
-    gate({ gateId: "P34-28", status: clinicalOperatingSystem.claims.structurallyValid && clinicalOperatingSystem.claims.decision === "REQUIRE_HUMAN" && !clinicalOperatingSystem.claims.publicationAuthorized ? "PASS" : "FAIL", ownerRole: "claims-governance-owner", description: "Machine-readable claims validate structure and evidence metadata but cannot publish without trusted evidence lookup and named publication approval.", evidence: [clinicalOperatingSystem.claims.claimHash], reasonCodes: clinicalOperatingSystem.claims.reasonCodes, candidateBound: false, externalActionRequired: false })
+    gate({ gateId: "P34-28", status: clinicalOperatingSystem.claims.structurallyValid && clinicalOperatingSystem.claims.decision === "REQUIRE_HUMAN" && !clinicalOperatingSystem.claims.publicationAuthorized ? "PASS" : "FAIL", ownerRole: "claims-governance-owner", description: "Machine-readable claims validate structure and evidence metadata but cannot publish without trusted evidence lookup and named publication approval.", evidence: [clinicalOperatingSystem.claims.claimHash], reasonCodes: clinicalOperatingSystem.claims.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-29", status: controlPlane2.action.evidenceFresh && controlPlane2.evidenceContext.classification === "synthetic-fixture-only" && !controlPlane2.evidenceContext.exactCandidateEvidenceVerified && controlPlane2.action.releaseStateCeiling === "EXACT_REVIEW_REQUIRED" ? "PASS" : "FAIL", ownerRole: "release-evidence-owner", description: "A fixed-clock synthetic fixture proves fail-closed expiry behavior; it is not exact-candidate evidence and cannot advance release state.", evidence: [controlPlane2.action.decisionHash], reasonCodes: [...controlPlane2.action.reasonCodes, "SYNTHETIC_FIXTURE_ONLY", "EXACT_CANDIDATE_EVIDENCE_UNVERIFIED"], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-30", status: atomicApproval.structurallyVerified && atomicApproval.approvalConsumed && atomicApproval.replayAttemptBlocked && !atomicApproval.persistentReplayProtectionAvailable && !atomicApproval.executionAuthorized ? "PASS" : "FAIL", ownerRole: "approval-policy-owner", description: "An in-process synthetic self-test proves one-store replay rejection; durable cross-request replay protection and execution authority remain unavailable.", evidence: [atomicApproval.receiptHash, atomicApproval.replayAttemptReceiptHash], reasonCodes: [...atomicApproval.reasonCodes, "SYNTHETIC_IN_PROCESS_SELF_TEST", "DURABLE_APPROVAL_STORE_REQUIRED"], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-31", status: egressFirewall.decision === "ALLOW" && !egressFirewall.forwardingAuthorized && !egressFirewall.containsRawPhi && !egressFirewall.containsSecrets && egressChannelCoverage.every((item) => item.passed) ? "PASS" : "FAIL", ownerRole: "privacy-security-owner", description: "The shared egress firewall scans every declared model, agent, telemetry, connector, proof, investor, and public channel without granting outbound authority.", evidence: [egressFirewall.decisionHash, ...egressChannelCoverage.map((item) => item.decisionHash)], reasonCodes: [...egressFirewall.reasonCodes, ...egressChannelCoverage.filter((item) => !item.passed).map((item) => `EGRESS_CHANNEL_COVERAGE_FAILED:${item.channel}`)], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-32", status: ["NORMAL", "RESTRICTED", "READ_ONLY", "HALTED"].includes(controlPlane2.killSwitchMode) && !controlPlane2.governedWritesExecuted && !controlPlane2.action.a3Available ? "PASS" : "FAIL", ownerRole: "runtime-safety-owner", description: "The global kill switch defaults to read-only, reports the trusted server mode, and never grants governed writes or A3 authority.", evidence: [controlPlane2.summaryHash], reasonCodes: controlPlane2.action.reasonCodes.filter((reason) => reason.startsWith("KILL_SWITCH_")), candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-33", status: controlPlane2.oversight.incidents.length === 0 && !controlPlane2.oversight.executionAuthorityGranted && controlPlane2.oversightDetectorCoverage.length === 12 && controlPlane2.oversightDetectorCoverage.every((item) => item.detected && !item.executionAuthorityGranted) ? "PASS" : "FAIL", ownerRole: "oversight-sentinel-owner", description: "Oversight Sentinel 2.0 independently exercises privilege, maturity, evidence, retry, delegation, budget, model, policy, network, tenant, approval, and distribution drift detectors without gaining execution authority.", evidence: [controlPlane2.oversight.sentinelHash, ...controlPlane2.oversightDetectorCoverage.map((item) => item.sentinelHash)], reasonCodes: controlPlane2.oversightDetectorCoverage.filter((item) => !item.detected).map((item) => `SENTINEL_DETECTOR_COVERAGE_FAILED:${item.signal}`), candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-34", status: Boolean(controlPlane2.trace.traceId && controlPlane2.trace.actionId && controlPlane2.trace.tenantId && controlPlane2.trace.modelId && controlPlane2.trace.promptVersion) && controlPlane2.trace.toolIds.length > 0 && controlPlane2.trace.evidenceHashes.length > 0 && [controlPlane2.trace.resultHash, controlPlane2.trace.evaluationHash, controlPlane2.trace.traceEvaluationHash].every((value) => /^[0-9a-f]{64}$/.test(value)) && controlPlane2.trace.latencyMs >= 0 && controlPlane2.trace.costUsd >= 0 && !controlPlane2.trace.containsRawPhi && !controlPlane2.trace.containsSecrets && !controlPlane2.trace.hiddenChainOfThoughtStored ? "PASS" : "FAIL", ownerRole: "evaluation-observability-owner", description: "Trace-to-eval retains every bounded model, prompt, tool, evidence, result, evaluation, correction, acceptance, latency, and cost linkage without PHI, secrets, or hidden reasoning.", evidence: [controlPlane2.trace.traceEvaluationHash], reasonCodes: [], candidateBound: false, externalActionRequired: false })
   ];
   const statuses: P34GateStatus[] = ["PASS", "OPERATOR_REQUIRED", "BLOCKED", "FAIL"];
   const gateCounts = Object.fromEntries(statuses.map((status) => [
@@ -439,7 +562,7 @@ export function getP34AdaptiveGovernanceSummary() {
     status: gateCounts.FAIL > 0 ? "local-validation-failed" : "local-synthetic-candidate-review-required",
     mission: "Optimize cost per safe, clinically accepted workflow outcome with deterministic-first, vendor-neutral, contemporaneously governed execution, bounded autonomy, and continuity evidence.",
     boundary: p34IntegratedBoundary,
-    componentBoundaries: [p34AdaptiveGovernanceBoundary, p34ContextProvenanceBoundary, p34DicomPrivacyBoundary, p34WorkflowContinuityBoundary, p34ClinicalOperatingSystemBoundary],
+    componentBoundaries: [p34AdaptiveGovernanceBoundary, p34ContextProvenanceBoundary, p34DicomPrivacyBoundary, p34WorkflowContinuityBoundary, p34ClinicalOperatingSystemBoundary, p34ControlPlane2Boundary],
     route: p34IntegratedRoute,
     apiRoute: p34IntegratedApiRoute,
     briefRoute: p34IntegratedBriefRoute,
@@ -473,6 +596,10 @@ export function getP34AdaptiveGovernanceSummary() {
     },
     roiDashboard,
     clinicalOperatingSystem,
+    controlPlane2,
+    atomicApproval,
+    egressFirewall,
+    egressChannelCoverage,
     pilotObjectives: p34PilotObjectives,
     publicClaimDecision,
     gateMatrix,
@@ -530,6 +657,9 @@ export function buildP34AdaptiveGovernanceBrief() {
     `- External validation: ${summary.clinicalOperatingSystem.externalValidation.decision}; clinical production eligible ${summary.clinicalOperatingSystem.externalValidation.clinicalProductionEligible}`,
     `- Patient Take-Home: ${summary.clinicalOperatingSystem.patientTakeHome.decision}; delivery ${summary.clinicalOperatingSystem.patientTakeHome.deliveryAuthorized}`,
     `- Medical coding: ${summary.clinicalOperatingSystem.coding.effectiveMode}; billing submission ${summary.clinicalOperatingSystem.coding.billingSubmissionAuthorized}`,
+    `- Control Plane 2.0: ${summary.controlPlane2.action.decision}; ${summary.controlPlane2.evidenceContext.classification}; exact evidence ${summary.controlPlane2.evidenceContext.exactCandidateEvidenceVerified}; release ${summary.controlPlane2.release.resultingState}`,
+    `- Atomic approval: ${summary.atomicApproval.evidenceClassification}; first consumption ${summary.atomicApproval.approvalConsumed}; replay blocked ${summary.atomicApproval.replayAttemptBlocked}; durable store ${summary.atomicApproval.persistentReplayProtectionAvailable}; execution ${summary.atomicApproval.executionAuthorized}`,
+    `- Shared egress firewall: ${summary.egressFirewall.decision}; forwarding ${summary.egressFirewall.forwardingAuthorized}`,
     "",
     "## Gates",
     ...summary.gateMatrix.map((gateRecord) => `- ${gateRecord.gateId}: ${gateRecord.status} — ${gateRecord.description}`),

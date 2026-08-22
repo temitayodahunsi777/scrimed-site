@@ -844,6 +844,16 @@ export default function ProductConsolePage() {
           <p>Clinical production eligibility remains blocked while local oversight stays at {(summary.p34ClinicalOperatingSystem.oversight.reviewedActionPercentage * 100).toFixed(0)}%.</p>
           <div><strong>{summary.p34ClinicalOperatingSystem.patientTakeHome.decision}</strong><p>patient preview review state</p></div>
         </article>
+        <article className="module-row">
+          <div><span>{summary.p34ControlPlane2.killSwitchMode}</span><h2>Release and kill switch</h2></div>
+          <p>{summary.p34ControlPlane2.release.resultingState}; writes and A3 authority remain unavailable.</p>
+          <div><strong>{summary.p34ControlPlane2.runtime.reviewState}</strong><p>exact-candidate review state</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34AtomicApproval.decision}</span><h2>Atomic approval evidence</h2></div>
+          <p>An in-process synthetic self-test rejects replay within one store; durable replay protection and execution authority remain unavailable.</p>
+          <div><strong>{summary.p34EgressFirewall.decision}</strong><p>shared egress firewall</p></div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="SCRIMED operating command center">

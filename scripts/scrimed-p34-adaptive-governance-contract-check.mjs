@@ -134,7 +134,13 @@ const assertions = [
   [runbook.includes("Workflow Admission"), "workflow admission runbook"],
   [claims.includes("primary source, retrieval date"), "claims control"],
   [JSON.parse(gateArtifact).productionStatus === "blocked", "production gate artifact"],
-  [JSON.parse(validationArtifact).status === "PASS", "deterministic validation artifact"]
+  [
+    JSON.parse(validationArtifact).behaviorChecksStatus === "PASS" &&
+      JSON.parse(validationArtifact).status === "REVIEW_REQUIRED" &&
+      JSON.parse(validationArtifact).releaseEvidenceStatus === "EXPIRED_REGENERATE_REQUIRED" &&
+      JSON.parse(validationArtifact).releaseGateEligible === false,
+    "deterministic validation and expired release-evidence boundary"
+  ]
 ];
 
 const failures = assertions.filter(([passed]) => !passed);

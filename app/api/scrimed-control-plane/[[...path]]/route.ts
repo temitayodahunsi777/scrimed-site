@@ -262,6 +262,15 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "p34/claims") {
     return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.claims, "control-plane-p34-claims");
   }
+  if (endpoint === "p34/control-plane-2") {
+    return json(getP34AdaptiveGovernanceSummary().controlPlane2, "control-plane-p34-control-plane-2");
+  }
+  if (endpoint === "p34/atomic-approval") {
+    return json(getP34AdaptiveGovernanceSummary().atomicApproval, "control-plane-p34-atomic-approval");
+  }
+  if (endpoint === "p34/egress-firewall") {
+    return json(getP34AdaptiveGovernanceSummary().egressFirewall, "control-plane-p34-egress-firewall");
+  }
   if (endpoint === "p34/assurance") {
     const summary = getP34AdaptiveGovernanceSummary();
     return json({

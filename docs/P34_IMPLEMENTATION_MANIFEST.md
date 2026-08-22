@@ -1,17 +1,22 @@
 # SCRIMED p.34 Clinical Operating System Implementation Manifest
 
-Status: source implementation and full safe local validation complete; exact local commit and post-commit candidate evidence pending.
+Status: source implementation complete; final safe local revalidation, exact local commit, and post-commit candidate evidence pending.
 
-Baseline: `c9cf72d1cefb608837b3012539c114e06c824260` on `agent/scrimed-p34-adaptive-governance`.
+The deterministic `artifacts/p34/P34_VALIDATION_REPORT.json` proves fixture behavior and byte integrity only. It is explicitly ineligible as release evidence, carries a source-candidate binding and expiry, and must be regenerated after expiry and again after the final exact-candidate commit. Its behavior checks report separately from a top-level `REVIEW_REQUIRED` and `EXPIRED_REGENERATE_REQUIRED` release-evidence state. Current focused coverage comprises 85 policy checks and 79 contract checks before artifact regeneration.
 
-Implementation branch: `agent/scrimed-clinical-ops-p34`.
+Foundation baseline: `c9cf72d1cefb608837b3012539c114e06c824260` on `agent/scrimed-p34-adaptive-governance`.
+
+Gap-closure baseline: `72c44bed5bc4550464bbf8a6ece648403ed7da4e`.
+
+Implementation branch: `agent/scrimed-p34-gap-closure`.
 
 ## Architecture
 
 | Area | Existing component extended | Primary implementation |
 | --- | --- | --- |
 | Decision evidence | p.33 Decision Evidence Ledger | p.34 canonical clinical operating governance record and query service |
-| Autonomy | p.33 exact-action policy and p.34 action maturity | A0-A3 contract and scoped structural approval evaluator; execution authorization fixed false pending trusted atomic consumption |
+| Autonomy | p.33 exact-action policy and p.34 action maturity | A0-A3 contract and scoped structural approval evaluator; execution authorization fixed false pending trusted durable atomic consumption |
+| Control Plane 2.0 | Existing p.34 control plane | Runtime-validated governed-action declaration, fixed-clock synthetic evidence-expiry fixture, in-process replay self-test, classified bounded egress firewall, total emergency halt, exact-review release ceiling, Oversight Sentinel 2.0, and bounded trace-to-eval receipt |
 | PHI and secrets | p.34 capability admission and existing no-PHI boundaries | Field registry, startup gate, trusted-clock token-vault adapter, one-use validator grants, egress scan, break glass, secret handles |
 | Agent isolation | Existing p.34 placement and contained tool stages | Provider-neutral sandbox policy review; runtime authorization fixed false pending canonical/open-time containment |
 | Context and retrieval | p.33 Context Fabric and p.34 provenance envelope | Authenticated tenant/purpose plus alias/freshness/authority/rerank/citation evaluator |
@@ -26,6 +31,11 @@ Implementation branch: `agent/scrimed-clinical-ops-p34`.
 
 - `app/lib/scrimed-p34/types.ts`
 - `app/lib/scrimed-p34/clinicalOperatingSystem.ts`
+- `app/lib/scrimed-p34/trustedClock.ts`
+- `app/lib/scrimed-p34/evidenceExpiry.ts`
+- `app/lib/scrimed-p34/atomicApproval.ts`
+- `app/lib/scrimed-p34/egressFirewall.ts`
+- `app/lib/scrimed-p34/controlPlane2.ts`
 - `app/lib/scrimed-p34/index.ts`
 - `app/lib/scrimed-p34/adaptiveGovernance.ts`
 - `app/api/scrimed-control-plane/[[...path]]/route.ts`
@@ -34,6 +44,9 @@ Implementation branch: `agent/scrimed-clinical-ops-p34`.
 - `app/product/page.tsx`
 - `scripts/scrimed-p34-clinical-operating-system-policy-test.mjs`
 - `scripts/scrimed-p34-clinical-operating-system-contract-check.mjs`
+- `scripts/scrimed-p34-gap-closure-policy-test.mjs`
+- `scripts/scrimed-p34-gap-closure-contract-check.mjs`
+- `scripts/scrimed-p34-gap-closure-smoke.mjs`
 - `scripts/scrimed-p34-artifacts.mjs`
 - `scripts/scrimed-nonsecret-test-suite.mjs`
 - `package.json`

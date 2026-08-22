@@ -26,10 +26,16 @@ Status: `NO-GO` for deployment, migration, PHI, clinical operation, billing, pay
 | P34-26 | Assisted coding and billing block | PASS |
 | P34-27 | Retry, checkpoint, idempotency, and recovery | PASS |
 | P34-28 | Evidence-bound internal claim review; publication remains unauthorized | PASS |
+| P34-29 | Synthetic trusted-time expiry test; exact-candidate evidence unverified | PASS |
+| P34-30 | In-process replay self-test; durable approval store unavailable | PASS |
+| P34-31 | Shared PHI/secret egress firewall | PASS |
+| P34-32 | Global read-only kill switch; A3 and writes unavailable | PASS |
+| P34-33 | Oversight Sentinel 2.0 | PASS |
+| P34-34 | PHI-safe trace-to-eval linkage | PASS |
 
 PASS means the deterministic synthetic control behaved as specified. It does not grant external authority.
 
-Current deterministic totals: 21 `PASS`, 2 `OPERATOR_REQUIRED`, 5 `BLOCKED`, and 0 `FAIL` across 28 gates. The artifact validation report passes 31/31 checks.
+Current deterministic totals: 27 `PASS`, 2 `OPERATOR_REQUIRED`, 5 `BLOCKED`, and 0 `FAIL` across 34 gates. The regenerated artifact validation report covers 37 deterministic checks.
 
 ## External And Operator Gates
 
@@ -49,4 +55,4 @@ Exact fingerprints are intentionally pending until the final source mutation is 
 
 ## Rollback
 
-The source rollback point is baseline commit `c9cf72d1cefb608837b3012539c114e06c824260`. No database or external-state rollback is required because this wave adds no migration and performs no external mutation. Do not use destructive Git commands; revert the focused local commit through the repository's normal reviewed process if required.
+The source rollback point is baseline commit `72c44bed5bc4550464bbf8a6ece648403ed7da4e`. No database or external-state rollback is required because this wave adds no migration and performs no external mutation. Do not use destructive Git commands; revert the focused local commit through the repository's normal reviewed process if required.
