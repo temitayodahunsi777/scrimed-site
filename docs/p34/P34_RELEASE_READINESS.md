@@ -5,7 +5,7 @@ The gap-closure candidate is eligible for local assurance and exact-candidate re
 | Lane | Engineering state | Authority state |
 | --- | --- | --- |
 | Control Plane 2.0 | implemented and locally testable | no execution authority |
-| Evidence expiry | fail closed | fresh exact-candidate packets required |
+| Evidence expiry | signed, issuer-bound, version-bound, type-specific, fail closed | fresh trusted exact-candidate packets required |
 | Atomic approval | synthetic one-use verifier | trusted durable store absent |
 | Egress and trace safety | local policy covered | no external provider or PHI authority |
 | Kill switch | default `READ_ONLY` | no production control-plane claim |
@@ -13,6 +13,7 @@ The gap-closure candidate is eligible for local assurance and exact-candidate re
 | Supabase | connected project healthy; migration registry inspected | three migrations unapplied; leaked-password protection warning retained |
 | AAL2 | local verifier and workflow exist | fresh operator-bound evidence required |
 | Independent review | packet prepared | named review required after final fingerprints |
+| Runtime provenance display | commit and fingerprint declarations exposed safely | candidate fingerprint remains `DECLARED_UNVERIFIED` until exact proof validates |
 | Deployment and customer | procedures only | blocked |
 
 Deliberate safety boundaries are not failures. They remain `OPERATOR_ACTION_REQUIRED`, `TARGETED_SPECIALIST_REVIEW_REQUIRED`, or `PRODUCTION_AUTHORIZATION_REQUIRED` as applicable.

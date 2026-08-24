@@ -4,11 +4,19 @@ import { createClinicalEvidenceHash } from "../app/lib/clinicalEvidenceControls.
 import {
   FixedTrustedClock,
   InMemorySyntheticAtomicApprovalStore,
+  InMemorySyntheticExactCandidateReviewStore,
+  compareP34TraceEvaluations,
   consumeAtomicApproval,
+  createP34CausalTraceGraph,
   createP34ControlPlane2Summary,
   createP34TraceEvaluationRecord,
   createSyntheticApprovalSignature,
   createSyntheticApprovalVerifier,
+  createSyntheticExactReviewSignature,
+  createSyntheticExactReviewVerifier,
+  createSyntheticP34EvidenceSignature,
+  createSyntheticP34EvidenceVerifier,
+  evaluateP34DynamicGovernance,
   evaluateP34EgressFirewall,
   evaluateP34EvidenceFreshness,
   evaluateP34EvidenceSet,
@@ -16,9 +24,13 @@ import {
   evaluateP34OversightSentinel,
   evaluateP34ReleaseTransition,
   evaluateTrustedTimeWindow,
+  explainP34AcceptedOutput,
   getP34AdaptiveGovernanceSummary,
   p34EgressChannels,
-  p34ControlPlane2Version
+  p34ControlPlane2Version,
+  p34CausalTraceStages,
+  revalidateP34GovernedActionImmediatelyBeforeEffect,
+  verifyExactCandidateReview
 } from "../app/lib/scrimed-p34/index.ts";
 
 let passed = 0;
@@ -30,9 +42,18 @@ function check(name, run) {
 const hash = (value) => createClinicalEvidenceHash(value);
 const clock = new FixedTrustedClock("2026-08-21T04:00:00.000Z");
 const candidateFingerprint = hash("p34-gap-closure-test-candidate");
+const evidenceVerifierId = "p34-gap-closure-evidence-verifier";
+const evidenceIssuerIdentityHash = hash("p34-gap-closure-evidence-issuer");
+const evidenceVerificationContext = {
+  usage: "synthetic-test-only",
+  expectedValidationVersion: p34ControlPlane2Version,
+  expectedIssuerIdentityHash: evidenceIssuerIdentityHash,
+  verifier: createSyntheticP34EvidenceVerifier(evidenceVerifierId)
+};
 
 function evidence(evidenceType, overrides = {}) {
-  return {
+  const unsigned = {
+    schemaVersion: "scrimed-p34-evidence-envelope-v2",
     evidenceId: `evidence-${evidenceType}`,
     evidenceType,
     sourceCandidate: candidateFingerprint,
@@ -40,7 +61,13 @@ function evidence(evidenceType, overrides = {}) {
     generatedAt: "2026-08-21T03:30:00.000Z",
     expiresAt: "2026-08-22T05:11:03.000Z",
     evidenceHash: hash(`evidence-${evidenceType}`),
+    issuerIdentityHash: evidenceIssuerIdentityHash,
+    trustClass: "synthetic-test-only",
     ...overrides
+  };
+  return {
+    ...unsigned,
+    signature: createSyntheticP34EvidenceSignature(unsigned, evidenceVerifierId)
   };
 }
 
@@ -48,6 +75,7 @@ function declaration(overrides = {}) {
   return {
     schemaVersion: "scrimed-p34-governed-action-v2",
     actionId: "inspect-synthetic-evidence",
+    resourceId: "synthetic-evidence",
     tenantId: "synthetic-tenant",
     actorIdHash: hash("p34-gap-closure-actor"),
     candidateFingerprint,
@@ -81,6 +109,7 @@ function governedRequest(overrides = {}) {
       evidence("validation-packet"),
       evidence("security-evidence")
     ],
+    evidenceVerificationContext,
     killSwitchMode: "READ_ONLY",
     clock,
     ...overrides
@@ -89,18 +118,22 @@ function governedRequest(overrides = {}) {
 
 function approvalToken(overrides = {}) {
   const unsigned = {
-    schemaVersion: "scrimed-p34-atomic-approval-v1",
+    schemaVersion: "scrimed-p34-atomic-approval-v2",
     approvalId: "p34-gap-closure-approval",
     candidateFingerprint,
     actionId: "prepare-synthetic-receipt",
+    resourceId: "synthetic-receipt",
     tenantId: "synthetic-tenant",
     environmentId: "local-synthetic",
     requesterClass: "synthetic-policy-runner",
+    autonomyLevel: "A2",
+    maturityLevel: "REVIEW_READY",
     issuedAt: "2026-08-21T03:45:00.000Z",
     expiresAt: "2026-08-21T04:15:00.000Z",
     permittedSideEffect: "reversible-synthetic-internal-write",
     nonce: "p34-gap-closure-nonce-001",
-    approvalOwnerHash: hash("p34-gap-closure-approval-owner"),
+    approverIdentityHash: hash("p34-gap-closure-approval-owner"),
+    policyDecisionHash: hash("p34-gap-closure-policy-decision"),
     ...overrides
   };
   return {
@@ -115,15 +148,70 @@ function consume(token, store = new InMemorySyntheticAtomicApprovalStore(), expe
     expected: {
       candidateFingerprint,
       actionId: "prepare-synthetic-receipt",
+      resourceId: "synthetic-receipt",
       tenantId: "synthetic-tenant",
       environmentId: "local-synthetic",
       requesterClass: "synthetic-policy-runner",
+      autonomyLevel: "A2",
+      maturityLevel: "REVIEW_READY",
       permittedSideEffect: "reversible-synthetic-internal-write",
+      approverIdentityHash: hash("p34-gap-closure-approval-owner"),
+      policyDecisionHash: hash("p34-gap-closure-policy-decision"),
       ...expectedOverrides
     },
     clock,
     store,
     verifier: createSyntheticApprovalVerifier("p34-gap-closure-verifier")
+  });
+}
+
+function exactReviewBinding(overrides = {}) {
+  return {
+    pullRequestNumber: 47,
+    commitSha: "a".repeat(40),
+    treeSha: "b".repeat(40),
+    candidateFingerprint: hash("exact-review-candidate"),
+    sourceFingerprint: hash("exact-review-source"),
+    validationFingerprint: hash("exact-review-validation"),
+    reviewPacketFingerprint: hash("exact-review-packet"),
+    sbomFingerprint: hash("exact-review-sbom"),
+    gatePacketFingerprint: hash("exact-review-gates"),
+    ...overrides
+  };
+}
+
+function exactReviewApproval(binding = exactReviewBinding(), overrides = {}) {
+  const unsigned = {
+    schemaVersion: "scrimed-p34-exact-candidate-review-v2",
+    approvalId: "p34-exact-review-approval",
+    binding,
+    reviewerIdentityHash: hash("independent-reviewer"),
+    authorIdentityHash: hash("candidate-author"),
+    reviewerRole: "independent-technical-reviewer",
+    decision: "APPROVED_FOR_MERGE_AUTHORIZATION_REVIEW",
+    issuedAt: "2026-08-21T03:45:00.000Z",
+    expiresAt: "2026-08-21T04:15:00.000Z",
+    nonce: "p34-exact-review-nonce",
+    ...overrides
+  };
+  return {
+    ...unsigned,
+    signature: createSyntheticExactReviewSignature(unsigned, "p34-exact-review-verifier")
+  };
+}
+
+function verifyReview(
+  approval,
+  expected = exactReviewBinding(),
+  store = new InMemorySyntheticExactCandidateReviewStore()
+) {
+  return verifyExactCandidateReview({
+    approval,
+    expected,
+    expectedAuthorIdentityHash: hash("candidate-author"),
+    clock,
+    store,
+    verifier: createSyntheticExactReviewVerifier("p34-exact-review-verifier")
   });
 }
 
@@ -154,6 +242,16 @@ check("trusted-clock-enforces-maximum-age", () => {
     maximumAgeMs: 15 * 60 * 1000
   }, clock);
   assert.ok(result.reasonCodes.includes("ISSUED_AT_STALE"));
+});
+
+check("trusted-clock-rejects-overlong-replay-window", () => {
+  const result = evaluateTrustedTimeWindow({
+    issuedAt: "2026-08-21T03:45:00.000Z",
+    expiresAt: "2026-08-21T05:00:00.000Z",
+    maximumWindowMs: 30 * 60 * 1000
+  }, clock);
+  assert.equal(result.valid, false);
+  assert.ok(result.reasonCodes.includes("TIME_WINDOW_TOO_LONG"));
 });
 
 check("trusted-clock-rejects-invalid-skew-policy", () => {
@@ -196,8 +294,8 @@ check("trusted-clock-null-input-fails-closed", () => {
 });
 
 check("evidence-freshness-is-candidate-bound", () => {
-  assert.equal(evaluateP34EvidenceFreshness(evidence("gate-packet"), candidateFingerprint, clock).freshness, "fresh");
-  const mismatch = evaluateP34EvidenceFreshness(evidence("gate-packet"), hash("other-candidate"), clock);
+  assert.equal(evaluateP34EvidenceFreshness(evidence("gate-packet"), candidateFingerprint, clock, evidenceVerificationContext).freshness, "fresh");
+  const mismatch = evaluateP34EvidenceFreshness(evidence("gate-packet"), hash("other-candidate"), clock, evidenceVerificationContext);
   assert.equal(mismatch.freshness, "candidate-mismatch");
   assert.ok(mismatch.requiredRegeneration.includes("validation-packet"));
 });
@@ -205,7 +303,7 @@ check("evidence-freshness-is-candidate-bound", () => {
 check("expired-evidence-requires-regeneration", () => {
   const result = evaluateP34EvidenceFreshness(evidence("gate-packet", {
     expiresAt: "2026-08-21T03:59:59.000Z"
-  }), candidateFingerprint, clock);
+  }), candidateFingerprint, clock, evidenceVerificationContext);
   assert.equal(result.decision, "BLOCK");
   assert.equal(result.freshness, "expired");
   assert.ok(result.requiredRegeneration.includes("gate-packet"));
@@ -216,26 +314,98 @@ check("missing-required-evidence-fails-set", () => {
     evidence: [evidence("candidate-manifest")],
     requiredTypes: ["candidate-manifest", "validation-packet"],
     expectedCandidate: candidateFingerprint,
-    clock
+    clock,
+    verificationContext: evidenceVerificationContext
   });
   assert.equal(result.fresh, false);
   assert.deepEqual(result.missingTypes, ["validation-packet"]);
 });
 
 check("invalid-evidence-type-fails-closed", () => {
-  const result = evaluateP34EvidenceFreshness(evidence("unknown-evidence"), candidateFingerprint, clock);
+  const result = evaluateP34EvidenceFreshness(evidence("unknown-evidence"), candidateFingerprint, clock, evidenceVerificationContext);
   assert.equal(result.decision, "BLOCK");
   assert.ok(result.reasonCodes.includes("EVIDENCE_TYPE_INVALID"));
 });
 
 check("invalid-evidence-record-fails-closed", () => {
-  const result = evaluateP34EvidenceFreshness(null, candidateFingerprint, clock);
+  const result = evaluateP34EvidenceFreshness(null, candidateFingerprint, clock, evidenceVerificationContext);
   assert.equal(result.decision, "BLOCK");
   assert.ok(result.reasonCodes.includes("EVIDENCE_RECORD_INVALID"));
 });
 
+check("evidence-signature-binds-the-content-fingerprint", () => {
+  const signed = evidence("validation-packet");
+  const tampered = { ...signed, evidenceHash: hash("tampered-evidence") };
+  const result = evaluateP34EvidenceFreshness(
+    tampered,
+    candidateFingerprint,
+    clock,
+    evidenceVerificationContext
+  );
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("EVIDENCE_SIGNATURE_INVALID"));
+});
+
+check("high-trust-aal2-evidence-requires-authenticated-external-proof-and-short-window", () => {
+  const result = evaluateP34EvidenceFreshness(evidence("aal2", {
+    generatedAt: "2020-01-01T00:00:00.000Z",
+    expiresAt: "2099-01-01T00:00:00.000Z"
+  }), candidateFingerprint, clock, evidenceVerificationContext);
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("EVIDENCE_TRUSTED_EXTERNAL_REQUIRED"));
+  assert.ok(result.reasonCodes.includes("EVIDENCE_TIME_WINDOW_TOO_LONG"));
+  assert.ok(result.reasonCodes.includes("EVIDENCE_ISSUED_AT_STALE"));
+});
+
+check("trusted-external-evidence-cannot-use-a-synthetic-clock", () => {
+  const signed = evidence("aal2", {
+    trustClass: "trusted-external",
+    generatedAt: "2026-08-21T03:55:00.000Z",
+    expiresAt: "2026-08-21T04:10:00.000Z"
+  });
+  const result = evaluateP34EvidenceFreshness(signed, candidateFingerprint, clock, {
+    usage: "release-gate",
+    expectedValidationVersion: p34ControlPlane2Version,
+    expectedIssuerIdentityHash: evidenceIssuerIdentityHash,
+    verifier: {
+      verifierId: "trusted-external-evidence-verifier",
+      trustClass: "trusted-external",
+      verify: () => ({
+        valid: true,
+        authenticatedIssuerIdentityHash: evidenceIssuerIdentityHash
+      })
+    }
+  });
+  assert.equal(result.decision, "BLOCK");
+  assert.equal(result.releaseGateEligible, false);
+  assert.ok(result.reasonCodes.includes("EVIDENCE_SERVER_RUNTIME_CLOCK_REQUIRED"));
+});
+
+check("evidence-validation-version-must-match-the-current-policy", () => {
+  const result = evaluateP34EvidenceFreshness(
+    evidence("security-evidence", { validationVersion: "stale-validation-version" }),
+    candidateFingerprint,
+    clock,
+    evidenceVerificationContext
+  );
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("EVIDENCE_VALIDATION_VERSION_MISMATCH"));
+});
+
+check("evidence-envelope-rejects-undeclared-fields", () => {
+  const signed = evidence("gate-packet");
+  const result = evaluateP34EvidenceFreshness(
+    { ...signed, untrustedMetadata: "must-not-change-replay-identity" },
+    candidateFingerprint,
+    clock,
+    evidenceVerificationContext
+  );
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("EVIDENCE_FIELDS_INVALID"));
+});
+
 check("empty-required-evidence-contract-fails-closed", () => {
-  const result = evaluateP34EvidenceSet({ evidence: [], requiredTypes: [], expectedCandidate: candidateFingerprint, clock });
+  const result = evaluateP34EvidenceSet({ evidence: [], requiredTypes: [], expectedCandidate: candidateFingerprint, clock, verificationContext: evidenceVerificationContext });
   assert.equal(result.decision, "BLOCK");
   assert.ok(result.reasonCodes.includes("REQUIRED_EVIDENCE_TYPES_INVALID"));
 });
@@ -270,9 +440,14 @@ check("integrated-summary-labels-approval-as-nondurable-synthetic-self-test", ()
 for (const [name, tokenOverrides, reason] of [
   ["candidate-change", { candidateFingerprint: hash("changed-candidate") }, "APPROVAL_CANDIDATE_MISMATCH"],
   ["action-change", { actionId: "different-action" }, "APPROVAL_ACTION_MISMATCH"],
+  ["resource-change", { resourceId: "different-resource" }, "APPROVAL_RESOURCE_MISMATCH"],
   ["tenant-change", { tenantId: "other-tenant" }, "APPROVAL_TENANT_MISMATCH"],
   ["environment-change", { environmentId: "preview" }, "APPROVAL_ENVIRONMENT_MISMATCH"],
   ["requester-change", { requesterClass: "different-requester" }, "APPROVAL_REQUESTER_CLASS_MISMATCH"],
+  ["autonomy-change", { autonomyLevel: "A3" }, "APPROVAL_AUTONOMY_MISMATCH"],
+  ["maturity-change", { maturityLevel: "PILOT_READY" }, "APPROVAL_MATURITY_MISMATCH"],
+  ["approver-change", { approverIdentityHash: hash("different-approver") }, "APPROVAL_APPROVER_MISMATCH"],
+  ["policy-change", { policyDecisionHash: hash("different-policy") }, "APPROVAL_POLICY_DECISION_MISMATCH"],
   ["side-effect-expansion", { permittedSideEffect: "production-mutation" }, "APPROVAL_SIDE_EFFECT_MISMATCH"],
   ["expired-approval", { expiresAt: "2026-08-21T03:59:59.000Z" }, "APPROVAL_TIME_WINDOW_EXPIRED"]
 ]) {
@@ -325,10 +500,15 @@ check("atomic-approval-missing-verifier-and-store-fails-closed", () => {
     expected: {
       candidateFingerprint,
       actionId: "prepare-synthetic-receipt",
+      resourceId: "synthetic-receipt",
       tenantId: "synthetic-tenant",
       environmentId: "local-synthetic",
       requesterClass: "synthetic-policy-runner",
-      permittedSideEffect: "reversible-synthetic-internal-write"
+      autonomyLevel: "A2",
+      maturityLevel: "REVIEW_READY",
+      permittedSideEffect: "reversible-synthetic-internal-write",
+      approverIdentityHash: hash("p34-gap-closure-approval-owner"),
+      policyDecisionHash: hash("p34-gap-closure-policy-decision")
     },
     clock
   });
@@ -338,11 +518,295 @@ check("atomic-approval-missing-verifier-and-store-fails-closed", () => {
   assert.ok(result.reasonCodes.includes("APPROVAL_TRUST_CLASS_INVALID"));
 });
 
+check("trusted-external-atomic-approval-cannot-use-a-synthetic-clock", () => {
+  const token = approvalToken();
+  const result = consumeAtomicApproval({
+    token,
+    expected: {
+      candidateFingerprint,
+      actionId: "prepare-synthetic-receipt",
+      resourceId: "synthetic-receipt",
+      tenantId: "synthetic-tenant",
+      environmentId: "local-synthetic",
+      requesterClass: "synthetic-policy-runner",
+      autonomyLevel: "A2",
+      maturityLevel: "REVIEW_READY",
+      permittedSideEffect: "reversible-synthetic-internal-write",
+      approverIdentityHash: hash("p34-gap-closure-approval-owner"),
+      policyDecisionHash: hash("p34-gap-closure-policy-decision")
+    },
+    clock,
+    store: { trustClass: "trusted-external", consume: () => true },
+    verifier: {
+      verifierId: "trusted-external-approval-verifier",
+      trustClass: "trusted-external",
+      verify: () => true
+    }
+  });
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("APPROVAL_SERVER_RUNTIME_CLOCK_REQUIRED"));
+});
+
+check("exact-candidate-review-structural-test-cannot-self-satisfy-review", () => {
+  const binding = exactReviewBinding();
+  const result = verifyReview(exactReviewApproval(binding), binding);
+  assert.equal(result.status, "EXACT_REVIEW_REQUIRED");
+  assert.equal(result.structurallyVerified, true);
+  assert.equal(result.exactCandidateReviewed, false);
+  assert.equal(result.mergeAuthorized, false);
+  assert.equal(result.deploymentAuthorized, false);
+});
+
+for (const [name, expectedOverrides, reason] of [
+  ["stale-sha", { commitSha: "c".repeat(40) }, "EXACT_REVIEW_COMMIT_MISMATCH"],
+  ["wrong-tree", { treeSha: "d".repeat(40) }, "EXACT_REVIEW_TREE_MISMATCH"],
+  ["wrong-candidate", { candidateFingerprint: hash("other-candidate") }, "EXACT_REVIEW_CANDIDATE_MISMATCH"],
+  ["stale-packet", { reviewPacketFingerprint: hash("other-review-packet") }, "EXACT_REVIEW_REVIEW_PACKET_MISMATCH"],
+  ["modified-sbom", { sbomFingerprint: hash("other-sbom") }, "EXACT_REVIEW_SBOM_MISMATCH"]
+]) {
+  check(`exact-candidate-review-rejects-${name}`, () => {
+    const binding = exactReviewBinding();
+    const result = verifyReview(exactReviewApproval(binding), exactReviewBinding(expectedOverrides));
+    assert.equal(result.status, "FAIL");
+    assert.ok(result.reasonCodes.includes(reason));
+  });
+}
+
+check("exact-candidate-review-rejects-approval-replay", () => {
+  const binding = exactReviewBinding();
+  const approval = exactReviewApproval(binding);
+  const store = new InMemorySyntheticExactCandidateReviewStore();
+  assert.equal(verifyReview(approval, binding, store).approvalConsumed, true);
+  const replay = verifyReview(approval, binding, store);
+  assert.equal(replay.status, "FAIL");
+  assert.ok(replay.reasonCodes.includes("EXACT_REVIEW_APPROVAL_REPLAYED"));
+});
+
+check("exact-candidate-review-rejects-self-review", () => {
+  const identity = hash("same-reviewer-and-author");
+  const binding = exactReviewBinding();
+  const result = verifyReview(exactReviewApproval(binding, {
+    reviewerIdentityHash: identity,
+    authorIdentityHash: identity
+  }), binding);
+  assert.equal(result.status, "FAIL");
+  assert.ok(result.reasonCodes.includes("EXACT_REVIEW_SELF_REVIEW_PROHIBITED"));
+});
+
+check("exact-candidate-review-rejects-case-variant-self-review", () => {
+  const identity = hash("same-reviewer-case-variant");
+  const binding = exactReviewBinding();
+  const result = verifyReview(exactReviewApproval(binding, {
+    reviewerIdentityHash: identity.toUpperCase(),
+    authorIdentityHash: identity
+  }), binding);
+  assert.equal(result.status, "FAIL");
+  assert.ok(result.reasonCodes.includes("EXACT_REVIEW_SELF_REVIEW_PROHIBITED"));
+});
+
+check("exact-candidate-review-rejects-unknown-expected-fields-before-replay-consumption", () => {
+  const binding = exactReviewBinding();
+  const approval = exactReviewApproval(binding);
+  const store = new InMemorySyntheticExactCandidateReviewStore();
+  assert.equal(verifyReview(approval, binding, store).approvalConsumed, true);
+  const result = verifyReview(approval, { ...binding, ignoredReplaySalt: "different" }, store);
+  assert.equal(result.status, "FAIL");
+  assert.equal(result.approvalConsumed, false);
+  assert.ok(result.reasonCodes.includes("EXPECTED_BINDING_FIELDS_INVALID"));
+});
+
+check("exact-candidate-review-binds-the-author-to-authoritative-context", () => {
+  const binding = exactReviewBinding();
+  const approval = exactReviewApproval(binding);
+  const result = verifyExactCandidateReview({
+    approval,
+    expected: binding,
+    expectedAuthorIdentityHash: hash("different-author"),
+    clock,
+    store: new InMemorySyntheticExactCandidateReviewStore(),
+    verifier: createSyntheticExactReviewVerifier("p34-exact-review-verifier")
+  });
+  assert.equal(result.status, "FAIL");
+  assert.ok(result.reasonCodes.includes("EXACT_REVIEW_AUTHOR_IDENTITY_MISMATCH"));
+});
+
+check("exact-candidate-review-binds-claimed-reviewer-to-authenticated-signer", () => {
+  const binding = exactReviewBinding();
+  const approval = exactReviewApproval(binding);
+  const result = verifyExactCandidateReview({
+    approval,
+    expected: binding,
+    expectedAuthorIdentityHash: approval.authorIdentityHash,
+    clock,
+    store: { trustClass: "trusted-external", consume: () => true },
+    verifier: {
+      verifierId: "trusted-external-review-verifier",
+      trustClass: "trusted-external",
+      verify: () => ({
+        valid: true,
+        authenticatedSignerIdentityHash: hash("different-authenticated-reviewer"),
+        authenticatedSignerRole: "independent-technical-reviewer"
+      })
+    }
+  });
+  assert.equal(result.status, "FAIL");
+  assert.ok(result.reasonCodes.includes("EXACT_REVIEW_AUTHENTICATED_SIGNER_MISMATCH"));
+});
+
+check("trusted-external-exact-review-cannot-use-a-synthetic-clock", () => {
+  const binding = exactReviewBinding();
+  const approval = exactReviewApproval(binding);
+  const result = verifyExactCandidateReview({
+    approval,
+    expected: binding,
+    expectedAuthorIdentityHash: approval.authorIdentityHash,
+    clock,
+    store: { trustClass: "trusted-external", consume: () => true },
+    verifier: {
+      verifierId: "trusted-external-review-verifier",
+      trustClass: "trusted-external",
+      verify: () => ({
+        valid: true,
+        authenticatedSignerIdentityHash: approval.reviewerIdentityHash,
+        authenticatedSignerRole: "independent-technical-reviewer"
+      })
+    }
+  });
+  assert.equal(result.status, "FAIL");
+  assert.equal(result.exactCandidateReviewed, false);
+  assert.ok(result.reasonCodes.includes("EXACT_REVIEW_SERVER_RUNTIME_CLOCK_REQUIRED"));
+});
+
+check("exact-candidate-review-rejects-unsigned-approval", () => {
+  const binding = exactReviewBinding();
+  const result = verifyReview({ ...exactReviewApproval(binding), signature: "0".repeat(64) }, binding);
+  assert.equal(result.status, "FAIL");
+  assert.ok(result.reasonCodes.includes("EXACT_REVIEW_SIGNATURE_INVALID"));
+});
+
 check("read-only-a0-action-is-safe-and-nonexecuting", () => {
   const result = evaluateP34GovernedAction(governedRequest());
   assert.equal(result.decision, "ALLOW");
   assert.equal(result.executionAuthorized, false);
   assert.equal(result.a3Available, false);
+});
+
+function dynamicGovernanceInput(overrides = {}) {
+  return {
+    actionId: "inspect-synthetic-evidence",
+    actorIdentityHash: hash("dynamic-governance-actor"),
+    tenantId: "synthetic-tenant",
+    environmentId: "local-synthetic",
+    autonomyTier: "A0",
+    actionMaturity: "REVIEW_READY",
+    evidenceFresh: true,
+    dataClassification: "synthetic-no-phi",
+    jurisdiction: "local",
+    modelQualified: true,
+    toolQualified: true,
+    approvalState: "not-required",
+    deploymentState: "local-synthetic",
+    riskTier: "low",
+    externalSideEffectClass: "none",
+    ...overrides
+  };
+}
+
+check("adaptive-governance-2-permits-bounded-read-only-evidence", () => {
+  const result = evaluateP34DynamicGovernance(dynamicGovernanceInput());
+  assert.equal(result.status, "PERMITTED");
+  assert.deepEqual(result.reasonCodes, []);
+  assert.equal(result.executionAuthorized, false);
+});
+
+for (const [name, overrides, status, reason] of [
+  ["stale-evidence", { evidenceFresh: false }, "OPERATOR_ACTION_REQUIRED", "EVIDENCE_STALE_OR_MISSING"],
+  ["unqualified-model", { modelQualified: false }, "TARGETED_SPECIALIST_REVIEW_REQUIRED", "MODEL_QUALIFICATION_REQUIRED"],
+  ["unqualified-tool", { toolQualified: false }, "TARGETED_SPECIALIST_REVIEW_REQUIRED", "TOOL_QUALIFICATION_REQUIRED"],
+  ["a2-review", { autonomyTier: "A2", approvalState: "trusted-valid" }, "PERMITTED_WITH_REVIEW", "A2_NAMED_REVIEW_REQUIRED"],
+  ["phi", { dataClassification: "phi-restricted" }, "PROHIBITED", "LIVE_PHI_DISABLED"],
+  ["production", { deploymentState: "production" }, "PROHIBITED", "PRODUCTION_AUTHORIZATION_REQUIRED"],
+  ["approval-replay", { approvalState: "replayed" }, "PROHIBITED", "APPROVAL_REPLAY_DETECTED"]
+]) {
+  check(`adaptive-governance-2-classifies-${name}`, () => {
+    const result = evaluateP34DynamicGovernance(dynamicGovernanceInput(overrides));
+    assert.equal(result.status, status);
+    assert.ok(result.reasonCodes.includes(reason));
+    assert.equal(result.executionAuthorized, false);
+  });
+}
+
+check("runtime-revalidation-binds-candidate-tenant-resource-and-time", () => {
+  const request = governedRequest();
+  const initialDecision = evaluateP34GovernedAction(request);
+  const result = revalidateP34GovernedActionImmediatelyBeforeEffect({
+    immediateRequest: request,
+    expectedCandidateFingerprint: request.declaration.candidateFingerprint,
+    expectedEnvironmentId: request.environmentId,
+    expectedTenantId: request.declaration.tenantId,
+    expectedActionId: request.declaration.actionId,
+    expectedResourceId: request.declaration.resourceId,
+    expectedAutonomyClass: request.declaration.autonomyClass,
+    expectedMaturity: request.declaration.executionMaturity,
+    expectedInitialDecisionHash: initialDecision.decisionHash,
+    initialDecision,
+    atomicApprovalReceipt: null,
+    clock
+  });
+  assert.equal(result.preflightValid, true);
+  assert.equal(result.decision, "ALLOW");
+  assert.equal(result.executionAuthorized, false);
+});
+
+check("runtime-revalidation-rejects-toctou-resource-change", () => {
+  const request = governedRequest();
+  const initialDecision = evaluateP34GovernedAction(request);
+  const changedRequest = governedRequest({
+    declaration: { ...request.declaration, resourceId: "changed-resource" }
+  });
+  const result = revalidateP34GovernedActionImmediatelyBeforeEffect({
+    immediateRequest: changedRequest,
+    expectedCandidateFingerprint: request.declaration.candidateFingerprint,
+    expectedEnvironmentId: request.environmentId,
+    expectedTenantId: request.declaration.tenantId,
+    expectedActionId: request.declaration.actionId,
+    expectedResourceId: request.declaration.resourceId,
+    expectedAutonomyClass: request.declaration.autonomyClass,
+    expectedMaturity: request.declaration.executionMaturity,
+    expectedInitialDecisionHash: initialDecision.decisionHash,
+    initialDecision,
+    clock
+  });
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("TOCTOU_RESOURCE_CHANGED"));
+});
+
+check("runtime-revalidation-rejects-policy-change-during-use", () => {
+  const request = governedRequest();
+  const initialDecision = evaluateP34GovernedAction(request);
+  const staleRequest = governedRequest({
+    evidence: [
+      evidence("candidate-manifest", { expiresAt: "2026-08-21T03:59:59.000Z" }),
+      evidence("validation-packet"),
+      evidence("security-evidence")
+    ]
+  });
+  const result = revalidateP34GovernedActionImmediatelyBeforeEffect({
+    immediateRequest: staleRequest,
+    expectedCandidateFingerprint: request.declaration.candidateFingerprint,
+    expectedEnvironmentId: request.environmentId,
+    expectedTenantId: request.declaration.tenantId,
+    expectedActionId: request.declaration.actionId,
+    expectedResourceId: request.declaration.resourceId,
+    expectedAutonomyClass: request.declaration.autonomyClass,
+    expectedMaturity: request.declaration.executionMaturity,
+    expectedInitialDecisionHash: initialDecision.decisionHash,
+    initialDecision,
+    immediateDecision: initialDecision,
+    clock
+  });
+  assert.equal(result.decision, "BLOCK");
+  assert.ok(result.reasonCodes.includes("IMMEDIATE_PREFLIGHT_NOT_PERMITTED"));
 });
 
 check("null-governed-action-fails-closed", () => {
@@ -524,6 +988,7 @@ check("null-release-transition-fails-closed", () => {
 
 check("oversight-sentinel-halts-on-tenant-leak-and-replay", () => {
   const result = evaluateP34OversightSentinel({
+    autonomyEscalation: false,
     privilegeDrift: false,
     maturityDrift: false,
     evidenceExpired: false,
@@ -534,9 +999,12 @@ check("oversight-sentinel-halts-on-tenant-leak-and-replay", () => {
     budgetUsedRatio: 0.1,
     modelSubstitution: false,
     policyMutation: false,
+    routeDivergence: false,
     unexpectedNetworkTargets: [],
     tenantLeakageDetected: true,
     approvalReplayDetected: true,
+    egressFirewallTriggered: false,
+    anomalousToolEscalation: false,
     unauthorizedDistributionAttempt: false
   });
   assert.equal(result.recommendedMode, "HALTED");
@@ -546,6 +1014,7 @@ check("oversight-sentinel-halts-on-tenant-leak-and-replay", () => {
 
 check("oversight-sentinel-fails-closed-on-invalid-counters", () => {
   const result = evaluateP34OversightSentinel({
+    autonomyEscalation: false,
     privilegeDrift: false,
     maturityDrift: false,
     evidenceExpired: false,
@@ -556,9 +1025,12 @@ check("oversight-sentinel-fails-closed-on-invalid-counters", () => {
     budgetUsedRatio: 0.1,
     modelSubstitution: false,
     policyMutation: false,
+    routeDivergence: false,
     unexpectedNetworkTargets: [],
     tenantLeakageDetected: false,
     approvalReplayDetected: false,
+    egressFirewallTriggered: false,
+    anomalousToolEscalation: false,
     unauthorizedDistributionAttempt: false
   });
   assert.equal(result.recommendedMode, "HALTED");
@@ -570,6 +1042,7 @@ check("null-oversight-input-halts-without-echoing-extra-fields", () => {
   assert.equal(result.recommendedMode, "HALTED");
   assert.ok(result.incidents.some((incident) => incident.signal === "SENTINEL_INPUT_INVALID"));
   const withExtraField = evaluateP34OversightSentinel({
+    autonomyEscalation: false,
     privilegeDrift: false,
     maturityDrift: false,
     evidenceExpired: false,
@@ -580,9 +1053,12 @@ check("null-oversight-input-halts-without-echoing-extra-fields", () => {
     budgetUsedRatio: 0,
     modelSubstitution: false,
     policyMutation: false,
+    routeDivergence: false,
     unexpectedNetworkTargets: [],
     tenantLeakageDetected: false,
     approvalReplayDetected: false,
+    egressFirewallTriggered: false,
+    anomalousToolEscalation: false,
     unauthorizedDistributionAttempt: false,
     secret: "synthetic-must-not-enter-evidence"
   });
@@ -590,6 +1066,7 @@ check("null-oversight-input-halts-without-echoing-extra-fields", () => {
 });
 
 const oversightDetectorCases = [
+  ["AUTONOMY_ESCALATION", { autonomyEscalation: true }],
   ["PRIVILEGE_DRIFT", { privilegeDrift: true }],
   ["MATURITY_DRIFT", { maturityDrift: true }],
   ["EVIDENCE_EXPIRED", { evidenceExpired: true }],
@@ -597,13 +1074,17 @@ const oversightDetectorCases = [
   ["DELEGATION_DEPTH_EXCEEDED", { delegationDepth: 4 }],
   ["BUDGET_EXCEEDED", { budgetUsedRatio: 1.01 }],
   ["MODEL_SUBSTITUTION", { modelSubstitution: true }],
-  ["POLICY_MUTATION", { policyMutation: true }],
+  ["POLICY_DRIFT", { policyMutation: true }],
+  ["ROUTE_DIVERGENCE", { routeDivergence: true }],
   ["UNEXPECTED_NETWORK_TARGET", { unexpectedNetworkTargets: ["unexpected.example"] }],
   ["TENANT_LEAKAGE", { tenantLeakageDetected: true }],
   ["APPROVAL_REPLAY", { approvalReplayDetected: true }],
+  ["EGRESS_FIREWALL_TRIGGER", { egressFirewallTriggered: true }],
+  ["ANOMALOUS_TOOL_ESCALATION", { anomalousToolEscalation: true }],
   ["UNAUTHORIZED_DISTRIBUTION", { unauthorizedDistributionAttempt: true }]
 ];
 const oversightBaseInput = {
+  autonomyEscalation: false,
   privilegeDrift: false,
   maturityDrift: false,
   evidenceExpired: false,
@@ -614,9 +1095,12 @@ const oversightBaseInput = {
   budgetUsedRatio: 0.1,
   modelSubstitution: false,
   policyMutation: false,
+  routeDivergence: false,
   unexpectedNetworkTargets: [],
   tenantLeakageDetected: false,
   approvalReplayDetected: false,
+  egressFirewallTriggered: false,
+  anomalousToolEscalation: false,
   unauthorizedDistributionAttempt: false
 };
 for (const [signal, overrides] of oversightDetectorCases) {
@@ -764,13 +1248,64 @@ check("null-trace-input-fails-with-a-controlled-validation-error", () => {
   );
 });
 
+check("causal-trace-explains-accepted-output-with-immutable-references", () => {
+  const artifacts = Object.fromEntries(p34CausalTraceStages.map((stage) => [stage, hash(`causal-${stage}`)]));
+  const graph = createP34CausalTraceGraph({
+    traceId: "trace-causal-acceptance",
+    tenantId: "synthetic-tenant",
+    artifacts,
+    accepted: true
+  });
+  const explanation = explainP34AcceptedOutput(graph);
+  assert.equal(graph.nodes.length, p34CausalTraceStages.length);
+  assert.equal(graph.nodes[0].parentReference, null);
+  assert.equal(graph.nodes[1].parentReference, graph.nodes[0].immutableReference);
+  assert.equal(explanation.explainable, true);
+  assert.equal(graph.containsRawPhi, false);
+  assert.equal(graph.hiddenChainOfThoughtStored, false);
+});
+
+check("causal-trace-comparison-identifies-changed-evaluation-stage", () => {
+  const firstArtifacts = Object.fromEntries(p34CausalTraceStages.map((stage) => [stage, hash(`first-${stage}`)]));
+  const secondArtifacts = { ...firstArtifacts, evaluation: hash("second-evaluation") };
+  const first = createP34CausalTraceGraph({
+    traceId: "trace-causal-first",
+    tenantId: "synthetic-tenant",
+    artifacts: firstArtifacts,
+    accepted: true
+  });
+  const second = createP34CausalTraceGraph({
+    traceId: "trace-causal-second",
+    tenantId: "synthetic-tenant",
+    artifacts: secondArtifacts,
+    accepted: true
+  });
+  const comparison = compareP34TraceEvaluations(first, second);
+  assert.deepEqual(comparison.changedStages, ["evaluation"]);
+  assert.equal(comparison.acceptanceChanged, false);
+});
+
+check("causal-trace-rejects-missing-artifact-evidence", () => {
+  const artifacts = Object.fromEntries(p34CausalTraceStages.map((stage) => [stage, hash(`causal-${stage}`)]));
+  delete artifacts.policy;
+  assert.throws(() => createP34CausalTraceGraph({
+    traceId: "trace-causal-invalid",
+    tenantId: "synthetic-tenant",
+    artifacts,
+    accepted: false
+  }), /requires a SHA-256 artifact/);
+});
+
 check("integrated-control-plane-summary-remains-review-only", () => {
   const summary = createP34ControlPlane2Summary();
   assert.equal(summary.killSwitchMode, "READ_ONLY");
   assert.equal(summary.release.resultingState, "EXACT_REVIEW_REQUIRED");
   assert.equal(summary.governedWritesExecuted, false);
   assert.equal(summary.productionAuthorityGranted, false);
-  assert.equal(summary.oversightDetectorCoverage.length, 12);
+  assert.equal(summary.dynamicGovernance.status, "PERMITTED");
+  assert.equal(summary.runtimeRevalidation.preflightValid, true);
+  assert.equal(summary.acceptedOutputExplanation.explainable, true);
+  assert.equal(summary.oversightDetectorCoverage.length, 16);
   assert.ok(summary.oversightDetectorCoverage.every((item) => item.detected));
 });
 

@@ -8,7 +8,7 @@
     "FAIL"
   ],
   "counts": {
-    "PASS": 27,
+    "PASS": 31,
     "OPERATOR_REQUIRED": 2,
     "BLOCKED": 5,
     "FAIL": 0
@@ -26,7 +26,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "cf82db6b1be19bdf477a7e26068b2a2326df26f155802b08ac2762ef655aa5f3"
+      "gateHash": "858fec8972c9a12a18f6eb7d6d7b87a2facbb39589bfc90d3cac3a3e6e19782a"
     },
     {
       "gateId": "P34-02",
@@ -39,7 +39,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "60a82093d02de69411e7186ef8173fdad5d083a96951a573f5f6b5333ed3b491"
+      "gateHash": "7ab0cbe921233351107ecc77c775ac5abd1b6f48f3994dd2d73841e9ad7f4a23"
     },
     {
       "gateId": "P34-03",
@@ -55,7 +55,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "1c9ad632dcb2772fa82254f75f871f9e613c6bac7dcab9f301ea2be055e675d2"
+      "gateHash": "38318bcfaad4e2b7c7ca0c0a0812e70c8a42b869e014e68125507c1d25d9b720"
     },
     {
       "gateId": "P34-04",
@@ -71,7 +71,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "fc2e48c3d535c55d26600d04faac2163e80c7d0c3771ac19aed6ece9691e8a35"
+      "gateHash": "26a5a86b2bfbc661a5c281fb4f43eeb03e9d74b82932d94c89adb69863f423ce"
     },
     {
       "gateId": "P34-05",
@@ -84,7 +84,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "5306a4f67faf9817615533579689388845e85bbf91c26ca2c3cba7e1f7ad778d"
+      "gateHash": "949997ffe3222f6ed5f4d4af9eb2bf7f0cef9a61e78f91b948b0d05f88aecea2"
     },
     {
       "gateId": "P34-06",
@@ -99,7 +99,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "ec242fc72c29834423bdbe72a5fae0e03c9b0248f0da3229a7dd4c2aa3e64852"
+      "gateHash": "c2104ef59cfce8b937bb3ad25c92a0ba2115fb2c0aaa244bdda69675b2dcb42c"
     },
     {
       "gateId": "P34-07",
@@ -113,7 +113,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "e5ea53da6cea7b232226296b329bb6e0778982a3eda077af80c1db2ad6c9be85"
+      "gateHash": "0c7d6c8690734928a81d4d5e593a23a212b94a87642d820bcde4c9bc9dc503eb"
     },
     {
       "gateId": "P34-08",
@@ -128,7 +128,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "68fd1456e31bac5b1f5e56624d74abf9ea686684104219759e852330cfa7c7c4"
+      "gateHash": "04c67e8405be56f472b953b38ccfb5856c587fd4f5a8694646916c870f708d9d"
     },
     {
       "gateId": "P34-09",
@@ -144,7 +144,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "a4fa5f3503adb7d3030f84a6e388c2ad0192fac527cafd5a9919f2f14b73e081"
+      "gateHash": "7d323547fbe18502b614915d332a95a7f300b4955bf2da2eb55cc79494aae17b"
     },
     {
       "gateId": "P34-10",
@@ -160,7 +160,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "660152d1e010ee5a7b913e74b2a052d9c90f06ebcf387553cef5382a6fce2dd1"
+      "gateHash": "ee95b3d0ee1b84bb383a0ab32007438db43f9de78281831c577dcb787236b569"
     },
     {
       "gateId": "P34-11",
@@ -173,7 +173,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "a73dc2bedb2a1f68d9c0dc81006247a634fff28b77771944d3dd766ebe6c58e4"
+      "gateHash": "54dd39a6f2cbd6edce060ad5d050d17462433bb0a5596e664b2060dd99d072af"
     },
     {
       "gateId": "P34-12",
@@ -189,7 +189,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "7a234ebe816b62f4a41d6a578b46fc355a508b297ca4ab6b853a541ad8b390f1"
+      "gateHash": "8dfe209735dba71c2f258ed1e08827407572d7707f8ee0303984fff211ed8ce0"
     },
     {
       "gateId": "P34-13",
@@ -202,7 +202,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "a63c9347798bef3914e8ce5e3750304c1e54930bd9d7416b2204effde72c8c5b"
+      "gateHash": "3fbcfd9392374795fdd22cc2b4b8b310c78cc5c8ed7323b69dcc7c9724ccc53f"
     },
     {
       "gateId": "P34-14",
@@ -219,7 +219,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "4b34cbc4f0031123a71bb6e73c3d255ffc27be20facde628a24a7e1815610d3b"
+      "gateHash": "f2666d02a6b85a3cb9e839c3c0ab9bec44841e8ea248ec1ae56639c026643bf8"
     },
     {
       "gateId": "P34-15",
@@ -234,7 +234,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "8cc60ce8dd2d5a5cb33881fdb6be69e5d29e8f20d7d8104a13431a926e844359"
+      "gateHash": "f5db6118b09427b933aed5f9066a41b81043401b97dc491c1629775c4f64b66c"
     },
     {
       "gateId": "P34-16",
@@ -254,7 +254,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "36f740025e12646b152115fd53e2d24ba5b77abc8ae2f96dd48c07c53cd8a1d7"
+      "gateHash": "3c4132f1c7456d9aa6c29aa5d79b683649db5717fffa33fd7c7dbf400ff5a92e"
     },
     {
       "gateId": "P34-17",
@@ -274,7 +274,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "61114d82ebc7eb2759577a4b2dc1bc681ee362fc3dd05dbb861564643f60a2f3"
+      "gateHash": "dc59c1e98367dc1b83dde6b6c19e90396f9f07cbe892a0d23de54dffa538c596"
     },
     {
       "gateId": "P34-18",
@@ -287,7 +287,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "35c7583392f997b5da79612862bc9430f5227156aec383aff6f73dd712e0af47"
+      "gateHash": "1acfb6e3a20d66ad8c5bf8fb7e9655555b24c1e91695961541ceb51ba0125294"
     },
     {
       "gateId": "P34-19",
@@ -302,7 +302,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "cf5ae3095fd86fe14a87bcffbc4a36888fe1ec38d5656ae9697cfd27b0e7088c"
+      "gateHash": "e59bfea32d95d90cb8c0fd3e96f0b7620cfb516c0142e4199aa90989a15e8666"
     },
     {
       "gateId": "P34-20",
@@ -316,7 +316,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "83edff7baa462f7e9b49337a965fe3afab0a03ad755d31df8937182f4f2941af"
+      "gateHash": "649b521514d8c1181597fffe07b4d733b1803dd4fa8698cea1db2599cb41312b"
     },
     {
       "gateId": "P34-21",
@@ -331,7 +331,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "6e84108b7ba5548b05e272550f8dde9f05db76c1c3a941b6a66b02e123c8cd6d"
+      "gateHash": "76786a2e74d6f7a5ce70cbe4710064723a26465b14c9df3e95b95540f0e2d65c"
     },
     {
       "gateId": "P34-22",
@@ -344,7 +344,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "66807147a2db866204053d1f99c5bc271e8c12cce719abe8f1ea0544964a55f7"
+      "gateHash": "28aa73743220f6c1234343e3e02a832e91b99b62c00db3c863ee8a7a7889fdba"
     },
     {
       "gateId": "P34-23",
@@ -362,7 +362,7 @@
       ],
       "candidateBound": true,
       "externalActionRequired": true,
-      "gateHash": "a5c89d6ae3e87bf158914b0a4e5465356bee91c291d1f54f6ee92475e9277a34"
+      "gateHash": "111f45b55f3b30ffa1ab8999410cea07be26ce40ac7a1acd2463a71c859e9672"
     },
     {
       "gateId": "P34-24",
@@ -375,7 +375,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "06242284dafcd86b5deab422c31a12f857d48736705cf1feef903549bfec5b48"
+      "gateHash": "8c7f64cde1fb7a50f7841a5949ed38539f0520201a7df3804fe03d9ac3798cb9"
     },
     {
       "gateId": "P34-25",
@@ -390,7 +390,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "cfb8c7b4193c52dd1f51864d048bfa2d72c36495519b92bb45b1000f1693b596"
+      "gateHash": "c6e4c9dcd6d1a15dae85233d076a2819efb0a73680671a4089570da1244d903c"
     },
     {
       "gateId": "P34-26",
@@ -403,7 +403,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "4c2b1ad1e5661c83b2e82d437e35c230edc59dd48cebcf21caa16da0b4109f6f"
+      "gateHash": "dc3c7b6c44628bdaaa4f944494f7f74bc5ed955deb59d102c77431a8340f513d"
     },
     {
       "gateId": "P34-27",
@@ -416,7 +416,7 @@
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "1bb0828e086cc4f0ef95dbc1b2cae0e7da044bb332876073fe86fdc29cb469c4"
+      "gateHash": "a60344baf00bc4a1b667718d52645bffb7c9ae649ec4aeccecac58e3d6a1ba3d"
     },
     {
       "gateId": "P34-28",
@@ -431,7 +431,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "24ad4fa3c7c22397b9a92e6b147191e31889d15618584c28e544f4261c2566cf"
+      "gateHash": "bf0348b482acd77227eb925e4e9504291c8e9e51f4d9ce0da71b96414de52c46"
     },
     {
       "gateId": "P34-29",
@@ -439,7 +439,7 @@
       "ownerRole": "release-evidence-owner",
       "description": "A fixed-clock synthetic fixture proves fail-closed expiry behavior; it is not exact-candidate evidence and cannot advance release state.",
       "evidence": [
-        "829374b230842367ee555779ce4636a1f2a09e0016af241e53d4e57007bdcb5d"
+        "e98592f590cc1b259ae9bfebba13ad5df1943bfd118fe5e5b75e092ca69e0d6c"
       ],
       "reasonCodes": [
         "SYNTHETIC_FIXTURE_ONLY",
@@ -447,7 +447,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "27eae11af78df0046be9dd92beac4ab37989867edd4b5fab62fb4159c2c25da6"
+      "gateHash": "fb9128f712efd4b8b3b7f12863e39e8a60fb923f9b5b8065612a5378f9d047a8"
     },
     {
       "gateId": "P34-30",
@@ -455,8 +455,8 @@
       "ownerRole": "approval-policy-owner",
       "description": "An in-process synthetic self-test proves one-store replay rejection; durable cross-request replay protection and execution authority remain unavailable.",
       "evidence": [
-        "352e3b8ebea60eb64b0fdefb8fcc7e517ed097bba4f262806dacd695becb1889",
-        "1a163113b82ac9b501e702c29c1a3af4ac86b7cd7ce921b77807a7939b234f36"
+        "16c56cdb4c3f135c6ec78e38d46d5149a0b1add12aa6bd5518f0e1530a6f7bf6",
+        "720305252d0dd2fc1d96aecd17c3506191895328874dfabfc55f28c587bfc64b"
       ],
       "reasonCodes": [
         "SYNTHETIC_APPROVAL_STORE_CANNOT_AUTHORIZE_EXECUTION",
@@ -465,7 +465,7 @@
       ],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "b4f9729b10dc784484e9c9d83a4738afb159b57bc95adbdfb2e3a98c5f4d5849"
+      "gateHash": "51d6fea1f65e38afd3119c2fb667cb6dad6400429812693c1caaebf63789fcd1"
     },
     {
       "gateId": "P34-31",
@@ -476,17 +476,19 @@
         "e67e15316ce34fc14b3003c321f6e9f72c89520231d6fa05aa3e89ded46fde97",
         "f4de2cde7f8afd38b3ee3e64779d09a24d51281cb6816d486f29c8ac5be0b6e8",
         "2c1ae6463617af605f68677af3c58267a453c223cab7663a229d31761ebfdc2d",
+        "b2b30fcdf54046a09e89d763b8dc6910a341011cbf1cb479b868a46d2e0fd593",
         "fabdd92d55c5c45d71196e1da6e4ce3b38b70f2f3622238914a4998773e1e5d0",
         "fed39851c7d6734761c311c448c04353d42e72a4078c588b34c6d0af3550b774",
         "59bd4973bdd8911084196e80c80e6bffda5fa78ff9f5d94abccbcd5b51b737dd",
         "d28b5d7df4cafbe497aed09d27deb314bcfdcb8712d64024a49de6bdac622432",
         "5628e479efa9a98fac61c5d62b3e259ae78a03b3000bcf05fd5bf5ab610deed4",
-        "7413c97edad0cb00b44c7f5ed5df883a9815c4f53887ac9b94e1bc94666ec37c"
+        "7413c97edad0cb00b44c7f5ed5df883a9815c4f53887ac9b94e1bc94666ec37c",
+        "2848b62738f9a963edd9101643626d6175758b5f0758f38622fc41364054a1cb"
       ],
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "3efa7a3316901c42f72ce6341c5fe37e3a34f4938eae899c1e8b375956451081"
+      "gateHash": "8a1ccd49ae26ec8a3c675fa7915d267882841d782bed64457ec35327caf429b0"
     },
     {
       "gateId": "P34-32",
@@ -494,37 +496,41 @@
       "ownerRole": "runtime-safety-owner",
       "description": "The global kill switch defaults to read-only, reports the trusted server mode, and never grants governed writes or A3 authority.",
       "evidence": [
-        "1c37d46d3d42d301a79a8d04414a4f9de467f59dd74972e55bd640a3ca2f6ed5"
+        "082d81fdb14ed7fccf14635cf29007259f7a4e3962e090242457612aede67e51"
       ],
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "2536a6b41a76023fc67c75322e5ac20248193e6e861ce055b57b9d0472760da6"
+      "gateHash": "74bf15a02ffda8bea2dd5134b3b199f6dcd0efdddb441ab1d47ef79b2400d27b"
     },
     {
       "gateId": "P34-33",
       "status": "PASS",
       "ownerRole": "oversight-sentinel-owner",
-      "description": "Oversight Sentinel 2.0 independently exercises privilege, maturity, evidence, retry, delegation, budget, model, policy, network, tenant, approval, and distribution drift detectors without gaining execution authority.",
+      "description": "Oversight Sentinel 3.0 exercises autonomy, privilege, maturity, evidence, retry, delegation, budget, model, policy, route, egress, tool, network, tenant, approval, and distribution anomaly detectors without gaining execution authority.",
       "evidence": [
-        "d13fe0d1127fe9a2c95b73f0285ac4eb4b0071a26c0145f2316f103509933124",
-        "9702747aa31068e99ea09d3414506d9214ea9d4a5225042526c11d0c76302098",
-        "0aff290a2e3e81c8ff0b89f349743e45efe35276d76dac18e9697f27d1f36a38",
-        "ae7189fc6fb4f70457f5d8a6f8c8b9b44a77637425d110517094128f64ee0c45",
-        "bf49a93e280f68bb69d979718d260433d7ddb4c491db62349246c4c510903bbd",
-        "9cf9e0454c7751a57e2acdd06c8a75fd77003caf97699353570bf5fee264c155",
-        "ab1c4859a7b1bca6f5e393378147984a48e1831569b578d9cc4ddc78805a8de8",
-        "0dd601f4dd65f7a0c1c4010d3708a58ee9fde03af5b2f245d395282af0bec32b",
-        "162977d8ef48cdb9656bb9ff8a371bf6bb0e745f92fc3064a1378dee0436f89f",
-        "87db096a25031226711214f27091778c8ad2c856ef9850254c59902a602b9e80",
-        "e5be27dbe74587bad40565da31921447a1af33fd5069a53a8da51e5bf54d4b32",
-        "e9e33f87a22c6ba1c55dc6fedb1bdbe36d1aa4d4087a1231c52ab6d1e1dff75a",
-        "fca6ccac6e0b68f641fd71d7efc10a3f54af377e56b4196bdbd63f24d376b17f"
+        "9fbb591388c1b563c764f75355a3c4792a0ee980133242294821535684da6646",
+        "fddb0d28a4c14b09056e277a03dbed0fec8a21290df2e75c45b36aa74b366508",
+        "75d9657d9eff3cacf1ee09e8a5fbaa053a9aa48623e80f6823ae5df27883a751",
+        "dae0f9f93988e99c8774ee76d761aab8f463e18fec165b5dbd5dadf4913714f9",
+        "ea1fad54c455520a73fa54e9ec097d7054321a577be6c24f0e1cf5181f7a211f",
+        "6dfb4fdd03e8113029309333d37054a14423e6aa61d7b1e2d73b04fcafc4d32a",
+        "2cd83429d129ee873113d58ae895bf1b0a7c73c429148946e2740b1aa65c6704",
+        "67b727f4b26115f1929658b10bae54ab89e6bbd3772051c91c56fa23eb19095f",
+        "8b308d47f8355c2d772f0b6c02f318d86e70d2ecbf788b1c3937006b84e948cb",
+        "cae7a6f03c3a351e07fb310009009471ac285cec63c8f4de336406565de18064",
+        "8c100eba76dc13255cc48914b758aaebdc9bfd88ce9fbc9376ca5a011bf5c4c8",
+        "151e2915d9e8e17de9b74b086a607d21efb6fd6af7299fe8ee22ed4532dbbaa0",
+        "5775f04e9f0f775ab79484872c84fa653b261dba47ffc6b103333490dbebb50a",
+        "ccd2c30e6d1bdfd3e9f5526e3fc1395f9f389857f0cd6caf03c949092593b392",
+        "90b53a06ae46d8060a089177060cffe3043f2c235a68d58d1eb60644d0ad46b7",
+        "006207adc5b5d25d87b537c3314f7416ccd05cb2e4d17aedcf6edef20746c022",
+        "50a260df02c3e857455af6d8f64257f62fb4c59c6573df48d6d7dd4330996d0a"
       ],
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "67a2a5f7b46db4e33dcab8fae6628f5bc6be8e55e8252c90dec2fe60bafd7a7c"
+      "gateHash": "6847bedc3ce4a608e5e7e2d88c9ce1af7760fedb25a35db13d4b9fd3a6ed5a83"
     },
     {
       "gateId": "P34-34",
@@ -532,12 +538,73 @@
       "ownerRole": "evaluation-observability-owner",
       "description": "Trace-to-eval retains every bounded model, prompt, tool, evidence, result, evaluation, correction, acceptance, latency, and cost linkage without PHI, secrets, or hidden reasoning.",
       "evidence": [
-        "28bfaee7642f224fa12d43cde708242c415361e2ebfb5dfa65a2ab523556300e"
+        "5dc0ba32a10ccad212949b090e053cb004ab011c08a48c8cbfce30e39c92fda1"
       ],
       "reasonCodes": [],
       "candidateBound": false,
       "externalActionRequired": false,
-      "gateHash": "634473666e3f382b6d46270789039ddd7a77d11db4c4b3cad4c558653f75612e"
+      "gateHash": "9159eb65ab858c1b123332efbf3637de3c6e16558dfc51168dd2b812956fb17e"
+    },
+    {
+      "gateId": "P34-35",
+      "status": "PASS",
+      "ownerRole": "independent-technical-reviewer",
+      "description": "Exact-head review binding covers PR, commit, tree, candidate, source, validation, review, SBOM, and gate fingerprints; synthetic evidence cannot satisfy the independent-review gate.",
+      "evidence": [
+        "5b824165a45c019447013e3fe21a5c825574334f98fcef5fa6caa839f0ea38ff",
+        "b210b09646b3a642f6e03a33c3fb70ad2d8deaed117c235b3839de9ba1d64420"
+      ],
+      "reasonCodes": [
+        "SYNTHETIC_EXACT_REVIEW_CANNOT_SATISFY_GATE"
+      ],
+      "candidateBound": false,
+      "externalActionRequired": false,
+      "gateHash": "f844ab52d11f59eb127be61a8a43a697f827bbc8dc23812851903e8ef8910b29"
+    },
+    {
+      "gateId": "P34-36",
+      "status": "PASS",
+      "ownerRole": "governance-policy-owner",
+      "description": "Adaptive Governance 2.0 returns deterministic reason-coded states across actor, tenant, environment, autonomy, maturity, evidence, data, jurisdiction, model, tool, approval, deployment, risk, and side-effect inputs.",
+      "evidence": [
+        "dedfa5cb684ee8f40b2f2be29ccf869e1f54a10f472c2baf3fd2ec993d325de7"
+      ],
+      "reasonCodes": [],
+      "candidateBound": false,
+      "externalActionRequired": false,
+      "gateHash": "1a190a9a488de4b53802ecdf942af93aed709af8aef524288cb833c794841850"
+    },
+    {
+      "gateId": "P34-37",
+      "status": "PASS",
+      "ownerRole": "runtime-safety-owner",
+      "description": "Immediate runtime revalidation binds candidate, tenant, action, resource, autonomy, maturity, policy decision, and trusted execution time while retaining the no-write ceiling.",
+      "evidence": [
+        "09c719f511b34bcbf2484ca32c9e40042855c455aab2ea2235d723fdfd68ce73"
+      ],
+      "reasonCodes": [],
+      "candidateBound": false,
+      "externalActionRequired": false,
+      "gateHash": "3c696a2da31da674ee10a8d8a0c98af7e8328442e0e2d20bfee698dd54879135"
+    },
+    {
+      "gateId": "P34-38",
+      "status": "PASS",
+      "ownerRole": "evaluation-observability-owner",
+      "description": "The immutable causal graph links request through accepted result and supports acceptance and evaluation-delta queries using evidence references rather than hidden reasoning.",
+      "evidence": [
+        "d11a493564f89883ba9bebefdf19f925c6e9992b239c0ab85e429c0e771eaf8c",
+        "64efe749372b368caa718766d0b314a85540f28b0867e51880d74d0e6d8e9d4d"
+      ],
+      "reasonCodes": [
+        "POLICY_EVALUATED",
+        "EVIDENCE_LINKED",
+        "EVALUATION_ACCEPTED",
+        "RESULT_IMMUTABLY_LINKED"
+      ],
+      "candidateBound": false,
+      "externalActionRequired": false,
+      "gateHash": "2a4f0b89340159f2afed0c44530846f291f4dbce4f570f92b1f5468f7394c9bf"
     }
   ],
   "nonPhiPilotStatus": "local-controls-pass-independent-review-required",
@@ -547,5 +614,5 @@
   "migrationExecuted": false,
   "deploymentAuthorized": false,
   "externalDistributionAuthorized": false,
-  "summaryHash": "dd1b26fac5cf6908f50b973f741287821bb92219baae4a0cebdbe4da197dc551"
+  "summaryHash": "1c1b288738f0c427174a9a52b8f6ade74d601ead32f0b972fe87a322ebbc488c"
 }

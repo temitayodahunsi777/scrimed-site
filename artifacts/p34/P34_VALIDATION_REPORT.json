@@ -5,7 +5,7 @@
   "expiresAt": "2026-08-22T05:11:03.000Z",
   "evaluatedAt": "2026-08-22T05:12:30.000Z",
   "sourceCandidate": "1455b7028912d862d92faa715759cc37d0d154f63124e840b65263a24182a6b6",
-  "validationVersion": "scrimed-p34-control-plane-v2.1-2026-08-21",
+  "validationVersion": "scrimed-p34-control-plane-v2.3-2026-08-23",
   "status": "REVIEW_REQUIRED",
   "behaviorChecksStatus": "PASS",
   "releaseEvidenceStatus": "EXPIRED_REGENERATE_REQUIRED",
@@ -161,32 +161,32 @@
     {
       "id": "synthetic-evidence-expiry-boundary",
       "passed": true,
-      "evidence": "829374b230842367ee555779ce4636a1f2a09e0016af241e53d4e57007bdcb5d"
+      "evidence": "e98592f590cc1b259ae9bfebba13ad5df1943bfd118fe5e5b75e092ca69e0d6c"
     },
     {
       "id": "synthetic-approval-replay-self-test",
       "passed": true,
-      "evidence": "1a163113b82ac9b501e702c29c1a3af4ac86b7cd7ce921b77807a7939b234f36"
+      "evidence": "720305252d0dd2fc1d96aecd17c3506191895328874dfabfc55f28c587bfc64b"
     },
     {
       "id": "shared-egress-firewall",
       "passed": true,
-      "evidence": "f4de2cde7f8afd38b3ee3e64779d09a24d51281cb6816d486f29c8ac5be0b6e8,2c1ae6463617af605f68677af3c58267a453c223cab7663a229d31761ebfdc2d,fabdd92d55c5c45d71196e1da6e4ce3b38b70f2f3622238914a4998773e1e5d0,fed39851c7d6734761c311c448c04353d42e72a4078c588b34c6d0af3550b774,59bd4973bdd8911084196e80c80e6bffda5fa78ff9f5d94abccbcd5b51b737dd,d28b5d7df4cafbe497aed09d27deb314bcfdcb8712d64024a49de6bdac622432,5628e479efa9a98fac61c5d62b3e259ae78a03b3000bcf05fd5bf5ab610deed4,7413c97edad0cb00b44c7f5ed5df883a9815c4f53887ac9b94e1bc94666ec37c"
+      "evidence": "f4de2cde7f8afd38b3ee3e64779d09a24d51281cb6816d486f29c8ac5be0b6e8,2c1ae6463617af605f68677af3c58267a453c223cab7663a229d31761ebfdc2d,b2b30fcdf54046a09e89d763b8dc6910a341011cbf1cb479b868a46d2e0fd593,fabdd92d55c5c45d71196e1da6e4ce3b38b70f2f3622238914a4998773e1e5d0,fed39851c7d6734761c311c448c04353d42e72a4078c588b34c6d0af3550b774,59bd4973bdd8911084196e80c80e6bffda5fa78ff9f5d94abccbcd5b51b737dd,d28b5d7df4cafbe497aed09d27deb314bcfdcb8712d64024a49de6bdac622432,5628e479efa9a98fac61c5d62b3e259ae78a03b3000bcf05fd5bf5ab610deed4,7413c97edad0cb00b44c7f5ed5df883a9815c4f53887ac9b94e1bc94666ec37c,2848b62738f9a963edd9101643626d6175758b5f0758f38622fc41364054a1cb"
     },
     {
       "id": "global-kill-switch-server-mode",
       "passed": true,
-      "evidence": "1c37d46d3d42d301a79a8d04414a4f9de467f59dd74972e55bd640a3ca2f6ed5"
+      "evidence": "082d81fdb14ed7fccf14635cf29007259f7a4e3962e090242457612aede67e51"
     },
     {
       "id": "oversight-sentinel-no-authority",
       "passed": true,
-      "evidence": "9702747aa31068e99ea09d3414506d9214ea9d4a5225042526c11d0c76302098,0aff290a2e3e81c8ff0b89f349743e45efe35276d76dac18e9697f27d1f36a38,ae7189fc6fb4f70457f5d8a6f8c8b9b44a77637425d110517094128f64ee0c45,bf49a93e280f68bb69d979718d260433d7ddb4c491db62349246c4c510903bbd,9cf9e0454c7751a57e2acdd06c8a75fd77003caf97699353570bf5fee264c155,ab1c4859a7b1bca6f5e393378147984a48e1831569b578d9cc4ddc78805a8de8,0dd601f4dd65f7a0c1c4010d3708a58ee9fde03af5b2f245d395282af0bec32b,162977d8ef48cdb9656bb9ff8a371bf6bb0e745f92fc3064a1378dee0436f89f,87db096a25031226711214f27091778c8ad2c856ef9850254c59902a602b9e80,e5be27dbe74587bad40565da31921447a1af33fd5069a53a8da51e5bf54d4b32,e9e33f87a22c6ba1c55dc6fedb1bdbe36d1aa4d4087a1231c52ab6d1e1dff75a,fca6ccac6e0b68f641fd71d7efc10a3f54af377e56b4196bdbd63f24d376b17f"
+      "evidence": "fddb0d28a4c14b09056e277a03dbed0fec8a21290df2e75c45b36aa74b366508,75d9657d9eff3cacf1ee09e8a5fbaa053a9aa48623e80f6823ae5df27883a751,dae0f9f93988e99c8774ee76d761aab8f463e18fec165b5dbd5dadf4913714f9,ea1fad54c455520a73fa54e9ec097d7054321a577be6c24f0e1cf5181f7a211f,6dfb4fdd03e8113029309333d37054a14423e6aa61d7b1e2d73b04fcafc4d32a,2cd83429d129ee873113d58ae895bf1b0a7c73c429148946e2740b1aa65c6704,67b727f4b26115f1929658b10bae54ab89e6bbd3772051c91c56fa23eb19095f,8b308d47f8355c2d772f0b6c02f318d86e70d2ecbf788b1c3937006b84e948cb,cae7a6f03c3a351e07fb310009009471ac285cec63c8f4de336406565de18064,8c100eba76dc13255cc48914b758aaebdc9bfd88ce9fbc9376ca5a011bf5c4c8,151e2915d9e8e17de9b74b086a607d21efb6fd6af7299fe8ee22ed4532dbbaa0,5775f04e9f0f775ab79484872c84fa653b261dba47ffc6b103333490dbebb50a,ccd2c30e6d1bdfd3e9f5526e3fc1395f9f389857f0cd6caf03c949092593b392,90b53a06ae46d8060a089177060cffe3043f2c235a68d58d1eb60644d0ad46b7,006207adc5b5d25d87b537c3314f7416ccd05cb2e4d17aedcf6edef20746c022,50a260df02c3e857455af6d8f64257f62fb4c59c6573df48d6d7dd4330996d0a"
     },
     {
       "id": "trace-to-eval-redacted",
       "passed": true,
-      "evidence": "28bfaee7642f224fa12d43cde708242c415361e2ebfb5dfa65a2ab523556300e"
+      "evidence": "5dc0ba32a10ccad212949b090e053cb004ab011c08a48c8cbfce30e39c92fda1"
     },
     {
       "id": "synthetic-validation-artifact-not-release-evidence",
@@ -201,7 +201,7 @@
     {
       "id": "release-authority-retained",
       "passed": true,
-      "evidence": "dd1b26fac5cf6908f50b973f741287821bb92219baae4a0cebdbe4da197dc551"
+      "evidence": "1c1b288738f0c427174a9a52b8f6ade74d601ead32f0b972fe87a322ebbc488c"
     }
   ],
   "evidenceClassification": "synthetic-fixture-only",
@@ -213,5 +213,5 @@
   "durableApprovalReplayProtectionVerified": false,
   "externalEvidenceVerified": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "dd1b26fac5cf6908f50b973f741287821bb92219baae4a0cebdbe4da197dc551"
+  "summaryHash": "1c1b288738f0c427174a9a52b8f6ade74d601ead32f0b972fe87a322ebbc488c"
 }

@@ -12,18 +12,28 @@ export type AtomicApprovalSideEffect =
   | "external-distribution";
 
 export type AtomicApprovalToken = {
-  schemaVersion: "scrimed-p34-atomic-approval-v1";
+  schemaVersion: "scrimed-p34-atomic-approval-v2";
   approvalId: string;
   candidateFingerprint: string;
   actionId: string;
+  resourceId: string;
   tenantId: string;
   environmentId: string;
   requesterClass: string;
+  autonomyLevel: "A0" | "A1" | "A2" | "A3";
+  maturityLevel:
+    | "EXPERIMENTAL"
+    | "SYNTHETIC_VALIDATED"
+    | "REVIEW_READY"
+    | "PILOT_READY"
+    | "PRODUCTION_CANDIDATE"
+    | "AUTHORIZED_PRODUCTION";
   issuedAt: string;
   expiresAt: string;
   permittedSideEffect: AtomicApprovalSideEffect;
   nonce: string;
-  approvalOwnerHash: string;
+  approverIdentityHash: string;
+  policyDecisionHash: string;
   signature: string;
 };
 
@@ -31,10 +41,15 @@ export type AtomicApprovalExpectation = Pick<
   AtomicApprovalToken,
   | "candidateFingerprint"
   | "actionId"
+  | "resourceId"
   | "tenantId"
   | "environmentId"
   | "requesterClass"
+  | "autonomyLevel"
+  | "maturityLevel"
   | "permittedSideEffect"
+  | "approverIdentityHash"
+  | "policyDecisionHash"
 >;
 
 export type AtomicApprovalStore = {
@@ -72,6 +87,15 @@ const sideEffectClasses = new Set<AtomicApprovalSideEffect>([
   "production-mutation",
   "external-distribution"
 ]);
+const autonomyLevels = new Set<AtomicApprovalToken["autonomyLevel"]>(["A0", "A1", "A2", "A3"]);
+const maturityLevels = new Set<AtomicApprovalToken["maturityLevel"]>([
+  "EXPERIMENTAL",
+  "SYNTHETIC_VALIDATED",
+  "REVIEW_READY",
+  "PILOT_READY",
+  "PRODUCTION_CANDIDATE",
+  "AUTHORIZED_PRODUCTION"
+]);
 
 function isBoundedIdentifier(value: unknown): value is string {
   return typeof value === "string" && idPattern.test(value);
@@ -87,14 +111,18 @@ function unsignedToken(token: AtomicApprovalToken) {
     approvalId: token.approvalId,
     candidateFingerprint: token.candidateFingerprint,
     actionId: token.actionId,
+    resourceId: token.resourceId,
     tenantId: token.tenantId,
     environmentId: token.environmentId,
     requesterClass: token.requesterClass,
+    autonomyLevel: token.autonomyLevel,
+    maturityLevel: token.maturityLevel,
     issuedAt: token.issuedAt,
     expiresAt: token.expiresAt,
     permittedSideEffect: token.permittedSideEffect,
     nonce: token.nonce,
-    approvalOwnerHash: token.approvalOwnerHash
+    approverIdentityHash: token.approverIdentityHash,
+    policyDecisionHash: token.policyDecisionHash
   };
 }
 
@@ -144,30 +172,48 @@ export function consumeAtomicApproval(input: {
   if (record !== input || token !== record.token || expected !== record.expected || verifier !== record.verifier || store !== record.store) {
     reasonCodes.push("APPROVAL_RECORD_INVALID");
   }
-  if (token.schemaVersion !== "scrimed-p34-atomic-approval-v1") {
+  if (token.schemaVersion !== "scrimed-p34-atomic-approval-v2") {
     reasonCodes.push("APPROVAL_SCHEMA_VERSION_INVALID");
   }
-  for (const value of [token.approvalId, token.actionId, token.tenantId, token.environmentId, token.requesterClass, token.nonce]) {
+  for (const value of [token.approvalId, token.actionId, token.resourceId, token.tenantId, token.environmentId, token.requesterClass, token.nonce]) {
     if (!isBoundedIdentifier(value)) reasonCodes.push("APPROVAL_IDENTIFIER_INVALID");
   }
-  for (const value of [expected.actionId, expected.tenantId, expected.environmentId, expected.requesterClass]) {
+  for (const value of [expected.actionId, expected.resourceId, expected.tenantId, expected.environmentId, expected.requesterClass]) {
     if (!isBoundedIdentifier(value)) reasonCodes.push("APPROVAL_EXPECTATION_INVALID");
   }
-  for (const value of [token.candidateFingerprint, token.approvalOwnerHash, token.signature]) {
+  for (const value of [token.candidateFingerprint, token.approverIdentityHash, token.policyDecisionHash, token.signature]) {
     if (!isSha256(value)) reasonCodes.push("APPROVAL_CRYPTOGRAPHIC_BINDING_INVALID");
   }
-  if (!isSha256(expected.candidateFingerprint)) reasonCodes.push("APPROVAL_EXPECTATION_INVALID");
+  for (const value of [expected.candidateFingerprint, expected.approverIdentityHash, expected.policyDecisionHash]) {
+    if (!isSha256(value)) reasonCodes.push("APPROVAL_EXPECTATION_INVALID");
+  }
+  if (!autonomyLevels.has(token.autonomyLevel) || !autonomyLevels.has(expected.autonomyLevel)) {
+    reasonCodes.push("APPROVAL_AUTONOMY_INVALID");
+  }
+  if (!maturityLevels.has(token.maturityLevel) || !maturityLevels.has(expected.maturityLevel)) {
+    reasonCodes.push("APPROVAL_MATURITY_INVALID");
+  }
   if (!sideEffectClasses.has(token.permittedSideEffect) || !sideEffectClasses.has(expected.permittedSideEffect)) {
     reasonCodes.push("APPROVAL_SIDE_EFFECT_INVALID");
   }
   if (token.candidateFingerprint !== expected.candidateFingerprint) reasonCodes.push("APPROVAL_CANDIDATE_MISMATCH");
   if (token.actionId !== expected.actionId) reasonCodes.push("APPROVAL_ACTION_MISMATCH");
+  if (token.resourceId !== expected.resourceId) reasonCodes.push("APPROVAL_RESOURCE_MISMATCH");
   if (token.tenantId !== expected.tenantId) reasonCodes.push("APPROVAL_TENANT_MISMATCH");
   if (token.environmentId !== expected.environmentId) reasonCodes.push("APPROVAL_ENVIRONMENT_MISMATCH");
   if (token.requesterClass !== expected.requesterClass) reasonCodes.push("APPROVAL_REQUESTER_CLASS_MISMATCH");
+  if (token.autonomyLevel !== expected.autonomyLevel) reasonCodes.push("APPROVAL_AUTONOMY_MISMATCH");
+  if (token.maturityLevel !== expected.maturityLevel) reasonCodes.push("APPROVAL_MATURITY_MISMATCH");
   if (token.permittedSideEffect !== expected.permittedSideEffect) reasonCodes.push("APPROVAL_SIDE_EFFECT_MISMATCH");
+  if (token.approverIdentityHash !== expected.approverIdentityHash) reasonCodes.push("APPROVAL_APPROVER_MISMATCH");
+  if (token.policyDecisionHash !== expected.policyDecisionHash) reasonCodes.push("APPROVAL_POLICY_DECISION_MISMATCH");
 
-  const time = evaluateTrustedTimeWindow({ issuedAt: token.issuedAt, expiresAt: token.expiresAt }, record.clock as TrustedClock);
+  const time = evaluateTrustedTimeWindow({
+    issuedAt: token.issuedAt,
+    expiresAt: token.expiresAt,
+    maximumWindowMs: 60 * 60 * 1_000,
+    maximumAgeMs: 60 * 60 * 1_000
+  }, record.clock as TrustedClock);
   reasonCodes.push(...time.reasonCodes.map((reason) => `APPROVAL_${reason}`));
   if (!isBoundedIdentifier(verifier.verifierId) || typeof verifier.verify !== "function") reasonCodes.push("APPROVAL_VERIFIER_INVALID");
   let signatureVerified = false;
@@ -181,6 +227,10 @@ export function consumeAtomicApproval(input: {
   const storeTrustClassValid = store.trustClass === "synthetic-test-only" || store.trustClass === "trusted-external";
   if (!verifierTrustClassValid || !storeTrustClassValid) reasonCodes.push("APPROVAL_TRUST_CLASS_INVALID");
   if (verifier.trustClass !== store.trustClass) reasonCodes.push("APPROVAL_TRUST_CLASS_MISMATCH");
+  if ((verifier.trustClass === "trusted-external" || store.trustClass === "trusted-external") &&
+      time.source !== "server-runtime") {
+    reasonCodes.push("APPROVAL_SERVER_RUNTIME_CLOCK_REQUIRED");
+  }
 
   const bindingHash = createClinicalEvidenceHash({
     type: "p34-atomic-approval-binding",
@@ -188,10 +238,15 @@ export function consumeAtomicApproval(input: {
     expected: {
       candidateFingerprint: expected.candidateFingerprint,
       actionId: expected.actionId,
+      resourceId: expected.resourceId,
       tenantId: expected.tenantId,
       environmentId: expected.environmentId,
       requesterClass: expected.requesterClass,
-      permittedSideEffect: expected.permittedSideEffect
+      autonomyLevel: expected.autonomyLevel,
+      maturityLevel: expected.maturityLevel,
+      permittedSideEffect: expected.permittedSideEffect,
+      approverIdentityHash: expected.approverIdentityHash,
+      policyDecisionHash: expected.policyDecisionHash
     }
   });
   let approvalConsumed = false;
@@ -217,10 +272,15 @@ export function consumeAtomicApproval(input: {
     expectedHash: createClinicalEvidenceHash({
       candidateFingerprint: expected.candidateFingerprint,
       actionId: expected.actionId,
+      resourceId: expected.resourceId,
       tenantId: expected.tenantId,
       environmentId: expected.environmentId,
       requesterClass: expected.requesterClass,
-      permittedSideEffect: expected.permittedSideEffect
+      autonomyLevel: expected.autonomyLevel,
+      maturityLevel: expected.maturityLevel,
+      permittedSideEffect: expected.permittedSideEffect,
+      approverIdentityHash: expected.approverIdentityHash,
+      policyDecisionHash: expected.policyDecisionHash
     }),
     approvalConsumed,
     structurallyVerified,

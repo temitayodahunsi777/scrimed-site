@@ -36,6 +36,8 @@ export type ReleaseAssuranceCheck = {
 };
 
 const shaPattern = /^[0-9a-f]{40}$/i;
+const sha256Pattern = /^[0-9a-f]{64}$/i;
+const branchPattern = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/;
 
 function stableSerialize(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
@@ -68,12 +70,24 @@ function publicBuildTimestamp(env: NodeJS.ProcessEnv) {
   return value && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : null;
 }
 
+function publicBranch(env: NodeJS.ProcessEnv) {
+  const value = env.VERCEL_GIT_COMMIT_REF?.trim() || env.SCRIMED_BUILD_BRANCH?.trim();
+  return value && branchPattern.test(value) ? value : null;
+}
+
+function publicCandidateFingerprint(env: NodeJS.ProcessEnv) {
+  const value = env.SCRIMED_PREVIEW_CANDIDATE_SHA256?.trim();
+  return value && sha256Pattern.test(value) ? value.toLowerCase() : null;
+}
+
 export function getScrimedBuildInfo(
   env: NodeJS.ProcessEnv = process.env,
   runtimeVersion = process.versions.node
 ) {
   const runtime = getScrimedNodeRuntimeStatus({ env, runtimeVersion });
   const commit = publicCommitSha(env);
+  const branch = publicBranch(env);
+  const candidateFingerprint = publicCandidateFingerprint(env);
   const base = {
     service: "scrimed-build-info" as const,
     version: vercelReleaseAssuranceVersion,
@@ -85,6 +99,13 @@ export function getScrimedBuildInfo(
     nextVersion: "16.2.12" as const,
     commit,
     commitSha: commit,
+    branch,
+    candidateFingerprint,
+    candidateFingerprintDeclared: Boolean(candidateFingerprint),
+    candidateFingerprintBound: false as const,
+    candidateFingerprintVerificationStatus: candidateFingerprint
+      ? "DECLARED_UNVERIFIED" as const
+      : "NOT_PROVIDED" as const,
     buildTimestamp: publicBuildTimestamp(env),
     environment: releaseEnvironment(env),
     project: env.VERCEL_PROJECT_PRODUCTION_URL ? "scrimed-site" : "local-unbound",

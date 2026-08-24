@@ -268,6 +268,18 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "p34/atomic-approval") {
     return json(getP34AdaptiveGovernanceSummary().atomicApproval, "control-plane-p34-atomic-approval");
   }
+  if (endpoint === "p34/exact-candidate-review") {
+    return json(getP34AdaptiveGovernanceSummary().exactCandidateReview, "control-plane-p34-exact-candidate-review");
+  }
+  if (endpoint === "p34/runtime-revalidation") {
+    const controlPlane = getP34AdaptiveGovernanceSummary().controlPlane2;
+    return json({
+      dynamicGovernance: controlPlane.dynamicGovernance,
+      runtimeRevalidation: controlPlane.runtimeRevalidation,
+      causalTrace: controlPlane.causalTrace,
+      acceptedOutputExplanation: controlPlane.acceptedOutputExplanation
+    }, "control-plane-p34-runtime-revalidation");
+  }
   if (endpoint === "p34/egress-firewall") {
     return json(getP34AdaptiveGovernanceSummary().egressFirewall, "control-plane-p34-egress-firewall");
   }
@@ -278,6 +290,9 @@ export async function GET(request: Request, context: RouteContext) {
       gateCounts: summary.gateCounts,
       governance: summary.governance.verification,
       evaluation: summary.evaluation,
+      exactCandidateReview: summary.exactCandidateReview,
+      dynamicGovernance: summary.controlPlane2.dynamicGovernance,
+      runtimeRevalidation: summary.controlPlane2.runtimeRevalidation,
       boundary: summary.boundary
     }, "control-plane-p34-assurance");
   }

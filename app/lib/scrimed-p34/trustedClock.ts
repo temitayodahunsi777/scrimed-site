@@ -51,6 +51,7 @@ export function evaluateTrustedTimeWindow(input: {
   expiresAt: string;
   maximumAgeMs?: number;
   maximumFutureSkewMs?: number;
+  maximumWindowMs?: number;
 }, clock: TrustedClock): TrustedTimeWindowDecision {
   const reasonCodes: string[] = [];
   const record = (input && typeof input === "object" ? input : {}) as Partial<typeof input>;
@@ -86,13 +87,25 @@ export function evaluateTrustedTimeWindow(input: {
     : 0;
   const maximumAgeValid = record.maximumAgeMs === undefined ||
     (Number.isFinite(record.maximumAgeMs) && record.maximumAgeMs >= 0);
+  const maximumWindowValid = record.maximumWindowMs === undefined ||
+    (Number.isFinite(record.maximumWindowMs) && record.maximumWindowMs > 0);
 
   if (!issuedAt) reasonCodes.push("ISSUED_AT_INVALID");
   if (!expiresAt) reasonCodes.push("EXPIRES_AT_INVALID");
   if (maximumFutureSkewMs !== configuredFutureSkewMs) reasonCodes.push("MAXIMUM_FUTURE_SKEW_INVALID");
   if (!maximumAgeValid) reasonCodes.push("MAXIMUM_AGE_INVALID");
+  if (!maximumWindowValid) reasonCodes.push("MAXIMUM_WINDOW_INVALID");
   if (issuedAt && expiresAt && issuedAt.getTime() >= expiresAt.getTime()) {
     reasonCodes.push("TIME_WINDOW_INVALID");
+  }
+  if (
+    issuedAt &&
+    expiresAt &&
+    record.maximumWindowMs !== undefined &&
+    maximumWindowValid &&
+    expiresAt.getTime() - issuedAt.getTime() > record.maximumWindowMs
+  ) {
+    reasonCodes.push("TIME_WINDOW_TOO_LONG");
   }
   if (issuedAt && issuedAt.getTime() > now.getTime() + maximumFutureSkewMs) {
     reasonCodes.push("ISSUED_AT_IN_FUTURE");
@@ -112,6 +125,7 @@ export function evaluateTrustedTimeWindow(input: {
     issuedAt: issuedAtValue,
     expiresAt: expiresAtValue,
     maximumAgeMs: record.maximumAgeMs ?? null,
+    maximumWindowMs: record.maximumWindowMs ?? null,
     maximumFutureSkewMs: configuredFutureSkewMs,
     evaluatedAt: now.toISOString(),
     source,

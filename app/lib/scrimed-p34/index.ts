@@ -64,6 +64,14 @@ import {
 } from "./controlPlane2";
 import { evaluateP34EgressFirewall, p34EgressChannels } from "./egressFirewall";
 import { FixedTrustedClock } from "./trustedClock";
+import {
+  createSyntheticExactReviewSignature,
+  createSyntheticExactReviewVerifier,
+  InMemorySyntheticExactCandidateReviewStore,
+  verifyExactCandidateReview,
+  type P34ExactCandidateReviewApproval,
+  type P34ExactCandidateBinding
+} from "./exactCandidateReview";
 import type { P34GateRecord, P34GateStatus, TaskPolicy } from "./types";
 
 export * from "./types";
@@ -77,11 +85,12 @@ export * from "./controlPlane2";
 export * from "./egressFirewall";
 export * from "./evidenceExpiry";
 export * from "./trustedClock";
+export * from "./exactCandidateReview";
 
 export const p34IntegratedRoute = "/scrimed-p34";
 export const p34IntegratedApiRoute = "/api/scrimed-control-plane/p34";
 export const p34IntegratedBriefRoute = "/api/scrimed-control-plane/p34/brief";
-export const p34IntegratedVersion = "scrimed-p34-integrated-v5-2026-08-21";
+export const p34IntegratedVersion = "scrimed-p34-integrated-v6-2026-08-23";
 
 export const p34IntegratedBoundary =
   "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI clinical operating-system candidate with bounded workflow and autonomy contracts, model-fit routing, action maturity, tenant-first retrieval, PHI and sandbox controls, trusted evidence expiry, atomic approval verification, a global kill switch, external-validation gates, patient-education previews, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, billing or payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
@@ -104,18 +113,22 @@ export function getP34AdaptiveGovernanceSummary() {
   const atomicApprovalStore = new InMemorySyntheticAtomicApprovalStore();
   const atomicApprovalVerifierId = "p34-synthetic-atomic-verifier";
   const atomicApprovalUnsigned: Omit<AtomicApprovalToken, "signature"> = {
-    schemaVersion: "scrimed-p34-atomic-approval-v1",
+    schemaVersion: "scrimed-p34-atomic-approval-v2",
     approvalId: "p34-synthetic-atomic-approval",
     candidateFingerprint: controlPlane2.declaration.candidateFingerprint,
     actionId: "prepare-synthetic-internal-receipt",
+    resourceId: "synthetic-internal-receipt",
     tenantId: "synthetic-tenant",
     environmentId: "local-synthetic",
     requesterClass: "synthetic-policy-runner",
+    autonomyLevel: "A2",
+    maturityLevel: "REVIEW_READY",
     issuedAt: "2026-08-21T03:45:00.000Z",
     expiresAt: "2026-08-21T04:15:00.000Z",
     permittedSideEffect: "reversible-synthetic-internal-write",
     nonce: "p34-synthetic-nonce-001",
-    approvalOwnerHash: createClinicalEvidenceHash("p34-synthetic-atomic-approval-owner")
+    approverIdentityHash: createClinicalEvidenceHash("p34-synthetic-atomic-approval-owner"),
+    policyDecisionHash: controlPlane2.action.decisionHash
   };
   const atomicApprovalToken: AtomicApprovalToken = {
     ...atomicApprovalUnsigned,
@@ -126,10 +139,15 @@ export function getP34AdaptiveGovernanceSummary() {
     expected: {
       candidateFingerprint: atomicApprovalToken.candidateFingerprint,
       actionId: atomicApprovalToken.actionId,
+      resourceId: atomicApprovalToken.resourceId,
       tenantId: atomicApprovalToken.tenantId,
       environmentId: atomicApprovalToken.environmentId,
       requesterClass: atomicApprovalToken.requesterClass,
-      permittedSideEffect: atomicApprovalToken.permittedSideEffect
+      autonomyLevel: atomicApprovalToken.autonomyLevel,
+      maturityLevel: atomicApprovalToken.maturityLevel,
+      permittedSideEffect: atomicApprovalToken.permittedSideEffect,
+      approverIdentityHash: atomicApprovalToken.approverIdentityHash,
+      policyDecisionHash: atomicApprovalToken.policyDecisionHash
     },
     clock: new FixedTrustedClock("2026-08-21T04:00:00.000Z"),
     store: atomicApprovalStore,
@@ -140,10 +158,15 @@ export function getP34AdaptiveGovernanceSummary() {
     expected: {
       candidateFingerprint: atomicApprovalToken.candidateFingerprint,
       actionId: atomicApprovalToken.actionId,
+      resourceId: atomicApprovalToken.resourceId,
       tenantId: atomicApprovalToken.tenantId,
       environmentId: atomicApprovalToken.environmentId,
       requesterClass: atomicApprovalToken.requesterClass,
-      permittedSideEffect: atomicApprovalToken.permittedSideEffect
+      autonomyLevel: atomicApprovalToken.autonomyLevel,
+      maturityLevel: atomicApprovalToken.maturityLevel,
+      permittedSideEffect: atomicApprovalToken.permittedSideEffect,
+      approverIdentityHash: atomicApprovalToken.approverIdentityHash,
+      policyDecisionHash: atomicApprovalToken.policyDecisionHash
     },
     clock: new FixedTrustedClock("2026-08-21T04:00:00.000Z"),
     store: atomicApprovalStore,
@@ -158,6 +181,49 @@ export function getP34AdaptiveGovernanceSummary() {
     persistentReplayProtectionAvailable: false as const,
     exactCandidateApprovalVerified: false as const,
     durableTrustedStoreRequiredForExecution: true as const
+  };
+  const exactReviewBinding: P34ExactCandidateBinding = {
+    pullRequestNumber: 1,
+    commitSha: createClinicalEvidenceHash("p34-synthetic-review-commit").slice(0, 40),
+    treeSha: createClinicalEvidenceHash("p34-synthetic-review-tree").slice(0, 40),
+    candidateFingerprint: createClinicalEvidenceHash("p34-synthetic-review-candidate"),
+    sourceFingerprint: createClinicalEvidenceHash("p34-synthetic-review-source"),
+    validationFingerprint: createClinicalEvidenceHash("p34-synthetic-review-validation"),
+    reviewPacketFingerprint: createClinicalEvidenceHash("p34-synthetic-review-packet"),
+    sbomFingerprint: createClinicalEvidenceHash("p34-synthetic-review-sbom"),
+    gatePacketFingerprint: createClinicalEvidenceHash("p34-synthetic-review-gates")
+  };
+  const exactReviewVerifierId = "p34-synthetic-exact-review-verifier";
+  const exactReviewUnsigned: Omit<P34ExactCandidateReviewApproval, "signature"> = {
+    schemaVersion: "scrimed-p34-exact-candidate-review-v2",
+    approvalId: "p34-synthetic-exact-review",
+    binding: exactReviewBinding,
+    reviewerIdentityHash: createClinicalEvidenceHash("p34-independent-synthetic-reviewer"),
+    authorIdentityHash: createClinicalEvidenceHash("p34-synthetic-author"),
+    reviewerRole: "independent-technical-reviewer",
+    decision: "APPROVED_FOR_MERGE_AUTHORIZATION_REVIEW",
+    issuedAt: "2026-08-21T03:45:00.000Z",
+    expiresAt: "2026-08-21T04:15:00.000Z",
+    nonce: "p34-synthetic-exact-review-nonce"
+  };
+  const exactReviewApproval: P34ExactCandidateReviewApproval = {
+    ...exactReviewUnsigned,
+    signature: createSyntheticExactReviewSignature(exactReviewUnsigned, exactReviewVerifierId)
+  };
+  const exactCandidateReviewDecision = verifyExactCandidateReview({
+    approval: exactReviewApproval,
+    expected: exactReviewBinding,
+    expectedAuthorIdentityHash: exactReviewUnsigned.authorIdentityHash,
+    clock: new FixedTrustedClock("2026-08-21T04:00:00.000Z"),
+    store: new InMemorySyntheticExactCandidateReviewStore(),
+    verifier: createSyntheticExactReviewVerifier(exactReviewVerifierId)
+  });
+  const exactCandidateReview = {
+    ...exactCandidateReviewDecision,
+    evidenceClassification: "synthetic-structural-self-test" as const,
+    exactRemoteHeadVerified: false as const,
+    independentHumanReviewVerified: false as const,
+    externalTrustedStoreRequired: true as const
   };
   const egressFirewall = evaluateP34EgressFirewall({
     channel: "telemetry",
@@ -548,8 +614,12 @@ export function getP34AdaptiveGovernanceSummary() {
     gate({ gateId: "P34-30", status: atomicApproval.structurallyVerified && atomicApproval.approvalConsumed && atomicApproval.replayAttemptBlocked && !atomicApproval.persistentReplayProtectionAvailable && !atomicApproval.executionAuthorized ? "PASS" : "FAIL", ownerRole: "approval-policy-owner", description: "An in-process synthetic self-test proves one-store replay rejection; durable cross-request replay protection and execution authority remain unavailable.", evidence: [atomicApproval.receiptHash, atomicApproval.replayAttemptReceiptHash], reasonCodes: [...atomicApproval.reasonCodes, "SYNTHETIC_IN_PROCESS_SELF_TEST", "DURABLE_APPROVAL_STORE_REQUIRED"], candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-31", status: egressFirewall.decision === "ALLOW" && !egressFirewall.forwardingAuthorized && !egressFirewall.containsRawPhi && !egressFirewall.containsSecrets && egressChannelCoverage.every((item) => item.passed) ? "PASS" : "FAIL", ownerRole: "privacy-security-owner", description: "The shared egress firewall scans every declared model, agent, telemetry, connector, proof, investor, and public channel without granting outbound authority.", evidence: [egressFirewall.decisionHash, ...egressChannelCoverage.map((item) => item.decisionHash)], reasonCodes: [...egressFirewall.reasonCodes, ...egressChannelCoverage.filter((item) => !item.passed).map((item) => `EGRESS_CHANNEL_COVERAGE_FAILED:${item.channel}`)], candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-32", status: ["NORMAL", "RESTRICTED", "READ_ONLY", "HALTED"].includes(controlPlane2.killSwitchMode) && !controlPlane2.governedWritesExecuted && !controlPlane2.action.a3Available ? "PASS" : "FAIL", ownerRole: "runtime-safety-owner", description: "The global kill switch defaults to read-only, reports the trusted server mode, and never grants governed writes or A3 authority.", evidence: [controlPlane2.summaryHash], reasonCodes: controlPlane2.action.reasonCodes.filter((reason) => reason.startsWith("KILL_SWITCH_")), candidateBound: false, externalActionRequired: false }),
-    gate({ gateId: "P34-33", status: controlPlane2.oversight.incidents.length === 0 && !controlPlane2.oversight.executionAuthorityGranted && controlPlane2.oversightDetectorCoverage.length === 12 && controlPlane2.oversightDetectorCoverage.every((item) => item.detected && !item.executionAuthorityGranted) ? "PASS" : "FAIL", ownerRole: "oversight-sentinel-owner", description: "Oversight Sentinel 2.0 independently exercises privilege, maturity, evidence, retry, delegation, budget, model, policy, network, tenant, approval, and distribution drift detectors without gaining execution authority.", evidence: [controlPlane2.oversight.sentinelHash, ...controlPlane2.oversightDetectorCoverage.map((item) => item.sentinelHash)], reasonCodes: controlPlane2.oversightDetectorCoverage.filter((item) => !item.detected).map((item) => `SENTINEL_DETECTOR_COVERAGE_FAILED:${item.signal}`), candidateBound: false, externalActionRequired: false }),
-    gate({ gateId: "P34-34", status: Boolean(controlPlane2.trace.traceId && controlPlane2.trace.actionId && controlPlane2.trace.tenantId && controlPlane2.trace.modelId && controlPlane2.trace.promptVersion) && controlPlane2.trace.toolIds.length > 0 && controlPlane2.trace.evidenceHashes.length > 0 && [controlPlane2.trace.resultHash, controlPlane2.trace.evaluationHash, controlPlane2.trace.traceEvaluationHash].every((value) => /^[0-9a-f]{64}$/.test(value)) && controlPlane2.trace.latencyMs >= 0 && controlPlane2.trace.costUsd >= 0 && !controlPlane2.trace.containsRawPhi && !controlPlane2.trace.containsSecrets && !controlPlane2.trace.hiddenChainOfThoughtStored ? "PASS" : "FAIL", ownerRole: "evaluation-observability-owner", description: "Trace-to-eval retains every bounded model, prompt, tool, evidence, result, evaluation, correction, acceptance, latency, and cost linkage without PHI, secrets, or hidden reasoning.", evidence: [controlPlane2.trace.traceEvaluationHash], reasonCodes: [], candidateBound: false, externalActionRequired: false })
+    gate({ gateId: "P34-33", status: controlPlane2.oversight.incidents.length === 0 && !controlPlane2.oversight.executionAuthorityGranted && controlPlane2.oversightDetectorCoverage.length === 16 && controlPlane2.oversightDetectorCoverage.every((item) => item.detected && !item.executionAuthorityGranted) ? "PASS" : "FAIL", ownerRole: "oversight-sentinel-owner", description: "Oversight Sentinel 3.0 exercises autonomy, privilege, maturity, evidence, retry, delegation, budget, model, policy, route, egress, tool, network, tenant, approval, and distribution anomaly detectors without gaining execution authority.", evidence: [controlPlane2.oversight.sentinelHash, ...controlPlane2.oversightDetectorCoverage.map((item) => item.sentinelHash)], reasonCodes: controlPlane2.oversightDetectorCoverage.filter((item) => !item.detected).map((item) => `SENTINEL_DETECTOR_COVERAGE_FAILED:${item.signal}`), candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-34", status: Boolean(controlPlane2.trace.traceId && controlPlane2.trace.actionId && controlPlane2.trace.tenantId && controlPlane2.trace.modelId && controlPlane2.trace.promptVersion) && controlPlane2.trace.toolIds.length > 0 && controlPlane2.trace.evidenceHashes.length > 0 && [controlPlane2.trace.resultHash, controlPlane2.trace.evaluationHash, controlPlane2.trace.traceEvaluationHash].every((value) => /^[0-9a-f]{64}$/.test(value)) && controlPlane2.trace.latencyMs >= 0 && controlPlane2.trace.costUsd >= 0 && !controlPlane2.trace.containsRawPhi && !controlPlane2.trace.containsSecrets && !controlPlane2.trace.hiddenChainOfThoughtStored ? "PASS" : "FAIL", ownerRole: "evaluation-observability-owner", description: "Trace-to-eval retains every bounded model, prompt, tool, evidence, result, evaluation, correction, acceptance, latency, and cost linkage without PHI, secrets, or hidden reasoning.", evidence: [controlPlane2.trace.traceEvaluationHash], reasonCodes: [], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-35", status: exactCandidateReview.structurallyVerified && exactCandidateReview.status === "EXACT_REVIEW_REQUIRED" && !exactCandidateReview.exactCandidateReviewed && !exactCandidateReview.mergeAuthorized && !exactCandidateReview.deploymentAuthorized ? "PASS" : "FAIL", ownerRole: "independent-technical-reviewer", description: "Exact-head review binding covers PR, commit, tree, candidate, source, validation, review, SBOM, and gate fingerprints; synthetic evidence cannot satisfy the independent-review gate.", evidence: [exactCandidateReview.bindingHash, exactCandidateReview.receiptHash], reasonCodes: exactCandidateReview.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-36", status: controlPlane2.dynamicGovernance.status === "PERMITTED" && !controlPlane2.dynamicGovernance.executionAuthorized ? "PASS" : "FAIL", ownerRole: "governance-policy-owner", description: "Adaptive Governance 2.0 returns deterministic reason-coded states across actor, tenant, environment, autonomy, maturity, evidence, data, jurisdiction, model, tool, approval, deployment, risk, and side-effect inputs.", evidence: [controlPlane2.dynamicGovernance.decisionHash], reasonCodes: controlPlane2.dynamicGovernance.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-37", status: controlPlane2.runtimeRevalidation.preflightValid && controlPlane2.runtimeRevalidation.decision === "ALLOW" && !controlPlane2.runtimeRevalidation.executionAuthorized && !controlPlane2.runtimeRevalidation.externalSideEffectAuthorized ? "PASS" : "FAIL", ownerRole: "runtime-safety-owner", description: "Immediate runtime revalidation binds candidate, tenant, action, resource, autonomy, maturity, policy decision, and trusted execution time while retaining the no-write ceiling.", evidence: [controlPlane2.runtimeRevalidation.decisionHash], reasonCodes: controlPlane2.runtimeRevalidation.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-38", status: controlPlane2.acceptedOutputExplanation.explainable && controlPlane2.causalTrace.nodes.length === 11 && !controlPlane2.causalTrace.containsRawPhi && !controlPlane2.causalTrace.hiddenChainOfThoughtStored ? "PASS" : "FAIL", ownerRole: "evaluation-observability-owner", description: "The immutable causal graph links request through accepted result and supports acceptance and evaluation-delta queries using evidence references rather than hidden reasoning.", evidence: [controlPlane2.causalTrace.graphHash, controlPlane2.acceptedOutputExplanation.explanationHash], reasonCodes: controlPlane2.acceptedOutputExplanation.reasonCodes, candidateBound: false, externalActionRequired: false })
   ];
   const statuses: P34GateStatus[] = ["PASS", "OPERATOR_REQUIRED", "BLOCKED", "FAIL"];
   const gateCounts = Object.fromEntries(statuses.map((status) => [
@@ -598,6 +668,7 @@ export function getP34AdaptiveGovernanceSummary() {
     clinicalOperatingSystem,
     controlPlane2,
     atomicApproval,
+    exactCandidateReview,
     egressFirewall,
     egressChannelCoverage,
     pilotObjectives: p34PilotObjectives,

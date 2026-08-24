@@ -49,10 +49,14 @@ const previewBuildInfo = getScrimedBuildInfo(
     ...safeEnv,
     VERCEL_ENV: "preview",
     VERCEL_GIT_COMMIT_SHA: "a".repeat(40),
+    SCRIMED_PREVIEW_CANDIDATE_SHA256: "b".repeat(64),
     VERCEL_PROJECT_PRODUCTION_URL: "app.scrimedsolutions.com"
   },
   "24.0.0"
 );
+assert.equal(previewBuildInfo.candidateFingerprintDeclared, true);
+assert.equal(previewBuildInfo.candidateFingerprintBound, false);
+assert.equal(previewBuildInfo.candidateFingerprintVerificationStatus, "DECLARED_UNVERIFIED");
 assert.deepEqual(getProductRuntimePresentation(previewBuildInfo), {
   runtimeCompatibilityLabel: "verified in preview",
   vercelBuildStatus: "preview active"

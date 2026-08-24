@@ -1,13 +1,16 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
 import type { AutonomyTier, P34DataClassification, P34RiskTier } from "./types";
 import {
+  createSyntheticP34EvidenceSignature,
+  createSyntheticP34EvidenceVerifier,
   evaluateP34EvidenceSet,
   type P34EvidenceEnvelope,
-  type P34EvidenceType
+  type P34EvidenceType,
+  type P34EvidenceVerificationContext
 } from "./evidenceExpiry";
 import { evaluateTrustedTimeWindow, FixedTrustedClock, type TrustedClock } from "./trustedClock";
 
-export const p34ControlPlane2Version = "scrimed-p34-control-plane-v2.1-2026-08-21";
+export const p34ControlPlane2Version = "scrimed-p34-control-plane-v2.3-2026-08-23";
 export const p34ControlPlane2Boundary =
   "Synthetic/no-PHI policy evidence only. Control Plane 2.0 cannot authorize A3, external providers, clinical or payer actions, EHR/device writes, production mutations, customer activation, external distribution, migrations, or compliance claims.";
 
@@ -52,6 +55,7 @@ export type P34PolicyErrorCode =
 export type P34GovernedActionDeclaration = {
   schemaVersion: "scrimed-p34-governed-action-v2";
   actionId: string;
+  resourceId: string;
   tenantId: string;
   actorIdHash: string;
   candidateFingerprint: string;
@@ -78,6 +82,7 @@ export type P34GovernedActionRequest = {
   requestedToolIds: string[];
   requestedModelIds: string[];
   evidence: P34EvidenceEnvelope[];
+  evidenceVerificationContext: P34EvidenceVerificationContext;
   killSwitchMode: P34KillSwitchMode;
   clock: TrustedClock;
 };
@@ -93,10 +98,47 @@ export type P34GovernedActionDecision = {
   externalSideEffectAuthorized: false;
   currentMaturity: P34CapabilityMaturity;
   releaseStateCeiling: "EXACT_REVIEW_REQUIRED";
+  evaluatedAt: string;
+  decisionHash: string;
+};
+
+export type P34DynamicGovernanceStatus =
+  | "PERMITTED"
+  | "PERMITTED_WITH_REVIEW"
+  | "OPERATOR_ACTION_REQUIRED"
+  | "TARGETED_SPECIALIST_REVIEW_REQUIRED"
+  | "PROHIBITED";
+
+export type P34DynamicGovernanceInput = {
+  actionId: string;
+  actorIdentityHash: string;
+  tenantId: string;
+  environmentId: string;
+  autonomyTier: AutonomyTier;
+  actionMaturity: P34CapabilityMaturity;
+  evidenceFresh: boolean;
+  dataClassification: P34DataClassification;
+  jurisdiction: string;
+  modelQualified: boolean;
+  toolQualified: boolean;
+  approvalState: "not-required" | "missing" | "synthetic-only" | "trusted-valid" | "expired" | "replayed";
+  deploymentState: "local-synthetic" | "preview-synthetic" | "preproduction" | "production";
+  riskTier: P34RiskTier;
+  externalSideEffectClass: P34ExternalSideEffectClass;
+};
+
+export type P34DynamicGovernanceDecision = {
+  status: P34DynamicGovernanceStatus;
+  reasonCodes: string[];
+  humanReviewRequired: boolean;
+  executionAuthorized: false;
+  clinicalAuthorityGranted: false;
+  productionAuthorityGranted: false;
   decisionHash: string;
 };
 
 export type P34OversightSignalInput = {
+  autonomyEscalation: boolean;
   privilegeDrift: boolean;
   maturityDrift: boolean;
   evidenceExpired: boolean;
@@ -107,9 +149,12 @@ export type P34OversightSignalInput = {
   budgetUsedRatio: number;
   modelSubstitution: boolean;
   policyMutation: boolean;
+  routeDivergence: boolean;
   unexpectedNetworkTargets: string[];
   tenantLeakageDetected: boolean;
   approvalReplayDetected: boolean;
+  egressFirewallTriggered: boolean;
+  anomalousToolEscalation: boolean;
   unauthorizedDistributionAttempt: boolean;
 };
 
@@ -156,7 +201,8 @@ const releaseStates: P34ReleaseState[] = [
 ];
 const evidenceTypes = new Set<P34EvidenceType>([
   "candidate-manifest", "validation-packet", "gate-packet", "security-evidence",
-  "review-packet", "migration-report", "public-claims", "investor-artifact"
+  "review-packet", "migration-report", "model-qualification", "aal2", "public-claims",
+  "investor-artifact", "preview-validation", "specialist-review"
 ]);
 
 function canonical(values: readonly unknown[]) {
@@ -193,6 +239,117 @@ function killSwitchReasons(request: P34GovernedActionRequest) {
   return [];
 }
 
+export function evaluateP34DynamicGovernance(
+  input: P34DynamicGovernanceInput
+): P34DynamicGovernanceDecision {
+  const record = (input && typeof input === "object" ? input : {}) as Partial<P34DynamicGovernanceInput>;
+  const reasonCodes: string[] = [];
+  const approvalStates = new Set<P34DynamicGovernanceInput["approvalState"]>([
+    "not-required", "missing", "synthetic-only", "trusted-valid", "expired", "replayed"
+  ]);
+  const deploymentStates = new Set<P34DynamicGovernanceInput["deploymentState"]>([
+    "local-synthetic", "preview-synthetic", "preproduction", "production"
+  ]);
+  if (record !== input || !isBoundedIdentifier(record.actionId) || !isSha256(record.actorIdentityHash) ||
+      !isBoundedIdentifier(record.tenantId) || !isBoundedIdentifier(record.environmentId) ||
+      !isBoundedIdentifier(record.jurisdiction)) {
+    reasonCodes.push("DYNAMIC_GOVERNANCE_INPUT_INVALID");
+  }
+  if (!autonomyClasses.has(record.autonomyTier as AutonomyTier) ||
+      !capabilityMaturities.has(record.actionMaturity as P34CapabilityMaturity) ||
+      !dataClassifications.has(record.dataClassification as P34DataClassification) ||
+      !riskTiers.has(record.riskTier as P34RiskTier) ||
+      !externalSideEffectClasses.has(record.externalSideEffectClass as P34ExternalSideEffectClass) ||
+      !approvalStates.has(record.approvalState as P34DynamicGovernanceInput["approvalState"]) ||
+      !deploymentStates.has(record.deploymentState as P34DynamicGovernanceInput["deploymentState"]) ||
+      typeof record.evidenceFresh !== "boolean" || typeof record.modelQualified !== "boolean" ||
+      typeof record.toolQualified !== "boolean") {
+    reasonCodes.push("DYNAMIC_GOVERNANCE_ENUM_OR_STATE_INVALID");
+  }
+  if (record.riskTier === "prohibited") reasonCodes.push("PROHIBITED_RISK");
+  if (record.dataClassification === "phi-restricted") reasonCodes.push("LIVE_PHI_DISABLED");
+  if (record.deploymentState === "production") reasonCodes.push("PRODUCTION_AUTHORIZATION_REQUIRED");
+  if (record.autonomyTier === "A3") reasonCodes.push("A3_UNAVAILABLE_IN_CURRENT_CANDIDATE");
+  if (record.evidenceFresh === false) reasonCodes.push("EVIDENCE_STALE_OR_MISSING");
+  if (record.modelQualified === false) reasonCodes.push("MODEL_QUALIFICATION_REQUIRED");
+  if (record.toolQualified === false) reasonCodes.push("TOOL_QUALIFICATION_REQUIRED");
+  if (record.approvalState === "missing" || record.approvalState === "synthetic-only") {
+    reasonCodes.push("TRUSTED_APPROVAL_REQUIRED");
+  }
+  if (record.approvalState === "expired") reasonCodes.push("APPROVAL_EXPIRED");
+  if (record.approvalState === "replayed") reasonCodes.push("APPROVAL_REPLAY_DETECTED");
+  if (record.autonomyTier === "A2") reasonCodes.push("A2_NAMED_REVIEW_REQUIRED");
+  if (record.riskTier === "high") reasonCodes.push("HIGH_RISK_SPECIALIST_REVIEW_REQUIRED");
+  if (record.externalSideEffectClass !== "none" && record.externalSideEffectClass !== "reversible-synthetic-internal") {
+    reasonCodes.push("CONSEQUENTIAL_SIDE_EFFECT_PROHIBITED");
+  }
+  if ((record.autonomyTier === "A0" || record.autonomyTier === "A1") && record.externalSideEffectClass !== "none") {
+    reasonCodes.push("A0_A1_CANNOT_MUTATE");
+  }
+
+  const normalizedReasons = canonical(reasonCodes);
+  const prohibitedReasons = new Set([
+    "DYNAMIC_GOVERNANCE_INPUT_INVALID",
+    "DYNAMIC_GOVERNANCE_ENUM_OR_STATE_INVALID",
+    "PROHIBITED_RISK",
+    "LIVE_PHI_DISABLED",
+    "PRODUCTION_AUTHORIZATION_REQUIRED",
+    "A3_UNAVAILABLE_IN_CURRENT_CANDIDATE",
+    "APPROVAL_REPLAY_DETECTED",
+    "CONSEQUENTIAL_SIDE_EFFECT_PROHIBITED",
+    "A0_A1_CANNOT_MUTATE"
+  ]);
+  const specialistReasons = new Set([
+    "MODEL_QUALIFICATION_REQUIRED",
+    "TOOL_QUALIFICATION_REQUIRED",
+    "HIGH_RISK_SPECIALIST_REVIEW_REQUIRED"
+  ]);
+  const operatorReasons = new Set([
+    "EVIDENCE_STALE_OR_MISSING",
+    "TRUSTED_APPROVAL_REQUIRED",
+    "APPROVAL_EXPIRED"
+  ]);
+  const status: P34DynamicGovernanceStatus = normalizedReasons.some((reason) => prohibitedReasons.has(reason))
+    ? "PROHIBITED"
+    : normalizedReasons.some((reason) => specialistReasons.has(reason))
+      ? "TARGETED_SPECIALIST_REVIEW_REQUIRED"
+      : normalizedReasons.some((reason) => operatorReasons.has(reason))
+        ? "OPERATOR_ACTION_REQUIRED"
+        : normalizedReasons.includes("A2_NAMED_REVIEW_REQUIRED")
+          ? "PERMITTED_WITH_REVIEW"
+          : "PERMITTED";
+  const payload = {
+    actionId: isBoundedIdentifier(record.actionId) ? record.actionId : "invalid",
+    actorIdentityHash: isSha256(record.actorIdentityHash) ? record.actorIdentityHash : "invalid",
+    tenantIdHash: createClinicalEvidenceHash(isBoundedIdentifier(record.tenantId) ? record.tenantId : "invalid"),
+    environmentId: isBoundedIdentifier(record.environmentId) ? record.environmentId : "invalid",
+    autonomyTier: autonomyClasses.has(record.autonomyTier as AutonomyTier) ? record.autonomyTier : "invalid",
+    actionMaturity: capabilityMaturities.has(record.actionMaturity as P34CapabilityMaturity) ? record.actionMaturity : "invalid",
+    evidenceFresh: record.evidenceFresh === true,
+    dataClassification: dataClassifications.has(record.dataClassification as P34DataClassification) ? record.dataClassification : "invalid",
+    jurisdiction: isBoundedIdentifier(record.jurisdiction) ? record.jurisdiction : "invalid",
+    modelQualified: record.modelQualified === true,
+    toolQualified: record.toolQualified === true,
+    approvalState: approvalStates.has(record.approvalState as P34DynamicGovernanceInput["approvalState"]) ? record.approvalState : "invalid",
+    deploymentState: deploymentStates.has(record.deploymentState as P34DynamicGovernanceInput["deploymentState"]) ? record.deploymentState : "invalid",
+    riskTier: riskTiers.has(record.riskTier as P34RiskTier) ? record.riskTier : "invalid",
+    externalSideEffectClass: externalSideEffectClasses.has(record.externalSideEffectClass as P34ExternalSideEffectClass)
+      ? record.externalSideEffectClass
+      : "invalid",
+    status,
+    reasonCodes: normalizedReasons
+  };
+  return {
+    status,
+    reasonCodes: normalizedReasons,
+    humanReviewRequired: status !== "PERMITTED",
+    executionAuthorized: false,
+    clinicalAuthorityGranted: false,
+    productionAuthorityGranted: false,
+    decisionHash: createClinicalEvidenceHash({ type: "p34-dynamic-governance-decision", payload })
+  };
+}
+
 export function resolveP34KillSwitchMode(env: NodeJS.ProcessEnv = process.env): P34KillSwitchMode {
   const value = env.SCRIMED_P34_KILL_SWITCH_MODE?.trim().toUpperCase();
   return value === "NORMAL" || value === "RESTRICTED" || value === "READ_ONLY" || value === "HALTED"
@@ -226,7 +383,7 @@ export function evaluateP34GovernedAction(request: P34GovernedActionRequest): P3
     reasonCodes.push("ACTION_DECLARATION_ENUM_INVALID");
   }
   if (!killSwitchValid) reasonCodes.push("KILL_SWITCH_MODE_INVALID");
-  for (const value of [declaration.actionId, declaration.tenantId, declaration.policyVersion]) {
+  for (const value of [declaration.actionId, declaration.resourceId, declaration.tenantId, declaration.policyVersion]) {
     if (!isBoundedIdentifier(value)) reasonCodes.push("ACTION_DECLARATION_IDENTIFIER_INVALID");
   }
   if (!isSha256(declaration.actorIdHash) || !isSha256(declaration.candidateFingerprint)) {
@@ -271,7 +428,8 @@ export function evaluateP34GovernedAction(request: P34GovernedActionRequest): P3
     evidence: evidenceItems,
     requiredTypes: requiredEvidenceTypes,
     expectedCandidate: declaration.candidateFingerprint,
-    clock: record.clock as TrustedClock
+    clock: record.clock as TrustedClock,
+    verificationContext: record.evidenceVerificationContext as P34EvidenceVerificationContext
   });
   if (!evidence.fresh) reasonCodes.push("REQUIRED_EVIDENCE_MISSING_OR_EXPIRED");
   if (!allowedEnvironments.includes(record.environmentId ?? "")) reasonCodes.push("ENVIRONMENT_NOT_ALLOWED");
@@ -326,6 +484,7 @@ export function evaluateP34GovernedAction(request: P34GovernedActionRequest): P3
     declaration: {
       schemaVersion: schemaValid ? declaration.schemaVersion : "invalid",
       actionId: isBoundedIdentifier(declaration.actionId) ? declaration.actionId : "invalid",
+      resourceId: isBoundedIdentifier(declaration.resourceId) ? declaration.resourceId : "invalid",
       tenantIdHash: createClinicalEvidenceHash(isBoundedIdentifier(declaration.tenantId) ? declaration.tenantId : "invalid"),
       actorIdHash: isSha256(declaration.actorIdHash) ? declaration.actorIdHash : "invalid",
       candidateFingerprint: isSha256(declaration.candidateFingerprint) ? declaration.candidateFingerprint : "invalid",
@@ -364,7 +523,103 @@ export function evaluateP34GovernedAction(request: P34GovernedActionRequest): P3
     externalSideEffectAuthorized: false,
     currentMaturity: maturityValid ? declaration.executionMaturity : "EXPERIMENTAL",
     releaseStateCeiling: "EXACT_REVIEW_REQUIRED",
+    evaluatedAt: declarationWindow.evaluatedAt,
     decisionHash: createClinicalEvidenceHash({ type: "p34-governed-action-decision", payload })
+  };
+}
+
+export function revalidateP34GovernedActionImmediatelyBeforeEffect(input: {
+  immediateRequest: P34GovernedActionRequest;
+  expectedCandidateFingerprint: string;
+  expectedEnvironmentId: string;
+  expectedTenantId: string;
+  expectedActionId: string;
+  expectedResourceId: string;
+  expectedAutonomyClass: AutonomyTier;
+  expectedMaturity: P34CapabilityMaturity;
+  expectedInitialDecisionHash: string;
+  initialDecision: P34GovernedActionDecision;
+  atomicApprovalReceipt?: {
+    receiptHash: string;
+    structurallyVerified: boolean;
+    approvalConsumed: boolean;
+    executionAuthorized: boolean;
+  } | null;
+  clock: TrustedClock;
+}) {
+  const record = (input && typeof input === "object" ? input : {}) as Partial<typeof input>;
+  const immediateRequest = (record.immediateRequest && typeof record.immediateRequest === "object"
+    ? record.immediateRequest
+    : {}) as P34GovernedActionRequest;
+  const declaration = (immediateRequest.declaration && typeof immediateRequest.declaration === "object"
+    ? immediateRequest.declaration
+    : {}) as P34GovernedActionDeclaration;
+  const initialDecision = (record.initialDecision && typeof record.initialDecision === "object"
+    ? record.initialDecision
+    : {}) as P34GovernedActionDecision;
+  const immediateDecision = evaluateP34GovernedAction(immediateRequest);
+  const reasonCodes: string[] = [];
+  if (record !== input || immediateRequest !== record.immediateRequest ||
+      declaration !== immediateRequest.declaration || initialDecision !== record.initialDecision) {
+    reasonCodes.push("RUNTIME_REVALIDATION_INPUT_INVALID");
+  }
+  if (!isSha256(record.expectedCandidateFingerprint) || !isSha256(record.expectedInitialDecisionHash)) {
+    reasonCodes.push("RUNTIME_REVALIDATION_FINGERPRINT_INVALID");
+  }
+  for (const value of [record.expectedEnvironmentId, record.expectedTenantId, record.expectedActionId, record.expectedResourceId]) {
+    if (!isBoundedIdentifier(value)) reasonCodes.push("RUNTIME_REVALIDATION_BINDING_INVALID");
+  }
+  if (declaration.candidateFingerprint !== record.expectedCandidateFingerprint) reasonCodes.push("TOCTOU_CANDIDATE_CHANGED");
+  if (immediateRequest.environmentId !== record.expectedEnvironmentId) reasonCodes.push("TOCTOU_ENVIRONMENT_CHANGED");
+  if (declaration.tenantId !== record.expectedTenantId) reasonCodes.push("TOCTOU_TENANT_CHANGED");
+  if (declaration.actionId !== record.expectedActionId) reasonCodes.push("TOCTOU_ACTION_CHANGED");
+  if (declaration.resourceId !== record.expectedResourceId) reasonCodes.push("TOCTOU_RESOURCE_CHANGED");
+  if (declaration.autonomyClass !== record.expectedAutonomyClass) reasonCodes.push("TOCTOU_AUTONOMY_CHANGED");
+  if (declaration.executionMaturity !== record.expectedMaturity) reasonCodes.push("TOCTOU_MATURITY_CHANGED");
+  if (initialDecision.decisionHash !== record.expectedInitialDecisionHash) reasonCodes.push("TOCTOU_INITIAL_DECISION_CHANGED");
+  if (initialDecision.decision !== "ALLOW") reasonCodes.push("INITIAL_PREFLIGHT_NOT_PERMITTED");
+  if (immediateDecision.decision !== "ALLOW") reasonCodes.push("IMMEDIATE_PREFLIGHT_NOT_PERMITTED");
+  if (declaration.externalSideEffectClass !== "none") {
+    reasonCodes.push("CURRENT_CANDIDATE_WRITE_CEILING");
+    const approval = record.atomicApprovalReceipt;
+    if (!approval || !isSha256(approval.receiptHash) || approval.structurallyVerified !== true ||
+        approval.approvalConsumed !== true || approval.executionAuthorized !== true) {
+      reasonCodes.push("TRUSTED_ATOMIC_APPROVAL_REQUIRED");
+    }
+  }
+  let evaluatedAt = new Date(0).toISOString();
+  try {
+    const now = record.clock?.now();
+    if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new Error("invalid clock");
+    evaluatedAt = now.toISOString();
+  } catch {
+    reasonCodes.push("RUNTIME_REVALIDATION_CLOCK_INVALID");
+  }
+  const normalizedReasons = canonical(reasonCodes);
+  const preflightValid = normalizedReasons.length === 0;
+  const payload = {
+    candidateFingerprint: isSha256(declaration.candidateFingerprint) ? declaration.candidateFingerprint : "invalid",
+    tenantIdHash: createClinicalEvidenceHash(isBoundedIdentifier(declaration.tenantId) ? declaration.tenantId : "invalid"),
+    actionId: isBoundedIdentifier(declaration.actionId) ? declaration.actionId : "invalid",
+    resourceId: isBoundedIdentifier(declaration.resourceId) ? declaration.resourceId : "invalid",
+    environmentId: isBoundedIdentifier(immediateRequest.environmentId) ? immediateRequest.environmentId : "invalid",
+    expectedEnvironmentId: isBoundedIdentifier(record.expectedEnvironmentId) ? record.expectedEnvironmentId : "invalid",
+    autonomyClass: autonomyClasses.has(declaration.autonomyClass) ? declaration.autonomyClass : "invalid",
+    executionMaturity: capabilityMaturities.has(declaration.executionMaturity) ? declaration.executionMaturity : "invalid",
+    initialDecisionHash: isSha256(initialDecision.decisionHash) ? initialDecision.decisionHash : "invalid",
+    immediateDecisionHash: isSha256(immediateDecision.decisionHash) ? immediateDecision.decisionHash : "invalid",
+    evaluatedAt,
+    preflightValid,
+    reasonCodes: normalizedReasons
+  };
+  return {
+    decision: preflightValid ? "ALLOW" as const : "BLOCK" as const,
+    preflightValid,
+    executionAuthorized: false as const,
+    externalSideEffectAuthorized: false as const,
+    reasonCodes: normalizedReasons,
+    evaluatedAt,
+    decisionHash: createClinicalEvidenceHash({ type: "p34-immediate-runtime-revalidation", payload })
   };
 }
 
@@ -417,9 +672,10 @@ export function evaluateP34ReleaseTransition(input: {
 export function evaluateP34OversightSentinel(input: P34OversightSignalInput) {
   const record = (input && typeof input === "object" ? input : {}) as Partial<P34OversightSignalInput>;
   const booleanSignals = [
-    record.privilegeDrift, record.maturityDrift, record.evidenceExpired, record.modelSubstitution,
-    record.policyMutation, record.tenantLeakageDetected, record.approvalReplayDetected,
-    record.unauthorizedDistributionAttempt
+    record.autonomyEscalation, record.privilegeDrift, record.maturityDrift, record.evidenceExpired,
+    record.modelSubstitution, record.policyMutation, record.routeDivergence,
+    record.tenantLeakageDetected, record.approvalReplayDetected, record.egressFirewallTriggered,
+    record.anomalousToolEscalation, record.unauthorizedDistributionAttempt
   ];
   const counterValues = [record.retryCount, record.maximumRetries, record.delegationDepth, record.maximumDelegationDepth];
   const unexpectedNetworkTargetsValid = isBoundedIdentifierList(record.unexpectedNetworkTargets);
@@ -434,9 +690,13 @@ export function evaluateP34OversightSentinel(input: P34OversightSignalInput) {
     { active: inputInvalid, name: "SENTINEL_INPUT_INVALID", severity: "SEV0", containment: "HALTED" },
     { active: record.tenantLeakageDetected === true, name: "TENANT_LEAKAGE", severity: "SEV0", containment: "HALTED" },
     { active: record.approvalReplayDetected === true, name: "APPROVAL_REPLAY", severity: "SEV1", containment: "HALTED" },
+    { active: record.autonomyEscalation === true, name: "AUTONOMY_ESCALATION", severity: "SEV1", containment: "HALTED" },
+    { active: record.anomalousToolEscalation === true, name: "ANOMALOUS_TOOL_ESCALATION", severity: "SEV1", containment: "HALTED" },
+    { active: record.egressFirewallTriggered === true, name: "EGRESS_FIREWALL_TRIGGER", severity: "SEV1", containment: "HALTED" },
     { active: record.privilegeDrift === true, name: "PRIVILEGE_DRIFT", severity: "SEV1", containment: "HALTED" },
     { active: record.unauthorizedDistributionAttempt === true, name: "UNAUTHORIZED_DISTRIBUTION", severity: "SEV1", containment: "HALTED" },
-    { active: record.policyMutation === true, name: "POLICY_MUTATION", severity: "SEV1", containment: "READ_ONLY" },
+    { active: record.policyMutation === true, name: "POLICY_DRIFT", severity: "SEV1", containment: "READ_ONLY" },
+    { active: record.routeDivergence === true, name: "ROUTE_DIVERGENCE", severity: "SEV1", containment: "READ_ONLY" },
     { active: record.modelSubstitution === true, name: "MODEL_SUBSTITUTION", severity: "SEV1", containment: "READ_ONLY" },
     { active: record.maturityDrift === true, name: "MATURITY_DRIFT", severity: "SEV2", containment: "READ_ONLY" },
     { active: record.evidenceExpired === true, name: "EVIDENCE_EXPIRED", severity: "SEV2", containment: "READ_ONLY" },
@@ -469,6 +729,7 @@ export function evaluateP34OversightSentinel(input: P34OversightSignalInput) {
     sentinelHash: createClinicalEvidenceHash({
       type: "p34-oversight-sentinel",
       input: {
+        autonomyEscalation: record.autonomyEscalation === true,
         privilegeDrift: record.privilegeDrift === true,
         maturityDrift: record.maturityDrift === true,
         evidenceExpired: record.evidenceExpired === true,
@@ -479,8 +740,11 @@ export function evaluateP34OversightSentinel(input: P34OversightSignalInput) {
         budgetUsedRatio: Number.isFinite(record.budgetUsedRatio) ? record.budgetUsedRatio : null,
         modelSubstitution: record.modelSubstitution === true,
         policyMutation: record.policyMutation === true,
+        routeDivergence: record.routeDivergence === true,
         tenantLeakageDetected: record.tenantLeakageDetected === true,
         approvalReplayDetected: record.approvalReplayDetected === true,
+        egressFirewallTriggered: record.egressFirewallTriggered === true,
+        anomalousToolEscalation: record.anomalousToolEscalation === true,
         unauthorizedDistributionAttempt: record.unauthorizedDistributionAttempt === true,
         unexpectedNetworkTargetHashes: unexpectedNetworkTargets.map((target) => createClinicalEvidenceHash(target)),
       },
@@ -549,24 +813,155 @@ export function createP34TraceEvaluationRecord(input: {
   };
 }
 
+export const p34CausalTraceStages = [
+  "request",
+  "context",
+  "policy",
+  "model",
+  "agent",
+  "tool",
+  "evidence",
+  "response",
+  "evaluation",
+  "correction",
+  "accepted-result"
+] as const;
+
+export type P34CausalTraceStage = typeof p34CausalTraceStages[number];
+
+export function createP34CausalTraceGraph(input: {
+  traceId: string;
+  tenantId: string;
+  artifacts: Record<P34CausalTraceStage, string>;
+  accepted: boolean;
+}) {
+  const record = (input && typeof input === "object" ? input : {}) as Partial<typeof input>;
+  if (!isBoundedIdentifier(record.traceId) || !isBoundedIdentifier(record.tenantId) ||
+      !record.artifacts || typeof record.artifacts !== "object" || typeof record.accepted !== "boolean") {
+    throw new Error("Causal trace graph requires bounded identifiers, artifacts, and acceptance state");
+  }
+  const artifacts = record.artifacts as Partial<Record<P34CausalTraceStage, string>>;
+  for (const stage of p34CausalTraceStages) {
+    if (!isSha256(artifacts[stage])) throw new Error(`Causal trace stage ${stage} requires a SHA-256 artifact`);
+  }
+  let parentReference: string | null = null;
+  const nodes = p34CausalTraceStages.map((stage) => {
+    const payload = {
+      traceId: record.traceId as string,
+      tenantIdHash: createClinicalEvidenceHash(record.tenantId as string),
+      stage,
+      artifactHash: artifacts[stage] as string,
+      parentReference
+    };
+    const immutableReference = createClinicalEvidenceHash({ type: "p34-causal-trace-node", payload });
+    const node = { ...payload, immutableReference };
+    parentReference = immutableReference;
+    return node;
+  });
+  const payload = {
+    traceId: record.traceId as string,
+    tenantIdHash: createClinicalEvidenceHash(record.tenantId as string),
+    accepted: record.accepted as boolean,
+    nodes
+  };
+  return {
+    ...payload,
+    containsRawPhi: false as const,
+    hiddenChainOfThoughtStored: false as const,
+    graphHash: createClinicalEvidenceHash({ type: "p34-causal-trace-graph", payload })
+  };
+}
+
+export function explainP34AcceptedOutput(graph: ReturnType<typeof createP34CausalTraceGraph>) {
+  const nodeByStage = new Map(graph.nodes.map((node) => [node.stage, node]));
+  const acceptedNode = nodeByStage.get("accepted-result");
+  const evaluationNode = nodeByStage.get("evaluation");
+  const policyNode = nodeByStage.get("policy");
+  const evidenceNode = nodeByStage.get("evidence");
+  const explainable = graph.accepted && Boolean(acceptedNode && evaluationNode && policyNode && evidenceNode);
+  return {
+    explainable,
+    accepted: graph.accepted,
+    reasonCodes: explainable
+      ? ["POLICY_EVALUATED", "EVIDENCE_LINKED", "EVALUATION_ACCEPTED", "RESULT_IMMUTABLY_LINKED"]
+      : ["OUTPUT_NOT_ACCEPTED_OR_TRACE_INCOMPLETE"],
+    references: explainable
+      ? {
+        policy: policyNode?.immutableReference ?? null,
+        evidence: evidenceNode?.immutableReference ?? null,
+        evaluation: evaluationNode?.immutableReference ?? null,
+        acceptedResult: acceptedNode?.immutableReference ?? null
+      }
+      : null,
+    graphHash: graph.graphHash,
+    explanationHash: createClinicalEvidenceHash({
+      type: "p34-causal-trace-acceptance-explanation",
+      graphHash: graph.graphHash,
+      accepted: graph.accepted,
+      explainable
+    })
+  };
+}
+
+export function compareP34TraceEvaluations(
+  left: ReturnType<typeof createP34CausalTraceGraph>,
+  right: ReturnType<typeof createP34CausalTraceGraph>
+) {
+  const leftByStage = new Map(left.nodes.map((node) => [node.stage, node.artifactHash]));
+  const rightByStage = new Map(right.nodes.map((node) => [node.stage, node.artifactHash]));
+  const changedStages = p34CausalTraceStages.filter((stage) => leftByStage.get(stage) !== rightByStage.get(stage));
+  return {
+    changed: left.graphHash !== right.graphHash,
+    changedStages,
+    acceptanceChanged: left.accepted !== right.accepted,
+    leftGraphHash: left.graphHash,
+    rightGraphHash: right.graphHash,
+    comparisonHash: createClinicalEvidenceHash({
+      type: "p34-causal-trace-comparison",
+      leftGraphHash: left.graphHash,
+      rightGraphHash: right.graphHash,
+      changedStages,
+      acceptanceChanged: left.accepted !== right.accepted
+    })
+  };
+}
+
 export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.env) {
   const clock = new FixedTrustedClock("2026-08-21T04:00:00.000Z");
   const killSwitchMode = resolveP34KillSwitchMode(env);
   const candidateFingerprint = createClinicalEvidenceHash("p34-control-plane-2-synthetic-candidate");
+  const evidenceVerifierId = "p34-control-plane-synthetic-evidence-verifier";
+  const evidenceIssuerIdentityHash = createClinicalEvidenceHash("p34-control-plane-synthetic-evidence-issuer");
   const evidence: P34EvidenceEnvelope[] = ["candidate-manifest", "validation-packet", "security-evidence"].map(
-    (evidenceType, index) => ({
-      evidenceId: `p34-control-plane-evidence-${index + 1}`,
-      evidenceType: evidenceType as P34EvidenceType,
-      sourceCandidate: candidateFingerprint,
-      validationVersion: p34ControlPlane2Version,
-      generatedAt: "2026-08-21T03:30:00.000Z",
-      expiresAt: "2026-08-22T05:11:03.000Z",
-      evidenceHash: createClinicalEvidenceHash(`p34-control-plane-evidence-${evidenceType}`)
-    })
+    (evidenceType, index) => {
+      const unsigned: Omit<P34EvidenceEnvelope, "signature"> = {
+        schemaVersion: "scrimed-p34-evidence-envelope-v2",
+        evidenceId: `p34-control-plane-evidence-${index + 1}`,
+        evidenceType: evidenceType as P34EvidenceType,
+        sourceCandidate: candidateFingerprint,
+        validationVersion: p34ControlPlane2Version,
+        generatedAt: "2026-08-21T03:30:00.000Z",
+        expiresAt: "2026-08-22T05:11:03.000Z",
+        evidenceHash: createClinicalEvidenceHash(`p34-control-plane-evidence-${evidenceType}`),
+        issuerIdentityHash: evidenceIssuerIdentityHash,
+        trustClass: "synthetic-test-only"
+      };
+      return {
+        ...unsigned,
+        signature: createSyntheticP34EvidenceSignature(unsigned, evidenceVerifierId)
+      };
+    }
   );
+  const evidenceVerificationContext: P34EvidenceVerificationContext = {
+    usage: "synthetic-test-only",
+    expectedValidationVersion: p34ControlPlane2Version,
+    expectedIssuerIdentityHash: evidenceIssuerIdentityHash,
+    verifier: createSyntheticP34EvidenceVerifier(evidenceVerifierId)
+  };
   const declaration: P34GovernedActionDeclaration = {
     schemaVersion: "scrimed-p34-governed-action-v2",
     actionId: "inspect-synthetic-governance-evidence",
+    resourceId: "synthetic-governance-evidence",
     tenantId: "synthetic-tenant",
     actorIdHash: createClinicalEvidenceHash("p34-control-plane-actor"),
     candidateFingerprint,
@@ -585,17 +980,51 @@ export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.e
     jurisdictionConstraints: ["local"],
     expiresAt: "2026-08-22T05:11:03.000Z"
   };
-  const action = evaluateP34GovernedAction({
+  const governedRequest: P34GovernedActionRequest = {
     declaration,
     environmentId: "local-synthetic",
     jurisdiction: "local",
     requestedToolIds: ["evidence-reader"],
     requestedModelIds: ["deterministic-policy-engine-v1"],
     evidence,
+    evidenceVerificationContext,
     killSwitchMode,
+    clock
+  };
+  const action = evaluateP34GovernedAction(governedRequest);
+  const dynamicGovernance = evaluateP34DynamicGovernance({
+    actionId: declaration.actionId,
+    actorIdentityHash: declaration.actorIdHash,
+    tenantId: declaration.tenantId,
+    environmentId: "local-synthetic",
+    autonomyTier: declaration.autonomyClass,
+    actionMaturity: declaration.executionMaturity,
+    evidenceFresh: action.evidenceFresh,
+    dataClassification: declaration.dataClassification,
+    jurisdiction: "local",
+    modelQualified: true,
+    toolQualified: true,
+    approvalState: "not-required",
+    deploymentState: "local-synthetic",
+    riskTier: declaration.riskTier,
+    externalSideEffectClass: declaration.externalSideEffectClass
+  });
+  const runtimeRevalidation = revalidateP34GovernedActionImmediatelyBeforeEffect({
+    immediateRequest: governedRequest,
+    expectedCandidateFingerprint: declaration.candidateFingerprint,
+    expectedEnvironmentId: governedRequest.environmentId,
+    expectedTenantId: declaration.tenantId,
+    expectedActionId: declaration.actionId,
+    expectedResourceId: declaration.resourceId,
+    expectedAutonomyClass: declaration.autonomyClass,
+    expectedMaturity: declaration.executionMaturity,
+    expectedInitialDecisionHash: action.decisionHash,
+    initialDecision: action,
+    atomicApprovalReceipt: null,
     clock
   });
   const oversightBaseInput: P34OversightSignalInput = {
+    autonomyEscalation: false,
     privilegeDrift: false,
     maturityDrift: false,
     evidenceExpired: false,
@@ -606,9 +1035,12 @@ export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.e
     budgetUsedRatio: 0.1,
     modelSubstitution: false,
     policyMutation: false,
+    routeDivergence: false,
     unexpectedNetworkTargets: [],
     tenantLeakageDetected: false,
     approvalReplayDetected: false,
+    egressFirewallTriggered: false,
+    anomalousToolEscalation: false,
     unauthorizedDistributionAttempt: false
   };
   const oversight = evaluateP34OversightSentinel(oversightBaseInput);
@@ -616,6 +1048,7 @@ export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.e
     signal: string;
     input: Partial<P34OversightSignalInput>;
   }> = [
+    { signal: "AUTONOMY_ESCALATION", input: { autonomyEscalation: true } },
     { signal: "PRIVILEGE_DRIFT", input: { privilegeDrift: true } },
     { signal: "MATURITY_DRIFT", input: { maturityDrift: true } },
     { signal: "EVIDENCE_EXPIRED", input: { evidenceExpired: true } },
@@ -623,10 +1056,13 @@ export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.e
     { signal: "DELEGATION_DEPTH_EXCEEDED", input: { delegationDepth: 4 } },
     { signal: "BUDGET_EXCEEDED", input: { budgetUsedRatio: 1.01 } },
     { signal: "MODEL_SUBSTITUTION", input: { modelSubstitution: true } },
-    { signal: "POLICY_MUTATION", input: { policyMutation: true } },
+    { signal: "POLICY_DRIFT", input: { policyMutation: true } },
+    { signal: "ROUTE_DIVERGENCE", input: { routeDivergence: true } },
     { signal: "UNEXPECTED_NETWORK_TARGET", input: { unexpectedNetworkTargets: ["unexpected.example"] } },
     { signal: "TENANT_LEAKAGE", input: { tenantLeakageDetected: true } },
     { signal: "APPROVAL_REPLAY", input: { approvalReplayDetected: true } },
+    { signal: "EGRESS_FIREWALL_TRIGGER", input: { egressFirewallTriggered: true } },
+    { signal: "ANOMALOUS_TOOL_ESCALATION", input: { anomalousToolEscalation: true } },
     { signal: "UNAUTHORIZED_DISTRIBUTION", input: { unauthorizedDistributionAttempt: true } }
   ];
   const oversightDetectorCoverage = oversightDetectorCases.map(({ signal, input }) => {
@@ -660,6 +1096,17 @@ export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.e
     latencyMs: 3,
     costUsd: 0
   });
+  const causalArtifacts = Object.fromEntries(p34CausalTraceStages.map((stage) => [
+    stage,
+    createClinicalEvidenceHash(`p34-control-plane-causal-${stage}`)
+  ])) as Record<P34CausalTraceStage, string>;
+  const causalTrace = createP34CausalTraceGraph({
+    traceId: "trace-p34-control-plane-causal",
+    tenantId: declaration.tenantId,
+    artifacts: causalArtifacts,
+    accepted: true
+  });
+  const acceptedOutputExplanation = explainP34AcceptedOutput(causalTrace);
   const payload = {
     version: p34ControlPlane2Version,
     boundary: p34ControlPlane2Boundary,
@@ -672,11 +1119,15 @@ export function createP34ControlPlane2Summary(env: NodeJS.ProcessEnv = process.e
     killSwitchMode,
     declaration,
     action,
+    dynamicGovernance,
+    runtimeRevalidation,
     oversight,
     oversightDetectorCoverage,
     release,
     evidence,
     trace,
+    causalTrace,
+    acceptedOutputExplanation,
     runtime: {
       nodeTarget: "24.x" as const,
       vercelState: "preview-only" as const,

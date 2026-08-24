@@ -854,6 +854,16 @@ export default function ProductConsolePage() {
           <p>An in-process synthetic self-test rejects replay within one store; durable replay protection and execution authority remain unavailable.</p>
           <div><strong>{summary.p34EgressFirewall.decision}</strong><p>shared egress firewall</p></div>
         </article>
+        <article className="module-row">
+          <div><span>{summary.p34ReviewState}</span><h2>Exact candidate identity</h2></div>
+          <p>Branch {summary.runtimeBranch ?? "unbound local runtime"}; commit {summary.runtimeCandidateCommit?.slice(0, 12) ?? "unbound"}.</p>
+          <div><strong>{summary.runtimeCandidateFingerprintVerificationStatus}</strong><p>candidate fingerprint evidence</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34PreviewState}</span><h2>External assurance state</h2></div>
+          <p>{summary.p34MigrationState}; {summary.p34Aal2State}.</p>
+          <div><strong>OPERATOR_REQUIRED</strong><p>{summary.p34SupabaseSecurityState}</p></div>
+        </article>
       </section>
 
       <section className="table-section" aria-label="SCRIMED operating command center">

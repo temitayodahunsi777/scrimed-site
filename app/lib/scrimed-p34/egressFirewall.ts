@@ -3,12 +3,14 @@ import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
 export type P34EgressChannel =
   | "model-prompt"
   | "agent-tool"
+  | "http-egress"
   | "log"
   | "telemetry"
   | "connector"
   | "proof-packet"
   | "investor-artifact"
-  | "public-api";
+  | "public-api"
+  | "api-response";
 export type P34EgressDataClassification =
   | "public"
   | "synthetic-no-phi"
@@ -50,8 +52,8 @@ const secretKeyPattern = /(?:authorization|cookie|session|jwt|bearer|key|token|p
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{2,159}$/;
 const payloadKeyPattern = /^[A-Za-z_][A-Za-z0-9_.:-]{0,159}$/;
 export const p34EgressChannels = [
-  "model-prompt", "agent-tool", "log", "telemetry", "connector", "proof-packet",
-  "investor-artifact", "public-api"
+  "model-prompt", "agent-tool", "http-egress", "log", "telemetry", "connector", "proof-packet",
+  "investor-artifact", "public-api", "api-response"
 ] as const satisfies readonly P34EgressChannel[];
 const channels = new Set<P34EgressChannel>(p34EgressChannels);
 const dataClassifications = new Set<P34EgressDataClassification>([
