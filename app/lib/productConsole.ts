@@ -222,6 +222,8 @@ import { getAttributionAnalyticsSummary } from "./attributionAnalytics";
 import { getTrustSafetyOperationsSummary } from "./trustSafetyOperations";
 import { getP33IntegratedSummary } from "./scrimed-p33/index";
 import { getP34AdaptiveGovernanceSummary } from "./scrimed-p34/index";
+import { getP34ReviewReadinessSummary } from "./scrimed-p34/reviewReadiness";
+import { getSyntheticPilotReadinessSummary } from "./commercial/syntheticPilotReadiness";
 import {
   pilotDemoReadinessPacketProofStackStatus,
   pilotDemoReadinessProofStackStatus
@@ -1304,6 +1306,8 @@ export function getProductConsoleSummary() {
   const runtimePresentation = getProductRuntimePresentation(buildInfo);
   const p33IntegratedSummary = getP33IntegratedSummary();
   const p34IntegratedSummary = getP34AdaptiveGovernanceSummary();
+  const p34ReviewReadinessSummary = getP34ReviewReadinessSummary();
+  const syntheticPilotReadinessSummary = getSyntheticPilotReadinessSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
   const workflowResultValidationSummary = getWorkflowResultValidationResults();
@@ -1431,6 +1435,19 @@ export function getProductConsoleSummary() {
       : "PREVIEW_NOT_VERIFIED",
     p34Aal2State: "FRESH_EXACT_TARGET_OPERATOR_EVIDENCE_REQUIRED",
     p34SupabaseSecurityState: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_AND_LIVE_RECHECK_REQUIRED",
+    p34ReviewReadiness: p34ReviewReadinessSummary,
+    p34ReviewReadinessApiRoute: p34ReviewReadinessSummary.route,
+    p34SupabasePosture: {
+      project: "scrimed-protected-pilot",
+      authSecurity: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_REQUIRED",
+      rlsAssurance: "REPOSITORY_CONTRACTS_PASS_LIVE_POSTURE_NOT_IMPLIED",
+      migrationState: "THREE_PENDING_PRODUCTION_UNAPPLIED",
+      productionMutationState: "DISABLED"
+    },
+    syntheticPilotReadiness: syntheticPilotReadinessSummary,
+    syntheticPilotRoute: syntheticPilotReadinessSummary.route,
+    syntheticPilotApiRoute: syntheticPilotReadinessSummary.apiRoute,
+    commercialReadiness: syntheticPilotReadinessSummary.commercialReadiness,
     route: "/product",
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",
@@ -2714,8 +2731,15 @@ export function getProductConsoleSummary() {
 
 let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
 
+function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
+  summary.p34ReviewReadiness = getP34ReviewReadinessSummary();
+  return summary;
+}
+
 export function getProductConsoleApiSummary() {
-  if (productConsoleApiSummaryCache) return productConsoleApiSummaryCache;
+  if (productConsoleApiSummaryCache) {
+    return withFreshP34ReviewReadiness(productConsoleApiSummaryCache);
+  }
 
   const summary = getProductConsoleSummary();
   const {
@@ -2823,7 +2847,7 @@ export function getProductConsoleApiSummary() {
     }
   };
 
-  return productConsoleApiSummaryCache;
+  return withFreshP34ReviewReadiness(productConsoleApiSummaryCache);
 }
 
 export function getProductReadinessBrief() {

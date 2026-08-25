@@ -16,7 +16,7 @@ import { p33PortableAgentContractVersion } from "../scrimed-p33/agentPortability
 import { scrimedSafetyPolicyVersion } from "../scrimedSafetyGovernance";
 
 export const vercelReleaseAssuranceVersion =
-  "scrimed-vercel-release-assurance-v2-2026-08-14";
+  "scrimed-vercel-release-assurance-v3-2026-08-25";
 
 export const vercelReleaseAssuranceBoundary =
   "Safe operational metadata only. These endpoints expose no secret values, credentials, tenant data, PHI, deployment authorization, migration approval, customer activation, certification, or production claim.";
@@ -138,6 +138,7 @@ export function getScrimedHealth(
     ok: true,
     service: "scrimed-site",
     status: "healthy" as const,
+    scope: "process-and-application-health-only" as const,
     version: vercelReleaseAssuranceVersion,
     environment: build.environment,
     runtime: build.runtime,
@@ -146,6 +147,7 @@ export function getScrimedHealth(
     releaseFingerprint: build.releaseFingerprint,
     operatingMode: operatingMode.syntheticOnly ? "synthetic-no-phi" : "invalid-review-required",
     productionReleaseAuthorized: false as const,
+    productionReadinessClaimed: false as const,
     boundary: vercelReleaseAssuranceBoundary
   };
 }
@@ -239,6 +241,8 @@ export function getScrimedReleaseReadiness(
     ok: failed.length === 0,
     service: "scrimed-release-readiness" as const,
     status: failed.length === 0 ? ("ready-synthetic-read-only" as const) : ("not-ready-fail-closed" as const),
+    scope: "current-environment-operational-readiness-only" as const,
+    currentEnvironmentOnly: true as const,
     version: vercelReleaseAssuranceVersion,
     checks,
     failedCheckIds: failed.map((check) => check.id),
@@ -247,6 +251,7 @@ export function getScrimedReleaseReadiness(
     build,
     databaseProbeExecuted: false as const,
     productionReleaseAuthorized: false as const,
+    productionReadinessClaimed: false as const,
     customerActivationAuthorized: false as const,
     externalDistributionAuthorized: false as const,
     boundary: vercelReleaseAssuranceBoundary

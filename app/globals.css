@@ -406,6 +406,10 @@ h3 {
   max-width: 680px;
 }
 
+.evidence-fingerprint {
+  overflow-wrap: anywhere;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3870,6 +3874,10 @@ h3 {
 
   .site-navigation-group[open] {
     flex-basis: 100%;
+  }
+
+  .site-navigation-group:not([open]) .site-navigation-menu {
+    display: none;
   }
 
   .site-navigation-menu {

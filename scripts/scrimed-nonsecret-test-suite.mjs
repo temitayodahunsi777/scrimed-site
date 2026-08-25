@@ -1041,6 +1041,27 @@ const checks = [
     args: ["scripts/scrimed-p34-gap-closure-contract-check.mjs"]
   },
   {
+    label: "SCRIMED p.34 precision-wave policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-precision-wave-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 precision-wave contract",
+    args: ["scripts/scrimed-p34-precision-wave-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.34 AAL2 one-command verifier policy",
+    args: ["scripts/run-aal2-candidate-verification.mjs", "--self-test"]
+  },
+  {
+    label: "PR #39 review-map integrity",
+    args: ["scripts/generate-p39-review-map.mjs", "--check"]
+  },
+  {
     label: "SCRIMED p.34 artifact integrity",
     args: [
       "--disable-warning=ExperimentalWarning",

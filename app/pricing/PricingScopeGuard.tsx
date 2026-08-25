@@ -24,6 +24,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 function formatRange(range: CommercialPriceRange) {
+  if (range.customScope) return "Custom scope requiring named human approval";
   return `${currencyFormatter.format(range.minimumUsd)}-${currencyFormatter.format(range.maximumUsd)} ${range.cadence}`;
 }
 
@@ -150,7 +151,7 @@ export default function PricingScopeGuard({ tiers }: PricingScopeGuardProps) {
                   <strong>{decision.result.recommendedTier}</strong>
                 </article>
                 <article>
-                  <span>Non-binding range</span>
+                  <span>Non-binding posture</span>
                   <strong>{formatRange(decision.result.priceRange)}</strong>
                 </article>
               </div>

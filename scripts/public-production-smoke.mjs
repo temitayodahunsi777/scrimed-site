@@ -9522,16 +9522,16 @@ async function checkPilotDemoCommercialReadiness() {
     throw new Error("Pilot Demo Commercial Readiness expected market benchmark coverage.");
   }
 
-  if (!body.demoOfferPaths.some((path) => path.slug === "atlas-interoperability-readiness" && path.pricingBand.includes("$75k-$225k"))) {
-    throw new Error("Pilot Demo Commercial Readiness expected Atlas readiness pricing band.");
+  if (!body.demoOfferPaths.some((path) => path.slug === "atlas-interoperability-readiness" && path.pricingBand.includes("Custom enterprise scope"))) {
+    throw new Error("Pilot Demo Commercial Readiness expected custom Atlas readiness scope.");
   }
 
   if (!body.demoOfferPaths.some((path) => path.slug === "carepath-access-operations" && path.fastPathCta.includes("synthetic-pilot-evaluation"))) {
     throw new Error("Pilot Demo Commercial Readiness expected CarePath synthetic pilot fast path.");
   }
 
-  if (!body.pricingTierAlignments.some((alignment) => alignment.tier === "Synthetic Pilot Evaluation" && alignment.recommendedBand.includes("$125k-$350k"))) {
-    throw new Error("Pilot Demo Commercial Readiness expected aligned synthetic pilot band.");
+  if (!body.pricingTierAlignments.some((alignment) => alignment.tier === "Synthetic Pilot Evaluation" && alignment.recommendedBand.includes("Custom enterprise scope") && alignment.recommendedBand.includes("human"))) {
+    throw new Error("Pilot Demo Commercial Readiness expected human-approved custom synthetic pilot scope.");
   }
 
   if (!body.marketBenchmarks.some((benchmark) => benchmark.competitor === "Redox")) {
@@ -11459,6 +11459,10 @@ async function checkNavigationAudit() {
     throw new Error("Navigation Audit expected /company-assessment in page route inventory.");
   }
 
+  if (!body.pageRouteInventory.includes("/synthetic-pilot")) {
+    throw new Error("Navigation Audit expected /synthetic-pilot in page route inventory.");
+  }
+
   if (!body.pageRouteInventory.includes("/clinical-production-readiness")) {
     throw new Error("Navigation Audit expected /clinical-production-readiness in page route inventory.");
   }
@@ -11541,6 +11545,10 @@ async function checkNavigationAudit() {
 
   if (!body.smokeCoveredHtmlRoutes.includes("/company-assessment")) {
     throw new Error("Navigation Audit expected /company-assessment in smoke-covered HTML routes.");
+  }
+
+  if (!body.smokeCoveredHtmlRoutes.includes("/synthetic-pilot")) {
+    throw new Error("Navigation Audit expected /synthetic-pilot in smoke-covered HTML routes.");
   }
 
   if (!body.smokeCoveredHtmlRoutes.includes("/clinical-production-readiness")) {
@@ -15844,6 +15852,7 @@ await checkHtml("/scrimed-intelligence-platform");
 await checkHtml("/scrimed-work");
 await checkHtml("/scrimed-p33");
 await checkHtml("/scrimed-p34");
+await checkHtml("/synthetic-pilot");
 await checkHtml("/scrimed-agent-governance");
 await checkHtml("/scrimed-reasoning-stability");
 await checkHtml("/scrimed-clinical-benchmark-suite");

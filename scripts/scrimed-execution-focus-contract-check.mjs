@@ -141,7 +141,7 @@ requireIncludes(
 );
 requireIncludes("app/lib/siteNavigation.ts", files["app/lib/siteNavigation.ts"], "/scrimed-execution-focus");
 requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "/scrimed-execution-focus");
-requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "expectedApiRoutePatternCount = 452");
+requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "expectedApiRoutePatternCount = 453");
 requireIncludes("scripts/public-production-smoke.mjs", files["scripts/public-production-smoke.mjs"], "/scrimed-execution-focus");
 requireIncludes(
   "scripts/public-production-smoke.mjs",

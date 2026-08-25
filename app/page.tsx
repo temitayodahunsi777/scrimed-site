@@ -97,19 +97,19 @@ const buyerOutcomeCards = [
 const buyerPurchaseOptions = [
   {
     name: "Workflow Intelligence Assessment",
-    price: "Illustrative planning range: $25k-$150k",
+    price: "Starting at $25K, subject to written agreement",
     pitch: "A fast, finite way to identify where SCRIMED can reduce workflow friction and prepare a buyer-ready pilot decision.",
     href: "/pilot?offer=workflow-intelligence-assessment"
   },
   {
-    name: "Synthetic Pilot Evaluation",
-    price: "Illustrative planning range: $125k-$500k",
-    pitch: "A 45-90 day no-PHI pilot that gives enterprise sponsors proof, governance evidence, workflow metrics, and an expansion decision.",
-    href: "/pilot?offer=synthetic-pilot-evaluation"
+    name: "SCRIMED Synthetic Workflow Pilot",
+    price: "Custom enterprise scope",
+    pitch: "A bounded no-PHI pilot that gives enterprise sponsors proof, governance evidence, workflow metrics, and a human-controlled expansion decision.",
+    href: "/synthetic-pilot"
   },
   {
     name: "Protected Enterprise Pilot",
-    price: "Illustrative planning range: $400k-$2M+",
+    price: "Custom scope after insurance, counsel, security/privacy, and deployment prerequisites",
     pitch: "A controlled enterprise activation path for buyers who need protected proof, diligence rooms, onboarding, and production-readiness planning.",
     href: "/pilot?offer=protected-enterprise-pilot"
   }

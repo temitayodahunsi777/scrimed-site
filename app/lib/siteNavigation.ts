@@ -45,6 +45,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     description: "Packaged assessment, synthetic pilot, protected pilot, and governance paths."
   },
   {
+    label: "Synthetic Pilot",
+    href: "/synthetic-pilot",
+    description: "Bounded no-PHI workflow evaluation with synthetic scenarios, controls, evidence, and human-approved next steps.",
+    boundary: "Synthetic and nonproduction only; not a binding quote, customer activation, PHI authority, clinical authority, payer submission, EHR or device writeback, or production deployment."
+  },
+  {
     label: "Demo to Pilot",
     href: "/pilot-demo-commercial-readiness",
     description: "Seamless demo-to-pilot path with market-aligned pricing, proof assets, no-PHI intake, and margin-safe hard stops.",

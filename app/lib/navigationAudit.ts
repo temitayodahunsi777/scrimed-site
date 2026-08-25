@@ -33,7 +33,7 @@ export type NavigationBottleneck = {
 export const navigationAuditProofStackStatus = "route-navigation-audit-active";
 export const navigationAuditBriefProofStackStatus = "route-navigation-audit-brief-ready";
 export const navigationAuditUpdatedAt = "2026-08-12";
-export const expectedApiRoutePatternCount = 452;
+export const expectedApiRoutePatternCount = 453;
 
 export const navigationAuditBoundary =
   "SCRIMED Navigation Audit organizes page routes, API route patterns, smoke coverage, protected fail-closed checks, and retained approval boundaries into one operating map. It is an audit and navigation control surface only. It does not certify that every protected workflow has been executed, bypass AAL2, approve public release, authorize PHI processing, grant legal or clinical authority, certify security/compliance, or approve production connectors.";
@@ -184,6 +184,7 @@ export const pageRouteInventory = [
   "/strategic-problem-resolution",
   "/strategic-intelligence",
   "/synthetic",
+  "/synthetic-pilot",
   "/synthetic/[slug]",
   "/synthetic/fixtures",
   "/synthetic/fixtures/[slug]",
@@ -250,6 +251,7 @@ export const smokeCoveredHtmlRoutes = [
   "/scrimed-work",
   "/scrimed-p33",
   "/scrimed-p34",
+  "/synthetic-pilot",
   "/offerings",
   "/client-onboarding",
   "/boundary-release-approvals",
@@ -334,6 +336,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/scrimed-work",
       "/scrimed-p33",
       "/scrimed-p34",
+      "/synthetic-pilot",
       "/clinical-assurance-control-plane",
       "/scrimed-control-plane",
       "/scrimed-automation-autopilot",
@@ -376,6 +379,7 @@ export const navigationGroups: NavigationGroup[] = [
       "/competitive-defense",
       "/pricing",
       "/pilot-demo-commercial-readiness",
+      "/synthetic-pilot",
       "/demos",
       "/demos/[slug]",
       "/documentation-before-authorization",

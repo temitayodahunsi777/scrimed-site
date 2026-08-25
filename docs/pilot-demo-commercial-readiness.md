@@ -20,9 +20,9 @@ Public demos remain free and no-PHI. Qualified standard guided demos can stay no
 
 Paid assessment and pilot bands now align across demo, pilot, and pricing surfaces:
 
-- Assessment: standard `$25k-$75k`; mission-clinic access path `$12.5k-$25k` for one capped no-PHI workflow; enterprise assessments `$75k-$150k`.
-- Synthetic Pilot Evaluation: standard `$125k-$350k` for 45-90 days; `$350k-$500k` for multiple workflows, custom diligence, or executive proof packets.
-- Protected Enterprise Pilot: standard `$400k-$1.25M` for 90-180 days; `$1.25M-$2M+` for multi-site, sandbox-planning, or buyer-specific protected diligence.
+- Workflow Intelligence Assessment: starting at `$25K`, subject to a written agreement.
+- Synthetic Workflow Pilot: custom enterprise scope with named human commercial and finance approval.
+- Protected Enterprise Pilot: custom scope only after insurance, counsel, security/privacy, and deployment prerequisites.
 - Enterprise Operating License: `$1.5M-$6M` annual for an initial enterprise operating layer; `$6M-$12M+` for multi-department or multi-region expansion.
 - Strategic Platform Partnership: `$8M-$25M+` multi-year, sales-led, region-aware, and external-review-gated.
 

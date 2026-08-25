@@ -41,6 +41,7 @@ import {
   verifyControlPlaneSession
 } from "../../../lib/scrimed-control-plane";
 import type { DataClassification, RiskLevel } from "../../../lib/scrimed-control-plane";
+import { getP34ReviewReadinessSummary } from "../../../lib/scrimed-p34/reviewReadiness";
 
 export const dynamic = "force-dynamic";
 
@@ -185,6 +186,11 @@ export async function GET(request: Request, context: RouteContext) {
   }
   if (endpoint === "p34") {
     return json(getP34AdaptiveGovernanceSummary(), "control-plane-p34-adaptive-governance");
+  }
+  if (endpoint === "review-readiness") {
+    return json(getP34ReviewReadinessSummary(), "control-plane-p34-review-readiness", 200, {
+      "X-SCRIMED-Review-Authority": "external-human-review-required"
+    });
   }
   if (endpoint === "p34/brief") {
     return new NextResponse(buildP34AdaptiveGovernanceBrief(), {

@@ -246,7 +246,7 @@ requireIncludes(
 );
 requireIncludes("app/lib/siteNavigation.ts", files["app/lib/siteNavigation.ts"], "/enterprise-healthcare-infrastructure");
 requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "/enterprise-healthcare-infrastructure");
-requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "expectedApiRoutePatternCount = 452");
+requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "expectedApiRoutePatternCount = 453");
 requireIncludes(
   "scripts/public-production-smoke.mjs",
   files["scripts/public-production-smoke.mjs"],

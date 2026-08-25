@@ -442,7 +442,7 @@ export const pilotPrograms: PilotProgram[] = [
     duration: "30 days",
     buyer: "Healthcare operators selecting the first high-value workflow for governed AI transformation",
     engagementModel:
-      "Recommended fixed-fee range: $25k-$75k; mission-clinic access path $12.5k-$25k for one no-PHI workflow with capped artifacts",
+      "Starting at $25K, subject to a written scope and named human commercial approval",
     objective:
       "Convert one to three fragmented workflows into a prioritized operating map, measurable value hypothesis, and governed pilot decision.",
     demoSlugs: ["carepath-access-operations", "docutwin-documentation-review", "agentos-governance-evaluation"],
@@ -488,7 +488,7 @@ export const pilotPrograms: PilotProgram[] = [
     duration: "60 days",
     buyer: "Enterprise healthcare teams validating workflow value, trust, and human-review design before integration",
     engagementModel:
-      "Recommended synthetic-pilot range: $125k-$350k; $350k-$500k when multiple workflows, custom diligence, or executive proof packets expand scope",
+      "Synthetic pilot: custom enterprise scope requiring named human commercial and finance approval",
     objective:
       "Run a selected workflow through deterministic synthetic evidence, AgentOS orchestration, TrustQA, observability, and executive review.",
     demoSlugs: [
@@ -539,7 +539,7 @@ export const pilotPrograms: PilotProgram[] = [
     duration: "90 days",
     buyer: "Health systems, payers, governments, and enterprise operators preparing controlled deployment",
     engagementModel:
-      "Recommended protected-pilot range: $400k-$1.25M; $1.25M-$2M+ for multi-site, sandbox-planning, or buyer-specific protected diligence scope",
+      "Protected pilot: custom scope only after insurance, counsel, security/privacy, and deployment prerequisites are evidenced",
     objective:
       "Design the tenant, governance, interoperability, audit, runtime safety, and value model required for a controlled enterprise deployment.",
     demoSlugs: ["atlas-interoperability-readiness", "agentos-governance-evaluation", "carepath-access-operations"],
@@ -585,7 +585,7 @@ export const pilotPrograms: PilotProgram[] = [
     duration: "45-60 days",
     buyer: "CIO, compliance, security, clinical governance, and integration leadership teams",
     engagementModel:
-      "Recommended readiness range: $75k-$225k based on organizations, workflows, standards scope, and review depth",
+      "Custom enterprise scope requiring named human commercial and finance approval",
     objective:
       "Create an actionable AI asset, governance, interoperability, and production-readiness register before healthcare AI deployment.",
     demoSlugs: ["atlas-interoperability-readiness", "agentos-governance-evaluation"],

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "scrimed-p34-validation-report-v4",
-  "scope": "deterministic synthetic p.34 governance, autonomy, trusted evidence expiry, atomic approval verification, kill switch, PHI boundary, egress, sandbox, retrieval, validation, workflow, model-fit, action, continuity, operations, trace-to-eval, and evidence contracts",
+  "schemaVersion": "scrimed-p34-validation-report-v5",
+  "scope": "deterministic synthetic p.34 governance, autonomy, trusted evidence expiry, atomic approval verification, kill switch, PHI boundary, egress, sandbox, retrieval, validation, workflow, model-fit, action, continuity, operations, trace-to-eval, evidence contracts, and bounded synthetic-pilot commercial authority",
   "generatedAt": "2026-08-21T00:00:00.000Z",
   "expiresAt": "2026-08-22T05:11:03.000Z",
   "evaluatedAt": "2026-08-22T05:12:30.000Z",
@@ -9,8 +9,8 @@
   "status": "REVIEW_REQUIRED",
   "behaviorChecksStatus": "PASS",
   "releaseEvidenceStatus": "EXPIRED_REGENERATE_REQUIRED",
-  "checkCount": 38,
-  "passedCount": 38,
+  "checkCount": 40,
+  "passedCount": 40,
   "failedCount": 0,
   "checks": [
     {
@@ -199,9 +199,19 @@
       "evidence": "eight high-risk flags disabled"
     },
     {
+      "id": "synthetic-pilot-boundary-and-budget",
+      "passed": true,
+      "evidence": "20c2cedd2abbb35f47f802827cb4bb4994b0f8b491a8a04cd49a27f220d26619"
+    },
+    {
+      "id": "synthetic-pilot-nonbinding-commercial-authority",
+      "passed": true,
+      "evidence": "887f1561d58d3442e4342cfad07072bab0adaf8ba6b8ed39c06a556f2d803f4b"
+    },
+    {
       "id": "release-authority-retained",
       "passed": true,
-      "evidence": "1c1b288738f0c427174a9a52b8f6ade74d601ead32f0b972fe87a322ebbc488c"
+      "evidence": "0cb511479e3f015617fa5aa15ea44971df5f24ad6e4e34a4b6ef6848009e12f2"
     }
   ],
   "evidenceClassification": "synthetic-fixture-only",
@@ -213,5 +223,5 @@
   "durableApprovalReplayProtectionVerified": false,
   "externalEvidenceVerified": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "1c1b288738f0c427174a9a52b8f6ade74d601ead32f0b972fe87a322ebbc488c"
+  "summaryHash": "0cb511479e3f015617fa5aa15ea44971df5f24ad6e4e34a4b6ef6848009e12f2"
 }

@@ -286,7 +286,7 @@ export const publicMarketUnitEconomicsPackages: PublicMarketUnitEconomicsPackage
   {
     packageName: "Workflow Intelligence Assessment",
     commercialStage: "paid assessment",
-    priceSignal: "Starts at $50k; typical range $75k-$150k fixed fee",
+    priceSignal: "Starting at $25K, subject to written agreement",
     measurableValue: [
       "workflow friction map",
       "automation candidate scorecard",
@@ -302,7 +302,7 @@ export const publicMarketUnitEconomicsPackages: PublicMarketUnitEconomicsPackage
   {
     packageName: "Synthetic Pilot Evaluation",
     commercialStage: "sellable pilot",
-    priceSignal: "Starts at $150k; typical range $200k-$500k for 45-90 days",
+    priceSignal: "Custom enterprise scope; no binding quote without named human approval",
     measurableValue: [
       "cost per governed workflow",
       "time saved estimate",
@@ -319,7 +319,7 @@ export const publicMarketUnitEconomicsPackages: PublicMarketUnitEconomicsPackage
   {
     packageName: "Protected Enterprise Pilot",
     commercialStage: "protected pilot",
-    priceSignal: "Starts at $750k; typical range $1M-$2.5M for 90-180 days",
+    priceSignal: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites",
     measurableValue: [
       "buyer-approved workflow baseline",
       "reviewer acceptance rate",

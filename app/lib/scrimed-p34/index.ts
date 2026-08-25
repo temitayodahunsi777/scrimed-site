@@ -1,4 +1,5 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
+import { getSyntheticPilotReadinessSummary } from "../commercial/syntheticPilotReadiness";
 import {
   createP34CapabilityRegistry,
   createP34SyntheticGovernanceRecords,
@@ -90,7 +91,7 @@ export * from "./exactCandidateReview";
 export const p34IntegratedRoute = "/scrimed-p34";
 export const p34IntegratedApiRoute = "/api/scrimed-control-plane/p34";
 export const p34IntegratedBriefRoute = "/api/scrimed-control-plane/p34/brief";
-export const p34IntegratedVersion = "scrimed-p34-integrated-v6-2026-08-23";
+export const p34IntegratedVersion = "scrimed-p34-integrated-v7-2026-08-25";
 
 export const p34IntegratedBoundary =
   "SCRIMED p.34 is an adaptive, auditable, vendor-neutral synthetic/no-PHI clinical operating-system candidate with bounded workflow and autonomy contracts, model-fit routing, action maturity, tenant-first retrieval, PHI and sandbox controls, trusted evidence expiry, atomic approval verification, a global kill switch, external-validation gates, patient-education previews, continuity metrics, and evidence-gated expansion. It retains human authority and does not authorize live clinical care, PHI, diagnosis, treatment, prescribing, patient messaging, billing or payer submission, EHR/device mutation, external provider calls, production migration, deployment, customer activation, certification claims, public-sector eligibility claims, or external distribution.";
@@ -110,6 +111,7 @@ export function getP34AdaptiveGovernanceSummary() {
   const registry = createP34CapabilityRegistry();
   const clinicalOperatingSystem = createP34ClinicalOperatingSystemSummary();
   const controlPlane2 = createP34ControlPlane2Summary();
+  const syntheticPilotReadiness = getSyntheticPilotReadinessSummary();
   const atomicApprovalStore = new InMemorySyntheticAtomicApprovalStore();
   const atomicApprovalVerifierId = "p34-synthetic-atomic-verifier";
   const atomicApprovalUnsigned: Omit<AtomicApprovalToken, "signature"> = {
@@ -619,7 +621,9 @@ export function getP34AdaptiveGovernanceSummary() {
     gate({ gateId: "P34-35", status: exactCandidateReview.structurallyVerified && exactCandidateReview.status === "EXACT_REVIEW_REQUIRED" && !exactCandidateReview.exactCandidateReviewed && !exactCandidateReview.mergeAuthorized && !exactCandidateReview.deploymentAuthorized ? "PASS" : "FAIL", ownerRole: "independent-technical-reviewer", description: "Exact-head review binding covers PR, commit, tree, candidate, source, validation, review, SBOM, and gate fingerprints; synthetic evidence cannot satisfy the independent-review gate.", evidence: [exactCandidateReview.bindingHash, exactCandidateReview.receiptHash], reasonCodes: exactCandidateReview.reasonCodes, candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-36", status: controlPlane2.dynamicGovernance.status === "PERMITTED" && !controlPlane2.dynamicGovernance.executionAuthorized ? "PASS" : "FAIL", ownerRole: "governance-policy-owner", description: "Adaptive Governance 2.0 returns deterministic reason-coded states across actor, tenant, environment, autonomy, maturity, evidence, data, jurisdiction, model, tool, approval, deployment, risk, and side-effect inputs.", evidence: [controlPlane2.dynamicGovernance.decisionHash], reasonCodes: controlPlane2.dynamicGovernance.reasonCodes, candidateBound: false, externalActionRequired: false }),
     gate({ gateId: "P34-37", status: controlPlane2.runtimeRevalidation.preflightValid && controlPlane2.runtimeRevalidation.decision === "ALLOW" && !controlPlane2.runtimeRevalidation.executionAuthorized && !controlPlane2.runtimeRevalidation.externalSideEffectAuthorized ? "PASS" : "FAIL", ownerRole: "runtime-safety-owner", description: "Immediate runtime revalidation binds candidate, tenant, action, resource, autonomy, maturity, policy decision, and trusted execution time while retaining the no-write ceiling.", evidence: [controlPlane2.runtimeRevalidation.decisionHash], reasonCodes: controlPlane2.runtimeRevalidation.reasonCodes, candidateBound: false, externalActionRequired: false }),
-    gate({ gateId: "P34-38", status: controlPlane2.acceptedOutputExplanation.explainable && controlPlane2.causalTrace.nodes.length === 11 && !controlPlane2.causalTrace.containsRawPhi && !controlPlane2.causalTrace.hiddenChainOfThoughtStored ? "PASS" : "FAIL", ownerRole: "evaluation-observability-owner", description: "The immutable causal graph links request through accepted result and supports acceptance and evaluation-delta queries using evidence references rather than hidden reasoning.", evidence: [controlPlane2.causalTrace.graphHash, controlPlane2.acceptedOutputExplanation.explanationHash], reasonCodes: controlPlane2.acceptedOutputExplanation.reasonCodes, candidateBound: false, externalActionRequired: false })
+    gate({ gateId: "P34-38", status: controlPlane2.acceptedOutputExplanation.explainable && controlPlane2.causalTrace.nodes.length === 11 && !controlPlane2.causalTrace.containsRawPhi && !controlPlane2.causalTrace.hiddenChainOfThoughtStored ? "PASS" : "FAIL", ownerRole: "evaluation-observability-owner", description: "The immutable causal graph links request through accepted result and supports acceptance and evaluation-delta queries using evidence references rather than hidden reasoning.", evidence: [controlPlane2.causalTrace.graphHash, controlPlane2.acceptedOutputExplanation.explanationHash], reasonCodes: controlPlane2.acceptedOutputExplanation.reasonCodes, candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-39", status: syntheticPilotReadiness.status === "READY" && syntheticPilotReadiness.package.noPhi && syntheticPilotReadiness.package.nonclinical && syntheticPilotReadiness.package.nonproduction && syntheticPilotReadiness.budgetDecision.status === "PASS" && !syntheticPilotReadiness.evidencePack.productionAuthorityGranted && syntheticPilotReadiness.commercialReadiness.customerActivation === "BLOCKED" ? "PASS" : "FAIL", ownerRole: "synthetic-pilot-owner", description: "The bounded synthetic pilot package is evidence-linked, budget-controlled, no-PHI, nonclinical, nonproduction, and unable to activate a customer.", evidence: [syntheticPilotReadiness.readiness.decisionHash, syntheticPilotReadiness.budgetDecision.receiptHash, syntheticPilotReadiness.evidencePack.evidenceHash], reasonCodes: [...syntheticPilotReadiness.readiness.hardStops, ...syntheticPilotReadiness.budgetDecision.exceeded], candidateBound: false, externalActionRequired: false }),
+    gate({ gateId: "P34-40", status: syntheticPilotReadiness.commercialPosture.assessment.price === "Starting at $25K, subject to written agreement" && syntheticPilotReadiness.commercialPosture.syntheticPilot.price === "Custom enterprise scope" && syntheticPilotReadiness.commercialPosture.protectedPilot.authority === "blocked-before-external-prerequisites" && !syntheticPilotReadiness.evidencePack.bindingQuoteAuthorized && !syntheticPilotReadiness.commercialHandoff.contractAuthorized ? "PASS" : "FAIL", ownerRole: "commercial-governance-owner", description: "Commercial posture exposes a safe assessment starting point while custom and protected pilots remain human-scoped, nonbinding, and prerequisite-gated.", evidence: [syntheticPilotReadiness.evidencePack.evidenceHash, syntheticPilotReadiness.commercialHandoff.handoffHash], reasonCodes: [], candidateBound: false, externalActionRequired: false })
   ];
   const statuses: P34GateStatus[] = ["PASS", "OPERATOR_REQUIRED", "BLOCKED", "FAIL"];
   const gateCounts = Object.fromEntries(statuses.map((status) => [
@@ -665,6 +669,7 @@ export function getP34AdaptiveGovernanceSummary() {
       enabled: featureFlags.challengerEvaluationEnabled
     },
     roiDashboard,
+    syntheticPilotReadiness,
     clinicalOperatingSystem,
     controlPlane2,
     atomicApproval,
