@@ -15,8 +15,8 @@
     "productConsoleApiBytes": 350000
   },
   "routeInventory": {
-    "expectedBuiltRouteCount": 628,
-    "expectedPrerenderedRouteCount": 244
+    "expectedBuiltRouteCount": 630,
+    "expectedPrerenderedRouteCount": 245
   },
   "enforcement": {
     "deterministicBuildBudgets": "fail",
