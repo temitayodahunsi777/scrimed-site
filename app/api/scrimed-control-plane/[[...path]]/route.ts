@@ -15,6 +15,8 @@ import {
 } from "../../../lib/scrimed-work";
 import {
   buildControlPlaneBrief,
+  buildP33IntegratedBrief,
+  buildP34AdaptiveGovernanceBrief,
   consequenceBenchCases,
   controlPlaneAgentRegistry,
   controlPlaneHeaders,
@@ -25,15 +27,21 @@ import {
   getApprovalAchievementSummary,
   getComputeResilienceSummary,
   getControlPlaneSummary,
+  getP33IntegratedSummary,
+  getP34AdaptiveGovernanceSummary,
   getCrossPlatformEvidenceSummary,
   getOutcomeIntelligenceSummary,
+  getScrimedPlatformGraph,
   getPlatformStrategySummary,
+  getStrategicDecisionIntelligenceSummary,
+  getTrustReadinessSummary,
   routeControlPlaneModel,
   runConsequenceBench,
   searchControlPlaneContext,
   verifyControlPlaneSession
 } from "../../../lib/scrimed-control-plane";
 import type { DataClassification, RiskLevel } from "../../../lib/scrimed-control-plane";
+import { getP34ReviewReadinessSummary } from "../../../lib/scrimed-p34/reviewReadiness";
 
 export const dynamic = "force-dynamic";
 
@@ -144,6 +152,156 @@ export async function GET(request: Request, context: RouteContext) {
   if (endpoint === "approvals") return json(getApprovalAchievementSummary(), "control-plane-approvals");
   if (endpoint === "platform-evidence") return json(getCrossPlatformEvidenceSummary(), "control-plane-platform-evidence");
   if (endpoint === "platform-strategy") return json(getPlatformStrategySummary(), "control-plane-platform-strategy");
+  if (endpoint === "platform-graph") return json(getScrimedPlatformGraph(), "control-plane-platform-graph");
+  if (endpoint === "trust-readiness") return json(getTrustReadinessSummary(), "control-plane-trust-readiness");
+  if (endpoint === "strategic-decision-intelligence") {
+    return json(getStrategicDecisionIntelligenceSummary(), "control-plane-strategic-decision-intelligence");
+  }
+  if (endpoint === "p33") {
+    return json(getP33IntegratedSummary(), "control-plane-p33-integrated");
+  }
+  if (endpoint === "p33/brief") {
+    return new NextResponse(buildP33IntegratedBrief(), {
+      headers: {
+        "Content-Disposition": 'attachment; filename="scrimed-p33-integrated-upgrades.md"',
+        "Content-Type": "text/markdown; charset=utf-8",
+        ...controlPlaneHeaders({ "X-SCRIMED-P33": "synthetic-human-review-required" })
+      }
+    });
+  }
+  if (endpoint === "p33/context") {
+    return json(getP33IntegratedSummary().contextFabric, "control-plane-p33-context");
+  }
+  if (endpoint === "p33/evidence") {
+    return json(getP33IntegratedSummary().decisionEvidence, "control-plane-p33-evidence");
+  }
+  if (endpoint === "p33/opportunities") {
+    return json(getP33IntegratedSummary().opportunities, "control-plane-p33-opportunities");
+  }
+  if (endpoint === "p33/pilots") {
+    return json(getP33IntegratedSummary().pilotProfiles, "control-plane-p33-pilots");
+  }
+  if (endpoint === "p33/assurance") {
+    return json(getP33IntegratedSummary().continuousAssurance, "control-plane-p33-continuous-assurance");
+  }
+  if (endpoint === "p34") {
+    return json(getP34AdaptiveGovernanceSummary(), "control-plane-p34-adaptive-governance");
+  }
+  if (endpoint === "review-readiness") {
+    return json(getP34ReviewReadinessSummary(), "control-plane-p34-review-readiness", 200, {
+      "X-SCRIMED-Review-Authority": "external-human-review-required"
+    });
+  }
+  if (endpoint === "p34/brief") {
+    return new NextResponse(buildP34AdaptiveGovernanceBrief(), {
+      headers: {
+        "Content-Disposition": 'attachment; filename="scrimed-p34-adaptive-governance.md"',
+        "Content-Type": "text/markdown; charset=utf-8",
+        ...controlPlaneHeaders({ "X-SCRIMED-P34": "synthetic-human-review-required" })
+      }
+    });
+  }
+  if (endpoint === "p34/registry") {
+    return json(getP34AdaptiveGovernanceSummary().registry, "control-plane-p34-registry");
+  }
+  if (endpoint === "p34/operations") {
+    return json(getP34AdaptiveGovernanceSummary().operations, "control-plane-p34-operations");
+  }
+  if (endpoint === "p34/workflows") {
+    const summary = getP34AdaptiveGovernanceSummary();
+    return json({ contract: summary.workflowContract, decision: summary.workflowContractDecision }, "control-plane-p34-workflows");
+  }
+  if (endpoint === "p34/model-fit") {
+    return json(getP34AdaptiveGovernanceSummary().workflowModelFit, "control-plane-p34-model-fit");
+  }
+  if (endpoint === "p34/actions") {
+    return json(getP34AdaptiveGovernanceSummary().actionMaturity, "control-plane-p34-actions");
+  }
+  if (endpoint === "p34/continuity") {
+    return json(getP34AdaptiveGovernanceSummary().continuity, "control-plane-p34-continuity");
+  }
+  if (endpoint === "p34/public-sector") {
+    return json(getP34AdaptiveGovernanceSummary().publicSectorReadiness, "control-plane-p34-public-sector");
+  }
+  if (endpoint === "p34/challengers") {
+    return json(getP34AdaptiveGovernanceSummary().challengerHarness, "control-plane-p34-challengers");
+  }
+  if (endpoint === "p34/roi") {
+    return json(getP34AdaptiveGovernanceSummary().roiDashboard, "control-plane-p34-roi");
+  }
+  if (endpoint === "p34/context") {
+    return json(getP34AdaptiveGovernanceSummary().context, "control-plane-p34-context");
+  }
+  if (endpoint === "p34/dicom-privacy") {
+    return json(getP34AdaptiveGovernanceSummary().dicomPrivacy, "control-plane-p34-dicom-privacy");
+  }
+  if (endpoint === "p34/clinical-os") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem, "control-plane-p34-clinical-os");
+  }
+  if (endpoint === "p34/autonomy") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.autonomy, "control-plane-p34-autonomy");
+  }
+  if (endpoint === "p34/phi-boundary") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.phi, "control-plane-p34-phi-boundary");
+  }
+  if (endpoint === "p34/sandbox") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.sandbox, "control-plane-p34-sandbox");
+  }
+  if (endpoint === "p34/retrieval") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.retrieval, "control-plane-p34-retrieval");
+  }
+  if (endpoint === "p34/external-validation") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.externalValidation, "control-plane-p34-external-validation");
+  }
+  if (endpoint === "p34/oversight") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.oversight, "control-plane-p34-oversight");
+  }
+  if (endpoint === "p34/patient-take-home") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.patientTakeHome, "control-plane-p34-patient-take-home");
+  }
+  if (endpoint === "p34/medical-coding") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.coding, "control-plane-p34-medical-coding");
+  }
+  if (endpoint === "p34/recovery") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.operations, "control-plane-p34-clinical-operations");
+  }
+  if (endpoint === "p34/claims") {
+    return json(getP34AdaptiveGovernanceSummary().clinicalOperatingSystem.claims, "control-plane-p34-claims");
+  }
+  if (endpoint === "p34/control-plane-2") {
+    return json(getP34AdaptiveGovernanceSummary().controlPlane2, "control-plane-p34-control-plane-2");
+  }
+  if (endpoint === "p34/atomic-approval") {
+    return json(getP34AdaptiveGovernanceSummary().atomicApproval, "control-plane-p34-atomic-approval");
+  }
+  if (endpoint === "p34/exact-candidate-review") {
+    return json(getP34AdaptiveGovernanceSummary().exactCandidateReview, "control-plane-p34-exact-candidate-review");
+  }
+  if (endpoint === "p34/runtime-revalidation") {
+    const controlPlane = getP34AdaptiveGovernanceSummary().controlPlane2;
+    return json({
+      dynamicGovernance: controlPlane.dynamicGovernance,
+      runtimeRevalidation: controlPlane.runtimeRevalidation,
+      causalTrace: controlPlane.causalTrace,
+      acceptedOutputExplanation: controlPlane.acceptedOutputExplanation
+    }, "control-plane-p34-runtime-revalidation");
+  }
+  if (endpoint === "p34/egress-firewall") {
+    return json(getP34AdaptiveGovernanceSummary().egressFirewall, "control-plane-p34-egress-firewall");
+  }
+  if (endpoint === "p34/assurance") {
+    const summary = getP34AdaptiveGovernanceSummary();
+    return json({
+      gateMatrix: summary.gateMatrix,
+      gateCounts: summary.gateCounts,
+      governance: summary.governance.verification,
+      evaluation: summary.evaluation,
+      exactCandidateReview: summary.exactCandidateReview,
+      dynamicGovernance: summary.controlPlane2.dynamicGovernance,
+      runtimeRevalidation: summary.controlPlane2.runtimeRevalidation,
+      boundary: summary.boundary
+    }, "control-plane-p34-assurance");
+  }
 
   return failure("control_plane_route_not_found", "SCRIMED control-plane route was not found.", endpoint || "root", 404);
 }

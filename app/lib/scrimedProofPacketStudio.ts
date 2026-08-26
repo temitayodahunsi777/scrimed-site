@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   scrimedGuidedExecutionPaths,
   scrimedGuidedExecutionRunbooks,
@@ -8,6 +9,14 @@ import { scrimedSafetyPolicyVersion } from "./scrimedSafetyGovernance";
 
 export type ScrimedProofPacketType =
   | "investor_pitch_packet"
+  | "strategic_partner_packet"
+  | "enterprise_buyer_packet"
+  | "clinical_reviewer_packet"
+  | "security_reviewer_packet"
+  | "privacy_reviewer_packet"
+  | "legal_reviewer_packet"
+  | "regulatory_reviewer_packet"
+  | "technical_diligence_packet"
   | "buyer_demo_packet"
   | "pilot_scope_packet"
   | "partner_implementation_packet"
@@ -55,6 +64,43 @@ export type ScrimedProofPacketStudioScorecard = {
   summary: string;
 };
 
+export type ScrimedProofPacketRecipientClass =
+  | "investor"
+  | "strategic-partner"
+  | "enterprise-buyer"
+  | "clinical-reviewer"
+  | "security-reviewer"
+  | "privacy-reviewer"
+  | "legal-reviewer"
+  | "regulatory-reviewer"
+  | "technical-diligence-reviewer";
+
+export type ScrimedProofPacketCandidateBinding = {
+  packetId: string;
+  packetType: ScrimedProofPacketType;
+  exactCandidateSha: string;
+  sourceFingerprint: string;
+  evidenceFingerprint: string;
+  packetFingerprint: string;
+  recipientClass: ScrimedProofPacketRecipientClass;
+  intendedPurpose: string;
+  evidenceInventory: string[];
+  claimInventory: ScrimedProofPacketClaimInventoryItem[];
+  prohibitedClaims: string[];
+  expiresAt: string;
+  distributionStatus: "NOT_AUTHORIZED";
+  approvalsRequired: string[];
+  exactArtifactHashes: Record<string, string>;
+  externalDistributionAuthorized: false;
+  auditHash: string;
+};
+
+export type ScrimedProofPacketClaimInventoryItem = {
+  claimId: string;
+  status: "VERIFIED" | "QUALIFIED" | "SYNTHETIC" | "ESTIMATED" | "PLANNED";
+  evidenceReference: string;
+};
+
 export const scrimedProofPacketStudioApiRoute = "/api/scrimed-proof-packet-studio";
 export const scrimedProofPacketStudioPageRoute = "/scrimed-proof-packet-studio";
 export const scrimedProofPacketStudioStatus = "scrimed-proof-packet-studio-active-synthetic-no-phi";
@@ -71,6 +117,115 @@ function packetHash(id: string, title: string, objective: string) {
     safetyPolicyVersion: scrimedSafetyPolicyVersion,
     title
   });
+}
+
+function stableSerialize(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(",")}]`;
+  return `{${Object.entries(value as Record<string, unknown>)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, item]) => `${JSON.stringify(key)}:${stableSerialize(item)}`)
+    .join(",")}}`;
+}
+
+function sha256(value: unknown) {
+  return createHash("sha256").update(stableSerialize(value)).digest("hex");
+}
+
+const sha256Pattern = /^[0-9a-f]{64}$/;
+const safeBindingTextPattern = /^[A-Za-z0-9][A-Za-z0-9 ._:/#()%-]{2,159}$/;
+
+export function createScrimedProofPacketCandidateBinding(
+  input: {
+    packetId: string;
+    exactCandidateSha: string;
+    sourceFingerprint: string;
+    evidenceFingerprint: string;
+    recipientClass: ScrimedProofPacketRecipientClass;
+    intendedPurpose: string;
+    evidenceInventory: string[];
+    claimInventory?: ScrimedProofPacketClaimInventoryItem[];
+    expiresAt: string;
+    approvalsRequired: string[];
+    exactArtifactHashes: Record<string, string>;
+  },
+  evaluatedAt: string
+): ScrimedProofPacketCandidateBinding {
+  const packet = getScrimedProofPacketManifest(input.packetId);
+  const evaluatedAtMs = Date.parse(evaluatedAt);
+  const expiresAtMs = Date.parse(input.expiresAt);
+  const artifactEntries = Object.entries(input.exactArtifactHashes);
+  const claimInventory = input.claimInventory ?? [];
+
+  if (!packet) throw new Error("Proof packet candidate binding requires a canonical packet.");
+  if (![input.exactCandidateSha, input.sourceFingerprint, input.evidenceFingerprint].every((value) => sha256Pattern.test(value))) {
+    throw new Error("Proof packet candidate binding requires exact SHA-256 candidate, source, and evidence fingerprints.");
+  }
+  if (!Number.isFinite(evaluatedAtMs) || !Number.isFinite(expiresAtMs) || expiresAtMs <= evaluatedAtMs) {
+    throw new Error("Proof packet candidate binding requires a future expiration relative to evaluation.");
+  }
+  if (
+    !safeBindingTextPattern.test(input.intendedPurpose) ||
+    input.evidenceInventory.length === 0 ||
+    input.approvalsRequired.length === 0 ||
+    artifactEntries.length === 0
+  ) {
+    throw new Error("Proof packet candidate binding requires bounded purpose, evidence, approvals, and artifact hashes.");
+  }
+  if (
+    [...input.evidenceInventory, ...input.approvalsRequired, ...artifactEntries.map(([label]) => label)].some(
+      (value) => !safeBindingTextPattern.test(value)
+    ) ||
+    artifactEntries.some(([, hash]) => !sha256Pattern.test(hash))
+  ) {
+    throw new Error("Proof packet candidate binding contains invalid metadata or artifact hashes.");
+  }
+  if (
+    claimInventory.some(
+      (claim) =>
+        !safeBindingTextPattern.test(claim.claimId) ||
+        !safeBindingTextPattern.test(claim.evidenceReference)
+    )
+  ) {
+    throw new Error("Proof packet candidate binding contains invalid claim inventory metadata.");
+  }
+
+  const prohibitedClaims = [
+    "production authorization",
+    "live PHI authority",
+    "autonomous clinical care",
+    "customer activation",
+    "certification or regulatory approval",
+    "investment, partnership, revenue, valuation, or outcome assurance"
+  ];
+  const fingerprintInput = {
+    packetId: packet.id,
+    packetType: packet.packetType,
+    packetAuditHash: packet.auditHash,
+    exactCandidateSha: input.exactCandidateSha,
+    sourceFingerprint: input.sourceFingerprint,
+    evidenceFingerprint: input.evidenceFingerprint,
+    recipientClass: input.recipientClass,
+    intendedPurpose: input.intendedPurpose,
+    evidenceInventory: [...input.evidenceInventory].sort(),
+    claimInventory: [...claimInventory].sort((left, right) => left.claimId.localeCompare(right.claimId)),
+    prohibitedClaims,
+    expiresAt: new Date(expiresAtMs).toISOString(),
+    approvalsRequired: [...input.approvalsRequired].sort(),
+    exactArtifactHashes: Object.fromEntries(artifactEntries.sort(([left], [right]) => left.localeCompare(right))),
+    distributionStatus: "NOT_AUTHORIZED" as const
+  };
+  const packetFingerprint = sha256(fingerprintInput);
+  const binding = {
+    ...fingerprintInput,
+    packetFingerprint,
+    externalDistributionAuthorized: false as const
+  };
+
+  return {
+    ...binding,
+    auditHash: sha256({ binding, policyVersion: scrimedSafetyPolicyVersion })
+  };
 }
 
 function pathFor(audience: ScrimedGuidedAudience) {
@@ -459,9 +614,17 @@ export function getScrimedProofPacketStudioSummary() {
     packets: scrimedProofPacketManifests,
     packetCount: scrimedProofPacketManifests.length,
     downloadablePacketRoutes,
+    candidateBinding: {
+      supported: true,
+      exactSha256Required: true,
+      expirationRequired: true,
+      artifactHashesRequired: true,
+      distributionStatus: "NOT_AUTHORIZED" as const,
+      externalDistributionAuthorized: false as const
+    },
     productionBlockedPackets,
     recommendedNextBuildStep:
-      "Add a reviewed share-log ledger for packet recipients, freshness attestation, qualified owner approval, and post-meeting follow-up conversion.",
+      "Use the no-PII share-readiness preflight to bind the exact packet fingerprint, freshness confirmations, audience class, and protected channel before creating a separately approved Distribution Lockbox record. Capture post-meeting outcomes in Sales Operations.",
     productionReadiness: false,
     noPhiConfirmed: true
   };

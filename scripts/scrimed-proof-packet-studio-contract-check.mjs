@@ -4,9 +4,12 @@ import { readFile } from "node:fs/promises";
 
 const requiredFiles = [
   "app/lib/scrimedProofPacketStudio.ts",
+  "app/lib/proofPacketShareReadiness.ts",
   "app/api/scrimed-proof-packet-studio/route.ts",
   "app/api/scrimed-proof-packet-studio/[packetId]/brief/route.ts",
+  "app/api/scrimed-proof-packet-studio/share-readiness/route.ts",
   "app/scrimed-proof-packet-studio/page.tsx",
+  "app/scrimed-proof-packet-studio/ProofPacketShareReadinessWorkbench.tsx",
   "docs/scrimed-proof-packet-studio.md",
   "package.json",
   "scripts/scrimed-nonsecret-test-suite.mjs",
@@ -29,6 +32,32 @@ const files = Object.fromEntries(await Promise.all(requiredFiles.map(load)));
 const source = files["app/lib/scrimedProofPacketStudio.ts"];
 
 for (const expected of [
+  "ProofPacketShareReadinessInput",
+  "ProofPacketShareReadinessAssessment",
+  "READY_FOR_PROTECTED_INTAKE",
+  "validateProofPacketShareReadinessInput",
+  "assessProofPacketShareReadiness",
+  "protectedRequiredReviewerRoles",
+  "ProtectedDistributionAudience",
+  "ProtectedDistributionChannelControl",
+  "externalDistributionAuthorized: false",
+  "investorSolicitationAuthorized: false",
+  "customerPermissionCreated: false",
+  "productionReleaseAuthorized: false",
+  "phiAuthorized: false",
+  "liveClinicalExecutionAuthorized: false",
+  "Unexpected fields are not accepted",
+  "lockboxRecordCreated: false",
+  "sha256"
+]) {
+  requireIncludes(
+    "app/lib/proofPacketShareReadiness.ts",
+    files["app/lib/proofPacketShareReadiness.ts"],
+    expected
+  );
+}
+
+for (const expected of [
   "scrimed-proof-packet-studio-active-synthetic-no-phi",
   "ScrimedProofPacketManifest",
   "ScrimedProofPacketArtifact",
@@ -38,6 +67,22 @@ for (const expected of [
   "pilot_scope_packet",
   "partner_implementation_packet",
   "internal_execution_packet",
+  "strategic_partner_packet",
+  "enterprise_buyer_packet",
+  "clinical_reviewer_packet",
+  "security_reviewer_packet",
+  "legal_reviewer_packet",
+  "regulatory_reviewer_packet",
+  "technical_diligence_packet",
+  "ScrimedProofPacketCandidateBinding",
+  "createScrimedProofPacketCandidateBinding",
+  "exactCandidateSha",
+  "sourceFingerprint",
+  "evidenceFingerprint",
+  "packetFingerprint",
+  "exactArtifactHashes",
+  "distributionStatus: \"NOT_AUTHORIZED\"",
+  "externalDistributionAuthorized: false",
   "deckSections",
   "demoScript",
   "proofArtifacts",
@@ -93,6 +138,8 @@ for (const expected of [
 for (const expected of [
   "SCRIMED Proof Packet Studio",
   "Packet Manifests",
+  "Protected Share Readiness",
+  "ProofPacketShareReadinessWorkbench",
   "Presentation + Demo Structure",
   "Proof Artifacts",
   "Strategic Packaging",
@@ -103,10 +150,44 @@ for (const expected of [
 }
 
 for (const expected of [
+  "validateProofPacketShareReadinessInput",
+  "assessProofPacketShareReadiness",
+  "enforceRequestRateLimit",
+  "payload-too-large",
+  "unsupported-content-type",
+  "X-SCRIMED-External-Distribution",
+  "not-authorized",
+  "noindex, nofollow"
+]) {
+  requireIncludes(
+    "app/api/scrimed-proof-packet-studio/share-readiness/route.ts",
+    files["app/api/scrimed-proof-packet-studio/share-readiness/route.ts"],
+    expected
+  );
+}
+
+for (const expected of [
+  "Operator preflight confirmations",
+  "Assess protected handoff",
+  "Download handoff receipt",
+  "No recipient identity",
+  "READY_FOR_PROTECTED_INTAKE"
+]) {
+  requireIncludes(
+    "app/scrimed-proof-packet-studio/ProofPacketShareReadinessWorkbench.tsx",
+    files["app/scrimed-proof-packet-studio/ProofPacketShareReadinessWorkbench.tsx"],
+    expected
+  );
+}
+
+for (const expected of [
   "SCRIMED Proof Packet Studio",
   "Packet Types",
   "Required Packet Fields",
+  "Exact Candidate Binding",
   "Downloadable Markdown Packets",
+  "Protected Share Readiness",
+  "Canonical Distribution Path",
   "Safety Boundary",
   "Next Build Step"
 ]) {
@@ -127,9 +208,12 @@ const forbiddenClaimParts = [
 
 for (const path of [
   "app/lib/scrimedProofPacketStudio.ts",
+  "app/lib/proofPacketShareReadiness.ts",
   "app/api/scrimed-proof-packet-studio/route.ts",
   "app/api/scrimed-proof-packet-studio/[packetId]/brief/route.ts",
+  "app/api/scrimed-proof-packet-studio/share-readiness/route.ts",
   "app/scrimed-proof-packet-studio/page.tsx",
+  "app/scrimed-proof-packet-studio/ProofPacketShareReadinessWorkbench.tsx",
   "docs/scrimed-proof-packet-studio.md"
 ]) {
   const lower = files[path].toLowerCase();
@@ -143,10 +227,16 @@ for (const path of [
 }
 
 requireIncludes("package.json", files["package.json"], "\"smoke:scrimed-proof-packet-studio\"");
+requireIncludes("package.json", files["package.json"], "\"test:proof-packet-share-readiness\"");
 requireIncludes(
   "scripts/scrimed-nonsecret-test-suite.mjs",
   files["scripts/scrimed-nonsecret-test-suite.mjs"],
   "scripts/scrimed-proof-packet-studio-contract-check.mjs"
+);
+requireIncludes(
+  "scripts/scrimed-nonsecret-test-suite.mjs",
+  files["scripts/scrimed-nonsecret-test-suite.mjs"],
+  "scripts/proof-packet-share-readiness-policy-test.mjs"
 );
 requireIncludes("app/lib/siteNavigation.ts", files["app/lib/siteNavigation.ts"], "/scrimed-proof-packet-studio");
 requireIncludes("app/lib/navigationAudit.ts", files["app/lib/navigationAudit.ts"], "/scrimed-proof-packet-studio");

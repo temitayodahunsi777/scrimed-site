@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
-import { getProductConsoleSummary } from "../../../lib/productConsole";
+import { getProductConsoleApiSummary } from "../../../lib/productConsole";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json(getProductConsoleSummary());
+  return NextResponse.json(getProductConsoleApiSummary(), {
+    headers: {
+      "Cache-Control": "no-store",
+      "X-SCRIMED-Data-Class": "public-synthetic"
+    }
+  });
 }

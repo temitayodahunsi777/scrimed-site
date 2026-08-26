@@ -8,6 +8,7 @@ import {
   validateScrimedOperatingMode,
   type ScrimedOperatingMode
 } from "../operatingMode";
+import { getScrimedNodeRuntimeStatus } from "../platform/nodeRuntime";
 import { getReviewActionOperatingModeBlockReason } from "./reviewPolicyPreflight";
 import {
   getReviewRequirement,
@@ -76,6 +77,13 @@ export type DevelopmentContinuityPlan = {
     liveClinicalExecution: boolean;
   };
   evidenceReferences: string[];
+  runtimeLifecycle: {
+    targetNodeMajor: 24;
+    actualNodeMajor: number | null;
+    compatibilityStatus: "NODE24_CERTIFIED_RUNTIME_ACTIVE" | "RUNTIME_UPGRADE_REQUIRED";
+    riskInput: "runtime_upgrade_required" | "none";
+    certificationRequiredPerCandidate: true;
+  };
   actionCount: number;
   counts: Record<DevelopmentContinuityStatus, number>;
   recommendedAction: DevelopmentContinuityAction | null;
@@ -476,6 +484,7 @@ export function buildDevelopmentContinuityPlan(input: {
   operatingMode?: ScrimedOperatingMode;
 } = {}): DevelopmentContinuityPlan {
   const operatingMode = input.operatingMode ?? getScrimedOperatingModeSummary().mode;
+  const runtimeStatus = getScrimedNodeRuntimeStatus();
   const modeValidation = validateScrimedOperatingMode(operatingMode);
   const evidenceReferences = [
     ...new Set(
@@ -511,6 +520,12 @@ export function buildDevelopmentContinuityPlan(input: {
     version: scrimedDevelopmentContinuityVersion,
     policyVersion: scrimedReviewPolicyVersion,
     operatingMode,
+    runtimeLifecycle: {
+      targetNodeMajor: runtimeStatus.targetNodeMajor,
+      actualNodeMajor: runtimeStatus.actualNodeMajor,
+      compatibilityStatus: runtimeStatus.compatibilityStatus,
+      riskInput: runtimeStatus.runtimeUpgradeRequired ? "runtime_upgrade_required" : "none"
+    },
     evidenceReferences,
     actions: actions.map(({ automationDecision, ...action }) => ({
       ...action,
@@ -533,6 +548,13 @@ export function buildDevelopmentContinuityPlan(input: {
       syntheticOnly: operatingMode.syntheticOnly,
       allowPHI: operatingMode.allowPHI,
       liveClinicalExecution: operatingMode.liveClinicalExecution
+    },
+    runtimeLifecycle: {
+      targetNodeMajor: 24,
+      actualNodeMajor: runtimeStatus.actualNodeMajor,
+      compatibilityStatus: runtimeStatus.compatibilityStatus,
+      riskInput: runtimeStatus.runtimeUpgradeRequired ? "runtime_upgrade_required" : "none",
+      certificationRequiredPerCandidate: true
     },
     evidenceReferences,
     actionCount: actions.length,

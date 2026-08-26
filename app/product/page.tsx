@@ -23,6 +23,12 @@ export default function ProductConsolePage() {
           <Link className="secondary-action" href="/demos">
             Watch Demos
           </Link>
+          <Link className="secondary-action" href={summary.p33IntegratedRoute}>
+            Inspect p.33 Controls
+          </Link>
+          <Link className="secondary-action" href={summary.p34IntegratedRoute}>
+            Inspect p.34 Clinical OS
+          </Link>
           <a className="secondary-action" href={summary.pilotDemoCommercialReadinessBriefRoute}>
             Download Buyer Brief
           </a>
@@ -33,6 +39,64 @@ export default function ProductConsolePage() {
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
+        </article>
+        <article>
+          <span>Runtime</span>
+          <strong>Node {summary.nodeMajor ?? "unknown"}</strong>
+        </article>
+        <article>
+          <span>Environment</span>
+          <strong>{summary.runtimeEnvironment}</strong>
+        </article>
+        <article>
+          <span>Runtime assurance</span>
+          <strong>{summary.runtimeCompatibilityLabel}</strong>
+        </article>
+        <article>
+          <span>Vercel status</span>
+          <strong>{summary.vercelProjectStatus}</strong>
+        </article>
+        <article>
+          <span>Vercel build</span>
+          <strong>{summary.vercelBuildStatus}</strong>
+        </article>
+        <article>
+          <span>Release fingerprint</span>
+          <strong title={summary.runtimeReleaseFingerprint}>
+            {summary.runtimeReleaseFingerprint.slice(0, 12)}
+          </strong>
+        </article>
+        <article>
+          <span>p.33 controls</span>
+          <strong>{summary.p33IntegratedStatus}</strong>
+        </article>
+        <article>
+          <span>p.33 opportunities</span>
+          <strong>{summary.p33OpportunityModuleCount}</strong>
+        </article>
+        <article>
+          <span>p.33 blocked gates</span>
+          <strong>{summary.p33BlockedGateCount}</strong>
+        </article>
+        <article>
+          <span>p.34 controls</span>
+          <strong>{summary.p34IntegratedStatus}</strong>
+        </article>
+        <article>
+          <span>p.34 local passes</span>
+          <strong>{summary.p34PassedGateCount}</strong>
+        </article>
+        <article>
+          <span>p.34 blocked gates</span>
+          <strong>{summary.p34BlockedGateCount}</strong>
+        </article>
+        <article>
+          <span>Exact review</span>
+          <strong>{summary.p34ReviewReadiness.review.state}</strong>
+        </article>
+        <article>
+          <span>Synthetic pilot</span>
+          <strong>{summary.syntheticPilotReadiness.status}</strong>
         </article>
         <article>
           <span>Company score</span>
@@ -757,6 +821,120 @@ export default function ProductConsolePage() {
         <article>
           <span>External reviews</span>
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED p.34 clinical operating system controls">
+        <div className="section-heading">
+          <p className="eyebrow">Clinical operating system</p>
+          <h2>Authority, evidence, isolation, and review remain visible at the point of work.</h2>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.p34IntegratedRoute}>
+              Open p.34 Console
+            </Link>
+            <a className="secondary-action" href={summary.p34IntegratedApiRoute}>
+              Inspect p.34 API
+            </a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.p34ClinicalOperatingSystem.autonomy.decision}</span><h2>Autonomy and approval</h2></div>
+          <p>{summary.p34ClinicalOperatingSystem.autonomy.stoppingCondition}</p>
+          <div><strong>{summary.p34ClinicalOperatingSystem.autonomy.grantedTier}</strong><p>{summary.p34ClinicalOperatingSystem.autonomy.authorizationState}</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ClinicalOperatingSystem.phi.egress.decision}</span><h2>PHI route and sandbox</h2></div>
+          <p>Startup classification {summary.p34ClinicalOperatingSystem.phi.startupValidation.decision}; provider calls remain disabled.</p>
+          <div><strong>{summary.p34ClinicalOperatingSystem.sandbox.decision}</strong><p>default-deny egress</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ClinicalOperatingSystem.externalValidation.decision}</span><h2>External validation and oversight</h2></div>
+          <p>Clinical production eligibility remains blocked while local oversight stays at {(summary.p34ClinicalOperatingSystem.oversight.reviewedActionPercentage * 100).toFixed(0)}%.</p>
+          <div><strong>{summary.p34ClinicalOperatingSystem.patientTakeHome.decision}</strong><p>patient preview review state</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ControlPlane2.killSwitchMode}</span><h2>Release and kill switch</h2></div>
+          <p>{summary.p34ControlPlane2.release.resultingState}; writes and A3 authority remain unavailable.</p>
+          <div><strong>{summary.p34ControlPlane2.runtime.reviewState}</strong><p>exact-candidate review state</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34AtomicApproval.decision}</span><h2>Atomic approval evidence</h2></div>
+          <p>An in-process synthetic self-test rejects replay within one store; durable replay protection and execution authority remain unavailable.</p>
+          <div><strong>{summary.p34EgressFirewall.decision}</strong><p>shared egress firewall</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ReviewState}</span><h2>Exact candidate identity</h2></div>
+          <p>Branch {summary.runtimeBranch ?? "unbound local runtime"}; commit {summary.runtimeCandidateCommit?.slice(0, 12) ?? "unbound"}.</p>
+          <div><strong>{summary.runtimeCandidateFingerprintVerificationStatus}</strong><p>candidate fingerprint evidence</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34PreviewState}</span><h2>External assurance state</h2></div>
+          <p>{summary.p34MigrationState}; {summary.p34Aal2State}.</p>
+          <div><strong>OPERATOR_REQUIRED</strong><p>{summary.p34SupabaseSecurityState}</p></div>
+        </article>
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED p.34 review readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Exact-head review readiness</p>
+          <h2>Machine assurance is visible without being mistaken for independent human approval.</h2>
+          <div className="form-actions">
+            <a className="primary-action" href={summary.p34ReviewReadinessApiRoute}>Inspect Review API</a>
+            <Link className="secondary-action" href={summary.p34IntegratedRoute}>Open p.34 Console</Link>
+          </div>
+        </div>
+        <article className="module-row">
+          <div><span>PR #{summary.p34ReviewReadiness.pullRequest.number}</span><h2>Candidate identity</h2></div>
+          <p>Commit {summary.p34ReviewReadiness.candidate.commitSha?.slice(0, 12) ?? "runtime unbound"}; candidate {summary.p34ReviewReadiness.candidate.fingerprint?.slice(0, 12) ?? "runtime unbound"}.</p>
+          <div><strong>{summary.p34ReviewReadiness.candidate.runtimeBindingStatus}</strong><p>merge authority: blocked</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ReviewReadiness.review.state}</span><h2>Independent review</h2></div>
+          <p>Requested head {summary.p34ReviewReadiness.review.requestedHead?.slice(0, 12) ?? "not runtime-attested"}; reviewer {summary.p34ReviewReadiness.review.reviewerIdentity ?? "not recorded"}.</p>
+          <div><strong>{summary.p34ReviewReadiness.review.evidenceFreshness}</strong><p>runtime never self-approves</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34ReviewReadiness.scope.authoritativePrInventoryObserved} files</span><h2>Review surface</h2></div>
+          <p>The reviewer map separates the whole inherited PR from the direct p.34 gap-closure and generated evidence lanes.</p>
+          <div><strong>{summary.p34ReviewReadiness.scope.authoritativeGapClosureBaselineObserved} baseline direct files</strong><p>unexpected files prohibited</p></div>
+        </article>
+        {summary.p34ReviewReadiness.operatorActions.map((action) => (
+          <article className="module-row" key={action.id}>
+            <div><span>{action.state}</span><h2>{action.id.replaceAll("-", " ")}</h2></div>
+            <p>Owner: {action.owner}</p>
+            <div><strong>external accountability</strong><p>no delegated production authority</p></div>
+          </article>
+        ))}
+      </section>
+
+      <section className="table-section" aria-label="SCRIMED commercial readiness">
+        <div className="section-heading">
+          <p className="eyebrow">Commercial readiness</p>
+          <h2>Sell bounded evidence work now while protected and production activity remains gated.</h2>
+          <div className="form-actions">
+            <Link className="primary-action" href={summary.syntheticPilotRoute}>Open Synthetic Pilot</Link>
+            <a className="secondary-action" href={summary.syntheticPilotApiRoute}>Inspect Pilot API</a>
+          </div>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.commercialReadiness.assessment}</span><h2>Workflow Intelligence Assessment</h2></div>
+          <p>{summary.syntheticPilotReadiness.commercialPosture.assessment.price}</p>
+          <div><strong>human scoped</strong><p>subject to written agreement</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.commercialReadiness.syntheticPilot}</span><h2>SCRIMED Synthetic Workflow Pilot</h2></div>
+          <p>{summary.syntheticPilotReadiness.commercialPosture.syntheticPilot.price}; no PHI, clinical execution, or production connector.</p>
+          <div><strong>{summary.syntheticPilotReadiness.readiness.score}/100</strong><p>synthetic readiness score</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.commercialReadiness.protectedPilot}</span><h2>Protected Enterprise Pilot</h2></div>
+          <p>{summary.syntheticPilotReadiness.commercialPosture.protectedPilot.price}.</p>
+          <div><strong>{summary.commercialReadiness.customerActivation}</strong><p>customer activation</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34SupabasePosture.authSecurity}</span><h2>Supabase posture</h2></div>
+          <p>{summary.p34SupabasePosture.rlsAssurance}; migrations remain production-unapplied.</p>
+          <div><strong>{summary.p34SupabasePosture.productionMutationState}</strong><p>{summary.p34SupabasePosture.migrationState}</p></div>
         </article>
       </section>
 

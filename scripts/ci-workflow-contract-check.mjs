@@ -8,7 +8,8 @@ const workflowPaths = [
   ".github/workflows/authority-reference-qa-smoke.yml",
   ".github/workflows/sales-demo-session-qa-smoke.yml",
   ".github/workflows/migration-dry-run.yml",
-  ".github/workflows/preview-validation.yml"
+  ".github/workflows/preview-validation.yml",
+  ".github/workflows/node24-certification.yml"
 ];
 const securityWorkflowPaths = [
   ".github/workflows/dependency-review.yml",
@@ -36,7 +37,7 @@ for (const pathname of workflowPaths) {
   requireIncludes(pathname, "permissions:\n  contents: read");
   requireIncludes(pathname, "uses: actions/checkout@v6");
   requireIncludes(pathname, "uses: actions/setup-node@v6");
-  requireIncludes(pathname, "node-version: 22");
+  requireIncludes(pathname, "node-version: 24");
 
   for (const forbidden of [
     "continue-on-error: true",
@@ -85,6 +86,44 @@ for (const pathname of securityWorkflowPaths) {
   }
 }
 
+for (const pathname of [...workflowPaths, ...securityWorkflowPaths]) {
+  forbidIncludes(pathname, "node-version: 22");
+  if (files[pathname].includes("uses: actions/setup-node@v6")) {
+    requireIncludes(pathname, "node-version: 24");
+  }
+}
+
+for (const pathname of [
+  ".github/workflows/ci.yml",
+  ".github/workflows/dependency-review.yml",
+  ".github/workflows/dependency-security.yml",
+  ".github/workflows/node24-certification.yml"
+]) {
+  requireIncludes(pathname, "fetch-depth: 0");
+  requireIncludes(pathname, "SCRIMED_SBOM_BASE_REF:");
+}
+
+for (const expected of [
+  "name: Node 24 Certification",
+  "SCRIMED_SYNTHETIC_ONLY: \"true\"",
+  "SCRIMED_ALLOW_PHI: \"false\"",
+  "node scripts/verify-node24-vercel-build.mjs --prebuild",
+  "npm run test:scrimed-p33",
+  "npm run contract:scrimed-p33",
+  "npm run test:scrimed-p34",
+  "npm run contract:scrimed-p34",
+  "npm run test:nonsecret",
+  "npm audit --audit-level=high",
+  "npm run security:dependency-floor",
+  "npm run security:secret-scan",
+  "npm run security:sbom",
+  "npm run build",
+  "npm run certify:node24",
+  "npm run integrity"
+]) {
+  requireIncludes(".github/workflows/node24-certification.yml", expected);
+}
+
 for (const expected of [
   "pull_request:",
   "uses: actions/dependency-review-action@v4",
@@ -121,8 +160,13 @@ for (const expected of [
   "SCRIMED_SYNTHETIC_ONLY: \"true\"",
   "SCRIMED_ALLOW_PHI: \"false\"",
   "SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: \"false\"",
+  "SCRIMED_PREVIEW_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+  "VERCEL_GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+  "VERCEL_GIT_COMMIT_REF: ${{ github.head_ref || github.ref_name }}",
+  "ref: ${{ github.event.pull_request.head.sha || github.sha }}",
   "npm run test:preproduction-assurance",
   "node scripts/verify-preview-ui.mjs --strict",
+  "--candidate-sha=${SCRIMED_PREVIEW_CANDIDATE_SHA}",
   "retention-days: 7"
 ]) {
   requireIncludes(".github/workflows/preview-validation.yml", expected);
@@ -130,7 +174,8 @@ for (const expected of [
 
 for (const expected of [
   "npm audit --audit-level=high --json",
-  "npm audit --audit-level=critical",
+  "SCRIMED_HIGH_VULNERABILITY_POLICY: block",
+  "npm audit --audit-level=high",
   "npm run security:dependency-floor",
   "npm run security:sbom",
   "actions/dependency-review-action@v4"

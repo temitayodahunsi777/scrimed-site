@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "scrimed.strategic-roadmap.v1",
+  "version": "scrimed-platform-strategy-v1-2026-08-08",
+  "roadmap": {
+    "NOW": [
+      "Create a clean exact-source candidate and independent review packet.",
+      "Rehearse the Workflow Intelligence Assessment for three buyer archetypes.",
+      "Collect measured baseline, reviewer burden, acceptance, latency, and cost inputs from synthetic runs.",
+      "Complete AAL2 and disposable migration evidence without activating production scope."
+    ],
+    "NEXT": [
+      "Secure counsel-reviewed fundraising and commercial authority boundaries.",
+      "Run one buyer-approved synthetic evaluation with explicit acceptance criteria.",
+      "Qualify provider and connector adapters through conformance and failure testing.",
+      "Commission privacy and security readiness reviews when a qualified buyer requires protected scope."
+    ],
+    "LATER": [
+      "Advance a protected no-PHI pilot after identity, migration, tenant, reviewer, and buyer gates pass.",
+      "Build external outcome evidence and renewal dossiers from approved cases.",
+      "Expand sovereign and edge profiles only where measured demand supports the cost."
+    ],
+    "OPTIONALITY": [
+      "Clinical experience catalog modules remain synthetic demonstrations until use-specific evidence and authority exist.",
+      "Partner marketplace remains deferred until one read-only adapter passes governance and commercial validation.",
+      "Production PHI and device integration remain prohibited until separately approved."
+    ]
+  },
+  "boundary": "This registry describes SCRIMED's locally implemented, synthetic/no-PHI platform foundations and evidence paths. It does not authorize PHI, autonomous clinical care, diagnosis, treatment, prescribing, payer submission, EHR writeback, medical-device connectivity, production deployment, certification claims, customer activation, investor outreach, valuation claims, or revenue guarantees.",
+  "productionAuthorityGranted": false,
+  "auditHash": "86bd733a9c96d6e2efaea1d770a8f92892875b8d4ad95badb63c836350a62a19"
+}

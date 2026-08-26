@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "scrimed.portfolio-scorecard.v1",
+  "version": "scrimed-platform-strategy-v1-2026-08-08",
+  "status": "internal-prioritization-no-commercial-authority",
+  "boundary": "This registry describes SCRIMED's locally implemented, synthetic/no-PHI platform foundations and evidence paths. It does not authorize PHI, autonomous clinical care, diagnosis, treatment, prescribing, payer submission, EHR writeback, medical-device connectivity, production deployment, certification claims, customer activation, investor outreach, valuation claims, or revenue guarantees.",
+  "scorecards": [
+    {
+      "id": "governance-evidence-platform",
+      "category": "CORE_PLATFORM",
+      "scores": {
+        "buyerUrgency": 86,
+        "differentiation": 91,
+        "evidenceMaturity": 78,
+        "technicalReadiness": 84,
+        "regulatoryBurden": 48,
+        "integrationEffort": 46,
+        "monetization": 82,
+        "grossMarginPotential": 84,
+        "expansionValue": 94,
+        "timeToMeasurableRoi": 72
+      },
+      "confidence": "high",
+      "evidenceRoutes": [
+        "/scrimed-control-plane",
+        "/validation-evidence",
+        "/trust-center"
+      ],
+      "rationale": "Governance, evidence, policy, and release assurance connect every other SCRIMED product and remain useful across model vendors.",
+      "nextAction": "Package the control plane as the common evidence and governance layer behind every paid assessment and synthetic pilot.",
+      "priorityScore": 79,
+      "externalAuthorityGranted": false,
+      "auditHash": "47aa31514ef4abc2ac9d0d98096d843639ab7a478dc751b909ffb045b07b5498"
+    },
+    {
+      "id": "workflow-intelligence-entry-wedge",
+      "category": "NEAR_TERM_COMMERCIAL",
+      "scores": {
+        "buyerUrgency": 92,
+        "differentiation": 82,
+        "evidenceMaturity": 74,
+        "technicalReadiness": 88,
+        "regulatoryBurden": 24,
+        "integrationEffort": 28,
+        "monetization": 90,
+        "grossMarginPotential": 86,
+        "expansionValue": 87,
+        "timeToMeasurableRoi": 91
+      },
+      "confidence": "high",
+      "evidenceRoutes": [
+        "/offerings",
+        "/documentation-before-authorization",
+        "/pilot-demo-commercial-readiness"
+      ],
+      "rationale": "A bounded no-PHI workflow assessment reaches urgent administrative pain with the lowest current activation burden.",
+      "nextAction": "Run three buyer-specific rehearsals and retain baseline, acceptance, reviewer-burden, and expansion evidence.",
+      "priorityScore": 84,
+      "externalAuthorityGranted": false,
+      "auditHash": "b456068d204dca67525e2cdef6e851a75e9e0484d656338d2d0d3edc60737528"
+    },
+    {
+      "id": "governed-synthetic-evaluation",
+      "category": "NEAR_TERM_COMMERCIAL",
+      "scores": {
+        "buyerUrgency": 84,
+        "differentiation": 88,
+        "evidenceMaturity": 80,
+        "technicalReadiness": 86,
+        "regulatoryBurden": 30,
+        "integrationEffort": 32,
+        "monetization": 84,
+        "grossMarginPotential": 82,
+        "expansionValue": 90,
+        "timeToMeasurableRoi": 83
+      },
+      "confidence": "high",
+      "evidenceRoutes": [
+        "/validation-evidence",
+        "/scrimed-control-plane",
+        "/scrimed-clinical-benchmark-suite"
+      ],
+      "rationale": "Synthetic evaluation converts SCRIMED's governance infrastructure into buyer-reviewable proof without requiring live data.",
+      "nextAction": "Standardize one fixed-scope benchmark and evidence-readout package for the commercial wedge.",
+      "priorityScore": 82,
+      "externalAuthorityGranted": false,
+      "auditHash": "cdadbedb7360bee273cda55cd0106c2fb5b4a957845b4cb616245749c886359b"
+    },
+    {
+      "id": "protected-workflow-pilots",
+      "category": "ENTERPRISE_EXPANSION",
+      "scores": {
+        "buyerUrgency": 88,
+        "differentiation": 90,
+        "evidenceMaturity": 60,
+        "technicalReadiness": 72,
+        "regulatoryBurden": 78,
+        "integrationEffort": 76,
+        "monetization": 92,
+        "grossMarginPotential": 76,
+        "expansionValue": 96,
+        "timeToMeasurableRoi": 56
+      },
+      "confidence": "medium",
+      "evidenceRoutes": [
+        "/pilot-workspace/access",
+        "/approvals-readiness",
+        "/clinical-production-readiness"
+      ],
+      "rationale": "Protected pilots can create renewal evidence, but identity, migration, buyer, legal, privacy, security, and reviewer gates remain material.",
+      "nextAction": "Complete disposable migration evidence and one exact-candidate AAL2 protected workflow rehearsal before requesting pilot activation.",
+      "priorityScore": 71,
+      "externalAuthorityGranted": false,
+      "auditHash": "8a4693f2fa5f2df3cc32d8efe001920f51edc16e6a6e33d290a44e5d40b076d3"
+    },
+    {
+      "id": "healthcare-evidence-graph",
+      "category": "STRATEGIC_MOAT",
+      "scores": {
+        "buyerUrgency": 80,
+        "differentiation": 94,
+        "evidenceMaturity": 67,
+        "technicalReadiness": 77,
+        "regulatoryBurden": 54,
+        "integrationEffort": 60,
+        "monetization": 79,
+        "grossMarginPotential": 88,
+        "expansionValue": 98,
+        "timeToMeasurableRoi": 61
+      },
+      "confidence": "medium",
+      "evidenceRoutes": [
+        "/validation-evidence",
+        "/clinical-data-fabric",
+        "/scrimed-hybrid-retrieval"
+      ],
+      "rationale": "Evidence lineage, contradictions, expiry, and approvals can compound across products even as models change.",
+      "nextAction": "Bind one assessment workflow's claims, source lineage, review, value metric, and release artifact into the platform graph.",
+      "priorityScore": 74,
+      "externalAuthorityGranted": false,
+      "auditHash": "da18a3e01ff262a52b1c04359c15580c6b7cd8d6b8a5d952ae2cfde53d9ab874"
+    },
+    {
+      "id": "clinical-experience-catalog",
+      "category": "R_AND_D_OPTION",
+      "scores": {
+        "buyerUrgency": 76,
+        "differentiation": 84,
+        "evidenceMaturity": 48,
+        "technicalReadiness": 70,
+        "regulatoryBurden": 86,
+        "integrationEffort": 74,
+        "monetization": 64,
+        "grossMarginPotential": 71,
+        "expansionValue": 89,
+        "timeToMeasurableRoi": 43
+      },
+      "confidence": "medium",
+      "evidenceRoutes": [
+        "/demos",
+        "/healthcare-intelligence-os",
+        "/scrimed-patient-context-gateway"
+      ],
+      "rationale": "The catalog strengthens buyer storytelling, but broad commercialization would dilute focus and increase evidence and regulatory burden.",
+      "nextAction": "Retain only the modules needed for a specific buyer narrative and keep them synthetic demonstration-only.",
+      "priorityScore": 61,
+      "externalAuthorityGranted": false,
+      "auditHash": "8cbdbcf16394306fcb88496aaa70763cab295fe09802cc958423077e5061bbb5"
+    },
+    {
+      "id": "partner-agent-marketplace",
+      "category": "DEFER",
+      "scores": {
+        "buyerUrgency": 48,
+        "differentiation": 82,
+        "evidenceMaturity": 32,
+        "technicalReadiness": 52,
+        "regulatoryBurden": 88,
+        "integrationEffort": 86,
+        "monetization": 58,
+        "grossMarginPotential": 70,
+        "expansionValue": 91,
+        "timeToMeasurableRoi": 28
+      },
+      "confidence": "medium",
+      "evidenceRoutes": [
+        "/scrimed-studio",
+        "/approvals-readiness"
+      ],
+      "rationale": "Marketplace upside does not yet outweigh admission, liability, security, quality, and commercial complexity.",
+      "nextAction": "Validate one read-only partner adapter before revisiting marketplace activation.",
+      "priorityScore": 50,
+      "externalAuthorityGranted": false,
+      "auditHash": "0416e2d891aff5e6a9eae17750f7219dcc32f5b2143aa33bce7255b4f5333211"
+    }
+  ],
+  "coreWedge": {
+    "offer": "Workflow Intelligence Assessment",
+    "offerSlug": "workflow-intelligence-assessment",
+    "productWorkflow": "Documentation Before Authorization",
+    "progression": [
+      "paid no-PHI assessment",
+      "governed synthetic evaluation",
+      "protected workflow pilot",
+      "annual governed workflow subscription"
+    ],
+    "proofRoutes": [
+      "/offerings",
+      "/documentation-before-authorization",
+      "/healthcare-value-realization"
+    ],
+    "boundary": "No live PHI, payer submission, EHR writeback, clinical authority, outcome guarantee, or customer activation."
+  },
+  "externalActionsExecuted": false,
+  "auditHash": "86bd733a9c96d6e2efaea1d770a8f92892875b8d4ad95badb63c836350a62a19"
+}

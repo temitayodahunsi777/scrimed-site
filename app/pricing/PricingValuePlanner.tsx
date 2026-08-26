@@ -24,6 +24,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 function midpoint(range: CommercialPriceRange) {
+  if (range.customScope) return 0;
   return Math.round((range.minimumUsd + range.maximumUsd) / 2);
 }
 
@@ -32,7 +33,7 @@ function percentage(value: number) {
 }
 
 export default function PricingValuePlanner({ tiers }: PricingValuePlannerProps) {
-  const defaultTier = tiers.find((tier) => tier.goal === "synthetic-pilot") ?? tiers[0];
+  const defaultTier = tiers.find((tier) => tier.goal === "assessment") ?? tiers[0];
   const [engagementGoal, setEngagementGoal] = useState<CommercialEngagementGoal>(
     defaultTier?.goal ?? "assessment"
   );
@@ -118,7 +119,7 @@ export default function PricingValuePlanner({ tiers }: PricingValuePlannerProps)
                   </option>
                 ))}
               </select>
-              <small>Changing the goal loads the midpoint of its published non-binding planning range.</small>
+              <small>Assessment loads the approved starting point. Custom-scope pilots start blank for human planning.</small>
             </label>
 
             <label className="form-field">

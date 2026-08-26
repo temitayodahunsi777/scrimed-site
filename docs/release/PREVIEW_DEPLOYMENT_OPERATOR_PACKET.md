@@ -28,7 +28,12 @@ data adapter.
 5. Run public smoke, protected fail-closed checks, and:
 
 ```bash
-SCRIMED_PREVIEW_BASE_URL=https://<preview-host> npm run verify:preview-ui -- --json
+SCRIMED_PREVIEW_BASE_URL=https://<preview-host> npm run verify:preview-ui -- --strict
+node scripts/verify-vercel-preview.mjs --strict \
+  --base-url=https://<preview-host> \
+  --candidate-sha=<exact-40-character-candidate-sha> \
+  --ui-evidence=artifacts/ui-verification/preview-ui-verification.json \
+  --output=artifacts/vercel/vercel-preview-evidence.json
 ```
 
 CI may provide Playwright through its normal module path. If the approved runner uses an
@@ -42,6 +47,11 @@ installed Chrome/Chromium binary rather than Playwright-managed browsers, set th
 local CI server with seven-day evidence retention. It does not deploy a Vercel preview or grant
 production authority. Use its artifact to reduce the founder/operator review burden before the
 external preview action.
+
+The exact-candidate verifier rejects a commit mismatch, a non-preview environment, missing
+desktop/mobile evidence, browser console errors, HTTP 5xx responses, unsafe operating-mode flags,
+prohibited public claims, and missing synthetic/no-PHI language. A READY Vercel deployment alone
+is insufficient evidence.
 
 Rollback/removal means disable the preview deployment and revoke preview-scoped credentials;
 there is no production database state to restore. Expected routes include Home, Legal,

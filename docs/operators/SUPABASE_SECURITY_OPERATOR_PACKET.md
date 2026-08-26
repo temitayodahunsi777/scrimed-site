@@ -1,7 +1,7 @@
 # Supabase Security Operator Packet
 
 **Project:** `scrimed-protected-pilot` (`yxacqdfeyojrjghpwike`)
-**Observed:** 2026-08-01
+**Observed:** 2026-08-21 through the connected Supabase Security Advisor
 **Current state:** Security Advisor warning `auth_leaked_password_protection`; protection disabled
 **Required state:** leaked-password protection enabled
 **Status:** OPERATOR REQUIRED
@@ -30,6 +30,12 @@ if an operational regression occurs, the Auth owner must document the incident a
 approve any temporary reversal. Evidence must contain no token, credential, user list, email,
 session, or customer data.
 
-Repository review confirms service-role use remains server-only, protected routes fail closed,
+The connected project reported `ACTIVE_HEALTHY`, PostgreSQL 17, and migrations through
+`20260717002347_scrimed_work_completion_evidence`. The three repository migrations dated
+20260718, 20260721, and 20260722 remain absent from that registry. Repository review confirms
+service-role use remains server-only, protected routes fail closed,
 tenant scoping is enforced in SQL/API policy, and the three pending migrations remain unapplied.
 These source controls do not prove the dashboard setting has changed.
+
+Bind completion evidence to the final gap-closure candidate fingerprint after commit. Evidence
+from the preserved `72c44bed...` candidate cannot satisfy the new candidate automatically.

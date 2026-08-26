@@ -263,7 +263,7 @@ export const pilotDemoPricingTierAlignments: PilotDemoPricingTierAlignment[] = [
   {
     tier: "Workflow Intelligence Assessment",
     oldRisk: "Too-low sprint pricing can underprice founder/product time and create bespoke consulting drag.",
-    recommendedBand: "$25k-$75k standard; $12.5k-$25k mission clinic access path for one no-PHI workflow; $75k-$150k for multi-workflow enterprise assessment.",
+    recommendedBand: "Starting at $25K, subject to a written scope and named human commercial approval.",
     marketRationale:
       "Individual scribe subscriptions are cheap, but enterprise assessment value sits in workflow redesign, governance, interoperability, and executive decision support.",
     marginRule:
@@ -274,7 +274,7 @@ export const pilotDemoPricingTierAlignments: PilotDemoPricingTierAlignment[] = [
   {
     tier: "Synthetic Pilot Evaluation",
     oldRisk: "Old ranges diverged across pricing and pilot pages, confusing buyers and weakening deal discipline.",
-    recommendedBand: "$125k-$350k standard for 45-90 days; $350k-$500k when multiple workflows, extra diligence, or executive proof packets are included.",
+    recommendedBand: "Custom enterprise scope; no binding quote until named human commercial and finance owners approve the written pilot scope.",
     marketRationale:
       "Enterprise AI workflow pilots should sit well above seat-based scribe tools while staying below production integration commitments.",
     marginRule:
@@ -285,7 +285,7 @@ export const pilotDemoPricingTierAlignments: PilotDemoPricingTierAlignment[] = [
   {
     tier: "Protected Enterprise Pilot",
     oldRisk: "Low protected-pilot ranges can ignore security, privacy, evidence-room, tenant, connector, and support costs.",
-    recommendedBand: "$400k-$1.25M for 90-180 days; $1.25M-$2M+ when buyer-specific protected diligence, sandbox planning, or multi-site scope expands.",
+    recommendedBand: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites are evidenced.",
     marketRationale:
       "Redox and enterprise AI vendors use custom pricing because integration, security, governance, reliability, and implementation scope drive cost.",
     marginRule:
@@ -326,7 +326,7 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     recommendedPilotName: "60-Day Governed Automation Pilot",
     recommendedPilotRoute: "/pilots/60-day-governed-automation-pilot",
     recommendedOffer: "Synthetic Pilot Evaluation",
-    pricingBand: "$125k-$350k for 45-90 days after sponsor and workflow owner are confirmed.",
+    pricingBand: "Custom enterprise scope after sponsor, workflow owner, evidence design, and human commercial approval are confirmed.",
     buyerFit: "Access, care navigation, discharge, population health, and throughput leaders.",
     fastPathCta: "/pilot?offer=synthetic-pilot-evaluation&demo=carepath-access-operations",
     proofAssets: [
@@ -350,7 +350,7 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     recommendedPilotName: "60-Day Governed Automation Pilot",
     recommendedPilotRoute: "/pilots/60-day-governed-automation-pilot",
     recommendedOffer: "Synthetic Pilot Evaluation",
-    pricingBand: "$125k-$350k standard; custom note-quality, source-trace, or specialty packet work priced separately.",
+    pricingBand: "Custom enterprise scope; note-quality, source-trace, and specialty packet work require written human-approved scoping.",
     buyerFit: "Clinical documentation, ambulatory operations, quality, and CMIO teams.",
     fastPathCta: "/pilot?offer=synthetic-pilot-evaluation&demo=docutwin-documentation-review",
     proofAssets: [
@@ -374,7 +374,7 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     recommendedPilotName: "60-Day Governed Automation Pilot",
     recommendedPilotRoute: "/pilots/60-day-governed-automation-pilot",
     recommendedOffer: "Synthetic Pilot Evaluation",
-    pricingBand: "$125k-$350k for a governed synthetic documentation-readiness pilot; buyer-specific policy mapping is separately scoped.",
+    pricingBand: "Custom enterprise scope for a governed synthetic documentation-readiness pilot; buyer-specific policy mapping is separately approved.",
     buyerFit: "Prior authorization, RCM, utilization-management, access, and finance transformation leaders.",
     fastPathCta: "/pilot?offer=synthetic-pilot-evaluation&demo=prior-authorization-support",
     proofAssets: [
@@ -398,7 +398,7 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     recommendedPilotName: "60-Day Governed Automation Pilot",
     recommendedPilotRoute: "/pilots/60-day-governed-automation-pilot",
     recommendedOffer: "Synthetic Pilot Evaluation",
-    pricingBand: "$125k-$350k standard; research-network or multi-study scope requires custom pricing.",
+    pricingBand: "Custom enterprise scope; research-network or multi-study work requires separate written approval.",
     buyerFit: "Research operations, oncology programs, academic medical centers, and trial networks.",
     fastPathCta: "/pilot?offer=synthetic-pilot-evaluation&demo=trialcore-research-operations",
     proofAssets: [
@@ -422,7 +422,7 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     recommendedPilotName: "AI Governance + Interoperability Readiness Pilot",
     recommendedPilotRoute: "/pilots/ai-governance-interoperability-readiness",
     recommendedOffer: "Interoperability Readiness Sprint",
-    pricingBand: "$75k-$225k for readiness; production connector work requires separate reviewed scope.",
+    pricingBand: "Custom enterprise scope; production connector work requires separate reviewed scope and approval.",
     buyerFit: "CIOs, integration leaders, EHR teams, health tech platforms, and security teams.",
     fastPathCta: "/pilot?offer=interoperability-readiness-sprint&demo=atlas-interoperability-readiness",
     proofAssets: [
@@ -446,7 +446,7 @@ export const demoOfferPaths: PilotDemoOfferPath[] = [
     recommendedPilotName: "AI Governance + Interoperability Readiness Pilot",
     recommendedPilotRoute: "/pilots/ai-governance-interoperability-readiness",
     recommendedOffer: "TrustOS AI Governance Audit",
-    pricingBand: "$75k-$225k for governance and interoperability readiness; protected pilot scope starts above this.",
+    pricingBand: "Custom enterprise scope; protected pilot work remains unavailable until its external prerequisites pass.",
     buyerFit: "AI governance, compliance, innovation, clinical transformation, and executive leaders.",
     fastPathCta: "/pilot?offer=trustos-ai-governance-audit&demo=agentos-governance-evaluation",
     proofAssets: ["/agents", "/audit", "/trust", "/continuous-review-audit"],
@@ -800,7 +800,7 @@ export function getPilotDemoCommercialReadinessSummary() {
     recommendedMarketPosition:
       "SCRIMED should use free self-guided demos to compete with low-friction AI scribe entry, then price paid work as enterprise workflow intelligence, governance, interoperability readiness, proof packaging, and protected pilot infrastructure.",
     currentPricingDecision:
-      "Keep public demos free, guided standard demos no-cost for qualified buyers, assessments at $25k-$150k depending on scope, synthetic pilots at $125k-$500k, protected pilots at $400k-$2M+, annual licenses at $1.5M-$12M+, and strategic partnerships at $8M-$25M+.",
+      "Keep public demos free, assessments starting at $25K subject to written agreement, synthetic pilots custom-scoped, and protected pilots unavailable until insurance, counsel, security/privacy, and deployment prerequisites are evidenced. Any license or strategic-partnership price remains a human-approved, nonbinding proposal decision.",
     demoOfferPaths: getDemoPathCoverage(),
     buyerConversionPackets,
     sessionPlanner: {

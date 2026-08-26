@@ -1,7 +1,8 @@
 # SCRIMED Portfolio Rationalization
 
 **Status:** Internal operating decision; no customer, revenue, deployment, or investment claim
-**Machine-readable artifact:** `artifacts/product/product-portfolio.json`
+**Machine-readable artifacts:** `artifacts/product/product-portfolio.json`,
+`artifacts/product/portfolio-scorecard.json`
 
 ## Core Wedge
 
@@ -28,6 +29,25 @@ production connectors, payer submission, EHR writeback, or live clinical authori
 | Protected Workflow Pilots | Advance after gates | Best source of outcome and renewal evidence, but identity and external approvals remain material |
 | Clinical and patient experience catalog | Demo only | Preserve buyer storytelling while keeping commercialization focused |
 | Agent and partner marketplace | Incubate | Distribution upside exists, but legal, security, liability, quality, and commercial admission controls are incomplete |
+
+## Weighted Scorecard
+
+The deterministic scorecard weights buyer urgency, differentiation, evidence maturity, technical
+readiness, regulatory burden, integration effort, monetization, gross-margin potential, expansion
+value, and time to measurable ROI. Scores are internal prioritization heuristics, not market,
+revenue, valuation, ROI, customer, or investment claims.
+
+| Portfolio lane | Category | Priority | Confidence |
+| --- | --- | ---: | --- |
+| Workflow intelligence entry wedge | Near-term commercial | 84 | High |
+| Governed synthetic evaluation | Near-term commercial | 82 | High |
+| Governance and evidence platform | Core platform | 79 | High |
+| Healthcare evidence graph | Strategic moat | 74 | Medium |
+| Protected workflow pilots | Enterprise expansion | 71 | Medium |
+| Clinical experience catalog | R&D option | 61 | Medium |
+| Partner and agent marketplace | Defer | 50 | Medium |
+
+The artifact is authoritative if a generated score differs from this explanatory table.
 
 ## Stop Rules
 

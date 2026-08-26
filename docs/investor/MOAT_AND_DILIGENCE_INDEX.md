@@ -29,6 +29,7 @@ leadership, customers, revenue, production scale, or clinical validation.
 | Diligence question | Current evidence |
 | --- | --- |
 | What is the platform? | `docs/investor/SCRIMED_PLATFORM_MAP.md`, `artifacts/platform/platform-map.json` |
+| How is architecture integrity checked? | `docs/architecture/SCRIMED_PLATFORM_GRAPH.md`, `artifacts/platform/scrimed-platform-graph.json` |
 | What is sold first? | `docs/product/PORTFOLIO_RATIONALIZATION.md`, `artifacts/product/product-portfolio.json`, `/offerings` |
 | How is clinical risk bounded? | `docs/SECURITY_AND_EXECUTION_GATES.md`, `docs/REGULATORY_INTENDED_USE_REGISTER.md` |
 | How are model choices governed? | `docs/scrimed-model-routing.md`, `/scrimed-control-plane` |
@@ -37,6 +38,7 @@ leadership, customers, revenue, production scale, or clinical validation.
 | What remains externally gated? | `docs/EXTERNAL_SYSTEM_ACTIONS_REQUIRED.md`, `docs/CEO_AND_COUNSEL_DECISIONS_REQUIRED.md` |
 | What is deployed today? | `docs/release/PRODUCTION_DELTA_REPORT.md` |
 | How are earlier PRs reconciled? | `docs/release/PR_22_23_CONSOLIDATION_REPORT.md` |
+| What belongs in controlled diligence? | `docs/investor/DATA_ROOM_INDEX.md` |
 
 ## Investor Communication Rule
 

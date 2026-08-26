@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "scrimed-p34-validation-report-v5",
+  "scope": "deterministic synthetic p.34 governance, autonomy, trusted evidence expiry, atomic approval verification, kill switch, PHI boundary, egress, sandbox, retrieval, validation, workflow, model-fit, action, continuity, operations, trace-to-eval, evidence contracts, and bounded synthetic-pilot commercial authority",
+  "generatedAt": "2026-08-21T00:00:00.000Z",
+  "expiresAt": "2026-08-22T05:11:03.000Z",
+  "evaluatedAt": "2026-08-22T05:12:30.000Z",
+  "sourceCandidate": "1455b7028912d862d92faa715759cc37d0d154f63124e840b65263a24182a6b6",
+  "validationVersion": "scrimed-p34-control-plane-v2.3-2026-08-23",
+  "status": "REVIEW_REQUIRED",
+  "behaviorChecksStatus": "PASS",
+  "releaseEvidenceStatus": "EXPIRED_REGENERATE_REQUIRED",
+  "checkCount": 40,
+  "passedCount": 40,
+  "failedCount": 0,
+  "checks": [
+    {
+      "id": "capability-registry-integrity",
+      "passed": true,
+      "evidence": "003ffd892275a2e205c62a33d325c2a520cf5a0ad90ec9835c4368485c60a032"
+    },
+    {
+      "id": "unknown-capability-default-deny",
+      "passed": true,
+      "evidence": "scrimed-p34-adaptive-governance-v1-2026-08-15"
+    },
+    {
+      "id": "deterministic-first-route",
+      "passed": true,
+      "evidence": "06208793bc2ee50a4fb0c760c3811267f23273e493846a6d154eab9126be913f"
+    },
+    {
+      "id": "context-provenance-and-conflict-retention",
+      "passed": true,
+      "evidence": "30a540d48a997befe730f761e68631a6178772debffe5194da54daf213f94413"
+    },
+    {
+      "id": "grounded-claims",
+      "passed": true,
+      "evidence": "9053d641fd970a1e51f95cab2c06257777f31ff9996fd4ed76abb0ee8b214505"
+    },
+    {
+      "id": "dicom-export-fails-closed",
+      "passed": true,
+      "evidence": "527afeac0c85221402e8d86e37960e29fc9e32c9e47d83a80937cc1fbd8cfb6a"
+    },
+    {
+      "id": "governance-chain",
+      "passed": true,
+      "evidence": "b96f3b7e480267dafa2ccfd1a3c5e5cd7a8bcd31f7cd1d127ae28161410b97e8"
+    },
+    {
+      "id": "quality-no-auto-promotion",
+      "passed": true,
+      "evidence": "a7aa1b8ba0cff4b4ca548dec6bea645e7e2865d8fa5f65d10639b5e90694ef80"
+    },
+    {
+      "id": "task-level-economics",
+      "passed": true,
+      "evidence": "b561663482fc74ee39e2b6603b73afd60cd6e91e185d1740e141cf2a5b199cbb"
+    },
+    {
+      "id": "offline-placement",
+      "passed": true,
+      "evidence": "4b38f3ff2da3f778ba02c70100f47ba6d31d17300f7486e82b321e38b089ff66"
+    },
+    {
+      "id": "workflow-contract-complete",
+      "passed": true,
+      "evidence": "a26a2f12f838f93621ea311955d4f695f93589fb30a579b990ee1e84d83f10c2"
+    },
+    {
+      "id": "model-fit-local-evidence-only",
+      "passed": true,
+      "evidence": "b4730a1656a3de0a7b031b28f4e97ec7dad279c0e9e59bad1d06585ff072b035"
+    },
+    {
+      "id": "action-maturity-approval-pending",
+      "passed": true,
+      "evidence": "471376b76c26a352766c92907a264d5f6a0c756000fb9097251027716c710504"
+    },
+    {
+      "id": "trust-expansion-not-authorized",
+      "passed": true,
+      "evidence": "f29991c0c0a215cde9a71b8a0df701d5fa050918cd2f23eaa6fd17deee564b8c"
+    },
+    {
+      "id": "continuity-no-causal-claim",
+      "passed": true,
+      "evidence": "bfdcaecefdd7234c7aa158196808f056a052313eaadd4ac7cbf2a8050ddfb286"
+    },
+    {
+      "id": "public-sector-claims-disabled",
+      "passed": true,
+      "evidence": "45ed6544c8a9fb5c934023c7394661eca4ebfc873c299f1a363856b28559a2cf"
+    },
+    {
+      "id": "challenger-isolated-and-disabled",
+      "passed": true,
+      "evidence": "83e25e67dd2db18f571de262874fdab7292702bcf9f69fc13245f41be6cf19a9"
+    },
+    {
+      "id": "workflow-roi-redacted",
+      "passed": true,
+      "evidence": "f0409d4faab5adbb2eb8d0c44bdc85afc383512196cfaed0f7b56f8898446a59"
+    },
+    {
+      "id": "exact-autonomy-approval",
+      "passed": true,
+      "evidence": "832506ad8ec4ec6d468fb017ed370c45a65f1dc31cef48cde1a1fd593dc1e053"
+    },
+    {
+      "id": "clinical-governance-chain",
+      "passed": true,
+      "evidence": "d531bfd47ec9ef7aa13e2d829dd1df5e98b422f6a76588070ba479ca0bd4611e"
+    },
+    {
+      "id": "phi-and-secret-egress",
+      "passed": true,
+      "evidence": "560ccd8151b28d02c6b11c9833dc7af979f8339527e5875e887b431dd6b92cc1"
+    },
+    {
+      "id": "sandbox-default-deny",
+      "passed": true,
+      "evidence": "d712c1ad6abc3ce1038e5066b4de64fe9d8a60107a2a7c9e93f3dea4eeafd945"
+    },
+    {
+      "id": "tenant-first-retrieval",
+      "passed": true,
+      "evidence": "40e27aeefb2d6e2146e4b92cc561a82fae9d6bec11d7bd435c116f1e8f5d6473"
+    },
+    {
+      "id": "external-validation-fails-closed",
+      "passed": true,
+      "evidence": "ab1c2ec3231867ce6ea09f0332d84ee659b37fac995a4ee81230c8cd555356b4"
+    },
+    {
+      "id": "oversight-cannot-auto-reduce",
+      "passed": true,
+      "evidence": "e06f8c3190b07927ca672fb441ca2c76fed9a6e95767fbe5fd96e1ca40570577"
+    },
+    {
+      "id": "patient-delivery-review-gated",
+      "passed": true,
+      "evidence": "67ab6dda87df1b45880bc853a89617bd21dcc7ca87bda951a8d01cb7359fb628"
+    },
+    {
+      "id": "coding-and-billing-boundary",
+      "passed": true,
+      "evidence": "63161a8127fe0535bc23b03846574c41032174a0d89e5f803beb4730df433135"
+    },
+    {
+      "id": "operational-idempotency",
+      "passed": true,
+      "evidence": "a6474f8b67379e7d71ed578072defbdab95ba8e850e827a31dc7a92a606c8738"
+    },
+    {
+      "id": "evidence-bound-claim",
+      "passed": true,
+      "evidence": "7ec9e13238c536a24feedd6b0a6d9b4d3ada1451272ec277073bbb66ccf4f767"
+    },
+    {
+      "id": "synthetic-evidence-expiry-boundary",
+      "passed": true,
+      "evidence": "e98592f590cc1b259ae9bfebba13ad5df1943bfd118fe5e5b75e092ca69e0d6c"
+    },
+    {
+      "id": "synthetic-approval-replay-self-test",
+      "passed": true,
+      "evidence": "720305252d0dd2fc1d96aecd17c3506191895328874dfabfc55f28c587bfc64b"
+    },
+    {
+      "id": "shared-egress-firewall",
+      "passed": true,
+      "evidence": "f4de2cde7f8afd38b3ee3e64779d09a24d51281cb6816d486f29c8ac5be0b6e8,2c1ae6463617af605f68677af3c58267a453c223cab7663a229d31761ebfdc2d,b2b30fcdf54046a09e89d763b8dc6910a341011cbf1cb479b868a46d2e0fd593,fabdd92d55c5c45d71196e1da6e4ce3b38b70f2f3622238914a4998773e1e5d0,fed39851c7d6734761c311c448c04353d42e72a4078c588b34c6d0af3550b774,59bd4973bdd8911084196e80c80e6bffda5fa78ff9f5d94abccbcd5b51b737dd,d28b5d7df4cafbe497aed09d27deb314bcfdcb8712d64024a49de6bdac622432,5628e479efa9a98fac61c5d62b3e259ae78a03b3000bcf05fd5bf5ab610deed4,7413c97edad0cb00b44c7f5ed5df883a9815c4f53887ac9b94e1bc94666ec37c,2848b62738f9a963edd9101643626d6175758b5f0758f38622fc41364054a1cb"
+    },
+    {
+      "id": "global-kill-switch-server-mode",
+      "passed": true,
+      "evidence": "082d81fdb14ed7fccf14635cf29007259f7a4e3962e090242457612aede67e51"
+    },
+    {
+      "id": "oversight-sentinel-no-authority",
+      "passed": true,
+      "evidence": "fddb0d28a4c14b09056e277a03dbed0fec8a21290df2e75c45b36aa74b366508,75d9657d9eff3cacf1ee09e8a5fbaa053a9aa48623e80f6823ae5df27883a751,dae0f9f93988e99c8774ee76d761aab8f463e18fec165b5dbd5dadf4913714f9,ea1fad54c455520a73fa54e9ec097d7054321a577be6c24f0e1cf5181f7a211f,6dfb4fdd03e8113029309333d37054a14423e6aa61d7b1e2d73b04fcafc4d32a,2cd83429d129ee873113d58ae895bf1b0a7c73c429148946e2740b1aa65c6704,67b727f4b26115f1929658b10bae54ab89e6bbd3772051c91c56fa23eb19095f,8b308d47f8355c2d772f0b6c02f318d86e70d2ecbf788b1c3937006b84e948cb,cae7a6f03c3a351e07fb310009009471ac285cec63c8f4de336406565de18064,8c100eba76dc13255cc48914b758aaebdc9bfd88ce9fbc9376ca5a011bf5c4c8,151e2915d9e8e17de9b74b086a607d21efb6fd6af7299fe8ee22ed4532dbbaa0,5775f04e9f0f775ab79484872c84fa653b261dba47ffc6b103333490dbebb50a,ccd2c30e6d1bdfd3e9f5526e3fc1395f9f389857f0cd6caf03c949092593b392,90b53a06ae46d8060a089177060cffe3043f2c235a68d58d1eb60644d0ad46b7,006207adc5b5d25d87b537c3314f7416ccd05cb2e4d17aedcf6edef20746c022,50a260df02c3e857455af6d8f64257f62fb4c59c6573df48d6d7dd4330996d0a"
+    },
+    {
+      "id": "trace-to-eval-redacted",
+      "passed": true,
+      "evidence": "5dc0ba32a10ccad212949b090e053cb004ab011c08a48c8cbfce30e39c92fda1"
+    },
+    {
+      "id": "synthetic-validation-artifact-not-release-evidence",
+      "passed": true,
+      "evidence": "1455b7028912d862d92faa715759cc37d0d154f63124e840b65263a24182a6b6"
+    },
+    {
+      "id": "high-risk-flags-default-off",
+      "passed": true,
+      "evidence": "eight high-risk flags disabled"
+    },
+    {
+      "id": "synthetic-pilot-boundary-and-budget",
+      "passed": true,
+      "evidence": "20c2cedd2abbb35f47f802827cb4bb4994b0f8b491a8a04cd49a27f220d26619"
+    },
+    {
+      "id": "synthetic-pilot-nonbinding-commercial-authority",
+      "passed": true,
+      "evidence": "887f1561d58d3442e4342cfad07072bab0adaf8ba6b8ed39c06a556f2d803f4b"
+    },
+    {
+      "id": "release-authority-retained",
+      "passed": true,
+      "evidence": "0cb511479e3f015617fa5aa15ea44971df5f24ad6e4e34a4b6ef6848009e12f2"
+    }
+  ],
+  "evidenceClassification": "synthetic-fixture-only",
+  "integritySemantics": "deterministic-byte-integrity-only-not-release-evidence",
+  "releaseGateEligible": false,
+  "regenerationRequiredAfterExpiry": true,
+  "freshnessMode": "fixed-synthetic-test-only",
+  "exactCandidateEvidenceVerified": false,
+  "durableApprovalReplayProtectionVerified": false,
+  "externalEvidenceVerified": false,
+  "productionAuthorityGranted": false,
+  "summaryHash": "0cb511479e3f015617fa5aa15ea44971df5f24ad6e4e34a4b6ef6848009e12f2"
+}

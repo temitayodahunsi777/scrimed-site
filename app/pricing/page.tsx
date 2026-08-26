@@ -10,7 +10,7 @@ import PricingValuePlanner from "./PricingValuePlanner";
 export const metadata = {
   title: "SCRIMED Pricing | Governed Healthcare AI Evaluations",
   description:
-    "Explore non-binding SCRIMED planning ranges for no-PHI assessments, synthetic pilots, protected enterprise planning, and governed healthcare intelligence programs.",
+    "Explore SCRIMED's non-binding assessment starting point and human-scoped synthetic and protected enterprise evaluation pathways.",
   alternates: {
     canonical: "https://app.scrimedsolutions.com/pricing"
   }
@@ -46,7 +46,7 @@ export default function PricingPage() {
         <h1>Start with inspectable proof. Expand only when the value and governance case hold.</h1>
         <p className="hero-text">
           SCRIMED uses free public proof, paid no-PHI assessments, synthetic pilots, and externally reviewed
-          enterprise planning. Every range is non-binding until a named human owner approves scope, evidence,
+          enterprise planning. Every price or scope is non-binding until a named human owner approves evidence,
           terms, and retained safety gates.
         </p>
         <div className="hero-actions" aria-label="Pricing actions">

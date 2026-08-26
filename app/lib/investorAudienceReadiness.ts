@@ -1,6 +1,7 @@
 import { getCapitalVitalitySummary } from "./capitalVitality";
 import { getEnterpriseBusinessOpsSummary } from "./enterpriseBusinessOperations";
 import { getGrowthEngineSummary } from "./growthEngine";
+import { getInvestorDemoRunOfShowSummary } from "./investorDemoRunOfShow";
 import { getLimitationsWorkaroundSummary } from "./limitationsWorkaroundOperations";
 import { getMarketActivationSummary } from "./marketActivation";
 import { getPublicMarketReadinessSummary } from "./publicMarketReadiness";
@@ -588,6 +589,7 @@ export function getInvestorAudienceReadinessSummary() {
   const marketActivationSummary = getMarketActivationSummary();
   const publicMarketReadinessSummary = getPublicMarketReadinessSummary();
   const limitationsWorkaroundSummary = getLimitationsWorkaroundSummary();
+  const investorDemoRunOfShow = getInvestorDemoRunOfShowSummary();
   const strategicInvestorOutreach = getStrategicInvestorOutreachSummary();
   const proofRoutes = unique([
     ...weaknessReliefTracks.flatMap((track) => track.proofRoutes),
@@ -663,6 +665,14 @@ export function getInvestorAudienceReadinessSummary() {
     externalReviewAudienceCount,
     readinessGateCount: investorReadinessGates.length,
     strategicTargetCount: strategicInvestorOutreach.targetCount,
+    investorDemoModeCount: investorDemoRunOfShow.modeCount,
+    investorDemoProofChapterCount: investorDemoRunOfShow.proofChapterCount,
+    investorDemoInternalRehearsalReady:
+      investorDemoRunOfShow.recommendedRehearsalAssessment.internalRehearsalReady,
+    investorDemoAutomatedChecksPassed:
+      investorDemoRunOfShow.recommendedRehearsalAssessment.automatedChecksPassed,
+    investorDemoAutomatedCheckCount:
+      investorDemoRunOfShow.recommendedRehearsalAssessment.automatedCheckCount,
     strategicMeetingPacketCount: strategicInvestorOutreach.meetingPacketCount,
     diligenceEvidenceReadyCount: strategicInvestorOutreach.evidenceReadyCount,
     diligenceReviewRequiredCount:
@@ -677,6 +687,7 @@ export function getInvestorAudienceReadinessSummary() {
     investorAudiencePackets,
     investorReadinessGates,
     strategicInvestorOutreach,
+    investorDemoRunOfShow,
     proofRoutes,
     blockedClaims,
     nextInvestorMove:
@@ -753,6 +764,18 @@ export function buildInvestorAudienceReadinessBrief() {
       (target) =>
         `- ${target.organization} (${target.outreachStatus}): ${target.proofThesis} Ask: ${target.specificAsk} Official path: ${target.officialProgram} (${target.officialSource}) Boundary: ${target.claimBoundary}`
     ),
+    "",
+    "## Guided Investor Demonstration",
+    ...summary.investorDemoRunOfShow.plans.map(
+      (plan) =>
+        `- ${plan.modeLabel}: ${plan.durationMinutes} minutes, ${plan.chapters.length} proof chapters. Closing decision: ${plan.closingDecision}`
+    ),
+    `Internal rehearsal: ${summary.investorDemoRunOfShow.recommendedRehearsalAssessment.status}; ${summary.investorDemoAutomatedChecksPassed}/${summary.investorDemoAutomatedCheckCount} automated checks pass.`,
+    "Human actions before an external meeting:",
+    ...summary.investorDemoRunOfShow.recommendedRehearsalAssessment.requiredHumanActions.map(
+      (action) => `- ${action}`
+    ),
+    `Boundary: ${summary.investorDemoRunOfShow.boundary}`,
     "",
     "## Diligence Manifest",
     ...summary.strategicInvestorOutreach.diligenceManifest.map(

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "scrimed-performance-budgets-v1",
+  "measurementBoundary": "Synthetic and public no-PHI preview traffic only",
+  "minimumLiveSampleCount": 30,
+  "materialRegressionPercent": 20,
+  "budgets": {
+    "serverRouteP95Ms": 500,
+    "serverRouteP99Ms": 1200,
+    "pageLoadP75Ms": 2500,
+    "firstLoadJavaScriptBytes": 350000,
+    "hydrationP75Ms": 1000,
+    "serverlessExecutionMs": 10000,
+    "modelLatencyMs": 15000,
+    "agentWorkflowLatencyMs": 30000,
+    "productConsoleApiBytes": 350000
+  },
+  "routeInventory": {
+    "expectedBuiltRouteCount": 630,
+    "expectedPrerenderedRouteCount": 245
+  },
+  "enforcement": {
+    "deterministicBuildBudgets": "fail",
+    "livePercentileBudgetsBeforeMinimumSamples": "review_required",
+    "clinicalSafetyOrPrivacyRegression": "fail_closed"
+  }
+}

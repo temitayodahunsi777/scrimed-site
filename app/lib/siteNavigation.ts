@@ -45,6 +45,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     description: "Packaged assessment, synthetic pilot, protected pilot, and governance paths."
   },
   {
+    label: "Synthetic Pilot",
+    href: "/synthetic-pilot",
+    description: "Bounded no-PHI workflow evaluation with synthetic scenarios, controls, evidence, and human-approved next steps.",
+    boundary: "Synthetic and nonproduction only; not a binding quote, customer activation, PHI authority, clinical authority, payer submission, EHR or device writeback, or production deployment."
+  },
+  {
     label: "Demo to Pilot",
     href: "/pilot-demo-commercial-readiness",
     description: "Seamless demo-to-pilot path with market-aligned pricing, proof assets, no-PHI intake, and margin-safe hard stops.",
@@ -70,6 +76,12 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     href: "/investor-audience-readiness",
     description: "Weakness relief, competitive edge, sellable value, and audience-specific investor and clinic packets.",
     boundary: "Readiness only; not investment advice, securities material, solicitation, valuation assurance, legal advice, tax advice, donor advice, or approval."
+  },
+  {
+    label: "Investor Demo Command",
+    href: "/investor-demo-command-room",
+    description: "Timed investor presentation control with proof-route preflight, chapter progress, human confirmations, and an internal rehearsal receipt.",
+    boundary: "Synthetic operator rehearsal only; not securities material, solicitation, external-send authority, independent approval, PHI authority, clinical authority, production release, or customer go-live."
   },
   {
     label: "Investor Command",
@@ -208,6 +220,18 @@ export const siteNavigationPrimaryLinks: SiteNavigationLink[] = [
     boundary: "Synthetic/de-identified metadata only; consequential actions, investor outreach, clinical authority, payer submission, EHR writeback, production deployment, certification, and customer activation remain blocked."
   },
   {
+    label: "p.33 Integrated Upgrades",
+    href: "/scrimed-p33",
+    description: "Shared clinical context, signal compression, decision evidence, regulatory labels, oversight drift, portable agents, trajectory evaluation, opportunity workflows, and pilot gates.",
+    boundary: "Synthetic/no-PHI decision support only; no autonomous clinical care, provider calls, payer submission, EHR writeback, PHI-capable pilot, Linux local-agent pilot, production promotion, or external distribution."
+  },
+  {
+    label: "p.34 Adaptive Governance",
+    href: "/scrimed-p34",
+    description: "Vendor-neutral capability admission, deterministic-first routing, provenance, DICOM privacy, contemporaneous evidence, quality ratchets, FinOps, and operator accountability.",
+    boundary: "Synthetic/no-PHI controls only; no provider calls, live clinical care, PHI, DICOM export, payer submission, EHR/device mutation, deployment, customer activation, or external distribution."
+  },
+  {
     label: "Automation Autopilot",
     href: "/scrimed-automation-autopilot",
     description: "Automation control plane for autonomy scoring, approval routing, bottleneck workarounds, and review-gated service execution.",
@@ -344,10 +368,12 @@ export const siteNavigationSections: SiteNavigationSection[] = [
       { label: "Clinical Assurance", href: "/clinical-assurance-control-plane", description: "Inspect CAL resolution, sovereign enclaves, exact model passports, capacity and concentration admission, kill switches, worst-cell evidence, and independent fallback." },
       { label: "PayerIQ Workbench", href: "/documentation-before-authorization", description: "Interactive synthetic documentation completeness, evidence-gap, reviewer-queue, and no-submission workflow for prior-authorization teams." },
       { label: "Intelligence Control Plane", href: "/scrimed-control-plane", description: "Unified executive control plane for agent, skill, workflow, context, model, benchmark, capital, compute, outcome, and audit governance." },
+      { label: "p.34 Adaptive Governance", href: "/scrimed-p34", description: "Inspect deterministic-first routing, capability admission, provenance, synthetic DICOM privacy, quality, task economics, operator ownership, and retained gates." },
       { label: "Automation Autopilot", href: "/scrimed-automation-autopilot", description: "Automation control for safe autonomy modes, human approval gates, bottleneck workarounds, proof routes, and no-production-authority decisions." },
       { label: "Workarounds", href: "/limitations-workarounds", description: "Safe alternatives for blocked issues, hard limits, and retained gates." },
       { label: "Service Delivery", href: "/service-delivery", description: "Scoped work orders, artifacts, acceptance criteria, and delivery gates." },
       { label: "Investor Readiness", href: "/investor-audience-readiness", description: "Weakness relief, moat, sellable value, and audience-specific capital or clinic packets." },
+      { label: "Investor Demo Command", href: "/investor-demo-command-room", description: "Preflight proof routes, hold the timebox, advance the guided story, and retain a no-PII internal rehearsal receipt." },
       { label: "Investor Command", href: "/investor-readiness", description: "Enterprise diligence snapshot, readiness evidence, no-go boundaries, model/router status, risk register, and product readiness." },
       { label: "Enterprise Acceleration", href: "/scrimed-enterprise-acceleration", description: "Strategic command for systems, agents, UI, performance, validity, revenue motions, demo assets, sales pitch, and investor confidence." },
       { label: "Market Execution", href: "/scrimed-market-execution", description: "Clean-room market execution lanes that turn competitor research into sales motions, revenue levers, proof artifacts, privacy controls, PR language, and investor narratives." },

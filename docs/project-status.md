@@ -1,6 +1,23 @@
 # SCRIMED Project Status
 
-Updated: 2026-08-01
+Updated: 2026-08-11
+
+## Latest Governed Proof Packet Share-Readiness Release
+
+- Extended the existing Proof Packet Studio with a no-PII preflight that verifies canonical packet fingerprints, packet-specific recipient categories, approved purposes, protected channel controls, route freshness, limitation disclosures, and no-sensitive-data handling.
+- Reused the AAL2 Protected Distribution Lockbox as the sole controlled distribution ledger instead of creating a competing share system.
+- Added a typed `BLOCKED` or `READY_FOR_PROTECTED_INTAKE` policy decision, SHA-256 assessment fingerprint, disabled handoff manifest, required reviewer-role list, missing external evidence list, and browser-local Markdown receipt.
+- Added a rate-limited read/write-free assessment API and responsive operator workbench. No recipient identity, email address, free text, packet content, approval artifact, external message, or customer data is accepted or stored.
+- Routed post-meeting outcome categories to the existing Sales Operations surface while retaining human-controlled follow-up and external send.
+- Preserved retained boundaries: successful preflight is not external distribution, investment solicitation, customer permission, reviewer approval, production release, PHI authority, clinical execution, payer submission, EHR writeback, deployment, or customer go-live authority.
+
+## Latest Investor Demo Command Room Release
+
+- Added `/investor-demo-command-room` as a focused operator presentation surface for the existing three-minute executive preview and twelve-minute diligence walkthrough.
+- Added bounded same-origin `HEAD` preflight across every canonical proof route, including required no-PHI, no-live-care, and no-production-connector response-header checks.
+- Added reversible human presenter confirmations, ordered chapter progress, a pauseable timebox, fail-closed readiness states, and a browser-generated no-PII internal rehearsal receipt.
+- Added `/api/investor-demo-command-room`, typed command-room policy logic, contract and adversarial policy coverage, grouped navigation, and investor-readiness documentation.
+- Preserved retained boundaries: the command room grants no external send, solicitation, independent approval, PHI, clinical execution, payer submission, EHR writeback, production release, customer activation, or customer go-live authority.
 
 ## Latest Preproduction Review And Gate Closure Release
 

@@ -13,7 +13,7 @@ The contract checks:
 
 - main CI uses `npm ci`, dependency audit, dependency security floor, generated integrity, durable-store contract, Intelligence & Safety Stack contract, nonsecret suite, lint, typecheck, and build.
 - workflows use read-only repository permissions.
-- workflows use Node 22 through `actions/setup-node@v6`.
+- workflows use Node 24 through `actions/setup-node@v6`; the dedicated Node 24 certification workflow repeats p.33, nonsecret, secret, SBOM, build, route-inventory, and generated-integrity gates.
 - protected smoke workflows keep explicit timeouts, concurrency controls, and human-provided short-lived AAL2 token paths.
 - workflow files do not include common secret-printing or fail-open patterns.
 

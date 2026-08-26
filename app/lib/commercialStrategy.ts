@@ -11,6 +11,7 @@ export type CommercialPriceRange = {
   minimumUsd: number;
   maximumUsd: number;
   cadence: CommercialPriceCadence;
+  customScope?: boolean;
 };
 
 export type ProductAccessRoute = {
@@ -251,19 +252,19 @@ export const pricingAlignmentDecisions: PricingAlignmentDecision[] = [
   {
     lane: "Assessments",
     decision:
-      "Use $25k-$75k as the standard assessment band, with a $12.5k-$25k mission-clinic access path and $75k-$150k enterprise assessment band.",
+      "Start at $25K subject to a written scope and named human commercial approval.",
     rationale: "This stays approachable for early buyers without pricing SCRIMED like a commodity seat subscription.",
     marginProtection: "Cap workflow count, meetings, artifacts, and review cycles; discount only by reducing scope."
   },
   {
     lane: "Synthetic pilots",
-    decision: "Use $125k-$350k as the standard 45-90 day synthetic pilot band and $350k-$500k for expanded proof scope.",
+    decision: "Use custom enterprise scope for synthetic pilots; a named commercial owner and finance reviewer must approve every nonbinding proposal.",
     rationale: "Enterprise pilots should be materially above individual scribe subscriptions while staying below production integration commitments.",
     marginProtection: "Separate custom packets, protected workspaces, integration planning, legal/security diligence, and implementation labor."
   },
   {
     lane: "Protected enterprise pilots",
-    decision: "Use $400k-$1.25M as the standard 90-180 day protected pilot band and $1.25M-$2M+ for multi-site or heavy diligence scope.",
+    decision: "Keep protected pilots custom-scoped and unavailable until insurance, counsel, security/privacy, and deployment prerequisites are evidenced.",
     rationale: "Protected pilots carry security, privacy, tenant, evidence-room, support, and connector-readiness costs.",
     marginProtection: "Separate annual license, services, support, model usage, evidence-room release, connector work, and change orders."
   },
@@ -362,10 +363,10 @@ export const pricingTiers: PricingTier[] = [
     name: "Workflow Intelligence Assessment",
     status: "sellable-now",
     recommendedDisplayPrice:
-      "Standard $25k-$75k; mission-clinic access path $12.5k-$25k for one no-PHI workflow; enterprise assessment $75k-$150k",
+      "Starting at $25K, subject to written agreement",
     priceRange: {
-      minimumUsd: 12_500,
-      maximumUsd: 150_000,
+      minimumUsd: 25_000,
+      maximumUsd: 25_000,
       cadence: "one-time"
     },
     pricingAuthority: "non-binding-planning-range",
@@ -395,11 +396,12 @@ export const pricingTiers: PricingTier[] = [
     name: "Synthetic Pilot Evaluation",
     status: "sellable-now",
     recommendedDisplayPrice:
-      "Standard $125k-$350k for 45-90 days; $350k-$500k when multiple workflows, diligence, or executive proof packets expand scope",
+      "Custom enterprise scope; named human commercial and finance approval required",
     priceRange: {
-      minimumUsd: 125_000,
-      maximumUsd: 500_000,
-      cadence: "one-time"
+      minimumUsd: 0,
+      maximumUsd: 0,
+      cadence: "one-time",
+      customScope: true
     },
     pricingAuthority: "non-binding-planning-range",
     proposalGate: "Named sponsor, acceptance criteria, scope cap, commercial approval, and no-PHI boundary are required.",
@@ -429,11 +431,12 @@ export const pricingTiers: PricingTier[] = [
     name: "Protected Enterprise Pilot",
     status: "protected-pilot",
     recommendedDisplayPrice:
-      "Standard $400k-$1.25M for 90-180 days; $1.25M-$2M+ for multi-site, protected diligence, sandbox planning, or expanded scope",
+      "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites",
     priceRange: {
-      minimumUsd: 400_000,
-      maximumUsd: 2_000_000,
-      cadence: "one-time"
+      minimumUsd: 0,
+      maximumUsd: 0,
+      cadence: "one-time",
+      customScope: true
     },
     pricingAuthority: "human-approved-proposal-required",
     proposalGate:

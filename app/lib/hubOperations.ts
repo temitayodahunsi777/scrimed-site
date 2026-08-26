@@ -54,7 +54,7 @@ export const readinessChecks: ReadinessCheck[] = [
   { name: "github_push_auth", status: "pass", detail: "GitHub CLI authentication is configured and `main` pushes now publish through the normal Git path." },
   { name: "vercel_git_deployment", status: "pass", detail: "Vercel previews remain available, while automatic production deployment from `main` is disabled so release requires a separate exact-candidate authorization." },
   { name: "app_subdomain_dns", status: "pass", detail: "app.scrimedsolutions.com is bound to the Vercel production deployment and its health endpoint returns ready." },
-  { name: "local_package_manager", status: "pass", detail: "A controlled Node.js 22 and npm toolchain completed deterministic install, zero-vulnerability audit, lint, typecheck, and production build; the committed lockfile supports reproducible CI installs." },
+  { name: "local_package_manager", status: "pass", detail: "SCRIMED now pins Node.js 24 and npm lockfile v3 across repository and CI. The managed shell may use the bundled Node 24 direct runner, while canonical installs remain deterministic npm ci operations." },
   { name: "wix_cta_routing", status: "pass", detail: "The website administrator confirmed Wix CTAs are connected to SCRIMED product routes; branded app-domain routing remains a separate DNS action." },
   { name: "clinical_integrations", status: "planned", detail: "FHIR, HL7 v2, DICOM/DICOMweb, X12, IHE, pharmacy, device, and terminology-aware live connectors are not active yet." }
 ];

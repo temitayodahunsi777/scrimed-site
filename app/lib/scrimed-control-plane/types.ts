@@ -245,6 +245,7 @@ export type CapabilityPublicClaimStatus =
 export type PlatformCapabilityDefinition = {
   id: string;
   name: string;
+  product: string;
   plane: PlatformPlane;
   purpose: string;
   owner: string;
@@ -256,6 +257,8 @@ export type PlatformCapabilityDefinition = {
   allowedToolClasses: ToolRiskClass[];
   requiredEvidence: string[];
   jurisdictionConstraints: string[];
+  permittedJurisdictions: string[];
+  externalSideEffects: string[];
   activationStatus: CapabilityActivationStatus;
   publicClaimStatus: CapabilityPublicClaimStatus;
   maturity: "foundation" | "integrated" | "review-ready" | "protected-pilot";
@@ -270,6 +273,97 @@ export type PlatformCapabilityDefinition = {
   featureFlag: string;
   highRiskDefaultOff: boolean;
   externalActionsEnabled: false;
+  auditHash: string;
+};
+
+export type PlatformGraphNodeType =
+  | "platform-plane"
+  | "capability"
+  | "portfolio-offer"
+  | "agent"
+  | "workflow"
+  | "model-policy"
+  | "connector"
+  | "api"
+  | "database"
+  | "runtime"
+  | "environment"
+  | "release"
+  | "evidence"
+  | "approval"
+  | "metric"
+  | "proof-route"
+  | "policy"
+  | "moat";
+
+export type PlatformGraphRelation =
+  | "depends_on"
+  | "invokes"
+  | "provides_evidence_for"
+  | "governed_by"
+  | "activated_by"
+  | "reviewed_by"
+  | "routes_to"
+  | "measures"
+  | "generates"
+  | "contains"
+  | "prohibited_in";
+
+export type PlatformGraphNode = {
+  id: string;
+  type: PlatformGraphNodeType;
+  label: string;
+  owner: string;
+  maturity: string;
+  riskTier: RiskLevel | "not-applicable";
+  evidenceStatus: string;
+  syntheticOnly: true;
+  externalAuthorityGranted: false;
+  auditHash: string;
+};
+
+export type PlatformGraphEdge = {
+  id: string;
+  from: string;
+  to: string;
+  relation: PlatformGraphRelation;
+  reason: string;
+  auditHash: string;
+};
+
+export type PortfolioScore = {
+  buyerUrgency: number;
+  differentiation: number;
+  evidenceMaturity: number;
+  technicalReadiness: number;
+  regulatoryBurden: number;
+  integrationEffort: number;
+  monetization: number;
+  grossMarginPotential: number;
+  expansionValue: number;
+  timeToMeasurableRoi: number;
+};
+
+export type PortfolioCategory =
+  | "CORE_PLATFORM"
+  | "NEAR_TERM_COMMERCIAL"
+  | "ENTERPRISE_EXPANSION"
+  | "STRATEGIC_MOAT"
+  | "R_AND_D_OPTION"
+  | "DUPLICATE"
+  | "DEFER"
+  | "RETIRE";
+
+export type PortfolioScorecardEntry = {
+  id: string;
+  category: PortfolioCategory;
+  scores: PortfolioScore;
+  priorityScore: number;
+  confidence: "low" | "medium" | "high";
+  evidenceRoutes: string[];
+  rationale: string;
+  nextAction: string;
+  externalAuthorityGranted: false;
   auditHash: string;
 };
 

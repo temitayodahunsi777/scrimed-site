@@ -125,6 +125,15 @@ if (lockedVersion("sharp") !== sharpOverride) {
   throw new Error(`package-lock resolved sharp@${lockedVersion("sharp") ?? "missing"} but override requires ${sharpOverride}`);
 }
 
+const nanoidOverride = packageJson.overrides?.nanoid;
+if (nanoidOverride !== "3.3.18") {
+  throw new Error("nanoid override must remain pinned to the reviewed 3.3.18 security floor.");
+}
+
+if (lockedVersion("nanoid") !== nanoidOverride) {
+  throw new Error(`package-lock resolved nanoid@${lockedVersion("nanoid") ?? "missing"} but override requires ${nanoidOverride}`);
+}
+
 const lockedPackageVersions = (packageName) =>
   Object.entries(packageLock.packages ?? {})
     .filter(([packagePath]) =>
@@ -149,8 +158,8 @@ for (const version of lockedPackageVersions("js-yaml")) {
 }
 
 for (const version of lockedPackageVersions("nanoid")) {
-  if (compareVersions(version, "3.3.17", "nanoid") < 0) {
-    throw new Error(`nanoid@${version} is below the reviewed 3.3.17 security floor.`);
+  if (compareVersions(version, "3.3.18", "nanoid") < 0) {
+    throw new Error(`nanoid@${version} is below the reviewed 3.3.18 security floor.`);
   }
 }
 
@@ -170,5 +179,5 @@ for (const [packagePath, metadata] of Object.entries(packageLock.packages ?? {})
 console.log(
   `pass SCRIMED dependency security floor contract check (next ${dependencySpecifier("next")}, react ${dependencySpecifier(
     "react"
-  )}, postcss ${postcssOverride}, sharp ${sharpOverride}, nanoid ${lockedVersion("nanoid")})`
+  )}, postcss ${postcssOverride}, sharp ${sharpOverride}, nanoid ${nanoidOverride})`
 );
