@@ -1,5 +1,7 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
+import { getP34PreviewAcceptanceSummary } from "../release/previewAcceptance";
 import { getScrimedBuildInfo } from "../release/vercelReleaseAssurance";
+import { p34ExactHeadBaseline, p34ExactHeadBoundary } from "./exactHeadBaseline";
 import { getP34AdaptiveGovernanceSummary } from "./index";
 
 export const p34ReviewReadinessVersion = "scrimed-p34-review-readiness-v1-2026-08-25";
@@ -30,17 +32,30 @@ function reviewEvidenceFreshness(expiresAt: string | undefined) {
   };
 }
 
+function normalizedTimestamp(value: string | undefined | null, fallback: string) {
+  const candidate = value?.trim() ?? "";
+  return Number.isFinite(Date.parse(candidate)) ? new Date(candidate).toISOString() : fallback;
+}
+
 export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.env) {
   const build = getScrimedBuildInfo(env);
   const p34 = getP34AdaptiveGovernanceSummary();
+  const previewAcceptance = getP34PreviewAcceptanceSummary(env);
   const exactHead = normalizedGitSha(build.commitSha);
-  const requestedHead = normalizedGitSha(env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA);
+  const requestedHead = normalizedGitSha(
+    env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA ?? p34ExactHeadBaseline.commitSha
+  );
   const approvedHead = normalizedGitSha(env.SCRIMED_P34_REVIEW_APPROVED_HEAD_SHA);
   const reviewerIdentity = reviewerPattern.test(env.SCRIMED_P34_REVIEWER_ID?.trim() ?? "")
     ? env.SCRIMED_P34_REVIEWER_ID!.trim()
     : null;
   const candidate = normalizedSha256(build.candidateFingerprint);
   const freshness = reviewEvidenceFreshness(env.SCRIMED_P34_REVIEW_EXPIRES_AT);
+  const requestedAt = normalizedTimestamp(
+    env.SCRIMED_P34_REVIEW_REQUESTED_AT,
+    p34ExactHeadBaseline.reviewRequest.requestedAt
+  );
+  const requestAgeHours = Math.max(0, Number(((Date.now() - Date.parse(requestedAt)) / 3_600_000).toFixed(1)));
   const reviewRequested = Boolean(requestedHead);
   const reviewRequestCurrent = Boolean(exactHead && requestedHead && exactHead === requestedHead);
   const independentReviewRecorded = Boolean(
@@ -52,7 +67,9 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
   );
   const reviewState = independentReviewRecorded
     ? "HUMAN_REVIEW_EVIDENCE_PRESENT_REQUIRES_EXTERNAL_VERIFICATION"
-    : reviewRequested && !reviewRequestCurrent
+    : reviewRequested && !exactHead
+      ? "EXACT_REVIEW_REQUESTED_RUNTIME_UNBOUND"
+      : reviewRequested && !reviewRequestCurrent
       ? "STALE_REVIEW_REQUEST"
       : reviewRequestCurrent
         ? "EXACT_REVIEW_REQUESTED"
@@ -73,6 +90,19 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
       sbomFingerprint: normalizedSha256(env.SCRIMED_P34_SBOM_SHA256),
       runtimeBindingStatus: build.candidateFingerprintVerificationStatus
     },
+    frozenReviewTarget: {
+      commitSha: p34ExactHeadBaseline.commitSha,
+      treeSha: p34ExactHeadBaseline.treeSha,
+      candidateFingerprint: p34ExactHeadBaseline.candidateFingerprint,
+      sourceFingerprint: p34ExactHeadBaseline.sourceFingerprint,
+      validationFingerprint: p34ExactHeadBaseline.validationFingerprint,
+      reviewPacketFingerprint: p34ExactHeadBaseline.reviewPacketFingerprint,
+      gatePacketFingerprint: p34ExactHeadBaseline.gatePacketFingerprint,
+      sbomFingerprint: p34ExactHeadBaseline.sbomFingerprint,
+      reviewRequestEvidence: p34ExactHeadBaseline.reviewRequest.evidenceUrl,
+      previewDeploymentId: p34ExactHeadBaseline.preview.deploymentId,
+      runtimeMatchesTarget: exactHead === p34ExactHeadBaseline.commitSha
+    },
     pullRequest: {
       repository: "temitayodahunsi777/scrimed-site",
       number: 39,
@@ -92,6 +122,8 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
     review: {
       requested: reviewRequested,
       requestedHead,
+      requestedAt,
+      requestAgeHours,
       requestCurrent: reviewRequestCurrent,
       reviewerIdentity,
       approvedHead,
@@ -112,6 +144,7 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
       classificationRequired: true as const,
       unexpectedFilesAllowed: false as const
     },
+    previewAcceptance,
     operatorActions: [
       { id: "independent-review", owner: "independent-technical-reviewer", state: reviewState },
       { id: "aal2", owner: "authorized-preview-operator", state: "OPERATOR_ACTION_REQUIRED" },
@@ -124,7 +157,7 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
     },
     productionAuthorityGranted: false as const,
     boundary:
-      "Read-only operational metadata. Runtime environment declarations are not accepted as independent approval, signature verification, merge authority, deployment authority, PHI authority, clinical authority, or customer activation."
+      `Read-only operational metadata. ${p34ExactHeadBoundary} Runtime environment declarations are not accepted as independent approval, signature verification, merge authority, deployment authority, PHI authority, clinical authority, or customer activation.`
   };
 
   return {

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
 
 import { analyzeAal2BearerToken, tokenFingerprint, userFingerprint } from "./lib/aal2-token-policy.mjs";
 import {
@@ -9,10 +10,12 @@ import {
   parseAllowedAal2PreviewOrigins,
   readLocalAal2CandidateBinding
 } from "./lib/aal2-target-binding.mjs";
+import { createRedactedAal2Evidence } from "./lib/aal2-redacted-evidence.mjs";
 
 const selfTest = process.argv.includes("--self-test");
 const json = process.argv.includes("--json");
-const allowedArguments = new Set(["--self-test", "--json"]);
+const writeEvidence = process.argv.includes("--write-evidence");
+const allowedArguments = new Set(["--self-test", "--json", "--write-evidence"]);
 const unknownArguments = process.argv.slice(2).filter((argument) => !allowedArguments.has(argument));
 if (unknownArguments.length > 0) throw new Error(`Unsupported AAL2 candidate option: ${unknownArguments.join(", ")}`);
 
@@ -217,6 +220,14 @@ if (selfTest) {
   if (report.status !== "PASS_NONPRODUCTION_AAL2" || report.tokenPersisted !== false) {
     throw new Error("AAL2 candidate verification self-test failed.");
   }
+  const redacted = createRedactedAal2Evidence(report, "2027-01-15T08:00:00.000Z");
+  if (
+    "tokenFingerprint" in redacted
+    || "subjectFingerprint" in redacted
+    || JSON.stringify(redacted).includes("synthetic-signature")
+  ) {
+    throw new Error("AAL2 redacted evidence included credential-derived detail.");
+  }
 
   let disallowedFetches = 0;
   const disallowedReport = await runAal2CandidateVerification({
@@ -288,14 +299,19 @@ try {
 }
 
 const report = await runAal2CandidateVerification({ token, targetUrl, allowedPreviewOrigins, localBinding });
+if (writeEvidence) {
+  const evidence = createRedactedAal2Evidence(report);
+  await mkdir("artifacts/security", { recursive: true });
+  await writeFile("artifacts/security/p34-aal2-evidence.json", `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+}
 if (json) console.log(JSON.stringify(report, null, 2));
 else {
   console.log(`SCRIMED p.34 AAL2 candidate verification: ${report.status}`);
   console.log(`target=${report.targetOrigin ?? "invalid"}`);
   console.log(`commit=${report.commitSha}`);
   console.log(`candidate=${report.candidateFingerprint}`);
-  console.log(`token_fingerprint=${report.tokenFingerprint ?? "invalid"}`);
   for (const check of report.checks) console.log(`${check.passed ? "pass" : "blocked"} ${check.id}: ${check.detail}`);
+  if (writeEvidence) console.log("redacted_evidence=artifacts/security/p34-aal2-evidence.json");
   console.log(report.boundary);
 }
 if (report.status !== "PASS_NONPRODUCTION_AAL2") process.exit(1);

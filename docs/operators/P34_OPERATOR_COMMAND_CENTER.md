@@ -16,10 +16,10 @@ Use these bounded actions only after the final exact candidate is pushed. Every 
 
 - **Owner:** authorized preview operator
 - **Prerequisite:** fresh AAL2 token, final nonproduction preview URL, an exact-origin allowlist from the approved preview deployment record, exact clean local candidate
-- **Steps:** set `AAL2_TEST_TOKEN`, `TARGET_URL`, and `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` in the secure shell session; the target must exactly match one comma-delimited allowlist origin. Run `npm run verify:aal2:candidate`; unset the token after completion.
+- **Steps:** set `AAL2_TEST_TOKEN`, `TARGET_URL`, and `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` in the secure shell session; the target must exactly match one comma-delimited allowlist origin. Run `npm run verify:aal2:candidate:evidence`; unset the token after completion.
 - **Expected result:** candidate/preview binding, AAL2 and fresh step-up checks, protected endpoint verification, local replay guard, and stale-token policy rejection pass
 - **Verify:** inspect the redacted JSON receipt; no raw token is written
-- **Evidence:** operator-controlled redacted output
+- **Evidence:** `artifacts/security/p34-aal2-evidence.json`, containing only candidate, target, assurance result, timestamp, test dispositions, and evidence hash
 - **Recovery:** sign out, sign in, complete authenticator step-up, refresh the preview token, and rerun
 
 ## Supabase Leaked-Password Protection

@@ -66,6 +66,7 @@ import {
   releaseContinuityProofStackStatus
 } from "./releaseContinuity";
 import { getScrimedBuildInfo } from "./release/vercelReleaseAssurance";
+import { getP34PreviewAcceptanceSummary } from "./release/previewAcceptance";
 import {
   getNavigationAuditSummary,
   navigationAuditBriefProofStackStatus,
@@ -1307,6 +1308,7 @@ export function getProductConsoleSummary() {
   const p33IntegratedSummary = getP33IntegratedSummary();
   const p34IntegratedSummary = getP34AdaptiveGovernanceSummary();
   const p34ReviewReadinessSummary = getP34ReviewReadinessSummary();
+  const p34PreviewAcceptanceSummary = getP34PreviewAcceptanceSummary();
   const syntheticPilotReadinessSummary = getSyntheticPilotReadinessSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
@@ -1430,9 +1432,8 @@ export function getProductConsoleSummary() {
     p34AutonomyCeiling: p34IntegratedSummary.controlPlane2.action.a3Available ? "A3" : "A2_REVIEW_ONLY",
     p34ReviewState: p34IntegratedSummary.exactCandidateReview.status,
     p34MigrationState: "THREE_UNAPPLIED_STATIC_REVIEW_READY_OPERATOR_AUTHORIZATION_REQUIRED",
-    p34PreviewState: buildInfo.environment === "preview" && buildInfo.commitSha
-      ? "PREVIEW_RUNTIME_PRESENT_EXACT_EVIDENCE_REQUIRED"
-      : "PREVIEW_NOT_VERIFIED",
+    p34PreviewState: p34PreviewAcceptanceSummary.status,
+    p34PreviewAcceptance: p34PreviewAcceptanceSummary,
     p34Aal2State: "FRESH_EXACT_TARGET_OPERATOR_EVIDENCE_REQUIRED",
     p34SupabaseSecurityState: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_AND_LIVE_RECHECK_REQUIRED",
     p34ReviewReadiness: p34ReviewReadinessSummary,
@@ -2733,6 +2734,7 @@ let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
 
 function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
   summary.p34ReviewReadiness = getP34ReviewReadinessSummary();
+  summary.p34PreviewAcceptance = getP34PreviewAcceptanceSummary();
   return summary;
 }
 

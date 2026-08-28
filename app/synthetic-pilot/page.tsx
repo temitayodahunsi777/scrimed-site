@@ -124,6 +124,55 @@ export default function SyntheticPilotPage() {
         </div>
       </section>
 
+      <section className="table-section" aria-label="Synthetic pilot operating controls">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot operating system</p>
+          <h2>Objective success, spend, reproducibility, and expansion are governed before execution.</h2>
+        </div>
+        <article className="module-row">
+          <div><span>{summary.pilotOperatingSystem.manifestDecision.status}</span><h2>Manifest and control contract</h2></div>
+          <p>{summary.pilotOperatingSystem.manifestDecision.manifest?.templateTitle}; candidate, dataset, model policy, evidence policy, duration, exclusions, and approval state are fingerprinted.</p>
+          <div><strong>{summary.pilotOperatingSystem.templateRegistry.templateCount} templates</strong><p>production authority: none</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.pilotOperatingSystem.successCriteria.status}</span><h2>Objective success criteria</h2></div>
+          <p>{summary.pilotOperatingSystem.successCriteria.passedCount} of {summary.pilotOperatingSystem.successCriteria.criterionCount} synthetic criteria passed with matching evidence sources.</p>
+          <div><strong>no vague success state</strong><p>human review retained</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.pilotOperatingSystem.costGovernor.status}</span><h2>Cost governor</h2></div>
+          <p>Total synthetic spend ${summary.pilotOperatingSystem.costGovernor.totalSpendUsd?.toLocaleString() ?? "not calculable"}; overrun stops execution.</p>
+          <div><strong>{summary.pilotOperatingSystem.costGovernor.budgetUtilizationPercent ?? 0}%</strong><p>budget utilization</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.pilotOperatingSystem.expansion.decision}</span><h2>Expansion decision</h2></div>
+          <p>Protected pilot preparation requires insurance, counsel, privacy/security, deployment design, and customer authorization.</p>
+          <div><strong>activation blocked</strong><p>no agent sales commitment</p></div>
+        </article>
+      </section>
+
+      <section className="section-band" aria-label="Commercial priority evidence">
+        <div className="section-heading">
+          <p className="eyebrow">Commercial priority</p>
+          <h2>Buyer archetypes are ranked by value, feasibility, evidence gain, fit, effort, and risk.</h2>
+        </div>
+        <div className="principle-grid">
+          {summary.pilotOperatingSystem.buyerPriority.map((buyer) => (
+            <article key={buyer.archetype}>
+              <span>{buyer.status}</span>
+              <h3>{readable(buyer.archetype)}</h3>
+              <p>Priority {buyer.priorityScore}/100</p>
+              <ul className="compact-list">
+                <li>Commercial value: {buyer.commercialValue}</li>
+                <li>Pilot feasibility: {buyer.pilotFeasibility}</li>
+                <li>Risk adjustment: {buyer.riskAdjustment}</li>
+                <li>Automatic outreach: no</li>
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="table-section" aria-label="Strategic synthetic pilot profiles">
         <div className="section-heading">
           <p className="eyebrow">Strategic profiles</p>

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "scrimed-p34-review-index-v1",
+  "pullRequestNumber": 39,
+  "exactReviewTarget": {
+    "repository": "temitayodahunsi777/scrimed-site",
+    "pullRequestNumber": 39,
+    "commitSha": "45be650f48e422b05160821681ff40bb9f1229c9",
+    "treeSha": "f1d68282f84243a0e20d51eeb47775aff293a6f8",
+    "candidateFingerprint": "184b07843e9eaa4a0dd0bc2c783944b66df7cbc95b05dc37930663197ae71d16",
+    "sourceFingerprint": "410a544bfee9e7de246f684ef6966118206f228ef84c63b6508133f1f3647612",
+    "validationFingerprint": "42d4d7790f8270b8cb1d742938d11590ddb1d3e6fb59c066b97235c3c5960743",
+    "reviewPacketFingerprint": "7540b5b8c7abf467b9249b80bfcf41c4b180949588641ab4a38f3f0e12015035",
+    "gatePacketFingerprint": "a4193aab60512c280a425171a868785ea8e07ab30f80b17665001f02975dda0e",
+    "sbomFingerprint": "9febdb954737f82d9d9be29b0a1013c7cea520c6206f1793e79e5b1422ad38ef",
+    "reviewRequestedAt": "2026-08-26T00:30:13.000Z",
+    "reviewRequestUrl": "https://github.com/temitayodahunsi777/scrimed-site/pull/39#issuecomment-5418888268",
+    "deploymentId": "dpl_MPSXXudmikWZduLxEvAY8afTtXvz",
+    "deploymentUrl": "https://scrimed-site-8tjd5qyj0-temitayo-dahunsis-projects.vercel.app",
+    "branchAlias": "https://scrimed-site-git-agent-scrime-02c77f-temitayo-dahunsis-projects.vercel.app",
+    "builtRoutes": 630,
+    "prerenderedRoutes": 245
+  },
+  "targetReviewMinutes": {
+    "minimum": 10,
+    "maximum": 15
+  },
+  "sectionCount": 16,
+  "sections": [
+    {
+      "order": 1,
+      "title": "Exact SHA and tree",
+      "evidencePointer": "docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md"
+    },
+    {
+      "order": 2,
+      "title": "Architecture",
+      "evidencePointer": "docs/scrimed-p34-clinical-operating-system.md"
+    },
+    {
+      "order": 3,
+      "title": "65-file precision wave",
+      "evidencePointer": "docs/review/P39_FULL_INTEGRATION_MAP.md"
+    },
+    {
+      "order": 4,
+      "title": "Synthetic pilot additions",
+      "evidencePointer": "app/lib/commercial/syntheticPilotReadiness.ts"
+    },
+    {
+      "order": 5,
+      "title": "AAL2 verifier",
+      "evidencePointer": "scripts/run-aal2-candidate-verification.mjs"
+    },
+    {
+      "order": 6,
+      "title": "Tenant isolation",
+      "evidencePointer": "tests/security/supabase-rls-contract.test.mjs"
+    },
+    {
+      "order": 7,
+      "title": "Approval logic",
+      "evidencePointer": "app/lib/scrimed-p34/atomicApproval.ts"
+    },
+    {
+      "order": 8,
+      "title": "PHI egress",
+      "evidencePointer": "app/lib/scrimed-p34/egressFirewall.ts"
+    },
+    {
+      "order": 9,
+      "title": "Kill switch",
+      "evidencePointer": "app/lib/scrimed-p34/controlPlane2.ts"
+    },
+    {
+      "order": 10,
+      "title": "Oversight Sentinel",
+      "evidencePointer": "app/lib/scrimed-p34/controlPlane2.ts"
+    },
+    {
+      "order": 11,
+      "title": "Runtime revalidation",
+      "evidencePointer": "app/lib/scrimed-p34/controlPlane2.ts"
+    },
+    {
+      "order": 12,
+      "title": "Migrations",
+      "evidencePointer": "docs/operators/P34_MIGRATION_OPERATOR_PACKET.md"
+    },
+    {
+      "order": 13,
+      "title": "Vercel preview",
+      "evidencePointer": "docs/review/P34_PREVIEW_ACCEPTANCE_PACKET.md"
+    },
+    {
+      "order": 14,
+      "title": "Supabase",
+      "evidencePointer": "docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md"
+    },
+    {
+      "order": 15,
+      "title": "Commercial controls",
+      "evidencePointer": "app/lib/commercial/pilotOperatingSystem.ts"
+    },
+    {
+      "order": 16,
+      "title": "Security and residual gates",
+      "evidencePointer": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md"
+    }
+  ],
+  "integrationMapHash": "99e1ba9cfe32206a2c050a3f58d4fc96d9d758c1ec3987d31cc2f0aacad4bccb",
+  "independentReviewStatus": "EXACT_REVIEW_REQUIRED",
+  "mergeAuthorityGranted": false,
+  "productionAuthorityGranted": false,
+  "indexHash": "d470250668c8359d678cf60c4b055bfa9d8d363cbc02b877497408784fb0aeb3"
+}

@@ -890,8 +890,13 @@ export default function ProductConsolePage() {
         </article>
         <article className="module-row">
           <div><span>{summary.p34ReviewReadiness.review.state}</span><h2>Independent review</h2></div>
-          <p>Requested head {summary.p34ReviewReadiness.review.requestedHead?.slice(0, 12) ?? "not runtime-attested"}; reviewer {summary.p34ReviewReadiness.review.reviewerIdentity ?? "not recorded"}.</p>
+          <p>Requested head {summary.p34ReviewReadiness.review.requestedHead?.slice(0, 12) ?? "not runtime-attested"}; reviewer {summary.p34ReviewReadiness.review.reviewerIdentity ?? "not recorded"}; request age {summary.p34ReviewReadiness.review.requestAgeHours} hours.</p>
           <div><strong>{summary.p34ReviewReadiness.review.evidenceFreshness}</strong><p>runtime never self-approves</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.p34PreviewAcceptance.previewReady ? "READY" : "NOT READY"}</span><h2>Protected preview acceptance</h2></div>
+          <p>Deployment {summary.p34PreviewAcceptance.deploymentId}; exact runtime match {summary.p34PreviewAcceptance.runtimeMatchesFrozenTarget ? "yes" : "no"}.</p>
+          <div><strong>{summary.p34PreviewAcceptance.previewAccepted ? "YES" : "NO"}</strong><p>production alias: no; production authority: no</p></div>
         </article>
         <article className="module-row">
           <div><span>{summary.p34ReviewReadiness.scope.authoritativePrInventoryObserved} files</span><h2>Review surface</h2></div>
@@ -925,6 +930,16 @@ export default function ProductConsolePage() {
           <div><span>{summary.commercialReadiness.syntheticPilot}</span><h2>SCRIMED Synthetic Workflow Pilot</h2></div>
           <p>{summary.syntheticPilotReadiness.commercialPosture.syntheticPilot.price}; no PHI, clinical execution, or production connector.</p>
           <div><strong>{summary.syntheticPilotReadiness.readiness.score}/100</strong><p>synthetic readiness score</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.syntheticPilotReadiness.pilotOperatingSystem.manifestDecision.status}</span><h2>Pilot control contract</h2></div>
+          <p>{summary.syntheticPilotReadiness.pilotOperatingSystem.templateRegistry.templateCount} reusable templates bind scope, objective metrics, cost ceilings, exclusions, evidence, and human authority.</p>
+          <div><strong>{summary.syntheticPilotReadiness.pilotOperatingSystem.successCriteria.passedCount}/{summary.syntheticPilotReadiness.pilotOperatingSystem.successCriteria.criterionCount}</strong><p>synthetic objective criteria</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.syntheticPilotReadiness.pilotOperatingSystem.costGovernor.status}</span><h2>Cost and expansion governor</h2></div>
+          <p>Estimated spend ${summary.syntheticPilotReadiness.pilotOperatingSystem.costGovernor.totalSpendUsd?.toLocaleString() ?? "unavailable"}; protected-pilot prerequisites remain independent gates.</p>
+          <div><strong>{summary.syntheticPilotReadiness.pilotOperatingSystem.expansion.decision}</strong><p>customer activation: blocked</p></div>
         </article>
         <article className="module-row">
           <div><span>{summary.commercialReadiness.protectedPilot}</span><h2>Protected Enterprise Pilot</h2></div>

@@ -1054,12 +1054,29 @@ const checks = [
     args: ["scripts/scrimed-p34-precision-wave-contract-check.mjs"]
   },
   {
+    label: "SCRIMED p.34 post-review readiness policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-post-review-readiness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 post-review readiness contract",
+    args: ["scripts/scrimed-p34-post-review-readiness-contract-check.mjs"]
+  },
+  {
     label: "SCRIMED p.34 AAL2 one-command verifier policy",
     args: ["scripts/run-aal2-candidate-verification.mjs", "--self-test"]
   },
   {
     label: "PR #39 review-map integrity",
     args: ["scripts/generate-p39-review-map.mjs", "--check"]
+  },
+  {
+    label: "SCRIMED p.34 post-review artifact integrity",
+    args: ["scripts/generate-p34-post-review-artifacts.mjs", "--check"]
   },
   {
     label: "SCRIMED p.34 artifact integrity",
