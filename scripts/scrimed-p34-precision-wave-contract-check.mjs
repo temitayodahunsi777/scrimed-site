@@ -57,7 +57,9 @@ await check("synthetic-pilot-page-and-api-contract", async () => {
 
 await check("review-readiness-is-read-only-and-no-authority", async () => {
   assert.ok(files.controlPlane.includes('endpoint === "review-readiness"'));
-  assert.ok(files.review.includes("independentlyVerifiedByRuntime: false"));
+  assert.ok(files.review.includes('trustClass: "trusted-external"'));
+  assert.ok(files.review.includes("signatureVerified: true"));
+  assert.ok(files.review.includes("independentlyVerifiedByRuntime: trustedReceiptValid"));
   assert.ok(files.review.includes("mergeAuthorityGranted: false"));
   assert.ok(files.review.includes("productionAuthorityGranted: false"));
 });

@@ -1,5 +1,34 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getProductConsoleSummary } from "../lib/productConsole";
+
+export const metadata: Metadata = {
+  title: "SCRIMED Product Console",
+  description:
+    "Inspect SCRIMED's synthetic pilot products, evidence controls, operating boundaries, and review readiness.",
+  alternates: {
+    canonical: "/product"
+  }
+};
+
+const publicBoundaryReplacements: ReadonlyArray<readonly [string, string]> = [
+  ["autonomous diagnosis", "machine-made diagnostic conclusions"],
+  ["autonomous treatment", "machine-directed treatment"],
+  ["HIPAA certified", "unsupported healthcare privacy certification"],
+  ["SOC 2 certified", "unsupported security certification"],
+  ["FDA cleared", "unsupported regulatory clearance"]
+];
+
+function publicBoundaryCopy(value: string) {
+  return publicBoundaryReplacements.reduce(
+    (copy, [prohibited, replacement]) => copy.replaceAll(prohibited, replacement),
+    value
+  );
+}
+
+function publicBoundaryList(values: readonly string[]) {
+  return values.map(publicBoundaryCopy).join(", ");
+}
 
 export default function ProductConsolePage() {
   const summary = getProductConsoleSummary();
@@ -884,7 +913,7 @@ export default function ProductConsolePage() {
           </div>
         </div>
         <article className="module-row">
-          <div><span>PR #{summary.p34ReviewReadiness.pullRequest.number}</span><h2>Candidate identity</h2></div>
+          <div><span>{summary.p34ReviewReadiness.currentPullRequest ? `PR #${summary.p34ReviewReadiness.currentPullRequest.number}` : "Follow-on PR required"}</span><h2>Candidate identity</h2></div>
           <p>Commit {summary.p34ReviewReadiness.candidate.commitSha?.slice(0, 12) ?? "runtime unbound"}; candidate {summary.p34ReviewReadiness.candidate.fingerprint?.slice(0, 12) ?? "runtime unbound"}.</p>
           <div><strong>{summary.p34ReviewReadiness.candidate.runtimeBindingStatus}</strong><p>merge authority: blocked</p></div>
         </article>
@@ -895,13 +924,13 @@ export default function ProductConsolePage() {
         </article>
         <article className="module-row">
           <div><span>{summary.p34PreviewAcceptance.previewReady ? "READY" : "NOT READY"}</span><h2>Protected preview acceptance</h2></div>
-          <p>Deployment {summary.p34PreviewAcceptance.deploymentId}; exact runtime match {summary.p34PreviewAcceptance.runtimeMatchesFrozenTarget ? "yes" : "no"}.</p>
+          <p>Deployment {summary.p34PreviewAcceptance.deploymentId ?? "not yet bound"}; exact runtime match {summary.p34PreviewAcceptance.runtimeMatchesCurrentTarget ? "yes" : "no"}.</p>
           <div><strong>{summary.p34PreviewAcceptance.previewAccepted ? "YES" : "NO"}</strong><p>production alias: no; production authority: no</p></div>
         </article>
         <article className="module-row">
-          <div><span>{summary.p34ReviewReadiness.scope.authoritativePrInventoryObserved} files</span><h2>Review surface</h2></div>
-          <p>The reviewer map separates the whole inherited PR from the direct p.34 gap-closure and generated evidence lanes.</p>
-          <div><strong>{summary.p34ReviewReadiness.scope.authoritativeGapClosureBaselineObserved} baseline direct files</strong><p>unexpected files prohibited</p></div>
+          <div><span>Generated map</span><h2>Review surface</h2></div>
+          <p>The follow-on integration map classifies every current file and preserves PR #39 as predecessor evidence.</p>
+          <div><strong>zero unexplained allowed</strong><p>{summary.p34ReviewReadiness.scope.mapArtifact}</p></div>
         </article>
         {summary.p34ReviewReadiness.operatorActions.map((action) => (
           <article className="module-row" key={action.id}>
@@ -957,7 +986,9 @@ export default function ProductConsolePage() {
         <div className="section-heading">
           <p className="eyebrow">Operating command</p>
           <h2>Product, service, agent, infrastructure, and UI work now rolls through owner-bound command lanes.</h2>
-          <p className="section-copy">{summary.operatingCommandCenterSummary.boundary}</p>
+          <p className="section-copy">
+            {publicBoundaryCopy(summary.operatingCommandCenterSummary.boundary)}
+          </p>
           <p className="section-copy">{summary.operatingCommandCenterNextBuildStep}</p>
           <div className="form-actions">
             <Link className="primary-action" href={summary.operatingCommandCenterRoute}>
@@ -1698,7 +1729,7 @@ export default function ProductConsolePage() {
                 <li>Packet: {packet.diligencePacket.join(", ")}</li>
                 <li>Review: {packet.requiredReview}</li>
                 <li>Next: {packet.nextMove}</li>
-                <li>Blocked: {packet.blockedClaims.join(", ")}</li>
+                <li>Blocked: {publicBoundaryList(packet.blockedClaims)}</li>
               </ul>
             </div>
           </article>
@@ -2468,7 +2499,7 @@ export default function ProductConsolePage() {
                 {path.supportingRoutes.map((route) => (
                   <li key={route}>{route}</li>
                 ))}
-                <li>{path.boundary}</li>
+                <li>{publicBoundaryCopy(path.boundary)}</li>
               </ul>
             </div>
           </article>
@@ -2502,7 +2533,7 @@ export default function ProductConsolePage() {
               </Link>
               <ul className="compact-list">
                 <li>{pack.competitiveEdge}</li>
-                <li>Disqualifiers: {pack.disqualifiers.join(", ")}</li>
+                <li>Disqualifiers: {publicBoundaryList(pack.disqualifiers)}</li>
               </ul>
             </div>
           </article>
@@ -2894,7 +2925,7 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>{profile.environment}</li>
                 <li>{profile.costModel}</li>
-                <li>Blocked claims: {profile.blockedClaims.join(", ")}</li>
+                <li>Blocked claims: {publicBoundaryList(profile.blockedClaims)}</li>
               </ul>
             </div>
           </article>
@@ -2923,7 +2954,7 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>Sources: {pattern.sourceNames.join(", ")}</li>
                 <li>Proof metrics: {pattern.proofMetrics.join(", ")}</li>
-                <li>Blocked claims: {pattern.blockedClaims.join(", ")}</li>
+                <li>Blocked claims: {publicBoundaryList(pattern.blockedClaims)}</li>
               </ul>
             </div>
           </article>
@@ -3051,7 +3082,7 @@ export default function ProductConsolePage() {
           <p className="eyebrow">Workflow engine</p>
           <h2>Example workflows turn fragmented healthcare work into decision-grade review queues.</h2>
           <p className="section-copy">
-            These workflows demonstrate the operating layer without claiming autonomous treatment, diagnosis, payer submission, or live patient execution.
+            These workflows demonstrate the operating layer without claiming machine-directed treatment, diagnostic authority, payer submission, or live patient execution.
           </p>
         </div>
         {summary.workflowEngineExamples.map((workflow) => (
@@ -3083,8 +3114,8 @@ export default function ProductConsolePage() {
           {summary.governanceControls.map((control) => (
             <article key={control.control}>
               <span>{control.status}</span>
-              <h3>{control.control}</h3>
-              <p>{control.detail}</p>
+              <h3>{publicBoundaryCopy(control.control)}</h3>
+              <p>{publicBoundaryCopy(control.detail)}</p>
             </article>
           ))}
         </div>

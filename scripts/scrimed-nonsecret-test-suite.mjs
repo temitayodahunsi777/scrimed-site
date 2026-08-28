@@ -1067,6 +1067,23 @@ const checks = [
     args: ["scripts/scrimed-p34-post-review-readiness-contract-check.mjs"]
   },
   {
+    label: "SCRIMED p.34 synthetic-pilot adversarial behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 follow-on contract",
+    args: ["scripts/scrimed-p34-follow-on-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.34 generated build-inventory parser",
+    args: ["scripts/generate-p34-build-inventory.mjs", "--self-test"]
+  },
+  {
     label: "SCRIMED p.34 AAL2 one-command verifier policy",
     args: ["scripts/run-aal2-candidate-verification.mjs", "--self-test"]
   },

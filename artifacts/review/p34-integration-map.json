@@ -1,0 +1,340 @@
+{
+  "schemaVersion": "scrimed-p34-follow-on-integration-map-v1",
+  "repository": "temitayodahunsi777/scrimed-site",
+  "branch": "agent/scrimed-p34-post-review-readiness",
+  "predecessor": {
+    "pullRequestNumber": 39,
+    "branch": "agent/scrimed-p34-gap-closure",
+    "commitSha": "45be650f48e422b05160821681ff40bb9f1229c9",
+    "status": "PREDECESSOR"
+  },
+  "bindingArtifact": "artifacts/release/p34-current-candidate.json",
+  "classificationPolicy": [
+    "CORE_RUNTIME",
+    "GOVERNANCE",
+    "SECURITY",
+    "PILOT",
+    "COMMERCIAL",
+    "VERCEL",
+    "SUPABASE",
+    "AAL2",
+    "UI",
+    "TEST",
+    "GENERATED_EVIDENCE",
+    "DOCUMENTATION",
+    "CONFIGURATION",
+    "UNEXPECTED"
+  ],
+  "fileCount": 58,
+  "classificationCounts": {
+    "AAL2": 2,
+    "CONFIGURATION": 3,
+    "CORE_RUNTIME": 1,
+    "DOCUMENTATION": 12,
+    "GENERATED_EVIDENCE": 7,
+    "GOVERNANCE": 2,
+    "PILOT": 6,
+    "SECURITY": 1,
+    "TEST": 18,
+    "UI": 2,
+    "VERCEL": 4
+  },
+  "unexplainedFileCount": 0,
+  "files": [
+    {
+      "path": ".gitignore",
+      "classification": "CONFIGURATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/investor-demo-command-room/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/pilotManifest.ts",
+      "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/pilotOperatingSystem.ts",
+      "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/pilotTemplateRegistry.ts",
+      "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/syntheticPilotReadiness.ts",
+      "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/economics/pilotCostGovernor.ts",
+      "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/productConsole.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/release/previewAcceptance.ts",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactHeadBaseline.ts",
+      "classification": "GOVERNANCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/reviewReadiness.ts",
+      "classification": "GOVERNANCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/product/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/synthetic-pilot/page.tsx",
+      "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_GATE_MATRIX.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_GENERATION_INVENTORY.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_ROUTE_INVENTORY.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_VALIDATION_REPORT.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-review-index.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/review/p39-full-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "config/performance-budgets.json",
+      "classification": "CONFIGURATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_STATE_DISCOVERY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/release/P34_SOURCE_CONTROL_RECONCILIATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P34_FOCUSED_PR_CONSTRUCTION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P34_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P34_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P39_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "package.json",
+      "classification": "CONFIGURATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/build-with-p34-inventory.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/generate-p34-build-inventory.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/generate-p34-follow-on-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/generate-p34-post-review-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/generate-p39-review-map.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/lib/aal2-redacted-evidence.mjs",
+      "classification": "AAL2",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/lib/p34-candidate-state.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/lib/p34-post-review-runtime-evidence.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/node24-runtime-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/release-candidate-validation.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/run-aal2-candidate-verification.mjs",
+      "classification": "AAL2",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-nonsecret-test-suite.mjs",
+      "classification": "SECURITY",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-canary.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-certify.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-evidence.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-follow-on-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-post-review-readiness-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-post-review-readiness-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-verify-preview.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/verify-node24-vercel-build.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/verify-preview-ui.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    }
+  ],
+  "reviewStatus": "EXACT_REVIEW_REQUIRED",
+  "humanApprovalPresent": false,
+  "mergeAuthorityGranted": false,
+  "productionAuthorityGranted": false,
+  "mapFingerprint": "396aab9abbda5f6086b271c81933fb487f18a4ec9d405552fb55278fe0792491"
+}

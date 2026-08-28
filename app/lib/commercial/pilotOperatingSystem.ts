@@ -18,7 +18,21 @@ import {
 } from "./pilotTemplateRegistry";
 
 export const pilotOperatingSystemVersion =
-  "scrimed-p34-pilot-operating-system-v1-2026-08-27";
+  "scrimed-p34-pilot-operating-system-v2-2026-08-28";
+
+export type PilotLifecycleState =
+  | "DRAFT"
+  | "DISCOVERY"
+  | "WORKFLOW_MAPPING"
+  | "BASELINE_CAPTURE"
+  | "SYNTHETIC_SCENARIO_READY"
+  | "CONFIGURATION_READY"
+  | "EVALUATION_RUNNING"
+  | "EVALUATION_COMPLETE"
+  | "EVIDENCE_PACKET_READY"
+  | "EXECUTIVE_READOUT_READY"
+  | "EXPANSION_DECISION_REQUIRED"
+  | "CLOSED";
 
 export type PilotWorkflowStage =
   | "DISCOVERY"
@@ -49,6 +63,120 @@ const pilotStages: PilotWorkflowStage[] = [
   "EXECUTIVE_READOUT",
   "EXPANSION_DECISION"
 ];
+
+export const pilotLifecycleStates: PilotLifecycleState[] = [
+  "DRAFT",
+  "DISCOVERY",
+  "WORKFLOW_MAPPING",
+  "BASELINE_CAPTURE",
+  "SYNTHETIC_SCENARIO_READY",
+  "CONFIGURATION_READY",
+  "EVALUATION_RUNNING",
+  "EVALUATION_COMPLETE",
+  "EVIDENCE_PACKET_READY",
+  "EXECUTIVE_READOUT_READY",
+  "EXPANSION_DECISION_REQUIRED",
+  "CLOSED"
+];
+
+const lifecycleEvidence: Record<PilotLifecycleState, string[]> = {
+  DRAFT: [],
+  DISCOVERY: ["pilot-manifest"],
+  WORKFLOW_MAPPING: ["discovery-brief"],
+  BASELINE_CAPTURE: ["workflow-map"],
+  SYNTHETIC_SCENARIO_READY: ["baseline-measurements", "synthetic-scenario-inventory"],
+  CONFIGURATION_READY: ["pilot-control-contract", "cost-governor-receipt"],
+  EVALUATION_RUNNING: ["configuration-receipt"],
+  EVALUATION_COMPLETE: ["evaluation-results"],
+  EVIDENCE_PACKET_READY: ["success-criteria-result", "evidence-ledger"],
+  EXECUTIVE_READOUT_READY: ["evidence-pack"],
+  EXPANSION_DECISION_REQUIRED: ["executive-readout"],
+  CLOSED: ["named-expansion-decision", "closure-receipt"]
+};
+
+export function transitionPilotLifecycle(input: {
+  manifest: PilotManifest;
+  currentState: PilotLifecycleState;
+  requestedState: PilotLifecycleState;
+  actorId: string;
+  idempotencyKey: string;
+  consumedIdempotencyKeys: string[];
+  evidenceIds: string[];
+  timestamp: string;
+}) {
+  const reasonCodes: string[] = [];
+  const currentIndex = pilotLifecycleStates.indexOf(input.currentState);
+  const requestedIndex = pilotLifecycleStates.indexOf(input.requestedState);
+  if (!input.manifest.executionAuthorized && input.requestedState !== "DISCOVERY") {
+    reasonCodes.push("SYNTHETIC_EXECUTION_APPROVAL_REQUIRED");
+  }
+  if (currentIndex < 0 || requestedIndex !== currentIndex + 1) {
+    reasonCodes.push("ILLEGAL_LIFECYCLE_TRANSITION");
+  }
+  if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(input.actorId)) {
+    reasonCodes.push("ATTRIBUTABLE_ACTOR_REQUIRED");
+  }
+  if (!/^[A-Za-z0-9._:-]{8,160}$/.test(input.idempotencyKey)) {
+    reasonCodes.push("VALID_IDEMPOTENCY_KEY_REQUIRED");
+  }
+  if (input.consumedIdempotencyKeys.includes(input.idempotencyKey)) {
+    reasonCodes.push("DUPLICATE_EXECUTION_BLOCKED");
+  }
+  if (!Number.isFinite(Date.parse(input.timestamp))) reasonCodes.push("VALID_TIMESTAMP_REQUIRED");
+  for (const evidenceId of lifecycleEvidence[input.requestedState] ?? []) {
+    if (!input.evidenceIds.includes(evidenceId)) reasonCodes.push(`MISSING_EVIDENCE:${evidenceId}`);
+  }
+  const allowed = reasonCodes.length === 0;
+  const event = {
+    pilotId: input.manifest.pilotId,
+    currentState: input.currentState,
+    requestedState: input.requestedState,
+    resultingState: allowed ? input.requestedState : input.currentState,
+    actorId: input.actorId,
+    timestamp: input.timestamp,
+    idempotencyKeyHash: createClinicalEvidenceHash(input.idempotencyKey),
+    evidenceIds: [...new Set(input.evidenceIds)].sort(),
+    allowed,
+    reasonCodes: [...new Set(reasonCodes)].sort(),
+    protectedPilotAuthorized: false as const,
+    customerSystemWriteAuthorized: false as const,
+    productionAuthorityGranted: false as const
+  };
+  return {
+    ...event,
+    transitionHash: createClinicalEvidenceHash({ version: pilotOperatingSystemVersion, event })
+  };
+}
+
+export interface PilotLifecycleLeaseStore {
+  consume(idempotencyKeyHash: string): boolean;
+}
+
+export class InMemorySyntheticPilotLifecycleLeaseStore implements PilotLifecycleLeaseStore {
+  readonly #consumed = new Set<string>();
+
+  consume(idempotencyKeyHash: string) {
+    if (!/^[0-9a-f]{64}$/i.test(idempotencyKeyHash) || this.#consumed.has(idempotencyKeyHash)) return false;
+    this.#consumed.add(idempotencyKeyHash);
+    return true;
+  }
+}
+
+export function transitionPilotLifecycleAtomically(
+  input: Parameters<typeof transitionPilotLifecycle>[0],
+  store: PilotLifecycleLeaseStore
+) {
+  const evaluated = transitionPilotLifecycle(input);
+  if (!evaluated.allowed) return evaluated;
+  const keyHash = createClinicalEvidenceHash(input.idempotencyKey);
+  if (!store.consume(keyHash)) {
+    return transitionPilotLifecycle({
+      ...input,
+      consumedIdempotencyKeys: [...input.consumedIdempotencyKeys, input.idempotencyKey]
+    });
+  }
+  return evaluated;
+}
 
 const requiredTransitionEvidence: Record<PilotWorkflowStage, string[]> = {
   DISCOVERY: [],
@@ -249,6 +377,167 @@ export function buildPilotEvidencePacketV2(input: {
   };
 }
 
+export type PilotEvidenceLedgerLink = {
+  sequence: number;
+  kind:
+    | "pilot"
+    | "workflow"
+    | "scenario"
+    | "model"
+    | "agent"
+    | "tool"
+    | "policy"
+    | "output"
+    | "evaluation"
+    | "correction"
+    | "accepted-result"
+    | "value-estimate";
+  referenceId: string;
+  evidenceClassification: "SYNTHETIC" | "SIMULATED";
+  previousHash: string | null;
+  linkHash: string;
+};
+
+export function buildPilotEvidenceLedger(input: {
+  manifest: PilotManifest;
+  references: Array<{
+    kind: PilotEvidenceLedgerLink["kind"];
+    referenceId: string;
+    evidenceClassification: PilotEvidenceLedgerLink["evidenceClassification"];
+  }>;
+}) {
+  const requiredKinds = [
+    "pilot",
+    "workflow",
+    "scenario",
+    "model",
+    "agent",
+    "tool",
+    "policy",
+    "output",
+    "evaluation",
+    "correction",
+    "accepted-result",
+    "value-estimate"
+  ] as const;
+  const reasonCodes: string[] = [];
+  for (const kind of requiredKinds) {
+    if (!input.references.some((entry) => entry.kind === kind)) reasonCodes.push(`MISSING_LEDGER_LINK:${kind}`);
+  }
+  let previousHash: string | null = null;
+  const links = input.references.map((entry, index): PilotEvidenceLedgerLink => {
+    const payload = {
+      sequence: index + 1,
+      ...entry,
+      manifestHash: input.manifest.manifestHash,
+      previousHash
+    };
+    const linkHash = createClinicalEvidenceHash({ version: pilotOperatingSystemVersion, payload });
+    const link = { ...entry, sequence: index + 1, previousHash, linkHash };
+    previousHash = linkHash;
+    return link;
+  });
+  const ledger = {
+    status: reasonCodes.length === 0 ? "COMPLETE_SYNTHETIC_LEDGER" as const : "INCOMPLETE_BLOCKED" as const,
+    manifestHash: input.manifest.manifestHash,
+    links,
+    reasonCodes,
+    immutableAppendOnly: true as const,
+    containsPhi: false as const,
+    productionAuthorityGranted: false as const
+  };
+  return {
+    ...ledger,
+    ledgerHash: createClinicalEvidenceHash({ version: pilotOperatingSystemVersion, ledger })
+  };
+}
+
+export function verifyPilotEvidenceLedger(ledger: ReturnType<typeof buildPilotEvidenceLedger>) {
+  const reasonCodes: string[] = [];
+  let previousHash: string | null = null;
+  for (const [index, link] of ledger.links.entries()) {
+    if (link.sequence !== index + 1) reasonCodes.push("LEDGER_SEQUENCE_INVALID");
+    if (link.previousHash !== previousHash) reasonCodes.push("LEDGER_PREVIOUS_HASH_INVALID");
+    const expected = createClinicalEvidenceHash({
+      version: pilotOperatingSystemVersion,
+      payload: {
+        sequence: index + 1,
+        kind: link.kind,
+        referenceId: link.referenceId,
+        evidenceClassification: link.evidenceClassification,
+        manifestHash: ledger.manifestHash,
+        previousHash
+      }
+    });
+    if (link.linkHash !== expected) reasonCodes.push("LEDGER_LINK_HASH_INVALID");
+    previousHash = link.linkHash;
+  }
+  return {
+    valid: reasonCodes.length === 0,
+    reasonCodes: [...new Set(reasonCodes)].sort(),
+    verifiedLinkCount: ledger.links.length,
+    productionAuthorityGranted: false as const
+  };
+}
+
+export type PilotValueClassification = "VERIFIED" | "ESTIMATED" | "SIMULATED" | "UNAVAILABLE";
+
+export function calculateVerifiedIntelligenceYield(input: {
+  acceptedUsefulOutputs: number;
+  modelCostUsd: number;
+  retryCostUsd: number;
+  correctionCostUsd: number;
+  reviewerBurdenCostUsd: number;
+  classification: PilotValueClassification;
+}) {
+  const denominator = input.modelCostUsd
+    + input.retryCostUsd
+    + input.correctionCostUsd
+    + input.reviewerBurdenCostUsd;
+  const valid = Object.values(input)
+    .filter((value): value is number => typeof value === "number")
+    .every((value) => Number.isFinite(value) && value >= 0)
+    && input.acceptedUsefulOutputs >= 0;
+  const result = {
+    status: valid && denominator > 0 ? "AVAILABLE" as const : "UNAVAILABLE" as const,
+    acceptedUsefulOutputs: input.acceptedUsefulOutputs,
+    totalMeasuredBurdenUsd: valid ? Number(denominator.toFixed(2)) : null,
+    yield: valid && denominator > 0
+      ? Number((input.acceptedUsefulOutputs / denominator).toFixed(6))
+      : null,
+    unit: "accepted-useful-outputs-per-usd" as const,
+    classification: input.classification,
+    productionBenchmarkClaimAuthorized: false as const
+  };
+  return { ...result, evidenceHash: createClinicalEvidenceHash({ version: pilotOperatingSystemVersion, input, result }) };
+}
+
+export function buildHealthcareValueReturned(input: {
+  timeSavedMinutes: number | null;
+  workflowStepsRemoved: number | null;
+  reworkAvoidedCount: number | null;
+  administrativeBurdenReducedMinutes: number | null;
+  evidenceCompletenessDeltaPercent: number | null;
+  costAvoidedUsd: number | null;
+  classification: PilotValueClassification;
+}) {
+  const entries = Object.entries(input)
+    .filter(([key]) => key !== "classification")
+    .map(([metric, value]) => ({
+      metric,
+      value: typeof value === "number" && Number.isFinite(value) ? value : null,
+      classification: typeof value === "number" && Number.isFinite(value)
+        ? input.classification
+        : "UNAVAILABLE" as const
+    }));
+  return {
+    classification: input.classification,
+    entries,
+    customerOutcomeClaimAuthorized: false as const,
+    evidenceHash: createClinicalEvidenceHash({ version: pilotOperatingSystemVersion, entries })
+  };
+}
+
 export function evaluatePilotExpansion(input: {
   syntheticExecutionAuthorized: boolean;
   successCriteriaPassed: boolean;
@@ -291,25 +580,42 @@ export function evaluatePilotExpansion(input: {
 
 export function buildPilotProposalFingerprint(input: {
   proposalId: string;
+  prospectAlias: string;
   version: string;
   scope: string;
   pricingScenario: Record<string, number>;
+  artifactFingerprint: string;
   candidateReference: string;
   expiresAt: string;
   approvalStatus: "DRAFT" | "HUMAN_APPROVAL_REQUIRED" | "APPROVED_FOR_DELIVERY";
-}) {
+}, now: Date = new Date()) {
   const scopeFingerprint = createClinicalEvidenceHash(input.scope);
   const pricingFingerprint = createClinicalEvidenceHash(input.pricingScenario);
-  const validExpiry = Number.isFinite(Date.parse(input.expiresAt));
+  const expiresAt = Date.parse(input.expiresAt);
+  const nowMs = now instanceof Date ? now.getTime() : Number.NaN;
+  const validExpiry = Number.isFinite(expiresAt)
+    && Number.isFinite(nowMs)
+    && expiresAt > nowMs
+    && expiresAt - nowMs <= 90 * 24 * 60 * 60_000;
+  const structurallyValid = /^[a-z0-9][a-z0-9-]{2,79}$/.test(input.proposalId)
+    && /^prospect-[a-z0-9-]{3,60}$/.test(input.prospectAlias)
+    && /^[0-9a-f]{64}$/i.test(input.artifactFingerprint)
+    && /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/i.test(input.candidateReference)
+    && validExpiry;
   const proposal = {
     ...input,
     scopeFingerprint,
     pricingFingerprint,
     validExpiry,
+    structurallyValid,
+    approvalState: input.approvalStatus,
     agentMayDraft: true as const,
     agentMaySign: false as const,
     agentMayDiscount: false as const,
     contractAuthorized: false as const,
+    deliveryDateCommitmentAuthorized: false as const,
+    phiAuthorizationGranted: false as const,
+    protectedPilotAuthorized: false as const,
     productionAuthorityGranted: false as const
   };
   return {
@@ -356,6 +662,17 @@ export function evaluateBuyerReadiness(input: BuyerReadinessInput) {
     archetype: input.archetype,
     status: !valid ? "INVALID" as const : priorityScore >= 70 ? "PRIORITY" as const : priorityScore >= 50 ? "QUALIFY" as const : "DEFER" as const,
     priorityScore,
+    commercialPriorityScore: valid
+      ? Number((
+          ((input.pain / 100)
+            * (input.urgency / 100)
+            * (input.pilotFit / 100)
+            * (input.evidenceGain / 100)
+            * (input.expansion / 100)
+            * 100)
+          / Math.max(0.1, ((input.regulatoryExposure + input.effort) / 200))
+        ).toFixed(1))
+      : 0,
     commercialValue: Number(commercialValue.toFixed(1)),
     pilotFeasibility: Number(feasibility.toFixed(1)),
     riskAdjustment: Number(riskAdjustment.toFixed(1)),
@@ -382,14 +699,28 @@ export function getPilotOperatingSystemSummary() {
     templateId: template.templateId,
     scope,
     environment: "synthetic-nonproduction",
+    dataSourceClassification: ["SYNTHETIC"],
     datasetVersion: "governance-scenarios-v1",
+    scenarioVersion: "governance-scenarios-v1",
     candidateReference: "184b07843e9eaa4a0dd0bc2c783944b66df7cbc95b05dc37930663197ae71d16",
     modelPolicyVersion: "deterministic-policy-v1",
+    agentPolicyVersion: "bounded-agent-policy-v1",
+    toolPolicyVersion: "read-only-tool-policy-v1",
     evidencePolicyVersion: "synthetic-evidence-v1",
     costCeilingUsd: 500,
+    runtimeCeilingMinutes: 180,
+    retryCeiling: 4,
+    modelCallCeiling: 40,
+    toolCallCeiling: 80,
+    agentDepthCeiling: 4,
+    evidenceStorageCeilingBytes: 5_000_000,
     durationDays: 30,
+    startsAt: "2026-08-28T00:00:00.000Z",
+    endsAt: "2026-09-27T00:00:00.000Z",
     successCriteria: criteria,
     exclusions: template.exclusions,
+    commercialAuthorityState: "NO_BINDING_AUTHORITY",
+    protectedPilotExpansionState: "PROTECTED_PILOT_NOT_AUTHORIZED",
     approvalState: "HUMAN_SCOPE_REVIEW_REQUIRED",
     approvalEvidence: null,
     controlContract: syntheticPilotControlContract
@@ -406,14 +737,25 @@ export function getPilotOperatingSystemSummary() {
     toolCostUsd: 18,
     infrastructureCostUsd: 42,
     reviewCostUsd: 160,
+    correctionCostUsd: 28,
+    modelCalls: 12,
+    toolCalls: 18,
     retries: 1,
-    runtimeMinutes: 74
+    runtimeMinutes: 74,
+    agentDepth: 3,
+    evidenceStorageBytes: 42_000,
+    reviewerMinutes: 96,
+    acceptedUsefulOutputs: 3
   };
   const costGovernor = evaluatePilotCostGovernor({
     maxInferenceCostUsd: 150,
     maxToolCostUsd: 100,
+    maxModelCalls: 40,
+    maxToolCalls: 80,
     maxRetries: 4,
     maxRuntimeMinutes: 180,
+    maxAgentDepth: 4,
+    maxEvidenceStorageBytes: 5_000_000,
     maxTotalBudgetUsd: 500,
     warningThresholdPercent: 80
   }, costUsage);
@@ -461,21 +803,60 @@ export function getPilotOperatingSystemSummary() {
   ].map(evaluateBuyerReadiness).sort((left, right) => right.priorityScore - left.priorityScore);
   const proposal = buildPilotProposalFingerprint({
     proposalId: "proposal-synthetic-governance-001",
+    prospectAlias: "prospect-internal-demo-001",
     version: "v1",
     scope,
     pricingScenario: { proposedPriceUsd: 25_000, estimatedDeliveryCostUsd: margin.result?.deliveryCostUsd ?? 0 },
+    artifactFingerprint: evidencePacket.evidenceHash,
     candidateReference: manifestDecision.manifest.candidateReference,
     expiresAt: "2026-09-26T12:00:00.000Z",
     approvalStatus: "HUMAN_APPROVAL_REQUIRED"
+  });
+  const evidenceLedger = buildPilotEvidenceLedger({
+    manifest: manifestDecision.manifest,
+    references: [
+      { kind: "pilot", referenceId: manifestDecision.manifest.pilotId, evidenceClassification: "SYNTHETIC" },
+      { kind: "workflow", referenceId: "enterprise-ai-governance", evidenceClassification: "SYNTHETIC" },
+      { kind: "scenario", referenceId: "governance-scenarios-v1", evidenceClassification: "SYNTHETIC" },
+      { kind: "model", referenceId: "deterministic-policy-engine-v1", evidenceClassification: "SIMULATED" },
+      { kind: "agent", referenceId: "synthetic-governance-agent-v1", evidenceClassification: "SIMULATED" },
+      { kind: "tool", referenceId: "read-only-governance-registry-v1", evidenceClassification: "SIMULATED" },
+      { kind: "policy", referenceId: "synthetic-evidence-v1", evidenceClassification: "SYNTHETIC" },
+      { kind: "output", referenceId: evidencePacket.evidenceHash, evidenceClassification: "SYNTHETIC" },
+      { kind: "evaluation", referenceId: success.evaluationHash, evidenceClassification: "SYNTHETIC" },
+      { kind: "correction", referenceId: "synthetic-correction-ledger-v1", evidenceClassification: "SIMULATED" },
+      { kind: "accepted-result", referenceId: "synthetic-accepted-result-v1", evidenceClassification: "SIMULATED" },
+      { kind: "value-estimate", referenceId: margin.scenarioHash, evidenceClassification: "SIMULATED" }
+    ]
+  });
+  const verifiedIntelligenceYield = calculateVerifiedIntelligenceYield({
+    acceptedUsefulOutputs: costUsage.acceptedUsefulOutputs,
+    modelCostUsd: costUsage.inferenceCostUsd,
+    retryCostUsd: 8,
+    correctionCostUsd: costUsage.correctionCostUsd,
+    reviewerBurdenCostUsd: costUsage.reviewCostUsd,
+    classification: "SIMULATED"
+  });
+  const healthcareValueReturned = buildHealthcareValueReturned({
+    timeSavedMinutes: 144,
+    workflowStepsRemoved: 5,
+    reworkAvoidedCount: 3,
+    administrativeBurdenReducedMinutes: 96,
+    evidenceCompletenessDeltaPercent: 36,
+    costAvoidedUsd: null,
+    classification: "SIMULATED"
   });
   const payload = {
     version: pilotOperatingSystemVersion,
     templateRegistry: getPilotTemplateRegistrySummary(),
     manifestDecision,
-    lifecycle: pilotStages,
+    lifecycle: pilotLifecycleStates,
     successCriteria: success,
     costGovernor,
     evidencePacket,
+    evidenceLedger,
+    verifiedIntelligenceYield,
+    healthcareValueReturned,
     executiveReadout: {
       problem: template.scope,
       baseline: evidencePacket.baseline,

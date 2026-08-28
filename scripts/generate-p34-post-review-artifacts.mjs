@@ -29,8 +29,7 @@ const exact = {
   deploymentId: "dpl_MPSXXudmikWZduLxEvAY8afTtXvz",
   deploymentUrl: "https://scrimed-site-8tjd5qyj0-temitayo-dahunsis-projects.vercel.app",
   branchAlias: "https://scrimed-site-git-agent-scrime-02c77f-temitayo-dahunsis-projects.vercel.app",
-  builtRoutes: 630,
-  prerenderedRoutes: 245
+  routeInventoryEvidence: "PREDECESSOR_BUILD_EVIDENCE_RETAINED_IN_PR_39"
 };
 
 function stableSerialize(value) {
@@ -94,7 +93,7 @@ const reviewSections = [
   ["Kill switch", "app/lib/scrimed-p34/controlPlane2.ts"],
   ["Oversight Sentinel", "app/lib/scrimed-p34/controlPlane2.ts"],
   ["Runtime revalidation", "app/lib/scrimed-p34/controlPlane2.ts"],
-  ["Migrations", "docs/operators/P34_MIGRATION_OPERATOR_PACKET.md"],
+  ["Migrations", "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md"],
   ["Vercel preview", "docs/review/P34_PREVIEW_ACCEPTANCE_PACKET.md"],
   ["Supabase", "docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md"],
   ["Commercial controls", "app/lib/commercial/pilotOperatingSystem.ts"],
@@ -134,7 +133,7 @@ const baselineDoc = `# p.34 Current Exact-Head Baseline\n\n` +
   `| Review packet | \`${exact.reviewPacketFingerprint}\` |\n` +
   `| Gate packet | \`${exact.gatePacketFingerprint}\` |\n` +
   `| SBOM | \`${exact.sbomFingerprint}\` |\n` +
-  `| Routes | ${exact.builtRoutes} built / ${exact.prerenderedRoutes} prerendered |\n` +
+  `| Route inventory | ${exact.routeInventoryEvidence} |\n` +
   `| Review requested | ${exact.reviewRequestedAt} ([evidence](${exact.reviewRequestUrl})) |\n` +
   `| Vercel preview | \`${exact.deploymentId}\`, READY, target null, branch alias only |\n\n` +
   `All seven exact-head GitHub workflows were reported passed for this target. No independent approval, merge authority, production authority, migration authority, PHI authority, customer activation, or external-distribution authority is inferred.\n`;

@@ -1,13 +1,17 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
 
 export const pilotCostGovernorVersion =
-  "scrimed-p34-pilot-cost-governor-v1-2026-08-27";
+  "scrimed-p34-pilot-cost-governor-v2-2026-08-28";
 
 export type PilotCostLimits = {
   maxInferenceCostUsd: number;
   maxToolCostUsd: number;
+  maxModelCalls: number;
+  maxToolCalls: number;
   maxRetries: number;
   maxRuntimeMinutes: number;
+  maxAgentDepth: number;
+  maxEvidenceStorageBytes: number;
   maxTotalBudgetUsd: number;
   warningThresholdPercent: number;
 };
@@ -17,8 +21,15 @@ export type PilotCostUsage = {
   toolCostUsd: number;
   infrastructureCostUsd: number;
   reviewCostUsd: number;
+  correctionCostUsd: number;
+  modelCalls: number;
+  toolCalls: number;
   retries: number;
   runtimeMinutes: number;
+  agentDepth: number;
+  evidenceStorageBytes: number;
+  reviewerMinutes: number;
+  acceptedUsefulOutputs: number;
 };
 
 export function evaluatePilotCostGovernor(limits: PilotCostLimits, usage: PilotCostUsage) {
@@ -32,7 +43,8 @@ export function evaluatePilotCostGovernor(limits: PilotCostLimits, usage: PilotC
     usage.inferenceCostUsd,
     usage.toolCostUsd,
     usage.infrastructureCostUsd,
-    usage.reviewCostUsd
+    usage.reviewCostUsd,
+    usage.correctionCostUsd
   ];
   if (monetaryLimits.some((value) => !Number.isFinite(value) || value <= 0)) {
     reasons.push("INVALID_MONETARY_LIMIT");
@@ -42,19 +54,41 @@ export function evaluatePilotCostGovernor(limits: PilotCostLimits, usage: PilotC
   }
   if (!Number.isInteger(limits.maxRetries) || limits.maxRetries < 0) reasons.push("INVALID_RETRY_LIMIT");
   if (!Number.isFinite(limits.maxRuntimeMinutes) || limits.maxRuntimeMinutes <= 0) reasons.push("INVALID_RUNTIME_LIMIT");
+  for (const [value, reason] of [
+    [limits.maxModelCalls, "INVALID_MODEL_CALL_LIMIT"],
+    [limits.maxToolCalls, "INVALID_TOOL_CALL_LIMIT"],
+    [limits.maxAgentDepth, "INVALID_AGENT_DEPTH_LIMIT"],
+    [limits.maxEvidenceStorageBytes, "INVALID_EVIDENCE_STORAGE_LIMIT"]
+  ] as const) {
+    if (!Number.isInteger(value) || value < 1) reasons.push(reason);
+  }
   if (!Number.isFinite(limits.warningThresholdPercent) || limits.warningThresholdPercent < 1 || limits.warningThresholdPercent > 100) {
     reasons.push("INVALID_WARNING_THRESHOLD");
   }
   if (!Number.isInteger(usage.retries) || usage.retries < 0) reasons.push("INVALID_RETRY_USAGE");
   if (!Number.isFinite(usage.runtimeMinutes) || usage.runtimeMinutes < 0) reasons.push("INVALID_RUNTIME_USAGE");
+  for (const [value, reason] of [
+    [usage.modelCalls, "INVALID_MODEL_CALL_USAGE"],
+    [usage.toolCalls, "INVALID_TOOL_CALL_USAGE"],
+    [usage.agentDepth, "INVALID_AGENT_DEPTH_USAGE"],
+    [usage.evidenceStorageBytes, "INVALID_EVIDENCE_STORAGE_USAGE"],
+    [usage.reviewerMinutes, "INVALID_REVIEWER_MINUTES"],
+    [usage.acceptedUsefulOutputs, "INVALID_ACCEPTED_OUTPUT_COUNT"]
+  ] as const) {
+    if (!Number.isInteger(value) || value < 0) reasons.push(reason);
+  }
 
   const totalSpendUsd = monetaryUsage.every((value) => Number.isFinite(value) && value >= 0)
     ? Number(monetaryUsage.reduce((sum, value) => sum + value, 0).toFixed(2))
     : null;
   if (usage.inferenceCostUsd > limits.maxInferenceCostUsd) reasons.push("INFERENCE_COST_LIMIT_EXCEEDED");
   if (usage.toolCostUsd > limits.maxToolCostUsd) reasons.push("TOOL_COST_LIMIT_EXCEEDED");
+  if (usage.modelCalls > limits.maxModelCalls) reasons.push("MODEL_CALL_LIMIT_EXCEEDED");
+  if (usage.toolCalls > limits.maxToolCalls) reasons.push("TOOL_CALL_LIMIT_EXCEEDED");
   if (usage.retries > limits.maxRetries) reasons.push("RETRY_LIMIT_EXCEEDED");
   if (usage.runtimeMinutes > limits.maxRuntimeMinutes) reasons.push("RUNTIME_LIMIT_EXCEEDED");
+  if (usage.agentDepth > limits.maxAgentDepth) reasons.push("AGENT_DEPTH_LIMIT_EXCEEDED");
+  if (usage.evidenceStorageBytes > limits.maxEvidenceStorageBytes) reasons.push("EVIDENCE_STORAGE_LIMIT_EXCEEDED");
   if (totalSpendUsd !== null && totalSpendUsd > limits.maxTotalBudgetUsd) reasons.push("TOTAL_BUDGET_EXCEEDED");
 
   const invalidOrExceeded = reasons.length > 0;
@@ -64,13 +98,18 @@ export function evaluatePilotCostGovernor(limits: PilotCostLimits, usage: PilotC
   const warning = !invalidOrExceeded
     && budgetUtilizationPercent !== null
     && budgetUtilizationPercent >= limits.warningThresholdPercent;
-  const status = invalidOrExceeded ? "STOP" as const : warning ? "WARN" as const : "ALLOW" as const;
+  const status = invalidOrExceeded ? "STOP_SAFELY" as const : warning ? "WARN" as const : "ALLOW" as const;
   const decision = {
     status,
-    executionAllowed: status !== "STOP",
-    safeStopRequired: status === "STOP",
+    executionAllowed: status !== "STOP_SAFELY",
+    safeStopRequired: status === "STOP_SAFELY",
     totalSpendUsd,
     budgetUtilizationPercent,
+    verifiedIntelligenceYield: totalSpendUsd && usage.acceptedUsefulOutputs > 0
+      ? Number((usage.acceptedUsefulOutputs / totalSpendUsd).toFixed(6))
+      : 0,
+    verifiedIntelligenceYieldUnit: "accepted-useful-outputs-per-usd" as const,
+    valueClassification: "SIMULATED" as const,
     reasonCodes: [...new Set(reasons)].sort(),
     productionAuthorityGranted: false as const
   };
@@ -83,6 +122,60 @@ export function evaluatePilotCostGovernor(limits: PilotCostLimits, usage: PilotC
       decision
     })
   };
+}
+
+const zeroPilotCostUsage = (): PilotCostUsage => ({
+  inferenceCostUsd: 0,
+  toolCostUsd: 0,
+  infrastructureCostUsd: 0,
+  reviewCostUsd: 0,
+  correctionCostUsd: 0,
+  modelCalls: 0,
+  toolCalls: 0,
+  retries: 0,
+  runtimeMinutes: 0,
+  agentDepth: 0,
+  evidenceStorageBytes: 0,
+  reviewerMinutes: 0,
+  acceptedUsefulOutputs: 0
+});
+
+function combinePilotCostUsage(current: PilotCostUsage, requested: PilotCostUsage): PilotCostUsage {
+  return {
+    inferenceCostUsd: current.inferenceCostUsd + requested.inferenceCostUsd,
+    toolCostUsd: current.toolCostUsd + requested.toolCostUsd,
+    infrastructureCostUsd: current.infrastructureCostUsd + requested.infrastructureCostUsd,
+    reviewCostUsd: current.reviewCostUsd + requested.reviewCostUsd,
+    correctionCostUsd: current.correctionCostUsd + requested.correctionCostUsd,
+    modelCalls: current.modelCalls + requested.modelCalls,
+    toolCalls: current.toolCalls + requested.toolCalls,
+    retries: current.retries + requested.retries,
+    runtimeMinutes: current.runtimeMinutes + requested.runtimeMinutes,
+    agentDepth: Math.max(current.agentDepth, requested.agentDepth),
+    evidenceStorageBytes: current.evidenceStorageBytes + requested.evidenceStorageBytes,
+    reviewerMinutes: current.reviewerMinutes + requested.reviewerMinutes,
+    acceptedUsefulOutputs: current.acceptedUsefulOutputs + requested.acceptedUsefulOutputs
+  };
+}
+
+export class InMemorySyntheticPilotBudgetLedger {
+  #usage = zeroPilotCostUsage();
+
+  reserve(limits: PilotCostLimits, requested: PilotCostUsage) {
+    const proposedUsage = combinePilotCostUsage(this.#usage, requested);
+    const decision = evaluatePilotCostGovernor(limits, proposedUsage);
+    if (decision.executionAllowed) this.#usage = proposedUsage;
+    return {
+      ...decision,
+      reservationApplied: decision.executionAllowed,
+      usageAfterReservation: decision.executionAllowed ? { ...this.#usage } : { ...this.#usage },
+      productionAuthorityGranted: false as const
+    };
+  }
+
+  snapshot() {
+    return { ...this.#usage };
+  }
 }
 
 export type PilotMarginScenarioInput = {

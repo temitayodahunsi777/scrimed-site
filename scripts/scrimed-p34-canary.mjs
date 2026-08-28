@@ -10,6 +10,9 @@ const commands = [
   { script: "scripts/scrimed-p34-precision-wave-contract-check.mjs", nodeArgs: [], scriptArgs: [] },
   { script: "scripts/scrimed-p34-post-review-readiness-policy-test.mjs", nodeArgs: ["--disable-warning=ExperimentalWarning", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "--experimental-loader=./scripts/lib/ts-extension-loader.mjs"], scriptArgs: [] },
   { script: "scripts/scrimed-p34-post-review-readiness-contract-check.mjs", nodeArgs: [], scriptArgs: [] },
+  { script: "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs", nodeArgs: ["--disable-warning=ExperimentalWarning", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "--experimental-loader=./scripts/lib/ts-extension-loader.mjs"], scriptArgs: [] },
+  { script: "scripts/scrimed-p34-follow-on-contract-check.mjs", nodeArgs: [], scriptArgs: [] },
+  { script: "scripts/generate-p34-build-inventory.mjs", nodeArgs: [], scriptArgs: ["--self-test"] },
   { script: "scripts/run-aal2-candidate-verification.mjs", nodeArgs: [], scriptArgs: ["--self-test"] },
   { script: "scripts/generate-p39-review-map.mjs", nodeArgs: [], scriptArgs: ["--check"] },
   { script: "scripts/generate-p34-post-review-artifacts.mjs", nodeArgs: [], scriptArgs: ["--check"] }

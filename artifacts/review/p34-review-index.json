@@ -17,8 +17,7 @@
     "deploymentId": "dpl_MPSXXudmikWZduLxEvAY8afTtXvz",
     "deploymentUrl": "https://scrimed-site-8tjd5qyj0-temitayo-dahunsis-projects.vercel.app",
     "branchAlias": "https://scrimed-site-git-agent-scrime-02c77f-temitayo-dahunsis-projects.vercel.app",
-    "builtRoutes": 630,
-    "prerenderedRoutes": 245
+    "routeInventoryEvidence": "PREDECESSOR_BUILD_EVIDENCE_RETAINED_IN_PR_39"
   },
   "targetReviewMinutes": {
     "minimum": 10,
@@ -84,7 +83,7 @@
     {
       "order": 12,
       "title": "Migrations",
-      "evidencePointer": "docs/operators/P34_MIGRATION_OPERATOR_PACKET.md"
+      "evidencePointer": "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md"
     },
     {
       "order": 13,
@@ -107,9 +106,9 @@
       "evidencePointer": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md"
     }
   ],
-  "integrationMapHash": "99e1ba9cfe32206a2c050a3f58d4fc96d9d758c1ec3987d31cc2f0aacad4bccb",
+  "integrationMapHash": "9337c5a62132c19cd87092c3c597909721123dbe7bbbc2e8ebfe226e183c3fa7",
   "independentReviewStatus": "EXACT_REVIEW_REQUIRED",
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "indexHash": "d470250668c8359d678cf60c4b055bfa9d8d363cbc02b877497408784fb0aeb3"
+  "indexHash": "25b8e11e0e204f2130a1d7c3e075a1b11fb479b934efae69efb84ff91a72831e"
 }

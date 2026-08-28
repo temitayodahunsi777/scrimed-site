@@ -10,11 +10,15 @@ import {
   syntheticPilotControlContract
 } from "../app/lib/commercial/pilotManifest.ts";
 import {
+  buildHealthcareValueReturned,
+  buildPilotEvidenceLedger,
   buildPilotProposalFingerprint,
+  calculateVerifiedIntelligenceYield,
   evaluateBuyerReadiness,
   evaluatePilotExpansion,
   evaluatePilotSuccessCriteria,
   getPilotOperatingSystemSummary,
+  transitionPilotLifecycle,
   transitionPilotWorkflow
 } from "../app/lib/commercial/pilotOperatingSystem.ts";
 import {
@@ -26,6 +30,7 @@ import {
   getP34PreviewAcceptanceSummary
 } from "../app/lib/release/previewAcceptance.ts";
 import { p34ExactHeadBaseline } from "../app/lib/scrimed-p34/exactHeadBaseline.ts";
+import { getP34ReviewReadinessSummary } from "../app/lib/scrimed-p34/reviewReadiness.ts";
 import { createRedactedAal2Evidence } from "./lib/aal2-redacted-evidence.mjs";
 
 let passed = 0;
@@ -53,14 +58,28 @@ const validManifestInput = {
   templateId: template.templateId,
   scope,
   environment: "synthetic-nonproduction",
+  dataSourceClassification: ["SYNTHETIC"],
   datasetVersion: "synthetic-dataset-v1",
+  scenarioVersion: "synthetic-scenario-v1",
   candidateReference,
   modelPolicyVersion: "model-policy-v1",
+  agentPolicyVersion: "agent-policy-v1",
+  toolPolicyVersion: "tool-policy-v1",
   evidencePolicyVersion: "evidence-policy-v1",
   costCeilingUsd: 500,
+  runtimeCeilingMinutes: 60,
+  retryCeiling: 2,
+  modelCallCeiling: 10,
+  toolCallCeiling: 20,
+  agentDepthCeiling: 3,
+  evidenceStorageCeilingBytes: 1_000_000,
   durationDays: 30,
+  startsAt: "2026-08-27T00:00:00.000Z",
+  endsAt: "2026-09-26T00:00:00.000Z",
   successCriteria,
   exclusions: template.exclusions,
+  commercialAuthorityState: "NO_BINDING_AUTHORITY",
+  protectedPilotExpansionState: "PROTECTED_PILOT_NOT_AUTHORIZED",
   approvalState: "APPROVED_FOR_SYNTHETIC_EXECUTION",
   approvalEvidence: {
     approverId: "synthetic-test-approver",
@@ -163,6 +182,38 @@ check("pilot-stage-transition-allows-next-synthetic-stage", () => {
   assert.equal(result.productionAuthorityGranted, false);
 });
 
+check("pilot-lifecycle-rejects-illegal-or-evidence-free-transition", () => {
+  const result = transitionPilotLifecycle({
+    manifest: manifestDecision.manifest,
+    currentState: "DRAFT",
+    requestedState: "WORKFLOW_MAPPING",
+    actorId: "synthetic-test-operator",
+    idempotencyKey: "lifecycle-transition-001",
+    consumedIdempotencyKeys: [],
+    evidenceIds: [],
+    timestamp: "2026-08-27T12:10:00.000Z"
+  });
+  assert.equal(result.allowed, false);
+  assert.ok(result.reasonCodes.includes("ILLEGAL_LIFECYCLE_TRANSITION"));
+  assert.ok(result.reasonCodes.includes("MISSING_EVIDENCE:discovery-brief"));
+});
+
+check("pilot-lifecycle-blocks-concurrent-idempotency-replay", () => {
+  const result = transitionPilotLifecycle({
+    manifest: manifestDecision.manifest,
+    currentState: "DRAFT",
+    requestedState: "DISCOVERY",
+    actorId: "synthetic-test-operator",
+    idempotencyKey: "lifecycle-transition-002",
+    consumedIdempotencyKeys: ["lifecycle-transition-002"],
+    evidenceIds: ["pilot-manifest"],
+    timestamp: "2026-08-27T12:10:00.000Z"
+  });
+  assert.equal(result.allowed, false);
+  assert.ok(result.reasonCodes.includes("DUPLICATE_EXECUTION_BLOCKED"));
+  assert.equal(result.protectedPilotAuthorized, false);
+});
+
 check("objective-success-fails-on-missing-evidence", () => {
   const result = evaluatePilotSuccessCriteria({ manifest: manifestDecision.manifest, observations: [] });
   assert.equal(result.status, "FAIL");
@@ -173,8 +224,12 @@ check("cost-governor-stops-on-total-overrun", () => {
   const result = evaluatePilotCostGovernor({
     maxInferenceCostUsd: 100,
     maxToolCostUsd: 50,
+    maxModelCalls: 10,
+    maxToolCalls: 20,
     maxRetries: 2,
     maxRuntimeMinutes: 60,
+    maxAgentDepth: 3,
+    maxEvidenceStorageBytes: 1_000_000,
     maxTotalBudgetUsd: 150,
     warningThresholdPercent: 80
   }, {
@@ -182,10 +237,17 @@ check("cost-governor-stops-on-total-overrun", () => {
     toolCostUsd: 40,
     infrastructureCostUsd: 20,
     reviewCostUsd: 30,
+    correctionCostUsd: 10,
+    modelCalls: 5,
+    toolCalls: 8,
     retries: 1,
-    runtimeMinutes: 40
+    runtimeMinutes: 40,
+    agentDepth: 2,
+    evidenceStorageBytes: 50_000,
+    reviewerMinutes: 20,
+    acceptedUsefulOutputs: 1
   });
-  assert.equal(result.status, "STOP");
+  assert.equal(result.status, "STOP_SAFELY");
   assert.equal(result.executionAllowed, false);
   assert.ok(result.reasonCodes.includes("TOTAL_BUDGET_EXCEEDED"));
 });
@@ -225,17 +287,57 @@ check("protected-pilot-expansion-fails-closed", () => {
 check("proposal-fingerprint-does-not-grant-agent-authority", () => {
   const result = buildPilotProposalFingerprint({
     proposalId: "proposal-test-001",
+    prospectAlias: "prospect-test-001",
     version: "v1",
     scope,
     pricingScenario: { proposedPriceUsd: 25_000 },
+    artifactFingerprint: "f".repeat(64),
     candidateReference,
     expiresAt: "2026-09-27T00:00:00.000Z",
     approvalStatus: "HUMAN_APPROVAL_REQUIRED"
-  });
+  }, new Date("2026-08-28T12:00:00.000Z"));
   assert.equal(result.agentMaySign, false);
   assert.equal(result.agentMayDiscount, false);
   assert.equal(result.contractAuthorized, false);
+  assert.equal(result.protectedPilotAuthorized, false);
   assert.match(result.proposalFingerprint, /^[0-9a-f]{64}$/);
+});
+
+check("evidence-ledger-rejects-missing-chain-links", () => {
+  const result = buildPilotEvidenceLedger({
+    manifest: manifestDecision.manifest,
+    references: [{ kind: "pilot", referenceId: "synthetic-pilot-test", evidenceClassification: "SYNTHETIC" }]
+  });
+  assert.equal(result.status, "INCOMPLETE_BLOCKED");
+  assert.ok(result.reasonCodes.includes("MISSING_LEDGER_LINK:accepted-result"));
+});
+
+check("verified-intelligence-yield-remains-simulated", () => {
+  const result = calculateVerifiedIntelligenceYield({
+    acceptedUsefulOutputs: 4,
+    modelCostUsd: 10,
+    retryCostUsd: 2,
+    correctionCostUsd: 5,
+    reviewerBurdenCostUsd: 20,
+    classification: "SIMULATED"
+  });
+  assert.equal(result.status, "AVAILABLE");
+  assert.equal(result.classification, "SIMULATED");
+  assert.equal(result.productionBenchmarkClaimAuthorized, false);
+});
+
+check("healthcare-value-returned-tags-unavailable-values", () => {
+  const result = buildHealthcareValueReturned({
+    timeSavedMinutes: 10,
+    workflowStepsRemoved: 1,
+    reworkAvoidedCount: null,
+    administrativeBurdenReducedMinutes: 5,
+    evidenceCompletenessDeltaPercent: 4,
+    costAvoidedUsd: null,
+    classification: "SIMULATED"
+  });
+  assert.equal(result.entries.find((entry) => entry.metric === "costAvoidedUsd")?.classification, "UNAVAILABLE");
+  assert.equal(result.customerOutcomeClaimAuthorized, false);
 });
 
 check("buyer-priority-never-authorizes-outreach", () => {
@@ -338,6 +440,79 @@ check("runtime-preview-summary-never-self-accepts", () => {
   assert.equal(result.productionAuthorized, false);
 });
 
+const reviewBinding = {
+  commitSha: "b".repeat(40),
+  treeSha: "c".repeat(40),
+  candidateFingerprint: "d".repeat(64),
+  sourceFingerprint: "e".repeat(64),
+  validationFingerprint: "1".repeat(64),
+  reviewPacketFingerprint: "2".repeat(64),
+  gatePacketFingerprint: "3".repeat(64),
+  sbomFingerprint: "4".repeat(64),
+  previewDeploymentId: "dpl_P34ExactPreview1234"
+};
+const reviewEnv = {
+  VERCEL_ENV: "preview",
+  VERCEL_GIT_COMMIT_SHA: reviewBinding.commitSha,
+  VERCEL_GIT_COMMIT_REF: "agent/scrimed-p34-post-review-readiness",
+  SCRIMED_PREVIEW_CANDIDATE_SHA256: reviewBinding.candidateFingerprint,
+  SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA: reviewBinding.commitSha,
+  SCRIMED_P34_TREE_SHA: reviewBinding.treeSha,
+  SCRIMED_P34_SOURCE_SHA256: reviewBinding.sourceFingerprint,
+  SCRIMED_P34_VALIDATION_SHA256: reviewBinding.validationFingerprint,
+  SCRIMED_P34_REVIEW_PACKET_SHA256: reviewBinding.reviewPacketFingerprint,
+  SCRIMED_P34_GATE_PACKET_SHA256: reviewBinding.gatePacketFingerprint,
+  SCRIMED_P34_SBOM_SHA256: reviewBinding.sbomFingerprint,
+  SCRIMED_P34_PR_NUMBER: "40",
+  SCRIMED_P34_PR_URL: "https://github.com/temitayodahunsi777/scrimed-site/pull/40",
+  SCRIMED_P34_PREVIEW_DEPLOYMENT_ID: reviewBinding.previewDeploymentId,
+  SCRIMED_P34_REVIEW_REQUESTED_AT: "2026-08-28T11:30:00.000Z",
+  SCRIMED_P34_REVIEW_STATUS: "APPROVED"
+};
+const trustedReviewReceipt = {
+  status: "PASS",
+  trustClass: "trusted-external",
+  pullRequestNumber: 40,
+  ...reviewBinding,
+  reviewerIdentityHash: "5".repeat(64),
+  receiptHash: "6".repeat(64),
+  reviewedAt: "2026-08-28T12:00:00.000Z",
+  expiresAt: "2026-09-05T12:00:00.000Z",
+  signatureVerified: true,
+  approvalConsumed: true
+};
+
+check("review-env-cannot-self-approve", () => {
+  const result = getP34ReviewReadinessSummary(
+    reviewEnv,
+    null,
+    new Date("2026-08-28T12:05:00.000Z")
+  );
+  assert.equal(result.review.state, "REVIEW_CURRENT");
+  assert.equal(result.review.trustedExternalReceiptPresent, false);
+});
+
+check("trusted-review-requires-complete-exact-binding", () => {
+  const result = getP34ReviewReadinessSummary(
+    reviewEnv,
+    trustedReviewReceipt,
+    new Date("2026-08-28T12:05:00.000Z")
+  );
+  assert.equal(result.review.state, "APPROVED_EXACT_HEAD");
+  assert.equal(result.review.trustedExternalReceiptPresent, true);
+  assert.equal(result.mergeAuthority.granted, false);
+});
+
+check("trusted-review-mismatch-fails-closed", () => {
+  const result = getP34ReviewReadinessSummary(
+    reviewEnv,
+    { ...trustedReviewReceipt, treeSha: "a".repeat(40) },
+    new Date("2026-08-28T12:05:00.000Z")
+  );
+  assert.equal(result.review.state, "REVIEW_CURRENT");
+  assert.equal(result.review.trustedExternalReceiptPresent, false);
+});
+
 check("aal2-evidence-is-redacted", () => {
   const redacted = createRedactedAal2Evidence({
     commitSha: p34ExactHeadBaseline.commitSha,
@@ -367,6 +542,10 @@ check("operating-system-summary-retains-protected-boundary", () => {
   assert.equal(result.trustReadiness.find((entry) => entry.tier === "SYNTHETIC_PILOT")?.status, "NAMED_SCOPE_APPROVAL_REQUIRED");
   assert.equal(result.trustReadiness.find((entry) => entry.tier === "PRODUCTION")?.status, "BLOCKED");
   assert.equal(result.evidencePacket.watermark, "SYNTHETIC / NON-PRODUCTION");
+  assert.equal(result.evidenceLedger.status, "COMPLETE_SYNTHETIC_LEDGER");
+  assert.equal(result.verifiedIntelligenceYield.classification, "SIMULATED");
+  assert.equal(result.lifecycle[0], "DRAFT");
+  assert.equal(result.lifecycle.at(-1), "CLOSED");
 });
 
 console.log(`SCRIMED p.34 post-review readiness policy tests: ${passed}/${passed} passed`);

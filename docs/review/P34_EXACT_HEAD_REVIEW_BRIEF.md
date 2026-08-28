@@ -25,7 +25,7 @@ Confirm PR #39 still points to the exact commit and tree above. If it moved, sto
 9. **Kill switch:** `app/lib/scrimed-p34/controlPlane2.ts`
 10. **Oversight Sentinel:** `app/lib/scrimed-p34/controlPlane2.ts`
 11. **Runtime revalidation:** `app/lib/scrimed-p34/controlPlane2.ts`
-12. **Migrations:** `docs/operators/P34_MIGRATION_OPERATOR_PACKET.md`
+12. **Migrations:** `docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md`
 13. **Vercel preview:** `docs/review/P34_PREVIEW_ACCEPTANCE_PACKET.md`
 14. **Supabase:** `docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md`
 15. **Commercial controls:** `app/lib/commercial/pilotOperatingSystem.ts`

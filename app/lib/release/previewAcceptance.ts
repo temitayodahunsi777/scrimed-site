@@ -3,7 +3,7 @@ import { getScrimedBuildInfo } from "./vercelReleaseAssurance";
 import { p34ExactHeadBaseline } from "../scrimed-p34/exactHeadBaseline";
 
 export const previewAcceptanceVersion =
-  "scrimed-p34-preview-acceptance-v1-2026-08-27";
+  "scrimed-p34-preview-acceptance-v2-2026-08-28";
 
 export type PreviewAcceptanceInput = {
   deploymentId: string;
@@ -121,25 +121,57 @@ export function evaluatePreviewAcceptance(
 
 export function getP34PreviewAcceptanceSummary(env: NodeJS.ProcessEnv = process.env) {
   const build = getScrimedBuildInfo(env);
-  const runtimeMatchesFrozenTarget = build.commitSha === p34ExactHeadBaseline.commitSha
-    && build.candidateFingerprint === p34ExactHeadBaseline.candidateFingerprint;
-  const status = runtimeMatchesFrozenTarget && build.environment === "preview"
+  const expectedCommitSha = gitShaPattern.test(env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA ?? "")
+    ? env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA!.toLowerCase()
+    : null;
+  const expectedTreeSha = gitShaPattern.test(env.SCRIMED_P34_TREE_SHA ?? "")
+    ? env.SCRIMED_P34_TREE_SHA!.toLowerCase()
+    : null;
+  const expectedCandidateFingerprint = sha256Pattern.test(env.SCRIMED_PREVIEW_CANDIDATE_SHA256 ?? "")
+    ? env.SCRIMED_PREVIEW_CANDIDATE_SHA256!.toLowerCase()
+    : null;
+  const deploymentId = deploymentPattern.test(env.SCRIMED_P34_PREVIEW_DEPLOYMENT_ID ?? "")
+    ? env.SCRIMED_P34_PREVIEW_DEPLOYMENT_ID!
+    : null;
+  let deploymentUrl: string | null = null;
+  try {
+    const parsed = new URL(env.SCRIMED_P34_PREVIEW_URL ?? "");
+    if (parsed.protocol === "https:" && parsed.hostname.endsWith(".vercel.app") && parsed.pathname === "/") {
+      deploymentUrl = parsed.origin;
+    }
+  } catch {
+    // Missing preview evidence remains operator-required.
+  }
+  const runtimeMatchesCurrentTarget = Boolean(
+    expectedCommitSha
+    && expectedCandidateFingerprint
+    && build.commitSha === expectedCommitSha
+    && build.candidateFingerprint === expectedCandidateFingerprint
+  );
+  const exactPreviewDeclared = Boolean(deploymentId && deploymentUrl && expectedTreeSha);
+  const status = runtimeMatchesCurrentTarget && exactPreviewDeclared && build.environment === "preview"
     ? "READY_FOR_RELEASE_STEWARD_ACCEPTANCE"
     : "OPERATOR_ACTION_REQUIRED";
   const summary = {
     service: "scrimed-p34-preview-acceptance",
     version: previewAcceptanceVersion,
     status,
-    previewReady: p34ExactHeadBaseline.preview.state === "READY",
+    previewReady: exactPreviewDeclared,
     previewAccepted: false as const,
-    runtimeMatchesFrozenTarget,
-    deploymentId: p34ExactHeadBaseline.preview.deploymentId,
-    deploymentUrl: p34ExactHeadBaseline.preview.deploymentUrl,
-    expectedCommitSha: p34ExactHeadBaseline.commitSha,
-    expectedTreeSha: p34ExactHeadBaseline.treeSha,
-    expectedCandidateFingerprint: p34ExactHeadBaseline.candidateFingerprint,
+    runtimeMatchesCurrentTarget,
+    deploymentId,
+    deploymentUrl,
+    expectedCommitSha,
+    expectedTreeSha,
+    expectedCandidateFingerprint,
     currentRuntimeCommitSha: build.commitSha,
     currentRuntimeCandidateFingerprint: build.candidateFingerprint,
+    predecessorPreview: {
+      status: "PREDECESSOR" as const,
+      deploymentId: p34ExactHeadBaseline.preview.deploymentId,
+      deploymentUrl: p34ExactHeadBaseline.preview.deploymentUrl,
+      commitSha: p34ExactHeadBaseline.commitSha
+    },
     nodeMajor: build.nodeMajor,
     productionAliasAttached: false as const,
     mergeAuthorized: false as const,

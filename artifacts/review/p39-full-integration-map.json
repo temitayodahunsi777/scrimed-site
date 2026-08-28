@@ -16,8 +16,7 @@
     "deploymentId": "dpl_MPSXXudmikWZduLxEvAY8afTtXvz",
     "deploymentUrl": "https://scrimed-site-8tjd5qyj0-temitayo-dahunsis-projects.vercel.app",
     "branchAlias": "https://scrimed-site-git-agent-scrime-02c77f-temitayo-dahunsis-projects.vercel.app",
-    "builtRoutes": 630,
-    "prerenderedRoutes": 245
+    "routeInventoryEvidence": "PREDECESSOR_BUILD_EVIDENCE_RETAINED_IN_PR_39"
   },
   "sourceMapHash": "84e8c41fea5662b81e6fcabde4643e0295cb09913e4ccb3beaf79927c427d720",
   "fileCount": 314,
@@ -5077,5 +5076,5 @@
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
   "boundary": "Review compression only. The map grants no review approval, merge, deployment, migration, PHI, clinical, payer, EHR/device, customer, certification, compliance, or external-distribution authority.",
-  "mapHash": "99e1ba9cfe32206a2c050a3f58d4fc96d9d758c1ec3987d31cc2f0aacad4bccb"
+  "mapHash": "9337c5a62132c19cd87092c3c597909721123dbe7bbbc2e8ebfe226e183c3fa7"
 }

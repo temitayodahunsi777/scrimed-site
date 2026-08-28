@@ -44,8 +44,16 @@ await check("exact-head-baseline-is-frozen", async () => {
 });
 
 await check("review-status-remains-read-only-and-external", async () => {
-  assert.ok(files.review.includes("EXACT_REVIEW_REQUESTED_RUNTIME_UNBOUND"));
-  assert.ok(files.review.includes("independentlyVerifiedByRuntime: false"));
+  for (const state of [
+    "AUTOMATED_READY",
+    "REVIEW_REQUESTED",
+    "REVIEW_CURRENT",
+    "REVIEW_STALE",
+    "CHANGES_REQUESTED",
+    "APPROVED_EXACT_HEAD"
+  ]) assert.ok(files.review.includes(state), state);
+  assert.ok(files.review.includes('trustClass: "trusted-external"'));
+  assert.ok(files.review.includes("signatureVerified: true"));
   assert.ok(files.review.includes("productionAuthorityGranted: false"));
 });
 
@@ -110,7 +118,7 @@ await check("pilot-operating-system-is-deterministic-and-human-controlled", asyn
 });
 
 await check("cost-governor-stops-overrun-and-keeps-pricing-estimated", async () => {
-  assert.ok(files.cost.includes('status === "STOP"'));
+  assert.ok(files.cost.includes('status === "STOP_SAFELY"'));
   assert.ok(files.cost.includes("TOTAL_BUDGET_EXCEEDED"));
   assert.ok(files.cost.includes('classification: "ESTIMATED"'));
   assert.ok(files.cost.includes("bindingQuoteAuthorized: false"));

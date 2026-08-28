@@ -2733,8 +2733,27 @@ export function getProductConsoleSummary() {
 let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
 
 function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
-  summary.p34ReviewReadiness = getP34ReviewReadinessSummary();
-  summary.p34PreviewAcceptance = getP34PreviewAcceptanceSummary();
+  const review = getP34ReviewReadinessSummary();
+  const preview = getP34PreviewAcceptanceSummary();
+  summary.p34ReviewReadiness = review;
+  summary.p34PreviewAcceptance = preview;
+  summary.p34CurrentCandidatePosture = {
+    branch: summary.runtimeBranch ?? null,
+    commitSha: review.candidate.commitSha,
+    candidateFingerprint: review.candidate.fingerprint,
+    currentPullRequest: review.currentPullRequest,
+    predecessorPullRequest: review.predecessorPullRequest,
+    reviewState: review.review.state,
+    previewState: preview.status,
+    aal2State: "OPERATOR_ACTION_REQUIRED",
+    supabaseLeakedPasswordProtection: "OPERATOR_ACTION_REQUIRED",
+    migrationState: "THREE_PENDING_PRODUCTION_UNAPPLIED",
+    autonomyCeiling: "A2_REVIEW_ONLY",
+    syntheticPilotAuthority: "BOUNDED_SCOPE_APPROVAL_REQUIRED",
+    protectedPilotAuthority: false,
+    productionAuthority: false,
+    customerActivationAuthority: false
+  };
   return summary;
 }
 
@@ -2758,13 +2777,20 @@ export function getProductConsoleApiSummary() {
     salesOperationsSummary,
     strategicPlatformIntelligenceSummary
   } = summary;
+  // The full page model contains large repeated collections. The API keeps its
+  // stable scalar contract and sends callers to dedicated routes for details.
   const apiSummary = Object.fromEntries(
-    Object.entries(summary).filter(([key]) => !key.endsWith("Summary"))
+    Object.entries(summary).filter(
+      ([key, value]) =>
+        !key.endsWith("Summary") &&
+        (value === null || ["string", "number", "boolean"].includes(typeof value))
+    )
   );
 
   productConsoleApiSummaryCache = {
     ...apiSummary,
     payloadProfile: "compact-api-v2",
+    proofStack: summary.proofStack,
     detailRoutes: {
       companyAssessment: companyAssessmentSummary.apiRoute,
       enterpriseBusinessOperations: summary.enterpriseBusinessOpsApiRoute,

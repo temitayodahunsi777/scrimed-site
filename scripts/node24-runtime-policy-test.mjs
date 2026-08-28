@@ -13,6 +13,7 @@ import {
 } from "../app/lib/release/vercelReleaseAssurance.ts";
 import {
   getProductConsoleApiSummary,
+  getProductConsoleSummary,
   getProductRuntimePresentation
 } from "../app/lib/productConsole.ts";
 import { getScrimedPlatformGraph } from "../app/lib/scrimed-control-plane/platformGraph.ts";
@@ -110,6 +111,7 @@ assert.equal(commandCenter.runtimeStatus.targetNodeMajor, 24);
 const budgets = JSON.parse(await readFile("config/performance-budgets.json", "utf8"));
 const productConsoleApi = getProductConsoleApiSummary();
 const productConsoleBytes = Buffer.byteLength(JSON.stringify(productConsoleApi));
+const productConsoleFullBytes = Buffer.byteLength(JSON.stringify(getProductConsoleSummary()));
 assert.equal(productConsoleApi.payloadProfile, "compact-api-v2");
 assert.ok(
   productConsoleApi.healthcareOptimizationCommandSummary.blockedActions.includes(
@@ -126,5 +128,8 @@ assert.equal(
   true
 );
 assert.ok(productConsoleBytes <= budgets.budgets.productConsoleApiBytes);
+assert.ok(productConsoleBytes <= productConsoleFullBytes * 0.4);
 
-console.log(`pass SCRIMED Node 24 runtime policy tests (26 checks; Product Console API ${productConsoleBytes} bytes)`);
+console.log(
+  `pass SCRIMED Node 24 runtime policy tests (27 checks; Product Console API ${productConsoleBytes} bytes, full model ${productConsoleFullBytes} bytes)`
+);

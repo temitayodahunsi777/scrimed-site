@@ -18,8 +18,7 @@ export const p34ExactHeadBaseline = {
     "a4193aab60512c280a425171a868785ea8e07ab30f80b17665001f02975dda0e",
   sbomFingerprint:
     "9febdb954737f82d9d9be29b0a1013c7cea520c6206f1793e79e5b1422ad38ef",
-  builtRouteCount: 630,
-  prerenderedRouteCount: 245,
+  routeInventoryEvidence: "PREDECESSOR_BUILD_EVIDENCE_RETAINED_IN_PR_39",
   reviewRequest: {
     requested: true,
     requestedAt: "2026-08-26T00:30:13.000Z",

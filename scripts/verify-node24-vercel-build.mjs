@@ -83,6 +83,8 @@ const packageJson = JSON.parse(packageJsonText);
 const packageLock = JSON.parse(packageLockText);
 const vercelConfig = await readJson("vercel.json");
 const performanceBudgets = await readJson("config/performance-budgets.json");
+const p34RouteInventory = prebuild ? null : await readJson(performanceBudgets.routeInventory.builtRoutesArtifact);
+const p34GenerationInventory = prebuild ? null : await readJson(performanceBudgets.routeInventory.generationArtifact);
 const actualNodeMajor = parseNodeMajor(process.versions.node);
 const competingLockfiles = [];
 for (const lockfile of ["pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb"]) {
@@ -112,13 +114,18 @@ if (!prebuild) {
     check("next-build-present", Boolean(buildId), "A Next.js production BUILD_ID is present."),
     check(
       "built-route-count",
-      routeCount === performanceBudgets.routeInventory.expectedBuiltRouteCount,
-      `${routeCount} built routes; expected ${performanceBudgets.routeInventory.expectedBuiltRouteCount}.`
+      routeCount === p34RouteInventory?.builtRouteCount,
+      `${routeCount} built routes; generated inventory records ${p34RouteInventory?.builtRouteCount ?? "missing"}.`
     ),
     check(
       "prerendered-route-count",
-      prerenderedRouteCount === performanceBudgets.routeInventory.expectedPrerenderedRouteCount,
-      `${prerenderedRouteCount} prerendered routes; expected ${performanceBudgets.routeInventory.expectedPrerenderedRouteCount}.`
+      prerenderedRouteCount === p34GenerationInventory?.prerenderedRouteCount,
+      `${prerenderedRouteCount} prerendered routes; generated inventory records ${p34GenerationInventory?.prerenderedRouteCount ?? "missing"}.`
+    ),
+    check(
+      "generated-route-inventory",
+      p34RouteInventory?.status === "GENERATED_FROM_NEXT_BUILD" && performanceBudgets.routeInventory.manualExpectedCountsAllowed === false,
+      "Route expectations are generated from the Next.js build rather than manually maintained."
     )
   );
 }
@@ -150,7 +157,10 @@ const fingerprintPayload = {
     environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "local",
     buildId,
     routeCount,
-    prerenderedRouteCount
+    prerenderedRouteCount,
+    routeInventoryFingerprint: p34RouteInventory?.inventoryFingerprint ?? null,
+    generationInventoryFingerprint: p34GenerationInventory?.inventoryFingerprint ?? null,
+    generationWorkUnits: p34GenerationInventory?.generationWorkUnits ?? null
   }
 };
 const failedChecks = checks.filter((entry) => entry.mandatory && !entry.passed);

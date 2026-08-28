@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "SCRIMED Investor Demo Command Room",
   description:
     "A timed, proof-checked, human-led command room for SCRIMED synthetic investor demonstrations.",
+  alternates: {
+    canonical: "/investor-demo-command-room"
+  },
   robots: {
     index: false,
     follow: false

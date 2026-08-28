@@ -16,10 +16,11 @@ template -> manifest -> human scope approval -> deterministic stages -> objectiv
 - `app/lib/commercial/pilotTemplateRegistry.ts`: six reusable buyer-safe templates.
 - `app/lib/commercial/pilotManifest.ts`: candidate, dataset, policy, budget, duration, objective
   criteria, exclusions, and approval binding.
-- `app/lib/commercial/pilotOperatingSystem.ts`: deterministic transitions, success evaluation,
-  evidence, readout, proposal fingerprints, expansion gates, and buyer priority.
+- `app/lib/commercial/pilotOperatingSystem.ts`: deterministic transitions, atomic single-use
+  lifecycle leases, verifiable evidence chains, success evaluation, readout, proposal fingerprints,
+  expansion gates, and buyer priority.
 - `app/lib/economics/pilotCostGovernor.ts`: inference, tool, retry, runtime, total-spend stops and
-  estimated margin sensitivity.
+  estimated margin sensitivity, plus atomic cumulative reservations for concurrent work.
 - `app/lib/commercial/syntheticPilotReadiness.ts`: consolidated read-only public summary.
 
 ## Control Contract
@@ -36,6 +37,11 @@ Every executable synthetic manifest must affirm all seven controls:
 
 Missing controls fail configuration. Duplicate idempotency keys, skipped workflow stages, missing
 evidence, cost overruns, and missing named synthetic-scope approval also fail closed.
+
+Malformed manifests are normalized as untrusted inputs and return a blocked decision rather than
+throwing. The adversarial suite fuzzes 160 malformed cases and tests concurrent transition and
+budget attempts. In-memory lease and budget stores are deterministic test/local adapters; a
+protected pilot requires durable transactional persistence and remains unauthorized.
 
 ## Commercial Authority
 
@@ -66,8 +72,12 @@ certification claims, and external investor distribution remain blocked.
 
 ```bash
 npm run test:scrimed-p34-post-review-readiness
+npm run test:scrimed-p34-pilot-adversarial
 npm run contract:scrimed-p34-post-review-readiness
+npm run contract:scrimed-p34-follow-on
 npm run smoke:scrimed-p34-canary
+npm run scrimed:p34:certify
+npm run scrimed:p34:evidence
 PORT=3049 npm run start
 SCRIMED_BASE_URL=http://127.0.0.1:3049 npm run smoke:synthetic-pilot
 npm run verify:preview-ui -- --base-url=http://127.0.0.1:3049

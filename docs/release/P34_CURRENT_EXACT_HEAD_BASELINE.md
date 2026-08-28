@@ -15,7 +15,7 @@ This document freezes the independently reviewable p.34 target. Follow-on engine
 | Review packet | `7540b5b8c7abf467b9249b80bfcf41c4b180949588641ab4a38f3f0e12015035` |
 | Gate packet | `a4193aab60512c280a425171a868785ea8e07ab30f80b17665001f02975dda0e` |
 | SBOM | `9febdb954737f82d9d9be29b0a1013c7cea520c6206f1793e79e5b1422ad38ef` |
-| Routes | 630 built / 245 prerendered |
+| Route inventory | PREDECESSOR_BUILD_EVIDENCE_RETAINED_IN_PR_39 |
 | Review requested | 2026-08-26T00:30:13.000Z ([evidence](https://github.com/temitayodahunsi777/scrimed-site/pull/39#issuecomment-5418888268)) |
 | Vercel preview | `dpl_MPSXXudmikWZduLxEvAY8afTtXvz`, READY, target null, branch alias only |
 

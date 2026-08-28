@@ -4,7 +4,7 @@ import { getScrimedBuildInfo } from "../release/vercelReleaseAssurance";
 import { p34ExactHeadBaseline, p34ExactHeadBoundary } from "./exactHeadBaseline";
 import { getP34AdaptiveGovernanceSummary } from "./index";
 
-export const p34ReviewReadinessVersion = "scrimed-p34-review-readiness-v1-2026-08-25";
+export const p34ReviewReadinessVersion = "scrimed-p34-review-readiness-v2-2026-08-28";
 export const p34ReviewReadinessRoute = "/api/scrimed-control-plane/review-readiness";
 
 const gitShaPattern = /^[0-9a-f]{40}$/i;
@@ -21,14 +21,23 @@ function normalizedSha256(value: string | undefined | null) {
   return sha256Pattern.test(normalized) ? normalized : null;
 }
 
-function reviewEvidenceFreshness(expiresAt: string | undefined) {
-  if (!expiresAt || Number.isNaN(Date.parse(expiresAt))) {
-    return { status: "NOT_PRESENT" as const, expiresAt: null };
+function reviewEvidenceFreshness(reviewedAt: string | undefined, expiresAt: string | undefined, now: Date) {
+  const reviewedAtMs = Date.parse(reviewedAt ?? "");
+  const expiresAtMs = Date.parse(expiresAt ?? "");
+  const nowMs = now.getTime();
+  if (!Number.isFinite(reviewedAtMs) || !Number.isFinite(expiresAtMs) || !Number.isFinite(nowMs)) {
+    return { status: "NOT_PRESENT" as const, reviewedAt: null, expiresAt: null };
   }
-  const normalized = new Date(expiresAt).toISOString();
+  const normalizedReviewedAt = new Date(reviewedAtMs).toISOString();
+  const normalizedExpiresAt = new Date(expiresAtMs).toISOString();
+  const temporallyValid = reviewedAtMs <= nowMs + 5 * 60_000
+    && expiresAtMs > nowMs
+    && expiresAtMs > reviewedAtMs
+    && expiresAtMs - reviewedAtMs <= 30 * 24 * 60 * 60_000;
   return {
-    status: Date.parse(normalized) > Date.now() ? ("CURRENT" as const) : ("EXPIRED" as const),
-    expiresAt: normalized
+    status: temporallyValid ? ("CURRENT" as const) : ("EXPIRED" as const),
+    reviewedAt: normalizedReviewedAt,
+    expiresAt: normalizedExpiresAt
   };
 }
 
@@ -37,43 +46,112 @@ function normalizedTimestamp(value: string | undefined | null, fallback: string)
   return Number.isFinite(Date.parse(candidate)) ? new Date(candidate).toISOString() : fallback;
 }
 
-export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.env) {
+export type P34TrustedExternalReviewReceipt = {
+  status: "PASS" | "CHANGES_REQUESTED";
+  trustClass: "trusted-external";
+  pullRequestNumber: number;
+  commitSha: string;
+  treeSha: string;
+  candidateFingerprint: string;
+  sourceFingerprint: string;
+  validationFingerprint: string;
+  reviewPacketFingerprint: string;
+  gatePacketFingerprint: string;
+  sbomFingerprint: string;
+  previewDeploymentId: string | null;
+  reviewerIdentityHash: string;
+  receiptHash: string;
+  reviewedAt: string;
+  expiresAt: string;
+  signatureVerified: true;
+  approvalConsumed: true;
+};
+
+export function getP34ReviewReadinessSummary(
+  env: NodeJS.ProcessEnv = process.env,
+  trustedReviewReceipt: P34TrustedExternalReviewReceipt | null = null,
+  now: Date = new Date()
+) {
   const build = getScrimedBuildInfo(env);
   const p34 = getP34AdaptiveGovernanceSummary();
   const previewAcceptance = getP34PreviewAcceptanceSummary(env);
   const exactHead = normalizedGitSha(build.commitSha);
-  const requestedHead = normalizedGitSha(
-    env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA ?? p34ExactHeadBaseline.commitSha
-  );
-  const approvedHead = normalizedGitSha(env.SCRIMED_P34_REVIEW_APPROVED_HEAD_SHA);
+  const requestedHead = normalizedGitSha(env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA);
+  const approvedHead = normalizedGitSha(trustedReviewReceipt?.commitSha);
+  const exactTree = normalizedGitSha(env.SCRIMED_P34_TREE_SHA);
+  const sourceFingerprint = normalizedSha256(env.SCRIMED_P34_SOURCE_SHA256);
+  const validationFingerprint = normalizedSha256(env.SCRIMED_P34_VALIDATION_SHA256);
+  const reviewPacketFingerprint = normalizedSha256(env.SCRIMED_P34_REVIEW_PACKET_SHA256);
+  const gatePacketFingerprint = normalizedSha256(env.SCRIMED_P34_GATE_PACKET_SHA256);
+  const sbomFingerprint = normalizedSha256(env.SCRIMED_P34_SBOM_SHA256);
   const reviewerIdentity = reviewerPattern.test(env.SCRIMED_P34_REVIEWER_ID?.trim() ?? "")
     ? env.SCRIMED_P34_REVIEWER_ID!.trim()
     : null;
   const candidate = normalizedSha256(build.candidateFingerprint);
-  const freshness = reviewEvidenceFreshness(env.SCRIMED_P34_REVIEW_EXPIRES_AT);
+  const freshness = reviewEvidenceFreshness(
+    trustedReviewReceipt?.reviewedAt,
+    trustedReviewReceipt?.expiresAt,
+    now
+  );
   const requestedAt = normalizedTimestamp(
     env.SCRIMED_P34_REVIEW_REQUESTED_AT,
     p34ExactHeadBaseline.reviewRequest.requestedAt
   );
-  const requestAgeHours = Math.max(0, Number(((Date.now() - Date.parse(requestedAt)) / 3_600_000).toFixed(1)));
+  const requestAgeHours = Math.max(0, Number(((now.getTime() - Date.parse(requestedAt)) / 3_600_000).toFixed(1)));
   const reviewRequested = Boolean(requestedHead);
   const reviewRequestCurrent = Boolean(exactHead && requestedHead && exactHead === requestedHead);
-  const independentReviewRecorded = Boolean(
+  const currentPrNumber = Number.parseInt(env.SCRIMED_P34_PR_NUMBER ?? "", 10);
+  const currentPrUrl = env.SCRIMED_P34_PR_URL?.trim() ?? null;
+  const currentPreviewDeploymentId = env.SCRIMED_P34_PREVIEW_DEPLOYMENT_ID?.trim() || null;
+  const trustedReceiptValid = Boolean(
     exactHead &&
       approvedHead &&
       exactHead === approvedHead &&
-      reviewerIdentity &&
+      exactTree &&
+      normalizedGitSha(trustedReviewReceipt?.treeSha) === exactTree &&
+      candidate &&
+      normalizedSha256(trustedReviewReceipt?.candidateFingerprint) === candidate &&
+      sourceFingerprint &&
+      normalizedSha256(trustedReviewReceipt?.sourceFingerprint) === sourceFingerprint &&
+      validationFingerprint &&
+      normalizedSha256(trustedReviewReceipt?.validationFingerprint) === validationFingerprint &&
+      reviewPacketFingerprint &&
+      normalizedSha256(trustedReviewReceipt?.reviewPacketFingerprint) === reviewPacketFingerprint &&
+      gatePacketFingerprint &&
+      normalizedSha256(trustedReviewReceipt?.gatePacketFingerprint) === gatePacketFingerprint &&
+      sbomFingerprint &&
+      normalizedSha256(trustedReviewReceipt?.sbomFingerprint) === sbomFingerprint &&
+      Number.isInteger(currentPrNumber) &&
+      currentPrNumber > 0 &&
+      trustedReviewReceipt?.pullRequestNumber === currentPrNumber &&
+      (trustedReviewReceipt?.previewDeploymentId ?? null) === currentPreviewDeploymentId &&
+      trustedReviewReceipt?.trustClass === "trusted-external" &&
+      trustedReviewReceipt.signatureVerified === true &&
+      trustedReviewReceipt.approvalConsumed === true &&
+      sha256Pattern.test(trustedReviewReceipt.reviewerIdentityHash) &&
+      sha256Pattern.test(trustedReviewReceipt.receiptHash) &&
       freshness.status === "CURRENT"
   );
-  const reviewState = independentReviewRecorded
-    ? "HUMAN_REVIEW_EVIDENCE_PRESENT_REQUIRES_EXTERNAL_VERIFICATION"
+  const reviewState = trustedReceiptValid && trustedReviewReceipt?.status === "PASS"
+    ? "APPROVED_EXACT_HEAD"
+    : trustedReceiptValid && trustedReviewReceipt?.status === "CHANGES_REQUESTED"
+      ? "CHANGES_REQUESTED"
     : reviewRequested && !exactHead
-      ? "EXACT_REVIEW_REQUESTED_RUNTIME_UNBOUND"
+      ? "REVIEW_REQUESTED"
       : reviewRequested && !reviewRequestCurrent
-      ? "STALE_REVIEW_REQUEST"
+      ? "REVIEW_STALE"
       : reviewRequestCurrent
-        ? "EXACT_REVIEW_REQUESTED"
-        : "EXACT_REVIEW_REQUIRED";
+        ? "REVIEW_CURRENT"
+        : "AUTOMATED_READY";
+  const currentPr = Number.isInteger(currentPrNumber) && currentPrNumber > 0
+    ? {
+        number: currentPrNumber,
+        url: currentPrUrl && /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/\d+$/.test(currentPrUrl)
+          ? currentPrUrl
+          : null,
+        state: "OPEN_REVIEW_REQUIRED" as const
+      }
+    : null;
 
   const summary = {
     service: "scrimed-p34-review-readiness",
@@ -82,15 +160,15 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
     candidate: {
       fingerprint: candidate,
       commitSha: exactHead,
-      treeSha: normalizedGitSha(env.SCRIMED_P34_TREE_SHA),
-      sourceFingerprint: normalizedSha256(env.SCRIMED_P34_SOURCE_SHA256),
-      validationFingerprint: normalizedSha256(env.SCRIMED_P34_VALIDATION_SHA256),
-      reviewPacketFingerprint: normalizedSha256(env.SCRIMED_P34_REVIEW_PACKET_SHA256),
-      gatePacketFingerprint: normalizedSha256(env.SCRIMED_P34_GATE_PACKET_SHA256),
-      sbomFingerprint: normalizedSha256(env.SCRIMED_P34_SBOM_SHA256),
+      treeSha: exactTree,
+      sourceFingerprint,
+      validationFingerprint,
+      reviewPacketFingerprint,
+      gatePacketFingerprint,
+      sbomFingerprint,
       runtimeBindingStatus: build.candidateFingerprintVerificationStatus
     },
-    frozenReviewTarget: {
+    predecessorReviewTarget: {
       commitSha: p34ExactHeadBaseline.commitSha,
       treeSha: p34ExactHeadBaseline.treeSha,
       candidateFingerprint: p34ExactHeadBaseline.candidateFingerprint,
@@ -103,12 +181,13 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
       previewDeploymentId: p34ExactHeadBaseline.preview.deploymentId,
       runtimeMatchesTarget: exactHead === p34ExactHeadBaseline.commitSha
     },
-    pullRequest: {
+    predecessorPullRequest: {
       repository: "temitayodahunsi777/scrimed-site",
       number: 39,
       stateExpected: "OPEN_DRAFT_UNMERGED",
       mergeAuthorityGranted: false as const
     },
+    currentPullRequest: currentPr,
     automatedEvidence: {
       p34Status: p34.status,
       passedGates: p34.gateCounts.PASS,
@@ -127,25 +206,23 @@ export function getP34ReviewReadinessSummary(env: NodeJS.ProcessEnv = process.en
       requestCurrent: reviewRequestCurrent,
       reviewerIdentity,
       approvedHead,
+      trustedExternalReceiptPresent: trustedReceiptValid,
       evidenceFreshness: freshness.status,
+      evidenceReviewedAt: freshness.reviewedAt,
       evidenceExpiresAt: freshness.expiresAt,
       state: reviewState,
-      independentlyVerifiedByRuntime: false as const
+      independentlyVerifiedByRuntime: trustedReceiptValid
     },
     scope: {
-      authoritativePrInventoryObserved: 286,
-      authoritativeGapClosureBaselineObserved: 33,
-      currentMappedFileCount: 314,
-      currentDirectLineageFileCount: 89,
-      currentUnexpectedFileCount: 0,
-      currentMapHash: "84e8c41fea5662b81e6fcabde4643e0295cb09913e4ccb3beaf79927c427d720",
-      mapArtifact: "artifacts/review/p39-review-map.json",
-      mapDocument: "docs/review/P39_REVIEW_MAP.md",
+      mapArtifact: "artifacts/review/p34-integration-map.json",
+      mapDocument: "docs/review/P34_INTEGRATION_MAP.md",
+      currentCandidateManifest: "artifacts/release/p34-current-candidate.json",
       classificationRequired: true as const,
       unexpectedFilesAllowed: false as const
     },
     previewAcceptance,
     operatorActions: [
+      { id: "publish-follow-on-pr", owner: "release-steward", state: currentPr ? "PASS" : "OPERATOR_ACTION_REQUIRED" },
       { id: "independent-review", owner: "independent-technical-reviewer", state: reviewState },
       { id: "aal2", owner: "authorized-preview-operator", state: "OPERATOR_ACTION_REQUIRED" },
       { id: "supabase-leaked-password-protection", owner: "supabase-project-owner", state: "OPERATOR_ACTION_REQUIRED" },
