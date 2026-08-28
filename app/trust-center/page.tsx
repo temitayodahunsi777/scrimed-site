@@ -1,10 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getEnterpriseReadinessSummary } from "../lib/enterpriseReadiness";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "SCRIMED Trust & Enterprise Readiness Center",
   description:
-    "Inspectable legal, security, privacy, brand, governance, marketing, communications, sales, and advertising readiness for SCRIMED."
+    "Inspectable legal, security, privacy, brand, governance, marketing, communications, sales, and advertising readiness for SCRIMED.",
+  alternates: { canonical: "/trust-center" }
 };
 
 export default function TrustCenterPage() {

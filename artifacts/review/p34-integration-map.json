@@ -25,7 +25,7 @@
     "CONFIGURATION",
     "UNEXPECTED"
   ],
-  "fileCount": 58,
+  "fileCount": 60,
   "classificationCounts": {
     "AAL2": 2,
     "CONFIGURATION": 3,
@@ -36,7 +36,7 @@
     "PILOT": 6,
     "SECURITY": 1,
     "TEST": 18,
-    "UI": 2,
+    "UI": 4,
     "VERCEL": 4
   },
   "unexplainedFileCount": 0,
@@ -102,8 +102,18 @@
       "status": "CURRENT"
     },
     {
+      "path": "app/scrimed-p34/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT"
+    },
+    {
       "path": "app/synthetic-pilot/page.tsx",
       "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/trust-center/page.tsx",
+      "classification": "UI",
       "status": "CURRENT"
     },
     {
@@ -336,5 +346,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "396aab9abbda5f6086b271c81933fb487f18a4ec9d405552fb55278fe0792491"
+  "mapFingerprint": "873d8a4e580e0aeeadba1a6b1b666808766316a499586a71e15ffe3369eb84df"
 }

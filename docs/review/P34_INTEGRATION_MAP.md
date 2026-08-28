@@ -2,11 +2,11 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files explained: **58/58**
+Files explained: **60/60**
 
 Unexplained: **0**
 
-Map SHA-256: `396aab9abbda5f6086b271c81933fb487f18a4ec9d405552fb55278fe0792491`
+Map SHA-256: `873d8a4e580e0aeeadba1a6b1b666808766316a499586a71e15ffe3369eb84df`
 
 | Classification | Files |
 | --- | ---: |
@@ -19,7 +19,7 @@ Map SHA-256: `396aab9abbda5f6086b271c81933fb487f18a4ec9d405552fb55278fe0792491`
 | PILOT | 6 |
 | SECURITY | 1 |
 | TEST | 18 |
-| UI | 2 |
+| UI | 4 |
 | VERCEL | 4 |
 
 The machine-readable path-by-path inventory is `artifacts/review/p34-integration-map.json`. Review evidence must bind the exact runtime candidate manifest; this map grants no approval.
