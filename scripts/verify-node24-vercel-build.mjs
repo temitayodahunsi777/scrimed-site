@@ -110,6 +110,13 @@ if (!prebuild) {
   buildId = (await readFile(".next/BUILD_ID", "utf8")).trim();
   routeCount = Object.keys(appRoutes).length;
   prerenderedRouteCount = Object.keys(prerenderManifest.routes ?? {}).length;
+  const observedRoutes = Object.entries(appRoutes)
+    .map(([route, outputPath]) => ({ route, outputPath }))
+    .sort((left, right) => left.route.localeCompare(right.route));
+  const observedPrerenderedRoutes = Object.keys(prerenderManifest.routes ?? {}).sort();
+  const observedDynamicRoutes = Object.keys(prerenderManifest.dynamicRoutes ?? {}).sort();
+  const { inventoryFingerprint: routeInventoryFingerprint, ...routeInventoryPayload } = p34RouteInventory ?? {};
+  const { inventoryFingerprint: renderInventoryFingerprint, ...renderInventoryPayload } = p34GenerationInventory ?? {};
   checks.push(
     check("next-build-present", Boolean(buildId), "A Next.js production BUILD_ID is present."),
     check(
@@ -123,9 +130,28 @@ if (!prebuild) {
       `${prerenderedRouteCount} prerendered routes; generated inventory records ${p34GenerationInventory?.prerenderedRouteCount ?? "missing"}.`
     ),
     check(
+      "exact-route-baseline",
+      JSON.stringify(observedRoutes) === JSON.stringify(p34RouteInventory?.routes),
+      "Observed Next.js routes exactly match the independent committed route baseline."
+    ),
+    check(
+      "exact-render-baseline",
+      JSON.stringify(observedPrerenderedRoutes) === JSON.stringify(p34GenerationInventory?.prerenderedRoutes)
+        && JSON.stringify(observedDynamicRoutes) === JSON.stringify(p34GenerationInventory?.dynamicRoutes),
+      "Observed prerender and dynamic routes exactly match the independent committed render baseline."
+    ),
+    check(
+      "inventory-fingerprints",
+      routeInventoryFingerprint === sha256(stableSerialize(routeInventoryPayload))
+        && renderInventoryFingerprint === sha256(stableSerialize(renderInventoryPayload)),
+      "Committed route and render inventory fingerprints verify."
+    ),
+    check(
       "generated-route-inventory",
-      p34RouteInventory?.status === "GENERATED_FROM_NEXT_BUILD" && performanceBudgets.routeInventory.manualExpectedCountsAllowed === false,
-      "Route expectations are generated from the Next.js build rather than manually maintained."
+      p34RouteInventory?.status === "GENERATED_FROM_NEXT_BUILD"
+        && performanceBudgets.routeInventory.manualExpectedCountsAllowed === false
+        && performanceBudgets.routeInventory.buildMayOverwriteBaseline === false,
+      "Route expectations are generated intentionally and ordinary builds cannot overwrite the committed baseline."
     )
   );
 }

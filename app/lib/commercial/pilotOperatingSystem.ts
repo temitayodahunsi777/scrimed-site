@@ -398,6 +398,47 @@ export type PilotEvidenceLedgerLink = {
   linkHash: string;
 };
 
+export const pilotEvidenceLedgerRequiredKinds = [
+  "pilot",
+  "scenario",
+  "workflow",
+  "model",
+  "agent",
+  "tool",
+  "policy",
+  "output",
+  "evaluation",
+  "correction",
+  "accepted-result",
+  "value-estimate"
+] as const satisfies ReadonlyArray<PilotEvidenceLedgerLink["kind"]>;
+
+const evidenceReferencePattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{2,255}$/;
+const sha256Pattern = /^[0-9a-f]{64}$/i;
+
+function validatePilotEvidenceLedgerLinks(links: readonly PilotEvidenceLedgerLink[]) {
+  const reasonCodes: string[] = [];
+  if (links.length !== pilotEvidenceLedgerRequiredKinds.length) {
+    reasonCodes.push("LEDGER_LINK_COUNT_INVALID");
+  }
+  for (const [index, expectedKind] of pilotEvidenceLedgerRequiredKinds.entries()) {
+    const matches = links.filter((link) => link.kind === expectedKind);
+    if (matches.length === 0) reasonCodes.push(`MISSING_LEDGER_LINK:${expectedKind}`);
+    if (matches.length > 1) reasonCodes.push(`DUPLICATE_LEDGER_LINK:${expectedKind}`);
+    if (links[index]?.kind !== expectedKind) reasonCodes.push(`LEDGER_LINK_ORDER_INVALID:${expectedKind}`);
+  }
+  for (const link of links) {
+    if (!(pilotEvidenceLedgerRequiredKinds as readonly string[]).includes(link.kind)) {
+      reasonCodes.push("LEDGER_LINK_KIND_INVALID");
+    }
+    if (!evidenceReferencePattern.test(link.referenceId)) reasonCodes.push("LEDGER_REFERENCE_INVALID");
+    if (link.evidenceClassification !== "SYNTHETIC" && link.evidenceClassification !== "SIMULATED") {
+      reasonCodes.push("LEDGER_CLASSIFICATION_INVALID");
+    }
+  }
+  return [...new Set(reasonCodes)].sort();
+}
+
 export function buildPilotEvidenceLedger(input: {
   manifest: PilotManifest;
   references: Array<{
@@ -406,24 +447,6 @@ export function buildPilotEvidenceLedger(input: {
     evidenceClassification: PilotEvidenceLedgerLink["evidenceClassification"];
   }>;
 }) {
-  const requiredKinds = [
-    "pilot",
-    "workflow",
-    "scenario",
-    "model",
-    "agent",
-    "tool",
-    "policy",
-    "output",
-    "evaluation",
-    "correction",
-    "accepted-result",
-    "value-estimate"
-  ] as const;
-  const reasonCodes: string[] = [];
-  for (const kind of requiredKinds) {
-    if (!input.references.some((entry) => entry.kind === kind)) reasonCodes.push(`MISSING_LEDGER_LINK:${kind}`);
-  }
   let previousHash: string | null = null;
   const links = input.references.map((entry, index): PilotEvidenceLedgerLink => {
     const payload = {
@@ -437,6 +460,7 @@ export function buildPilotEvidenceLedger(input: {
     previousHash = linkHash;
     return link;
   });
+  const reasonCodes = validatePilotEvidenceLedgerLinks(links);
   const ledger = {
     status: reasonCodes.length === 0 ? "COMPLETE_SYNTHETIC_LEDGER" as const : "INCOMPLETE_BLOCKED" as const,
     manifestHash: input.manifest.manifestHash,
@@ -453,7 +477,16 @@ export function buildPilotEvidenceLedger(input: {
 }
 
 export function verifyPilotEvidenceLedger(ledger: ReturnType<typeof buildPilotEvidenceLedger>) {
-  const reasonCodes: string[] = [];
+  const reasonCodes = validatePilotEvidenceLedgerLinks(ledger.links);
+  const expectedStatus = reasonCodes.length === 0 ? "COMPLETE_SYNTHETIC_LEDGER" : "INCOMPLETE_BLOCKED";
+  if (ledger.status !== expectedStatus) reasonCodes.push("LEDGER_STATUS_INVALID");
+  if (JSON.stringify([...ledger.reasonCodes].sort()) !== JSON.stringify([...reasonCodes].filter((code) => code !== "LEDGER_STATUS_INVALID").sort())) {
+    reasonCodes.push("LEDGER_REASON_CODES_INVALID");
+  }
+  if (!sha256Pattern.test(ledger.manifestHash)) reasonCodes.push("LEDGER_MANIFEST_HASH_INVALID");
+  if (ledger.immutableAppendOnly !== true) reasonCodes.push("LEDGER_APPEND_ONLY_REQUIRED");
+  if (ledger.containsPhi !== false) reasonCodes.push("LEDGER_PHI_BOUNDARY_INVALID");
+  if (ledger.productionAuthorityGranted !== false) reasonCodes.push("LEDGER_PRODUCTION_AUTHORITY_INVALID");
   let previousHash: string | null = null;
   for (const [index, link] of ledger.links.entries()) {
     if (link.sequence !== index + 1) reasonCodes.push("LEDGER_SEQUENCE_INVALID");
@@ -471,6 +504,14 @@ export function verifyPilotEvidenceLedger(ledger: ReturnType<typeof buildPilotEv
     });
     if (link.linkHash !== expected) reasonCodes.push("LEDGER_LINK_HASH_INVALID");
     previousHash = link.linkHash;
+  }
+  const { ledgerHash, ...ledgerPayload } = ledger;
+  const expectedLedgerHash = createClinicalEvidenceHash({
+    version: pilotOperatingSystemVersion,
+    ledger: ledgerPayload
+  });
+  if (!sha256Pattern.test(ledgerHash) || ledgerHash !== expectedLedgerHash) {
+    reasonCodes.push("LEDGER_HASH_INVALID");
   }
   return {
     valid: reasonCodes.length === 0,
@@ -816,8 +857,8 @@ export function getPilotOperatingSystemSummary() {
     manifest: manifestDecision.manifest,
     references: [
       { kind: "pilot", referenceId: manifestDecision.manifest.pilotId, evidenceClassification: "SYNTHETIC" },
-      { kind: "workflow", referenceId: "enterprise-ai-governance", evidenceClassification: "SYNTHETIC" },
       { kind: "scenario", referenceId: "governance-scenarios-v1", evidenceClassification: "SYNTHETIC" },
+      { kind: "workflow", referenceId: "enterprise-ai-governance", evidenceClassification: "SYNTHETIC" },
       { kind: "model", referenceId: "deterministic-policy-engine-v1", evidenceClassification: "SIMULATED" },
       { kind: "agent", referenceId: "synthetic-governance-agent-v1", evidenceClassification: "SIMULATED" },
       { kind: "tool", referenceId: "read-only-governance-registry-v1", evidenceClassification: "SIMULATED" },

@@ -107,8 +107,10 @@ function validCriterion(criterion: unknown) {
   return safeIdPattern.test(typeof value.metricId === "string" ? value.metricId : "")
     && (typeof value.label === "string" ? value.label.trim().length : 0) >= 3
     && (typeof value.unit === "string" ? value.unit.trim().length : 0) >= 1
+    && ["increase", "decrease", "at-least", "at-most"].includes(value.direction ?? "")
     && Number.isFinite(value.baseline)
     && Number.isFinite(value.target)
+    && typeof value.mandatory === "boolean"
     && (typeof value.evidenceSourceId === "string" ? value.evidenceSourceId.trim().length : 0) >= 3;
 }
 

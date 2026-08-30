@@ -2,6 +2,7 @@ import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
 import { getP34PreviewAcceptanceSummary } from "../release/previewAcceptance";
 import { getScrimedBuildInfo } from "../release/vercelReleaseAssurance";
 import { p34ExactHeadBaseline, p34ExactHeadBoundary } from "./exactHeadBaseline";
+import { deriveExactHeadReviewState } from "./exactHeadReviewState";
 import { getP34AdaptiveGovernanceSummary } from "./index";
 
 export const p34ReviewReadinessVersion = "scrimed-p34-review-readiness-v2-2026-08-28";
@@ -132,17 +133,21 @@ export function getP34ReviewReadinessSummary(
       sha256Pattern.test(trustedReviewReceipt.receiptHash) &&
       freshness.status === "CURRENT"
   );
-  const reviewState = trustedReceiptValid && trustedReviewReceipt?.status === "PASS"
-    ? "APPROVED_EXACT_HEAD"
-    : trustedReceiptValid && trustedReviewReceipt?.status === "CHANGES_REQUESTED"
-      ? "CHANGES_REQUESTED"
-    : reviewRequested && !exactHead
-      ? "REVIEW_REQUESTED"
-      : reviewRequested && !reviewRequestCurrent
-      ? "REVIEW_STALE"
-      : reviewRequestCurrent
-        ? "REVIEW_CURRENT"
-        : "AUTOMATED_READY";
+  const reviewState = deriveExactHeadReviewState({
+    currentHeadSha: exactHead,
+    requestedHeadSha: requestedHead,
+    requestAcknowledged: reviewRequestCurrent && (
+      env.SCRIMED_P34_REVIEW_REQUEST_ACKNOWLEDGED === "true"
+      || (Number.isInteger(currentPrNumber) && currentPrNumber > 0)
+    ),
+    disposition: trustedReviewReceipt?.status === "PASS"
+      ? "APPROVED"
+      : trustedReviewReceipt?.status === "CHANGES_REQUESTED"
+        ? "CHANGES_REQUESTED"
+        : "NONE",
+    dispositionHeadSha: approvedHead,
+    trustedExternalReceiptValid: trustedReceiptValid
+  });
   const currentPr = Number.isInteger(currentPrNumber) && currentPrNumber > 0
     ? {
         number: currentPrNumber,

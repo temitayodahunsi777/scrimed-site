@@ -2,20 +2,20 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files explained: **60/60**
+Files explained: **70/70**
 
 Unexplained: **0**
 
-Map SHA-256: `873d8a4e580e0aeeadba1a6b1b666808766316a499586a71e15ffe3369eb84df`
+Map SHA-256: `05b3bbc485b5ea76659db243660f60ea2a696c1f571187028e929c4f079d11be`
 
 | Classification | Files |
 | --- | ---: |
 | AAL2 | 2 |
 | CONFIGURATION | 3 |
 | CORE_RUNTIME | 1 |
-| DOCUMENTATION | 12 |
-| GENERATED_EVIDENCE | 7 |
-| GOVERNANCE | 2 |
+| DOCUMENTATION | 17 |
+| GENERATED_EVIDENCE | 11 |
+| GOVERNANCE | 3 |
 | PILOT | 6 |
 | SECURITY | 1 |
 | TEST | 18 |

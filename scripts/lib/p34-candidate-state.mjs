@@ -10,8 +10,11 @@ export const p34Predecessor = Object.freeze({
 });
 
 export const p34RuntimeEvidencePath = "artifacts/release/p34-current-candidate.json";
-export const p34RouteInventoryPath = "artifacts/p34/P34_ROUTE_INVENTORY.json";
-export const p34GenerationInventoryPath = "artifacts/p34/P34_GENERATION_INVENTORY.json";
+export const p34ExactCandidateManifestPath = "artifacts/release/p34-exact-candidate-manifest.json";
+export const p34RouteInventoryPath = "artifacts/build/route-inventory.json";
+export const p34GenerationInventoryPath = "artifacts/build/render-inventory.json";
+export const p34LegacyRouteInventoryPath = "artifacts/p34/P34_ROUTE_INVENTORY.json";
+export const p34LegacyGenerationInventoryPath = "artifacts/p34/P34_GENERATION_INVENTORY.json";
 
 export function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -115,6 +118,7 @@ export function inspectP34CandidateState(env = process.env) {
   const branch = gitText(["branch", "--show-current"]);
   const base = gitSha(`${env.SCRIMED_P34_BASE_REF?.trim() || p34Predecessor.commitSha}^{commit}`);
   if (!head || !tree || !branch || !base) throw new Error("p.34 candidate state requires a valid Git branch, HEAD, tree, and predecessor base.");
+  const commitTimestamp = gitText(["show", "-s", "--format=%cI", head]);
   const ancestry = git(["merge-base", "--is-ancestor", base, head]);
   if (ancestry === null) throw new Error("p.34 predecessor must be an ancestor of the current candidate.");
 
@@ -142,6 +146,9 @@ export function inspectP34CandidateState(env = process.env) {
     schemaVersion: "scrimed-p34-follow-on-candidate-v2",
     base,
     commit: head,
+    commitTimestamp: commitTimestamp && Number.isFinite(Date.parse(commitTimestamp))
+      ? new Date(commitTimestamp).toISOString()
+      : null,
     tree,
     sourceFingerprint,
     integrationEntries
@@ -215,7 +222,7 @@ export function inspectP34CandidateState(env = process.env) {
       ]
     },
     aal2: { status: "OPERATOR_ACTION_REQUIRED", exactCandidateEvidencePresent: false },
-    review: { status: currentPr ? "REVIEW_REQUESTED" : "AUTOMATED_READY", humanApprovalPresent: false },
+    review: { status: "NOT_REQUESTED", humanApprovalPresent: false },
     authority: {
       syntheticNoPhiPreview: true,
       protectedPilot: false,

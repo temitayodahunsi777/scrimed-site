@@ -93,6 +93,21 @@ check("non-synthetic-data-classification-is-ineligible", () => {
   assert.ok(decision.reasonCodes.includes("SYNTHETIC_DATA_CLASSIFICATION_REQUIRED"));
 });
 
+check("success-criteria-require-enumerated-direction-and-explicit-mandatory-state", () => {
+  for (const invalidCriterion of [
+    { ...input.successCriteria[0], direction: "sideways" },
+    { ...input.successCriteria[0], mandatory: undefined },
+    { ...input.successCriteria[0], mandatory: "true" }
+  ]) {
+    const decision = createPilotManifest(
+      { ...input, successCriteria: [invalidCriterion] },
+      new Date("2026-08-28T02:00:00.000Z")
+    );
+    assert.equal(decision.status, "BLOCKED");
+    assert.ok(decision.reasonCodes.includes("OBJECTIVE_SUCCESS_CRITERIA_REQUIRED"));
+  }
+});
+
 check("atomic-lifecycle-lease-blocks-double-spend", () => {
   const store = new InMemorySyntheticPilotLifecycleLeaseStore();
   const request = {
@@ -149,7 +164,7 @@ check("concurrent-budget-reservations-stop-before-overrun", () => {
 });
 
 check("tampered-evidence-ledger-is-rejected", () => {
-  const kinds = ["pilot", "workflow", "scenario", "model", "agent", "tool", "policy", "output", "evaluation", "correction", "accepted-result", "value-estimate"];
+  const kinds = ["pilot", "scenario", "workflow", "model", "agent", "tool", "policy", "output", "evaluation", "correction", "accepted-result", "value-estimate"];
   const ledger = buildPilotEvidenceLedger({
     manifest: manifestDecision.manifest,
     references: kinds.map((kind, index) => ({ kind, referenceId: `synthetic-ref-${index + 1}`, evidenceClassification: "SYNTHETIC" }))
@@ -159,6 +174,22 @@ check("tampered-evidence-ledger-is-rejected", () => {
   const verification = verifyPilotEvidenceLedger(tampered);
   assert.equal(verification.valid, false);
   assert.ok(verification.reasonCodes.includes("LEDGER_LINK_HASH_INVALID"));
+
+  const truncated = { ...ledger, links: ledger.links.slice(0, -1) };
+  const truncatedVerification = verifyPilotEvidenceLedger(truncated);
+  assert.equal(truncatedVerification.valid, false);
+  assert.ok(truncatedVerification.reasonCodes.includes("MISSING_LEDGER_LINK:value-estimate"));
+  assert.ok(truncatedVerification.reasonCodes.includes("LEDGER_STATUS_INVALID"));
+
+  const hashTampered = { ...ledger, ledgerHash: "0".repeat(64) };
+  const hashVerification = verifyPilotEvidenceLedger(hashTampered);
+  assert.equal(hashVerification.valid, false);
+  assert.ok(hashVerification.reasonCodes.includes("LEDGER_HASH_INVALID"));
+
+  const statusTampered = { ...ledger, status: "INCOMPLETE_BLOCKED" };
+  const statusVerification = verifyPilotEvidenceLedger(statusTampered);
+  assert.equal(statusVerification.valid, false);
+  assert.ok(statusVerification.reasonCodes.includes("LEDGER_STATUS_INVALID"));
 });
 
 check("proposal-expiry-and-authority-fail-closed", () => {

@@ -11,6 +11,9 @@ export type PreviewAcceptanceInput = {
   commitSha: string;
   treeSha: string;
   candidateFingerprint: string;
+  sourceFingerprint: string;
+  routeInventoryFingerprint: string;
+  renderInventoryFingerprint: string;
   environment: "preview" | "production" | "development" | "test" | "unknown";
   nodeMajor: number | null;
   healthPassed: boolean;
@@ -30,6 +33,9 @@ export type PreviewAcceptanceExpected = {
   commitSha: string;
   treeSha: string;
   candidateFingerprint: string;
+  sourceFingerprint: string;
+  routeInventoryFingerprint: string;
+  renderInventoryFingerprint: string;
 };
 
 const gitShaPattern = /^[0-9a-f]{40}$/i;
@@ -66,6 +72,15 @@ export function evaluatePreviewAcceptance(
   if (!sha256Pattern.test(input.candidateFingerprint) || input.candidateFingerprint !== expected.candidateFingerprint) {
     reasonCodes.push("CANDIDATE_MISMATCH");
   }
+  if (!sha256Pattern.test(input.sourceFingerprint) || input.sourceFingerprint !== expected.sourceFingerprint) {
+    reasonCodes.push("SOURCE_MISMATCH");
+  }
+  if (!sha256Pattern.test(input.routeInventoryFingerprint) || input.routeInventoryFingerprint !== expected.routeInventoryFingerprint) {
+    reasonCodes.push("ROUTE_INVENTORY_MISMATCH");
+  }
+  if (!sha256Pattern.test(input.renderInventoryFingerprint) || input.renderInventoryFingerprint !== expected.renderInventoryFingerprint) {
+    reasonCodes.push("RENDER_INVENTORY_MISMATCH");
+  }
   if (input.environment !== "preview") reasonCodes.push("NONPRODUCTION_PREVIEW_REQUIRED");
   if (input.nodeMajor !== 24) reasonCodes.push("NODE24_REQUIRED");
   if (!input.healthPassed) reasonCodes.push("HEALTH_CHECK_REQUIRED");
@@ -95,6 +110,9 @@ export function evaluatePreviewAcceptance(
     commitSha: input.commitSha,
     treeSha: input.treeSha,
     candidateFingerprint: input.candidateFingerprint,
+    sourceFingerprint: input.sourceFingerprint,
+    routeInventoryFingerprint: input.routeInventoryFingerprint,
+    renderInventoryFingerprint: input.renderInventoryFingerprint,
     environment: input.environment,
     nodeMajor: input.nodeMajor,
     acceptedBy: input.acceptedBy,

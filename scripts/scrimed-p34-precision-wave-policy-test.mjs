@@ -258,7 +258,7 @@ check("review-request-becomes-stale-when-head-moves", () => {
     SCRIMED_BUILD_COMMIT_SHA: "a".repeat(40),
     SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA: "b".repeat(40)
   });
-  assert.equal(summary.review.state, "REVIEW_STALE");
+  assert.equal(summary.review.state, "STALE");
   assert.equal(summary.review.requestCurrent, false);
 });
 

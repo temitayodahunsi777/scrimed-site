@@ -30,6 +30,7 @@ import {
   getP34PreviewAcceptanceSummary
 } from "../app/lib/release/previewAcceptance.ts";
 import { p34ExactHeadBaseline } from "../app/lib/scrimed-p34/exactHeadBaseline.ts";
+import { deriveExactHeadReviewState } from "../app/lib/scrimed-p34/exactHeadReviewState.ts";
 import { getP34ReviewReadinessSummary } from "../app/lib/scrimed-p34/reviewReadiness.ts";
 import { createRedactedAal2Evidence } from "./lib/aal2-redacted-evidence.mjs";
 
@@ -366,6 +367,9 @@ const previewInput = {
   commitSha: p34ExactHeadBaseline.commitSha,
   treeSha: p34ExactHeadBaseline.treeSha,
   candidateFingerprint: p34ExactHeadBaseline.candidateFingerprint,
+  sourceFingerprint: "7".repeat(64),
+  routeInventoryFingerprint: "8".repeat(64),
+  renderInventoryFingerprint: "9".repeat(64),
   environment: "preview",
   nodeMajor: 24,
   healthPassed: true,
@@ -383,7 +387,10 @@ const previewExpected = {
   deploymentUrl: p34ExactHeadBaseline.preview.deploymentUrl,
   commitSha: p34ExactHeadBaseline.commitSha,
   treeSha: p34ExactHeadBaseline.treeSha,
-  candidateFingerprint: p34ExactHeadBaseline.candidateFingerprint
+  candidateFingerprint: p34ExactHeadBaseline.candidateFingerprint,
+  sourceFingerprint: "7".repeat(64),
+  routeInventoryFingerprint: "8".repeat(64),
+  renderInventoryFingerprint: "9".repeat(64)
 };
 
 check("preview-acceptance-is-exact-bound-and-nonproduction", () => {
@@ -482,13 +489,42 @@ const trustedReviewReceipt = {
   approvalConsumed: true
 };
 
+check("exact-head-review-state-is-deterministic-and-stales-on-source-change", () => {
+  const head = "a".repeat(40);
+  const base = {
+    currentHeadSha: head,
+    requestedHeadSha: null,
+    requestAcknowledged: false,
+    disposition: "NONE",
+    dispositionHeadSha: null,
+    trustedExternalReceiptValid: false
+  };
+  assert.equal(deriveExactHeadReviewState(base), "NOT_REQUESTED");
+  assert.equal(deriveExactHeadReviewState({ ...base, requestedHeadSha: head }), "REQUESTED");
+  assert.equal(deriveExactHeadReviewState({ ...base, requestedHeadSha: head, requestAcknowledged: true }), "CURRENT");
+  assert.equal(deriveExactHeadReviewState({ ...base, requestedHeadSha: "b".repeat(40) }), "STALE");
+  assert.equal(deriveExactHeadReviewState({
+    ...base,
+    requestedHeadSha: head,
+    disposition: "CHANGES_REQUESTED",
+    dispositionHeadSha: head
+  }), "CHANGES_REQUESTED");
+  assert.equal(deriveExactHeadReviewState({
+    ...base,
+    requestedHeadSha: head,
+    disposition: "APPROVED",
+    dispositionHeadSha: head,
+    trustedExternalReceiptValid: true
+  }), "APPROVED_EXACT_HEAD");
+});
+
 check("review-env-cannot-self-approve", () => {
   const result = getP34ReviewReadinessSummary(
     reviewEnv,
     null,
     new Date("2026-08-28T12:05:00.000Z")
   );
-  assert.equal(result.review.state, "REVIEW_CURRENT");
+  assert.equal(result.review.state, "CURRENT");
   assert.equal(result.review.trustedExternalReceiptPresent, false);
 });
 
@@ -509,7 +545,7 @@ check("trusted-review-mismatch-fails-closed", () => {
     { ...trustedReviewReceipt, treeSha: "a".repeat(40) },
     new Date("2026-08-28T12:05:00.000Z")
   );
-  assert.equal(result.review.state, "REVIEW_CURRENT");
+  assert.equal(result.review.state, "CURRENT");
   assert.equal(result.review.trustedExternalReceiptPresent, false);
 });
 

@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import {
   hashFileIfPresent,
   inspectP34CandidateState,
+  p34ExactCandidateManifestPath,
   p34RuntimeEvidencePath,
   sha256
 } from "./lib/p34-candidate-state.mjs";
@@ -75,12 +76,22 @@ const commercialControlFingerprint = sha256({
 const evidence = {
   ...state,
   schemaVersion: "scrimed-p34-current-candidate-manifest-v1",
-  observedAt: new Date().toISOString(),
+  observedAt: state.commitTimestamp,
+  created_at: state.commitTimestamp,
+  expires_at: null,
+  pullRequestNumber: state.currentPr?.number ?? 40,
+  previewDeployment: state.preview,
+  supabaseProject: state.supabase,
+  migrationState: state.migrations,
+  aal2State: state.aal2,
+  reviewState: state.review,
   validationFingerprint,
   reviewPacketFingerprint,
   gatePacketFingerprint,
   sbomFingerprint: sbom.sbomHash,
   routeInventoryFingerprint: state.routeInventory?.inventoryFingerprint ?? null,
+  prerenderInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
+  renderInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
   generationInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
   securityFingerprint,
   pilotReadinessFingerprint,
@@ -111,5 +122,36 @@ const evidence = {
 };
 evidence.manifestFingerprint = sha256(evidence);
 await mkdir("artifacts/release", { recursive: true });
-await writeFile(p34RuntimeEvidencePath, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+for (const path of [p34RuntimeEvidencePath, p34ExactCandidateManifestPath]) {
+  await writeFile(path, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+}
+const p40Aal2Path = "artifacts/security/p40-aal2-evidence.json";
+const existingAal2 = await readFile(p40Aal2Path, "utf8").then(JSON.parse).catch(() => null);
+if (!(
+  existingAal2?.candidate?.candidateFingerprint === state.candidateFingerprint
+  && existingAal2?.assuranceResult === "PASS_NONPRODUCTION_AAL2"
+)) {
+  const pendingAal2Base = {
+    schemaVersion: "scrimed-p40-aal2-redacted-evidence-v1",
+    status: "OPERATOR_ACTION_REQUIRED",
+    commit: state.commit,
+    candidateFingerprint: state.candidateFingerprint,
+    deploymentId: state.preview?.deploymentId ?? null,
+    tests: [
+      "nonproduction-target",
+      "aal2-token-policy",
+      "mfa-method",
+      "fresh-step-up",
+      "stale-token-policy-rejection",
+      "exact-candidate-preview-binding",
+      "privileged-endpoint",
+      "candidate-replay-guard"
+    ].map((id) => ({ id, passed: null })),
+    credentialMaterialPersisted: false,
+    productionAuthorityGranted: false
+  };
+  const pendingAal2 = { ...pendingAal2Base, evidenceFingerprint: sha256(pendingAal2Base) };
+  await mkdir("artifacts/security", { recursive: true });
+  await writeFile(p40Aal2Path, `${JSON.stringify(pendingAal2, null, 2)}\n`, "utf8");
+}
 console.log(`generated p.34 exact candidate evidence candidate=${evidence.candidateFingerprint} source=${evidence.sourceFingerprint} manifest=${evidence.manifestFingerprint}`);

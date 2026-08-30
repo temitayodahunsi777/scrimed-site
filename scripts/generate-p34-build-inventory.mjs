@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-import { access, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import {
+  p34LegacyGenerationInventoryPath,
+  p34LegacyRouteInventoryPath,
   p34GenerationInventoryPath,
   p34RouteInventoryPath,
   sha256
@@ -12,9 +14,14 @@ import {
 const rawArgs = process.argv.slice(2);
 const checkOnly = rawArgs.includes("--check");
 const selfTest = rawArgs.includes("--self-test");
-const allowedArgs = new Set(["--check", "--self-test"]);
+const updateBaseline = rawArgs.includes("--update-baseline");
+const bootstrapFromLegacy = rawArgs.includes("--bootstrap-from-legacy");
+const allowedArgs = new Set(["--check", "--self-test", "--update-baseline", "--bootstrap-from-legacy"]);
 const unknownArgs = rawArgs.filter((arg) => !allowedArgs.has(arg));
 if (unknownArgs.length > 0) throw new Error(`Unsupported p.34 build-inventory option: ${unknownArgs.join(", ")}`);
+if ([checkOnly, selfTest, updateBaseline, bootstrapFromLegacy].filter(Boolean).length > 1) {
+  throw new Error("Choose exactly one p.34 build-inventory operation.");
+}
 
 function stripAnsi(value) {
   return value.replace(/\u001b\[[0-9;]*m/g, "");
@@ -90,52 +97,145 @@ export async function buildP34BuildInventories({ buildOutput = "" } = {}) {
   };
 }
 
-export async function writeP34BuildInventories({ buildOutput = "", check = false } = {}) {
+function verifyInventoryFingerprint(inventory, label) {
+  const { inventoryFingerprint, ...payload } = inventory;
+  if (inventoryFingerprint !== sha256(payload)) {
+    throw new Error(`${label} fingerprint verification failed.`);
+  }
+}
+
+export function assertP34BuildInventoryBaseline(generated, routeBaseline, renderBaseline) {
+  verifyInventoryFingerprint(routeBaseline, "p.34 route baseline");
+  verifyInventoryFingerprint(renderBaseline, "p.34 render baseline");
+  const failures = [];
+  if (
+    routeBaseline.schemaVersion !== generated.routeInventory.schemaVersion
+    || routeBaseline.builtRouteCount !== generated.routeInventory.builtRouteCount
+    || JSON.stringify(routeBaseline.routes) !== JSON.stringify(generated.routeInventory.routes)
+  ) failures.push("ROUTE_BASELINE_DRIFT");
+  if (
+    renderBaseline.schemaVersion !== generated.generationInventory.schemaVersion
+    || renderBaseline.prerenderedRouteCount !== generated.generationInventory.prerenderedRouteCount
+    || renderBaseline.dynamicPrerenderRouteCount !== generated.generationInventory.dynamicPrerenderRouteCount
+    || JSON.stringify(renderBaseline.prerenderedRoutes) !== JSON.stringify(generated.generationInventory.prerenderedRoutes)
+    || JSON.stringify(renderBaseline.dynamicRoutes) !== JSON.stringify(generated.generationInventory.dynamicRoutes)
+  ) failures.push("RENDER_BASELINE_DRIFT");
+  if (
+    !Number.isInteger(renderBaseline.generationWorkUnits)
+    || renderBaseline.generationWorkUnits < renderBaseline.prerenderedRouteCount
+    || renderBaseline.generationWorkUnitsCompleted !== renderBaseline.generationWorkUnits
+    || renderBaseline.status !== "GENERATED_FROM_NEXT_BUILD"
+  ) failures.push("GENERATION_BASELINE_INCOMPLETE");
+  if (
+    generated.generationInventory.generationWorkUnits !== null
+    && (
+      generated.generationInventory.generationWorkUnits !== renderBaseline.generationWorkUnits
+      || generated.generationInventory.generationWorkUnitsCompleted !== renderBaseline.generationWorkUnitsCompleted
+    )
+  ) failures.push("GENERATION_WORK_UNIT_DRIFT");
+  if (failures.length > 0) {
+    throw new Error(
+      `p.34 build differs from the independent committed baseline: ${failures.join(", ")}. ` +
+      "Review the route delta, then run the explicit baseline-update command only for an intentional change."
+    );
+  }
+  return { routeInventory: routeBaseline, generationInventory: renderBaseline, buildId: generated.buildId };
+}
+
+export async function writeP34BuildInventories({
+  buildOutput = "",
+  check = false,
+  update = false,
+  bootstrap = false
+} = {}) {
+  if (bootstrap) {
+    const legacyRoute = await readJson(p34LegacyRouteInventoryPath);
+    const legacyRender = await readJson(p34LegacyGenerationInventoryPath);
+    verifyInventoryFingerprint(legacyRoute, "legacy p.34 route baseline");
+    verifyInventoryFingerprint(legacyRender, "legacy p.34 render baseline");
+    await mkdir("artifacts/build", { recursive: true });
+    await writeFile(p34RouteInventoryPath, `${JSON.stringify(legacyRoute, null, 2)}\n`, "utf8");
+    await writeFile(p34GenerationInventoryPath, `${JSON.stringify(legacyRender, null, 2)}\n`, "utf8");
+    return { routeInventory: legacyRoute, generationInventory: legacyRender, buildId: null };
+  }
   const generated = await buildP34BuildInventories({ buildOutput });
-  let result = generated;
   const outputs = [
     [p34RouteInventoryPath, `${JSON.stringify(generated.routeInventory, null, 2)}\n`],
     [p34GenerationInventoryPath, `${JSON.stringify(generated.generationInventory, null, 2)}\n`]
   ];
-  if (check) {
-    const currentRoute = await readJson(p34RouteInventoryPath);
-    const currentGeneration = await readJson(p34GenerationInventoryPath);
-    if (JSON.stringify(currentRoute) !== JSON.stringify(generated.routeInventory)) {
-      throw new Error(`${p34RouteInventoryPath} is stale; run the p.34 inventory-enabled build.`);
-    }
+  if (update) {
     if (
-      currentGeneration.prerenderedRouteCount !== generated.generationInventory.prerenderedRouteCount
-      || JSON.stringify(currentGeneration.prerenderedRoutes) !== JSON.stringify(generated.generationInventory.prerenderedRoutes)
-      || !Number.isInteger(currentGeneration.generationWorkUnits)
-      || currentGeneration.generationWorkUnits < currentGeneration.prerenderedRouteCount
-      || currentGeneration.generationWorkUnitsCompleted !== currentGeneration.generationWorkUnits
-      || currentGeneration.status !== "GENERATED_FROM_NEXT_BUILD"
+      generated.generationInventory.status !== "GENERATED_FROM_NEXT_BUILD"
+      || !Number.isInteger(generated.generationInventory.generationWorkUnits)
+      || generated.generationInventory.generationWorkUnitsCompleted !== generated.generationInventory.generationWorkUnits
     ) {
-      throw new Error(`${p34GenerationInventoryPath} is stale or incomplete; run the p.34 inventory-enabled build.`);
+      throw new Error(
+        "An intentional p.34 baseline update requires complete generation output from the inventory-enabled production build."
+      );
     }
-    const { inventoryFingerprint: routeFingerprint, ...routePayload } = currentRoute;
-    const { inventoryFingerprint: generationFingerprint, ...generationPayload } = currentGeneration;
-    if (routeFingerprint !== sha256(routePayload) || generationFingerprint !== sha256(generationPayload)) {
-      throw new Error("p.34 build inventory fingerprint verification failed.");
-    }
-    result = { routeInventory: currentRoute, generationInventory: currentGeneration, buildId: generated.buildId };
-  } else {
+    await mkdir("artifacts/build", { recursive: true });
     for (const [path, content] of outputs) await writeFile(path, content, "utf8");
+    return generated;
   }
-  return result;
+  if (!check) throw new Error("Build inventory is read-only by default; use --check or the explicit baseline-update command.");
+  const currentRoute = await readJson(p34RouteInventoryPath);
+  const currentRender = await readJson(p34GenerationInventoryPath);
+  return assertP34BuildInventoryBaseline(generated, currentRoute, currentRender);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   if (selfTest) {
     const parsed = parseGenerationWorkUnits(
-      "Generating static pages using 11 workers (0/462)\n" +
-      "Generating static pages using 11 workers (230/462)\n" +
-      "Generating static pages using 11 workers (462/462)"
+      "Generating static pages using 3 workers (0/37)\n" +
+      "Generating static pages using 3 workers (19/37)\n" +
+      "Generating static pages using 3 workers (37/37)"
     );
-    if (parsed?.total !== 462 || parsed.completed !== 462) throw new Error("p.34 generation parser self-test failed.");
-    console.log("pass p.34 build inventory parser self-test");
+    if (parsed?.total !== 37 || parsed.completed !== 37) throw new Error("p.34 generation parser self-test failed.");
+    const routePayload = {
+      schemaVersion: "scrimed-p34-route-inventory-v1",
+      source: "synthetic",
+      builtRouteCount: 2,
+      routes: [{ route: "/a/page", outputPath: "/a" }, { route: "/b/page", outputPath: "/b" }],
+      manualExpectedCount: null,
+      status: "GENERATED_FROM_NEXT_BUILD"
+    };
+    const renderPayload = {
+      schemaVersion: "scrimed-p34-generation-inventory-v1",
+      source: "synthetic",
+      prerenderedRouteCount: 1,
+      dynamicPrerenderRouteCount: 0,
+      generationWorkUnits: 3,
+      generationWorkUnitsCompleted: 3,
+      generationWorkUnitsSource: "next-build-output",
+      prerenderedRoutes: ["/a"],
+      dynamicRoutes: [],
+      status: "GENERATED_FROM_NEXT_BUILD"
+    };
+    const synthetic = {
+      routeInventory: { ...routePayload, inventoryFingerprint: sha256(routePayload) },
+      generationInventory: { ...renderPayload, inventoryFingerprint: sha256(renderPayload) },
+      buildId: "synthetic"
+    };
+    assertP34BuildInventoryBaseline(synthetic, synthetic.routeInventory, synthetic.generationInventory);
+    let driftRejected = false;
+    try {
+      assertP34BuildInventoryBaseline(
+        { ...synthetic, routeInventory: { ...synthetic.routeInventory, routes: synthetic.routeInventory.routes.slice(0, 1), builtRouteCount: 1 } },
+        synthetic.routeInventory,
+        synthetic.generationInventory
+      );
+    } catch {
+      driftRejected = true;
+    }
+    if (!driftRejected) throw new Error("p.34 independent route baseline failed to reject drift.");
+    console.log("pass p.34 build inventory parser and independent-baseline self-test");
   } else {
-    const generated = await writeP34BuildInventories({ check: checkOnly });
-    console.log(`${checkOnly ? "pass" : "generated"} p.34 build inventory (${generated.routeInventory.builtRouteCount} built routes, ${generated.generationInventory.prerenderedRouteCount} prerendered routes, ${generated.generationInventory.generationWorkUnits ?? "uncaptured"} generation work units)`);
+    const generated = await writeP34BuildInventories({
+      check: checkOnly || (!updateBaseline && !bootstrapFromLegacy),
+      update: updateBaseline,
+      bootstrap: bootstrapFromLegacy
+    });
+    const verb = updateBaseline ? "updated" : bootstrapFromLegacy ? "bootstrapped" : "verified";
+    console.log(`${verb} p.34 build inventory baseline (${generated.routeInventory.builtRouteCount} built routes, ${generated.generationInventory.prerenderedRouteCount} prerendered routes, ${generated.generationInventory.generationWorkUnits ?? "baseline-preserved"} generation work units)`);
   }
 }

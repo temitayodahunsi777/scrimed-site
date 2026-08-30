@@ -302,7 +302,12 @@ const report = await runAal2CandidateVerification({ token, targetUrl, allowedPre
 if (writeEvidence) {
   const evidence = createRedactedAal2Evidence(report);
   await mkdir("artifacts/security", { recursive: true });
-  await writeFile("artifacts/security/p34-aal2-evidence.json", `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+  for (const path of [
+    "artifacts/security/p34-aal2-evidence.json",
+    "artifacts/security/p40-aal2-evidence.json"
+  ]) {
+    await writeFile(path, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+  }
 }
 if (json) console.log(JSON.stringify(report, null, 2));
 else {
@@ -311,7 +316,7 @@ else {
   console.log(`commit=${report.commitSha}`);
   console.log(`candidate=${report.candidateFingerprint}`);
   for (const check of report.checks) console.log(`${check.passed ? "pass" : "blocked"} ${check.id}: ${check.detail}`);
-  if (writeEvidence) console.log("redacted_evidence=artifacts/security/p34-aal2-evidence.json");
+  if (writeEvidence) console.log("redacted_evidence=artifacts/security/p40-aal2-evidence.json");
   console.log(report.boundary);
 }
 if (report.status !== "PASS_NONPRODUCTION_AAL2") process.exit(1);

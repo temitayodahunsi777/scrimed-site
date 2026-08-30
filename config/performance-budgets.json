@@ -18,9 +18,11 @@
     "pilotControlOverheadP95Ms": 150
   },
   "routeInventory": {
-    "builtRoutesArtifact": "artifacts/p34/P34_ROUTE_INVENTORY.json",
-    "generationArtifact": "artifacts/p34/P34_GENERATION_INVENTORY.json",
-    "manualExpectedCountsAllowed": false
+    "builtRoutesArtifact": "artifacts/build/route-inventory.json",
+    "generationArtifact": "artifacts/build/render-inventory.json",
+    "manualExpectedCountsAllowed": false,
+    "buildMayOverwriteBaseline": false,
+    "intentionalUpdateCommand": "npm run update:p34-build-inventory"
   },
   "enforcement": {
     "deterministicBuildBudgets": "fail",

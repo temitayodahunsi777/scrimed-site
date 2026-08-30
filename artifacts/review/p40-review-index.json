@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "scrimed-p40-review-index-v1",
+  "repository": "temitayodahunsi777/scrimed-site",
+  "pullRequestNumber": 40,
+  "branch": "agent/scrimed-p34-post-review-readiness",
+  "exactCandidateBinding": "artifacts/release/p34-exact-candidate-manifest.json",
+  "integrationMap": "artifacts/review/p40-full-integration-map.json",
+  "integrationMapFingerprint": "4330eeb7c85169bfa04644f071eef71826567380227f0db4d1a40ac8f220f11c",
+  "targetReviewMinutes": 10,
+  "reviewState": "EXACT_REVIEW_REQUIRED",
+  "highestRiskFiles": [
+    "app/lib/commercial/pilotManifest.ts",
+    "app/lib/commercial/pilotOperatingSystem.ts",
+    "app/lib/scrimed-p34/exactHeadReviewState.ts",
+    "app/lib/scrimed-p34/reviewReadiness.ts",
+    "app/lib/release/previewAcceptance.ts",
+    "scripts/generate-p34-build-inventory.mjs",
+    "scripts/scrimed-p34-certify.mjs"
+  ],
+  "operatorStates": {
+    "aal2": "OPERATOR_ACTION_REQUIRED",
+    "supabaseLeakedPasswordProtection": "OPERATOR_ACTION_REQUIRED",
+    "productionMigrations": "PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED",
+    "protectedPilot": "PROTECTED_PILOT_AUTHORIZATION_REQUIRED"
+  },
+  "safetyBoundary": {
+    "noPhi": true,
+    "nonproduction": true,
+    "noClinicalExecution": true,
+    "noPayerSubmission": true,
+    "noEhrWriteback": true,
+    "noDeviceWriteback": true,
+    "productionAuthorityGranted": false
+  },
+  "indexFingerprint": "1c1daecd9528d6029a8229e1daa445a5975c562a0480f80c28a9bdacd460d93b"
+}

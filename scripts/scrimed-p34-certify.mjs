@@ -2,6 +2,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
+import { dirname, resolve } from "node:path";
 import { inspectP34CandidateState, sha256 } from "./lib/p34-candidate-state.mjs";
 
 const maximumOutputBytes = 64 * 1024 * 1024;
@@ -30,6 +31,8 @@ function run(id, command, args, env) {
 }
 
 const initialState = inspectP34CandidateState();
+const npmCli = process.env.npm_execpath
+  ?? resolve(dirname(process.execPath), "../lib/node_modules/npm/bin/npm-cli.js");
 const env = {
   ...process.env,
   SCRIMED_RELEASE_CANDIDATE_BASE_REF: initialState.base,
@@ -39,13 +42,22 @@ const env = {
 const checks = [];
 const commands = [
   ["p34-follow-on-artifacts", process.execPath, ["scripts/generate-p34-follow-on-artifacts.mjs", "--check"]],
+  ["p34-post-review-artifacts", process.execPath, ["scripts/generate-p34-post-review-artifacts.mjs", "--check"]],
   ["p34-build-inventory-self-test", process.execPath, ["scripts/generate-p34-build-inventory.mjs", "--self-test"]],
   ["p34-canary", process.execPath, ["scripts/scrimed-p34-canary.mjs"]],
-  ["strict-candidate-validation", process.execPath, ["scripts/release-candidate-validation.mjs", "--strict"]],
+  ["generated-integrity-prebuild", process.execPath, ["scripts/check-generated-integrity.mjs"]],
+  ["typecheck", process.execPath, [npmCli, "run", "typecheck"]],
+  ["lint", process.execPath, [npmCli, "run", "lint"]],
+  ["nonsecret-suite", process.execPath, [npmCli, "run", "test:nonsecret"]],
+  ["production-build", process.execPath, [npmCli, "run", "build"]],
+  ["node24-certification", process.execPath, ["scripts/verify-node24-vercel-build.mjs"]],
   ["p34-build-inventory", process.execPath, ["scripts/generate-p34-build-inventory.mjs", "--check"]],
   ["local-public-smoke", process.execPath, ["scripts/scrimed-local-public-smoke-runner.mjs", "--port=3054"]],
   ["secret-scan", process.execPath, ["scripts/scrimed-secret-scan.mjs"]],
+  ["dependency-audit", process.execPath, [npmCli, "audit", "--audit-level=moderate"]],
   ["sbom", process.execPath, ["scripts/scrimed-sbom.mjs", "--verify", `--base-ref=${initialState.base}`]],
+  ["strict-candidate-validation", process.execPath, ["scripts/release-candidate-validation.mjs", "--strict"]],
+  ["generated-integrity-postbuild", process.execPath, ["scripts/check-generated-integrity.mjs"]],
   ["git-diff-check", "git", ["diff", "--check"]]
 ];
 

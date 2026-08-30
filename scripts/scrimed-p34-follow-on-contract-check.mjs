@@ -11,6 +11,7 @@ const paths = [
   "app/lib/commercial/pilotOperatingSystem.ts",
   "app/lib/economics/pilotCostGovernor.ts",
   "app/lib/scrimed-p34/exactHeadBaseline.ts",
+  "app/lib/scrimed-p34/exactHeadReviewState.ts",
   "app/lib/scrimed-p34/reviewReadiness.ts",
   "app/lib/release/previewAcceptance.ts",
   "app/lib/productConsole.ts",
@@ -21,7 +22,16 @@ const paths = [
   "scripts/scrimed-p34-evidence.mjs",
   "scripts/scrimed-p34-certify.mjs",
   "scripts/scrimed-p34-verify-preview.mjs",
-  "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs"
+  "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs",
+  "artifacts/build/route-inventory.json",
+  "artifacts/build/render-inventory.json",
+  "artifacts/review/p40-review-index.json",
+  "artifacts/review/p40-full-integration-map.json",
+  "docs/release/P34_CURRENT_CANONICAL_BASELINE.md",
+  "docs/release/P40_SOURCE_CONTROL_INTEGRITY.md",
+  "docs/review/P40_EXACT_HEAD_REVIEW_BRIEF.md",
+  "docs/review/P40_FULL_INTEGRATION_MAP.md",
+  "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md"
 ];
 const files = Object.fromEntries(await Promise.all(paths.map(async (path) => [path, await readFile(path, "utf8")])));
 const packageJson = JSON.parse(files["package.json"]);
@@ -31,12 +41,17 @@ for (const script of ["scrimed:p34:evidence", "scrimed:p34:certify", "scrimed:p3
   assert.equal(typeof packageJson.scripts[script], "string", script);
 }
 assert.equal(performance.routeInventory.manualExpectedCountsAllowed, false);
-assert.equal(performance.routeInventory.builtRoutesArtifact, "artifacts/p34/P34_ROUTE_INVENTORY.json");
-assert.equal(performance.routeInventory.generationArtifact, "artifacts/p34/P34_GENERATION_INVENTORY.json");
+assert.equal(performance.routeInventory.builtRoutesArtifact, "artifacts/build/route-inventory.json");
+assert.equal(performance.routeInventory.generationArtifact, "artifacts/build/render-inventory.json");
+assert.equal(performance.routeInventory.buildMayOverwriteBaseline, false);
 assert.equal(files["app/lib/scrimed-p34/exactHeadBaseline.ts"].includes("builtRouteCount"), false);
+assert.equal(JSON.parse(files["artifacts/build/route-inventory.json"]).builtRouteCount > 0, true);
+assert.equal(JSON.parse(files["artifacts/build/render-inventory.json"]).prerenderedRouteCount > 0, true);
+assert.equal(JSON.parse(files["artifacts/review/p40-full-integration-map.json"]).unexplainedFileCount, 0);
+assert.equal(JSON.parse(files["artifacts/review/p40-review-index.json"]).reviewState, "EXACT_REVIEW_REQUIRED");
 
-for (const state of ["AUTOMATED_READY", "REVIEW_REQUESTED", "REVIEW_CURRENT", "REVIEW_STALE", "CHANGES_REQUESTED", "APPROVED_EXACT_HEAD"]) {
-  assert.ok(files["app/lib/scrimed-p34/reviewReadiness.ts"].includes(state), state);
+for (const state of ["NOT_REQUESTED", "REQUESTED", "CURRENT", "STALE", "CHANGES_REQUESTED", "APPROVED_EXACT_HEAD"]) {
+  assert.ok(files["app/lib/scrimed-p34/exactHeadReviewState.ts"].includes(state), state);
 }
 for (const control of [
   "dataSourceClassification",

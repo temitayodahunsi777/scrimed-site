@@ -14,6 +14,7 @@ async function check(name, run) {
 
 const files = {
   baseline: await readFile("app/lib/scrimed-p34/exactHeadBaseline.ts", "utf8"),
+  reviewState: await readFile("app/lib/scrimed-p34/exactHeadReviewState.ts", "utf8"),
   review: await readFile("app/lib/scrimed-p34/reviewReadiness.ts", "utf8"),
   preview: await readFile("app/lib/release/previewAcceptance.ts", "utf8"),
   templates: await readFile("app/lib/commercial/pilotTemplateRegistry.ts", "utf8"),
@@ -45,13 +46,13 @@ await check("exact-head-baseline-is-frozen", async () => {
 
 await check("review-status-remains-read-only-and-external", async () => {
   for (const state of [
-    "AUTOMATED_READY",
-    "REVIEW_REQUESTED",
-    "REVIEW_CURRENT",
-    "REVIEW_STALE",
+    "NOT_REQUESTED",
+    "REQUESTED",
+    "CURRENT",
+    "STALE",
     "CHANGES_REQUESTED",
     "APPROVED_EXACT_HEAD"
-  ]) assert.ok(files.review.includes(state), state);
+  ]) assert.ok(files.reviewState.includes(state), state);
   assert.ok(files.review.includes('trustClass: "trusted-external"'));
   assert.ok(files.review.includes("signatureVerified: true"));
   assert.ok(files.review.includes("productionAuthorityGranted: false"));
