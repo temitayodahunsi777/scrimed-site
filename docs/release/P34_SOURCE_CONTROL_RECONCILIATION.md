@@ -6,7 +6,7 @@ PR #39 and commit `45be650f48e422b05160821681ff40bb9f1229c9` remain **PREDECESSO
 
 ## Current Lineage
 
-The current branch `agent/scrimed-p34-post-review-readiness` descends directly from the predecessor and is intended for a new, focused PR whose base is `agent/scrimed-p34-gap-closure`. The generated integration map explains 79 files and permits zero `UNEXPECTED` entries.
+The current branch `agent/scrimed-p34-post-review-readiness` descends directly from the predecessor and is intended for a new, focused PR whose base is `agent/scrimed-p34-gap-closure`. The generated integration map explains 84 files and permits zero `UNEXPECTED` entries.
 
 ## Evidence Statuses
 

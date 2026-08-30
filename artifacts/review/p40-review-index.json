@@ -5,7 +5,7 @@
   "branch": "agent/scrimed-p34-post-review-readiness",
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
   "integrationMap": "artifacts/review/p40-full-integration-map.json",
-  "integrationMapFingerprint": "1bdb590ed209a7fb91d7308cf37bce9eda79c04aebdfee5e9ea9d865861afa35",
+  "integrationMapFingerprint": "dd0350dfe9782ba883e8d7cd0c54102d1571a298d47eddc941e135c5780efce1",
   "targetReviewMinutes": 10,
   "reviewState": "EXACT_REVIEW_REQUIRED",
   "highestRiskFiles": [
@@ -32,5 +32,5 @@
     "noDeviceWriteback": true,
     "productionAuthorityGranted": false
   },
-  "indexFingerprint": "0751aa33b6c0a9ee94ce2de9e9e4104b23e3f7d04406ac3b1abeefe922921b94"
+  "indexFingerprint": "dda231ccf79c2c883bb5803df12496dfe6d3a5cb3ba3c95fbf64510e2868e708"
 }

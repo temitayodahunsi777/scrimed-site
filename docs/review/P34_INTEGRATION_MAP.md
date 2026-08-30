@@ -2,11 +2,11 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files explained: **79/79**
+Files explained: **84/84**
 
 Unexplained: **0**
 
-Map SHA-256: `4d39fa6d118f671ae37c95504524a9fd2dd379e2f7daa113f09f7d5ac4035eb3`
+Map SHA-256: `df82771438368d91ea2e8ceb731c9ca264a23e2e3ebbba1266d8b928651fb7bb`
 
 | Classification | Files |
 | --- | ---: |
@@ -18,7 +18,7 @@ Map SHA-256: `4d39fa6d118f671ae37c95504524a9fd2dd379e2f7daa113f09f7d5ac4035eb3`
 | GOVERNANCE | 3 |
 | PILOT | 6 |
 | SECURITY | 1 |
-| TEST | 21 |
+| TEST | 26 |
 | UI | 5 |
 | VERCEL | 4 |
 
