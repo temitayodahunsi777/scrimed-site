@@ -11,6 +11,8 @@ const root = process.cwd();
 const loopbackHost = "127.0.0.1";
 const defaultPort = 3048;
 const defaultStartupTimeoutMs = 30_000;
+const generatedOutputStabilizationRounds = 3;
+const generatedOutputStabilizationDelayMs = 500;
 const localEnvironmentFiles = [
   ".env",
   ".env.local",
@@ -439,36 +441,41 @@ try {
   }
 }
 
-const postflight = runNodeStage(
-  "post-smoke generated-output postflight",
-  [entrypoints.postflight],
-  environment,
-  60_000,
-  true
-);
+for (let round = 1; round <= generatedOutputStabilizationRounds; round += 1) {
+  await delay(generatedOutputStabilizationDelayMs);
+  const postflight = runNodeStage(
+    `post-smoke generated-output postflight ${round}/${generatedOutputStabilizationRounds}`,
+    [entrypoints.postflight],
+    environment,
+    60_000,
+    true
+  );
 
-if (!postflight.ok) {
-  runError ??= new Error(`${postflight.message} Generated output remains untrusted.`);
-}
+  if (!postflight.ok) {
+    runError ??= new Error(`${postflight.message} Generated output remains untrusted.`);
+    break;
+  }
 
-const integrity = runNodeStage(
-  "post-smoke generated integrity",
-  [entrypoints.integrity],
-  environment,
-  30_000,
-  true
-);
-
-if (!integrity.ok) {
-  const cleanup = runNodeStage(
-    "corrupted generated-output cleanup",
-    [entrypoints.cleanup],
+  const integrity = runNodeStage(
+    `post-smoke generated integrity ${round}/${generatedOutputStabilizationRounds}`,
+    [entrypoints.integrity],
     environment,
     30_000,
     true
   );
-  const cleanupStatus = cleanup.ok ? "corrupted output was removed" : `cleanup also failed: ${cleanup.message}`;
-  runError ??= new Error(`${integrity.message} ${cleanupStatus}. A clean rebuild is required.`);
+
+  if (!integrity.ok) {
+    const cleanup = runNodeStage(
+      "corrupted generated-output cleanup",
+      [entrypoints.cleanup],
+      environment,
+      30_000,
+      true
+    );
+    const cleanupStatus = cleanup.ok ? "corrupted output was removed" : `cleanup also failed: ${cleanup.message}`;
+    runError ??= new Error(`${integrity.message} ${cleanupStatus}. A clean rebuild is required.`);
+    break;
+  }
 }
 
 if (runError) {
