@@ -2,18 +2,18 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files: **78**
+Files: **79**
 
 Unexplained: **0**
 
-Fingerprint: `56ac0eb505e530f72c70af6d17c1b0e5d7f23aaf955a92e44fb4ac106b55c3d7`
+Fingerprint: `1d77232ae3c41df47023da2ebe599c07234eb4bfac4134dedf3bc196412ca13e`
 
 | Rank | Files |
 | --- | ---: |
 | CRITICAL | 3 |
 | HIGH | 7 |
 | MEDIUM | 9 |
-| LOW | 26 |
+| LOW | 27 |
 | GENERATED | 12 |
 | DOCUMENTATION | 21 |
 
@@ -54,6 +54,7 @@ Fingerprint: `56ac0eb505e530f72c70af6d17c1b0e5d7f23aaf955a92e44fb4ac106b55c3d7`
 | LOW | `scripts/node24-runtime-policy-test.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/product-console-payload-budget-test.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/release-candidate-validation.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
+| LOW | `scripts/scrimed-local-public-smoke-runner.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-p34-artifacts.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-p34-canary.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-p34-evidence.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |

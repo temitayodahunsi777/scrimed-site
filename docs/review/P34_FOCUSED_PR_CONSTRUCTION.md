@@ -7,6 +7,6 @@ Required PR properties:
 - new PR; do not retarget or rewrite PR #39;
 - head branch `agent/scrimed-p34-post-review-readiness`;
 - exact candidate manifest attached or quoted after the final commit;
-- 78/78 files explained; zero unexpected;
+- 79/79 files explained; zero unexpected;
 - draft until automated checks and exact preview are complete;
 - human review grants review evidence only, never merge or production authority.
