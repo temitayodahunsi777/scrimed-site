@@ -11,7 +11,7 @@ external-distribution authority.
 - **Time:** 1-5 minutes after the source is stable
 - **Action:** run `npm run scrimed:p34:certify`, then `npm run scrimed:p34:evidence`.
 - **Input:** the clean exact follow-on commit and predecessor base `45be650f48e422b05160821681ff40bb9f1229c9`.
-- **Evidence:** ignored runtime files `artifacts/release/p34-certification.json` and `artifacts/release/p34-current-candidate.json`.
+- **Evidence:** ignored runtime files `artifacts/release/p34-certification.json` and `artifacts/release/scrimed-p34-release-manifest.json`.
 - **Verify:** candidate, commit, tree, source, validation, review packet, gate packet, SBOM, route inventory, and generation inventory agree. Certification from any other candidate is marked stale.
 - **Recovery:** fix the failed check, regenerate tracked artifacts, recommit if source changed, and rerun. Never edit evidence fingerprints manually.
 
@@ -43,7 +43,7 @@ external-distribution authority.
 - **Prerequisite:** fresh AAL2 token, exact accepted preview origin, and exact clean candidate.
 - **Action:** set `AAL2_TEST_TOKEN`, `TARGET_URL`, and `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` in a secure shell; run `npm run verify:aal2:candidate:evidence`; unset the token immediately afterward.
 - **Expected result:** issuer/audience, candidate/preview binding, MFA/AAL2, fresh step-up, privileged route, replay rejection, and expiry checks pass.
-- **Evidence:** redacted `artifacts/security/p34-aal2-evidence.json`; bearer credentials are never persisted.
+- **Evidence:** redacted `artifacts/security/p40-aal2.json`; bearer credentials are never persisted.
 - **Verify:** candidate and target match the exact preview manifest.
 - **Recovery:** sign out, sign in, perform authenticator step-up, obtain a fresh token, and rerun. Missing credentials remain `OPERATOR_ACTION_REQUIRED`, not a test pass.
 

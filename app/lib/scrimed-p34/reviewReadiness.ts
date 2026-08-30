@@ -221,7 +221,7 @@ export function getP34ReviewReadinessSummary(
     scope: {
       mapArtifact: "artifacts/review/p34-integration-map.json",
       mapDocument: "docs/review/P34_INTEGRATION_MAP.md",
-      currentCandidateManifest: "artifacts/release/p34-current-candidate.json",
+      currentCandidateManifest: "artifacts/release/scrimed-p34-release-manifest.json",
       classificationRequired: true as const,
       unexpectedFilesAllowed: false as const
     },

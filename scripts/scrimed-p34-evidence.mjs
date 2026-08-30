@@ -5,8 +5,7 @@ import { spawnSync } from "node:child_process";
 import {
   hashFileIfPresent,
   inspectP34CandidateState,
-  p34ExactCandidateManifestPath,
-  p34RuntimeEvidencePath,
+  p34CanonicalReleaseManifestPath,
   sha256
 } from "./lib/p34-candidate-state.mjs";
 
@@ -39,8 +38,9 @@ const certificationCurrent = Boolean(
   && certification.tree === state.tree
   && certification.status === "AUTOMATED_ASSURANCE_COMPLETE_HUMAN_REVIEW_REQUIRED"
 );
-const integrationMapHash = hashFileIfPresent("artifacts/review/p34-integration-map.json");
-const reviewBriefHash = hashFileIfPresent("docs/review/P34_REVIEW_BRIEF.md");
+const integrationMapHash = hashFileIfPresent("artifacts/review/p40-full-integration-map.json");
+const riskRankedDiffHash = hashFileIfPresent("artifacts/review/p40-risk-ranked-diff.json");
+const reviewBriefHash = hashFileIfPresent("docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md");
 const gateMatrixHash = hashFileIfPresent("artifacts/p34/P34_GATE_MATRIX.json");
 const migrationEvidenceHash = hashFileIfPresent("artifacts/p32/P32_MIGRATION_EVIDENCE_PACKET.json")
   ?? hashFileIfPresent("docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md");
@@ -50,7 +50,12 @@ const validationFingerprint = sha256({
   legacyValidationArtifactHash: hashFileIfPresent("artifacts/p34/P34_VALIDATION_REPORT.json"),
   status: certificationCurrent ? certification.status : "CERTIFICATION_REQUIRED"
 });
-const reviewPacketFingerprint = sha256({ candidate: state.candidateFingerprint, integrationMapHash, reviewBriefHash });
+const reviewPacketFingerprint = sha256({
+  candidate: state.candidateFingerprint,
+  integrationMapHash,
+  riskRankedDiffHash,
+  reviewBriefHash
+});
 const gatePacketFingerprint = sha256({ candidate: state.candidateFingerprint, gateMatrixHash, authority: state.authority });
 const securityFingerprint = sha256({
   candidate: state.candidateFingerprint,
@@ -73,31 +78,71 @@ const commercialControlFingerprint = sha256({
   productionAuthority: false
 });
 
+const createdAt = state.commitTimestamp;
+const evidenceExpiresAt = createdAt
+  ? new Date(Date.parse(createdAt) + 14 * 24 * 60 * 60_000).toISOString()
+  : null;
+const p40Aal2Path = "artifacts/security/p40-aal2.json";
+const existingAal2 = await readFile(p40Aal2Path, "utf8").then(JSON.parse).catch(() => null);
+const aal2Current = Boolean(
+  existingAal2?.candidate?.candidateFingerprint === state.candidateFingerprint
+  && existingAal2?.candidate?.commitSha === state.commit
+  && existingAal2?.assuranceResult === "PASS_NONPRODUCTION_AAL2"
+  && existingAal2?.passed === true
+);
+const aal2State = aal2Current
+  ? { status: "PASS_NONPRODUCTION_AAL2", exactCandidateEvidencePresent: true, evidenceFingerprint: existingAal2.evidenceHash ?? null }
+  : state.aal2;
+const previewVerificationHash = hashFileIfPresent("artifacts/release/p34-preview-verification.json");
+const previewObservabilityHash = hashFileIfPresent("artifacts/vercel/p40-observability.json");
+const previewFingerprint = state.preview
+  ? sha256({
+      candidate: state.candidateFingerprint,
+      preview: state.preview,
+      previewVerificationHash,
+      previewObservabilityHash
+    })
+  : null;
+
 const evidence = {
   ...state,
-  schemaVersion: "scrimed-p34-current-candidate-manifest-v1",
-  observedAt: state.commitTimestamp,
-  created_at: state.commitTimestamp,
-  expires_at: null,
-  pullRequestNumber: state.currentPr?.number ?? 40,
-  previewDeployment: state.preview,
-  supabaseProject: state.supabase,
-  migrationState: state.migrations,
-  aal2State: state.aal2,
-  reviewState: state.review,
+  schemaVersion: "scrimed-p34-release-manifest-v1",
+  branch: state.branch,
+  PR: state.currentPr?.number ?? 40,
+  commit: state.commit,
+  tree: state.tree,
+  candidateFingerprint: state.candidateFingerprint,
+  sourceFingerprint: state.sourceFingerprint,
   validationFingerprint,
   reviewPacketFingerprint,
   gatePacketFingerprint,
-  sbomFingerprint: sbom.sbomHash,
-  routeInventoryFingerprint: state.routeInventory?.inventoryFingerprint ?? null,
-  prerenderInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
-  renderInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
-  generationInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
+  SBOMFingerprint: sbom.sbomHash,
   securityFingerprint,
+  certificationFingerprint: certificationCurrent ? certification.certificationFingerprint : null,
+  routeInventoryFingerprint: state.routeInventory?.inventoryFingerprint ?? null,
+  renderInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
+  previewDeployment: state.preview,
+  previewFingerprint,
+  NodeVersion: state.runtime.node,
+  NextVersion: state.runtime.next,
+  SupabaseProject: state.supabase,
+  AAL2State: aal2State,
+  migrationState: state.migrations,
+  reviewState: state.review,
+  createdAt,
+  evidenceExpiresAt,
+  observedAt: createdAt,
+  created_at: createdAt,
+  expires_at: evidenceExpiresAt,
+  pullRequestNumber: state.currentPr?.number ?? 40,
+  supabaseProject: state.supabase,
+  sbomFingerprint: sbom.sbomHash,
+  prerenderInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
+  generationInventoryFingerprint: state.generationInventory?.inventoryFingerprint ?? null,
+  aal2State,
   pilotReadinessFingerprint,
   commercialControlFingerprint,
   migrationEvidenceFingerprint: migrationEvidenceHash,
-  previewFingerprint: state.preview ? sha256({ candidate: state.candidateFingerprint, preview: state.preview }) : null,
   candidateManifestEvidence: {
     status: candidateManifest.status,
     mode: candidateManifest.candidateMode,
@@ -115,28 +160,28 @@ const evidence = {
     validation: certificationCurrent ? "CURRENT" : "STALE_REGENERATE_REQUIRED",
     humanReview: "OPERATOR_ACTION_REQUIRED",
     preview: state.preview ? "REQUIRES_VERIFICATION" : "OPERATOR_ACTION_REQUIRED",
-    aal2: "OPERATOR_ACTION_REQUIRED",
+    aal2: aal2Current ? "CURRENT" : "OPERATOR_ACTION_REQUIRED",
     supabaseLeakedPasswordProtection: "OPERATOR_ACTION_REQUIRED"
   },
   boundary: "Local no-PHI evidence only. This manifest grants no review, merge, deployment, migration, production, clinical, payer, EHR/device, customer, contract, certification, compliance, or external-distribution authority."
 };
 evidence.manifestFingerprint = sha256(evidence);
 await mkdir("artifacts/release", { recursive: true });
-for (const path of [p34RuntimeEvidencePath, p34ExactCandidateManifestPath]) {
-  await writeFile(path, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
-}
-const p40Aal2Path = "artifacts/security/p40-aal2-evidence.json";
-const existingAal2 = await readFile(p40Aal2Path, "utf8").then(JSON.parse).catch(() => null);
+await writeFile(p34CanonicalReleaseManifestPath, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
 if (!(
   existingAal2?.candidate?.candidateFingerprint === state.candidateFingerprint
   && existingAal2?.assuranceResult === "PASS_NONPRODUCTION_AAL2"
 )) {
   const pendingAal2Base = {
     schemaVersion: "scrimed-p40-aal2-redacted-evidence-v1",
-    status: "OPERATOR_ACTION_REQUIRED",
-    commit: state.commit,
-    candidateFingerprint: state.candidateFingerprint,
+    candidate: {
+      commitSha: state.commit,
+      candidateFingerprint: state.candidateFingerprint
+    },
+    target: state.preview?.url ?? null,
     deploymentId: state.preview?.deploymentId ?? null,
+    assuranceResult: "OPERATOR_ACTION_REQUIRED",
+    timestamp: null,
     tests: [
       "nonproduction-target",
       "aal2-token-policy",
@@ -147,10 +192,11 @@ if (!(
       "privileged-endpoint",
       "candidate-replay-guard"
     ].map((id) => ({ id, passed: null })),
+    passed: false,
     credentialMaterialPersisted: false,
     productionAuthorityGranted: false
   };
-  const pendingAal2 = { ...pendingAal2Base, evidenceFingerprint: sha256(pendingAal2Base) };
+  const pendingAal2 = { ...pendingAal2Base, evidenceHash: sha256(pendingAal2Base) };
   await mkdir("artifacts/security", { recursive: true });
   await writeFile(p40Aal2Path, `${JSON.stringify(pendingAal2, null, 2)}\n`, "utf8");
 }

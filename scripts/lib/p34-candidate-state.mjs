@@ -9,9 +9,11 @@ export const p34Predecessor = Object.freeze({
   status: "PREDECESSOR"
 });
 
-export const p34RuntimeEvidencePath = "artifacts/release/p34-current-candidate.json";
-export const p34ExactCandidateManifestPath = "artifacts/release/p34-exact-candidate-manifest.json";
-export const p34RouteInventoryPath = "artifacts/build/route-inventory.json";
+export const p34CanonicalReleaseManifestPath = "artifacts/release/scrimed-p34-release-manifest.json";
+// Compatibility exports intentionally resolve to the one canonical release manifest.
+export const p34RuntimeEvidencePath = p34CanonicalReleaseManifestPath;
+export const p34ExactCandidateManifestPath = p34CanonicalReleaseManifestPath;
+export const p34RouteInventoryPath = "artifacts/build/routes.json";
 export const p34GenerationInventoryPath = "artifacts/build/render-inventory.json";
 export const p34LegacyRouteInventoryPath = "artifacts/p34/P34_ROUTE_INVENTORY.json";
 export const p34LegacyGenerationInventoryPath = "artifacts/p34/P34_GENERATION_INVENTORY.json";
@@ -176,6 +178,9 @@ export function inspectP34CandidateState(env = process.env) {
     repository: "temitayodahunsi777/scrimed-site",
     branch,
     commit: head,
+    commitTimestamp: commitTimestamp && Number.isFinite(Date.parse(commitTimestamp))
+      ? new Date(commitTimestamp).toISOString()
+      : null,
     tree,
     base,
     upstream: upstream || null,

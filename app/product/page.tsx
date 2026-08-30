@@ -64,7 +64,26 @@ export default function ProductConsolePage() {
         </div>
       </section>
 
-      <section className="section-band hub-summary" aria-label="SCRIMED product summary">
+      <section className="section-band" aria-label="SCRIMED priority release and pilot gates">
+        <div className="section-heading">
+          <p className="eyebrow">Current decision gates</p>
+          <h2>Eleven states govern what SCRIMED can review, demonstrate, pilot, or activate.</h2>
+          <p>Machine assurance and synthetic demonstrations can proceed. Human and operator authority remains explicit for protected or production work.</p>
+        </div>
+        <div className="hub-summary priority-gate-grid">
+          {summary.p34PriorityGates.map((gate) => (
+            <article key={gate.id}>
+              <span>{gate.label}</span>
+              <strong>{gate.state}</strong>
+              <Link href={gate.href}>Inspect</Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <details className="table-section">
+        <summary>Open the full diagnostic inventory</summary>
+      <section className="section-band hub-summary" aria-label="SCRIMED full diagnostic inventory">
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
@@ -852,6 +871,7 @@ export default function ProductConsolePage() {
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
       </section>
+      </details>
 
       <section className="table-section" aria-label="SCRIMED p.34 clinical operating system controls">
         <div className="section-heading">

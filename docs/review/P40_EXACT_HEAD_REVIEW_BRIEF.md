@@ -4,7 +4,7 @@ Target review time: **10 minutes**
 
 ## Exact Binding
 
-Open `artifacts/release/p34-exact-candidate-manifest.json` and verify PR 40, commit, tree, candidate, source, validation, review packet, gate packet, SBOM, route/render inventories, and preview deployment. Stop if the PR head differs.
+Open `artifacts/release/scrimed-p34-release-manifest.json` and verify PR 40, commit, tree, candidate, source, validation, review packet, gate packet, SBOM, route/render inventories, and preview deployment. Stop if the PR head differs.
 
 ## Review Order
 

@@ -43,7 +43,23 @@ const checks = [];
 const commands = [
   ["p34-follow-on-artifacts", process.execPath, ["scripts/generate-p34-follow-on-artifacts.mjs", "--check"]],
   ["p34-post-review-artifacts", process.execPath, ["scripts/generate-p34-post-review-artifacts.mjs", "--check"]],
+  ["p34-generated-artifacts", process.execPath, [
+    "--disable-warning=ExperimentalWarning",
+    "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+    "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+    "scripts/scrimed-p34-artifacts.mjs",
+    "--check"
+  ]],
   ["p34-build-inventory-self-test", process.execPath, ["scripts/generate-p34-build-inventory.mjs", "--self-test"]],
+  ["p34-gap-policy", process.execPath, [npmCli, "run", "test:scrimed-p34-gap-closure"]],
+  ["p34-gap-contract", process.execPath, [npmCli, "run", "contract:scrimed-p34-gap-closure"]],
+  ["p34-precision-policy", process.execPath, [npmCli, "run", "test:scrimed-p34-precision-wave"]],
+  ["p34-precision-contract", process.execPath, [npmCli, "run", "contract:scrimed-p34-precision-wave"]],
+  ["p34-post-review-policy", process.execPath, [npmCli, "run", "test:scrimed-p34-post-review-readiness"]],
+  ["p34-post-review-contract", process.execPath, [npmCli, "run", "contract:scrimed-p34-post-review-readiness"]],
+  ["p34-follow-on-contract", process.execPath, [npmCli, "run", "contract:scrimed-p34-follow-on"]],
+  ["p34-adversarial-fuzz-concurrency", process.execPath, [npmCli, "run", "test:scrimed-p34-pilot-adversarial"]],
+  ["product-console-payload-budget", process.execPath, [npmCli, "run", "test:product-console-payload-budget"]],
   ["p34-canary", process.execPath, ["scripts/scrimed-p34-canary.mjs"]],
   ["generated-integrity-prebuild", process.execPath, ["scripts/check-generated-integrity.mjs"]],
   ["typecheck", process.execPath, [npmCli, "run", "typecheck"]],
@@ -92,7 +108,29 @@ const reportBase = {
   customerActivationAuthorized: false,
   boundary: "Automated local no-PHI certification only; no external or consequential authority is granted."
 };
-const report = { ...reportBase, certificationFingerprint: sha256(reportBase) };
+const deterministicCertification = {
+  schemaVersion: reportBase.schemaVersion,
+  status: reportBase.status,
+  commit: reportBase.commit,
+  tree: reportBase.tree,
+  candidateFingerprint: reportBase.candidateFingerprint,
+  sourceFingerprint: reportBase.sourceFingerprint,
+  routeInventoryFingerprint: reportBase.routeInventoryFingerprint,
+  generationInventoryFingerprint: reportBase.generationInventoryFingerprint,
+  sourceStable: reportBase.sourceStable,
+  checks: reportBase.checks.map(({ id, passed: checkPassed, exitCode, timedOut }) => ({
+    id,
+    passed: checkPassed,
+    exitCode,
+    timedOut
+  }))
+};
+const report = {
+  ...reportBase,
+  deterministicCertification,
+  diagnosticOutputFingerprint: sha256(reportBase.checks.map(({ id, outputFingerprint }) => ({ id, outputFingerprint }))),
+  certificationFingerprint: sha256(deterministicCertification)
+};
 await mkdir("artifacts/release", { recursive: true });
 await writeFile("artifacts/release/p34-certification.json", `${JSON.stringify(report, null, 2)}\n`, "utf8");
 if (!passed) process.exitCode = 1;

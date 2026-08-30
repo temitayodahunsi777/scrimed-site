@@ -15,6 +15,16 @@ import {
 } from "../app/lib/commercial/pilotOperatingSystem.ts";
 import { getPilotTemplate } from "../app/lib/commercial/pilotTemplateRegistry.ts";
 import { InMemorySyntheticPilotBudgetLedger } from "../app/lib/economics/pilotCostGovernor.ts";
+import {
+  consumeAtomicApproval,
+  createSyntheticApprovalSignature,
+  createSyntheticApprovalVerifier,
+  InMemorySyntheticAtomicApprovalStore
+} from "../app/lib/scrimed-p34/atomicApproval.ts";
+import { evaluateP34EgressFirewall } from "../app/lib/scrimed-p34/egressFirewall.ts";
+import { deriveExactHeadReviewState } from "../app/lib/scrimed-p34/exactHeadReviewState.ts";
+import { FixedTrustedClock } from "../app/lib/scrimed-p34/trustedClock.ts";
+import { evaluatePreviewAcceptance } from "../app/lib/release/previewAcceptance.ts";
 
 let passed = 0;
 function check(name, run) {
@@ -211,4 +221,182 @@ check("proposal-expiry-and-authority-fail-closed", () => {
   assert.equal(proposal.protectedPilotAuthorized, false);
 });
 
-console.log(`SCRIMED p.34 pilot adversarial tests: ${passed}/${passed} passed (160 manifest fuzz cases)`);
+check("approval-spoof-replay-and-service-failure-fail-closed", () => {
+  const verifierId = "synthetic-verifier-v1";
+  const unsigned = {
+    schemaVersion: "scrimed-p34-atomic-approval-v2",
+    approvalId: "approval-adversarial-001",
+    candidateFingerprint: "c".repeat(64),
+    actionId: "synthetic-action-001",
+    resourceId: "synthetic-resource-001",
+    tenantId: "synthetic-tenant-001",
+    environmentId: "synthetic-environment-001",
+    requesterClass: "synthetic-operator",
+    autonomyLevel: "A2",
+    maturityLevel: "SYNTHETIC_VALIDATED",
+    issuedAt: "2026-08-28T01:50:00.000Z",
+    expiresAt: "2026-08-28T02:30:00.000Z",
+    permittedSideEffect: "reversible-synthetic-internal-write",
+    nonce: "nonce-adversarial-001",
+    approverIdentityHash: "d".repeat(64),
+    policyDecisionHash: "e".repeat(64)
+  };
+  const token = { ...unsigned, signature: createSyntheticApprovalSignature(unsigned, verifierId) };
+  const expected = {
+    candidateFingerprint: unsigned.candidateFingerprint,
+    actionId: unsigned.actionId,
+    resourceId: unsigned.resourceId,
+    tenantId: unsigned.tenantId,
+    environmentId: unsigned.environmentId,
+    requesterClass: unsigned.requesterClass,
+    autonomyLevel: unsigned.autonomyLevel,
+    maturityLevel: unsigned.maturityLevel,
+    permittedSideEffect: unsigned.permittedSideEffect,
+    approverIdentityHash: unsigned.approverIdentityHash,
+    policyDecisionHash: unsigned.policyDecisionHash
+  };
+  const clock = new FixedTrustedClock("2026-08-28T02:00:00.000Z");
+  const verifier = createSyntheticApprovalVerifier(verifierId);
+  const store = new InMemorySyntheticAtomicApprovalStore();
+
+  const candidateSpoof = consumeAtomicApproval({
+    token,
+    expected: { ...expected, candidateFingerprint: "f".repeat(64) },
+    clock,
+    verifier,
+    store: new InMemorySyntheticAtomicApprovalStore()
+  });
+  assert.ok(candidateSpoof.reasonCodes.includes("APPROVAL_CANDIDATE_MISMATCH"));
+  assert.equal(candidateSpoof.executionAuthorized, false);
+
+  const first = consumeAtomicApproval({ token, expected, clock, verifier, store });
+  const replay = consumeAtomicApproval({ token, expected, clock, verifier, store });
+  assert.equal(first.approvalConsumed, true);
+  assert.equal(first.executionAuthorized, false);
+  assert.ok(replay.reasonCodes.includes("APPROVAL_REPLAY_DETECTED"));
+
+  const storeFailure = consumeAtomicApproval({
+    token,
+    expected,
+    clock,
+    verifier,
+    store: { trustClass: "synthetic-test-only", consume() { throw new Error("synthetic outage"); } }
+  });
+  assert.ok(storeFailure.reasonCodes.includes("APPROVAL_STORE_FAILURE"));
+  assert.equal(storeFailure.executionAuthorized, false);
+
+  const verifierFailure = consumeAtomicApproval({
+    token,
+    expected,
+    clock,
+    verifier: { verifierId, trustClass: "synthetic-test-only", verify() { throw new Error("synthetic outage"); } },
+    store: new InMemorySyntheticAtomicApprovalStore()
+  });
+  assert.ok(verifierFailure.reasonCodes.includes("APPROVAL_VERIFIER_FAILURE"));
+  assert.equal(verifierFailure.executionAuthorized, false);
+});
+
+check("candidate-substitution-and-review-fuzz-never-false-green", () => {
+  const current = "1".repeat(40);
+  assert.equal(deriveExactHeadReviewState({
+    currentHeadSha: current,
+    requestedHeadSha: current,
+    requestAcknowledged: true,
+    disposition: "APPROVED",
+    dispositionHeadSha: "2".repeat(40),
+    trustedExternalReceiptValid: true
+  }), "STALE");
+
+  const malformed = [null, "", "not-a-sha", "0".repeat(39), "g".repeat(40), "../candidate"];
+  for (let index = 0; index < 240; index += 1) {
+    const value = malformed[index % malformed.length];
+    const state = deriveExactHeadReviewState({
+      currentHeadSha: value,
+      requestedHeadSha: malformed[(index + 1) % malformed.length],
+      requestAcknowledged: index % 2 === 0,
+      disposition: index % 3 === 0 ? "APPROVED" : "NONE",
+      dispositionHeadSha: malformed[(index + 2) % malformed.length],
+      trustedExternalReceiptValid: true
+    });
+    assert.notEqual(state, "APPROVED_EXACT_HEAD");
+  }
+});
+
+check("phi-secret-egress-is-redacted-and-never-forwarded", () => {
+  const decision = evaluateP34EgressFirewall({
+    channel: "telemetry",
+    dataClassification: "public-synthetic",
+    payload: {
+      patientName: "Synthetic Person",
+      accessToken: "synthetic-secret-marker",
+      safeMetric: 1
+    },
+    purpose: "synthetic-assurance",
+    tenantId: "synthetic-tenant-001"
+  });
+  assert.equal(decision.decision, "BLOCK");
+  assert.equal(decision.forwardingAuthorized, false);
+  assert.equal(decision.containsRawPhi, false);
+  assert.equal(decision.containsSecrets, false);
+  assert.equal(JSON.stringify(decision.sanitizedPayload).includes("Synthetic Person"), false);
+  assert.equal(JSON.stringify(decision.sanitizedPayload).includes("synthetic-secret-marker"), false);
+});
+
+check("preview-production-escalation-is-rejected", () => {
+  const expected = {
+    deploymentId: "dpl_1234567890ab",
+    deploymentUrl: "https://scrimed-synthetic-preview.vercel.app",
+    commitSha: "3".repeat(40),
+    treeSha: "4".repeat(40),
+    candidateFingerprint: "5".repeat(64),
+    sourceFingerprint: "6".repeat(64),
+    routeInventoryFingerprint: "7".repeat(64),
+    renderInventoryFingerprint: "8".repeat(64)
+  };
+  const result = evaluatePreviewAcceptance({
+    ...expected,
+    environment: "preview",
+    nodeMajor: 24,
+    healthPassed: true,
+    readinessPassed: true,
+    browserSmokePassed: true,
+    apiSmokePassed: true,
+    safetyBoundariesPassed: true,
+    protectedWritesObserved: false,
+    productionAliases: ["app.scrimedsolutions.com"],
+    acceptedBy: "release-steward",
+    acceptedAt: "2026-08-28T02:00:00.000Z"
+  }, expected, new Date("2026-08-28T02:01:00.000Z"));
+  assert.equal(result.accepted, false);
+  assert.ok(result.reasonCodes.includes("PRODUCTION_ALIAS_ATTACHED"));
+  assert.equal(result.productionAuthorized, false);
+});
+
+check("proposal-pricing-fuzz-remains-nonbinding-and-fingerprinted", () => {
+  const fingerprints = new Set();
+  for (let index = 0; index < 240; index += 1) {
+    const proposal = buildPilotProposalFingerprint({
+      proposalId: `proposal-fuzz-${String(index).padStart(3, "0")}`,
+      prospectAlias: "prospect-adversarial-001",
+      version: `v${index + 1}`,
+      scope,
+      pricingScenario: {
+        proposedPriceUsd: index * 100,
+        modelCostUsd: index % 17,
+        reviewCostUsd: index % 29
+      },
+      artifactFingerprint: "9".repeat(64),
+      candidateReference,
+      expiresAt: "2026-09-10T00:00:00.000Z",
+      approvalStatus: index % 2 === 0 ? "DRAFT" : "APPROVED_FOR_DELIVERY"
+    }, new Date("2026-08-28T00:00:00.000Z"));
+    assert.equal(proposal.agentMaySign, false);
+    assert.equal(proposal.agentMayDiscount, false);
+    assert.equal(proposal.contractAuthorized, false);
+    assert.equal(proposal.protectedPilotAuthorized, false);
+    fingerprints.add(proposal.proposalFingerprint);
+  }
+  assert.equal(fingerprints.size, 240);
+});
+
+console.log(`SCRIMED p.34 pilot adversarial tests: ${passed}/${passed} passed (160 manifest + 240 review + 240 proposal fuzz cases)`);

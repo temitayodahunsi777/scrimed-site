@@ -1396,6 +1396,87 @@ export function getProductConsoleSummary() {
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
+  const p34PriorityGates = [
+    {
+      id: "candidate",
+      label: "Candidate",
+      state: buildInfo.commitSha && buildInfo.candidateFingerprintDeclared
+        ? "EXACT_BINDING_REQUIRED"
+        : "CANDIDATE_EVIDENCE_REQUIRED",
+      owner: "release-steward",
+      href: "/api/build-info"
+    },
+    {
+      id: "review",
+      label: "Review",
+      state: p34ReviewReadinessSummary.review.state,
+      owner: "independent-technical-reviewer",
+      href: p34ReviewReadinessSummary.route
+    },
+    {
+      id: "preview",
+      label: "Preview",
+      state: p34PreviewAcceptanceSummary.status,
+      owner: "release-steward",
+      href: "/api/readiness"
+    },
+    {
+      id: "security",
+      label: "Security",
+      state: "AUTOMATED_ASSURANCE_COMPLETE",
+      owner: "security-owner",
+      href: "/trust-safety-operations"
+    },
+    {
+      id: "aal2",
+      label: "AAL2",
+      state: "OPERATOR_ACTION_REQUIRED",
+      owner: "authorized-preview-operator",
+      href: "/pilot-workspace/access"
+    },
+    {
+      id: "supabase",
+      label: "Supabase",
+      state: "OPERATOR_ACTION_REQUIRED",
+      owner: "supabase-project-owner",
+      href: "/approvals-readiness"
+    },
+    {
+      id: "migrations",
+      label: "Migrations",
+      state: "PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED",
+      owner: "database-release-owner",
+      href: "/approvals-readiness"
+    },
+    {
+      id: "synthetic-pilot",
+      label: "Synthetic Pilot Readiness",
+      state: syntheticPilotReadinessSummary.status,
+      owner: "synthetic-pilot-owner",
+      href: syntheticPilotReadinessSummary.route
+    },
+    {
+      id: "commercial",
+      label: "Commercial Readiness",
+      state: syntheticPilotReadinessSummary.commercialReadiness.assessment,
+      owner: "commercial-owner",
+      href: "/pilot-deal-room"
+    },
+    {
+      id: "protected-pilot",
+      label: "Protected Pilot Readiness",
+      state: "PROTECTED_PILOT_AUTHORIZATION_REQUIRED",
+      owner: "privacy-security-clinical-owners",
+      href: "/pilot-workspace/access"
+    },
+    {
+      id: "production",
+      label: "Production Authority",
+      state: "PRODUCTION_AUTHORIZATION_REQUIRED",
+      owner: "release-authority",
+      href: "/clinical-production-readiness"
+    }
+  ] as const;
 
   return {
     service: "scrimed-product-console",
@@ -1449,6 +1530,7 @@ export function getProductConsoleSummary() {
     syntheticPilotRoute: syntheticPilotReadinessSummary.route,
     syntheticPilotApiRoute: syntheticPilotReadinessSummary.apiRoute,
     commercialReadiness: syntheticPilotReadinessSummary.commercialReadiness,
+    p34PriorityGates,
     route: "/product",
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",
@@ -2737,6 +2819,15 @@ function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
   const preview = getP34PreviewAcceptanceSummary();
   summary.p34ReviewReadiness = review;
   summary.p34PreviewAcceptance = preview;
+  if (Array.isArray(summary.priorityGates)) {
+    summary.priorityGates = summary.priorityGates.map((gate) => {
+      if (!gate || typeof gate !== "object") return gate;
+      const record = gate as { id?: string; state?: string };
+      if (record.id === "review") return { ...record, state: review.review.state };
+      if (record.id === "preview") return { ...record, state: preview.status };
+      return record;
+    });
+  }
   summary.p34CurrentCandidatePosture = {
     branch: summary.runtimeBranch ?? null,
     commitSha: review.candidate.commitSha,
@@ -2790,6 +2881,7 @@ export function getProductConsoleApiSummary() {
   productConsoleApiSummaryCache = {
     ...apiSummary,
     payloadProfile: "compact-api-v2",
+    priorityGates: summary.p34PriorityGates,
     proofStack: summary.proofStack,
     detailRoutes: {
       companyAssessment: companyAssessmentSummary.apiRoute,

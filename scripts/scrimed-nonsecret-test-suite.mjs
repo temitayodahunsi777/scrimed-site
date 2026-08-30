@@ -1076,6 +1076,15 @@ const checks = [
     ]
   },
   {
+    label: "Product Console compact payload budget",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/product-console-payload-budget-test.mjs"
+    ]
+  },
+  {
     label: "SCRIMED p.34 follow-on contract",
     args: ["scripts/scrimed-p34-follow-on-contract-check.mjs"]
   },

@@ -8,7 +8,7 @@
     "commitSha": "45be650f48e422b05160821681ff40bb9f1229c9",
     "status": "PREDECESSOR"
   },
-  "bindingArtifact": "artifacts/release/p34-current-candidate.json",
+  "bindingArtifact": "artifacts/release/scrimed-p34-release-manifest.json",
   "classificationPolicy": [
     "CORE_RUNTIME",
     "GOVERNANCE",
@@ -25,18 +25,18 @@
     "CONFIGURATION",
     "UNEXPECTED"
   ],
-  "fileCount": 70,
+  "fileCount": 78,
   "classificationCounts": {
     "AAL2": 2,
     "CONFIGURATION": 3,
     "CORE_RUNTIME": 1,
-    "DOCUMENTATION": 17,
-    "GENERATED_EVIDENCE": 11,
+    "DOCUMENTATION": 21,
+    "GENERATED_EVIDENCE": 12,
     "GOVERNANCE": 3,
     "PILOT": 6,
     "SECURITY": 1,
-    "TEST": 18,
-    "UI": 4,
+    "TEST": 20,
+    "UI": 5,
     "VERCEL": 4
   },
   "unexplainedFileCount": 0,
@@ -44,6 +44,11 @@
     {
       "path": ".gitignore",
       "classification": "CONFIGURATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/globals.css",
+      "classification": "UI",
       "status": "CURRENT"
     },
     {
@@ -127,7 +132,7 @@
       "status": "CURRENT"
     },
     {
-      "path": "artifacts/build/route-inventory.json",
+      "path": "artifacts/build/routes.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT"
     },
@@ -177,6 +182,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "artifacts/review/p40-risk-ranked-diff.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
       "path": "config/performance-budgets.json",
       "classification": "CONFIGURATION",
       "status": "CURRENT"
@@ -193,6 +203,11 @@
     },
     {
       "path": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -218,6 +233,11 @@
     },
     {
       "path": "docs/release/P34_CURRENT_STATE_DISCOVERY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/release/P34_EXECUTIVE_CANONICAL_STATE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -262,7 +282,17 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/review/P40_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P40_RISK_RANKED_DIFF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -317,6 +347,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
       "path": "scripts/release-candidate-validation.mjs",
       "classification": "TEST",
       "status": "CURRENT"
@@ -329,6 +364,11 @@
     {
       "path": "scripts/scrimed-nonsecret-test-suite.mjs",
       "classification": "SECURITY",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-artifacts.mjs",
+      "classification": "TEST",
       "status": "CURRENT"
     },
     {
@@ -396,5 +436,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "05b3bbc485b5ea76659db243660f60ea2a696c1f571187028e929c4f079d11be"
+  "mapFingerprint": "50bc9667450be4ac66d0f5ae610003cfabc1f2afa7b3ea5116bee562cebca205"
 }

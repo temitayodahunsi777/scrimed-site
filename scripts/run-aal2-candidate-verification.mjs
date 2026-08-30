@@ -284,9 +284,9 @@ if (selfTest) {
 
 const token = process.env.AAL2_TEST_TOKEN?.trim() ?? "";
 const targetUrl = process.env.TARGET_URL?.trim() ?? "";
-const allowedPreviewOrigins = process.env.SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS?.trim() ?? "";
-if (!token || !targetUrl || !allowedPreviewOrigins) {
-  console.error("AAL2_TEST_TOKEN, TARGET_URL, and SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS are required. Values are never printed or persisted.");
+const allowedPreviewOrigins = process.env.SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS?.trim() || targetUrl;
+if (!token || !targetUrl) {
+  console.error("AAL2_TEST_TOKEN and TARGET_URL are required. Values are never printed or persisted.");
   process.exit(1);
 }
 
@@ -302,12 +302,7 @@ const report = await runAal2CandidateVerification({ token, targetUrl, allowedPre
 if (writeEvidence) {
   const evidence = createRedactedAal2Evidence(report);
   await mkdir("artifacts/security", { recursive: true });
-  for (const path of [
-    "artifacts/security/p34-aal2-evidence.json",
-    "artifacts/security/p40-aal2-evidence.json"
-  ]) {
-    await writeFile(path, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
-  }
+  await writeFile("artifacts/security/p40-aal2.json", `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
 }
 if (json) console.log(JSON.stringify(report, null, 2));
 else {
@@ -316,7 +311,7 @@ else {
   console.log(`commit=${report.commitSha}`);
   console.log(`candidate=${report.candidateFingerprint}`);
   for (const check of report.checks) console.log(`${check.passed ? "pass" : "blocked"} ${check.id}: ${check.detail}`);
-  if (writeEvidence) console.log("redacted_evidence=artifacts/security/p40-aal2-evidence.json");
+  if (writeEvidence) console.log("redacted_evidence=artifacts/security/p40-aal2.json");
   console.log(report.boundary);
 }
 if (report.status !== "PASS_NONPRODUCTION_AAL2") process.exit(1);

@@ -5,7 +5,7 @@ Status: **CURRENT FOLLOW-ON CANDIDATE / AUTOMATED ASSURANCE IN PROGRESS**
 | Field | Verified repository state |
 | --- | --- |
 | Branch | `agent/scrimed-p34-post-review-readiness` |
-| Exact candidate binding | generated post-commit in `artifacts/release/p34-current-candidate.json` |
+| Exact candidate binding | generated post-commit in `artifacts/release/scrimed-p34-release-manifest.json` |
 | Upstream | `origin/agent/scrimed-p34-post-review-readiness` |
 | Predecessor | PR #39, `45be650f48e422b05160821681ff40bb9f1229c9` |
 | Current PR | #40 canonical review target; exact runtime state is recorded outside tracked source |

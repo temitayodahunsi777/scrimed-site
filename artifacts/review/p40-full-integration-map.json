@@ -4,16 +4,16 @@
   "pullRequestNumber": 40,
   "branch": "agent/scrimed-p34-post-review-readiness",
   "machineRepairBaseCommit": "d074658b65399d91124f2a1b737e82ef50f69095",
-  "exactCandidateBinding": "artifacts/release/p34-exact-candidate-manifest.json",
-  "fileCount": 70,
+  "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+  "fileCount": 78,
   "reviewLaneCounts": {
-    "CORE_RUNTIME": 19,
+    "CORE_RUNTIME": 22,
     "PILOT_OS": 4,
     "COMMERCIAL": 4,
     "SECURITY": 1,
-    "GOVERNANCE": 35,
+    "GOVERNANCE": 39,
     "VERCEL": 4,
-    "SUPABASE": 1,
+    "SUPABASE": 2,
     "AAL2": 2
   },
   "unexplainedFileCount": 0,
@@ -21,6 +21,12 @@
     {
       "path": ".gitignore",
       "classification": "CONFIGURATION",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
+    },
+    {
+      "path": "app/globals.css",
+      "classification": "UI",
       "status": "CURRENT",
       "reviewLane": "CORE_RUNTIME"
     },
@@ -121,7 +127,7 @@
       "reviewLane": "GOVERNANCE"
     },
     {
-      "path": "artifacts/build/route-inventory.json",
+      "path": "artifacts/build/routes.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
@@ -181,6 +187,12 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "artifacts/review/p40-risk-ranked-diff.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "config/performance-budgets.json",
       "classification": "CONFIGURATION",
       "status": "CURRENT",
@@ -203,6 +215,12 @@
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE"
     },
     {
       "path": "docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md",
@@ -230,6 +248,12 @@
     },
     {
       "path": "docs/release/P34_CURRENT_STATE_DISCOVERY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/release/P34_EXECUTIVE_CANONICAL_STATE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
@@ -283,7 +307,19 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "docs/review/P40_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/review/P40_RISK_RANKED_DIFF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
@@ -349,6 +385,12 @@
       "reviewLane": "CORE_RUNTIME"
     },
     {
+      "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
+    },
+    {
       "path": "scripts/release-candidate-validation.mjs",
       "classification": "TEST",
       "status": "CURRENT",
@@ -365,6 +407,12 @@
       "classification": "SECURITY",
       "status": "CURRENT",
       "reviewLane": "SECURITY"
+    },
+    {
+      "path": "scripts/scrimed-p34-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
     },
     {
       "path": "scripts/scrimed-p34-canary.mjs",
@@ -443,5 +491,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "4330eeb7c85169bfa04644f071eef71826567380227f0db4d1a40ac8f220f11c"
+  "mapFingerprint": "fc59e1d420f3f9e19b31efc302fb13812f27f98498c792372c118ac8829a4c87"
 }

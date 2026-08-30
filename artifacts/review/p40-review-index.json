@@ -3,9 +3,9 @@
   "repository": "temitayodahunsi777/scrimed-site",
   "pullRequestNumber": 40,
   "branch": "agent/scrimed-p34-post-review-readiness",
-  "exactCandidateBinding": "artifacts/release/p34-exact-candidate-manifest.json",
+  "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
   "integrationMap": "artifacts/review/p40-full-integration-map.json",
-  "integrationMapFingerprint": "4330eeb7c85169bfa04644f071eef71826567380227f0db4d1a40ac8f220f11c",
+  "integrationMapFingerprint": "fc59e1d420f3f9e19b31efc302fb13812f27f98498c792372c118ac8829a4c87",
   "targetReviewMinutes": 10,
   "reviewState": "EXACT_REVIEW_REQUIRED",
   "highestRiskFiles": [
@@ -32,5 +32,5 @@
     "noDeviceWriteback": true,
     "productionAuthorityGranted": false
   },
-  "indexFingerprint": "1c1daecd9528d6029a8229e1daa445a5975c562a0480f80c28a9bdacd460d93b"
+  "indexFingerprint": "e5698c96aa8ac49794955110e02ad3bdcbfe624e052e7666a9be141527d5de72"
 }

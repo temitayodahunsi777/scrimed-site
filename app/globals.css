@@ -2597,6 +2597,22 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.priority-gate-grid article {
+  min-height: 150px;
+}
+
+.priority-gate-grid strong {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+details.table-section > summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 18px 0;
+}
+
 .evidence-grid {
   display: grid;
   gap: 14px;

@@ -126,6 +126,6 @@ const observabilityBase = {
 };
 const observability = { ...observabilityBase, observabilityFingerprint: sha256(observabilityBase) };
 await mkdir("artifacts/vercel", { recursive: true });
-await writeFile("artifacts/vercel/p40-preview-observability.json", `${JSON.stringify(observability, null, 2)}\n`, "utf8");
+await writeFile("artifacts/vercel/p40-observability.json", `${JSON.stringify(observability, null, 2)}\n`, "utf8");
 if (!passed) process.exitCode = 1;
 else console.log(`pass exact nonproduction preview verification fingerprint=${report.previewFingerprint}`);

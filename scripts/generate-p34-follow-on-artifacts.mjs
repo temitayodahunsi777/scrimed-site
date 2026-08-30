@@ -18,7 +18,7 @@ const integrationBase = {
   repository: state.repository,
   branch: state.branch,
   predecessor: p34Predecessor,
-  bindingArtifact: "artifacts/release/p34-current-candidate.json",
+  bindingArtifact: "artifacts/release/scrimed-p34-release-manifest.json",
   classificationPolicy: [
     "CORE_RUNTIME", "GOVERNANCE", "SECURITY", "PILOT", "COMMERCIAL", "VERCEL",
     "SUPABASE", "AAL2", "UI", "TEST", "GENERATED_EVIDENCE", "DOCUMENTATION",
@@ -42,7 +42,7 @@ const discovery = `# p.34 Current State Discovery\n\n` +
   `Status: **CURRENT FOLLOW-ON CANDIDATE / AUTOMATED ASSURANCE IN PROGRESS**\n\n` +
   `| Field | Verified repository state |\n| --- | --- |\n` +
   `| Branch | \`${state.branch}\` |\n` +
-  `| Exact candidate binding | generated post-commit in \`artifacts/release/p34-current-candidate.json\` |\n` +
+  `| Exact candidate binding | generated post-commit in \`artifacts/release/scrimed-p34-release-manifest.json\` |\n` +
   `| Upstream | ${state.upstream ? `\`${state.upstream}\`` : "not configured"} |\n` +
   `| Predecessor | PR #${p34Predecessor.pullRequestNumber}, \`${p34Predecessor.commitSha}\` |\n` +
   `| Current PR | #40 canonical review target; exact runtime state is recorded outside tracked source |\n` +
@@ -112,6 +112,91 @@ const p40Entries = state.integrationEntries.map((entry) => ({
   ...entry,
   reviewLane: p40ReviewLane(entry.path)
 }));
+
+const riskOrder = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "GENERATED", "DOCUMENTATION"];
+
+function p40Risk(path, classification) {
+  const lower = path.toLowerCase();
+  if (classification === "DOCUMENTATION") return "DOCUMENTATION";
+  if (classification === "GENERATED_EVIDENCE") return "GENERATED";
+  if (
+    lower.includes("atomicapproval")
+    || lower.includes("controlplane2")
+    || lower.includes("reviewreadiness")
+    || lower.includes("previewacceptance")
+    || lower.includes("pilotmanifest")
+    || lower.includes("migration")
+  ) return "CRITICAL";
+  if (
+    lower.includes("security")
+    || lower.includes("secret")
+    || lower.includes("egress")
+    || lower.includes("exactheadreview")
+    || lower.includes("pilotoperatingsystem")
+    || lower.includes("pilotcostgovernor")
+    || lower.includes("aal2")
+    || lower.includes("certif")
+  ) return "HIGH";
+  if (classification === "UI" || classification === "CORE_RUNTIME" || classification === "CONFIGURATION") return "MEDIUM";
+  return "LOW";
+}
+
+function reviewEvidenceFor(entry) {
+  const lane = entry.reviewLane;
+  const tests = lane === "PILOT_OS" || lane === "COMMERCIAL"
+    ? ["npm run test:scrimed-p34-post-review-readiness", "npm run test:scrimed-p34-pilot-adversarial"]
+    : lane === "SECURITY" || lane === "AAL2"
+      ? ["npm run test:scrimed-p34-gap-closure", "npm run test:nonsecret"]
+      : lane === "VERCEL" || entry.classification === "UI"
+        ? ["npm run smoke:public", "npm run scrimed:p34:certify"]
+        : ["npm run contract:scrimed-p34-follow-on", "npm run test:nonsecret"];
+  return {
+    whyChanged: lane === "PILOT_OS"
+      ? "Strengthens bounded synthetic-pilot execution and evidence controls."
+      : lane === "COMMERCIAL"
+        ? "Strengthens nonbinding economics, proposal, and buyer-readiness controls."
+        : lane === "SECURITY" || lane === "AAL2"
+          ? "Strengthens fail-closed identity, approval, egress, or security evidence."
+          : lane === "VERCEL"
+            ? "Binds nonproduction preview behavior and observability to the exact candidate."
+            : entry.classification === "GENERATED_EVIDENCE"
+              ? "Regenerates deterministic candidate evidence from repository sources."
+              : entry.classification === "DOCUMENTATION"
+                ? "Explains implemented behavior, retained boundaries, and operator action."
+                : "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+    relevantTests: tests,
+    relevantEvidence: [
+      "artifacts/release/scrimed-p34-release-manifest.json",
+      entry.classification === "GENERATED_EVIDENCE"
+        ? entry.path
+        : "artifacts/review/p40-full-integration-map.json"
+    ]
+  };
+}
+
+const p40RiskEntries = p40Entries
+  .map((entry) => ({
+    ...entry,
+    risk: p40Risk(entry.path, entry.classification),
+    ...reviewEvidenceFor(entry)
+  }))
+  .sort((left, right) => riskOrder.indexOf(left.risk) - riskOrder.indexOf(right.risk) || left.path.localeCompare(right.path));
+const p40RiskDiffBase = {
+  schemaVersion: "scrimed-p40-risk-ranked-diff-v1",
+  repository: state.repository,
+  pullRequestNumber: 40,
+  branch: state.branch,
+  exactCandidateBinding: "artifacts/release/scrimed-p34-release-manifest.json",
+  rankOrder: riskOrder,
+  fileCount: p40RiskEntries.length,
+  riskCounts: Object.fromEntries(riskOrder.map((risk) => [risk, p40RiskEntries.filter((entry) => entry.risk === risk).length])),
+  files: p40RiskEntries,
+  unexplainedFileCount: p40RiskEntries.filter((entry) => entry.classification === "UNEXPECTED").length,
+  reviewDecision: "EXACT_REVIEW_REQUIRED",
+  productionAuthorityGranted: false
+};
+if (p40RiskDiffBase.unexplainedFileCount !== 0) throw new Error("PR #40 risk-ranked diff contains unexplained files.");
+const p40RiskDiff = { ...p40RiskDiffBase, diffFingerprint: sha256(p40RiskDiffBase) };
 const p40ReviewLanes = ["CORE_RUNTIME", "PILOT_OS", "COMMERCIAL", "SECURITY", "GOVERNANCE", "VERCEL", "SUPABASE", "AAL2"];
 const p40MapBase = {
   schemaVersion: "scrimed-p40-full-integration-map-v1",
@@ -119,7 +204,7 @@ const p40MapBase = {
   pullRequestNumber: 40,
   branch: state.branch,
   machineRepairBaseCommit: "d074658b65399d91124f2a1b737e82ef50f69095",
-  exactCandidateBinding: "artifacts/release/p34-exact-candidate-manifest.json",
+  exactCandidateBinding: "artifacts/release/scrimed-p34-release-manifest.json",
   fileCount: p40Entries.length,
   reviewLaneCounts: Object.fromEntries(p40ReviewLanes.map((lane) => [lane, p40Entries.filter((entry) => entry.reviewLane === lane).length])),
   unexplainedFileCount: p40Entries.filter((entry) => entry.classification === "UNEXPECTED").length,
@@ -137,7 +222,7 @@ const p40ReviewIndexBase = {
   repository: state.repository,
   pullRequestNumber: 40,
   branch: state.branch,
-  exactCandidateBinding: "artifacts/release/p34-exact-candidate-manifest.json",
+  exactCandidateBinding: "artifacts/release/scrimed-p34-release-manifest.json",
   integrationMap: "artifacts/review/p40-full-integration-map.json",
   integrationMapFingerprint: p40Map.mapFingerprint,
   targetReviewMinutes: 10,
@@ -171,7 +256,7 @@ const p40ReviewIndex = { ...p40ReviewIndexBase, indexFingerprint: sha256(p40Revi
 
 const canonicalBaselineDoc = `# p.34 Current Canonical Baseline\n\n` +
   `Status: **EXACT-HEAD INDEPENDENT REVIEW REQUIRED**\n\n` +
-  `PR #40 on branch \`${state.branch}\` is the canonical review target. The machine-remediation base is \`d074658b65399d91124f2a1b737e82ef50f69095\`. Exact successor commit, tree, candidate, source, validation, review, gate, SBOM, route, render, preview, migration, AAL2, and security fingerprints are generated only after source stabilization in \`artifacts/release/p34-exact-candidate-manifest.json\`.\n\n` +
+  `PR #40 on branch \`${state.branch}\` is the canonical review target. The machine-remediation base is \`d074658b65399d91124f2a1b737e82ef50f69095\`. Exact successor commit, tree, candidate, source, validation, review, gate, SBOM, route, render, preview, migration, AAL2, and security fingerprints are generated only after source stabilization in \`artifacts/release/scrimed-p34-release-manifest.json\`.\n\n` +
   `PR #39 remains predecessor evidence and cannot approve PR #40. Production, PHI, clinical execution, payer/EHR/device writeback, protected-pilot activation, customer activation, merge, migration, and external distribution remain separately gated.\n`;
 
 const sourceIntegrityDoc = `# PR #40 Source-Control Integrity\n\n` +
@@ -180,13 +265,13 @@ const sourceIntegrityDoc = `# PR #40 Source-Control Integrity\n\n` +
   `| PR #39 exact-head evidence | PREDECESSOR |\n` +
   `| PR #40 source and tests | CURRENT |\n` +
   `| Legacy \`artifacts/p34/P34_*_INVENTORY.json\` | SUPERSEDED |\n` +
-  `| \`artifacts/build/route-inventory.json\` | REGENERATED / CANONICAL BASELINE |\n` +
+  `| \`artifacts/build/routes.json\` | REGENERATED / CANONICAL BASELINE |\n` +
   `| \`artifacts/build/render-inventory.json\` | REGENERATED / CANONICAL BASELINE |\n` +
   `| Exact successor evidence | REGENERATED POST-COMMIT |\n\n` +
   `Ordinary builds are read-only with respect to the committed route/render baseline. An intentional route change requires the explicit baseline-update command plus review. No force push, merge, production deployment, migration, or external distribution is authorized.\n`;
 
 const p40ReviewBrief = `# PR #40 Exact-Head Review Brief\n\nTarget review time: **10 minutes**\n\n` +
-  `## Exact Binding\n\nOpen \`artifacts/release/p34-exact-candidate-manifest.json\` and verify PR 40, commit, tree, candidate, source, validation, review packet, gate packet, SBOM, route/render inventories, and preview deployment. Stop if the PR head differs.\n\n` +
+  `## Exact Binding\n\nOpen \`artifacts/release/scrimed-p34-release-manifest.json\` and verify PR 40, commit, tree, candidate, source, validation, review packet, gate packet, SBOM, route/render inventories, and preview deployment. Stop if the PR head differs.\n\n` +
   `## Review Order\n\n` +
   p40ReviewIndex.highestRiskFiles.map((path, index) => `${index + 1}. \`${path}\``).join("\n") +
   `\n\n## Required Safety Checks\n\nConfirm strict synthetic/no-PHI boundaries, tenant isolation, atomic approvals, kill switch, Oversight Sentinel, evidence-ledger integrity, independent route baseline, and truthful AAL2, Supabase, migration, commercial-authority, protected-pilot, and production states.\n\n` +
@@ -196,6 +281,56 @@ const p40MapDoc = `# PR #40 Full Integration Map\n\nStatus: **EXACT_REVIEW_REQUI
   `| Review lane | Files |\n| --- | ---: |\n` +
   Object.entries(p40Map.reviewLaneCounts).map(([lane, count]) => `| ${lane} | ${count} |`).join("\n") +
   `\n\nThe machine-readable map is \`artifacts/review/p40-full-integration-map.json\`. Exact candidate values live in the post-commit candidate manifest; this tracked map grants no approval.\n`;
+
+const executiveCanonicalState = `# p.34 Executive Canonical State\n\n` +
+  `Status: **AUTOMATED ASSURANCE IN PROGRESS / EXACT-HEAD INDEPENDENT REVIEW REQUIRED**\n\n` +
+  `| Control | Canonical source | Current state |\n| --- | --- | --- |\n` +
+  `| Candidate | \`artifacts/release/scrimed-p34-release-manifest.json\` | Generated only after the source is frozen |\n` +
+  `| Review | PR #40 + \`artifacts/review/p40-risk-ranked-diff.json\` | Named independent review not present |\n` +
+  `| Routes | \`artifacts/build/routes.json\` | Generated from the Next build; no manual expected count |\n` +
+  `| Rendering | \`artifacts/build/render-inventory.json\` | Generated from build manifests and build output |\n` +
+  `| Preview | exact candidate Vercel preview | Nonproduction only; acceptance must be candidate-bound |\n` +
+  `| AAL2 | \`artifacts/security/p40-aal2.json\` | Fresh operator evidence required |\n` +
+  `| Supabase | project \`yxacqdfeyojrjghpwike\` | Leaked-password protection operator action required |\n` +
+  `| Migrations | three checksum-bound files | Static ready; production unapplied and unauthorized |\n` +
+  `| Synthetic pilots | six bounded archetypes | No-PHI/nonproduction execution only with scope approval |\n` +
+  `| Protected pilot | external authority | Not authorized |\n` +
+  `| Production | external authority | Not authorized |\n\n` +
+  `The conversion wave began at \`9e58d8dbc2bfe15f1334cc0b6dadf479f5fbddb2\`. The exact successor values must be read from the canonical ignored manifest so tracked documentation never self-references its own commit. No production, migration, PHI, clinical, payer, EHR/device, customer, merge, or external-distribution authority is inferred.\n`;
+
+const executiveReviewBrief = `# PR #40 Executive Review Brief\n\nTarget reading time: **10 minutes**\n\n` +
+  `## 1. Purpose\nValidate the exact p.34 conversion candidate as a bounded synthetic/no-PHI pilot and assurance platform.\n\n` +
+  `## 2. Exact Candidate\nStart with \`artifacts/release/scrimed-p34-release-manifest.json\`. Stop if PR #40, commit, tree, candidate, source, validation, review, gate, SBOM, or preview differs.\n\n` +
+  `## 3. What Changed\nThe wave consolidates release truth, hardens deterministic evidence, focuses Product Console, and productizes six synthetic pilot archetypes without adding clinical authority.\n\n` +
+  `## 4. Highest-Risk Files\nRead CRITICAL then HIGH entries in \`docs/review/P40_RISK_RANKED_DIFF.md\`.\n\n` +
+  `## 5. Governance Model\nRules, evidence, exact-candidate approvals, one-use execution, budgets, and immediate pre-effect revalidation remain fail closed.\n\n` +
+  `## 6. Synthetic-Pilot Boundary\nNO_PHI, NONPRODUCTION, no clinical execution, no payer submission, no EHR/device writeback, and no customer-system writes are invariant.\n\n` +
+  `## 7. PHI Controls\nPHI egress and storage are blocked; telemetry and evidence retain hashes and redacted operational facts only.\n\n` +
+  `## 8. Approval Controls\nSynthetic approvals cannot authorize external execution. Review, merge, deployment, migration, protected-pilot, and production authority remain separate.\n\n` +
+  `## 9. Tenant Isolation\nReview tenant-bound approvals, Supabase RLS contracts, cross-tenant negative tests, and hashed tenant evidence.\n\n` +
+  `## 10. Preview Evidence\nThe accepted target must be the exact Node 24 nonproduction Vercel deployment, with public smoke, desktop/390px checks, protected denial, and no production alias.\n\n` +
+  `## 11. Migrations\nThree migrations remain unapplied. Verify checksums and static/disposable evidence; do not authorize production application through this review.\n\n` +
+  `## 12. AAL2\nFresh candidate-bound operator evidence remains required and contains no credential material.\n\n` +
+  `## 13. Supabase\nThe leaked-password warning remains owner action until the Auth setting is changed and Security Advisor is rerun.\n\n` +
+  `## 14. Security Evidence\nReview secret scan, dependency audit, SBOM, adversarial/fuzz/concurrency/failure tests, and fail-closed protected APIs.\n\n` +
+  `## 15. Commercial Authority\nPricing and value outputs are estimated/simulated and nonbinding. Agents cannot sign, discount, promise dates, activate customers, or distribute investor artifacts.\n\n` +
+  `## 16. Reviewer Decision\nRecord exactly one: **APPROVE_EXACT_HEAD**, **REQUEST_CHANGES**, or **REJECT**. Bind identity and disposition to the exact manifest. Approval grants review evidence only.\n`;
+
+const riskDiffDoc = `# PR #40 Risk-Ranked Diff\n\n` +
+  `Status: **EXACT_REVIEW_REQUIRED**\n\nFiles: **${p40RiskDiff.fileCount}**\n\nUnexplained: **${p40RiskDiff.unexplainedFileCount}**\n\nFingerprint: \`${p40RiskDiff.diffFingerprint}\`\n\n` +
+  `| Rank | Files |\n| --- | ---: |\n` +
+  Object.entries(p40RiskDiff.riskCounts).map(([risk, count]) => `| ${risk} | ${count} |`).join("\n") +
+  `\n\n## Ordered Files\n\n| Rank | Path | Why | Primary test |\n| --- | --- | --- | --- |\n` +
+  p40RiskDiff.files.map((entry) => `| ${entry.risk} | \`${entry.path}\` | ${entry.whyChanged} | \`${entry.relevantTests[0]}\` |`).join("\n") +
+  `\n\nExact test and evidence arrays are in \`artifacts/review/p40-risk-ranked-diff.json\`. Generated and documentation files remain reviewable evidence but cannot substitute for behavior or named approval.\n`;
+
+const supabaseCloseout = `# Supabase Leaked-Password Closeout\n\n` +
+  `Current warning: **auth_leaked_password_protection / Leaked Password Protection Disabled**\n\n` +
+  `Project: **scrimed-protected-pilot** (\`yxacqdfeyojrjghpwike\`)\n\n` +
+  `## Two-Minute Owner Action\n\n1. Open Supabase Dashboard and select the exact project above.\n2. Open **Authentication > Sign In / Providers > Password security** (the dashboard label may be **Authentication > Settings > Password Security**).\n3. Enable only **Prevent use of leaked passwords**.\n4. Save. Do not change users, sessions, providers, redirect URLs, RLS, roles, schema, data, or migrations.\n5. Open **Advisors > Security Advisor** and rerun/refresh it.\n\n` +
+  `## Expected Result\n\nThe \`auth_leaked_password_protection\` warning is absent. Record a non-sensitive screenshot or advisor result with project name and timestamp; do not capture users, emails, tokens, or configuration secrets.\n\n` +
+  `## Verification\n\nRun the connected Security Advisor again and require zero leaked-password warnings. Protected-pilot readiness remains blocked until this is observed and candidate-bound evidence is recorded.\n\n` +
+  `## Rollback\n\nIf the setting causes an authentication incident, the project owner may disable only the same setting, record the reason and timestamp, and restore the gate to \`OPERATOR_ACTION_REQUIRED\`. No unrelated Auth setting may be changed.\n`;
 
 const macosSwcNote = `# macOS SWC Environment Note\n\n` +
   `The local macOS environment may report \`next-swc-native-binding-unavailable-wasm-fallback\`. The warning remains visible. It is environmental, not classified as a pass for native SWC, and does not grant production authority. A candidate may proceed to human review only when the supported WASM fallback completes the same typecheck, build, route/render baseline, public-smoke, and generated-integrity checks without behavioral drift. CI and any authorized deployment must still use a supported Node 24 environment and report their actual native/fallback state.\n`;
@@ -208,12 +343,17 @@ const outputs = [
   ["docs/review/P34_INTEGRATION_MAP.md", integrationDoc],
   ["docs/review/P34_REVIEW_BRIEF.md", reviewBrief],
   ["docs/release/P34_CURRENT_CANONICAL_BASELINE.md", canonicalBaselineDoc],
+  ["docs/release/P34_EXECUTIVE_CANONICAL_STATE.md", executiveCanonicalState],
   ["docs/release/P40_SOURCE_CONTROL_INTEGRITY.md", sourceIntegrityDoc],
   ["docs/review/P40_EXACT_HEAD_REVIEW_BRIEF.md", p40ReviewBrief],
+  ["docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md", executiveReviewBrief],
+  ["docs/review/P40_RISK_RANKED_DIFF.md", riskDiffDoc],
   ["docs/review/P40_FULL_INTEGRATION_MAP.md", p40MapDoc],
+  ["docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md", supabaseCloseout],
   ["docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md", macosSwcNote],
   ["artifacts/review/p40-review-index.json", `${JSON.stringify(p40ReviewIndex, null, 2)}\n`],
-  ["artifacts/review/p40-full-integration-map.json", `${JSON.stringify(p40Map, null, 2)}\n`]
+  ["artifacts/review/p40-full-integration-map.json", `${JSON.stringify(p40Map, null, 2)}\n`],
+  ["artifacts/review/p40-risk-ranked-diff.json", `${JSON.stringify(p40RiskDiff, null, 2)}\n`]
 ];
 
 await mkdir("artifacts/review", { recursive: true });
