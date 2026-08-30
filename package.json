@@ -53,7 +53,7 @@
     "test:faithcore-neutrality": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/faithcore-neutrality-policy-test.mjs",
     "verify:public-release": "node scripts/verify-public-release.mjs --require-build",
     "prebuild": "node scripts/clean-generated-cache.mjs --preserve-next-cache && node scripts/release-provenance-preflight.mjs --deployment-aware",
-    "build": "node scripts/check-generated-integrity.mjs && node scripts/build-with-p34-inventory.mjs && node scripts/generated-output-postflight.mjs && node scripts/verify-public-release.mjs --require-build && node scripts/check-generated-integrity.mjs",
+    "build": "node scripts/check-generated-integrity.mjs && node scripts/build-with-p34-inventory.mjs && node scripts/generated-output-postflight.mjs --repair-disposable-conflicts && node scripts/verify-public-release.mjs --require-build && node scripts/check-generated-integrity.mjs",
     "start": "next start",
     "integrity": "node scripts/check-generated-integrity.mjs",
     "lint": "eslint .",

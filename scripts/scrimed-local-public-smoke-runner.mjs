@@ -395,7 +395,12 @@ await assertEntrypoints();
 const environment = createNonsecretEnvironment(options.port, localEnvironmentNames);
 const baseUrl = environment.SCRIMED_BASE_URL;
 
-runNodeStage("pre-smoke generated-output postflight", [entrypoints.postflight], environment, 60_000);
+runNodeStage(
+  "pre-smoke generated-output postflight",
+  [entrypoints.postflight, "--repair-disposable-conflicts"],
+  environment,
+  60_000
+);
 runNodeStage("pre-smoke generated integrity", [entrypoints.integrity], environment, 30_000);
 runNodeStage(
   "built public release verification",
@@ -445,7 +450,7 @@ for (let round = 1; round <= generatedOutputStabilizationRounds; round += 1) {
   await delay(generatedOutputStabilizationDelayMs);
   const postflight = runNodeStage(
     `post-smoke generated-output postflight ${round}/${generatedOutputStabilizationRounds}`,
-    [entrypoints.postflight],
+    [entrypoints.postflight, "--repair-disposable-conflicts"],
     environment,
     60_000,
     true

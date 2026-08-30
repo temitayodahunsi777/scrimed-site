@@ -214,7 +214,7 @@ if (!requestedOptions.has("--no-build")) {
   stages.push({
     id: "postflight",
     label: "generated-output postflight",
-    args: [entrypoints.postflight],
+    args: [entrypoints.postflight, "--repair-disposable-conflicts"],
     timeoutMs: 60_000
   });
   stages.push({

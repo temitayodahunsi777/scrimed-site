@@ -72,7 +72,7 @@ if (duplicates.size > 0) {
     console.error(`- ${duplicate}`);
   }
   console.error(
-    "Run `node scripts/generated-output-postflight.mjs` to remove only proven-redundant output. If it fails closed, stop Next/Node processes, remove `.next`, and rebuild."
+    "Run `node scripts/generated-output-postflight.mjs` to remove byte-identical duplicates. Build and smoke runners may explicitly use `--repair-disposable-conflicts`, then must revalidate canonical build inventories and integrity."
   );
   process.exit(1);
 }
