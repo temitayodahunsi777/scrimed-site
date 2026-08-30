@@ -25,19 +25,19 @@
     "CONFIGURATION",
     "UNEXPECTED"
   ],
-  "fileCount": 84,
+  "fileCount": 89,
   "classificationCounts": {
     "AAL2": 2,
     "CONFIGURATION": 3,
-    "CORE_RUNTIME": 1,
-    "DOCUMENTATION": 21,
+    "CORE_RUNTIME": 2,
+    "DOCUMENTATION": 22,
     "GENERATED_EVIDENCE": 12,
     "GOVERNANCE": 3,
     "PILOT": 6,
     "SECURITY": 1,
-    "TEST": 26,
+    "TEST": 27,
     "UI": 5,
-    "VERCEL": 4
+    "VERCEL": 6
   },
   "unexplainedFileCount": 0,
   "files": [
@@ -74,6 +74,11 @@
     {
       "path": "app/lib/commercial/syntheticPilotReadiness.ts",
       "classification": "PILOT",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/deploymentProfiles.ts",
+      "classification": "CORE_RUNTIME",
       "status": "CURRENT"
     },
     {
@@ -217,6 +222,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
@@ -352,12 +362,22 @@
       "status": "CURRENT"
     },
     {
+      "path": "scripts/lib/vercel-preview-access.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
       "path": "scripts/node24-runtime-policy-test.mjs",
       "classification": "TEST",
       "status": "CURRENT"
     },
     {
       "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/public-production-smoke.mjs",
       "classification": "TEST",
       "status": "CURRENT"
     },
@@ -452,6 +472,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "scripts/vercel-preview-access-policy-test.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
       "path": "scripts/verify-node24-vercel-build.mjs",
       "classification": "VERCEL",
       "status": "CURRENT"
@@ -466,5 +491,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "df82771438368d91ea2e8ceb731c9ca264a23e2e3ebbba1266d8b928651fb7bb"
+  "mapFingerprint": "1b40c672e5dd0ad5deb5f5a36a5eb44f8e2fb98fb328cfee924b34087550a96a"
 }

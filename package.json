@@ -48,6 +48,7 @@
     "test:wix-production-verifier": "node scripts/verify-wix-production.mjs --self-test",
     "verify:wix-production": "node scripts/verify-wix-production.mjs --canonical=https://www.scrimedsolutions.com --strict",
     "test:preview-ui": "node scripts/verify-preview-ui.mjs --self-test",
+    "test:vercel-preview-access": "node scripts/vercel-preview-access-policy-test.mjs",
     "verify:preview-ui": "node scripts/verify-preview-ui.mjs --strict",
     "test:public-remediation-policy": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/public-remediation-policy-test.mjs",
     "test:faithcore-neutrality": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-loader=./scripts/lib/ts-extension-loader.mjs scripts/faithcore-neutrality-policy-test.mjs",

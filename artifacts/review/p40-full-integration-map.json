@@ -5,14 +5,14 @@
   "branch": "agent/scrimed-p34-post-review-readiness",
   "machineRepairBaseCommit": "d074658b65399d91124f2a1b737e82ef50f69095",
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
-  "fileCount": 84,
+  "fileCount": 89,
   "reviewLaneCounts": {
-    "CORE_RUNTIME": 28,
+    "CORE_RUNTIME": 30,
     "PILOT_OS": 4,
     "COMMERCIAL": 4,
     "SECURITY": 1,
     "GOVERNANCE": 39,
-    "VERCEL": 4,
+    "VERCEL": 7,
     "SUPABASE": 2,
     "AAL2": 2
   },
@@ -59,6 +59,12 @@
       "classification": "PILOT",
       "status": "CURRENT",
       "reviewLane": "COMMERCIAL"
+    },
+    {
+      "path": "app/lib/deploymentProfiles.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
     },
     {
       "path": "app/lib/economics/pilotCostGovernor.ts",
@@ -229,6 +235,12 @@
       "reviewLane": "SUPABASE"
     },
     {
+      "path": "docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL"
+    },
+    {
       "path": "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
@@ -391,6 +403,12 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "scripts/lib/vercel-preview-access.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL"
+    },
+    {
       "path": "scripts/node24-runtime-policy-test.mjs",
       "classification": "TEST",
       "status": "CURRENT",
@@ -398,6 +416,12 @@
     },
     {
       "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
+    },
+    {
+      "path": "scripts/public-production-smoke.mjs",
       "classification": "TEST",
       "status": "CURRENT",
       "reviewLane": "CORE_RUNTIME"
@@ -511,6 +535,12 @@
       "reviewLane": "VERCEL"
     },
     {
+      "path": "scripts/vercel-preview-access-policy-test.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL"
+    },
+    {
       "path": "scripts/verify-node24-vercel-build.mjs",
       "classification": "VERCEL",
       "status": "CURRENT",
@@ -527,5 +557,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "dd0350dfe9782ba883e8d7cd0c54102d1571a298d47eddc941e135c5780efce1"
+  "mapFingerprint": "210dd75ae7d93e88a50fb55fa07476b02c101887baed188793c1501609dbfe12"
 }

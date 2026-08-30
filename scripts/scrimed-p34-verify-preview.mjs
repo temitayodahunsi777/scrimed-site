@@ -3,6 +3,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { p34RuntimeEvidencePath, sha256 } from "./lib/p34-candidate-state.mjs";
+import { obtainVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
 
 function parseTarget(value) {
   if (!value) throw new Error("Set TARGET_URL to the exact p.34 Vercel preview origin.");
@@ -42,13 +43,25 @@ function run(id, script, args, env) {
 const targetUrl = parseTarget(process.env.TARGET_URL ?? process.env.SCRIMED_P34_PREVIEW_URL);
 const manifest = JSON.parse(await readFile(p34RuntimeEvidencePath, "utf8"));
 if (manifest.dirty) throw new Error("Preview verification requires evidence generated from a clean exact candidate commit.");
+const previewAccessCookie = await obtainVercelPreviewAccessCookie({
+  shareUrl: process.env.SCRIMED_VERCEL_SHARE_URL,
+  expectedOrigin: targetUrl
+});
 const buildStartedAt = Date.now();
 const buildResponse = await fetch(`${targetUrl}/api/build-info`, {
   redirect: "error",
   signal: AbortSignal.timeout(20_000),
-  headers: { Accept: "application/json" }
+  headers: {
+    Accept: "application/json",
+    ...(previewAccessCookie ? { Cookie: previewAccessCookie } : {})
+  }
 });
-if (buildResponse.status !== 200) throw new Error(`Preview build-info returned ${buildResponse.status}.`);
+if (buildResponse.status !== 200) {
+  const accessHint = buildResponse.status === 401 && !previewAccessCookie
+    ? " Supply SCRIMED_VERCEL_SHARE_URL through the secure process environment for a protected preview."
+    : "";
+  throw new Error(`Preview build-info returned ${buildResponse.status}.${accessHint}`);
+}
 const buildInfo = await buildResponse.json();
 const buildInfoLatencyMs = Date.now() - buildStartedAt;
 if (buildInfo.commitSha !== manifest.commit) {
@@ -57,7 +70,13 @@ if (buildInfo.commitSha !== manifest.commit) {
 if (buildInfo.environment !== "preview") throw new Error(`Expected Vercel preview environment, received ${buildInfo.environment}.`);
 if (buildInfo.nodeMajor !== 24) throw new Error(`Expected Node 24 preview, received ${buildInfo.nodeMajor}.`);
 
-const env = { ...process.env, SCRIMED_BASE_URL: targetUrl, SCRIMED_PREVIEW_BASE_URL: targetUrl };
+const env = {
+  ...process.env,
+  SCRIMED_BASE_URL: targetUrl,
+  SCRIMED_PREVIEW_BASE_URL: targetUrl,
+  ...(previewAccessCookie ? { SCRIMED_PREVIEW_ACCESS_COOKIE: previewAccessCookie } : {})
+};
+delete env.SCRIMED_VERCEL_SHARE_URL;
 const checks = [
   run("public-smoke", "scripts/public-production-smoke.mjs", [], env),
   run("desktop-mobile-browser", "scripts/verify-preview-ui.mjs", [

@@ -2,20 +2,20 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files explained: **84/84**
+Files explained: **89/89**
 
 Unexplained: **0**
 
-Map SHA-256: `dd0350dfe9782ba883e8d7cd0c54102d1571a298d47eddc941e135c5780efce1`
+Map SHA-256: `210dd75ae7d93e88a50fb55fa07476b02c101887baed188793c1501609dbfe12`
 
 | Review lane | Files |
 | --- | ---: |
-| CORE_RUNTIME | 28 |
+| CORE_RUNTIME | 30 |
 | PILOT_OS | 4 |
 | COMMERCIAL | 4 |
 | SECURITY | 1 |
 | GOVERNANCE | 39 |
-| VERCEL | 4 |
+| VERCEL | 7 |
 | SUPABASE | 2 |
 | AAL2 | 2 |
 

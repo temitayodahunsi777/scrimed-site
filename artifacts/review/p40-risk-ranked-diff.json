@@ -12,14 +12,14 @@
     "GENERATED",
     "DOCUMENTATION"
   ],
-  "fileCount": 84,
+  "fileCount": 89,
   "riskCounts": {
     "CRITICAL": 3,
     "HIGH": 7,
-    "MEDIUM": 9,
-    "LOW": 32,
+    "MEDIUM": 10,
+    "LOW": 35,
     "GENERATED": 12,
-    "DOCUMENTATION": 21
+    "DOCUMENTATION": 22
   },
   "files": [
     {
@@ -224,6 +224,22 @@
       "relevantTests": [
         "npm run smoke:public",
         "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/deploymentProfiles.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
       ],
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
@@ -535,6 +551,22 @@
       ]
     },
     {
+      "path": "scripts/lib/vercel-preview-access.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "scripts/node24-runtime-policy-test.mjs",
       "classification": "TEST",
       "status": "CURRENT",
@@ -552,6 +584,22 @@
     },
     {
       "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/public-production-smoke.mjs",
       "classification": "TEST",
       "status": "CURRENT",
       "reviewLane": "CORE_RUNTIME",
@@ -792,6 +840,22 @@
     },
     {
       "path": "scripts/scrimed-p34-verify-preview.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/vercel-preview-access-policy-test.mjs",
       "classification": "VERCEL",
       "status": "CURRENT",
       "reviewLane": "VERCEL",
@@ -1095,6 +1159,22 @@
       ]
     },
     {
+      "path": "docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
@@ -1370,5 +1450,5 @@
   "unexplainedFileCount": 0,
   "reviewDecision": "EXACT_REVIEW_REQUIRED",
   "productionAuthorityGranted": false,
-  "diffFingerprint": "fe18f433a532aee8bab9e8961b9b5aa8b067a41b4364c1a346c3d7f371839d82"
+  "diffFingerprint": "91e8992b27198ad60e76ca81aa95cb39e0a3f4a04e57044d4198a747daefd5ad"
 }

@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
+import { parseVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
 
 const rawArgs = process.argv.slice(2);
 const flags = new Set(rawArgs.filter((arg) => arg.startsWith("--") && !arg.includes("=")));
@@ -103,6 +104,17 @@ function normalizePreviewBaseUrl(value) {
   return parsed.origin;
 }
 
+function isVercelToolbarCspIssue(value) {
+  return value.includes("https://vercel.live/_next-live/feedback/feedback.js")
+    && /content security policy|\bcsp\b/i.test(value);
+}
+
+function isExpectedTeardownCancellation({ url, error, resourceType }, baseUrl) {
+  return error === "net::ERR_ABORTED"
+    && url.startsWith(`${baseUrl}/`)
+    && new Set(["document", "fetch"]).has(resourceType);
+}
+
 export function evaluatePreviewSnapshot(snapshot, policy) {
   const failures = [];
   const normalizedText = snapshot.text.toLowerCase();
@@ -115,6 +127,7 @@ export function evaluatePreviewSnapshot(snapshot, policy) {
   }
   if ((snapshot.consoleErrors ?? []).length > 0) failures.push(`console-error:${policy.path}`);
   if ((snapshot.pageErrors ?? []).length > 0) failures.push(`page-error:${policy.path}`);
+  if ((snapshot.resourceErrors ?? []).length > 0) failures.push(`resource-error:${policy.path}`);
   if ((snapshot.http4xx ?? []).length > 0) failures.push(`http-4xx:${policy.path}`);
   if ((snapshot.http5xx ?? []).length > 0) failures.push(`http-5xx:${policy.path}`);
   if ((snapshot.redirectCount ?? 0) > 10) failures.push(`redirect-loop:${policy.path}`);
@@ -207,6 +220,7 @@ function safeSnapshot(policy, width = 390) {
     focusIndicatorVisible: true,
     consoleErrors: [],
     pageErrors: [],
+    resourceErrors: [],
     http4xx: [],
     http5xx: [],
     redirectCount: 0
@@ -230,6 +244,23 @@ if (flags.has("--self-test")) {
   const duplicateId = safeSnapshot(routePolicy[0]);
   duplicateId.duplicateIds = ["duplicate"];
   assert.ok(evaluatePreviewSnapshot(duplicateId, routePolicy[0]).includes("duplicate-id:/"));
+  const resourceError = safeSnapshot(routePolicy[0]);
+  resourceError.resourceErrors = [{ url: "https://preview.example.test/_next/static/test.js", error: "failed" }];
+  assert.ok(evaluatePreviewSnapshot(resourceError, routePolicy[0]).includes("resource-error:/"));
+  assert.equal(
+    isVercelToolbarCspIssue(
+      "Loading https://vercel.live/_next-live/feedback/feedback.js violates Content Security Policy"
+    ),
+    true
+  );
+  assert.equal(isVercelToolbarCspIssue("https://example.test/feedback.js csp"), false);
+  assert.equal(
+    isExpectedTeardownCancellation(
+      { url: "https://preview.example.test/pilot", error: "net::ERR_ABORTED", resourceType: "fetch" },
+      "https://preview.example.test"
+    ),
+    true
+  );
   assert.deepEqual(
     evaluateReviewReadinessResponse({
       status: 200,
@@ -257,6 +288,9 @@ const baseUrl = normalizePreviewBaseUrl(
 );
 const canonicalOrigin = normalizePreviewBaseUrl(
   valueArg("canonical-origin", "https://app.scrimedsolutions.com")
+);
+const previewAccessCookie = parseVercelPreviewAccessCookie(
+  process.env.SCRIMED_PREVIEW_ACCESS_COOKIE
 );
 const outputDir = path.resolve(valueArg("output-dir", "artifacts/ui-verification"));
 await mkdir(outputDir, { recursive: true });
@@ -297,24 +331,56 @@ try {
       viewport: { width: viewport.width, height: viewport.height }
     });
     try {
+      if (previewAccessCookie) {
+        await context.addCookies([{
+          name: previewAccessCookie.name,
+          value: previewAccessCookie.value,
+          url: baseUrl,
+          httpOnly: true,
+          secure: true,
+          sameSite: "Lax"
+        }]);
+      }
       for (const policy of routePolicy) {
         const page = await context.newPage();
         const consoleErrors = [];
         const pageErrors = [];
+        const resourceErrors = [];
+        const platformWarnings = [];
+        const canceledRequests = [];
         const http4xx = [];
         const http5xx = [];
         page.on("console", (message) => {
-          if (message.type() === "error") consoleErrors.push(message.text().slice(0, 240));
+          if (message.type() !== "error") return;
+          const value = message.text().slice(0, 240);
+          if (isVercelToolbarCspIssue(value)) platformWarnings.push({ source: "console", message: value });
+          else consoleErrors.push(value);
         });
         page.on("pageerror", (error) => pageErrors.push(error.message.slice(0, 240)));
+        page.on("requestfailed", (request) => {
+          const entry = {
+            url: request.url().split("?", 1)[0],
+            error: request.failure()?.errorText?.slice(0, 240) ?? "request failed",
+            resourceType: request.resourceType()
+          };
+          if (isVercelToolbarCspIssue(`${entry.url} ${entry.error}`)) {
+            platformWarnings.push({ source: "resource", ...entry });
+          } else if (isExpectedTeardownCancellation(entry, baseUrl)) {
+            canceledRequests.push(entry);
+          } else {
+            resourceErrors.push(entry);
+          }
+        });
         page.on("response", (response) => {
           if (response.status() >= 400 && response.status() < 500) http4xx.push({ status: response.status(), url: response.url().split("?", 1)[0] });
           if (response.status() >= 500) http5xx.push({ status: response.status(), url: response.url().split("?", 1)[0] });
         });
         const response = await page.goto(`${baseUrl}${policy.path}`, {
-          waitUntil: "networkidle",
+          waitUntil: "domcontentloaded",
           timeout: 30_000
         });
+        await page.waitForSelector("main", { state: "visible", timeout: 15_000 });
+        await page.waitForTimeout(750);
         const snapshot = await page.evaluate(({ pagePath, origin, expectedCanonicalOrigin }) => ({
           path: pagePath,
           baseUrl: origin,
@@ -368,6 +434,7 @@ try {
         for (let request = response?.request().redirectedFrom(); request; request = request.redirectedFrom()) redirectCount += 1;
         snapshot.consoleErrors = consoleErrors;
         snapshot.pageErrors = pageErrors;
+        snapshot.resourceErrors = resourceErrors;
         snapshot.http4xx = http4xx;
         snapshot.http5xx = http5xx;
         snapshot.redirectCount = redirectCount;
@@ -384,7 +451,7 @@ try {
           `${viewport.name}-${policy.path === "/" ? "home" : policy.path.slice(1)}.png`
         );
         await page.screenshot({ path: screenshotPath, fullPage: true });
-        results.push({ viewport: viewport.name, path: policy.path, failures, screenshotPath, consoleErrors, pageErrors, http4xx, http5xx, redirectCount });
+        results.push({ viewport: viewport.name, path: policy.path, failures, screenshotPath, consoleErrors, pageErrors, resourceErrors, platformWarnings, canceledRequests, http4xx, http5xx, redirectCount });
         await page.close();
       }
     } finally {
@@ -394,6 +461,16 @@ try {
 
   const apiContext = await browser.newContext();
   try {
+    if (previewAccessCookie) {
+      await apiContext.addCookies([{
+        name: previewAccessCookie.name,
+        value: previewAccessCookie.value,
+        url: baseUrl,
+        httpOnly: true,
+        secure: true,
+        sameSite: "Lax"
+      }]);
+    }
     const response = await apiContext.request.get(`${baseUrl}${reviewReadinessApiPath}`);
     const contentType = response.headers()["content-type"] ?? "";
     let payload = null;

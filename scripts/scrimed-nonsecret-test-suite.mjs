@@ -133,6 +133,10 @@ const checks = [
     args: ["scripts/verify-preview-ui.mjs", "--self-test"]
   },
   {
+    label: "protected Vercel preview access policy",
+    args: ["scripts/vercel-preview-access-policy-test.mjs"]
+  },
+  {
     label: "public remediation policy tests",
     args: [
       "--disable-warning=ExperimentalWarning",

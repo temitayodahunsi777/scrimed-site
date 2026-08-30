@@ -10,6 +10,7 @@ import {
   parsePublicSmokeTimeoutMs,
   readBoundedResponseText
 } from "./lib/bounded-public-fetch.mjs";
+import { parseVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
 
 const baseUrl = normalizePublicSmokeBaseUrl(
   process.env.SCRIMED_BASE_URL,
@@ -25,6 +26,9 @@ const maxReadAttempts = parsePublicSmokeMaxAttempts(
   process.env.SCRIMED_SMOKE_MAX_ATTEMPTS
 );
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG?.trim() || "atlas-synthetic-evaluation";
+const previewAccessCookie = parseVercelPreviewAccessCookie(
+  process.env.SCRIMED_PREVIEW_ACCESS_COOKIE
+)?.header;
 if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(workspaceSlug)) {
   throw new Error("SCRIMED_WORKSPACE_SLUG must be a bounded lowercase workspace slug.");
 }
@@ -55,7 +59,9 @@ async function request(path) {
   let response;
 
   try {
-    response = await boundedPublicFetch(endpoint(path), {}, {
+    response = await boundedPublicFetch(endpoint(path), {
+      headers: previewAccessCookie ? { Cookie: previewAccessCookie } : {}
+    }, {
       timeoutMs: requestTimeoutMs,
       maxAttempts: maxReadAttempts
     });
@@ -84,6 +90,7 @@ async function postJson(path, payload, extraHeaders = {}) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(previewAccessCookie ? { Cookie: previewAccessCookie } : {}),
           ...extraHeaders
         },
         body: JSON.stringify(payload)

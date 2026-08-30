@@ -176,7 +176,7 @@ export const deploymentProfiles: DeploymentProfile[] = [
       "Patient safety review",
       "Incident response and rollback plan"
     ],
-    blockedClaims: ["clinical decision support authorized", "EHR writeback enabled", "patient treatment automation"]
+    blockedClaims: ["clinical decision support authorized", "EHR system mutation authority", "patient treatment automation"]
   },
   {
     slug: "sovereign-cloud",

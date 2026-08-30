@@ -2,20 +2,20 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files: **84**
+Files: **89**
 
 Unexplained: **0**
 
-Fingerprint: `fe18f433a532aee8bab9e8961b9b5aa8b067a41b4364c1a346c3d7f371839d82`
+Fingerprint: `91e8992b27198ad60e76ca81aa95cb39e0a3f4a04e57044d4198a747daefd5ad`
 
 | Rank | Files |
 | --- | ---: |
 | CRITICAL | 3 |
 | HIGH | 7 |
-| MEDIUM | 9 |
-| LOW | 32 |
+| MEDIUM | 10 |
+| LOW | 35 |
 | GENERATED | 12 |
-| DOCUMENTATION | 21 |
+| DOCUMENTATION | 22 |
 
 ## Ordered Files
 
@@ -34,6 +34,7 @@ Fingerprint: `fe18f433a532aee8bab9e8961b9b5aa8b067a41b4364c1a346c3d7f371839d82`
 | MEDIUM | `.gitignore` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | MEDIUM | `app/globals.css` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run smoke:public` |
 | MEDIUM | `app/investor-demo-command-room/page.tsx` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run smoke:public` |
+| MEDIUM | `app/lib/deploymentProfiles.ts` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | MEDIUM | `app/lib/productConsole.ts` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | MEDIUM | `app/product/page.tsx` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run smoke:public` |
 | MEDIUM | `app/scrimed-p34/page.tsx` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run smoke:public` |
@@ -53,8 +54,10 @@ Fingerprint: `fe18f433a532aee8bab9e8961b9b5aa8b067a41b4364c1a346c3d7f371839d82`
 | LOW | `scripts/generated-output-postflight.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/lib/p34-candidate-state.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/lib/p34-post-review-runtime-evidence.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
+| LOW | `scripts/lib/vercel-preview-access.mjs` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
 | LOW | `scripts/node24-runtime-policy-test.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/product-console-payload-budget-test.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
+| LOW | `scripts/public-production-smoke.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/release-candidate-validation.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-local-public-smoke-runner-contract-check.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-local-public-smoke-runner.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
@@ -70,6 +73,7 @@ Fingerprint: `fe18f433a532aee8bab9e8961b9b5aa8b067a41b4364c1a346c3d7f371839d82`
 | LOW | `scripts/scrimed-p34-precision-wave-contract-check.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-p34-precision-wave-policy-test.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `scripts/scrimed-p34-verify-preview.mjs` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
+| LOW | `scripts/vercel-preview-access-policy-test.mjs` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
 | LOW | `scripts/verify-node24-vercel-build.mjs` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
 | LOW | `scripts/verify-preview-ui.mjs` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
 | GENERATED | `artifacts/build/render-inventory.json` | Regenerates deterministic candidate evidence from repository sources. | `npm run contract:scrimed-p34-follow-on` |
@@ -88,6 +92,7 @@ Fingerprint: `fe18f433a532aee8bab9e8961b9b5aa8b067a41b4364c1a346c3d7f371839d82`
 | DOCUMENTATION | `docs/operators/P34_OPERATOR_COMMAND_CENTER.md` | Explains implemented behavior, retained boundaries, and operator action. | `npm run contract:scrimed-p34-follow-on` |
 | DOCUMENTATION | `docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md` | Explains implemented behavior, retained boundaries, and operator action. | `npm run contract:scrimed-p34-follow-on` |
 | DOCUMENTATION | `docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md` | Explains implemented behavior, retained boundaries, and operator action. | `npm run contract:scrimed-p34-follow-on` |
+| DOCUMENTATION | `docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
 | DOCUMENTATION | `docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md` | Strengthens bounded synthetic-pilot execution and evidence controls. | `npm run test:scrimed-p34-post-review-readiness` |
 | DOCUMENTATION | `docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md` | Explains implemented behavior, retained boundaries, and operator action. | `npm run contract:scrimed-p34-follow-on` |
 | DOCUMENTATION | `docs/release/P34_CURRENT_CANONICAL_BASELINE.md` | Explains implemented behavior, retained boundaries, and operator action. | `npm run contract:scrimed-p34-follow-on` |

@@ -30,7 +30,7 @@ external-distribution authority.
 - **Owner:** release steward
 - **Time:** 3-5 minutes after Vercel reports READY
 - **Prerequisite:** a branch preview for the exact follow-on commit, Node 24, no production alias, and the current candidate manifest.
-- **Action:** set `TARGET_URL` to the exact HTTPS `.vercel.app` deployment and run `npm run scrimed:p34:verify-preview`.
+- **Action:** set `TARGET_URL` to the exact HTTPS `.vercel.app` deployment and run `npm run scrimed:p34:verify-preview`. When Vercel Authentication protects the preview, also provide the temporary same-origin share URL as `SCRIMED_VERCEL_SHARE_URL` through the process environment. The verifier exchanges it for an in-memory cookie and never records either credential.
 - **Expected result:** build identity, health, current-environment readiness, public/API smoke, desktop UI, and 390px mobile UI pass in synthetic/no-PHI preview mode.
 - **Evidence:** `artifacts/release/p34-preview-verification.json`, the deployment ID/URL, and Vercel build metadata.
 - **Verify:** the receipt says `NONPRODUCTION_PREVIEW_ACCEPTED`; production and customer authorities remain false.
