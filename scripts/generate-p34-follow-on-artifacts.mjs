@@ -45,7 +45,7 @@ const discovery = `# p.34 Current State Discovery\n\n` +
   `| Exact candidate binding | generated post-commit in \`artifacts/release/p34-current-candidate.json\` |\n` +
   `| Upstream | ${state.upstream ? `\`${state.upstream}\`` : "not configured"} |\n` +
   `| Predecessor | PR #${p34Predecessor.pullRequestNumber}, \`${p34Predecessor.commitSha}\` |\n` +
-  `| Current PR | ${state.currentPr ? `#${state.currentPr.number}` : "not created at discovery"} |\n` +
+  `| Current PR | #40 canonical review target; exact runtime state is recorded outside tracked source |\n` +
   `| Node | ${state.runtime.node} locally; 24.x required |\n` +
   `| Vercel | current follow-on preview not yet bound at discovery |\n` +
   `| Supabase | \`${state.supabase.projectName}\`; leaked-password protection remains operator-required |\n` +

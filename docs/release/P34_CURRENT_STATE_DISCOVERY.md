@@ -8,7 +8,7 @@ Status: **CURRENT FOLLOW-ON CANDIDATE / AUTOMATED ASSURANCE IN PROGRESS**
 | Exact candidate binding | generated post-commit in `artifacts/release/p34-current-candidate.json` |
 | Upstream | `origin/agent/scrimed-p34-post-review-readiness` |
 | Predecessor | PR #39, `45be650f48e422b05160821681ff40bb9f1229c9` |
-| Current PR | not created at discovery |
+| Current PR | #40 canonical review target; exact runtime state is recorded outside tracked source |
 | Node | 24.19.0 locally; 24.x required |
 | Vercel | current follow-on preview not yet bound at discovery |
 | Supabase | `scrimed-protected-pilot`; leaked-password protection remains operator-required |
