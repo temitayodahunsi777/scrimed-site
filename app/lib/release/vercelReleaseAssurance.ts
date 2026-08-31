@@ -16,7 +16,7 @@ import { p33PortableAgentContractVersion } from "../scrimed-p33/agentPortability
 import { scrimedSafetyPolicyVersion } from "../scrimedSafetyGovernance";
 
 export const vercelReleaseAssuranceVersion =
-  "scrimed-vercel-release-assurance-v3-2026-08-25";
+  "scrimed-vercel-release-assurance-v4-2026-08-31";
 
 export const vercelReleaseAssuranceBoundary =
   "Safe operational metadata only. These endpoints expose no secret values, credentials, tenant data, PHI, deployment authorization, migration approval, customer activation, certification, or production claim.";
@@ -38,6 +38,8 @@ export type ReleaseAssuranceCheck = {
 const shaPattern = /^[0-9a-f]{40}$/i;
 const sha256Pattern = /^[0-9a-f]{64}$/i;
 const branchPattern = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/;
+const deploymentIdPattern = /^dpl_[A-Za-z0-9]{12,80}$/;
+const vercelDeploymentHostnamePattern = /^(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+vercel\.app$/;
 
 function stableSerialize(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
@@ -80,6 +82,16 @@ function publicCandidateFingerprint(env: NodeJS.ProcessEnv) {
   return value && sha256Pattern.test(value) ? value.toLowerCase() : null;
 }
 
+function publicDeploymentId(env: NodeJS.ProcessEnv) {
+  const value = env.VERCEL_DEPLOYMENT_ID?.trim();
+  return value && deploymentIdPattern.test(value) ? value : null;
+}
+
+function publicDeploymentUrl(env: NodeJS.ProcessEnv) {
+  const value = env.VERCEL_URL?.trim().toLowerCase();
+  return value && vercelDeploymentHostnamePattern.test(value) ? `https://${value}` : null;
+}
+
 export function getScrimedBuildInfo(
   env: NodeJS.ProcessEnv = process.env,
   runtimeVersion = process.versions.node
@@ -88,6 +100,8 @@ export function getScrimedBuildInfo(
   const commit = publicCommitSha(env);
   const branch = publicBranch(env);
   const candidateFingerprint = publicCandidateFingerprint(env);
+  const deploymentId = publicDeploymentId(env);
+  const deploymentUrl = publicDeploymentUrl(env);
   const base = {
     service: "scrimed-build-info" as const,
     version: vercelReleaseAssuranceVersion,
@@ -100,6 +114,9 @@ export function getScrimedBuildInfo(
     commit,
     commitSha: commit,
     branch,
+    deploymentId,
+    deploymentUrl,
+    deploymentIdentityBound: Boolean(deploymentId && deploymentUrl),
     candidateFingerprint,
     candidateFingerprintDeclared: Boolean(candidateFingerprint),
     candidateFingerprintBound: false as const,

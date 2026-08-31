@@ -25,7 +25,7 @@
     "CONFIGURATION",
     "UNEXPECTED"
   ],
-  "fileCount": 111,
+  "fileCount": 112,
   "classificationCounts": {
     "AAL2": 2,
     "COMMERCIAL": 1,
@@ -38,7 +38,7 @@
     "SECURITY": 1,
     "TEST": 29,
     "UI": 6,
-    "VERCEL": 6
+    "VERCEL": 7
   },
   "unexplainedFileCount": 0,
   "files": [
@@ -114,6 +114,11 @@
     },
     {
       "path": "app/lib/release/previewAcceptance.ts",
+      "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/release/vercelReleaseAssurance.ts",
       "classification": "VERCEL",
       "status": "CURRENT"
     },
@@ -602,5 +607,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "2dd2bf467e056e11dbc45b2825b06aedce8779606c8e3eb68a83167c99bb8e08"
+  "mapFingerprint": "7b9f1e1e768e8271d9273b1af8aa960db939ffb50f3baf4e3611299944c58cac"
 }

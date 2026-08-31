@@ -60,6 +60,23 @@ export function requireP34ExactPreviewBinding(targetUrl, preview) {
   return { targetUrl: normalizedTarget, deploymentId: preview.deploymentId };
 }
 
+export function requireP34RuntimeDeploymentBinding(buildInfo, previewBinding) {
+  if (!buildInfo || typeof buildInfo !== "object" || Array.isArray(buildInfo)) {
+    throw new Error("Exact preview verification requires runtime deployment metadata.");
+  }
+  if (buildInfo.deploymentIdentityBound !== true) {
+    throw new Error("Runtime deployment identity is not bound.");
+  }
+  if (buildInfo.deploymentId !== previewBinding.deploymentId) {
+    throw new Error("Runtime deployment ID does not match the manifest preview deployment ID.");
+  }
+  const runtimeOrigin = normalizeVercelPreviewOrigin(buildInfo.deploymentUrl);
+  if (runtimeOrigin !== previewBinding.targetUrl) {
+    throw new Error("Runtime deployment URL does not match the manifest preview URL.");
+  }
+  return { deploymentId: buildInfo.deploymentId, deploymentUrl: runtimeOrigin };
+}
+
 export function evaluateP34CertificationCompletion({ checks, expectedCheckCount, initialState, finalState }) {
   const sourceStable = initialState.sourceFingerprint === finalState.sourceFingerprint;
   const cleanCandidate = initialState.dirty === false

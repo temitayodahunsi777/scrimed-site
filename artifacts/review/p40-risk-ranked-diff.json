@@ -12,12 +12,12 @@
     "GENERATED",
     "DOCUMENTATION"
   ],
-  "fileCount": 111,
+  "fileCount": 112,
   "riskCounts": {
     "CRITICAL": 3,
     "HIGH": 7,
     "MEDIUM": 13,
-    "LOW": 39,
+    "LOW": 40,
     "GENERATED": 15,
     "DOCUMENTATION": 34
   },
@@ -448,6 +448,22 @@
       "relevantTests": [
         "npm run test:scrimed-p34-post-review-readiness",
         "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/vercelReleaseAssurance.ts",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
       ],
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
@@ -1802,5 +1818,5 @@
   "unexplainedFileCount": 0,
   "reviewDecision": "EXACT_REVIEW_REQUIRED",
   "productionAuthorityGranted": false,
-  "diffFingerprint": "0abc097747db341e382d7fdd7ecbba15acfe5933f18ca38adb2be14771d13acb"
+  "diffFingerprint": "b1aa1798a83c85865aba6b0d2b7315f37c37608ae0446e5c69eb845d2b1d2969"
 }

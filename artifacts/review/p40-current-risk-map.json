@@ -4,12 +4,12 @@
   "pullRequestNumber": 40,
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
   "sourceArtifact": "artifacts/review/p40-risk-ranked-diff.json",
-  "sourceFingerprint": "0abc097747db341e382d7fdd7ecbba15acfe5933f18ca38adb2be14771d13acb",
+  "sourceFingerprint": "b1aa1798a83c85865aba6b0d2b7315f37c37608ae0446e5c69eb845d2b1d2969",
   "riskCounts": {
     "CRITICAL": 3,
     "HIGH": 7,
     "MEDIUM": 13,
-    "LOW": 39,
+    "LOW": 40,
     "GENERATED": 15,
     "DOCUMENTATION": 34
   },
@@ -149,5 +149,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "riskMapFingerprint": "a54bd67e6a029c1c1e2f8db8a3b7bb4abd7b2ffd1bf4c00550e973a10051246e"
+  "riskMapFingerprint": "3f58a8614f5288ad0fa40f3e020b5d680c86ea457238530322fd781cd7ee3fa3"
 }

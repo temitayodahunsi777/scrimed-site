@@ -5,14 +5,14 @@
   "branch": "agent/scrimed-p34-post-review-readiness",
   "machineRepairBaseCommit": "d074658b65399d91124f2a1b737e82ef50f69095",
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
-  "fileCount": 111,
+  "fileCount": 112,
   "reviewLaneCounts": {
     "CORE_RUNTIME": 33,
     "PILOT_OS": 4,
     "COMMERCIAL": 13,
     "SECURITY": 1,
     "GOVERNANCE": 49,
-    "VERCEL": 7,
+    "VERCEL": 8,
     "SUPABASE": 2,
     "AAL2": 2
   },
@@ -104,6 +104,12 @@
     },
     {
       "path": "app/lib/release/previewAcceptance.ts",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL"
+    },
+    {
+      "path": "app/lib/release/vercelReleaseAssurance.ts",
       "classification": "VERCEL",
       "status": "CURRENT",
       "reviewLane": "VERCEL"
@@ -689,5 +695,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "47739e5d97feb2aba90830e029a03fa717e087ba0ed8f30cd72beeaada2755ac"
+  "mapFingerprint": "4d5f3e3f3441517428a087762382b1909961f940755c05ac18c23f0e2f76d1a8"
 }

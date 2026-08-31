@@ -67,6 +67,52 @@ export function bindVercelPreviewAccessCookie({ cookie, accessOrigin, requestOri
   return { ...parsed, origin: boundOrigin };
 }
 
+export async function resolveVercelPreviewAccess({
+  shareUrl,
+  inheritedCookie,
+  inheritedAccessOrigin,
+  expectedOrigin,
+  fetchImplementation = globalThis.fetch,
+  timeoutMs = 20_000
+}) {
+  const hasShareUrl = typeof shareUrl === "string" && shareUrl.length > 0;
+  const hasInheritedCookie = typeof inheritedCookie === "string" && inheritedCookie.length > 0;
+  if (hasShareUrl && hasInheritedCookie) {
+    throw new Error("Vercel preview access must use either a share URL or a bound inherited cookie, not both.");
+  }
+  if (hasShareUrl) {
+    const origin = normalizeVercelPreviewOrigin(expectedOrigin);
+    const cookie = await obtainVercelPreviewAccessCookie({
+      shareUrl,
+      expectedOrigin: origin,
+      fetchImplementation,
+      timeoutMs
+    });
+    return cookie ? { cookie, origin, source: "share-exchange" } : null;
+  }
+  if (hasInheritedCookie) {
+    const bound = bindVercelPreviewAccessCookie({
+      cookie: inheritedCookie,
+      accessOrigin: inheritedAccessOrigin,
+      requestOrigin: expectedOrigin
+    });
+    return bound ? { cookie: bound.header, origin: bound.origin, source: "inherited-bound-cookie" } : null;
+  }
+  return null;
+}
+
+export function applyVercelPreviewAccessToEnvironment(environment, access) {
+  const next = { ...environment };
+  delete next.SCRIMED_PREVIEW_ACCESS_COOKIE;
+  delete next.SCRIMED_PREVIEW_ACCESS_ORIGIN;
+  delete next.SCRIMED_VERCEL_SHARE_URL;
+  if (access) {
+    next.SCRIMED_PREVIEW_ACCESS_COOKIE = access.cookie;
+    next.SCRIMED_PREVIEW_ACCESS_ORIGIN = access.origin;
+  }
+  return next;
+}
+
 function extractVercelJwt(headers) {
   const values = typeof headers.getSetCookie === "function"
     ? headers.getSetCookie()

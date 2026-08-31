@@ -2,18 +2,18 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files: **111**
+Files: **112**
 
 Unexplained: **0**
 
-Fingerprint: `0abc097747db341e382d7fdd7ecbba15acfe5933f18ca38adb2be14771d13acb`
+Fingerprint: `b1aa1798a83c85865aba6b0d2b7315f37c37608ae0446e5c69eb845d2b1d2969`
 
 | Rank | Files |
 | --- | ---: |
 | CRITICAL | 3 |
 | HIGH | 7 |
 | MEDIUM | 13 |
-| LOW | 39 |
+| LOW | 40 |
 | GENERATED | 15 |
 | DOCUMENTATION | 34 |
 
@@ -48,6 +48,7 @@ Fingerprint: `0abc097747db341e382d7fdd7ecbba15acfe5933f18ca38adb2be14771d13acb`
 | LOW | `app/lib/commercial/syntheticPilotReadiness.ts` | Strengthens nonbinding economics, proposal, and buyer-readiness controls. | `npm run test:scrimed-p34-post-review-readiness` |
 | LOW | `app/lib/commercialStrategy.ts` | Strengthens nonbinding economics, proposal, and buyer-readiness controls. | `npm run test:scrimed-p34-post-review-readiness` |
 | LOW | `app/lib/pilotDemoCommercialReadiness.ts` | Strengthens nonbinding economics, proposal, and buyer-readiness controls. | `npm run test:scrimed-p34-post-review-readiness` |
+| LOW | `app/lib/release/vercelReleaseAssurance.ts` | Binds nonproduction preview behavior and observability to the exact candidate. | `npm run smoke:public` |
 | LOW | `app/lib/scrimed-p34/exactHeadBaseline.ts` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |
 | LOW | `app/synthetic-pilot/page.tsx` | Strengthens bounded synthetic-pilot execution and evidence controls. | `npm run test:scrimed-p34-post-review-readiness` |
 | LOW | `scripts/build-with-p34-inventory.mjs` | Integrates the p.34 conversion wave into the existing runtime and test surface. | `npm run contract:scrimed-p34-follow-on` |

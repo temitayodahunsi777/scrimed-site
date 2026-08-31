@@ -2,11 +2,11 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files explained: **111/111**
+Files explained: **112/112**
 
 Unexplained: **0**
 
-Map SHA-256: `47739e5d97feb2aba90830e029a03fa717e087ba0ed8f30cd72beeaada2755ac`
+Map SHA-256: `4d5f3e3f3441517428a087762382b1909961f940755c05ac18c23f0e2f76d1a8`
 
 | Review lane | Files |
 | --- | ---: |
@@ -15,7 +15,7 @@ Map SHA-256: `47739e5d97feb2aba90830e029a03fa717e087ba0ed8f30cd72beeaada2755ac`
 | COMMERCIAL | 13 |
 | SECURITY | 1 |
 | GOVERNANCE | 49 |
-| VERCEL | 7 |
+| VERCEL | 8 |
 | SUPABASE | 2 |
 | AAL2 | 2 |
 

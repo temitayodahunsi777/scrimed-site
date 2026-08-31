@@ -14,6 +14,7 @@ const paths = [
   "app/lib/scrimed-p34/exactHeadReviewState.ts",
   "app/lib/scrimed-p34/reviewReadiness.ts",
   "app/lib/release/previewAcceptance.ts",
+  "app/lib/release/vercelReleaseAssurance.ts",
   "app/lib/productConsole.ts",
   "scripts/lib/p34-candidate-state.mjs",
   "scripts/lib/vercel-preview-access.mjs",
@@ -88,11 +89,19 @@ for (const control of ["STOP_SAFELY", "maxModelCalls", "maxToolCalls", "maxAgent
 }
 assert.ok(files["app/lib/productConsole.ts"].includes("p34CurrentCandidatePosture"));
 assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("requireP34ExactPreviewBinding"));
+assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("requireP34RuntimeDeploymentBinding"));
 assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("normalizeVercelPreviewOrigin"));
 assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("vercelPreviewHostnamePattern"));
 assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("bindVercelPreviewAccessCookie"));
+assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("resolveVercelPreviewAccess"));
+assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("applyVercelPreviewAccessToEnvironment"));
 assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("requireP34ExactPreviewBinding"));
-assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("SCRIMED_PREVIEW_ACCESS_ORIGIN"));
+assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("requireP34RuntimeDeploymentBinding"));
+assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("applyVercelPreviewAccessToEnvironment"));
+assert.equal(files["scripts/scrimed-p34-verify-preview.mjs"].includes("SCRIMED_PREVIEW_ACCESS_ORIGIN: targetUrl"), false);
+assert.ok(files["app/lib/release/vercelReleaseAssurance.ts"].includes("VERCEL_DEPLOYMENT_ID"));
+assert.ok(files["app/lib/release/vercelReleaseAssurance.ts"].includes("VERCEL_URL"));
+assert.ok(files["app/lib/release/vercelReleaseAssurance.ts"].includes("deploymentIdentityBound"));
 assert.ok(files["scripts/scrimed-p34-certify.mjs"].includes("cleanCandidate"));
 assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("productionAliasAttached: false"));
 assert.equal(files["scripts/scrimed-p34-certify.mjs"].includes("git push"), false);

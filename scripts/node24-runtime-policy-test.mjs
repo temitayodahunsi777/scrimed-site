@@ -50,6 +50,8 @@ const previewBuildInfo = getScrimedBuildInfo(
     ...safeEnv,
     VERCEL_ENV: "preview",
     VERCEL_GIT_COMMIT_SHA: "a".repeat(40),
+    VERCEL_DEPLOYMENT_ID: "dpl_P34Runtime123456",
+    VERCEL_URL: "scrimed-p34-runtime.vercel.app",
     SCRIMED_PREVIEW_CANDIDATE_SHA256: "b".repeat(64),
     VERCEL_PROJECT_PRODUCTION_URL: "app.scrimedsolutions.com"
   },
@@ -58,6 +60,10 @@ const previewBuildInfo = getScrimedBuildInfo(
 assert.equal(previewBuildInfo.candidateFingerprintDeclared, true);
 assert.equal(previewBuildInfo.candidateFingerprintBound, false);
 assert.equal(previewBuildInfo.candidateFingerprintVerificationStatus, "DECLARED_UNVERIFIED");
+assert.equal(previewBuildInfo.deploymentId, "dpl_P34Runtime123456");
+assert.equal(previewBuildInfo.deploymentUrl, "https://scrimed-p34-runtime.vercel.app");
+assert.equal(previewBuildInfo.deploymentIdentityBound, true);
+assert.equal(getScrimedBuildInfo({ ...safeEnv, VERCEL_DEPLOYMENT_ID: "invalid", VERCEL_URL: "attacker.example" }, "24.0.0").deploymentIdentityBound, false);
 assert.deepEqual(getProductRuntimePresentation(previewBuildInfo), {
   runtimeCompatibilityLabel: "verified in preview",
   vercelBuildStatus: "preview active"

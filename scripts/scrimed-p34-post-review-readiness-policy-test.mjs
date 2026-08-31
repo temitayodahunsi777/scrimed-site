@@ -35,7 +35,8 @@ import { getP34ReviewReadinessSummary } from "../app/lib/scrimed-p34/reviewReadi
 import { createRedactedAal2Evidence } from "./lib/aal2-redacted-evidence.mjs";
 import {
   evaluateP34CertificationCompletion,
-  requireP34ExactPreviewBinding
+  requireP34ExactPreviewBinding,
+  requireP34RuntimeDeploymentBinding
 } from "./lib/p34-candidate-state.mjs";
 
 let passed = 0;
@@ -457,13 +458,37 @@ check("exact-preview-verification-requires-the-manifest-deployment", () => {
     url: "https://scrimed-p34-preview.vercel.app",
     productionAliasAttached: false
   };
+  const binding = requireP34ExactPreviewBinding("https://scrimed-p34-preview.vercel.app", preview);
   assert.deepEqual(
-    requireP34ExactPreviewBinding("https://scrimed-p34-preview.vercel.app", preview),
+    binding,
     { targetUrl: "https://scrimed-p34-preview.vercel.app", deploymentId: preview.deploymentId }
   );
+  assert.deepEqual(requireP34RuntimeDeploymentBinding({
+    deploymentIdentityBound: true,
+    deploymentId: preview.deploymentId,
+    deploymentUrl: preview.url
+  }, binding), {
+    deploymentId: preview.deploymentId,
+    deploymentUrl: preview.url
+  });
   assert.throws(() => requireP34ExactPreviewBinding("https://other-preview.vercel.app", preview));
   assert.throws(() => requireP34ExactPreviewBinding(preview.url, null));
   assert.throws(() => requireP34ExactPreviewBinding(preview.url, { ...preview, deploymentId: null }));
+  assert.throws(() => requireP34RuntimeDeploymentBinding({
+    deploymentIdentityBound: true,
+    deploymentId: "dpl_OtherRuntime12345",
+    deploymentUrl: preview.url
+  }, binding));
+  assert.throws(() => requireP34RuntimeDeploymentBinding({
+    deploymentIdentityBound: true,
+    deploymentId: preview.deploymentId,
+    deploymentUrl: "https://mutable-alias.vercel.app"
+  }, binding));
+  assert.throws(() => requireP34RuntimeDeploymentBinding({
+    deploymentIdentityBound: false,
+    deploymentId: preview.deploymentId,
+    deploymentUrl: preview.url
+  }, binding));
 });
 
 check("certification-requires-clean-initial-and-final-worktrees", () => {

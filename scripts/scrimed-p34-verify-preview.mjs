@@ -5,9 +5,13 @@ import { spawnSync } from "node:child_process";
 import {
   p34RuntimeEvidencePath,
   requireP34ExactPreviewBinding,
+  requireP34RuntimeDeploymentBinding,
   sha256
 } from "./lib/p34-candidate-state.mjs";
-import { obtainVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
+import {
+  applyVercelPreviewAccessToEnvironment,
+  resolveVercelPreviewAccess
+} from "./lib/vercel-preview-access.mjs";
 
 function run(id, script, args, env) {
   const startedAt = Date.now();
@@ -36,10 +40,13 @@ const previewBinding = requireP34ExactPreviewBinding(
   manifest.preview
 );
 const targetUrl = previewBinding.targetUrl;
-const previewAccessCookie = await obtainVercelPreviewAccessCookie({
+const previewAccess = await resolveVercelPreviewAccess({
   shareUrl: process.env.SCRIMED_VERCEL_SHARE_URL,
+  inheritedCookie: process.env.SCRIMED_PREVIEW_ACCESS_COOKIE,
+  inheritedAccessOrigin: process.env.SCRIMED_PREVIEW_ACCESS_ORIGIN,
   expectedOrigin: targetUrl
 });
+const previewAccessCookie = previewAccess?.cookie ?? null;
 const buildStartedAt = Date.now();
 const buildResponse = await fetch(`${targetUrl}/api/build-info`, {
   redirect: "error",
@@ -62,15 +69,13 @@ if (buildInfo.commitSha !== manifest.commit) {
 }
 if (buildInfo.environment !== "preview") throw new Error(`Expected Vercel preview environment, received ${buildInfo.environment}.`);
 if (buildInfo.nodeMajor !== 24) throw new Error(`Expected Node 24 preview, received ${buildInfo.nodeMajor}.`);
+const runtimeDeployment = requireP34RuntimeDeploymentBinding(buildInfo, previewBinding);
 
-const env = {
+const env = applyVercelPreviewAccessToEnvironment({
   ...process.env,
   SCRIMED_BASE_URL: targetUrl,
-  SCRIMED_PREVIEW_BASE_URL: targetUrl,
-  SCRIMED_PREVIEW_ACCESS_ORIGIN: targetUrl,
-  ...(previewAccessCookie ? { SCRIMED_PREVIEW_ACCESS_COOKIE: previewAccessCookie } : {})
-};
-delete env.SCRIMED_VERCEL_SHARE_URL;
+  SCRIMED_PREVIEW_BASE_URL: targetUrl
+}, previewAccess);
 const checks = [
   run("public-smoke", "scripts/public-production-smoke.mjs", [], env),
   run("desktop-mobile-browser", "scripts/verify-preview-ui.mjs", [
@@ -82,7 +87,7 @@ const checks = [
 ];
 const passed = checks.every((check) => check.passed);
 const reportBase = {
-  schemaVersion: "scrimed-p34-exact-preview-verification-v1",
+  schemaVersion: "scrimed-p34-exact-preview-verification-v2",
   status: passed ? "EXACT_NONPRODUCTION_PREVIEW_VERIFIED_ACCEPTANCE_REQUIRED" : "PREVIEW_VERIFICATION_FAILED_CLOSED",
   targetUrl,
   commit: manifest.commit,
@@ -90,6 +95,8 @@ const reportBase = {
   candidateFingerprint: manifest.candidateFingerprint,
   sourceFingerprint: manifest.sourceFingerprint,
   deploymentCommit: buildInfo.commitSha,
+  deploymentId: runtimeDeployment.deploymentId,
+  deploymentUrl: runtimeDeployment.deploymentUrl,
   runtime: buildInfo.runtime,
   nodeMajor: buildInfo.nodeMajor,
   environment: buildInfo.environment,
@@ -105,12 +112,13 @@ const report = { ...reportBase, previewFingerprint: sha256(reportBase) };
 await mkdir("artifacts/release", { recursive: true });
 await writeFile("artifacts/release/p34-preview-verification.json", `${JSON.stringify(report, null, 2)}\n`, "utf8");
 const observabilityBase = {
-  schemaVersion: "scrimed-p40-preview-observability-v1",
+  schemaVersion: "scrimed-p40-preview-observability-v2",
   status: passed
     ? "AUTOMATED_OBSERVABILITY_COMPLETE_RELEASE_STEWARD_ACCEPTANCE_REQUIRED"
     : "PREVIEW_OBSERVABILITY_FAILED_CLOSED",
   targetUrl,
-  deploymentId: previewBinding.deploymentId,
+  deploymentId: runtimeDeployment.deploymentId,
+  deploymentUrl: runtimeDeployment.deploymentUrl,
   commit: manifest.commit,
   tree: manifest.tree,
   candidateFingerprint: manifest.candidateFingerprint,

@@ -2,10 +2,12 @@
 
 import assert from "node:assert/strict";
 import {
+  applyVercelPreviewAccessToEnvironment,
   bindVercelPreviewAccessCookie,
   obtainVercelPreviewAccessCookie,
   parseVercelPreviewAccessCookie,
-  parseVercelPreviewShareUrl
+  parseVercelPreviewShareUrl,
+  resolveVercelPreviewAccess
 } from "./lib/vercel-preview-access.mjs";
 
 const origin = "https://scrimed-p34-preview.vercel.app";
@@ -54,6 +56,44 @@ assert.equal(bindVercelPreviewAccessCookie({
   accessOrigin: undefined,
   requestOrigin: "http://127.0.0.1:3044"
 }), null);
+
+const inheritedAccess = await resolveVercelPreviewAccess({
+  inheritedCookie: `_vercel_jwt=${jwt}`,
+  inheritedAccessOrigin: origin,
+  expectedOrigin: origin
+});
+assert.deepEqual(inheritedAccess, {
+  cookie: `_vercel_jwt=${jwt}`,
+  origin,
+  source: "inherited-bound-cookie"
+});
+await assert.rejects(resolveVercelPreviewAccess({
+  inheritedCookie: `_vercel_jwt=${jwt}`,
+  inheritedAccessOrigin: "https://other-preview.vercel.app",
+  expectedOrigin: origin
+}), /does not match/);
+await assert.rejects(resolveVercelPreviewAccess({
+  shareUrl,
+  inheritedCookie: `_vercel_jwt=${jwt}`,
+  inheritedAccessOrigin: origin,
+  expectedOrigin: origin
+}), /either a share URL or a bound inherited cookie/);
+assert.deepEqual(applyVercelPreviewAccessToEnvironment({
+  SCRIMED_PREVIEW_ACCESS_COOKIE: "stale-cookie",
+  SCRIMED_PREVIEW_ACCESS_ORIGIN: "https://stale-preview.vercel.app",
+  SCRIMED_VERCEL_SHARE_URL: "redacted-share-url",
+  SAFE_MARKER: "preserved"
+}, inheritedAccess), {
+  SCRIMED_PREVIEW_ACCESS_COOKIE: `_vercel_jwt=${jwt}`,
+  SCRIMED_PREVIEW_ACCESS_ORIGIN: origin,
+  SAFE_MARKER: "preserved"
+});
+assert.deepEqual(applyVercelPreviewAccessToEnvironment({
+  SCRIMED_PREVIEW_ACCESS_COOKIE: "stale-cookie",
+  SCRIMED_PREVIEW_ACCESS_ORIGIN: "https://stale-preview.vercel.app",
+  SCRIMED_VERCEL_SHARE_URL: "redacted-share-url",
+  SAFE_MARKER: "preserved"
+}, null), { SAFE_MARKER: "preserved" });
 
 const cookie = await obtainVercelPreviewAccessCookie({
   shareUrl,
