@@ -5,6 +5,15 @@ predecessor evidence; they cannot approve or accept the current candidate. None 
 grants merge, migration, production, PHI, clinical, payer, EHR/device, customer, contract, or
 external-distribution authority.
 
+## Remaining Human Actions
+
+1. Independent review of PR #39 exact head.
+2. Independent review of PR #40 exact head.
+3. Fresh candidate-bound AAL2 verification.
+4. Enable Supabase leaked-password protection and refresh Security Advisor.
+5. Release-steward acceptance of the exact nonproduction preview.
+6. Later, separate merge, protected-pilot, migration, production, customer, and distribution decisions.
+
 ## Machine Evidence and Certification
 
 - **Owner:** release steward
@@ -15,14 +24,19 @@ external-distribution authority.
 - **Verify:** candidate, commit, tree, source, validation, review packet, gate packet, SBOM, route inventory, and generation inventory agree. Certification from any other candidate is marked stale.
 - **Recovery:** fix the failed check, regenerate tracked artifacts, recommit if source changed, and rerun. Never edit evidence fingerprints manually.
 
-## Independent Exact-Head Review
+## Independent PR #39 Predecessor Review
 
 - **Owner:** independent technical reviewer
-- **Time:** 10-15 minutes
-- **Prerequisite:** the new follow-on PR URL, exact candidate manifest, review brief, integration map, validation packet, gate packet, and SBOM all bind one source tree.
-- **Action:** open the new follow-on PR, not PR #39; confirm its head equals the manifest commit; review `docs/review/P34_REVIEW_BRIEF.md`; inspect checks; submit an attributable GitHub review against that exact head.
-- **Expected result:** a trusted external review receipt matching PR, commit, tree, candidate, source, validation, review packet, gate packet, SBOM, and preview when applicable.
-- **Verify:** `APPROVED_EXACT_HEAD` is possible only after the receipt signature and single-use approval are verified. An issue comment, author self-review, environment flag, or predecessor review cannot satisfy this gate.
+- **Time:** 5 minutes for the packet, then substantive review time chosen by the reviewer.
+- **Action:** open PR #39, verify head `45be650f48e422b05160821681ff40bb9f1229c9`, inspect its passing checks and `docs/review/P39_WHOLE_PR_INTEGRATION_SCOPE.md`, then submit an attributable GitHub review.
+- **Verify:** the review binds PR #39 and its exact head. It cannot approve PR #40, merge, migration, or production.
+
+## Independent PR #40 Delta Review
+
+- **Owner:** independent technical reviewer
+- **Time:** 10 minutes for the focused packet, plus any investigation.
+- **Action:** open PR #40, verify its head equals `artifacts/release/scrimed-p34-release-manifest.json`, read `docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md`, inspect CRITICAL/HIGH entries in `artifacts/review/p40-current-risk-map.json`, and submit an attributable GitHub review.
+- **Verify:** the decision binds PR #40, commit, tree, candidate, source, validation, review packet, gate packet, SBOM, and preview. An author self-review, issue comment, or Codex review cannot satisfy the human gate.
 - **Recovery:** any source-head change makes the review stale; repeat against the new exact head.
 
 ## Exact Vercel Preview and Acceptance
@@ -41,7 +55,7 @@ external-distribution authority.
 - **Owner:** authorized preview operator
 - **Time:** 2-5 minutes
 - **Prerequisite:** fresh AAL2 token, exact accepted preview origin, and exact clean candidate.
-- **Action:** set `AAL2_TEST_TOKEN`, `TARGET_URL`, and `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` in a secure shell; run `npm run verify:aal2:candidate:evidence`; unset the token immediately afterward.
+- **Action:** set `AAL2_TEST_TOKEN`, `TARGET_URL`, and `SCRIMED_AAL2_ALLOWED_PREVIEW_ORIGINS` in a secure shell; run `npm run scrimed:p34:aal2`; unset the token immediately afterward.
 - **Expected result:** issuer/audience, candidate/preview binding, MFA/AAL2, fresh step-up, privileged route, replay rejection, and expiry checks pass.
 - **Evidence:** redacted `artifacts/security/p40-aal2.json`; bearer credentials are never persisted.
 - **Verify:** candidate and target match the exact preview manifest.

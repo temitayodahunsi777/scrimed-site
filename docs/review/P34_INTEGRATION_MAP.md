@@ -2,24 +2,25 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-Files explained: **89/89**
+Files explained: **111/111**
 
 Unexplained: **0**
 
-Map SHA-256: `1b40c672e5dd0ad5deb5f5a36a5eb44f8e2fb98fb328cfee924b34087550a96a`
+Map SHA-256: `2dd2bf467e056e11dbc45b2825b06aedce8779606c8e3eb68a83167c99bb8e08`
 
 | Classification | Files |
 | --- | ---: |
 | AAL2 | 2 |
+| COMMERCIAL | 1 |
 | CONFIGURATION | 3 |
-| CORE_RUNTIME | 2 |
-| DOCUMENTATION | 22 |
-| GENERATED_EVIDENCE | 12 |
+| CORE_RUNTIME | 4 |
+| DOCUMENTATION | 34 |
+| GENERATED_EVIDENCE | 15 |
 | GOVERNANCE | 3 |
-| PILOT | 6 |
+| PILOT | 7 |
 | SECURITY | 1 |
-| TEST | 27 |
-| UI | 5 |
+| TEST | 29 |
+| UI | 6 |
 | VERCEL | 6 |
 
 The machine-readable path-by-path inventory is `artifacts/review/p34-integration-map.json`. Review evidence must bind the exact runtime candidate manifest; this map grants no approval.

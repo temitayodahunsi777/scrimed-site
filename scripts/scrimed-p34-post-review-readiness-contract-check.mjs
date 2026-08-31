@@ -25,6 +25,8 @@ const files = {
   pilotPage: await readFile("app/synthetic-pilot/page.tsx", "utf8"),
   aal2: await readFile("scripts/run-aal2-candidate-verification.mjs", "utf8"),
   generator: await readFile("scripts/generate-p34-post-review-artifacts.mjs", "utf8"),
+  followOnGenerator: await readFile("scripts/generate-p34-follow-on-artifacts.mjs", "utf8"),
+  candidateState: await readFile("scripts/lib/p34-candidate-state.mjs", "utf8"),
   baselineDoc: await readFile("docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md", "utf8"),
   reviewBrief: await readFile("docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md", "utf8"),
   fullMap: JSON.parse(await readFile("artifacts/review/p39-full-integration-map.json", "utf8")),
@@ -32,6 +34,14 @@ const files = {
   supabase: await readFile("docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md", "utf8"),
   docs: await readFile("docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md", "utf8")
 };
+files.currentExecutiveState = await readFile("docs/release/P34_CURRENT_EXECUTIVE_STATE.md", "utf8");
+files.stackedReviewDoc = await readFile("docs/review/P34_STACKED_REVIEW_PLAN.md", "utf8");
+files.currentHeadReviewBrief = await readFile("docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md", "utf8");
+files.cumulativeAssuranceDoc = await readFile("docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md", "utf8");
+files.stackedReview = JSON.parse(await readFile("artifacts/review/p34-stacked-review-plan.json", "utf8"));
+files.currentRiskMap = JSON.parse(await readFile("artifacts/review/p40-current-risk-map.json", "utf8"));
+files.cumulativeAssurance = JSON.parse(await readFile("artifacts/review/p34-cumulative-integration-assurance.json", "utf8"));
+files.p40RiskDiff = JSON.parse(await readFile("artifacts/review/p40-risk-ranked-diff.json", "utf8"));
 files.aal2Evidence = createPendingP34Aal2Evidence(files.reviewIndex.exactReviewTarget);
 files.observability = createPendingP34PreviewObservability(files.reviewIndex.exactReviewTarget);
 
@@ -65,6 +75,53 @@ await check("review-index-compresses-complete-map", async () => {
   assert.equal(files.reviewIndex.targetReviewMinutes.maximum, 15);
   assert.equal(files.reviewIndex.integrationMapHash, files.fullMap.mapHash);
   assert.ok(files.reviewBrief.includes("65-file precision wave"));
+});
+
+await check("stacked-review-model-keeps-predecessor-delta-and-integration-distinct", async () => {
+  assert.deepEqual(
+    files.stackedReview.reviewOrder,
+    ["LANE_A_PREDECESSOR", "LANE_B_DELTA", "LANE_C_INTEGRATION_ASSURANCE"]
+  );
+  assert.equal(files.stackedReview.lanes[0].pullRequestNumber, 39);
+  assert.equal(files.stackedReview.lanes[0].headCommit, "45be650f48e422b05160821681ff40bb9f1229c9");
+  assert.equal(files.stackedReview.lanes[1].pullRequestNumber, 40);
+  assert.equal(files.stackedReview.lanes[2].humanApprovalSubstitutionAllowed, false);
+  assert.equal(files.stackedReview.humanApprovalPresent, false);
+  assert.equal(files.stackedReview.mergeAuthorityGranted, false);
+  assert.equal(files.stackedReview.productionAuthorityGranted, false);
+  assert.ok(files.stackedReviewDoc.includes("PR #40 approval alone cannot establish assurance"));
+});
+
+await check("cumulative-assurance-covers-main-to-final-without-fabricating-approval", async () => {
+  assert.equal(files.cumulativeAssurance.baseCommit, "fd2a4d09174726e5ba685673fe1f0df25f2ad308");
+  assert.equal(files.cumulativeAssurance.unexplainedFileCount, 0);
+  assert.equal(files.cumulativeAssurance.files.length, files.cumulativeAssurance.cumulativeFileCount);
+  assert.equal(files.cumulativeAssurance.automatedEvidenceIsHumanApproval, false);
+  assert.equal(files.cumulativeAssurance.humanApprovalPresent, false);
+  assert.equal(files.cumulativeAssurance.finalHeadBinding, "artifacts/release/scrimed-p34-release-manifest.json");
+  assert.ok(files.cumulativeAssuranceDoc.includes("automated assurance evidence"));
+});
+
+await check("current-risk-map-reuses-one-risk-source-of-truth", async () => {
+  assert.equal(files.currentRiskMap.sourceArtifact, "artifacts/review/p40-risk-ranked-diff.json");
+  assert.equal(files.currentRiskMap.sourceFingerprint, files.p40RiskDiff.diffFingerprint);
+  assert.ok(files.currentRiskMap.criticalAndHighFiles.length > 0);
+  assert.ok(files.currentRiskMap.criticalAndHighFiles.every((entry) => ["CRITICAL", "HIGH"].includes(entry.risk)));
+  assert.equal(files.currentRiskMap.humanApprovalPresent, false);
+  assert.ok(files.currentHeadReviewBrief.includes("Target reading time: **10 minutes or less**"));
+});
+
+await check("current-executive-state-keeps-runtime-binding-and-operator-gates", async () => {
+  for (const required of [
+    "P34 STACKED REVIEW READY",
+    "artifacts/release/scrimed-p34-release-manifest.json",
+    "EXACT_REVIEW_REQUIRED",
+    "OPERATOR_ACTION_REQUIRED",
+    "PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED",
+    "MERGE_AUTHORIZATION_REQUIRED"
+  ]) assert.ok(files.currentExecutiveState.includes(required), required);
+  assert.ok(files.candidateState.includes("p34MainReviewBase"));
+  assert.ok(files.candidateState.includes("inspectP34CumulativeIntegrationState"));
 });
 
 await check("preview-acceptance-is-exact-bound-with-no-authority", async () => {
@@ -163,6 +220,15 @@ await check("artifact-generator-covers-all-required-post-review-outputs", async 
     "p34-preview-observability.json"
   ]) assert.ok(files.generator.includes(required), required);
   assert.ok(files.generator.includes("p34RuntimeEvidencePaths"));
+  for (const required of [
+    "P34_CURRENT_EXECUTIVE_STATE.md",
+    "P34_STACKED_REVIEW_PLAN.md",
+    "P34_CUMULATIVE_INTEGRATION_ASSURANCE.md",
+    "P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md",
+    "p34-stacked-review-plan.json",
+    "p34-cumulative-integration-assurance.json",
+    "p40-current-risk-map.json"
+  ]) assert.ok(files.followOnGenerator.includes(required), required);
 });
 
 console.log(`SCRIMED p.34 post-review readiness contract checks: ${passed}/${passed} passed`);

@@ -285,7 +285,8 @@ export const pilotDemoPricingTierAlignments: PilotDemoPricingTierAlignment[] = [
   {
     tier: "Protected Enterprise Pilot",
     oldRisk: "Low protected-pilot ranges can ignore security, privacy, evidence-room, tenant, connector, and support costs.",
-    recommendedBand: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites are evidenced.",
+    recommendedBand:
+      "Custom enterprise scope — subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.",
     marketRationale:
       "Redox and enterprise AI vendors use custom pricing because integration, security, governance, reliability, and implementation scope drive cost.",
     marginRule:
@@ -296,7 +297,8 @@ export const pilotDemoPricingTierAlignments: PilotDemoPricingTierAlignment[] = [
   {
     tier: "Enterprise Operating License",
     oldRisk: "A single giant range can feel arbitrary before pilots prove value.",
-    recommendedBand: "$1.5M-$6M annual for initial enterprise operating layer; $6M-$12M+ for multi-department or multi-region expansion.",
+    recommendedBand:
+      "Custom enterprise scope — commercial terms established following technical, security, legal, and deployment-readiness review.",
     marketRationale:
       "Ambience, Suki, Redox, and similar enterprise motions compete on workflow breadth, EHR adjacency, trust, uptime, data exchange, and measurable operational outcomes.",
     marginRule:
@@ -307,7 +309,8 @@ export const pilotDemoPricingTierAlignments: PilotDemoPricingTierAlignment[] = [
   {
     tier: "Strategic Platform Partnership",
     oldRisk: "Strategic pricing can overpromise national or global deployment before regional authority exists.",
-    recommendedBand: "$8M-$25M+ multi-year, sales-led, region-aware, and external-review-gated.",
+    recommendedBand:
+      "Custom strategic scope — commercial terms require regional, technical, security, legal, procurement, and authority review.",
     marketRationale:
       "National, payer, sovereign, and platform partnerships are not scribe subscriptions; they are multi-stakeholder infrastructure and governance programs.",
     marginRule:

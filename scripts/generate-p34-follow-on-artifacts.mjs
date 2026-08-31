@@ -2,7 +2,9 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import {
+  inspectP34CumulativeIntegrationState,
   inspectP34CandidateState,
+  p34MainReviewBase,
   p34Predecessor,
   sha256
 } from "./lib/p34-candidate-state.mjs";
@@ -13,6 +15,7 @@ const unknown = process.argv.slice(2).filter((arg) => !allowed.has(arg));
 if (unknown.length > 0) throw new Error(`Unsupported p.34 follow-on artifact option: ${unknown.join(", ")}`);
 
 const state = inspectP34CandidateState();
+const cumulativeState = inspectP34CumulativeIntegrationState();
 const integrationBase = {
   schemaVersion: "scrimed-p34-follow-on-integration-map-v1",
   repository: state.repository,
@@ -217,6 +220,117 @@ const p40MapBase = {
 if (p40MapBase.unexplainedFileCount !== 0) throw new Error("PR #40 integration map contains unexplained files.");
 const p40Map = { ...p40MapBase, mapFingerprint: sha256(p40MapBase) };
 
+if (cumulativeState.unexplainedFileCount !== 0) {
+  throw new Error(`p.34 cumulative assurance has ${cumulativeState.unexplainedFileCount} unexplained file(s).`);
+}
+
+const stackedReviewPlanBase = {
+  schemaVersion: "scrimed-p34-stacked-review-plan-v1",
+  repository: state.repository,
+  exactCandidateBinding: "artifacts/release/scrimed-p34-release-manifest.json",
+  reviewOrder: ["LANE_A_PREDECESSOR", "LANE_B_DELTA", "LANE_C_INTEGRATION_ASSURANCE"],
+  lanes: [
+    {
+      id: "LANE_A_PREDECESSOR",
+      pullRequestNumber: 39,
+      baseBranch: p34MainReviewBase.branch,
+      baseCommit: p34MainReviewBase.commitSha,
+      headBranch: p34Predecessor.branch,
+      headCommit: p34Predecessor.commitSha,
+      reviewScope: "main to p.34 Clinical Operating System predecessor",
+      reviewState: "EXACT_REVIEW_REQUIRED"
+    },
+    {
+      id: "LANE_B_DELTA",
+      pullRequestNumber: 40,
+      baseBranch: p34Predecessor.branch,
+      baseCommit: p34Predecessor.commitSha,
+      headBranch: state.branch,
+      headBinding: "artifacts/release/scrimed-p34-release-manifest.json",
+      reviewScope: "p.34 predecessor to Synthetic Pilot and preproduction-assurance delta",
+      reviewState: "EXACT_REVIEW_REQUIRED"
+    },
+    {
+      id: "LANE_C_INTEGRATION_ASSURANCE",
+      pullRequestNumber: null,
+      baseBranch: p34MainReviewBase.branch,
+      baseCommit: p34MainReviewBase.commitSha,
+      headBinding: "artifacts/release/scrimed-p34-release-manifest.json",
+      reviewScope: "cumulative main to final PR #40 tree",
+      reviewState: "AUTOMATED_ASSURANCE_COMPLETE",
+      humanApprovalSubstitutionAllowed: false
+    }
+  ],
+  humanApprovalPresent: false,
+  mergeAuthorityGranted: false,
+  productionAuthorityGranted: false,
+  boundary: "Automated cumulative assurance supports but never substitutes for exact-head human review of lanes A and B."
+};
+const stackedReviewPlan = {
+  ...stackedReviewPlanBase,
+  planFingerprint: sha256(stackedReviewPlanBase)
+};
+
+const p40CurrentRiskMapBase = {
+  schemaVersion: "scrimed-p40-current-risk-map-v1",
+  repository: state.repository,
+  pullRequestNumber: 40,
+  exactCandidateBinding: "artifacts/release/scrimed-p34-release-manifest.json",
+  sourceArtifact: "artifacts/review/p40-risk-ranked-diff.json",
+  sourceFingerprint: p40RiskDiff.diffFingerprint,
+  riskCounts: p40RiskDiff.riskCounts,
+  criticalAndHighFiles: p40RiskDiff.files
+    .filter((entry) => entry.risk === "CRITICAL" || entry.risk === "HIGH")
+    .map(({ path, risk, reviewLane, relevantTests, relevantEvidence }) => ({
+      path,
+      risk,
+      reviewLane,
+      relevantTests,
+      relevantEvidence
+    })),
+  reviewState: "EXACT_REVIEW_REQUIRED",
+  humanApprovalPresent: false,
+  mergeAuthorityGranted: false,
+  productionAuthorityGranted: false
+};
+const p40CurrentRiskMap = {
+  ...p40CurrentRiskMapBase,
+  riskMapFingerprint: sha256(p40CurrentRiskMapBase)
+};
+
+const cumulativeIntegrationBase = {
+  schemaVersion: "scrimed-p34-cumulative-integration-assurance-v1",
+  repository: state.repository,
+  baseBranch: p34MainReviewBase.branch,
+  baseCommit: cumulativeState.base,
+  mergeBaseCommit: cumulativeState.mergeBase,
+  finalHeadBinding: "artifacts/release/scrimed-p34-release-manifest.json",
+  stackedReviewPlan: "artifacts/review/p34-stacked-review-plan.json",
+  stackedReviewPlanFingerprint: stackedReviewPlan.planFingerprint,
+  cumulativeFileCount: cumulativeState.fileCount,
+  classificationCounts: cumulativeState.classificationCounts,
+  unexplainedFileCount: cumulativeState.unexplainedFileCount,
+  files: cumulativeState.files,
+  assuranceEvidence: {
+    routeInventory: "artifacts/build/routes.json",
+    renderInventory: "artifacts/build/render-inventory.json",
+    releaseManifest: "artifacts/release/scrimed-p34-release-manifest.json",
+    securityEvidence: "releaseManifest.securityFingerprint",
+    sbom: "releaseManifest.sbomFingerprint",
+    migrationPacket: "releaseManifest.migrationEvidenceFingerprint",
+    previewVerification: "releaseManifest.previewFingerprint"
+  },
+  reviewState: "EXACT_REVIEW_REQUIRED",
+  humanApprovalPresent: false,
+  automatedEvidenceIsHumanApproval: false,
+  mergeAuthorityGranted: false,
+  productionAuthorityGranted: false
+};
+const cumulativeIntegrationAssurance = {
+  ...cumulativeIntegrationBase,
+  assuranceFingerprint: sha256(cumulativeIntegrationBase)
+};
+
 const p40ReviewIndexBase = {
   schemaVersion: "scrimed-p40-review-index-v1",
   repository: state.repository,
@@ -316,6 +430,58 @@ const executiveReviewBrief = `# PR #40 Executive Review Brief\n\nTarget reading 
   `## 15. Commercial Authority\nPricing and value outputs are estimated/simulated and nonbinding. Agents cannot sign, discount, promise dates, activate customers, or distribute investor artifacts.\n\n` +
   `## 16. Reviewer Decision\nRecord exactly one: **APPROVE_EXACT_HEAD**, **REQUEST_CHANGES**, or **REJECT**. Bind identity and disposition to the exact manifest. Approval grants review evidence only.\n`;
 
+const currentExecutiveState = `# p.34 Current Executive State\n\n` +
+  `Status: **P34 STACKED REVIEW READY / OPERATOR ACTIONS RETAINED**\n\n` +
+  `## Canonical Topology\n\n` +
+  `- PR #39: \`${p34MainReviewBase.branch}\` at \`${p34MainReviewBase.commitSha}\` to \`${p34Predecessor.branch}\` at \`${p34Predecessor.commitSha}\`; predecessor review lane.\n` +
+  `- PR #40: \`${p34Predecessor.branch}\` to \`${state.branch}\`; focused Synthetic Pilot and preproduction-assurance delta.\n` +
+  `- Cumulative assurance: \`${p34MainReviewBase.branch}\` to the final PR #40 tree; automation supports but does not replace either human review.\n\n` +
+  `Exact PR #40 commit, tree, candidate, source, validation, review, gate, SBOM, security, route, render, preview, AAL2, migration, and certification state is generated post-commit in \`artifacts/release/scrimed-p34-release-manifest.json\`. Tracked documentation intentionally does not self-reference a future commit.\n\n` +
+  `## Current Gates\n\n` +
+  `| Control | State |\n| --- | --- |\n` +
+  `| PR #39 independent review | EXACT_REVIEW_REQUIRED |\n` +
+  `| PR #40 fresh machine review | EXACT_REVIEW_REQUIRED after any source change |\n` +
+  `| PR #40 independent review | EXACT_REVIEW_REQUIRED |\n` +
+  `| Cumulative main-to-final assurance | AUTOMATED_ASSURANCE_COMPLETE after certification |\n` +
+  `| Exact nonproduction preview | OPERATOR_ACTION_REQUIRED for release-steward acceptance |\n` +
+  `| AAL2 | OPERATOR_ACTION_REQUIRED |\n` +
+  `| Supabase leaked-password protection | OPERATOR_ACTION_REQUIRED |\n` +
+  `| Three production migrations | PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED |\n` +
+  `| Merge | MERGE_AUTHORIZATION_REQUIRED |\n` +
+  `| Protected pilot | PROTECTED_PILOT_AUTHORIZATION_REQUIRED |\n` +
+  `| Production | PRODUCTION_AUTHORIZATION_REQUIRED |\n\n` +
+  `Synthetic/no-PHI previews, workflow assessments, controlled demos, security testing, evidence generation, and proposal drafting remain allowed. Production, PHI, clinical execution, payer/EHR/device mutation, customer activation, contract signature, and external artifact distribution remain unauthorized.\n`;
+
+const stackedReviewDoc = `# p.34 Stacked Review Plan\n\n` +
+  `The final candidate is a two-PR stack. PR #40 approval alone cannot establish assurance for the complete \`main -> final head\` change set.\n\n` +
+  `| Lane | Scope | Required disposition |\n| --- | --- | --- |\n` +
+  `| LANE_A_PREDECESSOR | PR #39: \`${p34MainReviewBase.commitSha}\` -> \`${p34Predecessor.commitSha}\` | Independent exact-head review |\n` +
+  `| LANE_B_DELTA | PR #40: \`${p34Predecessor.commitSha}\` -> exact manifest head | Independent exact-head review |\n` +
+  `| LANE_C_INTEGRATION_ASSURANCE | \`${p34MainReviewBase.commitSha}\` -> exact manifest head | Automated cumulative assurance; never a human-approval substitute |\n\n` +
+  `## Review Order\n\n1. Review and decide PR #39.\n2. Review and decide PR #40.\n3. Confirm cumulative certification, route/render inventories, security, migrations, preview, and public claims against the exact final manifest.\n\n` +
+  `A reviewer may cover both PRs when repository policy permits, but each decision must bind its own exact SHA. Review approval grants no merge, migration, production, protected-pilot, customer, PHI, clinical, payer, EHR/device, contract, or distribution authority.\n\n` +
+  `Machine-readable plan: \`artifacts/review/p34-stacked-review-plan.json\`.\n`;
+
+const currentHeadReviewBrief = `# PR #40 Current Exact-Head Review Brief\n\nTarget reading time: **10 minutes or less**\n\n` +
+  `## Stop Condition\n\nOpen \`artifacts/release/scrimed-p34-release-manifest.json\`. Stop if its PR, commit, tree, candidate, source, validation, gate, review, SBOM, security, route, render, or preview binding differs from PR #40.\n\n` +
+  `## Predecessor Relationship\n\nPR #40 is based on PR #39 exact head \`${p34Predecessor.commitSha}\`. This review covers the focused delta only; the predecessor requires its own decision.\n\n` +
+  `## Highest-Risk Delta\n\n1. Pilot manifest validation and immutable evidence-ledger completeness.\n2. Cost governor, proposal authority, and protected-pilot expansion boundaries.\n3. Exact-head review freshness and replay prevention.\n4. Independent route/render regression baselines.\n5. Protected Vercel preview credential handling and fail-closed write checks.\n6. Public commercial pricing: protected and operating tiers remain custom scope.\n\n` +
+  `## Required Evidence\n\nRun status must include p.34 certification, Node 24, nonsecret suite, secret scan, dependency audit, SBOM, generated integrity, build, public smoke, protected-write denials, desktop/390px checks, and exact nonproduction preview evidence.\n\n` +
+  `## External Gates\n\nAAL2, Supabase leaked-password protection, release-steward preview acceptance, migration authorization, merge, protected pilot, production, customer activation, and external distribution remain separately controlled.\n\n` +
+  `## Decision\n\nSubmit exactly one attributable GitHub decision against the exact PR #40 head: **APPROVE**, **REQUEST_CHANGES**, or **COMMENT**. Approval provides review evidence only.\n\n` +
+  `Machine-readable risk index: \`artifacts/review/p40-current-risk-map.json\`.\n`;
+
+const cumulativeAssuranceDoc = `# p.34 Cumulative Integration Assurance\n\n` +
+  `Status: **EXACT_REVIEW_REQUIRED**\n\n` +
+  `This packet maps **${cumulativeIntegrationAssurance.cumulativeFileCount}** files from \`${cumulativeIntegrationAssurance.baseCommit}\` through the final PR #40 source tree, with **${cumulativeIntegrationAssurance.unexplainedFileCount}** unexplained files. Exact final commit and tree values are post-commit bindings in the canonical release manifest.\n\n` +
+  `## Coverage\n\n` +
+  Object.entries(cumulativeIntegrationAssurance.classificationCounts)
+    .map(([classification, count]) => `- ${classification}: ${count}`)
+    .join("\n") +
+  `\n\nCertification must cover the complete build, route/render inventories, security evidence, SBOM, migration immutability, Vercel preview, public claims, commercial boundaries, and synthetic-pilot controls.\n\n` +
+  `This is automated assurance evidence. It is not named human approval, merge authority, migration authority, production authorization, protected-pilot authorization, customer activation, or external-distribution permission.\n\n` +
+  `Machine-readable packet: \`artifacts/review/p34-cumulative-integration-assurance.json\`.\n`;
+
 const riskDiffDoc = `# PR #40 Risk-Ranked Diff\n\n` +
   `Status: **EXACT_REVIEW_REQUIRED**\n\nFiles: **${p40RiskDiff.fileCount}**\n\nUnexplained: **${p40RiskDiff.unexplainedFileCount}**\n\nFingerprint: \`${p40RiskDiff.diffFingerprint}\`\n\n` +
   `| Rank | Files |\n| --- | ---: |\n` +
@@ -344,16 +510,23 @@ const outputs = [
   ["docs/review/P34_REVIEW_BRIEF.md", reviewBrief],
   ["docs/release/P34_CURRENT_CANONICAL_BASELINE.md", canonicalBaselineDoc],
   ["docs/release/P34_EXECUTIVE_CANONICAL_STATE.md", executiveCanonicalState],
+  ["docs/release/P34_CURRENT_EXECUTIVE_STATE.md", currentExecutiveState],
   ["docs/release/P40_SOURCE_CONTROL_INTEGRITY.md", sourceIntegrityDoc],
   ["docs/review/P40_EXACT_HEAD_REVIEW_BRIEF.md", p40ReviewBrief],
   ["docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md", executiveReviewBrief],
   ["docs/review/P40_RISK_RANKED_DIFF.md", riskDiffDoc],
   ["docs/review/P40_FULL_INTEGRATION_MAP.md", p40MapDoc],
+  ["docs/review/P34_STACKED_REVIEW_PLAN.md", stackedReviewDoc],
+  ["docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md", cumulativeAssuranceDoc],
+  ["docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md", currentHeadReviewBrief],
   ["docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md", supabaseCloseout],
   ["docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md", macosSwcNote],
   ["artifacts/review/p40-review-index.json", `${JSON.stringify(p40ReviewIndex, null, 2)}\n`],
   ["artifacts/review/p40-full-integration-map.json", `${JSON.stringify(p40Map, null, 2)}\n`],
-  ["artifacts/review/p40-risk-ranked-diff.json", `${JSON.stringify(p40RiskDiff, null, 2)}\n`]
+  ["artifacts/review/p40-risk-ranked-diff.json", `${JSON.stringify(p40RiskDiff, null, 2)}\n`],
+  ["artifacts/review/p34-stacked-review-plan.json", `${JSON.stringify(stackedReviewPlan, null, 2)}\n`],
+  ["artifacts/review/p34-cumulative-integration-assurance.json", `${JSON.stringify(cumulativeIntegrationAssurance, null, 2)}\n`],
+  ["artifacts/review/p40-current-risk-map.json", `${JSON.stringify(p40CurrentRiskMap, null, 2)}\n`]
 ];
 
 await mkdir("artifacts/review", { recursive: true });

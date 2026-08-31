@@ -5,13 +5,13 @@
   "branch": "agent/scrimed-p34-post-review-readiness",
   "machineRepairBaseCommit": "d074658b65399d91124f2a1b737e82ef50f69095",
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
-  "fileCount": 89,
+  "fileCount": 111,
   "reviewLaneCounts": {
-    "CORE_RUNTIME": 30,
+    "CORE_RUNTIME": 33,
     "PILOT_OS": 4,
-    "COMMERCIAL": 4,
+    "COMMERCIAL": 13,
     "SECURITY": 1,
-    "GOVERNANCE": 39,
+    "GOVERNANCE": 49,
     "VERCEL": 7,
     "SUPABASE": 2,
     "AAL2": 2
@@ -61,6 +61,12 @@
       "reviewLane": "COMMERCIAL"
     },
     {
+      "path": "app/lib/commercialStrategy.ts",
+      "classification": "COMMERCIAL",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
       "path": "app/lib/deploymentProfiles.ts",
       "classification": "CORE_RUNTIME",
       "status": "CURRENT",
@@ -73,7 +79,25 @@
       "reviewLane": "PILOT_OS"
     },
     {
+      "path": "app/lib/marketActivation.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
+    },
+    {
+      "path": "app/lib/pilotDemoCommercialReadiness.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
       "path": "app/lib/productConsole.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
+    },
+    {
+      "path": "app/lib/publicMarketReadiness.ts",
       "classification": "CORE_RUNTIME",
       "status": "CURRENT",
       "reviewLane": "CORE_RUNTIME"
@@ -101,6 +125,12 @@
       "classification": "GOVERNANCE",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "app/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME"
     },
     {
       "path": "app/product/page.tsx",
@@ -163,6 +193,12 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "artifacts/review/p34-cumulative-integration-assurance.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "artifacts/review/p34-integration-map.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT",
@@ -175,7 +211,19 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "artifacts/review/p34-stacked-review-plan.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "artifacts/review/p39-full-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "artifacts/review/p40-current-risk-map.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
@@ -211,6 +259,42 @@
       "reviewLane": "PILOT_OS"
     },
     {
+      "path": "docs/commercial/PROTECTED_PILOT_INSURANCE_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
+      "path": "docs/commercial/WORKFLOW_INTELLIGENCE_ASSESSMENT_SALES_PACK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
+      "path": "docs/diligence/SCRIMED_ENTERPRISE_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/diligence/SCRIMED_INVESTOR_TECHNICAL_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/governance/P34_REVIEW_SCOPE_BY_STAGE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
@@ -241,6 +325,18 @@
       "reviewLane": "VERCEL"
     },
     {
+      "path": "docs/operators/WIX_COMMERCIAL_COPY_ALIGNMENT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
+      "path": "docs/pilot-demo-commercial-readiness.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
       "path": "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
@@ -254,6 +350,12 @@
     },
     {
       "path": "docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXECUTIVE_STATE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
@@ -283,6 +385,12 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
@@ -307,7 +415,19 @@
       "reviewLane": "GOVERNANCE"
     },
     {
+      "path": "docs/review/P34_STACKED_REVIEW_PLAN.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
       "path": "docs/review/P39_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE"
+    },
+    {
+      "path": "docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE"
@@ -353,6 +473,18 @@
       "classification": "TEST",
       "status": "CURRENT",
       "reviewLane": "CORE_RUNTIME"
+    },
+    {
+      "path": "scripts/commercial-pricing-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
+    },
+    {
+      "path": "scripts/commercial-pricing-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL"
     },
     {
       "path": "scripts/generate-p34-build-inventory.mjs",
@@ -557,5 +689,5 @@
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "210dd75ae7d93e88a50fb55fa07476b02c101887baed188793c1501609dbfe12"
+  "mapFingerprint": "47739e5d97feb2aba90830e029a03fa717e087ba0ed8f30cd72beeaada2755ac"
 }

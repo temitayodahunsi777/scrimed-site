@@ -105,7 +105,8 @@ export const revenueStreams: RevenueStream[] = [
     status: "approval-required",
     buyer: "Large health systems, payers, employers, and public-sector programs preparing controlled deployment.",
     offer: "Tenant-authenticated workspace, durable audit, activation governance, role-based review, and deployment profile planning.",
-    priceSignal: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites.",
+    priceSignal:
+      "Custom enterprise scope — subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.",
     conversionPath: "Synthetic pilot proof -> security/legal/privacy review -> protected workspace -> enterprise license proposal.",
     proofRoute: "/pilot-workspace",
     owner: "Enterprise sales, security, privacy, and implementation",
@@ -120,7 +121,8 @@ export const revenueStreams: RevenueStream[] = [
     status: "approval-required",
     buyer: "Multi-site organizations expanding from one workflow to operating-layer adoption.",
     offer: "Annual platform access for AgentOS, Atlas, TrustOS, workflow modules, governance, observability, and support.",
-    priceSignal: "$2.5M floor; enterprise range $3M-$12M+.",
+    priceSignal:
+      "Custom enterprise scope — commercial terms established following technical, security, legal, and deployment-readiness review.",
     conversionPath: "Protected pilot -> value review -> deployment profile -> annual license -> expansion roadmap.",
     proofRoute: "/product",
     owner: "Executive enterprise sales",
@@ -135,7 +137,8 @@ export const revenueStreams: RevenueStream[] = [
     status: "external-review-required",
     buyer: "Governments, national programs, major payers, and strategic healthcare networks.",
     offer: "Multi-year healthcare intelligence infrastructure partnership with regional governance and deployment planning.",
-    priceSignal: "$10M+ multi-year; national or ecosystem programs $25M+.",
+    priceSignal:
+      "Custom strategic scope — commercial terms require regional, technical, security, legal, procurement, and authority review.",
     conversionPath: "Executive briefing -> sovereign/public-sector profile -> legal/procurement review -> strategic program.",
     proofRoute: "/deployment-profiles",
     owner: "Founder and strategic partnerships",

@@ -22,9 +22,9 @@ Paid assessment and pilot bands now align across demo, pilot, and pricing surfac
 
 - Workflow Intelligence Assessment: starting at `$25K`, subject to a written agreement.
 - Synthetic Workflow Pilot: custom enterprise scope with named human commercial and finance approval.
-- Protected Enterprise Pilot: custom scope only after insurance, counsel, security/privacy, and deployment prerequisites.
-- Enterprise Operating License: `$1.5M-$6M` annual for an initial enterprise operating layer; `$6M-$12M+` for multi-department or multi-region expansion.
-- Strategic Platform Partnership: `$8M-$25M+` multi-year, sales-led, region-aware, and external-review-gated.
+- Protected Enterprise Pilot: custom enterprise scope, subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.
+- Enterprise Operating License: custom enterprise scope; commercial terms follow technical, security, legal, and deployment-readiness review.
+- Strategic Platform Partnership: custom strategic scope; commercial terms require regional, technical, security, legal, procurement, and authority review.
 
 ## Operator Rule
 

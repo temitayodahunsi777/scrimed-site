@@ -9,6 +9,12 @@ export const p34Predecessor = Object.freeze({
   status: "PREDECESSOR"
 });
 
+export const p34MainReviewBase = Object.freeze({
+  branch: "main",
+  commitSha: "fd2a4d09174726e5ba685673fe1f0df25f2ad308",
+  role: "PR_39_REVIEW_BASE"
+});
+
 export const p34CanonicalReleaseManifestPath = "artifacts/release/scrimed-p34-release-manifest.json";
 // Compatibility exports intentionally resolve to the one canonical release manifest.
 export const p34RuntimeEvidencePath = p34CanonicalReleaseManifestPath;
@@ -63,7 +69,7 @@ export function classifyP34Path(path) {
   const lower = path.toLowerCase();
   if (!path || path.startsWith("/") || path.includes("../") || path.includes("\0")) return "UNEXPECTED";
   if (path.startsWith("artifacts/")) return "GENERATED_EVIDENCE";
-  if (path.startsWith("docs/")) return "DOCUMENTATION";
+  if (path.startsWith("docs/") || path === "README.md" || path === "CONTRIBUTING.md" || path === "SECURITY.md") return "DOCUMENTATION";
   if (path.startsWith("tests/") || path.startsWith("test/")) return "TEST";
   if (path.startsWith(".github/workflows/")) return "TEST";
   if (path.startsWith("supabase/")) return "SUPABASE";
@@ -74,12 +80,16 @@ export function classifyP34Path(path) {
   if (lower.includes("pilot") && (path.startsWith("app/") || path.startsWith("config/"))) return "PILOT";
   if (lower.includes("commercial") || lower.includes("economics") || lower.includes("proposal")) return "COMMERCIAL";
   if (path.startsWith("app/lib/scrimed-p34/") || lower.includes("governance")) return "GOVERNANCE";
-  if (path.endsWith(".tsx") || path.endsWith(".css")) return "UI";
+  if (path.endsWith(".tsx") || path.endsWith(".css") || path === "app/icon.svg") return "UI";
   if (path.startsWith("app/lib/") || path.startsWith("app/api/")) return "CORE_RUNTIME";
   if (
     path === "package.json"
     || path === "package-lock.json"
     || path === ".gitignore"
+    || path === ".env.example"
+    || path === ".node-version"
+    || path === ".nvmrc"
+    || path === "next.config.js"
     || path.startsWith("config/")
     || path === "vercel.json"
   ) return "CONFIGURATION";
@@ -242,6 +252,41 @@ export function inspectP34CandidateState(env = process.env) {
       customerActivation: false,
       externalDistribution: false
     }
+  };
+}
+
+export function inspectP34CumulativeIntegrationState(env = process.env) {
+  const head = gitSha("HEAD");
+  const base = gitSha(`${env.SCRIMED_P34_MAIN_BASE_REF?.trim() || p34MainReviewBase.commitSha}^{commit}`);
+  if (!head || !base) throw new Error("p.34 cumulative integration state requires valid base and head commits.");
+  const mergeBase = gitSha(gitText(["merge-base", base, head]) ?? "");
+  if (!mergeBase) throw new Error("p.34 cumulative integration state requires a common merge base.");
+
+  const trackedPaths = nullList(git(["diff", "--name-only", "-z", `${base}...${head}`, "--"]));
+  const untrackedPaths = nullList(git(["ls-files", "--others", "--exclude-standard", "-z"]));
+  const paths = [...new Set([...trackedPaths, ...untrackedPaths])]
+    .filter((path) => !path.startsWith("artifacts/release/"))
+    .sort();
+  const files = paths.map((path) => ({
+    path,
+    classification: classifyP34Path(path),
+    status: "CUMULATIVE_MAIN_TO_CURRENT"
+  }));
+  const classificationCounts = Object.fromEntries(
+    [...new Set(files.map((entry) => entry.classification))]
+      .sort()
+      .map((classification) => [classification, files.filter((entry) => entry.classification === classification).length])
+  );
+
+  return {
+    schemaVersion: "scrimed-p34-cumulative-integration-state-v1",
+    base,
+    mergeBase,
+    head,
+    fileCount: files.length,
+    classificationCounts,
+    unexplainedFileCount: files.filter((entry) => entry.classification === "UNEXPECTED").length,
+    files
   };
 }
 

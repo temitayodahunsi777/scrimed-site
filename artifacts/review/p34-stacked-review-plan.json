@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "scrimed-p34-stacked-review-plan-v1",
+  "repository": "temitayodahunsi777/scrimed-site",
+  "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+  "reviewOrder": [
+    "LANE_A_PREDECESSOR",
+    "LANE_B_DELTA",
+    "LANE_C_INTEGRATION_ASSURANCE"
+  ],
+  "lanes": [
+    {
+      "id": "LANE_A_PREDECESSOR",
+      "pullRequestNumber": 39,
+      "baseBranch": "main",
+      "baseCommit": "fd2a4d09174726e5ba685673fe1f0df25f2ad308",
+      "headBranch": "agent/scrimed-p34-gap-closure",
+      "headCommit": "45be650f48e422b05160821681ff40bb9f1229c9",
+      "reviewScope": "main to p.34 Clinical Operating System predecessor",
+      "reviewState": "EXACT_REVIEW_REQUIRED"
+    },
+    {
+      "id": "LANE_B_DELTA",
+      "pullRequestNumber": 40,
+      "baseBranch": "agent/scrimed-p34-gap-closure",
+      "baseCommit": "45be650f48e422b05160821681ff40bb9f1229c9",
+      "headBranch": "agent/scrimed-p34-post-review-readiness",
+      "headBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+      "reviewScope": "p.34 predecessor to Synthetic Pilot and preproduction-assurance delta",
+      "reviewState": "EXACT_REVIEW_REQUIRED"
+    },
+    {
+      "id": "LANE_C_INTEGRATION_ASSURANCE",
+      "pullRequestNumber": null,
+      "baseBranch": "main",
+      "baseCommit": "fd2a4d09174726e5ba685673fe1f0df25f2ad308",
+      "headBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+      "reviewScope": "cumulative main to final PR #40 tree",
+      "reviewState": "AUTOMATED_ASSURANCE_COMPLETE",
+      "humanApprovalSubstitutionAllowed": false
+    }
+  ],
+  "humanApprovalPresent": false,
+  "mergeAuthorityGranted": false,
+  "productionAuthorityGranted": false,
+  "boundary": "Automated cumulative assurance supports but never substitutes for exact-head human review of lanes A and B.",
+  "planFingerprint": "420a32b131fec2f0a984b48b69b1b614feaa725bbffdae63c45231770522db88"
+}

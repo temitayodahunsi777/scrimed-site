@@ -1,0 +1,1988 @@
+{
+  "schemaVersion": "scrimed-p34-cumulative-integration-assurance-v1",
+  "repository": "temitayodahunsi777/scrimed-site",
+  "baseBranch": "main",
+  "baseCommit": "fd2a4d09174726e5ba685673fe1f0df25f2ad308",
+  "mergeBaseCommit": "c15a79c76d59a2f94bb7f999469da8bbc1618d8c",
+  "finalHeadBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+  "stackedReviewPlan": "artifacts/review/p34-stacked-review-plan.json",
+  "stackedReviewPlanFingerprint": "420a32b131fec2f0a984b48b69b1b614feaa725bbffdae63c45231770522db88",
+  "cumulativeFileCount": 389,
+  "classificationCounts": {
+    "AAL2": 6,
+    "COMMERCIAL": 1,
+    "CONFIGURATION": 8,
+    "CORE_RUNTIME": 57,
+    "DOCUMENTATION": 136,
+    "GENERATED_EVIDENCE": 28,
+    "GOVERNANCE": 15,
+    "PILOT": 10,
+    "SECURITY": 4,
+    "TEST": 97,
+    "UI": 17,
+    "VERCEL": 10
+  },
+  "unexplainedFileCount": 0,
+  "files": [
+    {
+      "path": ".env.example",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/aal2-assurance.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/agent-workspace-governance-smoke.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/authority-reference-qa-smoke.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/dependency-review.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/dependency-security.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/execution-attempt-durable-store-qa-smoke.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/migration-dry-run.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/node24-certification.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/preview-validation.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".github/workflows/sales-demo-session-qa-smoke.yml",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".gitignore",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".node-version",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": ".nvmrc",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "README.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/build-info/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/health/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/investor-demo-command-room/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/product/console/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/readiness/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/scrimed-control-plane/[[...path]]/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/scrimed-proof-packet-studio/share-readiness/route.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/api/synthetic-pilot/route.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/globals.css",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/icon.svg",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/investor-audience-readiness/InvestorDemoRunOfShow.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/investor-audience-readiness/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/investor-demo-command-room/InvestorDemoCommandRoom.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/investor-demo-command-room/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/pilotManifest.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/pilotOperatingSystem.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/pilotTemplateRegistry.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/commercial/syntheticPilotReadiness.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/commercialStrategy.ts",
+      "classification": "COMMERCIAL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/demoPilotPrograms.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/deploymentProfiles.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/components.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/elevation.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/motion.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/radii.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/spacing.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/tokens.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/design-system/typography.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/economics/pilotCostGovernor.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/evidence/publicSurfaceClaimRegistry.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/hubOperations.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/investorAudienceReadiness.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/investorDemoCommandRoom.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/investorDemoRunOfShow.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/marketActivation.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/navigationAudit.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/observability/errorTaxonomy.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/observability/logger.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/observability/performanceTelemetry.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/observability/requestContext.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/operatingMode.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/pilotDemoCommercialReadiness.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/platform/nodeRuntime.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/productConsole.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/proofPacketShareReadiness.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/publicMarketReadiness.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/qaEvidenceLedger.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/release/previewAcceptance.ts",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/release/vercelReleaseAssurance.ts",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/reliability/errorBudget.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/index.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/outcomeIntelligence.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformGraph.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformStrategy.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/strategicDecisionIntelligence.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/trustReadiness.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/types.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/agentPortability.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/changeControl.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/clinicalTrajectoryLab.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/contextFabric.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/continuousAssurance.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/decisionEvidenceLedger.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/index.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/opportunityModules.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/pilotProfiles.ts",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/regulatoryOversight.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/types.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/adaptiveGovernance.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/atomicApproval.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/clinicalOperatingSystem.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/contextProvenance.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/controlPlane2.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/dicomPrivacy.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/egressFirewall.ts",
+      "classification": "SECURITY",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/evidenceExpiry.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactCandidateReview.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactHeadBaseline.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactHeadReviewState.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/index.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/reviewReadiness.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/trustedClock.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/types.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p34/workflowContinuity.ts",
+      "classification": "GOVERNANCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-work/agentExecution.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-work/developmentContinuity.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-work/modelQualification.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimedOperatingCommandCenter.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimedP32GateEvidence.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/scrimedProofPacketStudio.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/siteNavigation.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/pricing/PricingScopeGuard.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/pricing/PricingValuePlanner.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/pricing/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/product/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/scrimed-control-plane/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/scrimed-p33/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/scrimed-p34/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/scrimed-proof-packet-studio/ProofPacketShareReadinessWorkbench.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/scrimed-proof-packet-studio/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/synthetic-pilot/page.tsx",
+      "classification": "PILOT",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/trust-center/page.tsx",
+      "classification": "UI",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/build/render-inventory.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/build/routes.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/design/code-connect-manifest.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/design/design-tokens.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/investor/investor-readiness.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/investor/moat-registry.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/p33/P33_GATE_MATRIX.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/p33/P33_VALIDATION_REPORT.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_GATE_MATRIX.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_GENERATION_INVENTORY.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_ROUTE_INVENTORY.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/p34/P34_VALIDATION_REPORT.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/platform/platform-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/platform/scrimed-platform-graph.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/product/portfolio-scorecard.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/product/product-portfolio.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-cumulative-integration-assurance.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-review-index.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-stacked-review-plan.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p39-full-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p39-pr-file-inventory.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p39-review-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p40-current-risk-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p40-full-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p40-review-index.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/review/p40-risk-ranked-diff.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "artifacts/strategy/strategic-roadmap.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "config/performance-budgets.json",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_AUTONOMY_AND_APPROVAL_CONTRACT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_CLINICAL_OPERATING_SYSTEM.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_CONTROL_MATRIX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_EVALUATION_AND_EXTERNAL_VALIDATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_IMPLEMENTATION_MANIFEST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_PHI_DATA_FLOW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_RELEASE_GATE_REPORT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/P34_THREAT_MODEL.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/PUBLIC_CLAIMS_REGISTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/SCRIMED_P33_INTEGRATED_UPGRADES.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/SCRIMED_P34_ADAPTIVE_GOVERNANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/SCRIMED_P34_IMPLEMENTATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/ADR_P33_CLINICAL_RELEASE_GATES.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/ADR_P33_CONTEXT_FABRIC.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/ADR_P33_DECISION_EVIDENCE_LEDGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/ADR_P33_PILOT_PROFILES.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/ADR_P33_ROUTING_POLICY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/ADR_P34_ADAPTIVE_GOVERNANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/SCRIMED_ENTERPRISE_GAP_CLOSURE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/architecture/SCRIMED_PLATFORM_GRAPH.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/assurance/CONTINUOUS_ASSURANCE_AND_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/brand/PUBLIC_SURFACE_CONSISTENCY_REPORT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/ci-workflow-governance.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/PROTECTED_PILOT_INSURANCE_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/WORKFLOW_INTELLIGENCE_ASSESSMENT_SALES_PACK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/design/FIGMA_SYNC_SPEC.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/diligence/SCRIMED_ENTERPRISE_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/diligence/SCRIMED_INVESTOR_TECHNICAL_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/governance/HUMAN_GATE_MINIMIZATION_REPORT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/governance/P34_REVIEW_SCOPE_BY_STAGE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/governance/REGULATORY_INTENDED_USE_REGISTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor-audience-readiness.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor-demo-command-room.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor/DATA_ROOM_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor/INVESTOR_ARTIFACT_REVIEW_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor/MOAT_AND_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor/SCRIMED_P33_INVESTOR_DECK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor/SCRIMED_P33_INVESTOR_DECK_MANIFEST.json",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/investor/SCRIMED_PLATFORM_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/legal/IP_INVENTION_REGISTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/AAL2_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/INVESTOR_ARTIFACT_REVIEW_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/NODE24_ROLLBACK_PLAN.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/PRODUCTION_RELEASE_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/SEARCH_INDEX_RECONCILIATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_SECURITY_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/VERCEL_NODE24_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/VERCEL_PREVIEW_RELEASE_ASSURANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/operators/WIX_COMMERCIAL_COPY_ALIGNMENT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_APPROVAL_MODEL.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_ARCHITECTURE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_AUTONOMY_MODEL.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_IMPLEMENTATION_MANIFEST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_OPERATOR_RUNBOOK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_PHI_FLOW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_RELEASE_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_REVIEW_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/p34/P34_THREAT_MODEL.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/pilot-demo-commercial-readiness.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/platform/NEXTJS_BOILERPLATE_DISPOSITION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/platform/NODE22_NODE24_DIFFERENTIAL.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/platform/NODE24_COMPATIBILITY_REPORT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/platform/NODE_RUNTIME_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/platform/VERCEL_RUNTIME_CACHING_AND_HEADERS_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/product/CORE_COMMERCIAL_WEDGE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/product/PORTFOLIO_RATIONALIZATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/project-status.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/CANDIDATE_BRANCH_DECISION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/CURRENT_EXTERNAL_AND_REPOSITORY_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/CURRENT_PLATFORM_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/ENTERPRISE_GAP_CLOSURE_COMMIT_MANIFEST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/ENTERPRISE_GAP_CLOSURE_IMPLEMENTATION_REPORT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P33_IMPLEMENTATION_STATUS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P33_INTEGRATED_UPGRADES_COMMIT_MANIFEST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P33_REVIEW_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_ADAPTIVE_GOVERNANCE_COMMIT_MANIFEST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_AUTHORITATIVE_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CANONICAL_REMOTE_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_CANONICAL_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXECUTIVE_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_CURRENT_STATE_DISCOVERY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_EXECUTIVE_CANONICAL_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_GAP_CLOSURE_AUTHORITATIVE_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_IMPLEMENTATION_STATUS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_PREDECESSOR_RECONCILIATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_REVIEW_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P34_SOURCE_CONTROL_RECONCILIATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/P40_SOURCE_CONTROL_INTEGRITY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/PENDING_MIGRATION_DRY_RUN_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/release/PREVIEW_DEPLOYMENT_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_CLINICAL_SAFETY_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_DATABASE_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_FOCUSED_PR_CONSTRUCTION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_INDEPENDENT_TECHNICAL_REVIEW_PRECHECK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_INSURANCE_READINESS_REGISTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_INTENDED_USE_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_LEGAL_CLAIMS_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_PREVIEW_ACCEPTANCE_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_PRIVACY_SECURITY_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_RELEASE_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_STACKED_REVIEW_PLAN.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P39_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P39_REVIEW_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P39_WHOLE_PR_INTEGRATION_SCOPE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P40_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P40_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P40_RISK_RANKED_DIFF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/runbooks/P33_OPERATOR_RUNBOOK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/runbooks/P34_ADAPTIVE_GOVERNANCE_RUNBOOK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/scrimed-p32-release-operations.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/scrimed-proof-packet-studio.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/AAL2_ASSURANCE_RUNBOOK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/DEPENDENCY_DELTA_REPORT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/DEPENDENCY_SECURITY_CI_GUIDE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/EXTERNAL_DEPENDENCY_ADVISORY_RUNBOOK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/HIGH_SEVERITY_DEPENDENCY_TRIAGE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/P33_THREAT_BOUNDARY_UPDATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/P34_THREAT_BOUNDARY_UPDATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/strategy/SCRIMED_STRATEGIC_ROADMAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "next.config.js",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "package-lock.json",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "package.json",
+      "classification": "CONFIGURATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/aal2-token-policy-selftest.mjs",
+      "classification": "AAL2",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/boundary-release-approval-matrix-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/boundary-release-evidence-intake-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/bounded-public-fetch-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/build-with-p34-inventory.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/check-generated-integrity.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/ci-workflow-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/clinical-context-gateway-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/clinical-data-fabric-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/clinical-data-governance-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/dependency-security-floor-contract-check.mjs",
+      "classification": "SECURITY",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/deployment-drift-guard-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/design-system-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/enterprise-healthcare-infrastructure-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/generate-p34-build-inventory.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/generate-p34-follow-on-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/generate-p34-post-review-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/generate-p39-review-map.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/generated-output-postflight.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/global-enterprise-command-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/healthcare-optimization-command-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/healthcare-value-realization-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/investor-demo-command-room-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/investor-demo-command-room-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/investor-demo-proof-route-smoke.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/investor-demo-run-of-show-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/investor-demo-run-of-show-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/lib/aal2-redacted-evidence.mjs",
+      "classification": "AAL2",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/lib/aal2-target-binding.mjs",
+      "classification": "AAL2",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/lib/bounded-public-fetch.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/lib/p34-candidate-state.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/lib/p34-post-review-runtime-evidence.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/lib/vercel-preview-access.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/node24-runtime-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/node24-vercel-contract-check.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/pilot-activation-planner-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/pilot-handoff-command-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/pilot-success-review-command-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/pilot-value-evidence-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/proof-packet-share-readiness-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/public-production-smoke.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/rehearse-investor-demo.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/release-candidate-validation.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/run-aal2-candidate-verification.mjs",
+      "classification": "AAL2",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-automation-autopilot-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-control-plane-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-control-plane-smoke.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-cyber-defense-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-enterprise-gap-closure-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-enterprise-gap-closure-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-execution-focus-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-local-public-smoke-runner-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-local-public-smoke-runner.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-local-quality-runner-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-local-quality-runner.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-nonsecret-test-suite.mjs",
+      "classification": "SECURITY",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-operating-command-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-os-upgrade-batch-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p32-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p32-release-gate-evidence.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p33-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p33-integrated-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p33-integrated-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-adaptive-governance-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-adaptive-governance-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-canary.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-certify.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-clinical-operating-system-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-clinical-operating-system-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-evidence.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-follow-on-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-gap-closure-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-gap-closure-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-gap-closure-smoke.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-post-review-readiness-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-post-review-readiness-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-verify-preview.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-p34-workflow-continuity-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-platform-graph-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-platform-strategy-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-platform-strategy-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-proof-packet-studio-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-sbom.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-strategic-decision-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-work-authenticated-smoke.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-work-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/strategic-problem-resolution-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/synthetic-pilot-smoke.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/vercel-preview-access-policy-test.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-aal2-evidence.mjs",
+      "classification": "AAL2",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-aal2-target-binding.mjs",
+      "classification": "AAL2",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-migration-dry-run.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-node24-vercel-build.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-preview-ui.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-supabase-security.mjs",
+      "classification": "SECURITY",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/verify-vercel-preview.mjs",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "tests/security/supabase-rls-contract.test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "vercel.json",
+      "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    }
+  ],
+  "assuranceEvidence": {
+    "routeInventory": "artifacts/build/routes.json",
+    "renderInventory": "artifacts/build/render-inventory.json",
+    "releaseManifest": "artifacts/release/scrimed-p34-release-manifest.json",
+    "securityEvidence": "releaseManifest.securityFingerprint",
+    "sbom": "releaseManifest.sbomFingerprint",
+    "migrationPacket": "releaseManifest.migrationEvidenceFingerprint",
+    "previewVerification": "releaseManifest.previewFingerprint"
+  },
+  "reviewState": "EXACT_REVIEW_REQUIRED",
+  "humanApprovalPresent": false,
+  "automatedEvidenceIsHumanApproval": false,
+  "mergeAuthorityGranted": false,
+  "productionAuthorityGranted": false,
+  "assuranceFingerprint": "ecc704a6cfef0e03a432b9efe0b629cf27858cc75f706ab182066fac94b96a78"
+}

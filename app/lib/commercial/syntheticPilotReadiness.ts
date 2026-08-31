@@ -627,7 +627,7 @@ export const syntheticPilotCommercialPosture = {
   },
   protectedPilot: {
     name: "Protected Enterprise Pilot",
-    price: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites",
+    price: "Custom enterprise scope subject to security, privacy, insurance, deployment-readiness, and written authorization requirements",
     authority: "blocked-before-external-prerequisites"
   },
   agentAllowed: ["draft pilot scope", "calculate synthetic scenarios", "prepare nonbinding proposal drafts"],

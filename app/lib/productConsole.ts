@@ -1456,13 +1456,6 @@ export function getProductConsoleSummary() {
       href: syntheticPilotReadinessSummary.route
     },
     {
-      id: "commercial",
-      label: "Commercial Readiness",
-      state: syntheticPilotReadinessSummary.commercialReadiness.assessment,
-      owner: "commercial-owner",
-      href: "/pilot-deal-room"
-    },
-    {
       id: "protected-pilot",
       label: "Protected Pilot Readiness",
       state: "PROTECTED_PILOT_AUTHORIZATION_REQUIRED",

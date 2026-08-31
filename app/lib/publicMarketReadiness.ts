@@ -319,7 +319,8 @@ export const publicMarketUnitEconomicsPackages: PublicMarketUnitEconomicsPackage
   {
     packageName: "Protected Enterprise Pilot",
     commercialStage: "protected pilot",
-    priceSignal: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites",
+    priceSignal:
+      "Custom enterprise scope — subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.",
     measurableValue: [
       "buyer-approved workflow baseline",
       "reviewer acceptance rate",
@@ -337,7 +338,8 @@ export const publicMarketUnitEconomicsPackages: PublicMarketUnitEconomicsPackage
   {
     packageName: "Enterprise Operating License",
     commercialStage: "annual platform license",
-    priceSignal: "Annual platform license starts at $2.5M; enterprise range $3M-$12M+",
+    priceSignal:
+      "Custom enterprise scope — commercial terms established following technical, security, legal, and deployment-readiness review.",
     measurableValue: [
       "workflows under governance",
       "departments served",

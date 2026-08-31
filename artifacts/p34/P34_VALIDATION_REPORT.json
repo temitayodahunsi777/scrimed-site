@@ -211,7 +211,7 @@
     {
       "id": "release-authority-retained",
       "passed": true,
-      "evidence": "a64f33d2bd83ace354e7ddaf0d822b2654a497d0201baedffebf8514ee447409"
+      "evidence": "c46b9799250eedce17db10f5e37b2334f35a53c48a3f1a47ff5ba12dd8c38141"
     }
   ],
   "evidenceClassification": "synthetic-fixture-only",
@@ -223,5 +223,5 @@
   "durableApprovalReplayProtectionVerified": false,
   "externalEvidenceVerified": false,
   "productionAuthorityGranted": false,
-  "summaryHash": "a64f33d2bd83ace354e7ddaf0d822b2654a497d0201baedffebf8514ee447409"
+  "summaryHash": "c46b9799250eedce17db10f5e37b2334f35a53c48a3f1a47ff5ba12dd8c38141"
 }

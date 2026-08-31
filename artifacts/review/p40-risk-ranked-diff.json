@@ -12,14 +12,14 @@
     "GENERATED",
     "DOCUMENTATION"
   ],
-  "fileCount": 89,
+  "fileCount": 111,
   "riskCounts": {
     "CRITICAL": 3,
     "HIGH": 7,
-    "MEDIUM": 10,
-    "LOW": 35,
-    "GENERATED": 12,
-    "DOCUMENTATION": 22
+    "MEDIUM": 13,
+    "LOW": 39,
+    "GENERATED": 15,
+    "DOCUMENTATION": 34
   },
   "files": [
     {
@@ -247,6 +247,22 @@
       ]
     },
     {
+      "path": "app/lib/marketActivation.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "app/lib/productConsole.ts",
       "classification": "CORE_RUNTIME",
       "status": "CURRENT",
@@ -256,6 +272,38 @@
       "relevantTests": [
         "npm run contract:scrimed-p34-follow-on",
         "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/publicMarketReadiness.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
       ],
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
@@ -375,6 +423,38 @@
       ]
     },
     {
+      "path": "app/lib/commercialStrategy.ts",
+      "classification": "COMMERCIAL",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/pilotDemoCommercialReadiness.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "app/lib/scrimed-p34/exactHeadBaseline.ts",
       "classification": "GOVERNANCE",
       "status": "CURRENT",
@@ -432,6 +512,38 @@
       "relevantTests": [
         "npm run contract:scrimed-p34-follow-on",
         "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/commercial-pricing-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/commercial-pricing-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
       ],
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
@@ -999,6 +1111,22 @@
       ]
     },
     {
+      "path": "artifacts/review/p34-cumulative-integration-assurance.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-cumulative-integration-assurance.json"
+      ]
+    },
+    {
       "path": "artifacts/review/p34-integration-map.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT",
@@ -1031,6 +1159,22 @@
       ]
     },
     {
+      "path": "artifacts/review/p34-stacked-review-plan.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-stacked-review-plan.json"
+      ]
+    },
+    {
       "path": "artifacts/review/p39-full-integration-map.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT",
@@ -1044,6 +1188,22 @@
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
         "artifacts/review/p39-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p40-current-risk-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-current-risk-map.json"
       ]
     },
     {
@@ -1092,6 +1252,102 @@
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
         "artifacts/review/p40-risk-ranked-diff.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/PROTECTED_PILOT_INSURANCE_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/WORKFLOW_INTELLIGENCE_ASSESSMENT_SALES_PACK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/diligence/SCRIMED_ENTERPRISE_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/diligence/SCRIMED_INVESTOR_TECHNICAL_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/governance/P34_REVIEW_SCOPE_BY_STAGE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
       ]
     },
     {
@@ -1175,12 +1431,44 @@
       ]
     },
     {
+      "path": "docs/operators/WIX_COMMERCIAL_COPY_ALIGNMENT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "PILOT_OS",
       "risk": "DOCUMENTATION",
       "whyChanged": "Strengthens bounded synthetic-pilot execution and evidence controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/pilot-demo-commercial-readiness.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
       "relevantTests": [
         "npm run test:scrimed-p34-post-review-readiness",
         "npm run test:scrimed-p34-pilot-adversarial"
@@ -1224,6 +1512,22 @@
     },
     {
       "path": "docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXECUTIVE_STATE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE",
@@ -1303,6 +1607,22 @@
       ]
     },
     {
+      "path": "docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
@@ -1367,7 +1687,39 @@
       ]
     },
     {
+      "path": "docs/review/P34_STACKED_REVIEW_PLAN.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
       "path": "docs/review/P39_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCUMENTATION",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT",
       "reviewLane": "GOVERNANCE",
@@ -1450,5 +1802,5 @@
   "unexplainedFileCount": 0,
   "reviewDecision": "EXACT_REVIEW_REQUIRED",
   "productionAuthorityGranted": false,
-  "diffFingerprint": "91e8992b27198ad60e76ca81aa95cb39e0a3f4a04e57044d4198a747daefd5ad"
+  "diffFingerprint": "0abc097747db341e382d7fdd7ecbba15acfe5933f18ca38adb2be14771d13acb"
 }
