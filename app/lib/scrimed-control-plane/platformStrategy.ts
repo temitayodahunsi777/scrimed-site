@@ -485,7 +485,7 @@ export const platformPortfolioRationalization: PlatformPortfolioDisposition[] = 
     rationale: "Best route to outcome and renewal evidence after identity, migration, tenant, security, and reviewer gates are independently satisfied.",
     buyer: "Qualified health-system, clinic, payer, and research pilot sponsors.",
     proofRoutes: ["/pilot-workspace/access", "/approvals-readiness", "/clinical-production-readiness"],
-    nextMilestone: "Close named review, leaked-password protection, disposable migration evidence, and exact-candidate preview validation.",
+    nextMilestone: "Close named review, fresh AAL2, migration authorization, and exact-candidate preview validation; retain passwordless compensating controls and deny unprotected password auth.",
     retainedBoundary: "No customer activation, PHI, live clinical execution, payer action, or production writeback."
   },
   {

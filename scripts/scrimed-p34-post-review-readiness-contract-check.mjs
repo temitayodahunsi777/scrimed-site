@@ -42,6 +42,7 @@ files.stackedReview = JSON.parse(await readFile("artifacts/review/p34-stacked-re
 files.currentRiskMap = JSON.parse(await readFile("artifacts/review/p40-current-risk-map.json", "utf8"));
 files.cumulativeAssurance = JSON.parse(await readFile("artifacts/review/p34-cumulative-integration-assurance.json", "utf8"));
 files.p40RiskDiff = JSON.parse(await readFile("artifacts/review/p40-risk-ranked-diff.json", "utf8"));
+files.finalRiskDiff = JSON.parse(await readFile("artifacts/review/p34-final-risk-ranked-diff.json", "utf8"));
 files.aal2Evidence = createPendingP34Aal2Evidence(files.reviewIndex.exactReviewTarget);
 files.observability = createPendingP34PreviewObservability(files.reviewIndex.exactReviewTarget);
 
@@ -103,8 +104,8 @@ await check("cumulative-assurance-covers-main-to-final-without-fabricating-appro
 });
 
 await check("current-risk-map-reuses-one-risk-source-of-truth", async () => {
-  assert.equal(files.currentRiskMap.sourceArtifact, "artifacts/review/p40-risk-ranked-diff.json");
-  assert.equal(files.currentRiskMap.sourceFingerprint, files.p40RiskDiff.diffFingerprint);
+  assert.equal(files.currentRiskMap.sourceArtifact, "artifacts/review/p34-final-risk-ranked-diff.json");
+  assert.equal(files.currentRiskMap.sourceFingerprint, files.finalRiskDiff.diffFingerprint);
   assert.ok(files.currentRiskMap.criticalAndHighFiles.length > 0);
   assert.ok(files.currentRiskMap.criticalAndHighFiles.every((entry) => ["CRITICAL", "HIGH"].includes(entry.risk)));
   assert.equal(files.currentRiskMap.humanApprovalPresent, false);

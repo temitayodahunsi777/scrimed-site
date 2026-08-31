@@ -1,53 +1,24 @@
 # Supabase Password Security Closure
 
-Status: **OPERATOR_ACTION_REQUIRED**
+Status: **COMPENSATING_CONTROL_ACTIVE / DEFERRED_PLATFORM_CONTROL**
 
-Priority: **P0 before any protected pilot**
-Owner: **Supabase project owner or authorized Auth administrator**
+The Security Advisor warning `auth_leaked_password_protection` remains open. The current plan does
+not expose **Prevent use of leaked passwords**, so the feature is deferred rather than represented
+as fixed. Protected password authentication remains denied.
 
-## Exact Project
-
-- Project: `scrimed-protected-pilot`
-- Project reference: `yxacqdfeyojrjghpwike`
-- Live Security Advisor observation on 2026-08-27: `auth_leaked_password_protection` WARN
-- Current state: leaked-password protection disabled
-- Required state: leaked-password protection enabled
-
-The connected administrative surface is read-only for this setting. No user, provider, session,
-redirect, role, RLS policy, credential, migration, or database row was changed.
-
-## Under-Two-Minute Owner Action
-
-1. Open Supabase Dashboard and select project `yxacqdfeyojrjghpwike`.
-2. Go to **Authentication > Sign In / Providers > Email** and open password security.
-3. Enable **Prevent use of leaked passwords**. Change no other setting.
-4. Save, then open **Advisors > Security**.
-5. Confirm `Leaked Password Protection Disabled` is absent.
-6. Capture a no-secret screenshot showing project reference, resolved advisor state, actor, and
-   timestamp. Do not capture users, emails, tokens, sessions, or credentials.
-7. Bind that evidence to the exact candidate under review.
-
-Official guidance: [Supabase password security](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
-
-## Verification
+Current passwordless synthetic access is permitted only while every control in
+`docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md` is current. Missing or stale
+evidence, public signup, user creation through OTP, password UI calls, absent TOTP/AAL2, excessive
+AAL1 duration, missing rate limits, or missing tenant/role/server authorization fails closed.
 
 Run:
 
 ```bash
+npm run test:supabase-passwordless-assurance
+npm run contract:supabase-passwordless-assurance
 npm run verify:supabase-security
 ```
 
-The verifier must report no leaked-password warning. Then run the controlled synthetic AAL2
-smoke. Repository contracts and RLS tests do not prove this dashboard setting is enabled.
-
-## Rollback
-
-Rollback is not recommended because disabling the control permits newly selected passwords known
-to be compromised. If an unexpected authentication regression occurs, the Auth owner must record
-an incident, obtain security-owner approval, document the temporary exception and expiry, and
-re-enable the protection after remediation.
-
-## Boundary
-
-Closing this warning does not establish HIPAA compliance, certification, legal approval, clinical
-authority, production authorization, PHI authority, customer activation, or go-live readiness.
+Upgrade or password-auth activation requires the future procedure in
+`docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md`. Neither current state nor future closure
+establishes compliance, certification, PHI, production, clinical, migration, or customer authority.

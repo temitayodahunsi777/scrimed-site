@@ -1,25 +1,19 @@
-# Supabase Leaked-Password Closeout
+# Supabase Leaked-Password Upgrade Path
 
 Current warning: **auth_leaked_password_protection / Leaked Password Protection Disabled**
 
-Project: **scrimed-protected-pilot** (`yxacqdfeyojrjghpwike`)
+Project: **scrimed-protected-pilot** (public alias only; project identifiers and secrets are excluded)
 
-## Two-Minute Owner Action
+Current classification: **DEFERRED_PLATFORM_CONTROL / DEFERRED_HARDENING_FOR_PASSWORD_AUTH**. The warning is not resolved. It is not a universal blocker for the bounded passwordless synthetic/no-PHI lane while all compensating controls remain current.
 
-1. Open Supabase Dashboard and select the exact project above.
-2. Open **Authentication > Sign In / Providers > Password security** (the dashboard label may be **Authentication > Settings > Password Security**).
-3. Enable only **Prevent use of leaked passwords**.
-4. Save. Do not change users, sessions, providers, redirect URLs, RLS, roles, schema, data, or migrations.
-5. Open **Advisors > Security Advisor** and rerun/refresh it.
+## Current Safe Lane
 
-## Expected Result
+Public signup is disabled, OTP/magic-link calls use `shouldCreateUser: false`, production UI password calls are absent, TOTP and AAL2 protect privileged operations, AAL1 sessions are bounded, tenant and role authorization are enforced server-side, and OTP/sign-in controls are rate limited. Any drift or stale evidence denies protected access.
 
-The `auth_leaked_password_protection` warning is absent. Record a non-sensitive screenshot or advisor result with project name and timestamp; do not capture users, emails, tokens, or configuration secrets.
+## Activation Trigger
 
-## Verification
+Before any password-based protected path is introduced, require leaked-password protection to be `VERIFIED`. If the project plan exposes the feature, enable it, rerun Security Advisor, run the passwordless assurance policy and auth regression suite, and retain non-sensitive evidence.
 
-Run the connected Security Advisor again and require zero leaked-password warnings. Protected-pilot readiness remains blocked until this is observed and candidate-bound evidence is recorded.
+## Invariant
 
-## Rollback
-
-If the setting causes an authentication incident, the project owner may disable only the same setting, record the reason and timestamp, and restore the gate to `OPERATOR_ACTION_REQUIRED`. No unrelated Auth setting may be changed.
+`passwordAuthEnabled == true && leakedPasswordProtection != VERIFIED -> protectedProductionAuth = DENY`. Production, PHI, protected-pilot, and customer authority remain separately denied.

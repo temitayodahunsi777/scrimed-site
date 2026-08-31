@@ -11,7 +11,7 @@ Status: **CURRENT FOLLOW-ON CANDIDATE / AUTOMATED ASSURANCE IN PROGRESS**
 | Current PR | #40 canonical review target; exact runtime state is recorded outside tracked source |
 | Node | 24.19.0 locally; 24.x required |
 | Vercel | current follow-on preview not yet bound at discovery |
-| Supabase | `scrimed-protected-pilot`; leaked-password protection remains operator-required |
+| Supabase | `scrimed-protected-pilot`; passwordless compensating controls active, leaked-password feature deferred |
 | Migrations | three production-unapplied migrations; production application prohibited |
 | AAL2 | fresh exact-preview operator evidence required |
 | Human review | not present for this follow-on candidate |

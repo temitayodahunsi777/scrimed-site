@@ -273,8 +273,13 @@ export function inspectP34CandidateState(env = process.env) {
     supabase: {
       projectRef: "yxacqdfeyojrjghpwike",
       projectName: "scrimed-protected-pilot",
-      status: "ACTIVE_HEALTHY_OBSERVED_2026_08_28",
-      leakedPasswordProtection: "OPERATOR_ACTION_REQUIRED"
+      status: "ACTIVE_HEALTHY_OBSERVED_2026_08_31",
+      authenticationMode: "PASSWORDLESS_OTP_MAGIC_LINK",
+      passwordlessProtectedAccess: "COMPENSATING_CONTROL_ACTIVE",
+      leakedPasswordProtection: "DEFERRED_PLATFORM_CONTROL",
+      passwordAuthSemanticStatus: "DEFERRED_HARDENING_FOR_PASSWORD_AUTH",
+      passwordBasedProtectedAuthWithoutVerifiedControl: "DENY",
+      productionAuthorityGranted: false
     },
     migrations: {
       productionApplicationAuthorized: false,

@@ -919,7 +919,7 @@ export default function ProductConsolePage() {
         <article className="module-row">
           <div><span>{summary.p34PreviewState}</span><h2>External assurance state</h2></div>
           <p>{summary.p34MigrationState}; {summary.p34Aal2State}.</p>
-          <div><strong>OPERATOR_REQUIRED</strong><p>{summary.p34SupabaseSecurityState}</p></div>
+          <div><strong>{summary.p34SupabasePasswordlessAssurance.currentLaneState}</strong><p>{summary.p34SupabaseSecurityState}</p></div>
         </article>
       </section>
 
@@ -997,7 +997,7 @@ export default function ProductConsolePage() {
         </article>
         <article className="module-row">
           <div><span>{summary.p34SupabasePosture.authSecurity}</span><h2>Supabase posture</h2></div>
-          <p>{summary.p34SupabasePosture.rlsAssurance}; migrations remain production-unapplied.</p>
+          <p>Leaked-password feature: {summary.p34SupabasePosture.leakedPasswordProtection}; {summary.p34SupabasePosture.rlsAssurance}; migrations remain production-unapplied.</p>
           <div><strong>{summary.p34SupabasePosture.productionMutationState}</strong><p>{summary.p34SupabasePosture.migrationState}</p></div>
         </article>
       </section>

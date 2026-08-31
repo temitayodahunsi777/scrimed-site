@@ -1,4 +1,5 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
+import { getCurrentSupabasePasswordlessAssurance } from "../release/supabasePasswordlessAssurance";
 import { getP33AgentPortabilitySummary } from "./agentPortability";
 import { getP33ChangeControlSummary } from "./changeControl";
 import { getP33ClinicalTrajectorySummary } from "./clinicalTrajectoryLab";
@@ -39,6 +40,7 @@ export function getP33GateMatrix(
   evidence: string[];
   reason: string;
 }> {
+  const supabaseAssurance = getCurrentSupabasePasswordlessAssurance();
   return [
     {
       gateId: "p33-local-contracts",
@@ -104,11 +106,18 @@ export function getP33GateMatrix(
       reason: "Real operator evidence cannot be minted or simulated by the repository."
     },
     {
+      gateId: "supabase-passwordless-protected-access",
+      status: supabaseAssurance.currentLaneState,
+      ownerRole: "security-identity-owner",
+      evidence: supabaseAssurance.evidenceReferences,
+      reason: "The current synthetic/no-PHI protected lane uses passwordless entry, AAL2, tenant and role authorization, server-side checks, and bounded sessions. Evidence expiry or control drift denies access."
+    },
+    {
       gateId: "supabase-leaked-password-protection",
-      status: "BLOCKED" as const,
+      status: supabaseAssurance.platformControlState,
       ownerRole: "supabase-project-owner",
-      evidence: ["non-sensitive setting evidence"],
-      reason: "Connected project setting remains an external operator action."
+      evidence: supabaseAssurance.evidenceReferences,
+      reason: "Leaked-password protection remains unavailable on the current plan and is deferred, not resolved. Password-based protected authentication is denied until this control is verified."
     },
     {
       gateId: "vercel-preview-authorization",
@@ -194,12 +203,22 @@ export function getP33IntegratedSummary() {
     pilotProfiles,
     continuousAssurance,
     gateMatrix,
-    gateCounts: {
-      PASS: gateMatrix.filter((gate) => gate.status === "PASS").length,
-      OPERATOR_REQUIRED: gateMatrix.filter((gate) => gate.status === "OPERATOR_REQUIRED").length,
-      BLOCKED: gateMatrix.filter((gate) => gate.status === "BLOCKED").length,
-      FAIL: gateMatrix.filter((gate) => gate.status === "FAIL").length
-    },
+    gateCounts: Object.fromEntries(
+      ([
+        "PASS",
+        "PASS_SAFE_BOUNDARY_ENFORCED",
+        "COMPENSATING_CONTROL_ACTIVE",
+        "DEFERRED_PLATFORM_CONTROL",
+        "OPERATOR_REQUIRED",
+        "OPERATOR_ACTION_REQUIRED",
+        "BLOCKED",
+        "BLOCKED_TECHNICAL",
+        "FAIL"
+      ] as P33GateStatus[]).map((status) => [
+        status,
+        gateMatrix.filter((gate) => gate.status === status).length
+      ])
+    ) as Record<P33GateStatus, number>,
     productionReadiness: false,
     externalDistributionAuthorized: false,
     boundary: p33IntegratedBoundary
@@ -237,6 +256,11 @@ export function buildP33IntegratedBrief() {
     "",
     "## Gate Matrix",
     `- PASS: ${summary.gateCounts.PASS}`,
+    `- PASS_SAFE_BOUNDARY_ENFORCED: ${summary.gateCounts.PASS_SAFE_BOUNDARY_ENFORCED}`,
+    `- COMPENSATING_CONTROL_ACTIVE: ${summary.gateCounts.COMPENSATING_CONTROL_ACTIVE}`,
+    `- DEFERRED_PLATFORM_CONTROL: ${summary.gateCounts.DEFERRED_PLATFORM_CONTROL}`,
+    `- OPERATOR_ACTION_REQUIRED: ${summary.gateCounts.OPERATOR_ACTION_REQUIRED}`,
+    `- BLOCKED_TECHNICAL: ${summary.gateCounts.BLOCKED_TECHNICAL}`,
     `- OPERATOR_REQUIRED: ${summary.gateCounts.OPERATOR_REQUIRED}`,
     `- BLOCKED: ${summary.gateCounts.BLOCKED}`,
     `- FAIL: ${summary.gateCounts.FAIL}`,

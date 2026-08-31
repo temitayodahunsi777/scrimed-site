@@ -67,6 +67,7 @@ import {
 } from "./releaseContinuity";
 import { getScrimedBuildInfo } from "./release/vercelReleaseAssurance";
 import { getP34PreviewAcceptanceSummary } from "./release/previewAcceptance";
+import { getCurrentSupabasePasswordlessAssurance } from "./release/supabasePasswordlessAssurance";
 import {
   getNavigationAuditSummary,
   navigationAuditBriefProofStackStatus,
@@ -1309,6 +1310,7 @@ export function getProductConsoleSummary() {
   const p34IntegratedSummary = getP34AdaptiveGovernanceSummary();
   const p34ReviewReadinessSummary = getP34ReviewReadinessSummary();
   const p34PreviewAcceptanceSummary = getP34PreviewAcceptanceSummary();
+  const supabasePasswordlessAssurance = getCurrentSupabasePasswordlessAssurance();
   const syntheticPilotReadinessSummary = getSyntheticPilotReadinessSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
@@ -1437,8 +1439,8 @@ export function getProductConsoleSummary() {
     {
       id: "supabase",
       label: "Supabase",
-      state: "OPERATOR_ACTION_REQUIRED",
-      owner: "supabase-project-owner",
+      state: supabasePasswordlessAssurance.currentLaneState,
+      owner: "security-identity-owner",
       href: "/approvals-readiness"
     },
     {
@@ -1509,12 +1511,14 @@ export function getProductConsoleSummary() {
     p34PreviewState: p34PreviewAcceptanceSummary.status,
     p34PreviewAcceptance: p34PreviewAcceptanceSummary,
     p34Aal2State: "FRESH_EXACT_TARGET_OPERATOR_EVIDENCE_REQUIRED",
-    p34SupabaseSecurityState: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_AND_LIVE_RECHECK_REQUIRED",
+    p34SupabaseSecurityState: supabasePasswordlessAssurance.semanticStatus,
+    p34SupabasePasswordlessAssurance: supabasePasswordlessAssurance,
     p34ReviewReadiness: p34ReviewReadinessSummary,
     p34ReviewReadinessApiRoute: p34ReviewReadinessSummary.route,
     p34SupabasePosture: {
       project: "scrimed-protected-pilot",
-      authSecurity: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_REQUIRED",
+      authSecurity: supabasePasswordlessAssurance.currentLaneState,
+      leakedPasswordProtection: supabasePasswordlessAssurance.platformControlState,
       rlsAssurance: "REPOSITORY_CONTRACTS_PASS_LIVE_POSTURE_NOT_IMPLIED",
       migrationState: "THREE_PENDING_PRODUCTION_UNAPPLIED",
       productionMutationState: "DISABLED"
@@ -2810,6 +2814,7 @@ let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
 function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
   const review = getP34ReviewReadinessSummary();
   const preview = getP34PreviewAcceptanceSummary();
+  const supabaseAssurance = getCurrentSupabasePasswordlessAssurance();
   summary.p34ReviewReadiness = review;
   summary.p34PreviewAcceptance = preview;
   if (Array.isArray(summary.priorityGates)) {
@@ -2818,6 +2823,7 @@ function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
       const record = gate as { id?: string; state?: string };
       if (record.id === "review") return { ...record, state: review.review.state };
       if (record.id === "preview") return { ...record, state: preview.status };
+      if (record.id === "supabase") return { ...record, state: supabaseAssurance.currentLaneState };
       return record;
     });
   }
@@ -2830,7 +2836,9 @@ function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
     reviewState: review.review.state,
     previewState: preview.status,
     aal2State: "OPERATOR_ACTION_REQUIRED",
-    supabaseLeakedPasswordProtection: "OPERATOR_ACTION_REQUIRED",
+    supabasePasswordlessProtectedAccess: supabaseAssurance.currentLaneState,
+    supabaseLeakedPasswordProtection: supabaseAssurance.platformControlState,
+    supabasePasswordAuthSemanticStatus: supabaseAssurance.semanticStatus,
     migrationState: "THREE_PENDING_PRODUCTION_UNAPPLIED",
     autonomyCeiling: "A2_REVIEW_ONLY",
     syntheticPilotAuthority: "BOUNDED_SCOPE_APPROVAL_REQUIRED",

@@ -3,15 +3,15 @@
   "repository": "temitayodahunsi777/scrimed-site",
   "pullRequestNumber": 40,
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
-  "sourceArtifact": "artifacts/review/p40-risk-ranked-diff.json",
-  "sourceFingerprint": "b1aa1798a83c85865aba6b0d2b7315f37c37608ae0446e5c69eb845d2b1d2969",
+  "sourceArtifact": "artifacts/review/p34-final-risk-ranked-diff.json",
+  "sourceFingerprint": "d6debd4b7889ac0b106a8b354762a2f09e520028090eb58a7221fd0584c02649",
   "riskCounts": {
     "CRITICAL": 3,
-    "HIGH": 7,
-    "MEDIUM": 13,
-    "LOW": 40,
-    "GENERATED": 15,
-    "DOCUMENTATION": 34
+    "HIGH": 9,
+    "MEDIUM": 18,
+    "LOW": 45,
+    "GENERATED": 23,
+    "DOCS": 50
   },
   "criticalAndHighFiles": [
     {
@@ -73,6 +73,20 @@
       "relevantTests": [
         "npm run test:scrimed-p34-post-review-readiness",
         "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/supabasePasswordlessAssurance.ts",
+      "risk": "HIGH",
+      "reviewLane": "SUPABASE",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
       ],
       "relevantEvidence": [
         "artifacts/release/scrimed-p34-release-manifest.json",
@@ -143,11 +157,25 @@
         "artifacts/release/scrimed-p34-release-manifest.json",
         "artifacts/review/p40-full-integration-map.json"
       ]
+    },
+    {
+      "path": "scripts/verify-supabase-security.mjs",
+      "risk": "HIGH",
+      "reviewLane": "SUPABASE",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
     }
   ],
   "reviewState": "EXACT_REVIEW_REQUIRED",
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "riskMapFingerprint": "3f58a8614f5288ad0fa40f3e020b5d680c86ea457238530322fd781cd7ee3fa3"
+  "riskMapFingerprint": "ccc7f9b562aa18d4eb8c3d883abafa210abf61d751135364582d291da22b8212"
 }

@@ -1,7 +1,16 @@
 import type { PolicyDecision } from "../scrimed-work/p32Contracts";
 import type { RiskLevel } from "../scrimed-work/types";
 
-export type P33GateStatus = "PASS" | "OPERATOR_REQUIRED" | "BLOCKED" | "FAIL";
+export type P33GateStatus =
+  | "PASS"
+  | "PASS_SAFE_BOUNDARY_ENFORCED"
+  | "COMPENSATING_CONTROL_ACTIVE"
+  | "DEFERRED_PLATFORM_CONTROL"
+  | "OPERATOR_REQUIRED"
+  | "OPERATOR_ACTION_REQUIRED"
+  | "BLOCKED"
+  | "BLOCKED_TECHNICAL"
+  | "FAIL";
 
 export type ContextDataClassification =
   | "public"

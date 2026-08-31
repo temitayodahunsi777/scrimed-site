@@ -25,18 +25,18 @@
     "CONFIGURATION",
     "UNEXPECTED"
   ],
-  "fileCount": 112,
+  "fileCount": 148,
   "classificationCounts": {
     "AAL2": 2,
     "COMMERCIAL": 1,
     "CONFIGURATION": 3,
-    "CORE_RUNTIME": 4,
-    "DOCUMENTATION": 34,
-    "GENERATED_EVIDENCE": 15,
+    "CORE_RUNTIME": 10,
+    "DOCUMENTATION": 50,
+    "GENERATED_EVIDENCE": 23,
     "GOVERNANCE": 3,
     "PILOT": 7,
-    "SECURITY": 1,
-    "TEST": 29,
+    "SECURITY": 2,
+    "TEST": 34,
     "UI": 6,
     "VERCEL": 7
   },
@@ -93,6 +93,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "app/lib/limitationsWorkaroundOperations.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT"
+    },
+    {
       "path": "app/lib/marketActivation.ts",
       "classification": "CORE_RUNTIME",
       "status": "CURRENT"
@@ -118,8 +123,33 @@
       "status": "CURRENT"
     },
     {
+      "path": "app/lib/release/supabasePasswordlessAssurance.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT"
+    },
+    {
       "path": "app/lib/release/vercelReleaseAssurance.ts",
       "classification": "VERCEL",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformEvidence.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformStrategy.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/index.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT"
+    },
+    {
+      "path": "app/lib/scrimed-p33/types.ts",
+      "classification": "CORE_RUNTIME",
       "status": "CURRENT"
     },
     {
@@ -173,6 +203,21 @@
       "status": "CURRENT"
     },
     {
+      "path": "artifacts/investor/moat-registry.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/p33/P33_GATE_MATRIX.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/p33/P33_VALIDATION_REPORT.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
       "path": "artifacts/p34/P34_GATE_MATRIX.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT"
@@ -193,7 +238,27 @@
       "status": "CURRENT"
     },
     {
+      "path": "artifacts/platform/platform-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/product/portfolio-scorecard.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/product/product-portfolio.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
       "path": "artifacts/review/p34-cumulative-integration-assurance.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
+      "path": "artifacts/review/p34-final-risk-ranked-diff.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CURRENT"
     },
@@ -238,6 +303,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "artifacts/strategy/strategic-roadmap.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT"
+    },
+    {
       "path": "config/performance-budgets.json",
       "classification": "CONFIGURATION",
       "status": "CURRENT"
@@ -248,12 +318,52 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/commercial/BUYER_QUALIFICATION_CHECKLIST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/commercial/ENTERPRISE_AI_GOVERNANCE_PILOT_ONE_PAGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/commercial/ENTERPRISE_DISCOVERY_QUESTIONNAIRE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/commercial/EXECUTIVE_PILOT_READOUT_TEMPLATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/commercial/PRICING_SCENARIO_CALCULATOR.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/commercial/PROTECTED_PILOT_INSURANCE_READINESS.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
     {
+      "path": "docs/commercial/RCM_WORKFLOW_INTELLIGENCE_PILOT_ONE_PAGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/commercial/ROI_VALUE_HYPOTHESIS_WORKSHEET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_SOW_TEMPLATE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -269,6 +379,11 @@
     },
     {
       "path": "docs/diligence/SCRIMED_INVESTOR_TECHNICAL_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/governance/GATE_CLOSURE_REGISTER.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -289,6 +404,11 @@
     },
     {
       "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -318,6 +438,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/release/CURRENT_CANDIDATE_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/release/P34_CURRENT_CANONICAL_BASELINE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
@@ -343,6 +468,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/release/P34_FINAL_SYNTHETIC_CANONICAL_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/release/P34_SOURCE_CONTROL_RECONCILIATION.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
@@ -353,12 +483,27 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/review-packets/adversarial/SECURITY_AND_SAFETY_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
     {
       "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
+      "path": "docs/review/P34_FINAL_RISK_RANKED_DIFF.md",
       "classification": "DOCUMENTATION",
       "status": "CURRENT"
     },
@@ -413,6 +558,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT"
+    },
+    {
       "path": "package.json",
       "classification": "CONFIGURATION",
       "status": "CURRENT"
@@ -458,6 +608,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "scripts/generate-preproduction-assurance.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
       "path": "scripts/generated-output-postflight.mjs",
       "classification": "TEST",
       "status": "CURRENT"
@@ -488,6 +643,11 @@
       "status": "CURRENT"
     },
     {
+      "path": "scripts/p34-commercial-conversion-assets-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
       "path": "scripts/product-console-payload-budget-test.mjs",
       "classification": "TEST",
       "status": "CURRENT"
@@ -505,6 +665,11 @@
     {
       "path": "scripts/run-aal2-candidate-verification.mjs",
       "classification": "AAL2",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/scrimed-enterprise-gap-closure-contract-check.mjs",
+      "classification": "TEST",
       "status": "CURRENT"
     },
     {
@@ -588,6 +753,16 @@
       "status": "CURRENT"
     },
     {
+      "path": "scripts/supabase-passwordless-assurance-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
+      "path": "scripts/supabase-passwordless-assurance-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT"
+    },
+    {
       "path": "scripts/vercel-preview-access-policy-test.mjs",
       "classification": "VERCEL",
       "status": "CURRENT"
@@ -601,11 +776,16 @@
       "path": "scripts/verify-preview-ui.mjs",
       "classification": "VERCEL",
       "status": "CURRENT"
+    },
+    {
+      "path": "scripts/verify-supabase-security.mjs",
+      "classification": "SECURITY",
+      "status": "CURRENT"
     }
   ],
   "reviewStatus": "EXACT_REVIEW_REQUIRED",
   "humanApprovalPresent": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "mapFingerprint": "7b9f1e1e768e8271d9273b1af8aa960db939ffb50f3baf4e3611299944c58cac"
+  "mapFingerprint": "74b0ba0349bd5a744ae3e18201dfa48fdd353d6e384810b6fffc233388e4fbc6"
 }

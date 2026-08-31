@@ -5,7 +5,7 @@
   "branch": "agent/scrimed-p34-post-review-readiness",
   "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
   "integrationMap": "artifacts/review/p40-full-integration-map.json",
-  "integrationMapFingerprint": "4d5f3e3f3441517428a087762382b1909961f940755c05ac18c23f0e2f76d1a8",
+  "integrationMapFingerprint": "71d1c5a332a738d740b8be8357424dde1ba9031078dc85b9605f1b359d6286b9",
   "targetReviewMinutes": 10,
   "reviewState": "EXACT_REVIEW_REQUIRED",
   "highestRiskFiles": [
@@ -14,12 +14,15 @@
     "app/lib/scrimed-p34/exactHeadReviewState.ts",
     "app/lib/scrimed-p34/reviewReadiness.ts",
     "app/lib/release/previewAcceptance.ts",
+    "app/lib/release/supabasePasswordlessAssurance.ts",
     "scripts/generate-p34-build-inventory.mjs",
     "scripts/scrimed-p34-certify.mjs"
   ],
   "operatorStates": {
     "aal2": "OPERATOR_ACTION_REQUIRED",
-    "supabaseLeakedPasswordProtection": "OPERATOR_ACTION_REQUIRED",
+    "supabasePasswordlessProtectedAccess": "COMPENSATING_CONTROL_ACTIVE",
+    "supabaseLeakedPasswordProtection": "DEFERRED_PLATFORM_CONTROL",
+    "passwordAuthWithoutVerifiedLeakedPasswordProtection": "DENY",
     "productionMigrations": "PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED",
     "protectedPilot": "PROTECTED_PILOT_AUTHORIZATION_REQUIRED"
   },
@@ -32,5 +35,5 @@
     "noDeviceWriteback": true,
     "productionAuthorityGranted": false
   },
-  "indexFingerprint": "bf740d8d7967d6688dcaa07274b6c91d193905627fd41df98636f69ec46106ae"
+  "indexFingerprint": "86bb8dc175eb028b65f5781af1a80f0df9327610e1530b45a8a1fc8c5e1f893d"
 }

@@ -1,5 +1,6 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
 import { getP34PreviewAcceptanceSummary } from "../release/previewAcceptance";
+import { getCurrentSupabasePasswordlessAssurance } from "../release/supabasePasswordlessAssurance";
 import { getScrimedBuildInfo } from "../release/vercelReleaseAssurance";
 import { p34ExactHeadBaseline, p34ExactHeadBoundary } from "./exactHeadBaseline";
 import { deriveExactHeadReviewState } from "./exactHeadReviewState";
@@ -76,6 +77,7 @@ export function getP34ReviewReadinessSummary(
   const build = getScrimedBuildInfo(env);
   const p34 = getP34AdaptiveGovernanceSummary();
   const previewAcceptance = getP34PreviewAcceptanceSummary(env);
+  const supabaseAssurance = getCurrentSupabasePasswordlessAssurance(now);
   const exactHead = normalizedGitSha(build.commitSha);
   const requestedHead = normalizedGitSha(env.SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA);
   const approvedHead = normalizedGitSha(trustedReviewReceipt?.commitSha);
@@ -226,11 +228,13 @@ export function getP34ReviewReadinessSummary(
       unexpectedFilesAllowed: false as const
     },
     previewAcceptance,
+    supabaseAssurance,
     operatorActions: [
       { id: "publish-follow-on-pr", owner: "release-steward", state: currentPr ? "PASS" : "OPERATOR_ACTION_REQUIRED" },
       { id: "independent-review", owner: "independent-technical-reviewer", state: reviewState },
       { id: "aal2", owner: "authorized-preview-operator", state: "OPERATOR_ACTION_REQUIRED" },
-      { id: "supabase-leaked-password-protection", owner: "supabase-project-owner", state: "OPERATOR_ACTION_REQUIRED" },
+      { id: "supabase-passwordless-protected-access", owner: "security-identity-owner", state: supabaseAssurance.currentLaneState },
+      { id: "supabase-leaked-password-protection", owner: "supabase-project-owner", state: supabaseAssurance.platformControlState },
       { id: "preview-acceptance", owner: "release-steward", state: "OPERATOR_ACTION_REQUIRED" }
     ],
     mergeAuthority: {

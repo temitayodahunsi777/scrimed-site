@@ -20,7 +20,8 @@ Exact PR #40 commit, tree, candidate, source, validation, review, gate, SBOM, se
 | Cumulative main-to-final assurance | AUTOMATED_ASSURANCE_COMPLETE after certification |
 | Exact nonproduction preview | OPERATOR_ACTION_REQUIRED for release-steward acceptance |
 | AAL2 | OPERATOR_ACTION_REQUIRED |
-| Supabase leaked-password protection | OPERATOR_ACTION_REQUIRED |
+| Supabase passwordless protected access | COMPENSATING_CONTROL_ACTIVE |
+| Supabase leaked-password protection | DEFERRED_PLATFORM_CONTROL |
 | Three production migrations | PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED |
 | Merge | MERGE_AUTHORIZATION_REQUIRED |
 | Protected pilot | PROTECTED_PILOT_AUTHORIZATION_REQUIRED |

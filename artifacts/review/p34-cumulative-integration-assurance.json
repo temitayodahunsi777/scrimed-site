@@ -7,18 +7,18 @@
   "finalHeadBinding": "artifacts/release/scrimed-p34-release-manifest.json",
   "stackedReviewPlan": "artifacts/review/p34-stacked-review-plan.json",
   "stackedReviewPlanFingerprint": "420a32b131fec2f0a984b48b69b1b614feaa725bbffdae63c45231770522db88",
-  "cumulativeFileCount": 391,
+  "cumulativeFileCount": 408,
   "classificationCounts": {
     "AAL2": 6,
     "COMMERCIAL": 1,
     "CONFIGURATION": 8,
-    "CORE_RUNTIME": 57,
-    "DOCUMENTATION": 136,
-    "GENERATED_EVIDENCE": 28,
+    "CORE_RUNTIME": 58,
+    "DOCUMENTATION": 148,
+    "GENERATED_EVIDENCE": 29,
     "GOVERNANCE": 15,
     "PILOT": 10,
     "SECURITY": 4,
-    "TEST": 99,
+    "TEST": 102,
     "UI": 17,
     "VERCEL": 10
   },
@@ -342,6 +342,11 @@
     {
       "path": "app/lib/release/previewAcceptance.ts",
       "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "app/lib/release/supabasePasswordlessAssurance.ts",
+      "classification": "CORE_RUNTIME",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
@@ -705,6 +710,11 @@
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
+      "path": "artifacts/review/p34-final-risk-ranked-diff.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
       "path": "artifacts/review/p34-integration-map.json",
       "classification": "GENERATED_EVIDENCE",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
@@ -885,12 +895,52 @@
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
+      "path": "docs/commercial/BUYER_QUALIFICATION_CHECKLIST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/ENTERPRISE_AI_GOVERNANCE_PILOT_ONE_PAGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/ENTERPRISE_DISCOVERY_QUESTIONNAIRE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/EXECUTIVE_PILOT_READOUT_TEMPLATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/PRICING_SCENARIO_CALCULATOR.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
       "path": "docs/commercial/PROTECTED_PILOT_INSURANCE_READINESS.md",
       "classification": "DOCUMENTATION",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
+      "path": "docs/commercial/RCM_WORKFLOW_INTELLIGENCE_PILOT_ONE_PAGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/ROI_VALUE_HYPOTHESIS_WORKSHEET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
       "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_SOW_TEMPLATE.md",
       "classification": "DOCUMENTATION",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
@@ -1225,6 +1275,11 @@
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
+      "path": "docs/release/P34_FINAL_SYNTHETIC_CANONICAL_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
       "path": "docs/release/P34_GAP_CLOSURE_AUTHORITATIVE_BASELINE.md",
       "classification": "DOCUMENTATION",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
@@ -1281,6 +1336,16 @@
     },
     {
       "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/review/P34_FINAL_RISK_RANKED_DIFF.md",
       "classification": "DOCUMENTATION",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
@@ -1431,6 +1496,11 @@
     },
     {
       "path": "docs/security/P34_THREAT_BOUNDARY_UPDATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md",
       "classification": "DOCUMENTATION",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
@@ -1637,6 +1707,11 @@
     {
       "path": "scripts/node24-vercel-contract-check.mjs",
       "classification": "VERCEL",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/p34-commercial-conversion-assets-contract-check.mjs",
+      "classification": "TEST",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
@@ -1925,6 +2000,16 @@
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
+      "path": "scripts/supabase-passwordless-assurance-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/supabase-passwordless-assurance-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
       "path": "scripts/synthetic-pilot-smoke.mjs",
       "classification": "TEST",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
@@ -1994,5 +2079,5 @@
   "automatedEvidenceIsHumanApproval": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "assuranceFingerprint": "2855625d5fb9bca99e5e1d9d8371120dbcb979be0b984f77e5fdf087630b6a31"
+  "assuranceFingerprint": "49f73338961cef3d08d2a6f03e1363c84d0758a7d015d0fc4e8aaeb9207bbfde"
 }

@@ -791,21 +791,21 @@ export const limitationsResolutionWorkOrders: LimitationsResolutionWorkOrder[] =
     slug: "supabase-password-posture",
     knownLimit:
       "Supabase leaked-password protection and password-auth posture must be resolved before password sign-in is used for protected operations.",
-    status: "blocked-external-dependency",
+    status: "resolved-by-workaround",
     severity: "high",
     currentImpact:
-      "Protected routes can stay passkey, magic-link, and AAL2 first, but password-based protected operator flows should not become the default until advisor posture is clean.",
+      "Protected synthetic routes remain passwordless and AAL2-gated. The advisor warning stays open, and password-based protected operator flows are denied until leaked-password protection is verified.",
     immediateWorkaround:
       "Keep protected durable-store and QA flows on short-lived AAL2 sessions from passkey or magic-link paths; exclude password sign-in from protected smoke instructions.",
     durableResolution:
-      "Clear the Supabase security advisor item, document the identity posture, and rerun protected AAL2 smoke before broadening password-based operator access.",
+      "Enable and verify leaked-password protection before introducing password-based protected access, or when the plan exposes the control; re-observe all compensating controls before their evidence expires.",
     owner: "Security lead + identity owner",
     nextProofCommand: "npm run smoke:aal2:token -- --prompt-token",
     proofRoutes: ["/global-certification-readiness", "/trust-center", "/pilot-workspace/access"],
     failClosedCheck:
       "Protected APIs continue to require verified Supabase Auth, aal=aal2, session_id, tenant role, and route-level authorization.",
     graduationGate:
-      "Advisor clean or password auth excluded, MFA enrollment verified, AAL2 claims present, and tenant role proof retained without secrets.",
+      "Password auth remains excluded or leaked-password protection is verified; MFA enrollment, AAL2 claims, rate limits, server authorization, and tenant role proof remain current without secrets.",
     hardStops: ["claiming HIPAA/SOC certification", "using password-only protected access", "bypassing AAL2"]
   },
   {

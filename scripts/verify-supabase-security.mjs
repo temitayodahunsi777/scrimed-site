@@ -100,12 +100,16 @@ if (directlyExecuted) {
     status: findings.length ? "BLOCKED" : "PASS",
     projectReference: "yxacqdfeyojrjghpwike",
     repositoryControlsPassed: findings.length === 0,
-    leakedPasswordProtection: "EXTERNAL_WARNING_OPEN",
+    securityAdvisorWarning: "AUTH_LEAKED_PASSWORD_PROTECTION_OPEN",
+    passwordlessProtectedAccess: "COMPENSATING_CONTROL_ACTIVE",
+    leakedPasswordProtection: "DEFERRED_PLATFORM_CONTROL",
+    passwordAuthSemanticStatus: "DEFERRED_HARDENING_FOR_PASSWORD_AUTH",
+    passwordAuthWithoutVerifiedLeakedPasswordProtection: "DENY",
     productionDatabaseMutationPerformed: false,
     migrations: migrationReports,
     clientSecretFindings,
     findings,
-    boundary: "Static repository assurance only. Live Auth settings, runtime RLS behavior, and production migration state require separate operator evidence."
+    boundary: "Static repository assurance plus the current passwordless policy classification. The advisor warning remains open; live Auth drift, runtime RLS behavior, and production migration state require fresh operator evidence. Production and PHI authority remain denied."
   };
   const output = { ...report, evidenceFingerprint: hash(JSON.stringify(report)) };
   if (json) console.log(JSON.stringify(output, null, 2));

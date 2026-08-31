@@ -1,44 +1,30 @@
 # Supabase Leaked-Password Protection
 
-**Project:** `scrimed-protected-pilot` (`yxacqdfeyojrjghpwike`)
-**Observed:** `2026-08-23` through the connected Supabase Security Advisor
-**Current state:** disabled; Security Advisor `auth_leaked_password_protection` warning present
-**Desired state:** enabled
-**Owner:** Supabase organization owner or authorized Auth administrator
-**Status:** OPERATOR ACTION REQUIRED
+Status: **DEFERRED_PLATFORM_CONTROL / WARNING OPEN**
 
-The connected Supabase tools provided read-only project and advisor evidence but no narrowly
-scoped Auth configuration mutation. No user, provider, session, redirect, key, RLS policy, role,
-storage setting, database row, or migration was changed.
+Supabase Security Advisor continues to report `auth_leaked_password_protection`. The feature is
+available on Pro plans and above and is unavailable on the current Free plan. This is not evidence
+that the warning is resolved.
 
-The 2026-08-23 advisor refresh confirmed the warning remains open. This document is an operator
-procedure, not evidence that the setting was changed.
+The current bounded synthetic/no-PHI application lane uses passwordless OTP or magic-link entry,
+sets `shouldCreateUser: false`, exposes no `signInWithPassword` production UI path, and requires
+TOTP/AAL2, tenant membership, authorized role, server-side permission checks, short AAL1 sessions,
+and rate limits for protected work. See
+`docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md`.
 
-## Exact Dashboard Action
+## Future Activation Procedure
 
-1. Open Supabase Dashboard and select `scrimed-protected-pilot`.
-2. Open **Authentication > Sign In / Providers > Email**.
-3. In password security, enable **Prevent use of leaked passwords** only.
-4. Save without changing providers, MFA, redirect URLs, users, sessions, or access policies.
-5. Open Security Advisor and confirm `auth_leaked_password_protection` no longer appears.
-6. Run the controlled synthetic authentication regression checks; do not test with real passwords
-   known to be compromised and do not capture user identifiers or tokens.
-7. Retain a no-secret screenshot or advisor export showing project reference, setting/result,
-   actor, and timestamp.
-8. Run `npm run verify:supabase-security` and the existing synthetic authentication/AAL2 tests.
+Before introducing password-based protected authentication, or after moving to a plan that exposes
+the feature:
 
-Supabase documents that this control checks proposed passwords against the Pwned Passwords API and
-is available on Pro plans and above. Expected impact: new passwords, password changes, and affected
-password sign-ins can be rejected with a weak-password response; existing account data is not
-rewritten. Rollback should be exceptional, documented, time-limited, and owned by the Auth
-administrator.
+1. Select the verified SCRIMED project in Supabase Dashboard.
+2. Open **Authentication > Sign In / Providers > Email > Password security**.
+3. Enable **Prevent use of leaked passwords** without changing users, providers, sessions, redirects,
+   roles, RLS, data, or migrations.
+4. Refresh Security Advisor and require the warning to be absent.
+5. Run the passwordless assurance, synthetic auth, AAL2, and protected-route regression tests.
+6. Retain no-secret evidence tied to the exact candidate and environment.
 
-## Completion Criteria
-
-- The advisor warning is absent after refresh.
-- Existing synthetic OTP/AAL2 and permitted sign-in flows still pass.
-- No unrelated Auth setting changed.
-- Evidence contains no password, token, email, user list, or session data.
-- Evidence is bound to the exact candidate before any release decision.
-
-Reference: `https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection`
+Invariant: password auth plus anything other than verified leaked-password protection denies
+protected access. This procedure grants no production, PHI, clinical, migration, customer, or
+compliance authority.

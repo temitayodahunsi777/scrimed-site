@@ -39,8 +39,10 @@ const certificationCurrent = Boolean(
   && certification.status === "AUTOMATED_ASSURANCE_COMPLETE_HUMAN_REVIEW_REQUIRED"
 );
 const integrationMapHash = hashFileIfPresent("artifacts/review/p40-full-integration-map.json");
-const riskRankedDiffHash = hashFileIfPresent("artifacts/review/p40-risk-ranked-diff.json");
-const reviewBriefHash = hashFileIfPresent("docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md");
+const riskRankedDiffHash = hashFileIfPresent("artifacts/review/p34-final-risk-ranked-diff.json")
+  ?? hashFileIfPresent("artifacts/review/p40-risk-ranked-diff.json");
+const reviewBriefHash = hashFileIfPresent("docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md")
+  ?? hashFileIfPresent("docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md");
 const gateMatrixHash = hashFileIfPresent("artifacts/p34/P34_GATE_MATRIX.json");
 const migrationEvidenceHash = hashFileIfPresent("artifacts/p32/P32_MIGRATION_EVIDENCE_PACKET.json")
   ?? hashFileIfPresent("docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md");
@@ -83,7 +85,15 @@ const evidenceExpiresAt = createdAt
   ? new Date(Date.parse(createdAt) + 14 * 24 * 60 * 60_000).toISOString()
   : null;
 const p40Aal2Path = "artifacts/security/p40-aal2.json";
-const existingAal2 = await readFile(p40Aal2Path, "utf8").then(JSON.parse).catch(() => null);
+const finalAal2Path = "artifacts/security/p34-aal2-final.json";
+const existingFinalAal2 = await readFile(finalAal2Path, "utf8").then(JSON.parse).catch(() => null);
+const existingP40Aal2 = await readFile(p40Aal2Path, "utf8").then(JSON.parse).catch(() => null);
+const existingAal2 = [existingFinalAal2, existingP40Aal2].find((entry) => (
+  entry?.candidate?.candidateFingerprint === state.candidateFingerprint
+  && entry?.candidate?.commitSha === state.commit
+  && entry?.assuranceResult === "PASS_NONPRODUCTION_AAL2"
+  && entry?.passed === true
+)) ?? existingFinalAal2 ?? existingP40Aal2;
 const aal2Current = Boolean(
   existingAal2?.candidate?.candidateFingerprint === state.candidateFingerprint
   && existingAal2?.candidate?.commitSha === state.commit
@@ -161,7 +171,9 @@ const evidence = {
     humanReview: "OPERATOR_ACTION_REQUIRED",
     preview: state.preview ? "REQUIRES_VERIFICATION" : "OPERATOR_ACTION_REQUIRED",
     aal2: aal2Current ? "CURRENT" : "OPERATOR_ACTION_REQUIRED",
-    supabaseLeakedPasswordProtection: "OPERATOR_ACTION_REQUIRED"
+    supabasePasswordlessProtectedAccess: state.supabase.passwordlessProtectedAccess,
+    supabaseLeakedPasswordProtection: state.supabase.leakedPasswordProtection,
+    supabasePasswordAuthSemanticStatus: state.supabase.passwordAuthSemanticStatus
   },
   boundary: "Local no-PHI evidence only. This manifest grants no review, merge, deployment, migration, production, clinical, payer, EHR/device, customer, contract, certification, compliance, or external-distribution authority."
 };
@@ -173,7 +185,7 @@ if (!(
   && existingAal2?.assuranceResult === "PASS_NONPRODUCTION_AAL2"
 )) {
   const pendingAal2Base = {
-    schemaVersion: "scrimed-p40-aal2-redacted-evidence-v1",
+    schemaVersion: "scrimed-p34-final-aal2-redacted-evidence-v1",
     candidate: {
       commitSha: state.commit,
       candidateFingerprint: state.candidateFingerprint
@@ -198,6 +210,10 @@ if (!(
   };
   const pendingAal2 = { ...pendingAal2Base, evidenceHash: sha256(pendingAal2Base) };
   await mkdir("artifacts/security", { recursive: true });
+  await writeFile(finalAal2Path, `${JSON.stringify(pendingAal2, null, 2)}\n`, "utf8");
   await writeFile(p40Aal2Path, `${JSON.stringify(pendingAal2, null, 2)}\n`, "utf8");
+} else {
+  await mkdir("artifacts/security", { recursive: true });
+  await writeFile(finalAal2Path, `${JSON.stringify(existingAal2, null, 2)}\n`, "utf8");
 }
 console.log(`generated p.34 exact candidate evidence candidate=${evidence.candidateFingerprint} source=${evidence.sourceFingerprint} manifest=${evidence.manifestFingerprint}`);

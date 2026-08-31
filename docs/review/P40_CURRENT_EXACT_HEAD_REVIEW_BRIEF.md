@@ -25,7 +25,7 @@ Run status must include p.34 certification, Node 24, nonsecret suite, secret sca
 
 ## External Gates
 
-AAL2, Supabase leaked-password protection, release-steward preview acceptance, migration authorization, merge, protected pilot, production, customer activation, and external distribution remain separately controlled.
+AAL2, release-steward preview acceptance, migration authorization, merge, protected pilot, production, customer activation, and external distribution remain separately controlled. Supabase leaked-password protection remains a deferred platform control; password auth stays denied until it is verified.
 
 ## Decision
 

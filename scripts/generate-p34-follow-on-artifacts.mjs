@@ -51,7 +51,7 @@ const discovery = `# p.34 Current State Discovery\n\n` +
   `| Current PR | #40 canonical review target; exact runtime state is recorded outside tracked source |\n` +
   `| Node | ${state.runtime.node} locally; 24.x required |\n` +
   `| Vercel | current follow-on preview not yet bound at discovery |\n` +
-  `| Supabase | \`${state.supabase.projectName}\`; leaked-password protection remains operator-required |\n` +
+  `| Supabase | \`${state.supabase.projectName}\`; passwordless compensating controls active, leaked-password feature deferred |\n` +
   `| Migrations | three production-unapplied migrations; production application prohibited |\n` +
   `| AAL2 | fresh exact-preview operator evidence required |\n` +
   `| Human review | not present for this follow-on candidate |\n\n` +
@@ -66,7 +66,8 @@ const reconciliation = `# p.34 Source-Control Reconciliation\n\n` +
   `- tracked route/generation inventories: **REGENERATED** by the inventory-enabled build\n` +
   `- current candidate manifest: **REGENERATED** after every source or evidence change\n` +
   `- old fingerprints copied into predecessor records: **PREDECESSOR**, never current approval\n` +
-  `- exact Vercel preview, AAL2, Supabase toggle, named review: **OPERATOR_ACTION_REQUIRED** until observed\n\n` +
+  `- exact Vercel preview, AAL2, and named review: **OPERATOR_ACTION_REQUIRED** until observed\n` +
+  `- Supabase passwordless protected access: **COMPENSATING_CONTROL_ACTIVE**; leaked-password feature: **DEFERRED_PLATFORM_CONTROL**\n\n` +
   `No force push, merge, deployment, migration, production alias, PHI operation, or customer activation is authorized by this reconciliation.\n`;
 
 const focusedPr = `# p.34 Focused PR Construction\n\n` +
@@ -116,11 +117,11 @@ const p40Entries = state.integrationEntries.map((entry) => ({
   reviewLane: p40ReviewLane(entry.path)
 }));
 
-const riskOrder = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "GENERATED", "DOCUMENTATION"];
+const riskOrder = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "GENERATED", "DOCS"];
 
 function p40Risk(path, classification) {
   const lower = path.toLowerCase();
-  if (classification === "DOCUMENTATION") return "DOCUMENTATION";
+  if (classification === "DOCUMENTATION") return "DOCS";
   if (classification === "GENERATED_EVIDENCE") return "GENERATED";
   if (
     lower.includes("atomicapproval")
@@ -138,6 +139,7 @@ function p40Risk(path, classification) {
     || lower.includes("pilotoperatingsystem")
     || lower.includes("pilotcostgovernor")
     || lower.includes("aal2")
+    || lower.includes("supabasepasswordlessassurance")
     || lower.includes("certif")
   ) return "HIGH";
   if (classification === "UI" || classification === "CORE_RUNTIME" || classification === "CONFIGURATION") return "MEDIUM";
@@ -148,7 +150,9 @@ function reviewEvidenceFor(entry) {
   const lane = entry.reviewLane;
   const tests = lane === "PILOT_OS" || lane === "COMMERCIAL"
     ? ["npm run test:scrimed-p34-post-review-readiness", "npm run test:scrimed-p34-pilot-adversarial"]
-    : lane === "SECURITY" || lane === "AAL2"
+    : lane === "SUPABASE"
+      ? ["npm run test:supabase-passwordless-assurance", "npm run contract:supabase-passwordless-assurance", "npm run verify:supabase-security"]
+      : lane === "SECURITY" || lane === "AAL2"
       ? ["npm run test:scrimed-p34-gap-closure", "npm run test:nonsecret"]
       : lane === "VERCEL" || entry.classification === "UI"
         ? ["npm run smoke:public", "npm run scrimed:p34:certify"]
@@ -158,7 +162,7 @@ function reviewEvidenceFor(entry) {
       ? "Strengthens bounded synthetic-pilot execution and evidence controls."
       : lane === "COMMERCIAL"
         ? "Strengthens nonbinding economics, proposal, and buyer-readiness controls."
-        : lane === "SECURITY" || lane === "AAL2"
+        : lane === "SECURITY" || lane === "AAL2" || lane === "SUPABASE"
           ? "Strengthens fail-closed identity, approval, egress, or security evidence."
           : lane === "VERCEL"
             ? "Binds nonproduction preview behavior and observability to the exact candidate."
@@ -200,6 +204,17 @@ const p40RiskDiffBase = {
 };
 if (p40RiskDiffBase.unexplainedFileCount !== 0) throw new Error("PR #40 risk-ranked diff contains unexplained files.");
 const p40RiskDiff = { ...p40RiskDiffBase, diffFingerprint: sha256(p40RiskDiffBase) };
+const p34FinalRiskDiffBase = {
+  ...p40RiskDiffBase,
+  schemaVersion: "scrimed-p34-final-risk-ranked-diff-v1",
+  sourcePullRequestNumber: 40,
+  reviewDecision: "EXACT_REVIEW_REQUIRED",
+  supersedes: "artifacts/review/p40-risk-ranked-diff.json"
+};
+const p34FinalRiskDiff = {
+  ...p34FinalRiskDiffBase,
+  diffFingerprint: sha256(p34FinalRiskDiffBase)
+};
 const p40ReviewLanes = ["CORE_RUNTIME", "PILOT_OS", "COMMERCIAL", "SECURITY", "GOVERNANCE", "VERCEL", "SUPABASE", "AAL2"];
 const p40MapBase = {
   schemaVersion: "scrimed-p40-full-integration-map-v1",
@@ -276,10 +291,10 @@ const p40CurrentRiskMapBase = {
   repository: state.repository,
   pullRequestNumber: 40,
   exactCandidateBinding: "artifacts/release/scrimed-p34-release-manifest.json",
-  sourceArtifact: "artifacts/review/p40-risk-ranked-diff.json",
-  sourceFingerprint: p40RiskDiff.diffFingerprint,
-  riskCounts: p40RiskDiff.riskCounts,
-  criticalAndHighFiles: p40RiskDiff.files
+  sourceArtifact: "artifacts/review/p34-final-risk-ranked-diff.json",
+  sourceFingerprint: p34FinalRiskDiff.diffFingerprint,
+  riskCounts: p34FinalRiskDiff.riskCounts,
+  criticalAndHighFiles: p34FinalRiskDiff.files
     .filter((entry) => entry.risk === "CRITICAL" || entry.risk === "HIGH")
     .map(({ path, risk, reviewLane, relevantTests, relevantEvidence }) => ({
       path,
@@ -347,12 +362,15 @@ const p40ReviewIndexBase = {
     "app/lib/scrimed-p34/exactHeadReviewState.ts",
     "app/lib/scrimed-p34/reviewReadiness.ts",
     "app/lib/release/previewAcceptance.ts",
+    "app/lib/release/supabasePasswordlessAssurance.ts",
     "scripts/generate-p34-build-inventory.mjs",
     "scripts/scrimed-p34-certify.mjs"
   ],
   operatorStates: {
     aal2: "OPERATOR_ACTION_REQUIRED",
-    supabaseLeakedPasswordProtection: "OPERATOR_ACTION_REQUIRED",
+    supabasePasswordlessProtectedAccess: "COMPENSATING_CONTROL_ACTIVE",
+    supabaseLeakedPasswordProtection: "DEFERRED_PLATFORM_CONTROL",
+    passwordAuthWithoutVerifiedLeakedPasswordProtection: "DENY",
     productionMigrations: "PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED",
     protectedPilot: "PROTECTED_PILOT_AUTHORIZATION_REQUIRED"
   },
@@ -400,12 +418,12 @@ const executiveCanonicalState = `# p.34 Executive Canonical State\n\n` +
   `Status: **AUTOMATED ASSURANCE IN PROGRESS / EXACT-HEAD INDEPENDENT REVIEW REQUIRED**\n\n` +
   `| Control | Canonical source | Current state |\n| --- | --- | --- |\n` +
   `| Candidate | \`artifacts/release/scrimed-p34-release-manifest.json\` | Generated only after the source is frozen |\n` +
-  `| Review | PR #40 + \`artifacts/review/p40-risk-ranked-diff.json\` | Named independent review not present |\n` +
+  `| Review | PR #40 + \`artifacts/review/p34-final-risk-ranked-diff.json\` | Named independent review not present |\n` +
   `| Routes | \`artifacts/build/routes.json\` | Generated from the Next build; no manual expected count |\n` +
   `| Rendering | \`artifacts/build/render-inventory.json\` | Generated from build manifests and build output |\n` +
   `| Preview | exact candidate Vercel preview | Nonproduction only; acceptance must be candidate-bound |\n` +
   `| AAL2 | \`artifacts/security/p40-aal2.json\` | Fresh operator evidence required |\n` +
-  `| Supabase | project \`yxacqdfeyojrjghpwike\` | Leaked-password protection operator action required |\n` +
+  `| Supabase | project \`yxacqdfeyojrjghpwike\` | Passwordless compensating control active; leaked-password feature deferred |\n` +
   `| Migrations | three checksum-bound files | Static ready; production unapplied and unauthorized |\n` +
   `| Synthetic pilots | six bounded archetypes | No-PHI/nonproduction execution only with scope approval |\n` +
   `| Protected pilot | external authority | Not authorized |\n` +
@@ -425,7 +443,7 @@ const executiveReviewBrief = `# PR #40 Executive Review Brief\n\nTarget reading 
   `## 10. Preview Evidence\nThe accepted target must be the exact Node 24 nonproduction Vercel deployment, with public smoke, desktop/390px checks, protected denial, and no production alias.\n\n` +
   `## 11. Migrations\nThree migrations remain unapplied. Verify checksums and static/disposable evidence; do not authorize production application through this review.\n\n` +
   `## 12. AAL2\nFresh candidate-bound operator evidence remains required and contains no credential material.\n\n` +
-  `## 13. Supabase\nThe leaked-password warning remains owner action until the Auth setting is changed and Security Advisor is rerun.\n\n` +
+  `## 13. Supabase\nThe leaked-password warning remains open and is classified \`DEFERRED_PLATFORM_CONTROL\` on the current plan. Passwordless synthetic access is permitted only while every compensating control is current; password auth without verified leaked-password protection is denied.\n\n` +
   `## 14. Security Evidence\nReview secret scan, dependency audit, SBOM, adversarial/fuzz/concurrency/failure tests, and fail-closed protected APIs.\n\n` +
   `## 15. Commercial Authority\nPricing and value outputs are estimated/simulated and nonbinding. Agents cannot sign, discount, promise dates, activate customers, or distribute investor artifacts.\n\n` +
   `## 16. Reviewer Decision\nRecord exactly one: **APPROVE_EXACT_HEAD**, **REQUEST_CHANGES**, or **REJECT**. Bind identity and disposition to the exact manifest. Approval grants review evidence only.\n`;
@@ -445,7 +463,8 @@ const currentExecutiveState = `# p.34 Current Executive State\n\n` +
   `| Cumulative main-to-final assurance | AUTOMATED_ASSURANCE_COMPLETE after certification |\n` +
   `| Exact nonproduction preview | OPERATOR_ACTION_REQUIRED for release-steward acceptance |\n` +
   `| AAL2 | OPERATOR_ACTION_REQUIRED |\n` +
-  `| Supabase leaked-password protection | OPERATOR_ACTION_REQUIRED |\n` +
+  `| Supabase passwordless protected access | COMPENSATING_CONTROL_ACTIVE |\n` +
+  `| Supabase leaked-password protection | DEFERRED_PLATFORM_CONTROL |\n` +
   `| Three production migrations | PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED |\n` +
   `| Merge | MERGE_AUTHORIZATION_REQUIRED |\n` +
   `| Protected pilot | PROTECTED_PILOT_AUTHORIZATION_REQUIRED |\n` +
@@ -467,7 +486,7 @@ const currentHeadReviewBrief = `# PR #40 Current Exact-Head Review Brief\n\nTarg
   `## Predecessor Relationship\n\nPR #40 is based on PR #39 exact head \`${p34Predecessor.commitSha}\`. This review covers the focused delta only; the predecessor requires its own decision.\n\n` +
   `## Highest-Risk Delta\n\n1. Pilot manifest validation and immutable evidence-ledger completeness.\n2. Cost governor, proposal authority, and protected-pilot expansion boundaries.\n3. Exact-head review freshness and replay prevention.\n4. Independent route/render regression baselines.\n5. Protected Vercel preview credential handling and fail-closed write checks.\n6. Public commercial pricing: protected and operating tiers remain custom scope.\n\n` +
   `## Required Evidence\n\nRun status must include p.34 certification, Node 24, nonsecret suite, secret scan, dependency audit, SBOM, generated integrity, build, public smoke, protected-write denials, desktop/390px checks, and exact nonproduction preview evidence.\n\n` +
-  `## External Gates\n\nAAL2, Supabase leaked-password protection, release-steward preview acceptance, migration authorization, merge, protected pilot, production, customer activation, and external distribution remain separately controlled.\n\n` +
+  `## External Gates\n\nAAL2, release-steward preview acceptance, migration authorization, merge, protected pilot, production, customer activation, and external distribution remain separately controlled. Supabase leaked-password protection remains a deferred platform control; password auth stays denied until it is verified.\n\n` +
   `## Decision\n\nSubmit exactly one attributable GitHub decision against the exact PR #40 head: **APPROVE**, **REQUEST_CHANGES**, or **COMMENT**. Approval provides review evidence only.\n\n` +
   `Machine-readable risk index: \`artifacts/review/p40-current-risk-map.json\`.\n`;
 
@@ -490,13 +509,75 @@ const riskDiffDoc = `# PR #40 Risk-Ranked Diff\n\n` +
   p40RiskDiff.files.map((entry) => `| ${entry.risk} | \`${entry.path}\` | ${entry.whyChanged} | \`${entry.relevantTests[0]}\` |`).join("\n") +
   `\n\nExact test and evidence arrays are in \`artifacts/review/p40-risk-ranked-diff.json\`. Generated and documentation files remain reviewable evidence but cannot substitute for behavior or named approval.\n`;
 
-const supabaseCloseout = `# Supabase Leaked-Password Closeout\n\n` +
+const supabaseCloseout = `# Supabase Leaked-Password Upgrade Path\n\n` +
   `Current warning: **auth_leaked_password_protection / Leaked Password Protection Disabled**\n\n` +
-  `Project: **scrimed-protected-pilot** (\`yxacqdfeyojrjghpwike\`)\n\n` +
-  `## Two-Minute Owner Action\n\n1. Open Supabase Dashboard and select the exact project above.\n2. Open **Authentication > Sign In / Providers > Password security** (the dashboard label may be **Authentication > Settings > Password Security**).\n3. Enable only **Prevent use of leaked passwords**.\n4. Save. Do not change users, sessions, providers, redirect URLs, RLS, roles, schema, data, or migrations.\n5. Open **Advisors > Security Advisor** and rerun/refresh it.\n\n` +
-  `## Expected Result\n\nThe \`auth_leaked_password_protection\` warning is absent. Record a non-sensitive screenshot or advisor result with project name and timestamp; do not capture users, emails, tokens, or configuration secrets.\n\n` +
-  `## Verification\n\nRun the connected Security Advisor again and require zero leaked-password warnings. Protected-pilot readiness remains blocked until this is observed and candidate-bound evidence is recorded.\n\n` +
-  `## Rollback\n\nIf the setting causes an authentication incident, the project owner may disable only the same setting, record the reason and timestamp, and restore the gate to \`OPERATOR_ACTION_REQUIRED\`. No unrelated Auth setting may be changed.\n`;
+  `Project: **scrimed-protected-pilot** (public alias only; project identifiers and secrets are excluded)\n\n` +
+  `Current classification: **DEFERRED_PLATFORM_CONTROL / DEFERRED_HARDENING_FOR_PASSWORD_AUTH**. The warning is not resolved. It is not a universal blocker for the bounded passwordless synthetic/no-PHI lane while all compensating controls remain current.\n\n` +
+  `## Current Safe Lane\n\nPublic signup is disabled, OTP/magic-link calls use \`shouldCreateUser: false\`, production UI password calls are absent, TOTP and AAL2 protect privileged operations, AAL1 sessions are bounded, tenant and role authorization are enforced server-side, and OTP/sign-in controls are rate limited. Any drift or stale evidence denies protected access.\n\n` +
+  `## Activation Trigger\n\nBefore any password-based protected path is introduced, require leaked-password protection to be \`VERIFIED\`. If the project plan exposes the feature, enable it, rerun Security Advisor, run the passwordless assurance policy and auth regression suite, and retain non-sensitive evidence.\n\n` +
+  `## Invariant\n\n\`passwordAuthEnabled == true && leakedPasswordProtection != VERIFIED -> protectedProductionAuth = DENY\`. Production, PHI, protected-pilot, and customer authority remain separately denied.\n`;
+
+const supabaseCompensatingControls = `# Supabase Free-Plan Passwordless Compensating Controls\n\n` +
+  `Status: **COMPENSATING_CONTROL_ACTIVE / DEFERRED_PLATFORM_CONTROL**\n\n` +
+  `## Limitation\n\nSupabase leaked-password protection is unavailable on the current Free plan. The Security Advisor warning remains open and must not be represented as resolved. The control primarily protects password authentication; SCRIMED's current protected application entry is passwordless OTP/magic link.\n\n` +
+  `## Compensating Controls\n\n` +
+  `- public signup disabled;\n` +
+  `- every application OTP call sets \`shouldCreateUser: false\`;\n` +
+  `- no production UI invokes \`signInWithPassword\`;\n` +
+  `- TOTP MFA enabled and privileged routes require \`aal2\`;\n` +
+  `- AAL1 sessions limited to 15 minutes;\n` +
+  `- password-only protected access prohibited;\n` +
+  `- OTP request, verification, sign-in, and protected APIs are bounded by rate-limit policy;\n` +
+  `- tenant membership, authorized role, session identity, and route permission are enforced server-side;\n` +
+  `- auth uncertainty, stale posture evidence, or control drift fails closed;\n` +
+  `- PHI, protected-pilot activation, production, and customer authority remain denied.\n\n` +
+  `## Residual Risk\n\nThe upstream warning remains visible. Direct identity-provider behavior and configuration can drift outside source control, so the posture needs periodic live re-observation. AAL1 account access is not authority for protected operations. Compensating controls reduce current bounded-lane exposure but do not substitute for the platform control when password authentication is used.\n\n` +
+  `## Activation Trigger\n\nIf SCRIMED introduces password-based protected authentication, or upgrades to a plan that exposes leaked-password protection, enable and verify the control before protected production access. The executable invariant is in \`app/lib/release/supabasePasswordlessAssurance.ts\`; tests fail when password auth is enabled without verified protection.\n\n` +
+  `## Evidence and Expiry\n\nCurrent non-sensitive posture was observed on 2026-08-31 and must be re-observed by 2026-09-30. No passwords, OTPs, tokens, user identities, or service credentials are retained.\n`;
+
+const finalCanonicalState = `# p.34 Final Synthetic Canonical State\n\n` +
+  `Status: **P34 EXACT-HEAD REVIEW PREPARATION / SYNTHETIC NO-PHI ONLY**\n\n` +
+  `## Exact Source of Truth\n\nThe post-commit exact commit, tree, candidate, source, validation, review packet, gate packet, SBOM, security, certification, migration, route, render, preview, and AAL2 bindings live in \`artifacts/release/scrimed-p34-release-manifest.json\`. That ignored artifact is regenerated after source freeze to avoid a self-referential tracked commit.\n\n` +
+  `## Verified Starting State\n\nThe correction wave began from clean synchronized commit \`dabe42112f3c6e93a6b3f14b13856c79b210a147\` on \`${state.branch}\`. PR #40 is the current review target; PR #39 remains predecessor evidence. No genuine independent human approval was present at discovery. The exact dabe preview was READY, Node 24, nonproduction, and carried no production alias.\n\n` +
+  `## Current Gate Semantics\n\n` +
+  `| Control | State |\n| --- | --- |\n` +
+  `| Local automated assurance | AUTOMATED_ASSURANCE_COMPLETE after final certification |\n` +
+  `| Human exact-head review | EXACT_REVIEW_REQUIRED |\n` +
+  `| Supabase passwordless protected access | COMPENSATING_CONTROL_ACTIVE while evidence is current |\n` +
+  `| Supabase leaked-password feature | DEFERRED_PLATFORM_CONTROL; warning open |\n` +
+  `| Password auth without verified leaked-password control | DENY |\n` +
+  `| Fresh candidate-bound AAL2 | OPERATOR_ACTION_REQUIRED |\n` +
+  `| Three pending migrations | STATIC_READY / DISPOSABLE_REPLAY_PASSED / PRODUCTION_UNAPPLIED |\n` +
+  `| Exact nonproduction preview | exact-head verification required after any source change |\n` +
+  `| Protected pilot | PROTECTED_PILOT_AUTHORIZATION_REQUIRED |\n` +
+  `| Merge | MERGE_AUTHORIZATION_REQUIRED |\n` +
+  `| Production | PRODUCTION_AUTHORIZATION_REQUIRED |\n` +
+  `| Customer activation | CUSTOMER_ACTIVATION_REQUIRED |\n\n` +
+  `## Commercial Lane\n\nWorkflow Intelligence Assessment, Enterprise AI Governance Pilot, and RCM Workflow Intelligence Pilot are the only prioritized external wedges. They remain nonbinding, synthetic/no-PHI, nonclinical, human-controlled, and evidence-labeled. Protected and operating tiers remain custom enterprise scope.\n\n` +
+  `## Absolute Boundary\n\nNo production deployment or alias, production migration, PHI, live patient data, clinical autonomy, diagnosis, treatment, triage, payer submission, EHR/device writeback, protected-pilot activation, customer activation, compliance/certification claim, partnership claim, merge, or external distribution is authorized.\n`;
+
+const finalReviewBrief = `# p.34 Final Exact-Head Review Brief\n\nTarget reading time: **10 minutes or less**\n\n` +
+  `1. **Exact candidate:** compare PR #40 head with every binding in \`artifacts/release/scrimed-p34-release-manifest.json\`; stop on any mismatch.\n` +
+  `2. **Delta:** review \`artifacts/review/p34-final-risk-ranked-diff.json\` in CRITICAL, HIGH, MEDIUM, LOW, GENERATED, DOCS order.\n` +
+  `3. **Highest-risk files:** start with pilot manifest/operating system, cost governor, exact-head review, preview acceptance, passwordless assurance, protected authorization, and migration controls.\n` +
+  `4. **Autonomy boundaries:** A3 clinical autonomy, diagnosis, treatment, triage, payer submission, and EHR/device writes remain denied.\n` +
+  `5. **Tenant isolation:** verify tenant membership and role checks precede protected reads/writes; cross-tenant evidence remains denied.\n` +
+  `6. **Approval logic:** approvals are exact-candidate, scoped, expiring, one-use, and cannot self-authorize, replay, merge, deploy, or activate a customer.\n` +
+  `7. **PHI egress:** no raw PHI, secrets, OTPs, or tokens enter logs, evidence, snapshots, provider calls, or public artifacts.\n` +
+  `8. **Supabase:** confirm \`COMPENSATING_CONTROL_ACTIVE\` for the passwordless lane, \`DEFERRED_PLATFORM_CONTROL\` for the warning, and fail-closed password-auth invariant.\n` +
+  `9. **AAL2:** fresh exact-preview operator evidence remains \`OPERATOR_ACTION_REQUIRED\`; no token may be persisted.\n` +
+  `10. **Migrations:** three files are checksum-bound, statically ready, disposable-replay tested, production-unapplied, and separately authorized.\n` +
+  `11. **Vercel preview:** require exact commit/tree/candidate, Node 24, READY, desktop and 390px checks, public smoke, protected denial, and no production alias.\n` +
+  `12. **Synthetic pilot:** verify NO_PHI, NONPRODUCTION, declared success criteria, immutable evidence, cost ceilings, HALT_SAFE, and no customer-system writes.\n` +
+  `13. **Commercial authority:** agents may draft and analyze only; they cannot sign, discount, promise dates, accept terms, activate protected work, or distribute artifacts.\n` +
+  `14. **Unresolved gates:** human review, AAL2, release-steward preview acceptance, merge, production migration/deployment, protected pilot, customer activation, and external distribution remain separate.\n` +
+  `15. **Decision:** record exactly one attributable outcome against the exact head: \`APPROVE_EXACT_HEAD\`, \`REQUEST_CHANGES\`, or \`REJECT\`. Approval grants review evidence only.\n`;
+
+const finalRiskDiffDoc = `# p.34 Final Risk-Ranked Diff\n\n` +
+  `Status: **EXACT_REVIEW_REQUIRED**\n\nFiles: **${p34FinalRiskDiff.fileCount}**\n\nUnexplained: **${p34FinalRiskDiff.unexplainedFileCount}**\n\nFingerprint: \`${p34FinalRiskDiff.diffFingerprint}\`\n\n` +
+  `| Rank | Files |\n| --- | ---: |\n` +
+  Object.entries(p34FinalRiskDiff.riskCounts).map(([risk, count]) => `| ${risk} | ${count} |`).join("\n") +
+  `\n\nEvery entry in \`artifacts/review/p34-final-risk-ranked-diff.json\` includes purpose, risk, tests, and evidence. Generated evidence and documentation support review but never replace behavioral verification or named approval.\n`;
 
 const macosSwcNote = `# macOS SWC Environment Note\n\n` +
   `The local macOS environment may report \`next-swc-native-binding-unavailable-wasm-fallback\`. The warning remains visible. It is environmental, not classified as a pass for native SWC, and does not grant production authority. A candidate may proceed to human review only when the supported WASM fallback completes the same typecheck, build, route/render baseline, public-smoke, and generated-integrity checks without behavioral drift. CI and any authorized deployment must still use a supported Node 24 environment and report their actual native/fallback state.\n`;
@@ -509,6 +590,7 @@ const outputs = [
   ["docs/review/P34_INTEGRATION_MAP.md", integrationDoc],
   ["docs/review/P34_REVIEW_BRIEF.md", reviewBrief],
   ["docs/release/P34_CURRENT_CANONICAL_BASELINE.md", canonicalBaselineDoc],
+  ["docs/release/P34_FINAL_SYNTHETIC_CANONICAL_STATE.md", finalCanonicalState],
   ["docs/release/P34_EXECUTIVE_CANONICAL_STATE.md", executiveCanonicalState],
   ["docs/release/P34_CURRENT_EXECUTIVE_STATE.md", currentExecutiveState],
   ["docs/release/P40_SOURCE_CONTROL_INTEGRITY.md", sourceIntegrityDoc],
@@ -519,11 +601,15 @@ const outputs = [
   ["docs/review/P34_STACKED_REVIEW_PLAN.md", stackedReviewDoc],
   ["docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md", cumulativeAssuranceDoc],
   ["docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md", currentHeadReviewBrief],
+  ["docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md", finalReviewBrief],
+  ["docs/review/P34_FINAL_RISK_RANKED_DIFF.md", finalRiskDiffDoc],
   ["docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md", supabaseCloseout],
+  ["docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md", supabaseCompensatingControls],
   ["docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md", macosSwcNote],
   ["artifacts/review/p40-review-index.json", `${JSON.stringify(p40ReviewIndex, null, 2)}\n`],
   ["artifacts/review/p40-full-integration-map.json", `${JSON.stringify(p40Map, null, 2)}\n`],
   ["artifacts/review/p40-risk-ranked-diff.json", `${JSON.stringify(p40RiskDiff, null, 2)}\n`],
+  ["artifacts/review/p34-final-risk-ranked-diff.json", `${JSON.stringify(p34FinalRiskDiff, null, 2)}\n`],
   ["artifacts/review/p34-stacked-review-plan.json", `${JSON.stringify(stackedReviewPlan, null, 2)}\n`],
   ["artifacts/review/p34-cumulative-integration-assurance.json", `${JSON.stringify(cumulativeIntegrationAssurance, null, 2)}\n`],
   ["artifacts/review/p40-current-risk-map.json", `${JSON.stringify(p40CurrentRiskMap, null, 2)}\n`]
@@ -531,6 +617,7 @@ const outputs = [
 
 await mkdir("artifacts/review", { recursive: true });
 await mkdir("docs/platform", { recursive: true });
+await mkdir("docs/security", { recursive: true });
 for (const [path, expected] of outputs) {
   if (checkOnly) {
     const actual = await readFile(path, "utf8");

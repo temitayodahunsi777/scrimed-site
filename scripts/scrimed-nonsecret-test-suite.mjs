@@ -1127,6 +1127,23 @@ const checks = [
     args: ["scripts/verify-supabase-security.mjs", "--strict"]
   },
   {
+    label: "Supabase passwordless assurance policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/supabase-passwordless-assurance-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Supabase passwordless assurance contract",
+    args: ["scripts/supabase-passwordless-assurance-contract-check.mjs"]
+  },
+  {
+    label: "p.34 commercial conversion assets contract",
+    args: ["scripts/p34-commercial-conversion-assets-contract-check.mjs"]
+  },
+  {
     label: "Supabase RLS contract",
     args: ["tests/security/supabase-rls-contract.test.mjs"]
   },

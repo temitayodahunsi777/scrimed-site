@@ -9,8 +9,13 @@
   ],
   "counts": {
     "PASS": 3,
+    "PASS_SAFE_BOUNDARY_ENFORCED": 0,
+    "COMPENSATING_CONTROL_ACTIVE": 1,
+    "DEFERRED_PLATFORM_CONTROL": 1,
     "OPERATOR_REQUIRED": 10,
-    "BLOCKED": 8,
+    "OPERATOR_ACTION_REQUIRED": 0,
+    "BLOCKED": 7,
+    "BLOCKED_TECHNICAL": 0,
     "FAIL": 0
   },
   "gates": [
@@ -109,13 +114,32 @@
       "reason": "Real operator evidence cannot be minted or simulated by the repository."
     },
     {
+      "gateId": "supabase-passwordless-protected-access",
+      "status": "COMPENSATING_CONTROL_ACTIVE",
+      "ownerRole": "security-identity-owner",
+      "evidence": [
+        "connected Supabase Auth configuration observation dated 2026-08-31",
+        "Supabase Security Advisor auth_leaked_password_protection warning",
+        "app/pilot-workspace/ProtectedPilotAccess.tsx",
+        "app/sales-operations/SalesOperationsConsole.tsx",
+        "app/lib/protectedPilotStore.ts",
+        "docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md"
+      ],
+      "reason": "The current synthetic/no-PHI protected lane uses passwordless entry, AAL2, tenant and role authorization, server-side checks, and bounded sessions. Evidence expiry or control drift denies access."
+    },
+    {
       "gateId": "supabase-leaked-password-protection",
-      "status": "BLOCKED",
+      "status": "DEFERRED_PLATFORM_CONTROL",
       "ownerRole": "supabase-project-owner",
       "evidence": [
-        "non-sensitive setting evidence"
+        "connected Supabase Auth configuration observation dated 2026-08-31",
+        "Supabase Security Advisor auth_leaked_password_protection warning",
+        "app/pilot-workspace/ProtectedPilotAccess.tsx",
+        "app/sales-operations/SalesOperationsConsole.tsx",
+        "app/lib/protectedPilotStore.ts",
+        "docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md"
       ],
-      "reason": "Connected project setting remains an external operator action."
+      "reason": "Leaked-password protection remains unavailable on the current plan and is deferred, not resolved. Password-based protected authentication is denied until this control is verified."
     },
     {
       "gateId": "vercel-preview-authorization",
@@ -384,5 +408,5 @@
   ],
   "productionReadiness": false,
   "externalDistributionAuthorized": false,
-  "summaryHash": "c2423a7fe0f04744034efcfc142d67e3246ae251399de5bc2ae49a0a5c145c74"
+  "summaryHash": "213cca9116893e7ff08e3000c0fbc0d9ba0da3af8868c3d2395cd45fa9405240"
 }

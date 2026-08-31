@@ -14,7 +14,9 @@ machine-readable companion. A disabled consequential capability is never authori
 | `clean-attributable-candidate` | `FOUNDER_INTERIM_ACCEPTANCE_REQUIRED` until exact commit exists | Founder/release steward | Candidate manifest and attribution decision |
 | `ai-independent-review` | `AUTOMATED_ASSURANCE_COMPLETE` when 12 lanes pass | Review orchestrator | Versioned rubric/evidence packets; never human approval |
 | `wix-faithcore-copy` | `OPERATOR_ACTION_REQUIRED` | Wix owner | Published neutral copy plus strict live/mobile evidence |
-| `supabase-leaked-password-protection` | `OPERATOR_ACTION_REQUIRED` | Supabase Auth owner | Resolved advisor warning and auth regression result |
+| `supabase-passwordless-protected-access` | `COMPENSATING_CONTROL_ACTIVE` while evidence is current | Security/identity owner | Passwordless policy, AAL2, rate-limit, tenant/role, and server authorization tests |
+| `supabase-leaked-password-protection` | `DEFERRED_PLATFORM_CONTROL` | Supabase Auth owner | Warning remains open; enable before protected password auth or when the plan exposes the feature |
+| `supabase-password-auth-invariant` | `PASS_SAFE_BOUNDARY_ENFORCED` | Security/identity owner | Password auth without verified leaked-password protection is denied |
 | `disposable-migration-dry-run` | `OPERATOR_ACTION_REQUIRED` | CI/platform owner | `migration-dry-run.yml` artifact for exact hashes |
 | `preview-authorization` | `FOUNDER_INTERIM_ACCEPTANCE_REQUIRED` | Founder | Signed exact candidate/assurance reference, maximum 30 days |
 | `fresh-dependency-advisory` | `OPERATOR_ACTION_REQUIRED` | Security owner | `dependency-security.yml` artifact and reviewed findings |

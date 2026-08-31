@@ -14,7 +14,8 @@ Status: **CLAIMS_REVIEW_REQUIRED / EXTERNAL DISTRIBUTION AUTHORIZATION REQUIRED*
 | --- | --- | --- |
 | Is the platform more than a concept? | Product Console, 630-route build inventory, synthetic pilot OS | BUILT / VALIDATED_SYNTHETIC |
 | Is the candidate reproducible? | exact manifest, Node 24 certification, route/render baselines, SBOM | VALIDATED_SYNTHETIC |
-| Is there a credible entry wedge? | Workflow Intelligence Assessment and bounded synthetic pilots | BUILT / PRE-COMMERCIAL |
+| Is there a credible entry wedge? | Workflow Intelligence Assessment, Enterprise AI Governance Pilot, and RCM Workflow Intelligence Pilot | BUILT / PRE-COMMERCIAL |
+| Is identity risk honestly represented? | passwordless assurance policy, AAL2 controls, open advisor warning, deferred platform control | VALIDATED_SYNTHETIC / OPERATOR EVIDENCE REQUIRED |
 | Are safety boundaries executable? | policy denials, no-PHI tests, protected-write smoke, audit controls | VALIDATED_SYNTHETIC |
 | Is production authorized? | release gate matrix | NOT_AUTHORIZED |
 | Are customer outcomes proven? | no verified customer outcome packet exists | NOT_AUTHORIZED |

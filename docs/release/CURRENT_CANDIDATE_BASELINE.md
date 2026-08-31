@@ -48,8 +48,9 @@ starting HEAD. Results: `10/10` passed, `0` failed, one retained warning
 - Safe enforced boundaries: synthetic-only, no PHI, and no clinical execution.
 - Automated assurance: complete for the starting candidate.
 - Wix FaithCore publication: operator action required; the safe draft was saved but not published.
-- Supabase leaked-password protection: operator action required; the security advisor warning was
-  still present.
+- Supabase leaked-password protection: warning still present and now classified
+  `DEFERRED_PLATFORM_CONTROL`; passwordless synthetic access requires current compensating controls,
+  and password auth without verified protection is denied.
 - Disposable migration execution: operator action required; static analysis passed but no
   disposable PostgreSQL runtime had executed the three migrations.
 - Legal adoption: targeted qualified review required only at binding adoption.

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "scrimed-p40-risk-ranked-diff-v1",
+  "schemaVersion": "scrimed-p34-final-risk-ranked-diff-v1",
   "repository": "temitayodahunsi777/scrimed-site",
   "pullRequestNumber": 40,
   "branch": "agent/scrimed-p34-post-review-readiness",
@@ -2402,5 +2402,7 @@
   "unexplainedFileCount": 0,
   "reviewDecision": "EXACT_REVIEW_REQUIRED",
   "productionAuthorityGranted": false,
-  "diffFingerprint": "f0eff1c2dc5d089670c28d34b444f21dc8dd4f8af636d710b8f57737580ec426"
+  "sourcePullRequestNumber": 40,
+  "supersedes": "artifacts/review/p40-risk-ranked-diff.json",
+  "diffFingerprint": "d6debd4b7889ac0b106a8b354762a2f09e520028090eb58a7221fd0584c02649"
 }

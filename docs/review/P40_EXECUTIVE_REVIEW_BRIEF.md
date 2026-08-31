@@ -39,7 +39,7 @@ Three migrations remain unapplied. Verify checksums and static/disposable eviden
 Fresh candidate-bound operator evidence remains required and contains no credential material.
 
 ## 13. Supabase
-The leaked-password warning remains owner action until the Auth setting is changed and Security Advisor is rerun.
+The leaked-password warning remains open and is classified `DEFERRED_PLATFORM_CONTROL` on the current plan. Passwordless synthetic access is permitted only while every compensating control is current; password auth without verified leaked-password protection is denied.
 
 ## 14. Security Evidence
 Review secret scan, dependency audit, SBOM, adversarial/fuzz/concurrency/failure tests, and fail-closed protected APIs.

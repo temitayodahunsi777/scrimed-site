@@ -13,8 +13,9 @@ Open `artifacts/release/scrimed-p34-release-manifest.json` and verify PR 40, com
 3. `app/lib/scrimed-p34/exactHeadReviewState.ts`
 4. `app/lib/scrimed-p34/reviewReadiness.ts`
 5. `app/lib/release/previewAcceptance.ts`
-6. `scripts/generate-p34-build-inventory.mjs`
-7. `scripts/scrimed-p34-certify.mjs`
+6. `app/lib/release/supabasePasswordlessAssurance.ts`
+7. `scripts/generate-p34-build-inventory.mjs`
+8. `scripts/scrimed-p34-certify.mjs`
 
 ## Required Safety Checks
 

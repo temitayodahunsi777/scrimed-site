@@ -14,6 +14,7 @@ const paths = [
   "app/lib/scrimed-p34/exactHeadReviewState.ts",
   "app/lib/scrimed-p34/reviewReadiness.ts",
   "app/lib/release/previewAcceptance.ts",
+  "app/lib/release/supabasePasswordlessAssurance.ts",
   "app/lib/release/vercelReleaseAssurance.ts",
   "app/lib/productConsole.ts",
   "scripts/lib/p34-candidate-state.mjs",
@@ -30,14 +31,19 @@ const paths = [
   "artifacts/review/p40-review-index.json",
   "artifacts/review/p40-full-integration-map.json",
   "artifacts/review/p40-risk-ranked-diff.json",
+  "artifacts/review/p34-final-risk-ranked-diff.json",
   "docs/release/P34_CURRENT_CANONICAL_BASELINE.md",
+  "docs/release/P34_FINAL_SYNTHETIC_CANONICAL_STATE.md",
   "docs/release/P34_EXECUTIVE_CANONICAL_STATE.md",
   "docs/release/P40_SOURCE_CONTROL_INTEGRITY.md",
   "docs/review/P40_EXACT_HEAD_REVIEW_BRIEF.md",
   "docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md",
   "docs/review/P40_RISK_RANKED_DIFF.md",
   "docs/review/P40_FULL_INTEGRATION_MAP.md",
+  "docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md",
+  "docs/review/P34_FINAL_RISK_RANKED_DIFF.md",
   "docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md",
+  "docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md",
   "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md"
 ];
 const files = Object.fromEntries(await Promise.all(paths.map(async (path) => [path, await readFile(path, "utf8")])));
@@ -58,6 +64,10 @@ assert.equal(JSON.parse(files["artifacts/review/p40-full-integration-map.json"])
 assert.equal(JSON.parse(files["artifacts/review/p40-review-index.json"]).reviewState, "EXACT_REVIEW_REQUIRED");
 assert.equal(JSON.parse(files["artifacts/review/p40-risk-ranked-diff.json"]).unexplainedFileCount, 0);
 assert.equal(JSON.parse(files["artifacts/review/p40-risk-ranked-diff.json"]).rankOrder[0], "CRITICAL");
+assert.equal(JSON.parse(files["artifacts/review/p34-final-risk-ranked-diff.json"]).rankOrder.at(-1), "DOCS");
+assert.equal(JSON.parse(files["artifacts/review/p34-final-risk-ranked-diff.json"]).unexplainedFileCount, 0);
+assert.ok(files["app/lib/release/supabasePasswordlessAssurance.ts"].includes("PASSWORD_AUTH_REQUIRES_VERIFIED_LEAKED_PASSWORD_PROTECTION"));
+assert.ok(files["docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md"].includes("warning remains open"));
 
 for (const state of ["NOT_REQUESTED", "REQUESTED", "CURRENT", "STALE", "CHANGES_REQUESTED", "APPROVED_EXACT_HEAD"]) {
   assert.ok(files["app/lib/scrimed-p34/exactHeadReviewState.ts"].includes(state), state);
