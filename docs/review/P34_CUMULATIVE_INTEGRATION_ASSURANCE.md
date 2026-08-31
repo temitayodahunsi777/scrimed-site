@@ -2,7 +2,7 @@
 
 Status: **EXACT_REVIEW_REQUIRED**
 
-This packet maps **389** files from `fd2a4d09174726e5ba685673fe1f0df25f2ad308` through the final PR #40 source tree, with **0** unexplained files. Exact final commit and tree values are post-commit bindings in the canonical release manifest.
+This packet maps **391** files from `fd2a4d09174726e5ba685673fe1f0df25f2ad308` through the final PR #40 source tree, with **0** unexplained files. Exact final commit and tree values are post-commit bindings in the canonical release manifest.
 
 ## Coverage
 
@@ -15,7 +15,7 @@ This packet maps **389** files from `fd2a4d09174726e5ba685673fe1f0df25f2ad308` t
 - GOVERNANCE: 15
 - PILOT: 10
 - SECURITY: 4
-- TEST: 97
+- TEST: 99
 - UI: 17
 - VERCEL: 10
 

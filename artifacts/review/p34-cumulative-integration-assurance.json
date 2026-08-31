@@ -7,7 +7,7 @@
   "finalHeadBinding": "artifacts/release/scrimed-p34-release-manifest.json",
   "stackedReviewPlan": "artifacts/review/p34-stacked-review-plan.json",
   "stackedReviewPlanFingerprint": "420a32b131fec2f0a984b48b69b1b614feaa725bbffdae63c45231770522db88",
-  "cumulativeFileCount": 389,
+  "cumulativeFileCount": 391,
   "classificationCounts": {
     "AAL2": 6,
     "COMMERCIAL": 1,
@@ -18,7 +18,7 @@
     "GOVERNANCE": 15,
     "PILOT": 10,
     "SECURITY": 4,
-    "TEST": 97,
+    "TEST": 99,
     "UI": 17,
     "VERCEL": 10
   },
@@ -1505,6 +1505,16 @@
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
     },
     {
+      "path": "scripts/commercial-pricing-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
+      "path": "scripts/commercial-pricing-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CUMULATIVE_MAIN_TO_CURRENT"
+    },
+    {
       "path": "scripts/dependency-security-floor-contract-check.mjs",
       "classification": "SECURITY",
       "status": "CUMULATIVE_MAIN_TO_CURRENT"
@@ -1984,5 +1994,5 @@
   "automatedEvidenceIsHumanApproval": false,
   "mergeAuthorityGranted": false,
   "productionAuthorityGranted": false,
-  "assuranceFingerprint": "ecc704a6cfef0e03a432b9efe0b629cf27858cc75f706ab182066fac94b96a78"
+  "assuranceFingerprint": "2855625d5fb9bca99e5e1d9d8371120dbcb979be0b984f77e5fdf087630b6a31"
 }
