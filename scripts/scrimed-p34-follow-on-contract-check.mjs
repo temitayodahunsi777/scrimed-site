@@ -101,6 +101,8 @@ assert.ok(files["app/lib/productConsole.ts"].includes("p34CurrentCandidatePostur
 assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("requireP34ExactPreviewBinding"));
 assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("requireP34RuntimeDeploymentBinding"));
 assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("normalizeVercelPreviewOrigin"));
+assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("committedPaths"));
+assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("worktreeTrackedPaths"));
 assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("vercelPreviewHostnamePattern"));
 assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("bindVercelPreviewAccessCookie"));
 assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("resolveVercelPreviewAccess"));
@@ -113,6 +115,8 @@ assert.ok(files["app/lib/release/vercelReleaseAssurance.ts"].includes("VERCEL_DE
 assert.ok(files["app/lib/release/vercelReleaseAssurance.ts"].includes("VERCEL_URL"));
 assert.ok(files["app/lib/release/vercelReleaseAssurance.ts"].includes("deploymentIdentityBound"));
 assert.ok(files["scripts/scrimed-p34-certify.mjs"].includes("cleanCandidate"));
+assert.ok(files["scripts/scrimed-p34-certify.mjs"].includes("REGISTRY_AUDIT"));
+assert.ok(files["scripts/scrimed-p34-certify.mjs"].includes("STATIC_SECURITY_FLOOR"));
 assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("productionAliasAttached: false"));
 assert.equal(files["scripts/scrimed-p34-certify.mjs"].includes("git push"), false);
 assert.equal(files["scripts/scrimed-p34-certify.mjs"].includes("vercel deploy"), false);

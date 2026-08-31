@@ -316,9 +316,10 @@ export function inspectP34CumulativeIntegrationState(env = process.env) {
   const mergeBase = gitSha(gitText(["merge-base", base, head]) ?? "");
   if (!mergeBase) throw new Error("p.34 cumulative integration state requires a common merge base.");
 
-  const trackedPaths = nullList(git(["diff", "--name-only", "-z", `${base}...${head}`, "--"]));
+  const committedPaths = nullList(git(["diff", "--name-only", "-z", `${base}...${head}`, "--"]));
+  const worktreeTrackedPaths = nullList(git(["diff", "--name-only", "-z", "HEAD", "--"]));
   const untrackedPaths = nullList(git(["ls-files", "--others", "--exclude-standard", "-z"]));
-  const paths = [...new Set([...trackedPaths, ...untrackedPaths])]
+  const paths = [...new Set([...committedPaths, ...worktreeTrackedPaths, ...untrackedPaths])]
     .filter((path) => !path.startsWith("artifacts/release/"))
     .sort();
   const files = paths.map((path) => ({
