@@ -442,14 +442,50 @@ check("preview-acceptance-rejects-stale-or-wrong-url-evidence", () => {
 });
 
 check("runtime-preview-summary-never-self-accepts", () => {
-  const result = getP34PreviewAcceptanceSummary({
+  const deploymentId = "dpl_P34SummaryRuntime1234";
+  const deploymentHostname = "scrimed-p34-summary.vercel.app";
+  const matchingEnvironment = {
     NODE_ENV: "test",
     VERCEL_ENV: "preview",
     VERCEL_GIT_COMMIT_SHA: p34ExactHeadBaseline.commitSha,
-    SCRIMED_PREVIEW_CANDIDATE_SHA256: p34ExactHeadBaseline.candidateFingerprint
-  });
+    VERCEL_DEPLOYMENT_ID: deploymentId,
+    VERCEL_URL: deploymentHostname,
+    SCRIMED_PREVIEW_CANDIDATE_SHA256: p34ExactHeadBaseline.candidateFingerprint,
+    SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA: p34ExactHeadBaseline.commitSha,
+    SCRIMED_P34_TREE_SHA: p34ExactHeadBaseline.treeSha,
+    SCRIMED_P34_PREVIEW_DEPLOYMENT_ID: deploymentId,
+    SCRIMED_P34_PREVIEW_URL: `https://${deploymentHostname}`
+  };
+  const result = getP34PreviewAcceptanceSummary(matchingEnvironment);
+  assert.equal(result.status, "READY_FOR_RELEASE_STEWARD_ACCEPTANCE");
+  assert.equal(result.runtimeMatchesCurrentTarget, true);
+  assert.equal(result.runtimeDeploymentIdentityMatches, true);
   assert.equal(result.previewAccepted, false);
   assert.equal(result.productionAuthorized, false);
+
+  const siblingPreview = getP34PreviewAcceptanceSummary({
+    ...matchingEnvironment,
+    VERCEL_DEPLOYMENT_ID: "dpl_P34SiblingRuntime123"
+  });
+  assert.equal(siblingPreview.status, "OPERATOR_ACTION_REQUIRED");
+  assert.equal(siblingPreview.runtimeMatchesCurrentTarget, false);
+  assert.equal(siblingPreview.runtimeDeploymentIdentityMatches, false);
+
+  const mutableAlias = getP34PreviewAcceptanceSummary({
+    ...matchingEnvironment,
+    VERCEL_URL: "mutable-branch-alias.vercel.app"
+  });
+  assert.equal(mutableAlias.status, "OPERATOR_ACTION_REQUIRED");
+  assert.equal(mutableAlias.runtimeMatchesCurrentTarget, false);
+  assert.equal(mutableAlias.runtimeDeploymentIdentityMatches, false);
+
+  const decoratedManifestUrl = getP34PreviewAcceptanceSummary({
+    ...matchingEnvironment,
+    SCRIMED_P34_PREVIEW_URL: `https://${deploymentHostname}/?untrusted=1`
+  });
+  assert.equal(decoratedManifestUrl.status, "OPERATOR_ACTION_REQUIRED");
+  assert.equal(decoratedManifestUrl.previewReady, false);
+  assert.equal(decoratedManifestUrl.runtimeDeploymentIdentityMatches, false);
 });
 
 check("exact-preview-verification-requires-the-manifest-deployment", () => {

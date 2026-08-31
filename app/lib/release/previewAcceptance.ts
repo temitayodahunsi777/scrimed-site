@@ -3,7 +3,7 @@ import { getScrimedBuildInfo } from "./vercelReleaseAssurance";
 import { p34ExactHeadBaseline } from "../scrimed-p34/exactHeadBaseline";
 
 export const previewAcceptanceVersion =
-  "scrimed-p34-preview-acceptance-v2-2026-08-28";
+  "scrimed-p34-preview-acceptance-v3-2026-08-31";
 
 export type PreviewAcceptanceInput = {
   deploymentId: string;
@@ -154,17 +154,33 @@ export function getP34PreviewAcceptanceSummary(env: NodeJS.ProcessEnv = process.
   let deploymentUrl: string | null = null;
   try {
     const parsed = new URL(env.SCRIMED_P34_PREVIEW_URL ?? "");
-    if (parsed.protocol === "https:" && parsed.hostname.endsWith(".vercel.app") && parsed.pathname === "/") {
+    if (
+      parsed.protocol === "https:"
+      && parsed.hostname.endsWith(".vercel.app")
+      && !parsed.username
+      && !parsed.password
+      && parsed.pathname === "/"
+      && !parsed.search
+      && !parsed.hash
+    ) {
       deploymentUrl = parsed.origin;
     }
   } catch {
     // Missing preview evidence remains operator-required.
   }
+  const runtimeDeploymentIdentityMatches = Boolean(
+    deploymentId
+    && deploymentUrl
+    && build.deploymentIdentityBound
+    && build.deploymentId === deploymentId
+    && build.deploymentUrl === deploymentUrl
+  );
   const runtimeMatchesCurrentTarget = Boolean(
     expectedCommitSha
     && expectedCandidateFingerprint
     && build.commitSha === expectedCommitSha
     && build.candidateFingerprint === expectedCandidateFingerprint
+    && runtimeDeploymentIdentityMatches
   );
   const exactPreviewDeclared = Boolean(deploymentId && deploymentUrl && expectedTreeSha);
   const status = runtimeMatchesCurrentTarget && exactPreviewDeclared && build.environment === "preview"
@@ -177,6 +193,7 @@ export function getP34PreviewAcceptanceSummary(env: NodeJS.ProcessEnv = process.
     previewReady: exactPreviewDeclared,
     previewAccepted: false as const,
     runtimeMatchesCurrentTarget,
+    runtimeDeploymentIdentityMatches,
     deploymentId,
     deploymentUrl,
     expectedCommitSha,
@@ -184,6 +201,8 @@ export function getP34PreviewAcceptanceSummary(env: NodeJS.ProcessEnv = process.
     expectedCandidateFingerprint,
     currentRuntimeCommitSha: build.commitSha,
     currentRuntimeCandidateFingerprint: build.candidateFingerprint,
+    currentRuntimeDeploymentId: build.deploymentId,
+    currentRuntimeDeploymentUrl: build.deploymentUrl,
     predecessorPreview: {
       status: "PREDECESSOR" as const,
       deploymentId: p34ExactHeadBaseline.preview.deploymentId,
