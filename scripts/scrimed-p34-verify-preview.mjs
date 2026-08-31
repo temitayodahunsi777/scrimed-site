@@ -2,23 +2,12 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
-import { p34RuntimeEvidencePath, sha256 } from "./lib/p34-candidate-state.mjs";
+import {
+  p34RuntimeEvidencePath,
+  requireP34ExactPreviewBinding,
+  sha256
+} from "./lib/p34-candidate-state.mjs";
 import { obtainVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
-
-function parseTarget(value) {
-  if (!value) throw new Error("Set TARGET_URL to the exact p.34 Vercel preview origin.");
-  const url = new URL(value);
-  if (
-    url.protocol !== "https:"
-    || !url.hostname.endsWith(".vercel.app")
-    || url.username
-    || url.password
-    || url.pathname !== "/"
-    || url.search
-    || url.hash
-  ) throw new Error("TARGET_URL must be a bare HTTPS vercel.app preview origin; production aliases are prohibited.");
-  return url.origin;
-}
 
 function run(id, script, args, env) {
   const startedAt = Date.now();
@@ -40,9 +29,13 @@ function run(id, script, args, env) {
   };
 }
 
-const targetUrl = parseTarget(process.env.TARGET_URL ?? process.env.SCRIMED_P34_PREVIEW_URL);
 const manifest = JSON.parse(await readFile(p34RuntimeEvidencePath, "utf8"));
 if (manifest.dirty) throw new Error("Preview verification requires evidence generated from a clean exact candidate commit.");
+const previewBinding = requireP34ExactPreviewBinding(
+  process.env.TARGET_URL ?? process.env.SCRIMED_P34_PREVIEW_URL,
+  manifest.preview
+);
+const targetUrl = previewBinding.targetUrl;
 const previewAccessCookie = await obtainVercelPreviewAccessCookie({
   shareUrl: process.env.SCRIMED_VERCEL_SHARE_URL,
   expectedOrigin: targetUrl
@@ -74,6 +67,7 @@ const env = {
   ...process.env,
   SCRIMED_BASE_URL: targetUrl,
   SCRIMED_PREVIEW_BASE_URL: targetUrl,
+  SCRIMED_PREVIEW_ACCESS_ORIGIN: targetUrl,
   ...(previewAccessCookie ? { SCRIMED_PREVIEW_ACCESS_COOKIE: previewAccessCookie } : {})
 };
 delete env.SCRIMED_VERCEL_SHARE_URL;
@@ -116,7 +110,7 @@ const observabilityBase = {
     ? "AUTOMATED_OBSERVABILITY_COMPLETE_RELEASE_STEWARD_ACCEPTANCE_REQUIRED"
     : "PREVIEW_OBSERVABILITY_FAILED_CLOSED",
   targetUrl,
-  deploymentId: manifest.preview?.deploymentId ?? null,
+  deploymentId: previewBinding.deploymentId,
   commit: manifest.commit,
   tree: manifest.tree,
   candidateFingerprint: manifest.candidateFingerprint,

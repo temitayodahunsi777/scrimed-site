@@ -173,6 +173,44 @@ check("concurrent-budget-reservations-stop-before-overrun", () => {
   assert.equal(ledger.snapshot().inferenceCostUsd, 60);
 });
 
+check("negative-budget-reservation-deltas-cannot-release-consumed-capacity", () => {
+  const ledger = new InMemorySyntheticPilotBudgetLedger();
+  const limits = {
+    maxInferenceCostUsd: 100,
+    maxToolCostUsd: 50,
+    maxModelCalls: 10,
+    maxToolCalls: 20,
+    maxRetries: 2,
+    maxRuntimeMinutes: 60,
+    maxAgentDepth: 3,
+    maxEvidenceStorageBytes: 1_000_000,
+    maxTotalBudgetUsd: 100,
+    warningThresholdPercent: 80
+  };
+  const reservation = {
+    inferenceCostUsd: 90,
+    toolCostUsd: 0,
+    infrastructureCostUsd: 0,
+    reviewCostUsd: 0,
+    correctionCostUsd: 0,
+    modelCalls: 1,
+    toolCalls: 1,
+    retries: 0,
+    runtimeMinutes: 10,
+    agentDepth: 1,
+    evidenceStorageBytes: 100,
+    reviewerMinutes: 0,
+    acceptedUsefulOutputs: 1
+  };
+  assert.equal(ledger.reserve(limits, reservation).reservationApplied, true);
+  const negative = ledger.reserve(limits, { ...reservation, inferenceCostUsd: -90 });
+  assert.equal(negative.reservationApplied, false);
+  assert.ok(negative.reasonCodes.includes("INVALID_MONETARY_USAGE"));
+  assert.equal(ledger.snapshot().inferenceCostUsd, 90);
+  assert.equal(ledger.reserve(limits, reservation).reservationApplied, false);
+  assert.equal(ledger.snapshot().inferenceCostUsd, 90);
+});
+
 check("tampered-evidence-ledger-is-rejected", () => {
   const kinds = ["pilot", "scenario", "workflow", "model", "agent", "tool", "policy", "output", "evaluation", "correction", "accepted-result", "value-estimate"];
   const ledger = buildPilotEvidenceLedger({

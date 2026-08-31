@@ -10,7 +10,7 @@ import {
   parsePublicSmokeTimeoutMs,
   readBoundedResponseText
 } from "./lib/bounded-public-fetch.mjs";
-import { parseVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
+import { bindVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
 
 const baseUrl = normalizePublicSmokeBaseUrl(
   process.env.SCRIMED_BASE_URL,
@@ -26,9 +26,11 @@ const maxReadAttempts = parsePublicSmokeMaxAttempts(
   process.env.SCRIMED_SMOKE_MAX_ATTEMPTS
 );
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG?.trim() || "atlas-synthetic-evaluation";
-const previewAccessCookie = parseVercelPreviewAccessCookie(
-  process.env.SCRIMED_PREVIEW_ACCESS_COOKIE
-)?.header;
+const previewAccessCookie = bindVercelPreviewAccessCookie({
+  cookie: process.env.SCRIMED_PREVIEW_ACCESS_COOKIE,
+  accessOrigin: process.env.SCRIMED_PREVIEW_ACCESS_ORIGIN,
+  requestOrigin: baseUrl
+})?.header;
 if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(workspaceSlug)) {
   throw new Error("SCRIMED_WORKSPACE_SLUG must be a bounded lowercase workspace slug.");
 }

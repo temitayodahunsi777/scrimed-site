@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
-import { parseVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
+import { bindVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
 
 const rawArgs = process.argv.slice(2);
 const flags = new Set(rawArgs.filter((arg) => arg.startsWith("--") && !arg.includes("=")));
@@ -289,9 +289,11 @@ const baseUrl = normalizePreviewBaseUrl(
 const canonicalOrigin = normalizePreviewBaseUrl(
   valueArg("canonical-origin", "https://app.scrimedsolutions.com")
 );
-const previewAccessCookie = parseVercelPreviewAccessCookie(
-  process.env.SCRIMED_PREVIEW_ACCESS_COOKIE
-);
+const previewAccessCookie = bindVercelPreviewAccessCookie({
+  cookie: process.env.SCRIMED_PREVIEW_ACCESS_COOKIE,
+  accessOrigin: process.env.SCRIMED_PREVIEW_ACCESS_ORIGIN,
+  requestOrigin: baseUrl
+});
 const outputDir = path.resolve(valueArg("output-dir", "artifacts/ui-verification"));
 await mkdir(outputDir, { recursive: true });
 

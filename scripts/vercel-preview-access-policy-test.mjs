@@ -2,6 +2,7 @@
 
 import assert from "node:assert/strict";
 import {
+  bindVercelPreviewAccessCookie,
   obtainVercelPreviewAccessCookie,
   parseVercelPreviewAccessCookie,
   parseVercelPreviewShareUrl
@@ -23,6 +24,36 @@ assert.deepEqual(parseVercelPreviewAccessCookie(`_vercel_jwt=${jwt}`), {
 });
 assert.throws(() => parseVercelPreviewAccessCookie(`_vercel_jwt=${jwt}; Path=/`));
 assert.throws(() => parseVercelPreviewAccessCookie("session=not-allowed"));
+assert.deepEqual(bindVercelPreviewAccessCookie({
+  cookie: `_vercel_jwt=${jwt}`,
+  accessOrigin: origin,
+  requestOrigin: origin
+}), {
+  name: "_vercel_jwt",
+  value: jwt,
+  header: `_vercel_jwt=${jwt}`,
+  origin
+});
+assert.throws(() => bindVercelPreviewAccessCookie({
+  cookie: `_vercel_jwt=${jwt}`,
+  accessOrigin: undefined,
+  requestOrigin: origin
+}));
+assert.throws(() => bindVercelPreviewAccessCookie({
+  cookie: `_vercel_jwt=${jwt}`,
+  accessOrigin: origin,
+  requestOrigin: "https://attacker.example"
+}));
+assert.throws(() => bindVercelPreviewAccessCookie({
+  cookie: `_vercel_jwt=${jwt}`,
+  accessOrigin: origin,
+  requestOrigin: "http://127.0.0.1:3044"
+}));
+assert.equal(bindVercelPreviewAccessCookie({
+  cookie: undefined,
+  accessOrigin: undefined,
+  requestOrigin: "http://127.0.0.1:3044"
+}), null);
 
 const cookie = await obtainVercelPreviewAccessCookie({
   shareUrl,
@@ -47,4 +78,4 @@ await assert.rejects(
   /did not issue an access cookie/
 );
 
-console.log("pass SCRIMED protected Vercel preview access policy (10/10)");
+console.log("pass SCRIMED protected Vercel preview access policy");

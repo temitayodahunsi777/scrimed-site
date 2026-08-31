@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { normalizeVercelPreviewOrigin } from "./vercel-preview-access.mjs";
 
 export const p34Predecessor = Object.freeze({
   pullRequestNumber: 39,
@@ -39,6 +40,37 @@ export function sha256(value) {
     ? value
     : Buffer.from(typeof value === "string" ? value : JSON.stringify(canonicalize(value)));
   return createHash("sha256").update(input).digest("hex");
+}
+
+export function requireP34ExactPreviewBinding(targetUrl, preview) {
+  const normalizedTarget = normalizeVercelPreviewOrigin(targetUrl);
+  if (!preview || typeof preview !== "object" || Array.isArray(preview)) {
+    throw new Error("Exact preview verification requires a populated manifest preview binding.");
+  }
+  const manifestOrigin = normalizeVercelPreviewOrigin(preview.url);
+  if (manifestOrigin !== normalizedTarget) {
+    throw new Error("Exact preview verification target does not match the manifest preview URL.");
+  }
+  if (!/^dpl_[A-Za-z0-9]{12,80}$/.test(preview.deploymentId ?? "")) {
+    throw new Error("Exact preview verification requires a valid manifest deployment ID.");
+  }
+  if (preview.productionAliasAttached !== false) {
+    throw new Error("Exact preview verification requires an explicit nonproduction alias posture.");
+  }
+  return { targetUrl: normalizedTarget, deploymentId: preview.deploymentId };
+}
+
+export function evaluateP34CertificationCompletion({ checks, expectedCheckCount, initialState, finalState }) {
+  const sourceStable = initialState.sourceFingerprint === finalState.sourceFingerprint;
+  const cleanCandidate = initialState.dirty === false
+    && initialState.dirtyEntryCount === 0
+    && finalState.dirty === false
+    && finalState.dirtyEntryCount === 0;
+  const passed = checks.length === expectedCheckCount
+    && checks.every((check) => check.passed)
+    && sourceStable
+    && cleanCandidate;
+  return { passed, sourceStable, cleanCandidate };
 }
 
 function git(args, { encoding = "utf8" } = {}) {

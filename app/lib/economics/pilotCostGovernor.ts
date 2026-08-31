@@ -162,6 +162,15 @@ export class InMemorySyntheticPilotBudgetLedger {
   #usage = zeroPilotCostUsage();
 
   reserve(limits: PilotCostLimits, requested: PilotCostUsage) {
+    const requestedDecision = evaluatePilotCostGovernor(limits, requested);
+    if (requestedDecision.reasonCodes.some((reason) => reason.startsWith("INVALID_"))) {
+      return {
+        ...requestedDecision,
+        reservationApplied: false,
+        usageAfterReservation: { ...this.#usage },
+        productionAuthorityGranted: false as const
+      };
+    }
     const proposedUsage = combinePilotCostUsage(this.#usage, requested);
     const decision = evaluatePilotCostGovernor(limits, proposedUsage);
     if (decision.executionAllowed) this.#usage = proposedUsage;

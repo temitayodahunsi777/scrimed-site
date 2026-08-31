@@ -16,6 +16,7 @@ const paths = [
   "app/lib/release/previewAcceptance.ts",
   "app/lib/productConsole.ts",
   "scripts/lib/p34-candidate-state.mjs",
+  "scripts/lib/vercel-preview-access.mjs",
   "scripts/generate-p34-build-inventory.mjs",
   "scripts/build-with-p34-inventory.mjs",
   "scripts/generate-p34-follow-on-artifacts.mjs",
@@ -86,7 +87,13 @@ for (const control of ["STOP_SAFELY", "maxModelCalls", "maxToolCalls", "maxAgent
   assert.ok(files["app/lib/economics/pilotCostGovernor.ts"].includes(control), control);
 }
 assert.ok(files["app/lib/productConsole.ts"].includes("p34CurrentCandidatePosture"));
-assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes(".vercel.app"));
+assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("requireP34ExactPreviewBinding"));
+assert.ok(files["scripts/lib/p34-candidate-state.mjs"].includes("normalizeVercelPreviewOrigin"));
+assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("vercelPreviewHostnamePattern"));
+assert.ok(files["scripts/lib/vercel-preview-access.mjs"].includes("bindVercelPreviewAccessCookie"));
+assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("requireP34ExactPreviewBinding"));
+assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("SCRIMED_PREVIEW_ACCESS_ORIGIN"));
+assert.ok(files["scripts/scrimed-p34-certify.mjs"].includes("cleanCandidate"));
 assert.ok(files["scripts/scrimed-p34-verify-preview.mjs"].includes("productionAliasAttached: false"));
 assert.equal(files["scripts/scrimed-p34-certify.mjs"].includes("git push"), false);
 assert.equal(files["scripts/scrimed-p34-certify.mjs"].includes("vercel deploy"), false);

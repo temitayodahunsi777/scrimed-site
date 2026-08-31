@@ -3,7 +3,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
-import { inspectP34CandidateState, sha256 } from "./lib/p34-candidate-state.mjs";
+import {
+  evaluateP34CertificationCompletion,
+  inspectP34CandidateState,
+  sha256
+} from "./lib/p34-candidate-state.mjs";
 
 const maximumOutputBytes = 64 * 1024 * 1024;
 const commandTimeoutMs = 30 * 60 * 1_000;
@@ -84,8 +88,12 @@ for (const [id, command, args] of commands) {
 }
 
 const finalState = inspectP34CandidateState();
-const sourceStable = initialState.sourceFingerprint === finalState.sourceFingerprint;
-const passed = checks.length === commands.length && checks.every((check) => check.passed) && sourceStable;
+const { passed, sourceStable, cleanCandidate } = evaluateP34CertificationCompletion({
+  checks,
+  expectedCheckCount: commands.length,
+  initialState,
+  finalState
+});
 const reportBase = {
   schemaVersion: "scrimed-p34-certification-v1",
   status: passed ? "AUTOMATED_ASSURANCE_COMPLETE_HUMAN_REVIEW_REQUIRED" : "CERTIFICATION_FAILED_CLOSED",
@@ -96,6 +104,9 @@ const reportBase = {
   routeInventoryFingerprint: finalState.routeInventory?.inventoryFingerprint ?? null,
   generationInventoryFingerprint: finalState.generationInventory?.inventoryFingerprint ?? null,
   sourceStable,
+  cleanCandidate,
+  initialDirtyEntryCount: initialState.dirtyEntryCount,
+  finalDirtyEntryCount: finalState.dirtyEntryCount,
   checks,
   humanReviewRequired: true,
   aal2OperatorEvidenceRequired: true,
@@ -118,6 +129,9 @@ const deterministicCertification = {
   routeInventoryFingerprint: reportBase.routeInventoryFingerprint,
   generationInventoryFingerprint: reportBase.generationInventoryFingerprint,
   sourceStable: reportBase.sourceStable,
+  cleanCandidate: reportBase.cleanCandidate,
+  initialDirtyEntryCount: reportBase.initialDirtyEntryCount,
+  finalDirtyEntryCount: reportBase.finalDirtyEntryCount,
   checks: reportBase.checks.map(({ id, passed: checkPassed, exitCode, timedOut }) => ({
     id,
     passed: checkPassed,

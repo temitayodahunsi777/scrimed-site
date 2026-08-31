@@ -33,6 +33,10 @@ import { p34ExactHeadBaseline } from "../app/lib/scrimed-p34/exactHeadBaseline.t
 import { deriveExactHeadReviewState } from "../app/lib/scrimed-p34/exactHeadReviewState.ts";
 import { getP34ReviewReadinessSummary } from "../app/lib/scrimed-p34/reviewReadiness.ts";
 import { createRedactedAal2Evidence } from "./lib/aal2-redacted-evidence.mjs";
+import {
+  evaluateP34CertificationCompletion,
+  requireP34ExactPreviewBinding
+} from "./lib/p34-candidate-state.mjs";
 
 let passed = 0;
 function check(name, run) {
@@ -445,6 +449,44 @@ check("runtime-preview-summary-never-self-accepts", () => {
   });
   assert.equal(result.previewAccepted, false);
   assert.equal(result.productionAuthorized, false);
+});
+
+check("exact-preview-verification-requires-the-manifest-deployment", () => {
+  const preview = {
+    deploymentId: "dpl_P34ExactPreview1234",
+    url: "https://scrimed-p34-preview.vercel.app",
+    productionAliasAttached: false
+  };
+  assert.deepEqual(
+    requireP34ExactPreviewBinding("https://scrimed-p34-preview.vercel.app", preview),
+    { targetUrl: "https://scrimed-p34-preview.vercel.app", deploymentId: preview.deploymentId }
+  );
+  assert.throws(() => requireP34ExactPreviewBinding("https://other-preview.vercel.app", preview));
+  assert.throws(() => requireP34ExactPreviewBinding(preview.url, null));
+  assert.throws(() => requireP34ExactPreviewBinding(preview.url, { ...preview, deploymentId: null }));
+});
+
+check("certification-requires-clean-initial-and-final-worktrees", () => {
+  const clean = { sourceFingerprint: "a".repeat(64), dirty: false, dirtyEntryCount: 0 };
+  const checks = [{ passed: true }];
+  assert.equal(evaluateP34CertificationCompletion({
+    checks,
+    expectedCheckCount: 1,
+    initialState: clean,
+    finalState: clean
+  }).passed, true);
+  assert.equal(evaluateP34CertificationCompletion({
+    checks,
+    expectedCheckCount: 1,
+    initialState: { ...clean, dirty: true, dirtyEntryCount: 1 },
+    finalState: clean
+  }).passed, false);
+  assert.equal(evaluateP34CertificationCompletion({
+    checks,
+    expectedCheckCount: 1,
+    initialState: clean,
+    finalState: { ...clean, dirty: true, dirtyEntryCount: 1 }
+  }).passed, false);
 });
 
 const reviewBinding = {

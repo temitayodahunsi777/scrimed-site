@@ -1,8 +1,11 @@
-const vercelPreviewHostnamePattern = /^[A-Za-z0-9.-]+\.vercel\.app$/;
+const vercelPreviewHostnamePattern = /^(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+vercel\.app$/;
 const vercelShareTokenPattern = /^[A-Za-z0-9_-]{16,256}$/;
 const vercelJwtPattern = /^[A-Za-z0-9._~-]{16,8192}$/;
 
-function requirePreviewOrigin(value) {
+export function normalizeVercelPreviewOrigin(value) {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error("Expected a bare HTTPS vercel.app preview origin.");
+  }
   const url = new URL(value);
   if (
     url.protocol !== "https:"
@@ -20,7 +23,7 @@ function requirePreviewOrigin(value) {
 
 export function parseVercelPreviewShareUrl(value, expectedOrigin) {
   if (!value) return null;
-  const origin = requirePreviewOrigin(expectedOrigin);
+  const origin = normalizeVercelPreviewOrigin(expectedOrigin);
   const url = new URL(value);
   const shareValues = url.searchParams.getAll("_vercel_share");
   if (
@@ -51,6 +54,17 @@ export function parseVercelPreviewAccessCookie(value) {
     throw new Error("Vercel preview access cookie is malformed.");
   }
   return { name, value: cookieValue, header: `${name}=${cookieValue}` };
+}
+
+export function bindVercelPreviewAccessCookie({ cookie, accessOrigin, requestOrigin }) {
+  const parsed = parseVercelPreviewAccessCookie(cookie);
+  if (!parsed) return null;
+  const boundOrigin = normalizeVercelPreviewOrigin(accessOrigin);
+  const normalizedRequestOrigin = normalizeVercelPreviewOrigin(requestOrigin);
+  if (normalizedRequestOrigin !== boundOrigin) {
+    throw new Error("Vercel preview access cookie origin does not match the request origin.");
+  }
+  return { ...parsed, origin: boundOrigin };
 }
 
 function extractVercelJwt(headers) {
