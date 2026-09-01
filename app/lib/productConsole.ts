@@ -66,6 +66,8 @@ import {
   releaseContinuityProofStackStatus
 } from "./releaseContinuity";
 import { getScrimedBuildInfo } from "./release/vercelReleaseAssurance";
+import { getP34PreviewAcceptanceSummary } from "./release/previewAcceptance";
+import { getCurrentSupabasePasswordlessAssurance } from "./release/supabasePasswordlessAssurance";
 import {
   getNavigationAuditSummary,
   navigationAuditBriefProofStackStatus,
@@ -1307,6 +1309,8 @@ export function getProductConsoleSummary() {
   const p33IntegratedSummary = getP33IntegratedSummary();
   const p34IntegratedSummary = getP34AdaptiveGovernanceSummary();
   const p34ReviewReadinessSummary = getP34ReviewReadinessSummary();
+  const p34PreviewAcceptanceSummary = getP34PreviewAcceptanceSummary();
+  const supabasePasswordlessAssurance = getCurrentSupabasePasswordlessAssurance();
   const syntheticPilotReadinessSummary = getSyntheticPilotReadinessSummary();
   const workflowExecutionSummary = getWorkflowExecutionSummary();
   const workflowExecutionResultSummary = getWorkflowExecutionResultSummary();
@@ -1394,6 +1398,80 @@ export function getProductConsoleSummary() {
   const productAgents = getProductAgents();
   const productWorkflows = getProductWorkflows();
   const sellablePilots = productOffers.filter((offer) => offer.status === "sellable-pilot").length;
+  const p34PriorityGates = [
+    {
+      id: "candidate",
+      label: "Candidate",
+      state: buildInfo.commitSha && buildInfo.candidateFingerprintDeclared
+        ? "EXACT_BINDING_REQUIRED"
+        : "CANDIDATE_EVIDENCE_REQUIRED",
+      owner: "release-steward",
+      href: "/api/build-info"
+    },
+    {
+      id: "review",
+      label: "Review",
+      state: p34ReviewReadinessSummary.review.state,
+      owner: "independent-technical-reviewer",
+      href: p34ReviewReadinessSummary.route
+    },
+    {
+      id: "preview",
+      label: "Preview",
+      state: p34PreviewAcceptanceSummary.status,
+      owner: "release-steward",
+      href: "/api/readiness"
+    },
+    {
+      id: "security",
+      label: "Security",
+      state: "AUTOMATED_ASSURANCE_COMPLETE",
+      owner: "security-owner",
+      href: "/trust-safety-operations"
+    },
+    {
+      id: "aal2",
+      label: "AAL2",
+      state: "OPERATOR_ACTION_REQUIRED",
+      owner: "authorized-preview-operator",
+      href: "/pilot-workspace/access"
+    },
+    {
+      id: "supabase",
+      label: "Supabase",
+      state: supabasePasswordlessAssurance.currentLaneState,
+      owner: "security-identity-owner",
+      href: "/approvals-readiness"
+    },
+    {
+      id: "migrations",
+      label: "Migrations",
+      state: "PRODUCTION_MIGRATION_AUTHORIZATION_REQUIRED",
+      owner: "database-release-owner",
+      href: "/approvals-readiness"
+    },
+    {
+      id: "synthetic-pilot",
+      label: "Synthetic Pilot Readiness",
+      state: syntheticPilotReadinessSummary.status,
+      owner: "synthetic-pilot-owner",
+      href: syntheticPilotReadinessSummary.route
+    },
+    {
+      id: "protected-pilot",
+      label: "Protected Pilot Readiness",
+      state: "PROTECTED_PILOT_AUTHORIZATION_REQUIRED",
+      owner: "privacy-security-clinical-owners",
+      href: "/pilot-workspace/access"
+    },
+    {
+      id: "production",
+      label: "Production Authority",
+      state: "PRODUCTION_AUTHORIZATION_REQUIRED",
+      owner: "release-authority",
+      href: "/clinical-production-readiness"
+    }
+  ] as const;
 
   return {
     service: "scrimed-product-console",
@@ -1430,16 +1508,17 @@ export function getProductConsoleSummary() {
     p34AutonomyCeiling: p34IntegratedSummary.controlPlane2.action.a3Available ? "A3" : "A2_REVIEW_ONLY",
     p34ReviewState: p34IntegratedSummary.exactCandidateReview.status,
     p34MigrationState: "THREE_UNAPPLIED_STATIC_REVIEW_READY_OPERATOR_AUTHORIZATION_REQUIRED",
-    p34PreviewState: buildInfo.environment === "preview" && buildInfo.commitSha
-      ? "PREVIEW_RUNTIME_PRESENT_EXACT_EVIDENCE_REQUIRED"
-      : "PREVIEW_NOT_VERIFIED",
+    p34PreviewState: p34PreviewAcceptanceSummary.status,
+    p34PreviewAcceptance: p34PreviewAcceptanceSummary,
     p34Aal2State: "FRESH_EXACT_TARGET_OPERATOR_EVIDENCE_REQUIRED",
-    p34SupabaseSecurityState: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_AND_LIVE_RECHECK_REQUIRED",
+    p34SupabaseSecurityState: supabasePasswordlessAssurance.semanticStatus,
+    p34SupabasePasswordlessAssurance: supabasePasswordlessAssurance,
     p34ReviewReadiness: p34ReviewReadinessSummary,
     p34ReviewReadinessApiRoute: p34ReviewReadinessSummary.route,
     p34SupabasePosture: {
       project: "scrimed-protected-pilot",
-      authSecurity: "LEAKED_PASSWORD_PROTECTION_OPERATOR_ACTION_REQUIRED",
+      authSecurity: supabasePasswordlessAssurance.currentLaneState,
+      leakedPasswordProtection: supabasePasswordlessAssurance.platformControlState,
       rlsAssurance: "REPOSITORY_CONTRACTS_PASS_LIVE_POSTURE_NOT_IMPLIED",
       migrationState: "THREE_PENDING_PRODUCTION_UNAPPLIED",
       productionMutationState: "DISABLED"
@@ -1448,6 +1527,7 @@ export function getProductConsoleSummary() {
     syntheticPilotRoute: syntheticPilotReadinessSummary.route,
     syntheticPilotApiRoute: syntheticPilotReadinessSummary.apiRoute,
     commercialReadiness: syntheticPilotReadinessSummary.commercialReadiness,
+    p34PriorityGates,
     route: "/product",
     apiRoute: "/api/product/console",
     pilotIntakeRoute: "/pilot",
@@ -1967,6 +2047,8 @@ export function getProductConsoleSummary() {
       limitationsWorkaroundSummary.boundaryEscalationCount,
     limitationsResolutionWorkOrderCount:
       limitationsWorkaroundSummary.resolutionWorkOrderCount,
+    limitationsResolutionWorkOrdersByStatus:
+      limitationsWorkaroundSummary.resolutionWorkOrdersByStatus,
     limitationsUnresolvedResolutionWorkOrderCount:
       limitationsWorkaroundSummary.unresolvedResolutionWorkOrderCount,
     limitationsWorkaroundExecutionLedgerCount:
@@ -2732,7 +2814,40 @@ export function getProductConsoleSummary() {
 let productConsoleApiSummaryCache: Record<string, unknown> | null = null;
 
 function withFreshP34ReviewReadiness(summary: Record<string, unknown>) {
-  summary.p34ReviewReadiness = getP34ReviewReadinessSummary();
+  const review = getP34ReviewReadinessSummary();
+  const preview = getP34PreviewAcceptanceSummary();
+  const supabaseAssurance = getCurrentSupabasePasswordlessAssurance();
+  summary.p34ReviewReadiness = review;
+  summary.p34PreviewAcceptance = preview;
+  if (Array.isArray(summary.priorityGates)) {
+    summary.priorityGates = summary.priorityGates.map((gate) => {
+      if (!gate || typeof gate !== "object") return gate;
+      const record = gate as { id?: string; state?: string };
+      if (record.id === "review") return { ...record, state: review.review.state };
+      if (record.id === "preview") return { ...record, state: preview.status };
+      if (record.id === "supabase") return { ...record, state: supabaseAssurance.currentLaneState };
+      return record;
+    });
+  }
+  summary.p34CurrentCandidatePosture = {
+    branch: summary.runtimeBranch ?? null,
+    commitSha: review.candidate.commitSha,
+    candidateFingerprint: review.candidate.fingerprint,
+    currentPullRequest: review.currentPullRequest,
+    predecessorPullRequest: review.predecessorPullRequest,
+    reviewState: review.review.state,
+    previewState: preview.status,
+    aal2State: "OPERATOR_ACTION_REQUIRED",
+    supabasePasswordlessProtectedAccess: supabaseAssurance.currentLaneState,
+    supabaseLeakedPasswordProtection: supabaseAssurance.platformControlState,
+    supabasePasswordAuthSemanticStatus: supabaseAssurance.semanticStatus,
+    migrationState: "THREE_PENDING_PRODUCTION_UNAPPLIED",
+    autonomyCeiling: "A2_REVIEW_ONLY",
+    syntheticPilotAuthority: "BOUNDED_SCOPE_APPROVAL_REQUIRED",
+    protectedPilotAuthority: false,
+    productionAuthority: false,
+    customerActivationAuthority: false
+  };
   return summary;
 }
 
@@ -2756,13 +2871,23 @@ export function getProductConsoleApiSummary() {
     salesOperationsSummary,
     strategicPlatformIntelligenceSummary
   } = summary;
+  // The full page model contains large repeated collections. The API keeps its
+  // stable scalar contract and sends callers to dedicated routes for details.
   const apiSummary = Object.fromEntries(
-    Object.entries(summary).filter(([key]) => !key.endsWith("Summary"))
+    Object.entries(summary).filter(
+      ([key, value]) =>
+        !key.endsWith("Summary") &&
+        (value === null || ["string", "number", "boolean"].includes(typeof value))
+    )
   );
 
   productConsoleApiSummaryCache = {
     ...apiSummary,
     payloadProfile: "compact-api-v2",
+    priorityGates: summary.p34PriorityGates,
+    limitationsResolutionWorkOrdersByStatus:
+      summary.limitationsResolutionWorkOrdersByStatus,
+    proofStack: summary.proofStack,
     detailRoutes: {
       companyAssessment: companyAssessmentSummary.apiRoute,
       enterpriseBusinessOperations: summary.enterpriseBusinessOpsApiRoute,

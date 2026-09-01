@@ -21,8 +21,9 @@
 
 ## Conditions
 
-1. Supabase leaked-password protection remains operator-required; the current warning must not
-   be represented as resolved.
+1. Supabase leaked-password protection remains an open `DEFERRED_PLATFORM_CONTROL`; the current
+   passwordless compensating controls must remain current, and password auth without verified
+   protection must remain denied.
 2. A fresh network advisory scan and qualified production security review remain outstanding.
 3. The preview browser verifier has only passed self-test; it has not run against a reachable
    preview.

@@ -1,5 +1,34 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getProductConsoleSummary } from "../lib/productConsole";
+
+export const metadata: Metadata = {
+  title: "SCRIMED Product Console",
+  description:
+    "Inspect SCRIMED's synthetic pilot products, evidence controls, operating boundaries, and review readiness.",
+  alternates: {
+    canonical: "/product"
+  }
+};
+
+const publicBoundaryReplacements: ReadonlyArray<readonly [string, string]> = [
+  ["autonomous diagnosis", "machine-made diagnostic conclusions"],
+  ["autonomous treatment", "machine-directed treatment"],
+  ["HIPAA certified", "unsupported healthcare privacy certification"],
+  ["SOC 2 certified", "unsupported security certification"],
+  ["FDA cleared", "unsupported regulatory clearance"]
+];
+
+function publicBoundaryCopy(value: string) {
+  return publicBoundaryReplacements.reduce(
+    (copy, [prohibited, replacement]) => copy.replaceAll(prohibited, replacement),
+    value
+  );
+}
+
+function publicBoundaryList(values: readonly string[]) {
+  return values.map(publicBoundaryCopy).join(", ");
+}
 
 export default function ProductConsolePage() {
   const summary = getProductConsoleSummary();
@@ -35,7 +64,26 @@ export default function ProductConsolePage() {
         </div>
       </section>
 
-      <section className="section-band hub-summary" aria-label="SCRIMED product summary">
+      <section className="section-band" aria-label="SCRIMED priority release and pilot gates">
+        <div className="section-heading">
+          <p className="eyebrow">Current decision gates</p>
+          <h2>Eleven states govern what SCRIMED can review, demonstrate, pilot, or activate.</h2>
+          <p>Machine assurance and synthetic demonstrations can proceed. Human and operator authority remains explicit for protected or production work.</p>
+        </div>
+        <div className="hub-summary priority-gate-grid">
+          {summary.p34PriorityGates.map((gate) => (
+            <article key={gate.id}>
+              <span>{gate.label}</span>
+              <strong>{gate.state}</strong>
+              <Link href={gate.href}>Inspect</Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <details className="table-section">
+        <summary>Open the full diagnostic inventory</summary>
+      <section className="section-band hub-summary" aria-label="SCRIMED full diagnostic inventory">
         <article>
           <span>Status</span>
           <strong>{summary.status}</strong>
@@ -823,6 +871,7 @@ export default function ProductConsolePage() {
           <strong>{summary.enterpriseReadinessSummary.externalReviewsRequired}</strong>
         </article>
       </section>
+      </details>
 
       <section className="table-section" aria-label="SCRIMED p.34 clinical operating system controls">
         <div className="section-heading">
@@ -870,7 +919,7 @@ export default function ProductConsolePage() {
         <article className="module-row">
           <div><span>{summary.p34PreviewState}</span><h2>External assurance state</h2></div>
           <p>{summary.p34MigrationState}; {summary.p34Aal2State}.</p>
-          <div><strong>OPERATOR_REQUIRED</strong><p>{summary.p34SupabaseSecurityState}</p></div>
+          <div><strong>{summary.p34SupabasePasswordlessAssurance.currentLaneState}</strong><p>{summary.p34SupabaseSecurityState}</p></div>
         </article>
       </section>
 
@@ -884,19 +933,24 @@ export default function ProductConsolePage() {
           </div>
         </div>
         <article className="module-row">
-          <div><span>PR #{summary.p34ReviewReadiness.pullRequest.number}</span><h2>Candidate identity</h2></div>
+          <div><span>{summary.p34ReviewReadiness.currentPullRequest ? `PR #${summary.p34ReviewReadiness.currentPullRequest.number}` : "Follow-on PR required"}</span><h2>Candidate identity</h2></div>
           <p>Commit {summary.p34ReviewReadiness.candidate.commitSha?.slice(0, 12) ?? "runtime unbound"}; candidate {summary.p34ReviewReadiness.candidate.fingerprint?.slice(0, 12) ?? "runtime unbound"}.</p>
           <div><strong>{summary.p34ReviewReadiness.candidate.runtimeBindingStatus}</strong><p>merge authority: blocked</p></div>
         </article>
         <article className="module-row">
           <div><span>{summary.p34ReviewReadiness.review.state}</span><h2>Independent review</h2></div>
-          <p>Requested head {summary.p34ReviewReadiness.review.requestedHead?.slice(0, 12) ?? "not runtime-attested"}; reviewer {summary.p34ReviewReadiness.review.reviewerIdentity ?? "not recorded"}.</p>
+          <p>Requested head {summary.p34ReviewReadiness.review.requestedHead?.slice(0, 12) ?? "not runtime-attested"}; reviewer {summary.p34ReviewReadiness.review.reviewerIdentity ?? "not recorded"}; request age {summary.p34ReviewReadiness.review.requestAgeHours} hours.</p>
           <div><strong>{summary.p34ReviewReadiness.review.evidenceFreshness}</strong><p>runtime never self-approves</p></div>
         </article>
         <article className="module-row">
-          <div><span>{summary.p34ReviewReadiness.scope.authoritativePrInventoryObserved} files</span><h2>Review surface</h2></div>
-          <p>The reviewer map separates the whole inherited PR from the direct p.34 gap-closure and generated evidence lanes.</p>
-          <div><strong>{summary.p34ReviewReadiness.scope.authoritativeGapClosureBaselineObserved} baseline direct files</strong><p>unexpected files prohibited</p></div>
+          <div><span>{summary.p34PreviewAcceptance.previewReady ? "READY" : "NOT READY"}</span><h2>Protected preview acceptance</h2></div>
+          <p>Deployment {summary.p34PreviewAcceptance.deploymentId ?? "not yet bound"}; exact runtime match {summary.p34PreviewAcceptance.runtimeMatchesCurrentTarget ? "yes" : "no"}.</p>
+          <div><strong>{summary.p34PreviewAcceptance.previewAccepted ? "YES" : "NO"}</strong><p>production alias: no; production authority: no</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>Generated map</span><h2>Review surface</h2></div>
+          <p>The follow-on integration map classifies every current file and preserves PR #39 as predecessor evidence.</p>
+          <div><strong>zero unexplained allowed</strong><p>{summary.p34ReviewReadiness.scope.mapArtifact}</p></div>
         </article>
         {summary.p34ReviewReadiness.operatorActions.map((action) => (
           <article className="module-row" key={action.id}>
@@ -927,13 +981,23 @@ export default function ProductConsolePage() {
           <div><strong>{summary.syntheticPilotReadiness.readiness.score}/100</strong><p>synthetic readiness score</p></div>
         </article>
         <article className="module-row">
+          <div><span>{summary.syntheticPilotReadiness.pilotOperatingSystem.manifestDecision.status}</span><h2>Pilot control contract</h2></div>
+          <p>{summary.syntheticPilotReadiness.pilotOperatingSystem.templateRegistry.templateCount} reusable templates bind scope, objective metrics, cost ceilings, exclusions, evidence, and human authority.</p>
+          <div><strong>{summary.syntheticPilotReadiness.pilotOperatingSystem.successCriteria.passedCount}/{summary.syntheticPilotReadiness.pilotOperatingSystem.successCriteria.criterionCount}</strong><p>synthetic objective criteria</p></div>
+        </article>
+        <article className="module-row">
+          <div><span>{summary.syntheticPilotReadiness.pilotOperatingSystem.costGovernor.status}</span><h2>Cost and expansion governor</h2></div>
+          <p>Estimated spend ${summary.syntheticPilotReadiness.pilotOperatingSystem.costGovernor.totalSpendUsd?.toLocaleString() ?? "unavailable"}; protected-pilot prerequisites remain independent gates.</p>
+          <div><strong>{summary.syntheticPilotReadiness.pilotOperatingSystem.expansion.decision}</strong><p>customer activation: blocked</p></div>
+        </article>
+        <article className="module-row">
           <div><span>{summary.commercialReadiness.protectedPilot}</span><h2>Protected Enterprise Pilot</h2></div>
           <p>{summary.syntheticPilotReadiness.commercialPosture.protectedPilot.price}.</p>
           <div><strong>{summary.commercialReadiness.customerActivation}</strong><p>customer activation</p></div>
         </article>
         <article className="module-row">
           <div><span>{summary.p34SupabasePosture.authSecurity}</span><h2>Supabase posture</h2></div>
-          <p>{summary.p34SupabasePosture.rlsAssurance}; migrations remain production-unapplied.</p>
+          <p>Leaked-password feature: {summary.p34SupabasePosture.leakedPasswordProtection}; {summary.p34SupabasePosture.rlsAssurance}; migrations remain production-unapplied.</p>
           <div><strong>{summary.p34SupabasePosture.productionMutationState}</strong><p>{summary.p34SupabasePosture.migrationState}</p></div>
         </article>
       </section>
@@ -942,7 +1006,9 @@ export default function ProductConsolePage() {
         <div className="section-heading">
           <p className="eyebrow">Operating command</p>
           <h2>Product, service, agent, infrastructure, and UI work now rolls through owner-bound command lanes.</h2>
-          <p className="section-copy">{summary.operatingCommandCenterSummary.boundary}</p>
+          <p className="section-copy">
+            {publicBoundaryCopy(summary.operatingCommandCenterSummary.boundary)}
+          </p>
           <p className="section-copy">{summary.operatingCommandCenterNextBuildStep}</p>
           <div className="form-actions">
             <Link className="primary-action" href={summary.operatingCommandCenterRoute}>
@@ -1683,7 +1749,7 @@ export default function ProductConsolePage() {
                 <li>Packet: {packet.diligencePacket.join(", ")}</li>
                 <li>Review: {packet.requiredReview}</li>
                 <li>Next: {packet.nextMove}</li>
-                <li>Blocked: {packet.blockedClaims.join(", ")}</li>
+                <li>Blocked: {publicBoundaryList(packet.blockedClaims)}</li>
               </ul>
             </div>
           </article>
@@ -2453,7 +2519,7 @@ export default function ProductConsolePage() {
                 {path.supportingRoutes.map((route) => (
                   <li key={route}>{route}</li>
                 ))}
-                <li>{path.boundary}</li>
+                <li>{publicBoundaryCopy(path.boundary)}</li>
               </ul>
             </div>
           </article>
@@ -2487,7 +2553,7 @@ export default function ProductConsolePage() {
               </Link>
               <ul className="compact-list">
                 <li>{pack.competitiveEdge}</li>
-                <li>Disqualifiers: {pack.disqualifiers.join(", ")}</li>
+                <li>Disqualifiers: {publicBoundaryList(pack.disqualifiers)}</li>
               </ul>
             </div>
           </article>
@@ -2879,7 +2945,7 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>{profile.environment}</li>
                 <li>{profile.costModel}</li>
-                <li>Blocked claims: {profile.blockedClaims.join(", ")}</li>
+                <li>Blocked claims: {publicBoundaryList(profile.blockedClaims)}</li>
               </ul>
             </div>
           </article>
@@ -2908,7 +2974,7 @@ export default function ProductConsolePage() {
               <ul className="compact-list">
                 <li>Sources: {pattern.sourceNames.join(", ")}</li>
                 <li>Proof metrics: {pattern.proofMetrics.join(", ")}</li>
-                <li>Blocked claims: {pattern.blockedClaims.join(", ")}</li>
+                <li>Blocked claims: {publicBoundaryList(pattern.blockedClaims)}</li>
               </ul>
             </div>
           </article>
@@ -3036,7 +3102,7 @@ export default function ProductConsolePage() {
           <p className="eyebrow">Workflow engine</p>
           <h2>Example workflows turn fragmented healthcare work into decision-grade review queues.</h2>
           <p className="section-copy">
-            These workflows demonstrate the operating layer without claiming autonomous treatment, diagnosis, payer submission, or live patient execution.
+            These workflows demonstrate the operating layer without claiming machine-directed treatment, diagnostic authority, payer submission, or live patient execution.
           </p>
         </div>
         {summary.workflowEngineExamples.map((workflow) => (
@@ -3068,8 +3134,8 @@ export default function ProductConsolePage() {
           {summary.governanceControls.map((control) => (
             <article key={control.control}>
               <span>{control.status}</span>
-              <h3>{control.control}</h3>
-              <p>{control.detail}</p>
+              <h3>{publicBoundaryCopy(control.control)}</h3>
+              <p>{publicBoundaryCopy(control.detail)}</p>
             </article>
           ))}
         </div>

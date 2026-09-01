@@ -1,4 +1,5 @@
 import { createClinicalEvidenceHash } from "../clinicalEvidenceControls";
+import { getPilotOperatingSystemSummary } from "./pilotOperatingSystem";
 
 export const syntheticPilotReadinessVersion =
   "scrimed-synthetic-pilot-readiness-v1-2026-08-25";
@@ -626,7 +627,7 @@ export const syntheticPilotCommercialPosture = {
   },
   protectedPilot: {
     name: "Protected Enterprise Pilot",
-    price: "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites",
+    price: "Custom enterprise scope subject to security, privacy, insurance, deployment-readiness, and written authorization requirements",
     authority: "blocked-before-external-prerequisites"
   },
   agentAllowed: ["draft pilot scope", "calculate synthetic scenarios", "prepare nonbinding proposal drafts"],
@@ -696,6 +697,7 @@ export function getSyntheticPilotReadinessSummary() {
     reviewEffortUsd: 2600,
     supportBurdenUsd: 1200
   });
+  const pilotOperatingSystem = getPilotOperatingSystemSummary();
 
   return {
     service: "scrimed-synthetic-pilot-readiness",
@@ -728,6 +730,7 @@ export function getSyntheticPilotReadinessSummary() {
     budgetDecision,
     verifiedIntelligenceYield,
     economics,
+    pilotOperatingSystem,
     healthcareValueReturned: {
       simulatedTimeReturnedMinutes: 420,
       simulatedReworkAvoided: 8,

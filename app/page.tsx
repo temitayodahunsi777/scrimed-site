@@ -109,7 +109,7 @@ const buyerPurchaseOptions = [
   },
   {
     name: "Protected Enterprise Pilot",
-    price: "Custom scope after insurance, counsel, security/privacy, and deployment prerequisites",
+    price: "Custom enterprise scope subject to security, privacy, insurance, deployment-readiness, and written authorization requirements",
     pitch: "A controlled enterprise activation path for buyers who need protected proof, diligence rooms, onboarding, and production-readiness planning.",
     href: "/pilot?offer=protected-enterprise-pilot"
   }

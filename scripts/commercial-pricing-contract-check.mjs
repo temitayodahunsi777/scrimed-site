@@ -4,6 +4,9 @@ import { readFile } from "node:fs/promises";
 
 const requiredFiles = [
   "app/lib/commercialStrategy.ts",
+  "app/lib/pilotDemoCommercialReadiness.ts",
+  "app/lib/publicMarketReadiness.ts",
+  "app/lib/marketActivation.ts",
   "app/api/commercial/pricing/route.ts",
   "app/pricing/page.tsx",
   "app/pricing/PricingScopeGuard.tsx",
@@ -39,9 +42,16 @@ const page = files["app/pricing/page.tsx"];
 const scopeGuard = files["app/pricing/PricingScopeGuard.tsx"];
 const planner = files["app/pricing/PricingValuePlanner.tsx"];
 const docs = files["docs/commercial-pricing-and-positioning.md"];
+const protectedPublicSurfaces = [
+  "app/lib/commercialStrategy.ts",
+  "app/lib/pilotDemoCommercialReadiness.ts",
+  "app/lib/publicMarketReadiness.ts",
+  "app/lib/marketActivation.ts"
+];
 
 for (const expected of [
   "CommercialPriceRange",
+  "CommercialPublicPricingPolicy",
   "CommercialValueScenarioInput",
   "CommercialReadinessControl",
   "CompetitivePositioningPillar",
@@ -56,12 +66,46 @@ for (const expected of [
   "commercial-planning-model-active-pre-commercial",
   "value-hypothesis-not-yet-supported-by-inputs",
   "bindingQuoteAuthorized: false",
+  "CUSTOM_SCOPE_REQUIRED",
   "productionAuthorityGranted: false",
   "not-customer-go-live-approval",
   "first-party-public",
   "2026-08-01"
 ]) {
   requireIncludes("app/lib/commercialStrategy.ts", source, expected);
+}
+
+for (const expected of [
+  "Custom enterprise scope — subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.",
+  "Custom enterprise scope — commercial terms established following technical, security, legal, and deployment-readiness review."
+]) {
+  requireIncludes("app/lib/commercialStrategy.ts", source, expected);
+}
+for (const forbidden of [
+  "$1.5M-$6M",
+  "$6M-$12M+",
+  "$2.5M floor",
+  "$3M-$12M+",
+  "$8M-$25M+",
+  "$10M+ multi-year",
+  "$25M+"
+]) {
+  requireNotIncludes("app/lib/commercialStrategy.ts", source, forbidden);
+}
+
+for (const path of protectedPublicSurfaces) {
+  requireIncludes(path, files[path], "Custom enterprise scope");
+  for (const forbidden of [
+    "$1.5M-$6M",
+    "$6M-$12M+",
+    "$2.5M floor",
+    "$3M-$12M+",
+    "$8M-$25M+",
+    "$10M+ multi-year",
+    "$25M+"
+  ]) {
+    requireNotIncludes(path, files[path], forbidden);
+  }
 }
 
 for (const expected of [

@@ -63,7 +63,7 @@
         "/approvals-readiness",
         "/clinical-production-readiness"
       ],
-      "nextMilestone": "Close named review, leaked-password protection, disposable migration evidence, and exact-candidate preview validation.",
+      "nextMilestone": "Close named review, fresh AAL2, migration authorization, and exact-candidate preview validation; retain passwordless compensating controls and deny unprotected password auth.",
       "retainedBoundary": "No customer activation, PHI, live clinical execution, payer action, or production writeback."
     },
     {
@@ -145,5 +145,5 @@
     "sourceOfferExists": true
   },
   "externalActionsExecuted": false,
-  "auditHash": "86bd733a9c96d6e2efaea1d770a8f92892875b8d4ad95badb63c836350a62a19"
+  "auditHash": "5ce287748b670e481ae3fe108908b14a001d81d1c2e9e02df82cfc5c4e9a7822"
 }

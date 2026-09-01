@@ -133,6 +133,10 @@ const checks = [
     args: ["scripts/verify-preview-ui.mjs", "--self-test"]
   },
   {
+    label: "protected Vercel preview access policy",
+    args: ["scripts/vercel-preview-access-policy-test.mjs"]
+  },
+  {
     label: "public remediation policy tests",
     args: [
       "--disable-warning=ExperimentalWarning",
@@ -1054,12 +1058,55 @@ const checks = [
     args: ["scripts/scrimed-p34-precision-wave-contract-check.mjs"]
   },
   {
+    label: "SCRIMED p.34 post-review readiness policy behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-post-review-readiness-policy-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 post-review readiness contract",
+    args: ["scripts/scrimed-p34-post-review-readiness-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.34 synthetic-pilot adversarial behavior",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs"
+    ]
+  },
+  {
+    label: "Product Console compact payload budget",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/product-console-payload-budget-test.mjs"
+    ]
+  },
+  {
+    label: "SCRIMED p.34 follow-on contract",
+    args: ["scripts/scrimed-p34-follow-on-contract-check.mjs"]
+  },
+  {
+    label: "SCRIMED p.34 generated build-inventory parser",
+    args: ["scripts/generate-p34-build-inventory.mjs", "--self-test"]
+  },
+  {
     label: "SCRIMED p.34 AAL2 one-command verifier policy",
     args: ["scripts/run-aal2-candidate-verification.mjs", "--self-test"]
   },
   {
     label: "PR #39 review-map integrity",
     args: ["scripts/generate-p39-review-map.mjs", "--check"]
+  },
+  {
+    label: "SCRIMED p.34 post-review artifact integrity",
+    args: ["scripts/generate-p34-post-review-artifacts.mjs", "--check"]
   },
   {
     label: "SCRIMED p.34 artifact integrity",
@@ -1078,6 +1125,23 @@ const checks = [
   {
     label: "Supabase repository security assurance",
     args: ["scripts/verify-supabase-security.mjs", "--strict"]
+  },
+  {
+    label: "Supabase passwordless assurance policy",
+    args: [
+      "--disable-warning=ExperimentalWarning",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "--experimental-loader=./scripts/lib/ts-extension-loader.mjs",
+      "scripts/supabase-passwordless-assurance-policy-test.mjs"
+    ]
+  },
+  {
+    label: "Supabase passwordless assurance contract",
+    args: ["scripts/supabase-passwordless-assurance-contract-check.mjs"]
+  },
+  {
+    label: "p.34 commercial conversion assets contract",
+    args: ["scripts/p34-commercial-conversion-assets-contract-check.mjs"]
   },
   {
     label: "Supabase RLS contract",

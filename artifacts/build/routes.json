@@ -1,0 +1,2530 @@
+{
+  "schemaVersion": "scrimed-p34-route-inventory-v1",
+  "source": ".next/app-path-routes-manifest.json",
+  "builtRouteCount": 630,
+  "routes": [
+    {
+      "route": "/_global-error/page",
+      "outputPath": "/_global-error"
+    },
+    {
+      "route": "/_not-found/page",
+      "outputPath": "/_not-found"
+    },
+    {
+      "route": "/agent-workspace/page",
+      "outputPath": "/agent-workspace"
+    },
+    {
+      "route": "/agents/[slug]/page",
+      "outputPath": "/agents/[slug]"
+    },
+    {
+      "route": "/agents/page",
+      "outputPath": "/agents"
+    },
+    {
+      "route": "/api/agent-os/evaluation/route",
+      "outputPath": "/api/agent-os/evaluation"
+    },
+    {
+      "route": "/api/agent-os/route",
+      "outputPath": "/api/agent-os"
+    },
+    {
+      "route": "/api/agent-os/tasks/route",
+      "outputPath": "/api/agent-os/tasks"
+    },
+    {
+      "route": "/api/agent-workspace/brief/route",
+      "outputPath": "/api/agent-workspace/brief"
+    },
+    {
+      "route": "/api/agent-workspace/governance-packs/brief/route",
+      "outputPath": "/api/agent-workspace/governance-packs/brief"
+    },
+    {
+      "route": "/api/agent-workspace/governance-packs/route",
+      "outputPath": "/api/agent-workspace/governance-packs"
+    },
+    {
+      "route": "/api/agent-workspace/proof-packet/route",
+      "outputPath": "/api/agent-workspace/proof-packet"
+    },
+    {
+      "route": "/api/agent-workspace/route",
+      "outputPath": "/api/agent-workspace"
+    },
+    {
+      "route": "/api/agent-workspaces/[workspaceSlug]/governance-ledger/incident-export/route",
+      "outputPath": "/api/agent-workspaces/[workspaceSlug]/governance-ledger/incident-export"
+    },
+    {
+      "route": "/api/agent-workspaces/[workspaceSlug]/governance-ledger/route",
+      "outputPath": "/api/agent-workspaces/[workspaceSlug]/governance-ledger"
+    },
+    {
+      "route": "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet/route",
+      "outputPath": "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/proof-packet"
+    },
+    {
+      "route": "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]/route",
+      "outputPath": "/api/agent-workspaces/[workspaceSlug]/work-orders/[workOrderId]"
+    },
+    {
+      "route": "/api/agent-workspaces/[workspaceSlug]/work-orders/route",
+      "outputPath": "/api/agent-workspaces/[workspaceSlug]/work-orders"
+    },
+    {
+      "route": "/api/agents/workflows/[slug]/route",
+      "outputPath": "/api/agents/workflows/[slug]"
+    },
+    {
+      "route": "/api/agents/workflows/route",
+      "outputPath": "/api/agents/workflows"
+    },
+    {
+      "route": "/api/approvals-readiness/brief/route",
+      "outputPath": "/api/approvals-readiness/brief"
+    },
+    {
+      "route": "/api/approvals-readiness/route",
+      "outputPath": "/api/approvals-readiness"
+    },
+    {
+      "route": "/api/atlas/intelligence-core/route",
+      "outputPath": "/api/atlas/intelligence-core"
+    },
+    {
+      "route": "/api/attribution-analytics/route",
+      "outputPath": "/api/attribution-analytics"
+    },
+    {
+      "route": "/api/audit/route",
+      "outputPath": "/api/audit"
+    },
+    {
+      "route": "/api/boundary-release-approvals/brief/route",
+      "outputPath": "/api/boundary-release-approvals/brief"
+    },
+    {
+      "route": "/api/boundary-release-approvals/route",
+      "outputPath": "/api/boundary-release-approvals"
+    },
+    {
+      "route": "/api/boundary-resolution/brief/route",
+      "outputPath": "/api/boundary-resolution/brief"
+    },
+    {
+      "route": "/api/boundary-resolution/route",
+      "outputPath": "/api/boundary-resolution"
+    },
+    {
+      "route": "/api/build-info/route",
+      "outputPath": "/api/build-info"
+    },
+    {
+      "route": "/api/buyer-release-control-run/brief/route",
+      "outputPath": "/api/buyer-release-control-run/brief"
+    },
+    {
+      "route": "/api/buyer-release-control-run/route",
+      "outputPath": "/api/buyer-release-control-run"
+    },
+    {
+      "route": "/api/capital-vitality/brief/route",
+      "outputPath": "/api/capital-vitality/brief"
+    },
+    {
+      "route": "/api/capital-vitality/route",
+      "outputPath": "/api/capital-vitality"
+    },
+    {
+      "route": "/api/client-onboarding/brief/route",
+      "outputPath": "/api/client-onboarding/brief"
+    },
+    {
+      "route": "/api/client-onboarding/route",
+      "outputPath": "/api/client-onboarding"
+    },
+    {
+      "route": "/api/clinical-assurance-control-plane/brief/route",
+      "outputPath": "/api/clinical-assurance-control-plane/brief"
+    },
+    {
+      "route": "/api/clinical-assurance-control-plane/route",
+      "outputPath": "/api/clinical-assurance-control-plane"
+    },
+    {
+      "route": "/api/clinical-authority-readiness/brief/route",
+      "outputPath": "/api/clinical-authority-readiness/brief"
+    },
+    {
+      "route": "/api/clinical-authority-readiness/route",
+      "outputPath": "/api/clinical-authority-readiness"
+    },
+    {
+      "route": "/api/clinical-care-activation/brief/route",
+      "outputPath": "/api/clinical-care-activation/brief"
+    },
+    {
+      "route": "/api/clinical-care-activation/route",
+      "outputPath": "/api/clinical-care-activation"
+    },
+    {
+      "route": "/api/clinical-context-gateway/brief/route",
+      "outputPath": "/api/clinical-context-gateway/brief"
+    },
+    {
+      "route": "/api/clinical-context-gateway/route",
+      "outputPath": "/api/clinical-context-gateway"
+    },
+    {
+      "route": "/api/clinical-data-fabric/brief/route",
+      "outputPath": "/api/clinical-data-fabric/brief"
+    },
+    {
+      "route": "/api/clinical-data-fabric/route",
+      "outputPath": "/api/clinical-data-fabric"
+    },
+    {
+      "route": "/api/clinical-data-governance/brief/route",
+      "outputPath": "/api/clinical-data-governance/brief"
+    },
+    {
+      "route": "/api/clinical-data-governance/route",
+      "outputPath": "/api/clinical-data-governance"
+    },
+    {
+      "route": "/api/clinical-production-readiness/brief/route",
+      "outputPath": "/api/clinical-production-readiness/brief"
+    },
+    {
+      "route": "/api/clinical-production-readiness/route",
+      "outputPath": "/api/clinical-production-readiness"
+    },
+    {
+      "route": "/api/clinical-robustness-lab/brief/route",
+      "outputPath": "/api/clinical-robustness-lab/brief"
+    },
+    {
+      "route": "/api/clinical-robustness-lab/route",
+      "outputPath": "/api/clinical-robustness-lab"
+    },
+    {
+      "route": "/api/commercial/pricing/route",
+      "outputPath": "/api/commercial/pricing"
+    },
+    {
+      "route": "/api/company-assessment/brief/route",
+      "outputPath": "/api/company-assessment/brief"
+    },
+    {
+      "route": "/api/company-assessment/route",
+      "outputPath": "/api/company-assessment"
+    },
+    {
+      "route": "/api/competitive-defense/brief/route",
+      "outputPath": "/api/competitive-defense/brief"
+    },
+    {
+      "route": "/api/competitive-defense/route",
+      "outputPath": "/api/competitive-defense"
+    },
+    {
+      "route": "/api/competitive-edge/route",
+      "outputPath": "/api/competitive-edge"
+    },
+    {
+      "route": "/api/competitive-intelligence/route",
+      "outputPath": "/api/competitive-intelligence"
+    },
+    {
+      "route": "/api/continuous-review-audit/brief/route",
+      "outputPath": "/api/continuous-review-audit/brief"
+    },
+    {
+      "route": "/api/continuous-review-audit/route",
+      "outputPath": "/api/continuous-review-audit"
+    },
+    {
+      "route": "/api/contracts/[slug]/route",
+      "outputPath": "/api/contracts/[slug]"
+    },
+    {
+      "route": "/api/contracts/route",
+      "outputPath": "/api/contracts"
+    },
+    {
+      "route": "/api/demos/[slug]/brief/route",
+      "outputPath": "/api/demos/[slug]/brief"
+    },
+    {
+      "route": "/api/demos/[slug]/route",
+      "outputPath": "/api/demos/[slug]"
+    },
+    {
+      "route": "/api/demos/route",
+      "outputPath": "/api/demos"
+    },
+    {
+      "route": "/api/deployment-drift-guard/brief/route",
+      "outputPath": "/api/deployment-drift-guard/brief"
+    },
+    {
+      "route": "/api/deployment-drift-guard/route",
+      "outputPath": "/api/deployment-drift-guard"
+    },
+    {
+      "route": "/api/deployment-profiles/route",
+      "outputPath": "/api/deployment-profiles"
+    },
+    {
+      "route": "/api/documentation-before-authorization/route",
+      "outputPath": "/api/documentation-before-authorization"
+    },
+    {
+      "route": "/api/documentation-before-authorization/scrimed-work-handoff/route",
+      "outputPath": "/api/documentation-before-authorization/scrimed-work-handoff"
+    },
+    {
+      "route": "/api/enterprise-business-ops/brief/route",
+      "outputPath": "/api/enterprise-business-ops/brief"
+    },
+    {
+      "route": "/api/enterprise-business-ops/route",
+      "outputPath": "/api/enterprise-business-ops"
+    },
+    {
+      "route": "/api/enterprise-healthcare-infrastructure/brief/route",
+      "outputPath": "/api/enterprise-healthcare-infrastructure/brief"
+    },
+    {
+      "route": "/api/enterprise-healthcare-infrastructure/route",
+      "outputPath": "/api/enterprise-healthcare-infrastructure"
+    },
+    {
+      "route": "/api/enterprise-readiness/[slug]/route",
+      "outputPath": "/api/enterprise-readiness/[slug]"
+    },
+    {
+      "route": "/api/enterprise-readiness/claims/route",
+      "outputPath": "/api/enterprise-readiness/claims"
+    },
+    {
+      "route": "/api/enterprise-readiness/diligence-brief/route",
+      "outputPath": "/api/enterprise-readiness/diligence-brief"
+    },
+    {
+      "route": "/api/enterprise-readiness/route",
+      "outputPath": "/api/enterprise-readiness"
+    },
+    {
+      "route": "/api/enterprise-scalability/brief/route",
+      "outputPath": "/api/enterprise-scalability/brief"
+    },
+    {
+      "route": "/api/enterprise-scalability/route",
+      "outputPath": "/api/enterprise-scalability"
+    },
+    {
+      "route": "/api/events/route",
+      "outputPath": "/api/events"
+    },
+    {
+      "route": "/api/fixtures/change-review/route",
+      "outputPath": "/api/fixtures/change-review"
+    },
+    {
+      "route": "/api/global-certification-readiness/brief/route",
+      "outputPath": "/api/global-certification-readiness/brief"
+    },
+    {
+      "route": "/api/global-certification-readiness/route",
+      "outputPath": "/api/global-certification-readiness"
+    },
+    {
+      "route": "/api/global-enterprise-command/brief/route",
+      "outputPath": "/api/global-enterprise-command/brief"
+    },
+    {
+      "route": "/api/global-enterprise-command/route",
+      "outputPath": "/api/global-enterprise-command"
+    },
+    {
+      "route": "/api/global-reach/brief/route",
+      "outputPath": "/api/global-reach/brief"
+    },
+    {
+      "route": "/api/global-reach/route",
+      "outputPath": "/api/global-reach"
+    },
+    {
+      "route": "/api/growth-engine/brief/route",
+      "outputPath": "/api/growth-engine/brief"
+    },
+    {
+      "route": "/api/growth-engine/route",
+      "outputPath": "/api/growth-engine"
+    },
+    {
+      "route": "/api/health-records/brief/route",
+      "outputPath": "/api/health-records/brief"
+    },
+    {
+      "route": "/api/health-records/extract/route",
+      "outputPath": "/api/health-records/extract"
+    },
+    {
+      "route": "/api/health-records/route",
+      "outputPath": "/api/health-records"
+    },
+    {
+      "route": "/api/health/route",
+      "outputPath": "/api/health"
+    },
+    {
+      "route": "/api/healthcare-intelligence-os/brief/route",
+      "outputPath": "/api/healthcare-intelligence-os/brief"
+    },
+    {
+      "route": "/api/healthcare-intelligence-os/route",
+      "outputPath": "/api/healthcare-intelligence-os"
+    },
+    {
+      "route": "/api/healthcare-optimization-command/brief/route",
+      "outputPath": "/api/healthcare-optimization-command/brief"
+    },
+    {
+      "route": "/api/healthcare-optimization-command/route",
+      "outputPath": "/api/healthcare-optimization-command"
+    },
+    {
+      "route": "/api/healthcare-value-realization/brief/route",
+      "outputPath": "/api/healthcare-value-realization/brief"
+    },
+    {
+      "route": "/api/healthcare-value-realization/route",
+      "outputPath": "/api/healthcare-value-realization"
+    },
+    {
+      "route": "/api/hub/summary/route",
+      "outputPath": "/api/hub/summary"
+    },
+    {
+      "route": "/api/integration-fixtures/[slug]/route",
+      "outputPath": "/api/integration-fixtures/[slug]"
+    },
+    {
+      "route": "/api/integration-fixtures/route",
+      "outputPath": "/api/integration-fixtures"
+    },
+    {
+      "route": "/api/integration-fixtures/validation/route",
+      "outputPath": "/api/integration-fixtures/validation"
+    },
+    {
+      "route": "/api/interoperability/conformance/route",
+      "outputPath": "/api/interoperability/conformance"
+    },
+    {
+      "route": "/api/interoperability/evaluations/[slug]/route",
+      "outputPath": "/api/interoperability/evaluations/[slug]"
+    },
+    {
+      "route": "/api/interoperability/evaluations/route",
+      "outputPath": "/api/interoperability/evaluations"
+    },
+    {
+      "route": "/api/interoperability/standards/[slug]/route",
+      "outputPath": "/api/interoperability/standards/[slug]"
+    },
+    {
+      "route": "/api/interoperability/standards/route",
+      "outputPath": "/api/interoperability/standards"
+    },
+    {
+      "route": "/api/investor-audience-readiness/brief/route",
+      "outputPath": "/api/investor-audience-readiness/brief"
+    },
+    {
+      "route": "/api/investor-audience-readiness/meeting-packet/route",
+      "outputPath": "/api/investor-audience-readiness/meeting-packet"
+    },
+    {
+      "route": "/api/investor-audience-readiness/route",
+      "outputPath": "/api/investor-audience-readiness"
+    },
+    {
+      "route": "/api/investor-demo-command-room/route",
+      "outputPath": "/api/investor-demo-command-room"
+    },
+    {
+      "route": "/api/investor-readiness/status/route",
+      "outputPath": "/api/investor-readiness/status"
+    },
+    {
+      "route": "/api/launch-readiness/brief/route",
+      "outputPath": "/api/launch-readiness/brief"
+    },
+    {
+      "route": "/api/launch-readiness/route",
+      "outputPath": "/api/launch-readiness"
+    },
+    {
+      "route": "/api/limitations-workarounds/brief/route",
+      "outputPath": "/api/limitations-workarounds/brief"
+    },
+    {
+      "route": "/api/limitations-workarounds/route",
+      "outputPath": "/api/limitations-workarounds"
+    },
+    {
+      "route": "/api/market-activation/route",
+      "outputPath": "/api/market-activation"
+    },
+    {
+      "route": "/api/memory/route",
+      "outputPath": "/api/memory"
+    },
+    {
+      "route": "/api/navigation-audit/brief/route",
+      "outputPath": "/api/navigation-audit/brief"
+    },
+    {
+      "route": "/api/navigation-audit/route",
+      "outputPath": "/api/navigation-audit"
+    },
+    {
+      "route": "/api/observability/route",
+      "outputPath": "/api/observability"
+    },
+    {
+      "route": "/api/offerings/brief/route",
+      "outputPath": "/api/offerings/brief"
+    },
+    {
+      "route": "/api/offerings/route",
+      "outputPath": "/api/offerings"
+    },
+    {
+      "route": "/api/omega-audit/brief/route",
+      "outputPath": "/api/omega-audit/brief"
+    },
+    {
+      "route": "/api/omega-audit/route",
+      "outputPath": "/api/omega-audit"
+    },
+    {
+      "route": "/api/operating-context/route",
+      "outputPath": "/api/operating-context"
+    },
+    {
+      "route": "/api/operating-mode/route",
+      "outputPath": "/api/operating-mode"
+    },
+    {
+      "route": "/api/operational-efficiency/brief/route",
+      "outputPath": "/api/operational-efficiency/brief"
+    },
+    {
+      "route": "/api/operational-efficiency/route",
+      "outputPath": "/api/operational-efficiency"
+    },
+    {
+      "route": "/api/operations/readiness/route",
+      "outputPath": "/api/operations/readiness"
+    },
+    {
+      "route": "/api/pilot-activation-planner/brief/route",
+      "outputPath": "/api/pilot-activation-planner/brief"
+    },
+    {
+      "route": "/api/pilot-activation-planner/route",
+      "outputPath": "/api/pilot-activation-planner"
+    },
+    {
+      "route": "/api/pilot-deal-room/route",
+      "outputPath": "/api/pilot-deal-room"
+    },
+    {
+      "route": "/api/pilot-demo-commercial-readiness/brief/route",
+      "outputPath": "/api/pilot-demo-commercial-readiness/brief"
+    },
+    {
+      "route": "/api/pilot-demo-commercial-readiness/route",
+      "outputPath": "/api/pilot-demo-commercial-readiness"
+    },
+    {
+      "route": "/api/pilot-evidence/brief/route",
+      "outputPath": "/api/pilot-evidence/brief"
+    },
+    {
+      "route": "/api/pilot-evidence/route",
+      "outputPath": "/api/pilot-evidence"
+    },
+    {
+      "route": "/api/pilot-handoff-command/brief/route",
+      "outputPath": "/api/pilot-handoff-command/brief"
+    },
+    {
+      "route": "/api/pilot-handoff-command/route",
+      "outputPath": "/api/pilot-handoff-command"
+    },
+    {
+      "route": "/api/pilot-success-review-command/brief/route",
+      "outputPath": "/api/pilot-success-review-command/brief"
+    },
+    {
+      "route": "/api/pilot-success-review-command/route",
+      "outputPath": "/api/pilot-success-review-command"
+    },
+    {
+      "route": "/api/pilot-value-evidence/brief/route",
+      "outputPath": "/api/pilot-value-evidence/brief"
+    },
+    {
+      "route": "/api/pilot-value-evidence/route",
+      "outputPath": "/api/pilot-value-evidence"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/activation-governance/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/activation-governance"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/audit/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/audit"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/authority-artifact-references/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/authority-artifact-references/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/authority-artifact-references/renewal-queue/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/authority-artifact-references/renewal-queue"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/authority-artifact-references/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/authority-artifact-references"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/board-scorecards/[scorecardId]/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/board-scorecards/[scorecardId]/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/board-scorecards/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/board-scorecards"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/boundary-release-evidence-intake/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/boundary-release-evidence-intake/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/boundary-release-evidence-intake/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/boundary-release-evidence-intake"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/metadata-drafts/checklist/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/metadata-drafts/checklist"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/metadata-drafts/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/metadata-drafts"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/reconciliation/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/reconciliation"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/remediation/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/remediation"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/timeline/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-release-control-run/timeline"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-room/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-room/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/buyer-room/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/buyer-room"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-approvals/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-approvals/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-approvals/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-approvals"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-dossier/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-dossier/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-dossier/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-activation-dossier"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-artifact-intake/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-artifact-intake/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-artifact-intake/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-artifact-intake"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-evidence-room/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-evidence-room/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-evidence-room/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-evidence-room"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-owner-matrix/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-owner-matrix/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-owner-matrix/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/clinical-authority-owner-matrix"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/command-intelligence/[snapshotId]/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/command-intelligence/[snapshotId]/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/command-intelligence/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/command-intelligence"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/demo-readiness/[snapshotId]/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/demo-readiness/[snapshotId]/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/demo-readiness/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/demo-readiness"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/distribution-lockbox/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/distribution-lockbox/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/distribution-lockbox/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/distribution-lockbox"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/enterprise-proof-packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/enterprise-proof-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-access-log-reconciliation/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-access-log-reconciliation/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-access-log-reconciliation/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-access-log-reconciliation"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-provider-adapters/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-provider-adapters/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-provider-adapters/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-provider-adapters"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-recipient-attestations/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-recipient-attestations/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-recipient-attestations/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/evidence-room-recipient-attestations"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/external-approval-evidence/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/external-approval-evidence/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/external-approval-evidence/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/external-approval-evidence"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/finance-methodology/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/finance-methodology/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/finance-methodology/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/finance-methodology"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/metric-rollups/[snapshotId]/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/metric-rollups/[snapshotId]/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/metric-rollups/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/metric-rollups"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/metric-trends/[reviewId]/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/metric-trends/[reviewId]/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/metric-trends/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/metric-trends"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/operator-metrics/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/operator-metrics"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/procurement-evidence/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/procurement-evidence/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/procurement-evidence/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/procurement-evidence"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/provider-security-reviews/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/provider-security-reviews/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/provider-security-reviews/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/provider-security-reviews"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/aal2-run-evidence/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/aal2-run-evidence"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/buyer-proof-release/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/buyer-proof-release"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/manual-execution-console/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/manual-execution-console"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/manual-run-packets/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/manual-run-packets"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/p32-attestation/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/p32-attestation"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/p32-candidate-review/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/qa-evidence/p32-candidate-review"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/release-authority-attestations/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/release-authority-attestations/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/release-authority-attestations/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/release-authority-attestations"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/release-decisions/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/release-decisions/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/release-decisions/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/release-decisions"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/reviewer-signoffs/packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/reviewer-signoffs/packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/reviewer-signoffs/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/reviewer-signoffs"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/sessions/[sessionId]/proof-packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/sessions/[sessionId]/proof-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/sessions/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/sessions"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/tenant-access/activation-proof-packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/tenant-access/activation-proof-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/tenant-access/invitations/[invitationId]/onboarding-packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/tenant-access/invitations/[invitationId]/onboarding-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/tenant-access/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/tenant-access"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/[incidentId]/review-packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/[incidentId]/review-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/[incidentId]/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/[incidentId]"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/trust-safety-incidents"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/trustos-decisions/[decisionId]/governance-packet/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/trustos-decisions/[decisionId]/governance-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/trustos-decisions/[decisionId]/reviews/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/trustos-decisions/[decisionId]/reviews"
+    },
+    {
+      "route": "/api/pilot-workspaces/[workspaceSlug]/trustos-decisions/route",
+      "outputPath": "/api/pilot-workspaces/[workspaceSlug]/trustos-decisions"
+    },
+    {
+      "route": "/api/pilot-workspaces/preview-proof-packet/route",
+      "outputPath": "/api/pilot-workspaces/preview-proof-packet"
+    },
+    {
+      "route": "/api/pilot-workspaces/readiness/route",
+      "outputPath": "/api/pilot-workspaces/readiness"
+    },
+    {
+      "route": "/api/pilot-workspaces/route",
+      "outputPath": "/api/pilot-workspaces"
+    },
+    {
+      "route": "/api/pilot/intake/route",
+      "outputPath": "/api/pilot/intake"
+    },
+    {
+      "route": "/api/pilots/[slug]/proposal/route",
+      "outputPath": "/api/pilots/[slug]/proposal"
+    },
+    {
+      "route": "/api/pilots/[slug]/route",
+      "outputPath": "/api/pilots/[slug]"
+    },
+    {
+      "route": "/api/pilots/route",
+      "outputPath": "/api/pilots"
+    },
+    {
+      "route": "/api/platform-power/brief/route",
+      "outputPath": "/api/platform-power/brief"
+    },
+    {
+      "route": "/api/platform-power/route",
+      "outputPath": "/api/platform-power"
+    },
+    {
+      "route": "/api/product/console/route",
+      "outputPath": "/api/product/console"
+    },
+    {
+      "route": "/api/product/readiness-brief/route",
+      "outputPath": "/api/product/readiness-brief"
+    },
+    {
+      "route": "/api/production-architecture/brief/route",
+      "outputPath": "/api/production-architecture/brief"
+    },
+    {
+      "route": "/api/production-architecture/route",
+      "outputPath": "/api/production-architecture"
+    },
+    {
+      "route": "/api/products/readiness/route",
+      "outputPath": "/api/products/readiness"
+    },
+    {
+      "route": "/api/public-market-readiness/brief/route",
+      "outputPath": "/api/public-market-readiness/brief"
+    },
+    {
+      "route": "/api/public-market-readiness/route",
+      "outputPath": "/api/public-market-readiness"
+    },
+    {
+      "route": "/api/public-release-status/route",
+      "outputPath": "/api/public-release-status"
+    },
+    {
+      "route": "/api/qa-evidence/aal2-run-evidence/brief/route",
+      "outputPath": "/api/qa-evidence/aal2-run-evidence/brief"
+    },
+    {
+      "route": "/api/qa-evidence/aal2-run-evidence/route",
+      "outputPath": "/api/qa-evidence/aal2-run-evidence"
+    },
+    {
+      "route": "/api/qa-evidence/aal2-smoke-readiness/brief/route",
+      "outputPath": "/api/qa-evidence/aal2-smoke-readiness/brief"
+    },
+    {
+      "route": "/api/qa-evidence/aal2-smoke-readiness/route",
+      "outputPath": "/api/qa-evidence/aal2-smoke-readiness"
+    },
+    {
+      "route": "/api/qa-evidence/activation-plan/brief/route",
+      "outputPath": "/api/qa-evidence/activation-plan/brief"
+    },
+    {
+      "route": "/api/qa-evidence/activation-plan/route",
+      "outputPath": "/api/qa-evidence/activation-plan"
+    },
+    {
+      "route": "/api/qa-evidence/activation-seal/brief/route",
+      "outputPath": "/api/qa-evidence/activation-seal/brief"
+    },
+    {
+      "route": "/api/qa-evidence/activation-seal/route",
+      "outputPath": "/api/qa-evidence/activation-seal"
+    },
+    {
+      "route": "/api/qa-evidence/brief/route",
+      "outputPath": "/api/qa-evidence/brief"
+    },
+    {
+      "route": "/api/qa-evidence/buyer-proof-release/brief/route",
+      "outputPath": "/api/qa-evidence/buyer-proof-release/brief"
+    },
+    {
+      "route": "/api/qa-evidence/buyer-proof-release/route",
+      "outputPath": "/api/qa-evidence/buyer-proof-release"
+    },
+    {
+      "route": "/api/qa-evidence/claim-guard/brief/route",
+      "outputPath": "/api/qa-evidence/claim-guard/brief"
+    },
+    {
+      "route": "/api/qa-evidence/claim-guard/route",
+      "outputPath": "/api/qa-evidence/claim-guard"
+    },
+    {
+      "route": "/api/qa-evidence/completion-bridge/brief/route",
+      "outputPath": "/api/qa-evidence/completion-bridge/brief"
+    },
+    {
+      "route": "/api/qa-evidence/completion-bridge/route",
+      "outputPath": "/api/qa-evidence/completion-bridge"
+    },
+    {
+      "route": "/api/qa-evidence/execution-readiness/brief/route",
+      "outputPath": "/api/qa-evidence/execution-readiness/brief"
+    },
+    {
+      "route": "/api/qa-evidence/execution-readiness/route",
+      "outputPath": "/api/qa-evidence/execution-readiness"
+    },
+    {
+      "route": "/api/qa-evidence/human-run-packet/brief/route",
+      "outputPath": "/api/qa-evidence/human-run-packet/brief"
+    },
+    {
+      "route": "/api/qa-evidence/human-run-packet/route",
+      "outputPath": "/api/qa-evidence/human-run-packet"
+    },
+    {
+      "route": "/api/qa-evidence/launch-kit/brief/route",
+      "outputPath": "/api/qa-evidence/launch-kit/brief"
+    },
+    {
+      "route": "/api/qa-evidence/launch-kit/route",
+      "outputPath": "/api/qa-evidence/launch-kit"
+    },
+    {
+      "route": "/api/qa-evidence/manual-execution-console/brief/route",
+      "outputPath": "/api/qa-evidence/manual-execution-console/brief"
+    },
+    {
+      "route": "/api/qa-evidence/manual-execution-console/route",
+      "outputPath": "/api/qa-evidence/manual-execution-console"
+    },
+    {
+      "route": "/api/qa-evidence/manual-run-packet/route",
+      "outputPath": "/api/qa-evidence/manual-run-packet"
+    },
+    {
+      "route": "/api/qa-evidence/proof-promotion/brief/route",
+      "outputPath": "/api/qa-evidence/proof-promotion/brief"
+    },
+    {
+      "route": "/api/qa-evidence/proof-promotion/route",
+      "outputPath": "/api/qa-evidence/proof-promotion"
+    },
+    {
+      "route": "/api/qa-evidence/route",
+      "outputPath": "/api/qa-evidence"
+    },
+    {
+      "route": "/api/qa-evidence/run-control/brief/route",
+      "outputPath": "/api/qa-evidence/run-control/brief"
+    },
+    {
+      "route": "/api/qa-evidence/run-control/route",
+      "outputPath": "/api/qa-evidence/run-control"
+    },
+    {
+      "route": "/api/quality/gates/route",
+      "outputPath": "/api/quality/gates"
+    },
+    {
+      "route": "/api/readiness/route",
+      "outputPath": "/api/readiness"
+    },
+    {
+      "route": "/api/release-candidate-readiness/brief/route",
+      "outputPath": "/api/release-candidate-readiness/brief"
+    },
+    {
+      "route": "/api/release-candidate-readiness/route",
+      "outputPath": "/api/release-candidate-readiness"
+    },
+    {
+      "route": "/api/release-continuity/authorization-chain/brief/route",
+      "outputPath": "/api/release-continuity/authorization-chain/brief"
+    },
+    {
+      "route": "/api/release-continuity/authorization-chain/route",
+      "outputPath": "/api/release-continuity/authorization-chain"
+    },
+    {
+      "route": "/api/release-continuity/brief/route",
+      "outputPath": "/api/release-continuity/brief"
+    },
+    {
+      "route": "/api/release-continuity/diligence-gate/brief/route",
+      "outputPath": "/api/release-continuity/diligence-gate/brief"
+    },
+    {
+      "route": "/api/release-continuity/diligence-gate/route",
+      "outputPath": "/api/release-continuity/diligence-gate"
+    },
+    {
+      "route": "/api/release-continuity/diligence-packet-manifest/brief/route",
+      "outputPath": "/api/release-continuity/diligence-packet-manifest/brief"
+    },
+    {
+      "route": "/api/release-continuity/diligence-packet-manifest/route",
+      "outputPath": "/api/release-continuity/diligence-packet-manifest"
+    },
+    {
+      "route": "/api/release-continuity/diligence-packet-share-guard/brief/route",
+      "outputPath": "/api/release-continuity/diligence-packet-share-guard/brief"
+    },
+    {
+      "route": "/api/release-continuity/diligence-packet-share-guard/route",
+      "outputPath": "/api/release-continuity/diligence-packet-share-guard"
+    },
+    {
+      "route": "/api/release-continuity/evidence-freshness-guard/brief/route",
+      "outputPath": "/api/release-continuity/evidence-freshness-guard/brief"
+    },
+    {
+      "route": "/api/release-continuity/evidence-freshness-guard/route",
+      "outputPath": "/api/release-continuity/evidence-freshness-guard"
+    },
+    {
+      "route": "/api/release-continuity/evidence-ledger/brief/route",
+      "outputPath": "/api/release-continuity/evidence-ledger/brief"
+    },
+    {
+      "route": "/api/release-continuity/evidence-ledger/route",
+      "outputPath": "/api/release-continuity/evidence-ledger"
+    },
+    {
+      "route": "/api/release-continuity/evidence-promotion/brief/route",
+      "outputPath": "/api/release-continuity/evidence-promotion/brief"
+    },
+    {
+      "route": "/api/release-continuity/evidence-promotion/route",
+      "outputPath": "/api/release-continuity/evidence-promotion"
+    },
+    {
+      "route": "/api/release-continuity/recipient-qualification-matrix/brief/route",
+      "outputPath": "/api/release-continuity/recipient-qualification-matrix/brief"
+    },
+    {
+      "route": "/api/release-continuity/recipient-qualification-matrix/route",
+      "outputPath": "/api/release-continuity/recipient-qualification-matrix"
+    },
+    {
+      "route": "/api/release-continuity/route",
+      "outputPath": "/api/release-continuity"
+    },
+    {
+      "route": "/api/risk-register/route",
+      "outputPath": "/api/risk-register"
+    },
+    {
+      "route": "/api/sales-attribution/route",
+      "outputPath": "/api/sales-attribution"
+    },
+    {
+      "route": "/api/sales-operations/attribution-analytics/route",
+      "outputPath": "/api/sales-operations/attribution-analytics"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/activation-approvals/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/activation-approvals/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/activation-approvals/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/activation-approvals"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/assessment-invitation/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/assessment-invitation"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/attribution-analytics-packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/attribution-analytics-packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/buyer-diligence/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/buyer-diligence/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/buyer-diligence/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/buyer-diligence"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/command-center/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/command-center"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/crm-export/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/crm-export"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/crm-sync/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/crm-sync"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/deal-room-packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/deal-room-packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/demo-execution/brief/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/demo-execution/brief"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/demo-execution/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/demo-execution"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/demo-sessions/[sessionId]/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/demo-sessions/[sessionId]/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/demo-sessions/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/demo-sessions"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/evidence-vault-readiness/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/evidence-vault-readiness/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/evidence-vault-readiness/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/evidence-vault-readiness"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/follow-up-draft/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/follow-up-draft"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/follow-up/complete/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/follow-up/complete"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/production-readiness/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/production-readiness/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/production-readiness/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/production-readiness"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/proposal/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/proposal"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/tenant-lifecycle/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/tenant-lifecycle/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/tenant-lifecycle/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/tenant-lifecycle"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/workspace-provisioning/packet/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/workspace-provisioning/packet"
+    },
+    {
+      "route": "/api/sales-operations/opportunities/[intakeId]/workspace-provisioning/route",
+      "outputPath": "/api/sales-operations/opportunities/[intakeId]/workspace-provisioning"
+    },
+    {
+      "route": "/api/sales-operations/qa/buyer-demo-sessions/route",
+      "outputPath": "/api/sales-operations/qa/buyer-demo-sessions"
+    },
+    {
+      "route": "/api/sales-operations/route",
+      "outputPath": "/api/sales-operations"
+    },
+    {
+      "route": "/api/scrimed-agent-governance/brief/route",
+      "outputPath": "/api/scrimed-agent-governance/brief"
+    },
+    {
+      "route": "/api/scrimed-agent-governance/route",
+      "outputPath": "/api/scrimed-agent-governance"
+    },
+    {
+      "route": "/api/scrimed-ai-infrastructure-watchtower/brief/route",
+      "outputPath": "/api/scrimed-ai-infrastructure-watchtower/brief"
+    },
+    {
+      "route": "/api/scrimed-ai-infrastructure-watchtower/route",
+      "outputPath": "/api/scrimed-ai-infrastructure-watchtower"
+    },
+    {
+      "route": "/api/scrimed-automation-autopilot/brief/route",
+      "outputPath": "/api/scrimed-automation-autopilot/brief"
+    },
+    {
+      "route": "/api/scrimed-automation-autopilot/route",
+      "outputPath": "/api/scrimed-automation-autopilot"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/brief/route",
+      "outputPath": "/api/scrimed-build-roadmap/brief"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/context-manifest/brief/route",
+      "outputPath": "/api/scrimed-build-roadmap/context-manifest/brief"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/context-manifest/route",
+      "outputPath": "/api/scrimed-build-roadmap/context-manifest"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/route",
+      "outputPath": "/api/scrimed-build-roadmap"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/stored-vector-rpc-smoke/route",
+      "outputPath": "/api/scrimed-build-roadmap/stored-vector-rpc-smoke"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/strategic-execution/brief/route",
+      "outputPath": "/api/scrimed-build-roadmap/strategic-execution/brief"
+    },
+    {
+      "route": "/api/scrimed-build-roadmap/strategic-execution/route",
+      "outputPath": "/api/scrimed-build-roadmap/strategic-execution"
+    },
+    {
+      "route": "/api/scrimed-clinical-benchmark-suite/brief/route",
+      "outputPath": "/api/scrimed-clinical-benchmark-suite/brief"
+    },
+    {
+      "route": "/api/scrimed-clinical-benchmark-suite/route",
+      "outputPath": "/api/scrimed-clinical-benchmark-suite"
+    },
+    {
+      "route": "/api/scrimed-compute-fabric/brief/route",
+      "outputPath": "/api/scrimed-compute-fabric/brief"
+    },
+    {
+      "route": "/api/scrimed-compute-fabric/migration-preflight/brief/route",
+      "outputPath": "/api/scrimed-compute-fabric/migration-preflight/brief"
+    },
+    {
+      "route": "/api/scrimed-compute-fabric/migration-preflight/route",
+      "outputPath": "/api/scrimed-compute-fabric/migration-preflight"
+    },
+    {
+      "route": "/api/scrimed-compute-fabric/route",
+      "outputPath": "/api/scrimed-compute-fabric"
+    },
+    {
+      "route": "/api/scrimed-control-plane/[[...path]]/route",
+      "outputPath": "/api/scrimed-control-plane/[[...path]]"
+    },
+    {
+      "route": "/api/scrimed-cyber-defense/evidence-packet/route",
+      "outputPath": "/api/scrimed-cyber-defense/evidence-packet"
+    },
+    {
+      "route": "/api/scrimed-cyber-defense/route",
+      "outputPath": "/api/scrimed-cyber-defense"
+    },
+    {
+      "route": "/api/scrimed-enterprise-acceleration/brief/route",
+      "outputPath": "/api/scrimed-enterprise-acceleration/brief"
+    },
+    {
+      "route": "/api/scrimed-enterprise-acceleration/route",
+      "outputPath": "/api/scrimed-enterprise-acceleration"
+    },
+    {
+      "route": "/api/scrimed-execution-focus/brief/route",
+      "outputPath": "/api/scrimed-execution-focus/brief"
+    },
+    {
+      "route": "/api/scrimed-execution-focus/route",
+      "outputPath": "/api/scrimed-execution-focus"
+    },
+    {
+      "route": "/api/scrimed-governance-learning-loop/route",
+      "outputPath": "/api/scrimed-governance-learning-loop"
+    },
+    {
+      "route": "/api/scrimed-guided-execution/route",
+      "outputPath": "/api/scrimed-guided-execution"
+    },
+    {
+      "route": "/api/scrimed-hybrid-retrieval/brief/route",
+      "outputPath": "/api/scrimed-hybrid-retrieval/brief"
+    },
+    {
+      "route": "/api/scrimed-hybrid-retrieval/route",
+      "outputPath": "/api/scrimed-hybrid-retrieval"
+    },
+    {
+      "route": "/api/scrimed-intelligence-platform/brief/route",
+      "outputPath": "/api/scrimed-intelligence-platform/brief"
+    },
+    {
+      "route": "/api/scrimed-intelligence-platform/evaluate/route",
+      "outputPath": "/api/scrimed-intelligence-platform/evaluate"
+    },
+    {
+      "route": "/api/scrimed-intelligence-platform/route",
+      "outputPath": "/api/scrimed-intelligence-platform"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/brief/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack/brief"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/evaluate/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack/evaluate"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/regression-disposition-preview/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack/regression-disposition-preview"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/regression-manifest/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack/regression-manifest"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/regression-promotion-gate/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack/regression-promotion-gate"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/review-packets/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack/review-packets"
+    },
+    {
+      "route": "/api/scrimed-intelligence-safety-stack/route",
+      "outputPath": "/api/scrimed-intelligence-safety-stack"
+    },
+    {
+      "route": "/api/scrimed-llmops-observability/brief/route",
+      "outputPath": "/api/scrimed-llmops-observability/brief"
+    },
+    {
+      "route": "/api/scrimed-llmops-observability/route",
+      "outputPath": "/api/scrimed-llmops-observability"
+    },
+    {
+      "route": "/api/scrimed-market-execution/brief/route",
+      "outputPath": "/api/scrimed-market-execution/brief"
+    },
+    {
+      "route": "/api/scrimed-market-execution/route",
+      "outputPath": "/api/scrimed-market-execution"
+    },
+    {
+      "route": "/api/scrimed-modules/brief/route",
+      "outputPath": "/api/scrimed-modules/brief"
+    },
+    {
+      "route": "/api/scrimed-modules/route",
+      "outputPath": "/api/scrimed-modules"
+    },
+    {
+      "route": "/api/scrimed-operating-command/brief/route",
+      "outputPath": "/api/scrimed-operating-command/brief"
+    },
+    {
+      "route": "/api/scrimed-operating-command/route",
+      "outputPath": "/api/scrimed-operating-command"
+    },
+    {
+      "route": "/api/scrimed-os/implementation-plan/brief/route",
+      "outputPath": "/api/scrimed-os/implementation-plan/brief"
+    },
+    {
+      "route": "/api/scrimed-os/implementation-plan/route",
+      "outputPath": "/api/scrimed-os/implementation-plan"
+    },
+    {
+      "route": "/api/scrimed-os/upgrade-batch/brief/route",
+      "outputPath": "/api/scrimed-os/upgrade-batch/brief"
+    },
+    {
+      "route": "/api/scrimed-os/upgrade-batch/route",
+      "outputPath": "/api/scrimed-os/upgrade-batch"
+    },
+    {
+      "route": "/api/scrimed-patient-context-gateway/brief/route",
+      "outputPath": "/api/scrimed-patient-context-gateway/brief"
+    },
+    {
+      "route": "/api/scrimed-patient-context-gateway/route",
+      "outputPath": "/api/scrimed-patient-context-gateway"
+    },
+    {
+      "route": "/api/scrimed-proof-packet-studio/[packetId]/brief/route",
+      "outputPath": "/api/scrimed-proof-packet-studio/[packetId]/brief"
+    },
+    {
+      "route": "/api/scrimed-proof-packet-studio/route",
+      "outputPath": "/api/scrimed-proof-packet-studio"
+    },
+    {
+      "route": "/api/scrimed-proof-packet-studio/share-readiness/route",
+      "outputPath": "/api/scrimed-proof-packet-studio/share-readiness"
+    },
+    {
+      "route": "/api/scrimed-reasoning-stability/brief/route",
+      "outputPath": "/api/scrimed-reasoning-stability/brief"
+    },
+    {
+      "route": "/api/scrimed-reasoning-stability/route",
+      "outputPath": "/api/scrimed-reasoning-stability"
+    },
+    {
+      "route": "/api/scrimed-trustops/brief/route",
+      "outputPath": "/api/scrimed-trustops/brief"
+    },
+    {
+      "route": "/api/scrimed-trustops/review-packets/brief/route",
+      "outputPath": "/api/scrimed-trustops/review-packets/brief"
+    },
+    {
+      "route": "/api/scrimed-trustops/review-packets/route",
+      "outputPath": "/api/scrimed-trustops/review-packets"
+    },
+    {
+      "route": "/api/scrimed-trustops/route",
+      "outputPath": "/api/scrimed-trustops"
+    },
+    {
+      "route": "/api/scrimed-upgrade-implementation-plan/brief/route",
+      "outputPath": "/api/scrimed-upgrade-implementation-plan/brief"
+    },
+    {
+      "route": "/api/scrimed-upgrade-implementation-plan/route",
+      "outputPath": "/api/scrimed-upgrade-implementation-plan"
+    },
+    {
+      "route": "/api/scrimed-work/agents/route",
+      "outputPath": "/api/scrimed-work/agents"
+    },
+    {
+      "route": "/api/scrimed-work/artifacts/route",
+      "outputPath": "/api/scrimed-work/artifacts"
+    },
+    {
+      "route": "/api/scrimed-work/brief/route",
+      "outputPath": "/api/scrimed-work/brief"
+    },
+    {
+      "route": "/api/scrimed-work/completion-queue/route",
+      "outputPath": "/api/scrimed-work/completion-queue"
+    },
+    {
+      "route": "/api/scrimed-work/context/search/route",
+      "outputPath": "/api/scrimed-work/context/search"
+    },
+    {
+      "route": "/api/scrimed-work/continuity/preflight/route",
+      "outputPath": "/api/scrimed-work/continuity/preflight"
+    },
+    {
+      "route": "/api/scrimed-work/production-hardening/route",
+      "outputPath": "/api/scrimed-work/production-hardening"
+    },
+    {
+      "route": "/api/scrimed-work/providers/route",
+      "outputPath": "/api/scrimed-work/providers"
+    },
+    {
+      "route": "/api/scrimed-work/review-queue/route",
+      "outputPath": "/api/scrimed-work/review-queue"
+    },
+    {
+      "route": "/api/scrimed-work/route",
+      "outputPath": "/api/scrimed-work"
+    },
+    {
+      "route": "/api/scrimed-work/route-model/route",
+      "outputPath": "/api/scrimed-work/route-model"
+    },
+    {
+      "route": "/api/scrimed-work/schedules/route",
+      "outputPath": "/api/scrimed-work/schedules"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/approve/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/approve"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/artifacts/[artifactId]/review"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/cancel/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/cancel"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/complete/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/complete"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/pause/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/pause"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/plan/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/plan"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/reject/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/reject"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/resume/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/resume"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/run/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/run"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/[sessionId]/verify/route",
+      "outputPath": "/api/scrimed-work/sessions/[sessionId]/verify"
+    },
+    {
+      "route": "/api/scrimed-work/sessions/route",
+      "outputPath": "/api/scrimed-work/sessions"
+    },
+    {
+      "route": "/api/scrimed-work/tools/route",
+      "outputPath": "/api/scrimed-work/tools"
+    },
+    {
+      "route": "/api/scrimed-work/voice/simulate/route",
+      "outputPath": "/api/scrimed-work/voice/simulate"
+    },
+    {
+      "route": "/api/service-delivery/brief/route",
+      "outputPath": "/api/service-delivery/brief"
+    },
+    {
+      "route": "/api/service-delivery/route",
+      "outputPath": "/api/service-delivery"
+    },
+    {
+      "route": "/api/service-reliability/brief/route",
+      "outputPath": "/api/service-reliability/brief"
+    },
+    {
+      "route": "/api/service-reliability/route",
+      "outputPath": "/api/service-reliability"
+    },
+    {
+      "route": "/api/source-intelligence/route",
+      "outputPath": "/api/source-intelligence"
+    },
+    {
+      "route": "/api/status/route",
+      "outputPath": "/api/status"
+    },
+    {
+      "route": "/api/strategic-intelligence/route",
+      "outputPath": "/api/strategic-intelligence"
+    },
+    {
+      "route": "/api/strategic-problem-resolution/brief/route",
+      "outputPath": "/api/strategic-problem-resolution/brief"
+    },
+    {
+      "route": "/api/strategic-problem-resolution/route",
+      "outputPath": "/api/strategic-problem-resolution"
+    },
+    {
+      "route": "/api/synthetic-pilot/route",
+      "outputPath": "/api/synthetic-pilot"
+    },
+    {
+      "route": "/api/synthetic/fixtures/[slug]/route",
+      "outputPath": "/api/synthetic/fixtures/[slug]"
+    },
+    {
+      "route": "/api/synthetic/fixtures/route",
+      "outputPath": "/api/synthetic/fixtures"
+    },
+    {
+      "route": "/api/synthetic/scenarios/[slug]/route",
+      "outputPath": "/api/synthetic/scenarios/[slug]"
+    },
+    {
+      "route": "/api/synthetic/scenarios/route",
+      "outputPath": "/api/synthetic/scenarios"
+    },
+    {
+      "route": "/api/synthetic/validation/[slug]/route",
+      "outputPath": "/api/synthetic/validation/[slug]"
+    },
+    {
+      "route": "/api/synthetic/validation/route",
+      "outputPath": "/api/synthetic/validation"
+    },
+    {
+      "route": "/api/trust-os/evaluate/route",
+      "outputPath": "/api/trust-os/evaluate"
+    },
+    {
+      "route": "/api/trust-os/route",
+      "outputPath": "/api/trust-os"
+    },
+    {
+      "route": "/api/trust-safety-operations/incidents/[incidentId]/report/route",
+      "outputPath": "/api/trust-safety-operations/incidents/[incidentId]/report"
+    },
+    {
+      "route": "/api/trust-safety-operations/route",
+      "outputPath": "/api/trust-safety-operations"
+    },
+    {
+      "route": "/api/trust/cards/route",
+      "outputPath": "/api/trust/cards"
+    },
+    {
+      "route": "/api/validation-evidence/route",
+      "outputPath": "/api/validation-evidence"
+    },
+    {
+      "route": "/api/workflows/audit-persistence/route",
+      "outputPath": "/api/workflows/audit-persistence"
+    },
+    {
+      "route": "/api/workflows/contracts/[slug]/route",
+      "outputPath": "/api/workflows/contracts/[slug]"
+    },
+    {
+      "route": "/api/workflows/contracts/route",
+      "outputPath": "/api/workflows/contracts"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/durable-store/brief/route",
+      "outputPath": "/api/workflows/execution-attempts/durable-store/brief"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/durable-store/record/route",
+      "outputPath": "/api/workflows/execution-attempts/durable-store/record"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/durable-store/replay/route",
+      "outputPath": "/api/workflows/execution-attempts/durable-store/replay"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/durable-store/review-disposition/route",
+      "outputPath": "/api/workflows/execution-attempts/durable-store/review-disposition"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/durable-store/route",
+      "outputPath": "/api/workflows/execution-attempts/durable-store"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/envelope/brief/route",
+      "outputPath": "/api/workflows/execution-attempts/envelope/brief"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/envelope/route",
+      "outputPath": "/api/workflows/execution-attempts/envelope"
+    },
+    {
+      "route": "/api/workflows/execution-attempts/route",
+      "outputPath": "/api/workflows/execution-attempts"
+    },
+    {
+      "route": "/api/workflows/execution-audit/[slug]/route",
+      "outputPath": "/api/workflows/execution-audit/[slug]"
+    },
+    {
+      "route": "/api/workflows/execution-audit/route",
+      "outputPath": "/api/workflows/execution-audit"
+    },
+    {
+      "route": "/api/workflows/executions/[slug]/route",
+      "outputPath": "/api/workflows/executions/[slug]"
+    },
+    {
+      "route": "/api/workflows/executions/route",
+      "outputPath": "/api/workflows/executions"
+    },
+    {
+      "route": "/api/workflows/governed-execution/[slug]/route",
+      "outputPath": "/api/workflows/governed-execution/[slug]"
+    },
+    {
+      "route": "/api/workflows/identity-access/route",
+      "outputPath": "/api/workflows/identity-access"
+    },
+    {
+      "route": "/api/workflows/implementation-readiness/route",
+      "outputPath": "/api/workflows/implementation-readiness"
+    },
+    {
+      "route": "/api/workflows/promotion-review/route",
+      "outputPath": "/api/workflows/promotion-review"
+    },
+    {
+      "route": "/api/workflows/results/[slug]/route",
+      "outputPath": "/api/workflows/results/[slug]"
+    },
+    {
+      "route": "/api/workflows/results/route",
+      "outputPath": "/api/workflows/results"
+    },
+    {
+      "route": "/api/workflows/results/validation/route",
+      "outputPath": "/api/workflows/results/validation"
+    },
+    {
+      "route": "/api/workflows/runtime-safety/route",
+      "outputPath": "/api/workflows/runtime-safety"
+    },
+    {
+      "route": "/approvals-readiness/page",
+      "outputPath": "/approvals-readiness"
+    },
+    {
+      "route": "/atlas/page",
+      "outputPath": "/atlas"
+    },
+    {
+      "route": "/attribution-analytics/page",
+      "outputPath": "/attribution-analytics"
+    },
+    {
+      "route": "/audit/page",
+      "outputPath": "/audit"
+    },
+    {
+      "route": "/boundary-release-approvals/page",
+      "outputPath": "/boundary-release-approvals"
+    },
+    {
+      "route": "/boundary-resolution/page",
+      "outputPath": "/boundary-resolution"
+    },
+    {
+      "route": "/buyer-release-control-run/page",
+      "outputPath": "/buyer-release-control-run"
+    },
+    {
+      "route": "/capital-vitality/page",
+      "outputPath": "/capital-vitality"
+    },
+    {
+      "route": "/claims/page",
+      "outputPath": "/claims"
+    },
+    {
+      "route": "/client-onboarding/page",
+      "outputPath": "/client-onboarding"
+    },
+    {
+      "route": "/clinical-assurance-control-plane/page",
+      "outputPath": "/clinical-assurance-control-plane"
+    },
+    {
+      "route": "/clinical-authority-readiness/page",
+      "outputPath": "/clinical-authority-readiness"
+    },
+    {
+      "route": "/clinical-care-activation/page",
+      "outputPath": "/clinical-care-activation"
+    },
+    {
+      "route": "/clinical-production-readiness/page",
+      "outputPath": "/clinical-production-readiness"
+    },
+    {
+      "route": "/clinical-robustness-lab/page",
+      "outputPath": "/clinical-robustness-lab"
+    },
+    {
+      "route": "/company-assessment/page",
+      "outputPath": "/company-assessment"
+    },
+    {
+      "route": "/competitive-defense/page",
+      "outputPath": "/competitive-defense"
+    },
+    {
+      "route": "/competitive-edge/page",
+      "outputPath": "/competitive-edge"
+    },
+    {
+      "route": "/competitive-intelligence/page",
+      "outputPath": "/competitive-intelligence"
+    },
+    {
+      "route": "/continuous-review-audit/page",
+      "outputPath": "/continuous-review-audit"
+    },
+    {
+      "route": "/contracts/[slug]/page",
+      "outputPath": "/contracts/[slug]"
+    },
+    {
+      "route": "/demos/[slug]/page",
+      "outputPath": "/demos/[slug]"
+    },
+    {
+      "route": "/demos/page",
+      "outputPath": "/demos"
+    },
+    {
+      "route": "/deployment-drift-guard/page",
+      "outputPath": "/deployment-drift-guard"
+    },
+    {
+      "route": "/deployment-profiles/page",
+      "outputPath": "/deployment-profiles"
+    },
+    {
+      "route": "/documentation-before-authorization/page",
+      "outputPath": "/documentation-before-authorization"
+    },
+    {
+      "route": "/enterprise-business-ops/page",
+      "outputPath": "/enterprise-business-ops"
+    },
+    {
+      "route": "/enterprise-healthcare-infrastructure/page",
+      "outputPath": "/enterprise-healthcare-infrastructure"
+    },
+    {
+      "route": "/enterprise-scalability/page",
+      "outputPath": "/enterprise-scalability"
+    },
+    {
+      "route": "/evaluation/page",
+      "outputPath": "/evaluation"
+    },
+    {
+      "route": "/faithcore/page",
+      "outputPath": "/faithcore"
+    },
+    {
+      "route": "/fixtures/change-review/page",
+      "outputPath": "/fixtures/change-review"
+    },
+    {
+      "route": "/global-certification-readiness/page",
+      "outputPath": "/global-certification-readiness"
+    },
+    {
+      "route": "/global-enterprise-command/page",
+      "outputPath": "/global-enterprise-command"
+    },
+    {
+      "route": "/global-reach/page",
+      "outputPath": "/global-reach"
+    },
+    {
+      "route": "/governance-packs/page",
+      "outputPath": "/governance-packs"
+    },
+    {
+      "route": "/growth-engine/page",
+      "outputPath": "/growth-engine"
+    },
+    {
+      "route": "/health-records/page",
+      "outputPath": "/health-records"
+    },
+    {
+      "route": "/healthcare-intelligence-os/page",
+      "outputPath": "/healthcare-intelligence-os"
+    },
+    {
+      "route": "/healthcare-optimization-command/page",
+      "outputPath": "/healthcare-optimization-command"
+    },
+    {
+      "route": "/healthcare-value-realization/page",
+      "outputPath": "/healthcare-value-realization"
+    },
+    {
+      "route": "/hub/events/page",
+      "outputPath": "/hub/events"
+    },
+    {
+      "route": "/hub/page",
+      "outputPath": "/hub"
+    },
+    {
+      "route": "/hub/readiness/page",
+      "outputPath": "/hub/readiness"
+    },
+    {
+      "route": "/icon.svg/route",
+      "outputPath": "/icon.svg"
+    },
+    {
+      "route": "/integrations/fixture-validation/page",
+      "outputPath": "/integrations/fixture-validation"
+    },
+    {
+      "route": "/integrations/fixtures/[slug]/page",
+      "outputPath": "/integrations/fixtures/[slug]"
+    },
+    {
+      "route": "/integrations/fixtures/page",
+      "outputPath": "/integrations/fixtures"
+    },
+    {
+      "route": "/integrations/page",
+      "outputPath": "/integrations"
+    },
+    {
+      "route": "/interoperability/[slug]/page",
+      "outputPath": "/interoperability/[slug]"
+    },
+    {
+      "route": "/interoperability/evaluations/[slug]/page",
+      "outputPath": "/interoperability/evaluations/[slug]"
+    },
+    {
+      "route": "/interoperability/evaluations/page",
+      "outputPath": "/interoperability/evaluations"
+    },
+    {
+      "route": "/interoperability/page",
+      "outputPath": "/interoperability"
+    },
+    {
+      "route": "/investor-audience-readiness/page",
+      "outputPath": "/investor-audience-readiness"
+    },
+    {
+      "route": "/investor-demo-command-room/page",
+      "outputPath": "/investor-demo-command-room"
+    },
+    {
+      "route": "/investor-readiness/page",
+      "outputPath": "/investor-readiness"
+    },
+    {
+      "route": "/launch-readiness/page",
+      "outputPath": "/launch-readiness"
+    },
+    {
+      "route": "/legal/[slug]/page",
+      "outputPath": "/legal/[slug]"
+    },
+    {
+      "route": "/legal/page",
+      "outputPath": "/legal"
+    },
+    {
+      "route": "/limitations-workarounds/page",
+      "outputPath": "/limitations-workarounds"
+    },
+    {
+      "route": "/market-activation/page",
+      "outputPath": "/market-activation"
+    },
+    {
+      "route": "/memory/page",
+      "outputPath": "/memory"
+    },
+    {
+      "route": "/modules/carepath-ai/page",
+      "outputPath": "/modules/carepath-ai"
+    },
+    {
+      "route": "/modules/clinical-copilot/page",
+      "outputPath": "/modules/clinical-copilot"
+    },
+    {
+      "route": "/modules/docutwin/page",
+      "outputPath": "/modules/docutwin"
+    },
+    {
+      "route": "/modules/trialcore/page",
+      "outputPath": "/modules/trialcore"
+    },
+    {
+      "route": "/modules/watchtower/page",
+      "outputPath": "/modules/watchtower"
+    },
+    {
+      "route": "/navigation/page",
+      "outputPath": "/navigation"
+    },
+    {
+      "route": "/observability/page",
+      "outputPath": "/observability"
+    },
+    {
+      "route": "/offerings/page",
+      "outputPath": "/offerings"
+    },
+    {
+      "route": "/omega-audit/page",
+      "outputPath": "/omega-audit"
+    },
+    {
+      "route": "/operating-context/page",
+      "outputPath": "/operating-context"
+    },
+    {
+      "route": "/operational-efficiency/page",
+      "outputPath": "/operational-efficiency"
+    },
+    {
+      "route": "/operations/page",
+      "outputPath": "/operations"
+    },
+    {
+      "route": "/page",
+      "outputPath": "/"
+    },
+    {
+      "route": "/pilot-activation-planner/page",
+      "outputPath": "/pilot-activation-planner"
+    },
+    {
+      "route": "/pilot-deal-room/page",
+      "outputPath": "/pilot-deal-room"
+    },
+    {
+      "route": "/pilot-demo-commercial-readiness/page",
+      "outputPath": "/pilot-demo-commercial-readiness"
+    },
+    {
+      "route": "/pilot-evidence/page",
+      "outputPath": "/pilot-evidence"
+    },
+    {
+      "route": "/pilot-handoff-command/page",
+      "outputPath": "/pilot-handoff-command"
+    },
+    {
+      "route": "/pilot-success-review-command/page",
+      "outputPath": "/pilot-success-review-command"
+    },
+    {
+      "route": "/pilot-value-evidence/page",
+      "outputPath": "/pilot-value-evidence"
+    },
+    {
+      "route": "/pilot-workspace/access/page",
+      "outputPath": "/pilot-workspace/access"
+    },
+    {
+      "route": "/pilot-workspace/page",
+      "outputPath": "/pilot-workspace"
+    },
+    {
+      "route": "/pilot/page",
+      "outputPath": "/pilot"
+    },
+    {
+      "route": "/pilots/[slug]/page",
+      "outputPath": "/pilots/[slug]"
+    },
+    {
+      "route": "/pilots/page",
+      "outputPath": "/pilots"
+    },
+    {
+      "route": "/platform-power/page",
+      "outputPath": "/platform-power"
+    },
+    {
+      "route": "/platform/page",
+      "outputPath": "/platform"
+    },
+    {
+      "route": "/pricing/page",
+      "outputPath": "/pricing"
+    },
+    {
+      "route": "/product/page",
+      "outputPath": "/product"
+    },
+    {
+      "route": "/production-architecture/page",
+      "outputPath": "/production-architecture"
+    },
+    {
+      "route": "/public-market-readiness/page",
+      "outputPath": "/public-market-readiness"
+    },
+    {
+      "route": "/qa-aal2-run-evidence/page",
+      "outputPath": "/qa-aal2-run-evidence"
+    },
+    {
+      "route": "/qa-activation-seal/page",
+      "outputPath": "/qa-activation-seal"
+    },
+    {
+      "route": "/qa-buyer-proof-release/page",
+      "outputPath": "/qa-buyer-proof-release"
+    },
+    {
+      "route": "/qa-claim-guard/page",
+      "outputPath": "/qa-claim-guard"
+    },
+    {
+      "route": "/qa-completion-bridge/page",
+      "outputPath": "/qa-completion-bridge"
+    },
+    {
+      "route": "/qa-evidence/page",
+      "outputPath": "/qa-evidence"
+    },
+    {
+      "route": "/qa-execution-readiness/page",
+      "outputPath": "/qa-execution-readiness"
+    },
+    {
+      "route": "/qa-human-run-packet/page",
+      "outputPath": "/qa-human-run-packet"
+    },
+    {
+      "route": "/qa-launch-kit/page",
+      "outputPath": "/qa-launch-kit"
+    },
+    {
+      "route": "/qa-manual-execution-console/page",
+      "outputPath": "/qa-manual-execution-console"
+    },
+    {
+      "route": "/qa-proof-promotion/page",
+      "outputPath": "/qa-proof-promotion"
+    },
+    {
+      "route": "/qa-run-control/page",
+      "outputPath": "/qa-run-control"
+    },
+    {
+      "route": "/quality/page",
+      "outputPath": "/quality"
+    },
+    {
+      "route": "/release-continuity/page",
+      "outputPath": "/release-continuity"
+    },
+    {
+      "route": "/risk-register/page",
+      "outputPath": "/risk-register"
+    },
+    {
+      "route": "/robots.txt/route",
+      "outputPath": "/robots.txt"
+    },
+    {
+      "route": "/sales-attribution/page",
+      "outputPath": "/sales-attribution"
+    },
+    {
+      "route": "/sales-operations/page",
+      "outputPath": "/sales-operations"
+    },
+    {
+      "route": "/scrimed-agent-governance/page",
+      "outputPath": "/scrimed-agent-governance"
+    },
+    {
+      "route": "/scrimed-ai-infrastructure-watchtower/page",
+      "outputPath": "/scrimed-ai-infrastructure-watchtower"
+    },
+    {
+      "route": "/scrimed-automation-autopilot/page",
+      "outputPath": "/scrimed-automation-autopilot"
+    },
+    {
+      "route": "/scrimed-build-roadmap/page",
+      "outputPath": "/scrimed-build-roadmap"
+    },
+    {
+      "route": "/scrimed-clinical-benchmark-suite/page",
+      "outputPath": "/scrimed-clinical-benchmark-suite"
+    },
+    {
+      "route": "/scrimed-control-plane/page",
+      "outputPath": "/scrimed-control-plane"
+    },
+    {
+      "route": "/scrimed-cyber-defense/page",
+      "outputPath": "/scrimed-cyber-defense"
+    },
+    {
+      "route": "/scrimed-enterprise-acceleration/page",
+      "outputPath": "/scrimed-enterprise-acceleration"
+    },
+    {
+      "route": "/scrimed-execution-focus/page",
+      "outputPath": "/scrimed-execution-focus"
+    },
+    {
+      "route": "/scrimed-governance-learning-loop/page",
+      "outputPath": "/scrimed-governance-learning-loop"
+    },
+    {
+      "route": "/scrimed-guided-execution/page",
+      "outputPath": "/scrimed-guided-execution"
+    },
+    {
+      "route": "/scrimed-hybrid-retrieval/page",
+      "outputPath": "/scrimed-hybrid-retrieval"
+    },
+    {
+      "route": "/scrimed-intelligence-platform/page",
+      "outputPath": "/scrimed-intelligence-platform"
+    },
+    {
+      "route": "/scrimed-intelligence-safety-stack/page",
+      "outputPath": "/scrimed-intelligence-safety-stack"
+    },
+    {
+      "route": "/scrimed-llmops-observability/page",
+      "outputPath": "/scrimed-llmops-observability"
+    },
+    {
+      "route": "/scrimed-market-execution/page",
+      "outputPath": "/scrimed-market-execution"
+    },
+    {
+      "route": "/scrimed-modules/page",
+      "outputPath": "/scrimed-modules"
+    },
+    {
+      "route": "/scrimed-operating-command/page",
+      "outputPath": "/scrimed-operating-command"
+    },
+    {
+      "route": "/scrimed-os/page",
+      "outputPath": "/scrimed-os"
+    },
+    {
+      "route": "/scrimed-p33/page",
+      "outputPath": "/scrimed-p33"
+    },
+    {
+      "route": "/scrimed-p34/page",
+      "outputPath": "/scrimed-p34"
+    },
+    {
+      "route": "/scrimed-patient-context-gateway/page",
+      "outputPath": "/scrimed-patient-context-gateway"
+    },
+    {
+      "route": "/scrimed-proof-packet-studio/page",
+      "outputPath": "/scrimed-proof-packet-studio"
+    },
+    {
+      "route": "/scrimed-reasoning-stability/page",
+      "outputPath": "/scrimed-reasoning-stability"
+    },
+    {
+      "route": "/scrimed-trustops/page",
+      "outputPath": "/scrimed-trustops"
+    },
+    {
+      "route": "/scrimed-upgrade-implementation-plan/page",
+      "outputPath": "/scrimed-upgrade-implementation-plan"
+    },
+    {
+      "route": "/scrimed-work/page",
+      "outputPath": "/scrimed-work"
+    },
+    {
+      "route": "/service-delivery/page",
+      "outputPath": "/service-delivery"
+    },
+    {
+      "route": "/service-reliability/page",
+      "outputPath": "/service-reliability"
+    },
+    {
+      "route": "/sitemap.xml/route",
+      "outputPath": "/sitemap.xml"
+    },
+    {
+      "route": "/source-intelligence/page",
+      "outputPath": "/source-intelligence"
+    },
+    {
+      "route": "/strategic-intelligence/page",
+      "outputPath": "/strategic-intelligence"
+    },
+    {
+      "route": "/strategic-problem-resolution/page",
+      "outputPath": "/strategic-problem-resolution"
+    },
+    {
+      "route": "/synthetic-pilot/page",
+      "outputPath": "/synthetic-pilot"
+    },
+    {
+      "route": "/synthetic/[slug]/page",
+      "outputPath": "/synthetic/[slug]"
+    },
+    {
+      "route": "/synthetic/fixtures/[slug]/page",
+      "outputPath": "/synthetic/fixtures/[slug]"
+    },
+    {
+      "route": "/synthetic/fixtures/page",
+      "outputPath": "/synthetic/fixtures"
+    },
+    {
+      "route": "/synthetic/page",
+      "outputPath": "/synthetic"
+    },
+    {
+      "route": "/synthetic/validation/page",
+      "outputPath": "/synthetic/validation"
+    },
+    {
+      "route": "/trust-center/[slug]/page",
+      "outputPath": "/trust-center/[slug]"
+    },
+    {
+      "route": "/trust-center/page",
+      "outputPath": "/trust-center"
+    },
+    {
+      "route": "/trust-os/page",
+      "outputPath": "/trust-os"
+    },
+    {
+      "route": "/trust-safety-operations/page",
+      "outputPath": "/trust-safety-operations"
+    },
+    {
+      "route": "/trust/page",
+      "outputPath": "/trust"
+    },
+    {
+      "route": "/validation-evidence/page",
+      "outputPath": "/validation-evidence"
+    },
+    {
+      "route": "/workflows/[slug]/page",
+      "outputPath": "/workflows/[slug]"
+    },
+    {
+      "route": "/workflows/audit-persistence/page",
+      "outputPath": "/workflows/audit-persistence"
+    },
+    {
+      "route": "/workflows/contracts/[slug]/page",
+      "outputPath": "/workflows/contracts/[slug]"
+    },
+    {
+      "route": "/workflows/contracts/page",
+      "outputPath": "/workflows/contracts"
+    },
+    {
+      "route": "/workflows/execution-attempts/page",
+      "outputPath": "/workflows/execution-attempts"
+    },
+    {
+      "route": "/workflows/execution-audit/[slug]/page",
+      "outputPath": "/workflows/execution-audit/[slug]"
+    },
+    {
+      "route": "/workflows/execution-audit/page",
+      "outputPath": "/workflows/execution-audit"
+    },
+    {
+      "route": "/workflows/identity-access/page",
+      "outputPath": "/workflows/identity-access"
+    },
+    {
+      "route": "/workflows/implementation-readiness/[slug]/page",
+      "outputPath": "/workflows/implementation-readiness/[slug]"
+    },
+    {
+      "route": "/workflows/implementation-readiness/page",
+      "outputPath": "/workflows/implementation-readiness"
+    },
+    {
+      "route": "/workflows/page",
+      "outputPath": "/workflows"
+    },
+    {
+      "route": "/workflows/promotion-review/page",
+      "outputPath": "/workflows/promotion-review"
+    },
+    {
+      "route": "/workflows/results/[slug]/page",
+      "outputPath": "/workflows/results/[slug]"
+    },
+    {
+      "route": "/workflows/results/page",
+      "outputPath": "/workflows/results"
+    },
+    {
+      "route": "/workflows/results/validation/page",
+      "outputPath": "/workflows/results/validation"
+    },
+    {
+      "route": "/workflows/runtime-safety/page",
+      "outputPath": "/workflows/runtime-safety"
+    }
+  ],
+  "manualExpectedCount": null,
+  "status": "GENERATED_FROM_NEXT_BUILD",
+  "inventoryFingerprint": "774525fb3f3d223601200cb67b49c2569d08452e8136aa67549ba08f8df89cf1"
+}

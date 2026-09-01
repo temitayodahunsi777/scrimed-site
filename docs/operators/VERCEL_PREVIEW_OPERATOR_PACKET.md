@@ -20,3 +20,5 @@ Owner: authorized Vercel release operator.
 5. Retain the preview deployment ID, exact commit, environment, smoke evidence, timestamp, expiry, and rollback owner.
 
 Rollback: delete or abandon the preview deployment; do not move aliases. Completion condition: exact-candidate preview verification passes. It does not authorize merge, production promotion, investor distribution, or customer access.
+
+For a Vercel Authentication-protected preview, obtain a temporary share URL from the deployment access control, provide it only as `SCRIMED_VERCEL_SHARE_URL` in the verifier process, and keep `TARGET_URL` as the bare preview origin. The verifier accepts only a same-origin `_vercel_share` URL, exchanges it for an in-memory `_vercel_jwt` cookie, removes the share URL before child checks, and does not persist either value.

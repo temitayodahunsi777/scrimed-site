@@ -1,0 +1,2408 @@
+{
+  "schemaVersion": "scrimed-p34-final-risk-ranked-diff-v1",
+  "repository": "temitayodahunsi777/scrimed-site",
+  "pullRequestNumber": 40,
+  "branch": "agent/scrimed-p34-post-review-readiness",
+  "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+  "rankOrder": [
+    "CRITICAL",
+    "HIGH",
+    "MEDIUM",
+    "LOW",
+    "GENERATED",
+    "DOCS"
+  ],
+  "fileCount": 148,
+  "riskCounts": {
+    "CRITICAL": 3,
+    "HIGH": 9,
+    "MEDIUM": 18,
+    "LOW": 45,
+    "GENERATED": 23,
+    "DOCS": 50
+  },
+  "files": [
+    {
+      "path": "app/lib/commercial/pilotManifest.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "CRITICAL",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/previewAcceptance.ts",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "CRITICAL",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/reviewReadiness.ts",
+      "classification": "GOVERNANCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "CRITICAL",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/commercial/pilotOperatingSystem.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/economics/pilotCostGovernor.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "PILOT_OS",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens bounded synthetic-pilot execution and evidence controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/supabasePasswordlessAssurance.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactHeadReviewState.ts",
+      "classification": "GOVERNANCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "HIGH",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/lib/aal2-redacted-evidence.mjs",
+      "classification": "AAL2",
+      "status": "CURRENT",
+      "reviewLane": "AAL2",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/run-aal2-candidate-verification.mjs",
+      "classification": "AAL2",
+      "status": "CURRENT",
+      "reviewLane": "AAL2",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-nonsecret-test-suite.mjs",
+      "classification": "SECURITY",
+      "status": "CURRENT",
+      "reviewLane": "SECURITY",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-certify.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "HIGH",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/verify-supabase-security.mjs",
+      "classification": "SECURITY",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "HIGH",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "classification": "CONFIGURATION",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/globals.css",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/investor-demo-command-room/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/deploymentProfiles.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/limitationsWorkaroundOperations.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/marketActivation.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/productConsole.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/publicMarketReadiness.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformEvidence.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformStrategy.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/index.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/types.ts",
+      "classification": "CORE_RUNTIME",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/product/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/scrimed-p34/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/trust-center/page.tsx",
+      "classification": "UI",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "config/performance-budgets.json",
+      "classification": "CONFIGURATION",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "package.json",
+      "classification": "CONFIGURATION",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "MEDIUM",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/commercial/pilotTemplateRegistry.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/commercial/syntheticPilotReadiness.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/commercialStrategy.ts",
+      "classification": "COMMERCIAL",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/pilotDemoCommercialReadiness.ts",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/vercelReleaseAssurance.ts",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactHeadBaseline.ts",
+      "classification": "GOVERNANCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/synthetic-pilot/page.tsx",
+      "classification": "PILOT",
+      "status": "CURRENT",
+      "reviewLane": "PILOT_OS",
+      "risk": "LOW",
+      "whyChanged": "Strengthens bounded synthetic-pilot execution and evidence controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/build-with-p34-inventory.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/check-generated-integrity.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/commercial-pricing-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/commercial-pricing-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/generate-p34-build-inventory.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/generate-p34-follow-on-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/generate-p34-post-review-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/generate-p39-review-map.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/generate-preproduction-assurance.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/generated-output-postflight.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/lib/p34-candidate-state.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/lib/p34-post-review-runtime-evidence.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/lib/vercel-preview-access.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/node24-runtime-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/p34-commercial-conversion-assets-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "LOW",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/product-console-payload-budget-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/public-production-smoke.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/release-candidate-validation.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-enterprise-gap-closure-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-local-public-smoke-runner-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-local-public-smoke-runner.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-local-quality-runner-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-local-quality-runner.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-artifacts.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-canary.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-evidence.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-follow-on-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-pilot-assurance-adversarial-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "PILOT_OS",
+      "risk": "LOW",
+      "whyChanged": "Strengthens bounded synthetic-pilot execution and evidence controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-post-review-readiness-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-post-review-readiness-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "CORE_RUNTIME",
+      "risk": "LOW",
+      "whyChanged": "Integrates the p.34 conversion wave into the existing runtime and test surface.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-verify-preview.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/supabase-passwordless-assurance-contract-check.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "LOW",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/supabase-passwordless-assurance-policy-test.mjs",
+      "classification": "TEST",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "LOW",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/vercel-preview-access-policy-test.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/verify-node24-vercel-build.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/verify-preview-ui.mjs",
+      "classification": "VERCEL",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "LOW",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/build/render-inventory.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/build/render-inventory.json"
+      ]
+    },
+    {
+      "path": "artifacts/build/routes.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/build/routes.json"
+      ]
+    },
+    {
+      "path": "artifacts/investor/moat-registry.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/investor/moat-registry.json"
+      ]
+    },
+    {
+      "path": "artifacts/p33/P33_GATE_MATRIX.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/p33/P33_GATE_MATRIX.json"
+      ]
+    },
+    {
+      "path": "artifacts/p33/P33_VALIDATION_REPORT.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/p33/P33_VALIDATION_REPORT.json"
+      ]
+    },
+    {
+      "path": "artifacts/p34/P34_GATE_MATRIX.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/p34/P34_GATE_MATRIX.json"
+      ]
+    },
+    {
+      "path": "artifacts/p34/P34_GENERATION_INVENTORY.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/p34/P34_GENERATION_INVENTORY.json"
+      ]
+    },
+    {
+      "path": "artifacts/p34/P34_ROUTE_INVENTORY.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/p34/P34_ROUTE_INVENTORY.json"
+      ]
+    },
+    {
+      "path": "artifacts/p34/P34_VALIDATION_REPORT.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/p34/P34_VALIDATION_REPORT.json"
+      ]
+    },
+    {
+      "path": "artifacts/platform/platform-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/platform/platform-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/product/portfolio-scorecard.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/product/portfolio-scorecard.json"
+      ]
+    },
+    {
+      "path": "artifacts/product/product-portfolio.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/product/product-portfolio.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p34-cumulative-integration-assurance.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-cumulative-integration-assurance.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p34-final-risk-ranked-diff.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-final-risk-ranked-diff.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p34-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-integration-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p34-review-index.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-review-index.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p34-stacked-review-plan.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p34-stacked-review-plan.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p39-full-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p39-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p40-current-risk-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-current-risk-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p40-full-integration-map.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p40-review-index.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-review-index.json"
+      ]
+    },
+    {
+      "path": "artifacts/review/p40-risk-ranked-diff.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-risk-ranked-diff.json"
+      ]
+    },
+    {
+      "path": "artifacts/strategy/strategic-roadmap.json",
+      "classification": "GENERATED_EVIDENCE",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "GENERATED",
+      "whyChanged": "Regenerates deterministic candidate evidence from repository sources.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/strategy/strategic-roadmap.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/BUYER_QUALIFICATION_CHECKLIST.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/ENTERPRISE_AI_GOVERNANCE_PILOT_ONE_PAGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/ENTERPRISE_DISCOVERY_QUESTIONNAIRE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/EXECUTIVE_PILOT_READOUT_TEMPLATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/PRICING_SCENARIO_CALCULATOR.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/PROTECTED_PILOT_INSURANCE_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/RCM_WORKFLOW_INTELLIGENCE_PILOT_ONE_PAGER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/ROI_VALUE_HYPOTHESIS_WORKSHEET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_SOW_TEMPLATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/commercial/WORKFLOW_INTELLIGENCE_ASSESSMENT_SALES_PACK.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/diligence/SCRIMED_ENTERPRISE_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/diligence/SCRIMED_INVESTOR_TECHNICAL_DILIGENCE_INDEX.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/governance/GATE_CLOSURE_REGISTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/governance/P34_REVIEW_SCOPE_BY_STAGE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_CLOSEOUT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/SUPABASE_PASSWORD_SECURITY_CLOSURE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "VERCEL",
+      "risk": "DOCS",
+      "whyChanged": "Binds nonproduction preview behavior and observability to the exact candidate.",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/operators/WIX_COMMERCIAL_COPY_ALIGNMENT.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/P34_SYNTHETIC_PILOT_OPERATING_SYSTEM.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "PILOT_OS",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens bounded synthetic-pilot execution and evidence controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/pilot-demo-commercial-readiness.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "COMMERCIAL",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens nonbinding economics, proposal, and buyer-readiness controls.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/platform/MACOS_SWC_ENVIRONMENT_NOTE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/CURRENT_CANDIDATE_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_CURRENT_CANONICAL_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXACT_HEAD_BASELINE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_CURRENT_EXECUTIVE_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_CURRENT_STATE_DISCOVERY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_EXECUTIVE_CANONICAL_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_FINAL_SYNTHETIC_CANONICAL_STATE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P34_SOURCE_CONTROL_RECONCILIATION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/release/P40_SOURCE_CONTROL_INTEGRITY.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review-packets/adversarial/SECURITY_AND_SAFETY_REVIEW.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "SECURITY",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_CUMULATIVE_INTEGRATION_ASSURANCE.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_FINAL_RISK_RANKED_DIFF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_FOCUSED_PR_CONSTRUCTION.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P34_STACKED_REVIEW_PLAN.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P39_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P40_CURRENT_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P40_EXACT_HEAD_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P40_EXECUTIVE_REVIEW_BRIEF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P40_FULL_INTEGRATION_MAP.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/review/P40_RISK_RANKED_DIFF.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "GOVERNANCE",
+      "risk": "DOCS",
+      "whyChanged": "Explains implemented behavior, retained boundaries, and operator action.",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "docs/security/SUPABASE_FREE_PLAN_PASSWORDLESS_COMPENSATING_CONTROLS.md",
+      "classification": "DOCUMENTATION",
+      "status": "CURRENT",
+      "reviewLane": "SUPABASE",
+      "risk": "DOCS",
+      "whyChanged": "Strengthens fail-closed identity, approval, egress, or security evidence.",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    }
+  ],
+  "unexplainedFileCount": 0,
+  "reviewDecision": "EXACT_REVIEW_REQUIRED",
+  "productionAuthorityGranted": false,
+  "sourcePullRequestNumber": 40,
+  "supersedes": "artifacts/review/p40-risk-ranked-diff.json",
+  "diffFingerprint": "d6debd4b7889ac0b106a8b354762a2f09e520028090eb58a7221fd0584c02649"
+}

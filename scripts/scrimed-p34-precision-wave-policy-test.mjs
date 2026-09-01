@@ -15,6 +15,7 @@ import {
   transitionSyntheticPilotStage
 } from "../app/lib/commercial/syntheticPilotReadiness.ts";
 import { getP34ReviewReadinessSummary } from "../app/lib/scrimed-p34/reviewReadiness.ts";
+import { p34ExactHeadBaseline } from "../app/lib/scrimed-p34/exactHeadBaseline.ts";
 import { getP34AdaptiveGovernanceSummary } from "../app/lib/scrimed-p34/index.ts";
 import {
   getProductConsoleApiSummary
@@ -238,13 +239,17 @@ check("review-readiness-never-self-approves", () => {
   assert.equal(summary.productionAuthorityGranted, false);
 });
 
-check("review-readiness-matches-current-review-map", () => {
-  const map = JSON.parse(readFileSync("artifacts/review/p39-review-map.json", "utf8"));
+check("review-readiness-separates-predecessor-from-current-map", () => {
+  const predecessorMap = JSON.parse(readFileSync("artifacts/review/p39-review-map.json", "utf8"));
+  const currentMap = JSON.parse(readFileSync("artifacts/review/p34-integration-map.json", "utf8"));
   const summary = getP34ReviewReadinessSummary({ NODE_ENV: "test" });
-  assert.equal(summary.scope.currentMappedFileCount, map.fileCount);
-  assert.equal(summary.scope.currentDirectLineageFileCount, map.lineageCounts.P34_DIRECT);
-  assert.equal(summary.scope.currentUnexpectedFileCount, map.unexpectedCount);
-  assert.equal(summary.scope.currentMapHash, map.mapHash);
+  assert.equal(summary.predecessorPullRequest.number, predecessorMap.pullRequestNumber);
+  assert.equal(summary.predecessorReviewTarget.commitSha, p34ExactHeadBaseline.commitSha);
+  assert.equal(summary.scope.mapArtifact, "artifacts/review/p34-integration-map.json");
+  assert.equal(summary.scope.unexpectedFilesAllowed, false);
+  assert.equal(currentMap.unexplainedFileCount, 0);
+  assert.equal(currentMap.fileCount, currentMap.files.length);
+  assert.equal(currentMap.reviewStatus, "EXACT_REVIEW_REQUIRED");
 });
 
 check("review-request-becomes-stale-when-head-moves", () => {
@@ -253,19 +258,19 @@ check("review-request-becomes-stale-when-head-moves", () => {
     SCRIMED_BUILD_COMMIT_SHA: "a".repeat(40),
     SCRIMED_P34_REVIEW_REQUESTED_HEAD_SHA: "b".repeat(40)
   });
-  assert.equal(summary.review.state, "STALE_REVIEW_REQUEST");
+  assert.equal(summary.review.state, "STALE");
   assert.equal(summary.review.requestCurrent, false);
 });
 
-check("product-console-refreshes-time-sensitive-review-state", () => {
+check("product-console-ignores-untrusted-review-expiry-environment", () => {
   const previous = process.env.SCRIMED_P34_REVIEW_EXPIRES_AT;
   try {
     process.env.SCRIMED_P34_REVIEW_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
     const current = getProductConsoleApiSummary().p34ReviewReadiness;
-    assert.equal(current.review.evidenceFreshness, "CURRENT");
+    assert.equal(current.review.evidenceFreshness, "NOT_PRESENT");
     process.env.SCRIMED_P34_REVIEW_EXPIRES_AT = "2000-01-01T00:00:00.000Z";
     const expired = getProductConsoleApiSummary().p34ReviewReadiness;
-    assert.equal(expired.review.evidenceFreshness, "EXPIRED");
+    assert.equal(expired.review.evidenceFreshness, "NOT_PRESENT");
   } finally {
     if (previous === undefined) delete process.env.SCRIMED_P34_REVIEW_EXPIRES_AT;
     else process.env.SCRIMED_P34_REVIEW_EXPIRES_AT = previous;

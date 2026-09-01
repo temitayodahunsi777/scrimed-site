@@ -10,6 +10,7 @@ import {
   parsePublicSmokeTimeoutMs,
   readBoundedResponseText
 } from "./lib/bounded-public-fetch.mjs";
+import { bindVercelPreviewAccessCookie } from "./lib/vercel-preview-access.mjs";
 
 const baseUrl = normalizePublicSmokeBaseUrl(
   process.env.SCRIMED_BASE_URL,
@@ -25,6 +26,11 @@ const maxReadAttempts = parsePublicSmokeMaxAttempts(
   process.env.SCRIMED_SMOKE_MAX_ATTEMPTS
 );
 const workspaceSlug = process.env.SCRIMED_WORKSPACE_SLUG?.trim() || "atlas-synthetic-evaluation";
+const previewAccessCookie = bindVercelPreviewAccessCookie({
+  cookie: process.env.SCRIMED_PREVIEW_ACCESS_COOKIE,
+  accessOrigin: process.env.SCRIMED_PREVIEW_ACCESS_ORIGIN,
+  requestOrigin: baseUrl
+})?.header;
 if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(workspaceSlug)) {
   throw new Error("SCRIMED_WORKSPACE_SLUG must be a bounded lowercase workspace slug.");
 }
@@ -55,7 +61,9 @@ async function request(path) {
   let response;
 
   try {
-    response = await boundedPublicFetch(endpoint(path), {}, {
+    response = await boundedPublicFetch(endpoint(path), {
+      headers: previewAccessCookie ? { Cookie: previewAccessCookie } : {}
+    }, {
       timeoutMs: requestTimeoutMs,
       maxAttempts: maxReadAttempts
     });
@@ -84,6 +92,7 @@ async function postJson(path, payload, extraHeaders = {}) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(previewAccessCookie ? { Cookie: previewAccessCookie } : {}),
           ...extraHeaders
         },
         body: JSON.stringify(payload)
@@ -3644,8 +3653,20 @@ async function checkBuyerTrustReliabilitySafetyMessaging() {
     throw new Error("Limitations Workarounds API expected known-limit resolution work orders.");
   }
 
-  if (limitationsJson.unresolvedResolutionWorkOrderCount < 4) {
-    throw new Error("Limitations Workarounds API expected unresolved known-limit blockers.");
+  const unresolvedStatuses = [
+    "active-workaround",
+    "blocked-external-dependency",
+    "requires-human-operator"
+  ];
+  const reconciledUnresolvedCount = unresolvedStatuses.reduce(
+    (total, status) => total + Number(limitationsJson.resolutionWorkOrdersByStatus?.[status] ?? 0),
+    0
+  );
+  if (limitationsJson.unresolvedResolutionWorkOrderCount !== reconciledUnresolvedCount) {
+    throw new Error("Limitations Workarounds API unresolved work-order count does not reconcile to its status buckets.");
+  }
+  if (reconciledUnresolvedCount < 1) {
+    throw new Error("Limitations Workarounds API expected at least one truthful unresolved external or operator-controlled work order.");
   }
 
   if (limitationsJson.executionLedgerCount < 5) {
@@ -3670,6 +3691,16 @@ async function checkBuyerTrustReliabilitySafetyMessaging() {
     if (!knownLimitSlugs.has(slug)) {
       throw new Error(`Limitations Workarounds API missing known-limit work order ${slug}.`);
     }
+  }
+
+  const supabasePasswordPosture = (limitationsJson.resolutionWorkOrders ?? []).find(
+    (workOrder) => workOrder.slug === "supabase-password-posture"
+  );
+  if (supabasePasswordPosture?.status !== "resolved-by-workaround") {
+    throw new Error("Supabase password posture must be resolved by the current passwordless compensating controls.");
+  }
+  if (!(supabasePasswordPosture.hardStops ?? []).includes("using password-only protected access")) {
+    throw new Error("Supabase password posture must retain the password-only protected-access hard stop.");
   }
 
   const executionLedgerSlugs = new Set(
@@ -4268,11 +4299,20 @@ async function checkProductConsole() {
     throw new Error("product console expected limitations workaround resolved execution-ledger coverage.");
   }
 
-  if (
-    !body.limitationsUnresolvedResolutionWorkOrderCount ||
-    body.limitationsUnresolvedResolutionWorkOrderCount < 4
-  ) {
-    throw new Error("product console expected unresolved known-limit blocker coverage.");
+  const productConsoleResolutionStatuses = body.limitationsResolutionWorkOrdersByStatus ?? {};
+  const productConsoleUnresolvedCount = [
+    "active-workaround",
+    "blocked-external-dependency",
+    "requires-human-operator"
+  ].reduce((total, status) => total + Number(productConsoleResolutionStatuses[status] ?? 0), 0);
+  if (body.limitationsUnresolvedResolutionWorkOrderCount !== productConsoleUnresolvedCount) {
+    throw new Error("product console unresolved work-order count does not reconcile to its status buckets.");
+  }
+  if (productConsoleUnresolvedCount < 1) {
+    throw new Error("product console expected at least one truthful unresolved external or operator-controlled work order.");
+  }
+  if (Number(productConsoleResolutionStatuses["resolved-by-workaround"] ?? 0) < 1) {
+    throw new Error("product console expected at least one verified safe workaround.");
   }
 
   if (!body.limitationsWorkaroundOpenRiskCount || body.limitationsWorkaroundOpenRiskCount < 8) {

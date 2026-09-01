@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "scrimed-p40-current-risk-map-v1",
+  "repository": "temitayodahunsi777/scrimed-site",
+  "pullRequestNumber": 40,
+  "exactCandidateBinding": "artifacts/release/scrimed-p34-release-manifest.json",
+  "sourceArtifact": "artifacts/review/p34-final-risk-ranked-diff.json",
+  "sourceFingerprint": "d6debd4b7889ac0b106a8b354762a2f09e520028090eb58a7221fd0584c02649",
+  "riskCounts": {
+    "CRITICAL": 3,
+    "HIGH": 9,
+    "MEDIUM": 18,
+    "LOW": 45,
+    "GENERATED": 23,
+    "DOCS": 50
+  },
+  "criticalAndHighFiles": [
+    {
+      "path": "app/lib/commercial/pilotManifest.ts",
+      "risk": "CRITICAL",
+      "reviewLane": "COMMERCIAL",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/previewAcceptance.ts",
+      "risk": "CRITICAL",
+      "reviewLane": "VERCEL",
+      "relevantTests": [
+        "npm run smoke:public",
+        "npm run scrimed:p34:certify"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/reviewReadiness.ts",
+      "risk": "CRITICAL",
+      "reviewLane": "GOVERNANCE",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/commercial/pilotOperatingSystem.ts",
+      "risk": "HIGH",
+      "reviewLane": "COMMERCIAL",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/economics/pilotCostGovernor.ts",
+      "risk": "HIGH",
+      "reviewLane": "PILOT_OS",
+      "relevantTests": [
+        "npm run test:scrimed-p34-post-review-readiness",
+        "npm run test:scrimed-p34-pilot-adversarial"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/release/supabasePasswordlessAssurance.ts",
+      "risk": "HIGH",
+      "reviewLane": "SUPABASE",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactHeadReviewState.ts",
+      "risk": "HIGH",
+      "reviewLane": "GOVERNANCE",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/lib/aal2-redacted-evidence.mjs",
+      "risk": "HIGH",
+      "reviewLane": "AAL2",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/run-aal2-candidate-verification.mjs",
+      "risk": "HIGH",
+      "reviewLane": "AAL2",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-nonsecret-test-suite.mjs",
+      "risk": "HIGH",
+      "reviewLane": "SECURITY",
+      "relevantTests": [
+        "npm run test:scrimed-p34-gap-closure",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-certify.mjs",
+      "risk": "HIGH",
+      "reviewLane": "CORE_RUNTIME",
+      "relevantTests": [
+        "npm run contract:scrimed-p34-follow-on",
+        "npm run test:nonsecret"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    },
+    {
+      "path": "scripts/verify-supabase-security.mjs",
+      "risk": "HIGH",
+      "reviewLane": "SUPABASE",
+      "relevantTests": [
+        "npm run test:supabase-passwordless-assurance",
+        "npm run contract:supabase-passwordless-assurance",
+        "npm run verify:supabase-security"
+      ],
+      "relevantEvidence": [
+        "artifacts/release/scrimed-p34-release-manifest.json",
+        "artifacts/review/p40-full-integration-map.json"
+      ]
+    }
+  ],
+  "reviewState": "EXACT_REVIEW_REQUIRED",
+  "humanApprovalPresent": false,
+  "mergeAuthorityGranted": false,
+  "productionAuthorityGranted": false,
+  "riskMapFingerprint": "ccc7f9b562aa18d4eb8c3d883abafa210abf61d751135364582d291da22b8212"
+}

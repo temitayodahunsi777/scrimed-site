@@ -27,5 +27,5 @@
   },
   "boundary": "This registry describes SCRIMED's locally implemented, synthetic/no-PHI platform foundations and evidence paths. It does not authorize PHI, autonomous clinical care, diagnosis, treatment, prescribing, payer submission, EHR writeback, medical-device connectivity, production deployment, certification claims, customer activation, investor outreach, valuation claims, or revenue guarantees.",
   "productionAuthorityGranted": false,
-  "auditHash": "86bd733a9c96d6e2efaea1d770a8f92892875b8d4ad95badb63c836350a62a19"
+  "auditHash": "5ce287748b670e481ae3fe108908b14a001d81d1c2e9e02df82cfc5c4e9a7822"
 }

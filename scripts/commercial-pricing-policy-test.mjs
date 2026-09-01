@@ -116,6 +116,26 @@ for (const tier of pricingTiers) {
   }
 }
 
+const customScopeTiers = [
+  "Synthetic Pilot Evaluation",
+  "Protected Enterprise Pilot",
+  "Enterprise Operating License",
+  "Strategic Platform Partnership"
+];
+for (const tierName of customScopeTiers) {
+  const tier = pricingTiers.find((candidate) => candidate.name === tierName);
+  assert.ok(tier, `${tierName} must remain in the canonical pricing registry`);
+  assert.equal(tier.publicPricingPolicy, "CUSTOM_SCOPE_REQUIRED");
+  assert.equal(tier.priceRange.customScope, true);
+  assert.equal(tier.priceRange.minimumUsd, 0);
+  assert.equal(tier.priceRange.maximumUsd, 0);
+  assert.doesNotMatch(tier.recommendedDisplayPrice, /\$|\b\d+(?:\.\d+)?\s*[mk]\b/i);
+}
+const protectedPilotTier = pricingTiers.find((tier) => tier.name === "Protected Enterprise Pilot");
+assert.match(protectedPilotTier?.recommendedDisplayPrice ?? "", /security, privacy, insurance/);
+const enterpriseLicenseTier = pricingTiers.find((tier) => tier.name === "Enterprise Operating License");
+assert.match(enterpriseLicenseTier?.recommendedDisplayPrice ?? "", /technical, security, legal/);
+
 const approvedMarketHosts = new Set([
   "www.getfreed.ai",
   "www.heidihealth.com",
@@ -175,5 +195,13 @@ assert.equal(summary.sourceCounts.marketBenchmarkCount, marketPricingBenchmarks.
 assert.equal(summary.sourceCounts.currentMarketBenchmarkCount, marketPricingBenchmarks.length);
 assert.equal(summary.sourceCounts.staleMarketBenchmarkCount, 0);
 assert.equal(summary.marketEvidenceReview.competitiveComparisonAllowed, true);
+assert.equal(
+  summary.pricingTiers.find((tier) => tier.name === "Protected Enterprise Pilot")?.publicPricingPolicy,
+  "CUSTOM_SCOPE_REQUIRED"
+);
+assert.equal(
+  summary.pricingTiers.find((tier) => tier.name === "Enterprise Operating License")?.publicPricingPolicy,
+  "CUSTOM_SCOPE_REQUIRED"
+);
 
 console.log("pass commercial pricing policy");

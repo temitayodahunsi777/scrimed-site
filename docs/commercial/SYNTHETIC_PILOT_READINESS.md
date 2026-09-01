@@ -12,7 +12,7 @@ Only the next stage may be entered. Missing scope, evidence, synthetic data, or 
 
 - Workflow Intelligence Assessment: starting at $25K, subject to written agreement.
 - SCRIMED Synthetic Workflow Pilot: custom enterprise scope.
-- Protected Enterprise Pilot: custom scope only after insurance, counsel, security/privacy, and deployment prerequisites.
+- Protected Enterprise Pilot: custom enterprise scope subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.
 
 Agents may draft scope, calculate synthetic scenarios, and prepare nonbinding proposals. They cannot sign, quote, accept terms, commit dates, negotiate liability, authorize PHI, or authorize production.
 

@@ -5,6 +5,10 @@ export type CommercialPricingAuthority =
   | "public-no-charge"
   | "non-binding-planning-range"
   | "human-approved-proposal-required";
+export type CommercialPublicPricingPolicy =
+  | "PUBLIC_NO_CHARGE"
+  | "PUBLIC_FIXED_STARTING_POINT"
+  | "CUSTOM_SCOPE_REQUIRED";
 export type CommercialEngagementGoal = "assessment" | "synthetic-pilot" | "protected-pilot";
 
 export type CommercialPriceRange = {
@@ -24,6 +28,7 @@ export type ProductAccessRoute = {
 export type PricingTier = {
   name: string;
   status: PricingTierStatus;
+  publicPricingPolicy: CommercialPublicPricingPolicy;
   recommendedDisplayPrice: string;
   priceRange: CommercialPriceRange;
   pricingAuthority: CommercialPricingAuthority;
@@ -270,8 +275,9 @@ export const pricingAlignmentDecisions: PricingAlignmentDecision[] = [
   },
   {
     lane: "Enterprise operating license",
-    decision: "Use $1.5M-$6M annual for initial enterprise layer and $6M-$12M+ for multi-department or multi-region expansion.",
-    rationale: "This aligns with infrastructure-level value while giving buyers a believable expansion ladder after pilots prove value.",
+    decision:
+      "Use custom enterprise scope; establish commercial terms only after technical, security, legal, and deployment-readiness review.",
+    rationale: "Pilot evidence and deployment obligations must precede any externally presented operating-license economics.",
     marginProtection: "Keep implementation, support, connector, usage, and continuous review retainers out of the base license unless explicitly priced."
   }
 ];
@@ -331,6 +337,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Public Product Preview",
     status: "public-preview",
+    publicPricingPolicy: "PUBLIC_NO_CHARGE",
     recommendedDisplayPrice: "Free public access",
     priceRange: {
       minimumUsd: 0,
@@ -362,6 +369,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Workflow Intelligence Assessment",
     status: "sellable-now",
+    publicPricingPolicy: "PUBLIC_FIXED_STARTING_POINT",
     recommendedDisplayPrice:
       "Starting at $25K, subject to written agreement",
     priceRange: {
@@ -395,6 +403,7 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Synthetic Pilot Evaluation",
     status: "sellable-now",
+    publicPricingPolicy: "CUSTOM_SCOPE_REQUIRED",
     recommendedDisplayPrice:
       "Custom enterprise scope; named human commercial and finance approval required",
     priceRange: {
@@ -430,8 +439,9 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Protected Enterprise Pilot",
     status: "protected-pilot",
+    publicPricingPolicy: "CUSTOM_SCOPE_REQUIRED",
     recommendedDisplayPrice:
-      "Custom scope only after insurance, counsel, security/privacy, and deployment prerequisites",
+      "Custom enterprise scope — subject to security, privacy, insurance, deployment-readiness, and written authorization requirements.",
     priceRange: {
       minimumUsd: 0,
       maximumUsd: 0,
@@ -467,12 +477,14 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Enterprise Operating License",
     status: "enterprise-license",
+    publicPricingPolicy: "CUSTOM_SCOPE_REQUIRED",
     recommendedDisplayPrice:
-      "Initial annual operating layer $1.5M-$6M; multi-department or multi-region expansion $6M-$12M+",
+      "Custom enterprise scope — commercial terms established following technical, security, legal, and deployment-readiness review.",
     priceRange: {
-      minimumUsd: 1_500_000,
-      maximumUsd: 12_000_000,
-      cadence: "annual"
+      minimumUsd: 0,
+      maximumUsd: 0,
+      cadence: "annual",
+      customScope: true
     },
     pricingAuthority: "human-approved-proposal-required",
     proposalGate:
@@ -502,11 +514,14 @@ export const pricingTiers: PricingTier[] = [
   {
     name: "Strategic Platform Partnership",
     status: "strategic",
-    recommendedDisplayPrice: "Multi-year partnerships $8M-$25M+, sales-led, region-aware, and external-review-gated",
+    publicPricingPolicy: "CUSTOM_SCOPE_REQUIRED",
+    recommendedDisplayPrice:
+      "Custom strategic scope — commercial terms require regional, technical, security, legal, procurement, and authority review.",
     priceRange: {
-      minimumUsd: 8_000_000,
-      maximumUsd: 25_000_000,
-      cadence: "multi-year"
+      minimumUsd: 0,
+      maximumUsd: 0,
+      cadence: "multi-year",
+      customScope: true
     },
     pricingAuthority: "human-approved-proposal-required",
     proposalGate:

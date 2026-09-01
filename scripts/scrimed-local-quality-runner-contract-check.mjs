@@ -25,6 +25,7 @@ for (const expected of [
   "--preserve-next-cache",
   "scripts/check-generated-integrity.mjs",
   "scripts/generated-output-postflight.mjs",
+  "--repair-disposable-conflicts",
   "scripts/verify-public-release.mjs",
   "scripts/workspace-hygiene-contract-check.mjs",
   "scripts/scrimed-nonsecret-test-suite.mjs",
@@ -54,6 +55,10 @@ if (packageJson.scripts?.["quality:direct-node"] !== `node ${runnerPath}`) {
 
 if (packageJson.scripts?.prebuild !== "node scripts/clean-generated-cache.mjs --preserve-next-cache && node scripts/release-provenance-preflight.mjs --deployment-aware") {
   throw new Error("package.json prebuild must preserve only the validated non-authoritative Next cache.");
+}
+
+if (!packageJson.scripts?.build?.includes("generated-output-postflight.mjs --repair-disposable-conflicts")) {
+  throw new Error("package.json build must explicitly reconcile disposable duplicate-suffixed Next output.");
 }
 
 for (const expected of [

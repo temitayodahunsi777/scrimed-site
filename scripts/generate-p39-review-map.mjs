@@ -13,6 +13,7 @@ const inventoryPath = "artifacts/review/p39-pr-file-inventory.json";
 const jsonOutputPath = "artifacts/review/p39-review-map.json";
 const markdownOutputPath = "docs/review/P39_REVIEW_MAP.md";
 const gapClosureBase = "48c49a065f0eef969e0927ca94894e10c693d5f0";
+const exactReviewHead = "45be650f48e422b05160821681ff40bb9f1229c9";
 
 function runGit(args) {
   const result = spawnSync("git", args, {
@@ -30,24 +31,6 @@ function sha256(value) {
 
 function sortedUnique(values) {
   return [...new Set(values.filter(Boolean))].sort((left, right) => left.localeCompare(right));
-}
-
-function worktreePaths() {
-  const output = runGit(["status", "--porcelain=v1", "-z", "--untracked-files=all"]);
-  const entries = output.split("\0").filter(Boolean);
-  const paths = [];
-  for (let index = 0; index < entries.length; index += 1) {
-    const entry = entries[index];
-    const status = entry.slice(0, 2);
-    const path = entry.slice(3);
-    if (status.includes("R") || status.includes("C")) {
-      paths.push(entries[index + 1] ?? path);
-      index += 1;
-    } else {
-      paths.push(path);
-    }
-  }
-  return paths;
 }
 
 function groupFor(path) {
@@ -101,8 +84,7 @@ if (inventory.pullRequestNumber !== 39 || !Array.isArray(inventory.files) || inv
 }
 
 const directFiles = sortedUnique([
-  ...runGit(["diff", "--name-only", `${gapClosureBase}...HEAD`]).split("\n"),
-  ...worktreePaths()
+  ...runGit(["diff", "--name-only", `${gapClosureBase}...${exactReviewHead}`]).split("\n")
 ]);
 const directSet = new Set(directFiles);
 const files = sortedUnique([...inventory.files, ...directFiles]);

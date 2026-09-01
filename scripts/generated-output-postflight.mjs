@@ -127,18 +127,35 @@ async function collectDuplicateCandidates(root) {
   return candidates;
 }
 
-async function reconcileGeneratedOutput(root) {
+async function reconcileGeneratedOutput(root, { repairDisposableConflicts = false } = {}) {
   const candidates = await collectDuplicateCandidates(root);
+  const divergent = [];
 
   for (const candidate of candidates) {
-    await assertRedundantDuplicate(candidate.duplicatePath, candidate.canonicalPath, candidate.label);
+    try {
+      await assertRedundantDuplicate(candidate.duplicatePath, candidate.canonicalPath, candidate.label);
+    } catch (error) {
+      if (
+        repairDisposableConflicts
+        && error instanceof Error
+        && error.message.includes("differs from its canonical counterpart")
+      ) {
+        divergent.push(candidate.label);
+        continue;
+      }
+
+      throw error;
+    }
   }
 
   for (const candidate of candidates) {
     await rm(candidate.duplicatePath, { force: true, recursive: true });
   }
 
-  return candidates.map((candidate) => candidate.label);
+  return {
+    divergent,
+    removed: candidates.map((candidate) => candidate.label)
+  };
 }
 
 async function writeFixture(filePath, contents) {
@@ -173,9 +190,11 @@ async function runSelfTest() {
     await writeFixture(path.join(safeRoot, ".next/BUILD_ID"), "build-one");
     await writeFixture(path.join(safeRoot, ".next 2/BUILD_ID"), "build-one");
 
-    const removed = await reconcileGeneratedOutput(safeRoot);
-    if (removed.length !== 3 || removed.some((label) => !label.includes(" 2"))) {
-      throw new Error(`Safe generated-output fixture removed an unexpected set: ${removed.join(", ")}.`);
+    const safeResult = await reconcileGeneratedOutput(safeRoot);
+    if (safeResult.removed.length !== 3 || safeResult.removed.some((label) => !label.includes(" 2"))) {
+      throw new Error(
+        `Safe generated-output fixture removed an unexpected set: ${safeResult.removed.join(", ")}.`
+      );
     }
 
     for (const removedPath of [
@@ -202,6 +221,17 @@ async function runSelfTest() {
     if (!(await exists(path.join(divergentRoot, ".next/server/app 2.js")))) {
       throw new Error("Divergent generated output was deleted instead of failing closed.");
     }
+    const repairedResult = await reconcileGeneratedOutput(divergentRoot, {
+      repairDisposableConflicts: true
+    });
+    if (
+      repairedResult.divergent.length !== 1
+      || repairedResult.divergent[0] !== ".next/server/app 2.js"
+      || await exists(path.join(divergentRoot, ".next/server/app 2.js"))
+      || !(await exists(path.join(divergentRoot, ".next/server/app.js")))
+    ) {
+      throw new Error("Explicit disposable-conflict repair did not preserve the canonical generated file.");
+    }
 
     const orphanRoot = path.join(fixtureRoot, "orphan");
     await writeFixture(path.join(orphanRoot, ".next/orphan 2.json"), "orphan");
@@ -216,23 +246,34 @@ async function runSelfTest() {
   }
 }
 
-const options = process.argv.slice(2);
-if (options.length > 1 || (options.length === 1 && options[0] !== "--self-test")) {
-  throw new Error(`Unsupported generated-output postflight option: ${options.join(", ")}`);
+const options = new Set(process.argv.slice(2));
+const supportedOptions = new Set(["--self-test", "--repair-disposable-conflicts"]);
+const unknownOptions = [...options].filter((option) => !supportedOptions.has(option));
+if (unknownOptions.length > 0 || (options.has("--self-test") && options.size > 1)) {
+  throw new Error(`Unsupported generated-output postflight option: ${[...options].join(", ")}`);
 }
 
-if (options[0] === "--self-test") {
+if (options.has("--self-test")) {
   await runSelfTest();
   process.exit(0);
 }
 
 try {
-  const removed = await reconcileGeneratedOutput(process.cwd());
+  const result = await reconcileGeneratedOutput(process.cwd(), {
+    repairDisposableConflicts: options.has("--repair-disposable-conflicts")
+  });
   console.log(
-    `pass SCRIMED generated-output postflight: duplicate_entries_removed=${removed.length} canonical_build_preserved=true`
+    `pass SCRIMED generated-output postflight: duplicate_entries_removed=${result.removed.length} `
+      + `divergent_conflicts_removed=${result.divergent.length} canonical_build_preserved=true`
   );
-  if (removed.length > 0) {
-    console.log(`removed redundant generated output: ${removed.join(", ")}`);
+  if (result.removed.length > 0) {
+    console.log(`removed noncanonical generated output: ${result.removed.join(", ")}`);
+  }
+  if (result.divergent.length > 0) {
+    console.warn(
+      "Removed divergent duplicate-suffixed disposable output after preserving the canonical Next paths; "
+        + `independent build verification remains required: ${result.divergent.join(", ")}.`
+    );
   }
 } catch (error) {
   console.error(

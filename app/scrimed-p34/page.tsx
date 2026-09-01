@@ -1,11 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { getP34AdaptiveGovernanceSummary } from "../lib/scrimed-p34";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "SCRIMED p.34 Adaptive Governance",
   description:
-    "Synthetic, human-supervised workflow contracts, model-fit routing, action maturity, continuity, provenance, assurance, and operator accountability."
+    "Synthetic, human-supervised workflow contracts, model-fit routing, action maturity, continuity, provenance, assurance, and operator accountability.",
+  alternates: { canonical: "/scrimed-p34" }
 };
 
 function Status({ value }: { value: string }) {

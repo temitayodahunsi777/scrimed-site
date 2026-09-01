@@ -1,0 +1,5080 @@
+{
+  "schemaVersion": "scrimed-p39-full-integration-map-v1",
+  "exactReviewTarget": {
+    "repository": "temitayodahunsi777/scrimed-site",
+    "pullRequestNumber": 39,
+    "commitSha": "45be650f48e422b05160821681ff40bb9f1229c9",
+    "treeSha": "f1d68282f84243a0e20d51eeb47775aff293a6f8",
+    "candidateFingerprint": "184b07843e9eaa4a0dd0bc2c783944b66df7cbc95b05dc37930663197ae71d16",
+    "sourceFingerprint": "410a544bfee9e7de246f684ef6966118206f228ef84c63b6508133f1f3647612",
+    "validationFingerprint": "42d4d7790f8270b8cb1d742938d11590ddb1d3e6fb59c066b97235c3c5960743",
+    "reviewPacketFingerprint": "7540b5b8c7abf467b9249b80bfcf41c4b180949588641ab4a38f3f0e12015035",
+    "gatePacketFingerprint": "a4193aab60512c280a425171a868785ea8e07ab30f80b17665001f02975dda0e",
+    "sbomFingerprint": "9febdb954737f82d9d9be29b0a1013c7cea520c6206f1793e79e5b1422ad38ef",
+    "reviewRequestedAt": "2026-08-26T00:30:13.000Z",
+    "reviewRequestUrl": "https://github.com/temitayodahunsi777/scrimed-site/pull/39#issuecomment-5418888268",
+    "deploymentId": "dpl_MPSXXudmikWZduLxEvAY8afTtXvz",
+    "deploymentUrl": "https://scrimed-site-8tjd5qyj0-temitayo-dahunsis-projects.vercel.app",
+    "branchAlias": "https://scrimed-site-git-agent-scrime-02c77f-temitayo-dahunsis-projects.vercel.app",
+    "routeInventoryEvidence": "PREDECESSOR_BUILD_EVIDENCE_RETAINED_IN_PR_39"
+  },
+  "sourceMapHash": "84e8c41fea5662b81e6fcabde4643e0295cb09913e4ccb3beaf79927c427d720",
+  "fileCount": 314,
+  "classificationCounts": {
+    "CURRENT_P34_DIRECT": 28,
+    "INHERITED_CANONICAL": 74,
+    "GENERATED": 16,
+    "TEST": 89,
+    "DOC": 107,
+    "SUPERSEDED": 0,
+    "UNEXPECTED": 0
+  },
+  "unexplainedFileCount": 0,
+  "files": [
+    {
+      "path": ".env.example",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": ".github/workflows/aal2-assurance.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": ".github/workflows/agent-workspace-governance-smoke.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "tenant isolation",
+      "risk": "high",
+      "ownerRole": "privacy-security-reviewer",
+      "tests": [
+        "cross-tenant negative tests",
+        "RLS contracts"
+      ],
+      "evidence": [
+        "tenant isolation receipts",
+        "Supabase advisory"
+      ]
+    },
+    {
+      "path": ".github/workflows/authority-reference-qa-smoke.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": ".github/workflows/dependency-review.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": ".github/workflows/dependency-security.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": ".github/workflows/execution-attempt-durable-store-qa-smoke.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": ".github/workflows/migration-dry-run.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "migrations",
+      "risk": "critical",
+      "ownerRole": "database-migration-owner",
+      "tests": [
+        "87-migration disposable replay",
+        "forward/recovery fingerprint"
+      ],
+      "evidence": [
+        "migration packet",
+        "production-unapplied state"
+      ]
+    },
+    {
+      "path": ".github/workflows/node24-certification.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": ".github/workflows/preview-validation.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": ".github/workflows/sales-demo-session-qa-smoke.yml",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": ".node-version",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": ".nvmrc",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/api/build-info/route.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "app/api/health/route.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "app/api/investor-demo-command-room/route.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/api/product/console/route.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/api/readiness/route.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "app/api/scrimed-control-plane/[[...path]]/route.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/api/scrimed-proof-packet-studio/share-readiness/route.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "app/api/synthetic-pilot/route.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/globals.css",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/icon.svg",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/investor-audience-readiness/InvestorDemoRunOfShow.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/investor-audience-readiness/page.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/investor-demo-command-room/InvestorDemoCommandRoom.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/investor-demo-command-room/page.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/commercial/syntheticPilotReadiness.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/commercialStrategy.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/demoPilotPrograms.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/components.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/elevation.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/motion.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/radii.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/spacing.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/tokens.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/design-system/typography.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/evidence/publicSurfaceClaimRegistry.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "app/lib/hubOperations.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/investorAudienceReadiness.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/investorDemoCommandRoom.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/investorDemoRunOfShow.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/marketActivation.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/navigationAudit.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/observability/errorTaxonomy.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/observability/logger.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/observability/performanceTelemetry.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/observability/requestContext.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/operatingMode.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/pilotDemoCommercialReadiness.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/platform/nodeRuntime.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/productConsole.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Product Console",
+      "risk": "moderate",
+      "ownerRole": "product-owner",
+      "tests": [
+        "route contract",
+        "desktop and mobile browser checks"
+      ],
+      "evidence": [
+        "UI verification",
+        "API response"
+      ]
+    },
+    {
+      "path": "app/lib/proofPacketShareReadiness.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/publicMarketReadiness.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "app/lib/qaEvidenceLedger.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "app/lib/release/vercelReleaseAssurance.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "app/lib/reliability/errorBudget.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/index.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/outcomeIntelligence.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformGraph.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/platformStrategy.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/strategicDecisionIntelligence.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/trustReadiness.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-control-plane/types.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/agentPortability.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "agents",
+      "risk": "high",
+      "ownerRole": "agent-runtime-reviewer",
+      "tests": [
+        "agent authorization",
+        "bounded retry"
+      ],
+      "evidence": [
+        "agent trace",
+        "capability receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/changeControl.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/clinicalTrajectoryLab.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/contextFabric.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/continuousAssurance.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/decisionEvidenceLedger.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/index.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/opportunityModules.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/pilotProfiles.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/regulatoryOversight.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p33/types.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/adaptiveGovernance.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/atomicApproval.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/clinicalOperatingSystem.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/contextProvenance.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/controlPlane2.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/dicomPrivacy.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/egressFirewall.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "egress",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "egress firewall",
+        "provider-call denial"
+      ],
+      "evidence": [
+        "egress decision receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/evidenceExpiry.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/exactCandidateReview.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/index.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/reviewReadiness.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/trustedClock.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/types.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-p34/workflowContinuity.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-work/agentExecution.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "agents",
+      "risk": "high",
+      "ownerRole": "agent-runtime-reviewer",
+      "tests": [
+        "agent authorization",
+        "bounded retry"
+      ],
+      "evidence": [
+        "agent trace",
+        "capability receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-work/developmentContinuity.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "agents",
+      "risk": "high",
+      "ownerRole": "agent-runtime-reviewer",
+      "tests": [
+        "agent authorization",
+        "bounded retry"
+      ],
+      "evidence": [
+        "agent trace",
+        "capability receipts"
+      ]
+    },
+    {
+      "path": "app/lib/scrimed-work/modelQualification.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "model routing",
+      "risk": "high",
+      "ownerRole": "model-governance-reviewer",
+      "tests": [
+        "provider conformance",
+        "no eligible route"
+      ],
+      "evidence": [
+        "routing rationale",
+        "model registry"
+      ]
+    },
+    {
+      "path": "app/lib/scrimedOperatingCommandCenter.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/scrimedP32GateEvidence.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "app/lib/scrimedProofPacketStudio.ts",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/lib/siteNavigation.ts",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "app/page.tsx",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "app/pricing/page.tsx",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/pricing/PricingScopeGuard.tsx",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/pricing/PricingValuePlanner.tsx",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "app/product/page.tsx",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Product Console",
+      "risk": "moderate",
+      "ownerRole": "product-owner",
+      "tests": [
+        "route contract",
+        "desktop and mobile browser checks"
+      ],
+      "evidence": [
+        "UI verification",
+        "API response"
+      ]
+    },
+    {
+      "path": "app/scrimed-control-plane/page.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/scrimed-p33/page.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/scrimed-p34/page.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "app/scrimed-proof-packet-studio/page.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/scrimed-proof-packet-studio/ProofPacketShareReadinessWorkbench.tsx",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "app/synthetic-pilot/page.tsx",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "artifacts/design/code-connect-manifest.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/design/design-tokens.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/investor/investor-readiness.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "artifacts/investor/moat-registry.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "artifacts/p33/P33_GATE_MATRIX.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/p33/P33_VALIDATION_REPORT.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/p34/P34_GATE_MATRIX.json",
+      "classification": "GENERATED",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/p34/P34_VALIDATION_REPORT.json",
+      "classification": "GENERATED",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/platform/platform-map.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/platform/scrimed-platform-graph.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/product/portfolio-scorecard.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/product/product-portfolio.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "artifacts/review/p39-pr-file-inventory.json",
+      "classification": "GENERATED",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "artifacts/review/p39-review-map.json",
+      "classification": "GENERATED",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "artifacts/strategy/strategic-roadmap.json",
+      "classification": "GENERATED",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "config/performance-budgets.json",
+      "classification": "GENERATED",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/architecture/ADR_P33_CLINICAL_RELEASE_GATES.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/architecture/ADR_P33_CONTEXT_FABRIC.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/architecture/ADR_P33_DECISION_EVIDENCE_LEDGER.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "docs/architecture/ADR_P33_PILOT_PROFILES.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/architecture/ADR_P33_ROUTING_POLICY.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "docs/architecture/ADR_P34_ADAPTIVE_GOVERNANCE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/architecture/SCRIMED_ENTERPRISE_GAP_CLOSURE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/architecture/SCRIMED_PLATFORM_GRAPH.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/assurance/CONTINUOUS_ASSURANCE_AND_PILOT_READINESS.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/brand/PUBLIC_SURFACE_CONSISTENCY_REPORT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "docs/ci-workflow-governance.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/commercial/SYNTHETIC_PILOT_READINESS.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/design/FIGMA_SYNC_SPEC.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/governance/HUMAN_GATE_MINIMIZATION_REPORT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/governance/REGULATORY_INTENDED_USE_REGISTER.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/investor-audience-readiness.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor-demo-command-room.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor/DATA_ROOM_INDEX.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor/INVESTOR_ARTIFACT_REVIEW_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor/MOAT_AND_DILIGENCE_INDEX.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor/SCRIMED_P33_INVESTOR_DECK_MANIFEST.json",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor/SCRIMED_P33_INVESTOR_DECK.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/investor/SCRIMED_PLATFORM_MAP.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/legal/IP_INVENTION_REGISTER.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/operators/AAL2_OPERATOR_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/operators/INVESTOR_ARTIFACT_REVIEW_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/operators/MIGRATION_DRY_RUN_OPERATOR_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "migrations",
+      "risk": "critical",
+      "ownerRole": "database-migration-owner",
+      "tests": [
+        "87-migration disposable replay",
+        "forward/recovery fingerprint"
+      ],
+      "evidence": [
+        "migration packet",
+        "production-unapplied state"
+      ]
+    },
+    {
+      "path": "docs/operators/NODE24_ROLLBACK_PLAN.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/operators/P34_OPERATOR_COMMAND_CENTER.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/operators/PRODUCTION_RELEASE_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/operators/SEARCH_INDEX_RECONCILIATION.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Supabase",
+      "risk": "high",
+      "ownerRole": "supabase-project-owner",
+      "tests": [
+        "security advisor",
+        "RLS contracts"
+      ],
+      "evidence": [
+        "live advisory result",
+        "migration state"
+      ]
+    },
+    {
+      "path": "docs/operators/SUPABASE_SECURITY_OPERATOR_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Supabase",
+      "risk": "high",
+      "ownerRole": "supabase-project-owner",
+      "tests": [
+        "security advisor",
+        "RLS contracts"
+      ],
+      "evidence": [
+        "live advisory result",
+        "migration state"
+      ]
+    },
+    {
+      "path": "docs/operators/VERCEL_NODE24_OPERATOR_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/operators/VERCEL_PREVIEW_OPERATOR_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/operators/VERCEL_PREVIEW_RELEASE_ASSURANCE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/P34_AUTONOMY_AND_APPROVAL_CONTRACT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/P34_CLINICAL_OPERATING_SYSTEM.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/P34_CONTROL_MATRIX.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/P34_EVALUATION_AND_EXTERNAL_VALIDATION.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "docs/P34_IMPLEMENTATION_MANIFEST.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/P34_PHI_DATA_FLOW.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/P34_RELEASE_GATE_REPORT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/P34_THREAT_MODEL.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "model routing",
+      "risk": "high",
+      "ownerRole": "model-governance-reviewer",
+      "tests": [
+        "provider conformance",
+        "no eligible route"
+      ],
+      "evidence": [
+        "routing rationale",
+        "model registry"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_APPROVAL_MODEL.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_ARCHITECTURE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_AUTONOMY_MODEL.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "model routing",
+      "risk": "high",
+      "ownerRole": "model-governance-reviewer",
+      "tests": [
+        "provider conformance",
+        "no eligible route"
+      ],
+      "evidence": [
+        "routing rationale",
+        "model registry"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_IMPLEMENTATION_MANIFEST.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_OPERATOR_RUNBOOK.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_PHI_FLOW.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_RELEASE_READINESS.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_REVIEW_PACKET.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/p34/P34_THREAT_MODEL.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "model routing",
+      "risk": "high",
+      "ownerRole": "model-governance-reviewer",
+      "tests": [
+        "provider conformance",
+        "no eligible route"
+      ],
+      "evidence": [
+        "routing rationale",
+        "model registry"
+      ]
+    },
+    {
+      "path": "docs/pilot-demo-commercial-readiness.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/platform/NEXTJS_BOILERPLATE_DISPOSITION.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/platform/NODE_RUNTIME_BASELINE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/platform/NODE22_NODE24_DIFFERENTIAL.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/platform/NODE24_COMPATIBILITY_REPORT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/platform/VERCEL_RUNTIME_CACHING_AND_HEADERS_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/product/CORE_COMMERCIAL_WEDGE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "docs/product/PORTFOLIO_RATIONALIZATION.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/project-status.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/PUBLIC_CLAIMS_REGISTER.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "docs/release/CANDIDATE_BRANCH_DECISION.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/CURRENT_EXTERNAL_AND_REPOSITORY_BASELINE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/CURRENT_PLATFORM_BASELINE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/ENTERPRISE_GAP_CLOSURE_COMMIT_MANIFEST.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/ENTERPRISE_GAP_CLOSURE_IMPLEMENTATION_REPORT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P33_IMPLEMENTATION_STATUS.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P33_INTEGRATED_UPGRADES_COMMIT_MANIFEST.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P33_REVIEW_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_ADAPTIVE_GOVERNANCE_COMMIT_MANIFEST.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_AUTHORITATIVE_BASELINE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_CANONICAL_REMOTE_BASELINE.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_GAP_CLOSURE_AUTHORITATIVE_BASELINE.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_IMPLEMENTATION_STATUS.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_PREDECESSOR_RECONCILIATION.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/P34_REVIEW_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/release/PENDING_MIGRATION_DRY_RUN_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "migrations",
+      "risk": "critical",
+      "ownerRole": "database-migration-owner",
+      "tests": [
+        "87-migration disposable replay",
+        "forward/recovery fingerprint"
+      ],
+      "evidence": [
+        "migration packet",
+        "production-unapplied state"
+      ]
+    },
+    {
+      "path": "docs/release/PREVIEW_DEPLOYMENT_OPERATOR_PACKET.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "docs/review/P34_CLINICAL_SAFETY_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_DATABASE_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_INDEPENDENT_TECHNICAL_REVIEW_PRECHECK.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_INSURANCE_READINESS_REGISTER.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_INTENDED_USE_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_LEGAL_CLAIMS_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_PREVIEW_ACCEPTANCE_PACKET.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_PRIVACY_SECURITY_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P34_RELEASE_REVIEW.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P39_REVIEW_MAP.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/review/P39_WHOLE_PR_INTEGRATION_SCOPE.md",
+      "classification": "DOC",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/runbooks/P33_OPERATOR_RUNBOOK.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/runbooks/P34_ADAPTIVE_GOVERNANCE_RUNBOOK.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/SCRIMED_P33_INTEGRATED_UPGRADES.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/SCRIMED_P34_ADAPTIVE_GOVERNANCE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/SCRIMED_P34_IMPLEMENTATION_MAP.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/scrimed-p32-release-operations.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/scrimed-proof-packet-studio.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "docs/security/AAL2_ASSURANCE_RUNBOOK.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "docs/security/DEPENDENCY_DELTA_REPORT.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "docs/security/DEPENDENCY_SECURITY_CI_GUIDE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "docs/security/EXTERNAL_DEPENDENCY_ADVISORY_RUNBOOK.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "docs/security/HIGH_SEVERITY_DEPENDENCY_TRIAGE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "docs/security/P33_THREAT_BOUNDARY_UPDATE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "docs/security/P34_THREAT_BOUNDARY_UPDATE.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "docs/strategy/SCRIMED_STRATEGIC_ROADMAP.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "next.config.js",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "package-lock.json",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "package.json",
+      "classification": "CURRENT_P34_DIRECT",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "README.md",
+      "classification": "DOC",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/aal2-token-policy-selftest.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/boundary-release-approval-matrix-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/boundary-release-evidence-intake-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "scripts/bounded-public-fetch-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/ci-workflow-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/clinical-context-gateway-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/clinical-data-fabric-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/clinical-data-governance-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/dependency-security-floor-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/deployment-drift-guard-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/design-system-artifacts.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "scripts/enterprise-healthcare-infrastructure-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/generate-p39-review-map.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/global-enterprise-command-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/healthcare-optimization-command-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/healthcare-value-realization-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/investor-demo-command-room-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/investor-demo-command-room-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/investor-demo-proof-route-smoke.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/investor-demo-run-of-show-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/investor-demo-run-of-show-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/lib/aal2-target-binding.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/lib/bounded-public-fetch.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "scripts/node24-runtime-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "scripts/node24-vercel-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "scripts/pilot-activation-planner-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/pilot-handoff-command-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/pilot-success-review-command-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/pilot-value-evidence-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/proof-packet-share-readiness-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/public-production-smoke.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "public claims",
+      "risk": "high",
+      "ownerRole": "claims-and-legal-reviewer",
+      "tests": [
+        "public claims contract",
+        "prohibited string scan"
+      ],
+      "evidence": [
+        "claims register",
+        "published surface smoke"
+      ]
+    },
+    {
+      "path": "scripts/rehearse-investor-demo.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/run-aal2-candidate-verification.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-automation-autopilot-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-control-plane-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-control-plane-smoke.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-cyber-defense-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-enterprise-gap-closure-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-enterprise-gap-closure-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-execution-focus-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-nonsecret-test-suite.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-operating-command-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-os-upgrade-batch-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p32-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p32-release-gate-evidence.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p33-artifacts.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p33-integrated-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p33-integrated-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-adaptive-governance-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-adaptive-governance-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-artifacts.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-canary.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-clinical-operating-system-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-clinical-operating-system-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-gap-closure-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-gap-closure-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-gap-closure-smoke.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-precision-wave-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-p34-workflow-continuity-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "clinical operating system",
+      "risk": "high",
+      "ownerRole": "clinical-safety-reviewer",
+      "tests": [
+        "p.34 clinical OS",
+        "nonsecret safety suite"
+      ],
+      "evidence": [
+        "p.34 validation report",
+        "clinical safety packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-platform-graph-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-platform-strategy-artifacts.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "evidence",
+      "risk": "moderate",
+      "ownerRole": "evidence-owner",
+      "tests": [
+        "generated integrity",
+        "evidence expiry"
+      ],
+      "evidence": [
+        "validation fingerprint",
+        "artifact hashes"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-platform-strategy-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-proof-packet-studio-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-sbom.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-strategic-decision-policy-test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "security",
+      "risk": "high",
+      "ownerRole": "security-reviewer",
+      "tests": [
+        "secret scan",
+        "CodeQL",
+        "security policy tests"
+      ],
+      "evidence": [
+        "security evidence",
+        "SBOM"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-work-authenticated-smoke.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "agents",
+      "risk": "high",
+      "ownerRole": "agent-runtime-reviewer",
+      "tests": [
+        "agent authorization",
+        "bounded retry"
+      ],
+      "evidence": [
+        "agent trace",
+        "capability receipts"
+      ]
+    },
+    {
+      "path": "scripts/scrimed-work-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "agents",
+      "risk": "high",
+      "ownerRole": "agent-runtime-reviewer",
+      "tests": [
+        "agent authorization",
+        "bounded retry"
+      ],
+      "evidence": [
+        "agent trace",
+        "capability receipts"
+      ]
+    },
+    {
+      "path": "scripts/strategic-problem-resolution-contract-check.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "governance",
+      "risk": "moderate",
+      "ownerRole": "governance-owner",
+      "tests": [
+        "strict candidate",
+        "policy and contract suites"
+      ],
+      "evidence": [
+        "candidate manifest",
+        "gate packet"
+      ]
+    },
+    {
+      "path": "scripts/synthetic-pilot-smoke.mjs",
+      "classification": "TEST",
+      "lineage": "P34_DIRECT",
+      "reviewLane": "commercial controls",
+      "risk": "moderate",
+      "ownerRole": "commercial-and-finance-reviewer",
+      "tests": [
+        "synthetic pilot policy",
+        "commercial authority contract"
+      ],
+      "evidence": [
+        "pilot evidence pack",
+        "nonbinding pricing posture"
+      ]
+    },
+    {
+      "path": "scripts/verify-aal2-evidence.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/verify-aal2-target-binding.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/verify-migration-dry-run.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "migrations",
+      "risk": "critical",
+      "ownerRole": "database-migration-owner",
+      "tests": [
+        "87-migration disposable replay",
+        "forward/recovery fingerprint"
+      ],
+      "evidence": [
+        "migration packet",
+        "production-unapplied state"
+      ]
+    },
+    {
+      "path": "scripts/verify-node24-vercel-build.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "scripts/verify-preview-ui.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "approvals",
+      "risk": "high",
+      "ownerRole": "independent-technical-reviewer",
+      "tests": [
+        "atomic approval",
+        "replay and stale evidence tests"
+      ],
+      "evidence": [
+        "review packet",
+        "approval receipts"
+      ]
+    },
+    {
+      "path": "scripts/verify-supabase-security.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Supabase",
+      "risk": "high",
+      "ownerRole": "supabase-project-owner",
+      "tests": [
+        "security advisor",
+        "RLS contracts"
+      ],
+      "evidence": [
+        "live advisory result",
+        "migration state"
+      ]
+    },
+    {
+      "path": "scripts/verify-vercel-preview.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    },
+    {
+      "path": "tests/security/supabase-rls-contract.test.mjs",
+      "classification": "TEST",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Supabase",
+      "risk": "high",
+      "ownerRole": "supabase-project-owner",
+      "tests": [
+        "security advisor",
+        "RLS contracts"
+      ],
+      "evidence": [
+        "live advisory result",
+        "migration state"
+      ]
+    },
+    {
+      "path": "vercel.json",
+      "classification": "INHERITED_CANONICAL",
+      "lineage": "INHERITED_CANONICAL",
+      "reviewLane": "Vercel",
+      "risk": "high",
+      "ownerRole": "release-platform-reviewer",
+      "tests": [
+        "Node 24 certification",
+        "preview validation"
+      ],
+      "evidence": [
+        "preview deployment evidence",
+        "build fingerprint"
+      ]
+    }
+  ],
+  "reviewDecision": "EXACT_REVIEW_REQUIRED",
+  "mergeAuthorityGranted": false,
+  "productionAuthorityGranted": false,
+  "boundary": "Review compression only. The map grants no review approval, merge, deployment, migration, PHI, clinical, payer, EHR/device, customer, certification, compliance, or external-distribution authority.",
+  "mapHash": "9337c5a62132c19cd87092c3c597909721123dbe7bbbc2e8ebfe226e183c3fa7"
+}

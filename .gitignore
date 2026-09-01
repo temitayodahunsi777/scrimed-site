@@ -27,6 +27,7 @@ artifacts/migrations/
 artifacts/security/
 artifacts/vercel/
 artifacts/live-mobile/
+artifacts/release/
 
 # Preserved pre-existing local script. The candidate-owned equivalent is
 # scripts/scrimed-p32-preproduction-governance-gates.mjs.

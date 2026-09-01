@@ -11,7 +11,17 @@ const required = {
   "app/lib/observability/logger.ts": ["redactForTelemetry", "no raw prompts"],
   "app/lib/reliability/errorBudget.ts": ["contractualSla: false", "p95-latency"],
   "scripts/verify-vercel-preview.mjs": ["CANDIDATE_SHA_MISMATCH", "DESKTOP_MOBILE_UI_EVIDENCE_REQUIRED", "--self-test"],
-  "scripts/verify-supabase-security.mjs": ["RLS_NOT_ENABLED", "EXTERNAL_WARNING_OPEN", "SERVICE_ROLE_REFERENCE"],
+  "scripts/verify-supabase-security.mjs": [
+    "RLS_NOT_ENABLED",
+    "COMPENSATING_CONTROL_ACTIVE",
+    "DEFERRED_PLATFORM_CONTROL",
+    "SERVICE_ROLE_REFERENCE"
+  ],
+  "app/lib/release/supabasePasswordlessAssurance.ts": [
+    "BLOCKED_TECHNICAL",
+    "protectedProductionAuth: \"DENY\"",
+    "applicationPasswordAuthEnabled"
+  ],
   "tests/security/supabase-rls-contract.test.mjs": ["deny-by-default fixture", "client secret boundary"],
   "scripts/verify-migration-dry-run.mjs": ["DRY_RUN_PASSED", "indexesInspected", "constraintsInspected"],
   "scripts/verify-aal2-evidence.mjs": ["mfa-challenge", "replay-rejection", "privileged-endpoint"],

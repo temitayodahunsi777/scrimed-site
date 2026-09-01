@@ -30,6 +30,7 @@ for (const expected of [
   "scripts/check-generated-integrity.mjs",
   "scripts/clean-generated-cache.mjs",
   "scripts/generated-output-postflight.mjs",
+  "--repair-disposable-conflicts",
   "scripts/verify-public-release.mjs",
   "pre-smoke generated-output postflight",
   "pre-smoke generated integrity",

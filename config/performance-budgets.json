@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "scrimed-performance-budgets-v1",
+  "schemaVersion": "scrimed-performance-budgets-v2",
   "measurementBoundary": "Synthetic and public no-PHI preview traffic only",
   "minimumLiveSampleCount": 30,
   "materialRegressionPercent": 20,
@@ -12,11 +12,17 @@
     "serverlessExecutionMs": 10000,
     "modelLatencyMs": 15000,
     "agentWorkflowLatencyMs": 30000,
-    "productConsoleApiBytes": 350000
+    "productConsoleApiBytes": 90000,
+    "governanceEvaluationP95Ms": 250,
+    "evidenceLookupP95Ms": 300,
+    "pilotControlOverheadP95Ms": 150
   },
   "routeInventory": {
-    "expectedBuiltRouteCount": 630,
-    "expectedPrerenderedRouteCount": 245
+    "builtRoutesArtifact": "artifacts/build/routes.json",
+    "generationArtifact": "artifacts/build/render-inventory.json",
+    "manualExpectedCountsAllowed": false,
+    "buildMayOverwriteBaseline": false,
+    "intentionalUpdateCommand": "npm run update:p34-build-inventory"
   },
   "enforcement": {
     "deterministicBuildBudgets": "fail",

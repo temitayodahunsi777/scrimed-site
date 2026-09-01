@@ -139,7 +139,7 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
     expiresAt,
     evidenceClass: "connector-observed",
     sourceReference: "Supabase project health, migration history, and advisor metadata",
-    summary: "The protected-pilot project is healthy and durable SCRIMED Work migrations are present; three newer p.32 migrations remain local-only and leaked-password protection remains disabled.",
+    summary: "The protected-pilot project is healthy and durable SCRIMED Work migrations are present. Three newer p.32 migrations remain production-unapplied. The leaked-password warning remains open, while the current passwordless synthetic lane uses compensating controls.",
     facts: [
       "Project scrimed-protected-pilot is ACTIVE_HEALTHY in us-east-1 on Postgres 17.6.1.",
       "Observed remote migrations include compute-fabric evidence binding, SCRIMED Work durability, review queues, approval binding, and completion evidence.",
@@ -149,16 +149,16 @@ export const crossPlatformEvidenceSnapshot: CrossPlatformEvidenceRecord[] = [
       "Performance Advisor reports informational unused indexes; no index was removed without representative workload evidence."
     ],
     drift: [
-      "Three newer governance migrations require an authorized disposable dry-run and separate application decision.",
-      "Leaked-password protection requires an Auth administrator action that the connected toolset cannot narrowly perform.",
+      "Three newer governance migrations require separate production authorization even after disposable replay evidence.",
+      "Leaked-password protection is unavailable on the current plan and must be enabled before password-based protected authentication when the platform control becomes available.",
       "Fresh exact-candidate AAL2 evidence remains required before protected-pilot expansion."
     ],
     approvalImpact: ["no-PHI protected-pilot release", "AAL2 durability evidence", "security review", "database change approval"],
     accountableOwner: "Data platform and security owners",
-    nextAction: "Enable leaked-password protection through the scoped dashboard control, authorize a disposable dry-run for the three pending migrations, and rerun exact-candidate AAL2 and advisor checks.",
+    nextAction: "Keep password auth excluded, re-observe the compensating controls before evidence expiry, retain the advisor warning, and obtain fresh exact-candidate AAL2 plus separate migration authorization.",
     remediationStatus: "prepared-not-applied",
     remediationEvidence: ["docs/MIGRATION_DRY_RUN_REPORT.md", "config/pending-migration-authorization.json", "docs/operators/SUPABASE_LEAKED_PASSWORD_PROTECTION.md"],
-    residualBlocker: "Auth-owner setting change, disposable migration authority, migration execution evidence, and fresh AAL2 validation remain external.",
+    residualBlocker: "Fresh AAL2, production migration authority, and any future password-auth activation remain external. The current passwordless synthetic lane is not blocked by the deferred plan feature while compensating controls pass.",
     externalMutationPerformed: false
   }),
   evidenceRecord({
