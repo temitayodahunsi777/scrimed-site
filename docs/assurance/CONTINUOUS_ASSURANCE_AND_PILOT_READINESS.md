@@ -85,6 +85,6 @@ Every pilot contract must identify the workflow, baseline, comparator, intended 
 
 ## External Actions
 
-Fresh exact-candidate review, AAL2 evidence, database-owner migration authorization, intended-use approval, claims/legal review, clinical-safety review, security/privacy review, platform/deployment authorization, Supabase leaked-password protection, post-deployment evidence, and customer go-live remain outside software authority.
+Fresh exact-candidate review, AAL2 evidence, database-owner migration authorization, intended-use approval, claims/legal review, clinical-safety review, security/privacy review, platform/deployment authorization, post-deployment evidence, and customer go-live remain outside software authority. Supabase leaked-password protection remains a deferred platform control on the current plan; passwordless compensating controls are active and protected password authentication remains denied until that control is verified.
 
 No live PHI, provider call, migration, deployment, clinical action, payer action, EHR writeback, customer activation, or external distribution is authorized by this implementation.
