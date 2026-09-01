@@ -2047,6 +2047,8 @@ export function getProductConsoleSummary() {
       limitationsWorkaroundSummary.boundaryEscalationCount,
     limitationsResolutionWorkOrderCount:
       limitationsWorkaroundSummary.resolutionWorkOrderCount,
+    limitationsResolutionWorkOrdersByStatus:
+      limitationsWorkaroundSummary.resolutionWorkOrdersByStatus,
     limitationsUnresolvedResolutionWorkOrderCount:
       limitationsWorkaroundSummary.unresolvedResolutionWorkOrderCount,
     limitationsWorkaroundExecutionLedgerCount:
@@ -2883,6 +2885,8 @@ export function getProductConsoleApiSummary() {
     ...apiSummary,
     payloadProfile: "compact-api-v2",
     priorityGates: summary.p34PriorityGates,
+    limitationsResolutionWorkOrdersByStatus:
+      summary.limitationsResolutionWorkOrdersByStatus,
     proofStack: summary.proofStack,
     detailRoutes: {
       companyAssessment: companyAssessmentSummary.apiRoute,

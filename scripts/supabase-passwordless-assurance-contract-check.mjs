@@ -30,6 +30,8 @@ const paths = [
   "docs/release/P34_FINAL_SYNTHETIC_CANONICAL_STATE.md",
   "docs/review/P34_FINAL_EXACT_HEAD_REVIEW_BRIEF.md",
   "artifacts/review/p34-final-risk-ranked-diff.json",
+  "app/lib/limitationsWorkaroundOperations.ts",
+  "scripts/public-production-smoke.mjs",
   "package.json"
 ];
 const files = Object.fromEntries(await Promise.all(paths.map(async (path) => [
@@ -77,6 +79,19 @@ assert.ok(docs.includes("warning remains open"));
 assert.ok(docs.includes("Activation Trigger"));
 assert.ok(docs.includes("password-based protected authentication"));
 assert.ok(docs.includes("2026-09-30"));
+
+const limitations = files["app/lib/limitationsWorkaroundOperations.ts"];
+assert.match(
+  limitations,
+  /slug:\s*"supabase-password-posture"[\s\S]*?status:\s*"resolved-by-workaround"/
+);
+assert.ok(limitations.includes("using password-only protected access"));
+
+const publicSmoke = files["scripts/public-production-smoke.mjs"];
+assert.ok(publicSmoke.includes("reconciledUnresolvedCount"));
+assert.ok(publicSmoke.includes('supabasePasswordPosture?.status !== "resolved-by-workaround"'));
+assert.ok(files["app/lib/productConsole.ts"].includes("limitationsResolutionWorkOrdersByStatus"));
+assert.ok(publicSmoke.includes("productConsoleUnresolvedCount"));
 
 const risk = JSON.parse(files["artifacts/review/p34-final-risk-ranked-diff.json"]);
 assert.equal(risk.unexplainedFileCount, 0);

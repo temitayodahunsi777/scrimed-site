@@ -33,5 +33,23 @@ assert.deepEqual(
 );
 assert.equal(summary.priorityGates.find((gate) => gate.id === "production")?.state, "PRODUCTION_AUTHORIZATION_REQUIRED");
 assert.equal(summary.priorityGates.find((gate) => gate.id === "protected-pilot")?.state, "PROTECTED_PILOT_AUTHORIZATION_REQUIRED");
+const unresolvedResolutionWorkOrderCount = [
+  "active-workaround",
+  "blocked-external-dependency",
+  "requires-human-operator"
+].reduce(
+  (total, status) =>
+    total + Number(summary.limitationsResolutionWorkOrdersByStatus?.[status] ?? 0),
+  0
+);
+assert.equal(
+  summary.limitationsUnresolvedResolutionWorkOrderCount,
+  unresolvedResolutionWorkOrderCount,
+  "Product Console compact API unresolved work-order count must reconcile to its status buckets."
+);
+assert.ok(unresolvedResolutionWorkOrderCount > 0);
+assert.ok(
+  Number(summary.limitationsResolutionWorkOrdersByStatus?.["resolved-by-workaround"] ?? 0) > 0
+);
 
 console.log(`pass Product Console compact payload ${payloadBytes}/${budgetBytes} bytes with 10 priority gates`);
