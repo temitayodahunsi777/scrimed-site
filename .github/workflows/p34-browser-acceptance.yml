@@ -57,11 +57,14 @@ jobs:
           test "$(npx --no-install playwright --version)" = "Version ${PLAYWRIGHT_VERSION}"
 
       - name: Build exact synthetic candidate
-        run: npm run build
+        env:
+          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: GITHUB_SHA="${EXPECTED_CANDIDATE_SHA}" npm run build
 
       - name: Start isolated local candidate
         run: |
-          npm run start -- --hostname 127.0.0.1 --port 3000 > /tmp/scrimed-p34-browser-server.log 2>&1 &
+          mkdir -p artifacts/ui-verification/p34-pinned-ci
+          npm run start -- --hostname 127.0.0.1 --port 3000 > artifacts/ui-verification/p34-pinned-ci/server.log 2>&1 &
           echo "$!" > /tmp/scrimed-p34-browser-server.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent --show-error http://127.0.0.1:3000/api/health >/dev/null; then
@@ -69,7 +72,7 @@ jobs:
             fi
             sleep 1
           done
-          cat /tmp/scrimed-p34-browser-server.log
+          cat artifacts/ui-verification/p34-pinned-ci/server.log
           exit 1
 
       - name: Run strict desktop and 390px mobile acceptance
@@ -98,13 +101,11 @@ jobs:
           '
 
       - name: Upload browser evidence
-        if: always()
+        if: always() && hashFiles('artifacts/ui-verification/p34-pinned-ci/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: p34-browser-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
-          path: |
-            artifacts/ui-verification/p34-pinned-ci/
-            /tmp/scrimed-p34-browser-server.log
+          path: artifacts/ui-verification/p34-pinned-ci/
           if-no-files-found: error
           retention-days: 14
 
