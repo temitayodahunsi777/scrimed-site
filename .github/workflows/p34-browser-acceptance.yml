@@ -1,0 +1,157 @@
+name: P34 Local Browser Regression - Not Deployment Acceptance
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p34-browser-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  SCRIMED_SYNTHETIC_ONLY: "true"
+  SCRIMED_ALLOW_PHI: "false"
+  SCRIMED_LIVE_CLINICAL_EXECUTION: "false"
+  SCRIMED_CONSEQUENTIAL_ACTIONS_ENABLED: "false"
+  SCRIMED_EXTERNAL_PROVIDER_CALLS_ENABLED: "false"
+  SCRIMED_SCHEDULES_ENABLED: "false"
+  PLAYWRIGHT_VERSION: "1.63.0"
+
+jobs:
+  browser-acceptance:
+    name: Local source regression only - release gates remain separate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out immutable CI event revision for local regression
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Verify local regression source binding
+        env:
+          EXPECTED_CANDIDATE_SHA: ${{ github.sha }}
+        run: test "$(git rev-parse HEAD)" = "${EXPECTED_CANDIDATE_SHA}"
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install exact application lockfile without lifecycle scripts
+        run: npm ci --ignore-scripts
+
+      - name: Prove pinned native dependency loads without postinstall
+        run: node scripts/unrs-resolver-install-script-proof.mjs
+
+      - name: Provision pinned Playwright runner
+        run: |
+          set -euo pipefail
+          HARNESS_DIR="$(mktemp -d "${RUNNER_TEMP}/scrimed-browser.XXXXXX")"
+          find node_modules -type f -print0 | sort -z | xargs -0 sha256sum > "${RUNNER_TEMP}/p34-app-before.sha256"
+          cp tools/p34-browser/package.json tools/p34-browser/package-lock.json "${HARNESS_DIR}/"
+          npm ci --prefix "${HARNESS_DIR}" --ignore-scripts --no-audit
+          node "${HARNESS_DIR}/node_modules/playwright/cli.js" install --with-deps chromium
+          test "$(node "${HARNESS_DIR}/node_modules/playwright/cli.js" --version)" = "Version ${PLAYWRIGHT_VERSION}"
+          find node_modules -type f -print0 | sort -z | xargs -0 sha256sum > "${RUNNER_TEMP}/p34-app-after.sha256"
+          cmp "${RUNNER_TEMP}/p34-app-before.sha256" "${RUNNER_TEMP}/p34-app-after.sha256"
+          echo "NODE_PATH=${HARNESS_DIR}/node_modules" >> "${GITHUB_ENV}"
+          echo "SCRIMED_BROWSER_HARNESS_DIR=${HARNESS_DIR}" >> "${GITHUB_ENV}"
+
+      # Preserve the real CI event SHA. A mismatch is a blocker, not permission
+      # to rewrite GITHUB_SHA or disable the candidate's provenance preflight.
+
+      - name: Build CI event revision with unchanged provenance preflight
+        run: npm run build
+
+      - name: Start isolated local candidate
+        run: |
+          mkdir -p artifacts/ui-verification/p34-pinned-ci
+          npm run start -- --hostname 127.0.0.1 --port 3000 > artifacts/ui-verification/p34-pinned-ci/server.log 2>&1 &
+          echo "$!" > /tmp/scrimed-p34-browser-server.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat artifacts/ui-verification/p34-pinned-ci/server.log
+          exit 1
+
+      - name: Run strict desktop and 390px mobile acceptance
+        run: |
+          npm run verify:preview-ui -- \
+            --base-url=http://127.0.0.1:3000 \
+            --canonical-origin=https://app.scrimedsolutions.com \
+            --output-dir=artifacts/ui-verification/p34-pinned-ci \
+            --strict \
+            --json
+
+      - name: Supplemental pilot and p34 desktop and mobile regression
+        run: |
+          node tools/p34-browser/extra-routes.cjs --self-test
+          node tools/p34-browser/extra-routes.cjs
+
+      - name: Enforce original eight-route browser evidence
+        run: |
+          node --input-type=module -e '
+            import { readFile } from "node:fs/promises";
+            const path = "artifacts/ui-verification/p34-pinned-ci/preview-ui-verification.json";
+            const report = JSON.parse(await readFile(path, "utf8"));
+            const desktop = report.results.filter((entry) => entry.viewport === "desktop");
+            const mobile = report.results.filter((entry) => entry.viewport === "mobile-390");
+            const failures = report.results.flatMap((entry) => entry.failures ?? []);
+            if (report.passed !== true || report.results.length !== 16 || desktop.length !== 8 || mobile.length !== 8 || failures.length !== 0) {
+              console.error(JSON.stringify({ passed: report.passed, checks: report.results.length, desktop: desktop.length, mobile: mobile.length, failures }, null, 2));
+              process.exit(1);
+            }
+            console.log("pass LIMITED LOCAL regression: 8 desktop + 8 mobile-390 + public boundary API; NOT exact-deployment, AAL2, or full route acceptance");
+          '
+
+      - name: Record evidence limitations and harness resolution
+        if: always()
+        run: |
+          mkdir -p artifacts/ui-verification/p34-pinned-ci
+          node --input-type=module -e '
+            import { writeFileSync, copyFileSync, existsSync } from "node:fs";
+            import { execFileSync } from "node:child_process";
+            const dir = "artifacts/ui-verification/p34-pinned-ci/";
+            writeFileSync(dir + "scope.json", JSON.stringify({
+              scope: "local_source_regression_only",
+              sourceRole: "github_event_revision_not_accepted_deployment",
+              acceptedCandidateReference: "5ae0b6f3d1e1dc4a06a5cb2c865649ed9611190a",
+              ciEventSha: process.env.GITHUB_SHA,
+              checkedOutSha: execFileSync("git", ["rev-parse", "HEAD"], {encoding:"utf8"}).trim(),
+              deploymentAcceptance: false, aal2Verified: false,
+              supplementalRouteReceipt: "supplemental-routes.json",
+              lockfilePolicy: "repository_pinned_npm_ci_ignore_scripts"
+            }, null, 2));
+            const lock = process.env.SCRIMED_BROWSER_HARNESS_DIR + "/package-lock.json";
+            if (existsSync(lock)) copyFileSync(lock, dir + "harness-package-lock.json");
+            for (const stage of ["before", "after"]) {
+              const file = process.env.RUNNER_TEMP + "/p34-app-" + stage + ".sha256";
+              if (existsSync(file)) copyFileSync(file, dir + "app-" + stage + ".sha256");
+            }
+          '
+
+      - name: Upload browser evidence
+        if: always() && hashFiles('artifacts/ui-verification/p34-pinned-ci/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: p34-local-browser-regression-${{ github.sha }}
+          path: artifacts/ui-verification/p34-pinned-ci/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Stop isolated local candidate
+        if: always()
+        run: |
+          if test -f /tmp/scrimed-p34-browser-server.pid; then
+            kill "$(cat /tmp/scrimed-p34-browser-server.pid)" 2>/dev/null || true
+          fi
