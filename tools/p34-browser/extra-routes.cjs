@@ -33,7 +33,8 @@ if (process.argv.includes('--self-test')) {
             const errors = [];
             page.on('pageerror', () => errors.push('page-error'));
             page.on('console', msg => { if(msg.type() === 'error') errors.push('console-error'); });
-            const response = await page.goto('http://127.0.0.1:3000' + route, {waitUntil:'networkidle',timeout:30000});
+            const response = await page.goto('http://127.0.0.1:3000' + route, {waitUntil:'domcontentloaded',timeout:30000});
+            await page.locator('main').waitFor({state:'attached',timeout:10000});
             const snapshot = await page.evaluate(() => ({origin:location.origin,width:document.documentElement.scrollWidth,viewport:innerWidth,main:document.querySelectorAll('main').length,text:document.body.innerText}));
             const found = failures({...snapshot,status:response?.status(),errors});
             results.push({route,width,failures:found});
