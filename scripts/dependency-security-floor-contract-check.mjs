@@ -125,6 +125,16 @@ if (lockedVersion("sharp") !== sharpOverride) {
   throw new Error(`package-lock resolved sharp@${lockedVersion("sharp") ?? "missing"} but override requires ${sharpOverride}`);
 }
 
+const browserslistOverride = packageJson.overrides?.browserslist;
+if (browserslistOverride !== "4.28.7") {
+  throw new Error("browserslist override must remain pinned to the reviewed 4.28.7 security floor.");
+}
+
+if (lockedVersion("browserslist") !== browserslistOverride) {
+  throw new Error(
+    `package-lock resolved browserslist@${lockedVersion("browserslist") ?? "missing"} but override requires ${browserslistOverride}`
+  );
+}
 const nanoidOverride = packageJson.overrides?.nanoid;
 if (nanoidOverride !== "3.3.18") {
   throw new Error("nanoid override must remain pinned to the reviewed 3.3.18 security floor.");
@@ -179,5 +189,5 @@ for (const [packagePath, metadata] of Object.entries(packageLock.packages ?? {})
 console.log(
   `pass SCRIMED dependency security floor contract check (next ${dependencySpecifier("next")}, react ${dependencySpecifier(
     "react"
-  )}, postcss ${postcssOverride}, sharp ${sharpOverride}, nanoid ${nanoidOverride})`
+  )}, postcss ${postcssOverride}, sharp ${sharpOverride}, nanoid ${nanoidOverride}, browserslist ${browserslistOverride})`
 );
