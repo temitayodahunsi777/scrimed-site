@@ -23,19 +23,19 @@ env:
 
 jobs:
   browser-acceptance:
-    name: Exact candidate desktop and 390px mobile
+    name: Accepted parent desktop and 390px mobile
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - name: Check out exact candidate
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
           fetch-depth: 0
 
       - name: Verify exact candidate binding
         env:
-          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
         run: test "$(git rev-parse HEAD)" = "${EXPECTED_CANDIDATE_SHA}"
 
       - name: Set up Node 24
@@ -58,7 +58,7 @@ jobs:
 
       - name: Build exact synthetic candidate
         env:
-          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
         run: GITHUB_SHA="${EXPECTED_CANDIDATE_SHA}" npm run build
 
       - name: Start isolated local candidate
@@ -104,7 +104,7 @@ jobs:
         if: always() && hashFiles('artifacts/ui-verification/p34-pinned-ci/**') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: p34-browser-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
+          name: p34-browser-acceptance-${{ github.event.pull_request.base.sha || github.sha }}
           path: artifacts/ui-verification/p34-pinned-ci/
           if-no-files-found: error
           retention-days: 14
