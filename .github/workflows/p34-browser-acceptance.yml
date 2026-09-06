@@ -27,15 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Check out exact candidate
+      - name: Check out immutable CI event revision for local regression
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
-      - name: Verify exact candidate binding
+      - name: Verify local regression source binding
         env:
-          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          EXPECTED_CANDIDATE_SHA: ${{ github.sha }}
         run: test "$(git rev-parse HEAD)" = "${EXPECTED_CANDIDATE_SHA}"
 
       - name: Set up Node 24
@@ -67,9 +67,7 @@ jobs:
       # Preserve the real CI event SHA. A mismatch is a blocker, not permission
       # to rewrite GITHUB_SHA or disable the candidate's provenance preflight.
 
-      - name: Build exact synthetic candidate
-        env:
-          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+      - name: Build CI event revision with unchanged provenance preflight
         run: npm run build
 
       - name: Start isolated local candidate
@@ -121,6 +119,8 @@ jobs:
             const dir = "artifacts/ui-verification/p34-pinned-ci/";
             writeFileSync(dir + "scope.json", JSON.stringify({
               scope: "local_source_regression_only",
+              sourceRole: "github_event_revision_not_accepted_deployment",
+              acceptedCandidateReference: "5ae0b6f3d1e1dc4a06a5cb2c865649ed9611190a",
               ciEventSha: process.env.GITHUB_SHA,
               checkedOutSha: execFileSync("git", ["rev-parse", "HEAD"], {encoding:"utf8"}).trim(),
               deploymentAcceptance: false, aal2Verified: false,
@@ -139,7 +139,7 @@ jobs:
         if: always() && hashFiles('artifacts/ui-verification/p34-pinned-ci/**') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: p34-browser-acceptance-${{ github.event.pull_request.base.sha || github.sha }}
+          name: p34-local-browser-regression-${{ github.sha }}
           path: artifacts/ui-verification/p34-pinned-ci/
           if-no-files-found: error
           retention-days: 14
