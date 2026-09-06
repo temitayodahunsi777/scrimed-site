@@ -30,7 +30,13 @@ jobs:
       - name: Check out exact candidate
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
+
+      - name: Verify exact candidate binding
+        env:
+          EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "${EXPECTED_CANDIDATE_SHA}"
 
       - name: Set up Node 24
         uses: actions/setup-node@v6
@@ -95,7 +101,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: p34-browser-acceptance-${{ github.sha }}
+          name: p34-browser-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             artifacts/ui-verification/p34-pinned-ci/
             /tmp/scrimed-p34-browser-server.log
