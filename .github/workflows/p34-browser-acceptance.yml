@@ -55,7 +55,7 @@ jobs:
           set -euo pipefail
           HARNESS_DIR="$(mktemp -d "${RUNNER_TEMP}/scrimed-browser.XXXXXX")"
           find node_modules -type f -print0 | sort -z | xargs -0 sha256sum > "${RUNNER_TEMP}/p34-app-before.sha256"
-          npm install --prefix "${HARNESS_DIR}" --save-exact --ignore-scripts --no-audit --package-lock-only "playwright@${PLAYWRIGHT_VERSION}"
+          cp tools/p34-browser/package.json tools/p34-browser/package-lock.json "${HARNESS_DIR}/"
           npm ci --prefix "${HARNESS_DIR}" --ignore-scripts --no-audit
           node "${HARNESS_DIR}/node_modules/playwright/cli.js" install --with-deps chromium
           test "$(node "${HARNESS_DIR}/node_modules/playwright/cli.js" --version)" = "Version ${PLAYWRIGHT_VERSION}"
@@ -93,7 +93,12 @@ jobs:
             --strict \
             --json
 
-      - name: Enforce complete browser evidence
+      - name: Supplemental pilot and p34 desktop and mobile regression
+        run: |
+          node tools/p34-browser/extra-routes.cjs --self-test
+          node tools/p34-browser/extra-routes.cjs
+
+      - name: Enforce original eight-route browser evidence
         run: |
           node --input-type=module -e '
             import { readFile } from "node:fs/promises";
@@ -124,8 +129,8 @@ jobs:
               ciEventSha: process.env.GITHUB_SHA,
               checkedOutSha: execFileSync("git", ["rev-parse", "HEAD"], {encoding:"utf8"}).trim(),
               deploymentAcceptance: false, aal2Verified: false,
-              missingRequiredRoutes: ["/pilot", "/scrimed-p34"],
-              lockfilePolicy: "resolved_this_run_not_repository_pinned"
+              supplementalRouteReceipt: "supplemental-routes.json",
+              lockfilePolicy: "repository_pinned_npm_ci_ignore_scripts"
             }, null, 2));
             const lock = process.env.SCRIMED_BROWSER_HARNESS_DIR + "/package-lock.json";
             if (existsSync(lock)) copyFileSync(lock, dir + "harness-package-lock.json");
