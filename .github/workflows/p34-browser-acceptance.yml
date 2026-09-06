@@ -1,4 +1,4 @@
-name: P34 Pinned Browser Acceptance
+name: P34 Local Browser Regression - Not Deployment Acceptance
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ env:
 
 jobs:
   browser-acceptance:
-    name: Accepted parent desktop and 390px mobile
+    name: Local source regression only - release gates remain separate
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -52,14 +52,25 @@ jobs:
 
       - name: Provision pinned Playwright runner
         run: |
-          npm install --no-save --package-lock=false --ignore-scripts --no-audit "playwright@${PLAYWRIGHT_VERSION}"
-          npx --no-install playwright install --with-deps chromium
-          test "$(npx --no-install playwright --version)" = "Version ${PLAYWRIGHT_VERSION}"
+          set -euo pipefail
+          HARNESS_DIR="$(mktemp -d "${RUNNER_TEMP}/scrimed-browser.XXXXXX")"
+          find node_modules -type f -print0 | sort -z | xargs -0 sha256sum > "${RUNNER_TEMP}/p34-app-before.sha256"
+          npm install --prefix "${HARNESS_DIR}" --save-exact --ignore-scripts --no-audit --package-lock-only "playwright@${PLAYWRIGHT_VERSION}"
+          npm ci --prefix "${HARNESS_DIR}" --ignore-scripts --no-audit
+          node "${HARNESS_DIR}/node_modules/playwright/cli.js" install --with-deps chromium
+          test "$(node "${HARNESS_DIR}/node_modules/playwright/cli.js" --version)" = "Version ${PLAYWRIGHT_VERSION}"
+          find node_modules -type f -print0 | sort -z | xargs -0 sha256sum > "${RUNNER_TEMP}/p34-app-after.sha256"
+          cmp "${RUNNER_TEMP}/p34-app-before.sha256" "${RUNNER_TEMP}/p34-app-after.sha256"
+          echo "NODE_PATH=${HARNESS_DIR}/node_modules" >> "${GITHUB_ENV}"
+          echo "SCRIMED_BROWSER_HARNESS_DIR=${HARNESS_DIR}" >> "${GITHUB_ENV}"
+
+      # Preserve the real CI event SHA. A mismatch is a blocker, not permission
+      # to rewrite GITHUB_SHA or disable the candidate's provenance preflight.
 
       - name: Build exact synthetic candidate
         env:
           EXPECTED_CANDIDATE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-        run: GITHUB_SHA="${EXPECTED_CANDIDATE_SHA}" npm run build
+        run: npm run build
 
       - name: Start isolated local candidate
         run: |
@@ -97,7 +108,31 @@ jobs:
               console.error(JSON.stringify({ passed: report.passed, checks: report.results.length, desktop: desktop.length, mobile: mobile.length, failures }, null, 2));
               process.exit(1);
             }
-            console.log("pass pinned browser evidence: 8 desktop + 8 mobile-390 + protected review-readiness API");
+            console.log("pass LIMITED LOCAL regression: 8 desktop + 8 mobile-390 + public boundary API; NOT exact-deployment, AAL2, or full route acceptance");
+          '
+
+      - name: Record evidence limitations and harness resolution
+        if: always()
+        run: |
+          mkdir -p artifacts/ui-verification/p34-pinned-ci
+          node --input-type=module -e '
+            import { writeFileSync, copyFileSync, existsSync } from "node:fs";
+            import { execFileSync } from "node:child_process";
+            const dir = "artifacts/ui-verification/p34-pinned-ci/";
+            writeFileSync(dir + "scope.json", JSON.stringify({
+              scope: "local_source_regression_only",
+              ciEventSha: process.env.GITHUB_SHA,
+              checkedOutSha: execFileSync("git", ["rev-parse", "HEAD"], {encoding:"utf8"}).trim(),
+              deploymentAcceptance: false, aal2Verified: false,
+              missingRequiredRoutes: ["/pilot", "/scrimed-p34"],
+              lockfilePolicy: "resolved_this_run_not_repository_pinned"
+            }, null, 2));
+            const lock = process.env.SCRIMED_BROWSER_HARNESS_DIR + "/package-lock.json";
+            if (existsSync(lock)) copyFileSync(lock, dir + "harness-package-lock.json");
+            for (const stage of ["before", "after"]) {
+              const file = process.env.RUNNER_TEMP + "/p34-app-" + stage + ".sha256";
+              if (existsSync(file)) copyFileSync(file, dir + "app-" + stage + ".sha256");
+            }
           '
 
       - name: Upload browser evidence
