@@ -1,0 +1,6 @@
+{
+  "name": "scrimed-p34-browser-harness",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": { "playwright": "1.63.0" }
+}
